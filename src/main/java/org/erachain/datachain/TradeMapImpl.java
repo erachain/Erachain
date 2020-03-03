@@ -77,18 +77,19 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
     /**
      * поиск ключей для протокольных вторичных индексов с учетом Родительской таблицы (если база форкнута)
-     * @param order
+     *
+     * @param orderID
      * @return
      */
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getIterator(Order order) {
-        return ((TradeSuit) this.map).getIterator(order);
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByInitiator(Long orderID) {
+        return ((TradeSuit) this.map).getIteratorByInitiator(orderID);
     }
 
     @Override
     public List<Trade> getInitiatedTrades(Order order) {
         //FILTER ALL TRADES
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIterator(order)) {
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByInitiator(order.getId())) {
 
             //GET ALL TRADES FOR KEYS
             List<Trade> trades = new ArrayList<Trade>();

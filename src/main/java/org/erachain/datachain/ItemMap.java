@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.database.serializer.ItemSerializer;
@@ -172,7 +173,10 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
     public ItemCls decrementRemove(long key) {
 
-        if (key != this.key) {
+        if (key != this.key
+                && !BlockChain.isNovaAsset(key)
+        ) {
+
             LOGGER.error("delete KEY: " + key + " != map.value.key: " + this.key);
 
             if (key > this.key) {
@@ -201,7 +205,10 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
     public void decrementDelete(long key) {
 
-        if (key != this.key) {
+        if (key != this.key
+                && !BlockChain.isNovaAsset(key)
+        ) {
+
             LOGGER.error("delete KEY: " + key + " != map.value.key: " + this.key);
 
             if (key > this.key) {

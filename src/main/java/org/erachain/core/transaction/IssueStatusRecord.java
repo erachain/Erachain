@@ -52,17 +52,6 @@ public class IssueStatusRecord extends IssueItemRecord {
 
     //GETTERS/SETTERS
 
-    // RETURN START KEY in tot GEMESIS
-    public long getStartKey(int height) {
-
-        if (height < BlockChain.VERS_4_11) {
-            return 0l;
-        }
-
-        return START_KEY;
-
-    }
-
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
         int test_len;

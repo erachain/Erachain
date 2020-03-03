@@ -803,11 +803,21 @@ public class BlockChain {
         return trustedPeers.contains(peer.getAddress().getHostAddress());
     }
 
+    public static boolean isNovaAsset(Long key) {
+        Iterator<Pair<Integer, byte[]>> iterator = NOVA_ASSETS.values().iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().getA().equals(key))
+                return true;
+        }
+        return false;
+    }
+
     /**
      * Calculate Target (Average Win Value for 1024 last blocks) for this block
-     * @param height - height of blockchain
+     *
+     * @param height         - height of blockchain
      * @param targetPrevious - previous Target
-     * @param winValue - current Win Value
+     * @param winValue       - current Win Value
      * @return
      */
     public static long calcTarget(int height, long targetPrevious, long winValue) {

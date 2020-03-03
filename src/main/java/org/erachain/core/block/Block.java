@@ -1,5 +1,6 @@
 package org.erachain.core.block;
 
+import com.google.common.collect.Iterators;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -20,6 +21,7 @@ import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.*;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Converter;
 import org.erachain.utils.NumberAsString;
@@ -2414,8 +2416,6 @@ import java.util.*;
         Controller cnt = Controller.getInstance();
         //DLSet dbSet = Controller.getInstance().getDBSet();
 
-        boolean notFork = !dcSet.isFork();
-
         TransactionMap unconfirmedMap = dcSet.getTransactionTab();
         TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
         TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
@@ -2443,46 +2443,36 @@ import java.util.*;
                 transaction.getCreator().removeLastTimestamp(dcSet, transaction.getTimestamp());
             }
 
-            if (notFork) {
-                if (!notStoreTXs) {
-                    if (true) {
-                        // тут учет сразу очистки базы происходит - что более правильно
-                        pool.offerMessage(transaction);
-                    } else {
-                        //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
-                        try {
-                            if (!unconfirmedMap.isClosed()) {
-                                unconfirmedMap.put(transaction);
-                            } else {
-                                unconfirmedMap = dcSet.getTransactionTab();
-                            }
-                        } catch (java.lang.Throwable e) {
-                            if (e instanceof java.lang.IllegalAccessError) {
-                                // налетели на закрытую таблицу
-                                unconfirmedMap = dcSet.getTransactionTab();
-                            } else {
-                                throw new Exception(e);
-                            }
-                        }
-                    }
-                }
-
-                Long key = Transaction.makeDBRef(height, seqNo);
-
-                finalMap.delete(key);
-                transFinalMapSinds.delete(transaction.getSignature());
-                List<byte[]> signatures = transaction.getOtherSignatures();
-                if (signatures != null) {
-                    for (byte[] itemSignature : signatures) {
-                        transFinalMapSinds.delete(itemSignature);
-                    }
-                }
+            if (!notStoreTXs) {
+                pool.offerMessage(transaction);
             }
 
+            Long key = Transaction.makeDBRef(height, seqNo);
+
+            finalMap.delete(key);
+            transFinalMapSinds.delete(transaction.getSignature());
+
+            // Обязательно надо делать иначе некоторые тразакции будут потом невалидны (удостоверение ключей и регистрация подписанной персоны)
+            List<byte[]> signatures = transaction.getOtherSignatures();
+            if (signatures != null) {
+                for (byte[] itemSignature : signatures) {
+                    transFinalMapSinds.delete(itemSignature);
+                }
+            }
         }
 
         // DELETE ALL CALCULATED
-        finalMap.delete(height);
+        if (dcSet.isFork()) {
+            /// если форк их тут вообще нету - нужно выцепить из Родительской таблицы
+            try (IteratorCloseable<Long> iterator = dcSet.getParent().getTransactionFinalMap().getIteratorByBlock(height)) {
+                Iterators.advance(iterator, this.transactionCount);
+                while (iterator.hasNext()) {
+                    finalMap.delete(iterator.next());
+                }
+            }
+        } else {
+            finalMap.delete(height);
+        }
     }
 
     @Override

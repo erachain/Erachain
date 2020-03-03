@@ -4,7 +4,6 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
@@ -166,8 +165,8 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getIterator(Order order) {
-        return map.getIndexIteratorFilter(Longs.toByteArray(order.getId()), false, false);
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByInitiator(Long orderID) {
+        return map.getIndexIteratorFilter(Longs.toByteArray(orderID), false, false);
     }
 
     @Override
