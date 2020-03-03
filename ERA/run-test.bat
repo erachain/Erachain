@@ -1,9 +1,9 @@
 @ECHO OFF
 
 set app=erachain
-set task=erachain
+set task=erachain-test
 
-set pars=
+set pars=-testnet
 
 set jpars=
 

@@ -17,12 +17,10 @@ public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls {
     // private final MessagesTableModel messagesTableModel;
 
     public AccountAssetRepayDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super("Repay Debt", assetIn, "If You want to give the borrowed asset %asset%, fill in this form", TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
+        super(false, null, assetIn, null,
+                TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         // icon.setIcon(null);
-        this.jButton_ok.setText(Lang.getInstance().translate("Repay Debt"));
-        this.jLabel_To.setText(Lang.getInstance().translate("Lender Account") + ":");
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Lender Details") + ":");
 
     }
 
@@ -38,7 +36,7 @@ public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls {
 
         String Status_text = "";
         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,
-                Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2),
+                Lang.getInstance().translate("Repay Debt"), (int) (this.getWidth() / 1.2),
                 (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
 

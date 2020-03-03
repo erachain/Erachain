@@ -1999,7 +1999,7 @@ import java.util.*;
                 emittedFee = this.blockHead.totalFee >> 1;
 
                 Account richAccount = new Account(rich);
-                richAccount.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
+                richAccount.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
                         new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true, true);
             } else {
                 emittedFee = this.blockHead.emittedFee;
@@ -2012,7 +2012,7 @@ import java.util.*;
         //UPDATE GENERATOR BALANCE WITH FEE
         if (this.blockHead.totalFee != 0) {
             BigDecimal totalFee = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE);
-            this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
+            this.creator.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
                     totalFee, true, false);
 
             // учтем что нафоржили
@@ -2030,7 +2030,7 @@ import java.util.*;
 
         if (emittedFee != 0) {
             // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
+            GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
                     new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true, false);
         }
 

@@ -1,6 +1,5 @@
 package org.erachain.gui.library;
 
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.records.VouchRecordDialog;
@@ -68,7 +67,7 @@ public class MenuPopupDealsButton extends JButton {
         dealsMenuSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND, null, null, null, null));
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, null, null, null, null));
 
             }
         });

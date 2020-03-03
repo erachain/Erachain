@@ -323,11 +323,12 @@ public class RVouch extends Transaction {
     public HashSet<Account> getRecipientAccounts() {
 
         HashSet<Account> accounts = new HashSet<Account>(2, 1);
+        if (isWiped())
+            return accounts;
 
         Transaction record = dcSet.getTransactionFinalMap().get(vouchHeight, vouchSeqNo);
         if (record == null) {
-            LOGGER.debug("org.erachain.core.transaction.RVouch.getRecipientAccounts() not found record: " + vouchHeight + "-" + vouchSeqNo);
-            return accounts;
+            new Exception(this.toString() + " - not found record: " + vouchHeight + "-" + vouchSeqNo);
         }
         accounts.addAll(record.getInvolvedAccounts());
 

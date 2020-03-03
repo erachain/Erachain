@@ -15,13 +15,12 @@ import org.erachain.lang.Lang;
 
 @SuppressWarnings("serial")
 
-public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
+public class AccountAssetSpendPanel extends AccountAssetActionPanelCls {
 
-    //private AccountAssetSendPanel th;
     public boolean noRecive;
 
-    public AccountAssetSendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person, String message) {
-        super(false, null, assetIn, null, TransactionAmount.ACTION_SEND, accountFrom, accountTo, message);
+    public AccountAssetSpendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person, String message) {
+        super(false, null, assetIn, null, TransactionAmount.ACTION_SPEND, accountFrom, accountTo, message);
 
         //  icon.setIcon(null);
 
@@ -32,23 +31,23 @@ public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
     }
     */
 
-   
+
     @Override
     public void onSendClick() {
-        
-     // confirm params
+
+        // confirm params
         if (!cheskError()) return;
 
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(
-                Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key,
-                amount, head, messageBytes, isTextByte, encrypted, 0);
+                Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, -key,
+                amount.negate(), head, messageBytes, isTextByte, encrypted, 0);
         // test result = new Pair<Transaction, Integer>(null,
         // Transaction.VALIDATE_OK);
 
         String Status_text = "";
         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,
-                Lang.getInstance().translate("Send"),
+                Lang.getInstance().translate("Spend"),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction"), !noRecive);
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
@@ -64,7 +63,7 @@ public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
 
                 // save
                 Library.saveJSONStringToEraFile(getParent(), transaction.toJson().toJSONString());
-               
+
 
             } else {
 

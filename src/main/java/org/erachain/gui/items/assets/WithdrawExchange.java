@@ -4,7 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.FundTokensComboBoxModel;
@@ -147,7 +146,7 @@ public class WithdrawExchange extends JPanel {
         if (assetIn != null && accountTo != null) {
 
             message += ":" + jTextField_Address.getText();
-            AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn, TransactionAmount.ACTION_SEND,
+            AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn,
                     null, new Account(accountTo), null, message);
 
             String rate = jsonObject.get("rate").toString();

@@ -1369,7 +1369,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         ) {
             // break loop
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, true);
+            invitedAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false, true);
             // учтем что получили бонусы
             invitedAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
 
@@ -1396,7 +1396,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             long fee_gift_get = fee_gift - fee_gift_next;
 
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, true);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false, true);
 
             // учтем что получили бонусы
             issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
@@ -1415,7 +1415,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             // this is END LEVEL
             // GET REST of GIFT
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY,
+            issuerAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY,
                     BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false, true);
 
             // учтем что получили бонусы
@@ -1441,7 +1441,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                 || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY) {
 
             // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
-            GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, FEE_KEY,
+            GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
                     BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), true, false);
 
             return;
@@ -1469,7 +1469,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, true, FEE_KEY, this.fee, true, true);
+                this.creator.changeBalance(this.dcSet, true, false, FEE_KEY, this.fee, true, true);
                 // учтем траты
                 this.creator.changeCOMPUBonusBalances(this.dcSet, true, this.fee, BALANCE_SIDE_CREDIT);
             }
@@ -1507,7 +1507,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (asDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, true, true);
+                this.creator.changeBalance(this.dcSet, false, false, FEE_KEY, this.fee, true, true);
                 // учтем траты
                 this.creator.changeCOMPUBonusBalances(this.dcSet, false, this.fee, BALANCE_SIDE_CREDIT);
 

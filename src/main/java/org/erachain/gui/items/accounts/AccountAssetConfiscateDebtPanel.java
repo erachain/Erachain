@@ -18,19 +18,12 @@ import org.erachain.lang.Lang;
 public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls {
 
     public AccountAssetConfiscateDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super("Confiscate Debt", assetIn, null, TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
-
-        this.jButton_ok.setText(Lang.getInstance().translate(asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
-        this.title = asset.isOutsideType() ? "Если Вы хотите подтвердить погашение требования %asset%, заполните эту форму"
-                : "If You want to confiscate in debt issued asset %asset%, fill in this form";
-        this.jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
+        super(true, null, assetIn, null,
+                TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         // icon.setIcon(null);
 
-        this.jLabel_To.setText(Lang.getInstance().translate(asset.isOutsideType()?"Счет эмитента" : "Debtor Account") + ":");
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate(asset.isOutsideType()?"Детали эмитента" : "Debtor Details") + ":");
-
-      }
+    }
 
     @Override
     public void onSendClick() {

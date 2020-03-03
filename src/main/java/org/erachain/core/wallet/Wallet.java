@@ -632,7 +632,7 @@ public class Wallet extends Observable implements Observer {
 
         for (Tuple2<Account, Long> account_asset : accounts_assets) {
             this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
-                    BigDecimal.ZERO);
+					BigDecimal.ZERO, false);
         }
 
 	}
@@ -1220,20 +1220,24 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		BigDecimal fee = transaction.getFee(account);
+		boolean isBackward = false;
 		if (absKey != 0) {
 			// ASSET TRANSFERED + FEE
 			BigDecimal amount = transaction.getAmount(account);
+			if (transaction instanceof RSend) {
+				isBackward = ((RSend) transaction).isBackward();
+			}
 
 			if (fee.compareTo(BigDecimal.ZERO) != 0) {
 				if (absKey == FEE_KEY) {
 					amount = amount.subtract(fee);
 				}
 			}
-			this.database.getAccountMap().changeBalance(address, !asOrphan, key, amount);
+			this.database.getAccountMap().changeBalance(address, !asOrphan, key, amount, isBackward);
 		} else {
 			// ONLY FEE
 			if (fee.compareTo(BigDecimal.ZERO) != 0) {
-				this.database.getAccountMap().changeBalance(address, !asOrphan, FEE_KEY, fee);
+				this.database.getAccountMap().changeBalance(address, !asOrphan, FEE_KEY, fee, isBackward);
 			}
 		}
 
@@ -1276,7 +1280,7 @@ public class Wallet extends Observable implements Observer {
 				// account.getAddress() ))
 				if (atTx.b.getRecipient() == account.getAddress()) {
 					this.database.getAccountMap().changeBalance(account.getAddress(), false, atTx.b.getKey(),
-							BigDecimal.valueOf(atTx.b.getAmount()));
+							BigDecimal.valueOf(atTx.b.getAmount()), false);
 
 				}
 			}
@@ -1320,7 +1324,7 @@ public class Wallet extends Observable implements Observer {
 				// CHECK IF INVOLVED
 				if (atTx.b.getRecipient().equalsIgnoreCase(account.getAddress())) {
 					this.database.getAccountMap().changeBalance(account.getAddress(), true, atTx.b.getKey(),
-							BigDecimal.valueOf(atTx.b.getAmount()));
+							BigDecimal.valueOf(atTx.b.getAmount()), false);
 				}
 			}
 		}
@@ -1369,7 +1373,7 @@ public class Wallet extends Observable implements Observer {
 
         */
 		this.database.getAccountMap().changeBalance(blockGenerator.getAddress(), asOrphan, FEE_KEY,
-				new BigDecimal(blockFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE));
+				new BigDecimal(blockFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
 	}
 
@@ -1626,17 +1630,17 @@ public class Wallet extends Observable implements Observer {
 				// GIFTs
 				if (this.accountExists(transPersonIssue.getCreator().getAddress())) {
 					this.database.getAccountMap().changeBalance(transPersonIssue.getCreator().getAddress(),
-							false, FEE_KEY, issued_FEE_BD);
+							false, FEE_KEY, issued_FEE_BD, false);
 				}
 
 				// GIFTs
 				if (this.accountExists(creator.getAddress())) {
-					this.database.getAccountMap().changeBalance(creator.getAddress(), false, FEE_KEY, issued_FEE_BD);
+					this.database.getAccountMap().changeBalance(creator.getAddress(), false, FEE_KEY, issued_FEE_BD, false);
 				}
 
 				PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
 				if (this.accountExists(pkAccount.getAddress())) {
-					this.database.getAccountMap().changeBalance(pkAccount.getAddress(), false, FEE_KEY, issued_FEE_BD);
+					this.database.getAccountMap().changeBalance(pkAccount.getAddress(), false, FEE_KEY, issued_FEE_BD, false);
 				}
 			}
 		}
@@ -1692,17 +1696,17 @@ public class Wallet extends Observable implements Observer {
 			// GIFTs
 			if (this.accountExists(transPersonIssue.getCreator().getAddress())) {
 				this.database.getAccountMap().changeBalance(transPersonIssue.getCreator().getAddress(),
-						true, FEE_KEY, issued_FEE_BD);
+						true, FEE_KEY, issued_FEE_BD, false);
 			}
 
 			// GIFTs
 			if (this.accountExists(creator.getAddress())) {
-				this.database.getAccountMap().changeBalance(creator.getAddress(), true, FEE_KEY, issued_FEE_BD);
+				this.database.getAccountMap().changeBalance(creator.getAddress(), true, FEE_KEY, issued_FEE_BD, false);
 			}
 
 			PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
 			if (this.accountExists(creator.getAddress())) {
-				this.database.getAccountMap().changeBalance(pkAccount.getAddress(), true, FEE_KEY, issued_FEE_BD);
+				this.database.getAccountMap().changeBalance(pkAccount.getAddress(), true, FEE_KEY, issued_FEE_BD, false);
 			}
 		}
 	}

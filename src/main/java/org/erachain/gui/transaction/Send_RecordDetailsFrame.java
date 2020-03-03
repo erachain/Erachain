@@ -2,6 +2,7 @@ package org.erachain.gui.transaction;
 // 30/03
 
 import org.erachain.controller.Controller;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.MAccoutnTextField;
@@ -58,13 +59,44 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
 
             // ISTEXT
             ++detailGBC.gridy;
-            detailGBC.gridwidth = 2;
+            //detailGBC.gridwidth = 2;
             JTextField head_Text = new JTextField(r_Send.getHead());
             head_Text.setEditable(false);
             MenuPopupUtil.installContextMenu(head_Text);
             this.add(head_Text, detailGBC);
         }
 
+        if (r_Send.getAmount() != null) {
+
+            AssetCls asset = r_Send.getAsset();
+
+            String sendType = Lang.getInstance().translate(asset.viewAssetTypeAction(r_Send.isBackward(), r_Send.getActionType()));
+            detailGBC.gridy = ++labelGBC.gridy;
+            ;
+            //detailGBC.gridwidth = 2;
+
+            JLabel amountLabel = new JLabel(sendType);
+            this.add(amountLabel, detailGBC);
+
+            //AMOUNT
+            detailGBC.gridy = ++labelGBC.gridy;
+            detailGBC.gridwidth = 2;
+            JTextField amount = new JTextField(r_Send.getAmount().toPlainString());
+            amount.setEditable(false);
+            MenuPopupUtil.installContextMenu(amount);
+            this.add(amount, detailGBC);
+
+            //ASSET
+            //detailGBC.gridy;
+            detailGBC.gridx = 3;
+            detailGBC.gridwidth = 1;
+            JTextField assetFld = new JTextField(Controller.getInstance().getAsset(r_Send.getAbsKey()).toString());
+            assetFld.setEditable(false);
+            MenuPopupUtil.installContextMenu(assetFld);
+            this.add(assetFld, detailGBC);
+            detailGBC.gridx = 1;
+            detailGBC.gridwidth = 3;
+        }
 
         byte[] r_data = r_Send.getData();
         if (r_data != null && r_data.length > 0) {
@@ -157,34 +189,6 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
                     }
                 });
             }
-        }
-
-        if (r_Send.getAmount() != null) {
-
-            String sendType = Lang.getInstance().translate(r_Send.viewFullTypeName());
-            //LABEL AMOUNT
-            ++labelGBC.gridy;
-            JLabel amountLabel = new JLabel(sendType + ":");
-            this.add(amountLabel, labelGBC);
-
-            //AMOUNT
-            detailGBC.gridy = labelGBC.gridy;
-            detailGBC.gridwidth = 2;
-            JTextField amount = new JTextField(r_Send.getAmount().toPlainString());
-            amount.setEditable(false);
-            MenuPopupUtil.installContextMenu(amount);
-            this.add(amount, detailGBC);
-
-            //ASSET
-            //detailGBC.gridy;
-            detailGBC.gridx = 3;
-            detailGBC.gridwidth = 1;
-            JTextField asset = new JTextField(Controller.getInstance().getAsset(r_Send.getAbsKey()).toString());
-            asset.setEditable(false);
-            MenuPopupUtil.installContextMenu(asset);
-            this.add(asset, detailGBC);
-            detailGBC.gridx = 1;
-            detailGBC.gridwidth = 3;
         }
 
         //PACK

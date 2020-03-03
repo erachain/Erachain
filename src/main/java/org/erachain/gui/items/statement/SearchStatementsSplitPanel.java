@@ -316,8 +316,8 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             int infoPanelHeight = jScrollPaneJPanelRightPanel.getSize().height;
 
             info_panel.setPreferredSize(new Dimension(infoPanelWidth, infoPanelHeight));
-            info_panel.setMinimumSize(new Dimension(infoPanelWidth, infoPanelHeight));
-            info_panel.setMaximumSize(new Dimension(infoPanelWidth, infoPanelHeight));
+            //info_panel.setMinimumSize(new Dimension(infoPanelWidth, infoPanelHeight));
+            //info_panel.setMaximumSize(new Dimension(infoPanelWidth, infoPanelHeight));
 
             jScrollPaneJPanelRightPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPaneJPanelRightPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);

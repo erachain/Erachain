@@ -370,6 +370,8 @@ public class Synchronizer extends Thread {
                 return;
             }
 
+            LOGGER.debug("*** TRY writeToParent");
+
             // сюда может прити только если проверка прошла успешно
 
             // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
@@ -385,12 +387,14 @@ public class Synchronizer extends Thread {
             dbsBroken = false;
 
             // теперь все транзакции в пул опять закидываем
-            for (Transaction transaction: orphanedTransactions.values()) {
+            for (Transaction transaction : orphanedTransactions.values()) {
                 if (ctrl.isOnStopping())
                     throw new Exception("on stopping");
 
                 ctrl.transactionsPool.offerMessage(transaction);
             }
+        } finally {
+            LOGGER.debug("*** END writeToParent");
         }
 
         if (dbsBroken) {
@@ -484,6 +488,10 @@ public class Synchronizer extends Thread {
                                 blockFromPeer.setFromTrustedPeer();
                             }
                         } catch (Exception e) {
+                            if (ctrl.isOnStopping()) {
+                                throw new Exception("on stopping");
+                            }
+
                             blockBuffer.stopThread();
                             peer.ban("get block BUFFER - " + e.getMessage());
                             throw new Exception(e);
@@ -541,6 +549,10 @@ public class Synchronizer extends Thread {
                                 // тут может парсинг транзакций упасть
                                 blockFromPeer.getTransactions();
                             } catch (Exception e) {
+                                if (ctrl.isOnStopping()) {
+                                    throw new Exception("on stopping");
+                                }
+
                                 LOGGER.debug(e.getMessage(), e);
                                 errorMess = "invalid PARSE! " + e.getMessage();
                                 banTime = BAN_BLOCK_TIMES << 1;
@@ -549,6 +561,7 @@ public class Synchronizer extends Thread {
                                 LOGGER.debug(e.getMessage(), e);
                                 errorMess = "invalid PARSE! " + e.getMessage();
                                 banTime = BAN_BLOCK_TIMES << 1;
+                                ctrl.stopAll(339);
                                 break;
                             }
 
@@ -565,14 +578,21 @@ public class Synchronizer extends Thread {
                                     database.close();
                                 }
                             } catch (Exception e) {
+
+                                if (ctrl.isOnStopping()) {
+                                    throw new Exception("on stopping");
+                                }
+
                                 LOGGER.debug(e.getMessage(), e);
                                 errorMess = "error io isValid! " + e.getMessage();
                                 banTime = BAN_BLOCK_TIMES;
+                                ctrl.stopAll(340);
                                 break;
                             } catch (Throwable e) {
                                 LOGGER.debug(e.getMessage(), e);
                                 errorMess = "error io isValid! " + e.getMessage();
                                 banTime = BAN_BLOCK_TIMES;
+                                ctrl.stopAll(341);
                                 break;
                             }
                             LOGGER.debug("BLOCK is Valid");
@@ -604,6 +624,14 @@ public class Synchronizer extends Thread {
                             } else {
                                 throw new Exception(e);
                             }
+                        } catch (Throwable e) {
+
+                            // STOP BLOCKBUFFER
+                            blockBuffer.stopThread();
+
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(343);
+
                         }
 
                     }
@@ -1000,10 +1028,11 @@ public class Synchronizer extends Thread {
                         long start = System.currentTimeMillis();
                         block.saveToChainFromvalidatedForkDB();
                         long tickets = System.currentTimeMillis() - start;
-                        if (block.blockHead.transactionsCount > 0 || tickets > 10) {
+                        if (block.blockHead.transactionsCount > 0 && tickets > 0 || tickets > 10) {
                             LOGGER.debug("[" + block.heightBlock + "] TOTAL processing time: " + tickets
                                     + " ms, TXs= " + block.blockHead.transactionsCount
-                                    + (block.blockHead.transactionsCount == 0 ? "" : " - " + (block.blockHead.transactionsCount * 1000 / tickets) + " tx/sec"));
+                                    + (block.blockHead.transactionsCount == 0 ? "" :
+                                    " - " + (block.blockHead.transactionsCount * 1000 / tickets) + " tx/sec"));
                         }
                     } finally {
                         // закрываем чуть позже тут - а то в MapDB в кэше ошибка может вылететь что база уже закрыта
@@ -1059,17 +1088,18 @@ public class Synchronizer extends Thread {
                     try {
                         // was BREAK - try ROLLBACK
                         dcSet.rollback();
+                        ctrl.stopAll(345);
+                        return;
+
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(342);
+                        ctrl.stopAll(346);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
                         ctrl.stopAll(347);
                         return;
                     }
-
-                    throw error;
 
                 } else if (thrown != null) {
 
@@ -1078,17 +1108,17 @@ public class Synchronizer extends Thread {
                     try {
                         // was BREAK - try ROLLBACK
                         dcSet.rollback();
+                        ctrl.stopAll(351);
+                        return;
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
                         ctrl.stopAll(352);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(355);
+                        ctrl.stopAll(353);
                         return;
                     }
-
-                    throw new Exception(thrown);
 
                 }
 

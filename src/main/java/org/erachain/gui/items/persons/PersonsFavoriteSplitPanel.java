@@ -3,7 +3,6 @@ package org.erachain.gui.items.persons;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
@@ -34,7 +33,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
         vsend_Coins_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
                         null, null, (PersonCls) itemTableSelected, null));
 
             }

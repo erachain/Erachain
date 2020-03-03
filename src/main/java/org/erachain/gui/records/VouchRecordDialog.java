@@ -51,7 +51,6 @@ public class VouchRecordDialog extends JDialog {
     public VouchRecordDialog(Integer block_No, Integer rec_No, Account account) {
         vouch(block_No, rec_No, account);
     }
-    //private javax.swing.JLabel jLabel_RecordInfo;
 
     public VouchRecordDialog(Integer block_No, Integer rec_No) {
         vouch(block_No, rec_No, null);
@@ -69,9 +68,9 @@ public class VouchRecordDialog extends JDialog {
         this.setIconImages(icons);
 
         initComponents();
-        setPreferredSize(new Dimension(1000, 800));
-        setMinimumSize(new Dimension(1000, 800));
-        setMaximumSize(new Dimension(1000, 800));
+        setPreferredSize(new Dimension(1000, 600));
+        //setMinimumSize(new Dimension(1000, 600));
+        //setMaximumSize(new Dimension(1000, 600));
 
 
         if (block_No != null && rec_No != null) {
@@ -402,9 +401,7 @@ public class VouchRecordDialog extends JDialog {
 
         getContentPane().add(jLabel_Name_Records, gridBagConstraints);
 
-
-        //    pack();
-    }// <
-    // End of variables declaration
+        pack();
+    }
 
 }

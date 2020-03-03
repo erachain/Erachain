@@ -136,7 +136,7 @@ public class Account {
     }
 
     // make TYPE of transactionAmount by signs of KEY and AMOUNT
-    public static int actionType(long key, BigDecimal amount) {
+    public static int balancePosition(long key, BigDecimal amount, boolean isBackward) {
         if (key == 0l || amount == null || amount.signum() == 0)
             return 0;
 
@@ -144,11 +144,11 @@ public class Account {
         int amount_sign = amount.signum();
         if (key > 0) {
             if (amount_sign > 0) {
-                // SEND
-                type = TransactionAmount.ACTION_SEND;
+                // OWN SEND or PLEDGE
+                type = isBackward ? TransactionAmount.ACTION_PLEDGE : TransactionAmount.ACTION_SEND;
             } else {
-                // HOLD in STOCK
-                type = TransactionAmount.ACTION_HOLD;
+                // HOLD in STOCK or PLEDGE
+                type = isBackward ? TransactionAmount.ACTION_HOLD : TransactionAmount.ACTION_PLEDGE;
             }
         } else {
             if (amount_sign > 0) {
@@ -739,10 +739,10 @@ public class Account {
      */
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
-    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, long key,
+    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, boolean isBackward, long key,
                                                                     BigDecimal amount_in, boolean notUpdateIncomed, boolean spendUpdate) {
 
-        int actionType = actionType(key, amount_in);
+        int actionType = balancePosition(key, amount_in, isBackward);
 
         ItemAssetBalanceMap map = db.getAssetBalanceMap();
 

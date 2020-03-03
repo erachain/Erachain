@@ -1,6 +1,6 @@
 package org.erachain.gui.library;
 
-import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.controller.Controller;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.MailSendPanel;
@@ -9,9 +9,6 @@ import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
-
-import org.erachain.controller.Controller;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -40,7 +37,7 @@ public class MenuDeals extends JMenu {
         dealsMenuSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
                         null, null, null, null));
 
             }
@@ -101,6 +98,22 @@ public class MenuDeals extends JMenu {
             }
         });
         add(dealsMenu_Repay_Debt);
+
+        addSeparator();
+
+        // Spend
+
+        JMenuItem dealsMenu_Spend = new JMenuItem(Lang.getInstance().translate("Spend"));
+        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenu_Spend.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                MainPanel.getInstance().insertTab(new AccountAssetSpendPanel(null,
+                        null, null, null, null));
+
+            }
+        });
+        add(dealsMenu_Spend);
 
         addSeparator();
 
