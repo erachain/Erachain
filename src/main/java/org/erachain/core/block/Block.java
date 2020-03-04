@@ -1935,13 +1935,6 @@ import java.util.*;
         return true;
     }
 
-    /**
-     * Скорее всего база уже закрыта выше - очистим
-     */
-    public void clearValidatedForkDB() {
-        validatedForkDB = null;
-    }
-
     public void setValidatedForkDB(DCSet validatedForkDB) {
         this.validatedForkDB = validatedForkDB;
     }

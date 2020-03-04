@@ -604,7 +604,8 @@ public class DCSet extends DBASet implements Closeable {
     public static boolean needResetUTXPoolMap = false;
     public static DB makeDBinMemory() {
 
-        int freeSpaceReclaimQ = 3;
+        // лучше для памяти ставить наилучшее сжатие чтобы память не кушать лишний раз
+        int freeSpaceReclaimQ = 10;
         needResetUTXPoolMap = freeSpaceReclaimQ < 3;
         return DBMaker
                 .newMemoryDB()
