@@ -370,7 +370,7 @@ public class BlockChain {
     static Logger LOGGER = LoggerFactory.getLogger(BlockChain.class.getSimpleName());
     private GenesisBlock genesisBlock;
     private long genesisTimestamp;
-    public Block waitWinBuffer;
+    private Block waitWinBuffer;
 
     //private int target = 0;
     //private byte[] lastBlockSignature;
@@ -1130,12 +1130,17 @@ public class BlockChain {
 
     public void clearWaitWinBuffer() {
         if (this.waitWinBuffer != null) {
-            waitWinBuffer.close();
+            synchronized (waitWinBuffer) {
+                waitWinBuffer.close();
+                this.waitWinBuffer = null;
+            }
         }
-        this.waitWinBuffer = null;
     }
 
     public Block popWaitWinBuffer() {
+        if (waitWinBuffer == null)
+            return null;
+
         synchronized (waitWinBuffer) {
             Block block = this.waitWinBuffer;
             this.waitWinBuffer = null;
@@ -1148,56 +1153,53 @@ public class BlockChain {
     // 1 - changed, need broadcasting;
     public synchronized boolean setWaitWinBuffer(DCSet dcSet, Block block, Peer peer) {
 
-        synchronized (waitWinBuffer) {
+        LOGGER.info("try set new winBlock: " + block.toString());
 
-            LOGGER.info("try set new winBlock: " + block.toString());
-
-            byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
-            if (!Arrays.equals(lastSignature, block.getReference())) {
-                LOGGER.info("new winBlock from FORK!");
-                return false;
-            }
-
-            if (this.waitWinBuffer != null && block.compareWin(waitWinBuffer) <= 0) {
-                LOGGER.info("new winBlock is POOR!");
-                return false;
-            }
-
-            // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-            boolean noValid = true;
-            DCSet fork = dcSet.fork(DCSet.makeDBinMemory());
-            try {
-                noValid = !block.isValid(fork, true);
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(1104);
-            } catch (Throwable e) {
-                LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(1105);
-            }
-
-            // FULL VALIDATE because before was only HEAD validating
-            if (noValid) {
-
-                // если невалидная то закроем Форк базы, иначе базу храним для последующего слива
-                fork.close();
-
-                LOGGER.info("new winBlock is BAD!");
-                if (peer != null)
-                    peer.ban(10, "invalid block");
-                else
-                    LOGGER.error("MY WinBlock is INVALID! ignore...");
-
-                return false;
-            }
-
-            // иначе запоним форкнутую СУБД чтобы потом быстро слить
-            block.setValidatedForkDB(fork);
-
-            // set and close OLD
-            setWaitWinBufferUnchecked(block);
-
+        byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
+        if (!Arrays.equals(lastSignature, block.getReference())) {
+            LOGGER.info("new winBlock from FORK!");
+            return false;
         }
+
+        if (this.waitWinBuffer != null && block.compareWin(waitWinBuffer) <= 0) {
+            LOGGER.info("new winBlock is POOR!");
+            return false;
+        }
+
+        // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
+        boolean noValid = true;
+        DCSet fork = dcSet.fork(DCSet.makeDBinMemory());
+        try {
+            noValid = !block.isValid(fork, true);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            Controller.getInstance().stopAll(1104);
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
+            Controller.getInstance().stopAll(1105);
+        }
+
+        // FULL VALIDATE because before was only HEAD validating
+        if (noValid) {
+
+            // если невалидная то закроем Форк базы, иначе базу храним для последующего слива
+            fork.close();
+
+            LOGGER.info("new winBlock is BAD!");
+            if (peer != null)
+                peer.ban(10, "invalid block");
+            else
+                LOGGER.error("MY WinBlock is INVALID! ignore...");
+
+            return false;
+        }
+
+        // иначе запоним форкнутую СУБД чтобы потом быстро слить
+        block.setValidatedForkDB(fork);
+
+        // set and close OLD
+        setWaitWinBufferUnchecked(block);
+
 
         LOGGER.info("new winBlock setted!!!" + block.toString());
         return true;
@@ -1209,15 +1211,19 @@ public class BlockChain {
      *
      * @param block
      */
-    public void setWaitWinBufferUnchecked(Block block) {
+    public synchronized void setWaitWinBufferUnchecked(Block block) {
 
         if (true || // тут же мы без проверки должны вносить любой блок
                 // иначе просто прилетевший блок в момент синхронизации не будет принят
                 this.waitWinBuffer == null || block.compareWin(waitWinBuffer) > 0) {
             if (this.waitWinBuffer != null) {
-                waitWinBuffer.close();
+                synchronized (waitWinBuffer) {
+                    waitWinBuffer.close();
+                    this.waitWinBuffer = block;
+                }
+            } else {
+                this.waitWinBuffer = block;
             }
-            this.waitWinBuffer = block;
         }
     }
 
