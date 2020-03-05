@@ -18,7 +18,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
     private static final String NAME_ID = "Issue Asset";
 
-    public static final long START_KEY = 1000L;
+    public static final long START_KEY = 1L<<14;
 
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
