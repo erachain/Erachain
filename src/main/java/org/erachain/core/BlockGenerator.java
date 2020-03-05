@@ -1167,7 +1167,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 ////////////////////////////  FLUSH NEW BLOCK /////////////////////////
                 // сдвиг 0 делаем
-                ctrl.checkStatusAndObserve(0);
+                ctrl.checkStatusAndObserve(bchain.getWaitWinBuffer() == null ? 0 : 1);
                 if (betterPeer != null || orphanto > 0 || this.syncTo > 0
                         || timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) < NTP.getTime()
                         && ctrl.needUpToDate()) {
@@ -1234,6 +1234,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         waitWin = ctrl.checkNewPeerUpdates(afterUpdatePeer);
                         afterUpdatePeer = null;
                     }
+
+                    // если есть уже победный блок то посчитаем что у нас цепочка на 1 выше
+                    ctrl.checkStatusAndObserve(waitWin == null ? 0 : 1);
 
                     if (waitWin == null) {
                         if (this.solvingReference != null) {
