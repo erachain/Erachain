@@ -194,7 +194,7 @@ public class Settings {
     }
 
     public String getPeersPath() {
-        return this.userPath + (isTestNet() ? "peers-demo.json" : "peers.json");
+        return this.userPath + (isDemoNet() ? "peers-demo.json" : isTestNet() ? "peers-test.json" : "peers.json");
     }
 
     public String getWalletDir() {
