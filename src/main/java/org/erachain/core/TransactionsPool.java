@@ -81,14 +81,16 @@ public class TransactionsPool extends MonitoredThread {
                     clearCount++;
                 }
             } else {
-                utxMap.put((Transaction) item);
+                utxMap.putDirect((Transaction) item);
                 clearCount++;
             }
+        } else if (item instanceof Long) {
+            utxMap.deleteDirect((Long) item);
 
         } else if (item instanceof TransactionMessage) {
 
-            long timeCheck = System.nanoTime();
-            long onMessageProcessTiming = timeCheck;
+            long timeCheck = System.currentTimeMillis();
+            long onMessageProcessTiming = System.nanoTime();
 
             TransactionMessage transactionMessage = (TransactionMessage) item;
 
@@ -171,7 +173,7 @@ public class TransactionsPool extends MonitoredThread {
                     clearCount++;
                 }
             } else {
-                utxMap.put(transaction);
+                utxMap.putDirect(transaction);
                 clearCount++;
             }
 

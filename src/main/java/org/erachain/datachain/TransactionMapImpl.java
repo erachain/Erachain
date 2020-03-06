@@ -7,6 +7,7 @@ import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.TransactionsPool;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.*;
@@ -46,6 +47,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         implements TransactionMap
 {
 
+    TransactionsPool pool = Controller.getInstance().transactionsPool;
     //public int TIMESTAMP_INDEX = 1;
 
     public int totalDeleted = 0;
@@ -226,6 +228,18 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         this.put(Longs.fromByteArray(transaction.getSignature()), transaction);
     }
 
+    /**
+     * Нужно вносить через очередь так как там может быть очистка таблицы с закрыванием запущена, см issue #1246
+     * Так же чтобы при закрытии в dbs.mapDB.DBMapSuitFork.writeToParent(DBMapSuitFork.java:371) не вылетала ошибка что таблица закрыта
+     *
+     * @param key
+     * @param transaction
+     */
+    @Override
+    public void put(Long key, Transaction transaction) {
+        pool.offerMessage(transaction);
+    }
+
     @Override
     public void delete(Transaction transaction) {
         this.delete(Longs.fromByteArray(transaction.getSignature()));
@@ -236,37 +250,55 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         this.delete(Longs.fromByteArray(signature));
     }
 
+    public void putDirect(Transaction transaction) {
+        super.put(Longs.fromByteArray(transaction.getSignature()), transaction);
+    }
+
+    public void deleteDirect(Long key) {
+        super.delete(key);
+    }
+
 
     /**
-     * synchronized - потому что почемуто вызывало ошибку в unconfirmedMap.delete(transactionSignature) в процессе блока.
-     * Head Zero - data corrupted
+     * Нужно удалять через очередь так как там может быть очистка таблицы с закрыванием запущена, см issue #1246
+     * Так же чтобы при закрытии в dbs.mapDB.DBMapSuitFork.writeToParent(DBMapSuitFork.java:371) не вылетала ошибка что таблица закрыта
+     * <hr>
+     * ////// synchronized - потому что почемуто вызывало ошибку в unconfirmedMap.delete(transactionSignature) в процессе блока.
+     * ////// Head Zero - data corrupted
+     *
      * @param key
      * @return
      */
     @Override
     public Transaction remove(Long key) {
         try {
-            Transaction transaction = super.remove(key);
-            if (transaction != null) {
-                // DELETE only if DELETED
+
+            Transaction transactionOld = null;
+            if (contains(key)) {
                 totalDeleted++;
+                transactionOld = get(key);
             }
+            pool.offerMessage(key);
 
-            return transaction;
+            return transactionOld;
         } catch (Exception e) {
-
         }
 
         return null;
 
     }
 
+    /**
+     * Нужно удалять через очередь так как там может быть очистка таблицы с закрыванием запущена, см issue #1246
+     * Так же чтобы при закрытии в dbs.mapDB.DBMapSuitFork.writeToParent(DBMapSuitFork.java:371) не вылетала ошибка что таблица закрыта
+     *
+     * @param key
+     */
     public void delete(Long key) {
         try {
-            super.delete(key);
+            pool.offerMessage(key);
             totalDeleted++;
         } catch (Exception e) {
-
         }
     }
 
