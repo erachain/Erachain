@@ -151,7 +151,7 @@ public class Settings {
             }
 
         } catch (Exception e) {
-            LOGGER.info("Error while reading peers.json " + file.getAbsolutePath() + " using default!");
+            LOGGER.info("Error while reading PEERS " + file.getAbsolutePath() + ", using default!");
             LOGGER.error(e.getMessage(), e);
             this.peersJSON = new JSONObject();
         }
@@ -194,7 +194,7 @@ public class Settings {
     }
 
     public String getPeersPath() {
-        return this.userPath + (isTestNet() ? "peers-demo.json" : "peers.json");
+        return this.userPath + (isDemoNet() ? "peers-demo.json" : isTestNet() ? "peers-test.json" : "peers.json");
     }
 
     public String getWalletDir() {

@@ -310,6 +310,9 @@ public class Synchronizer extends Thread {
                 }
             }
 
+            // далее тут блок не Процессим так как он в isValid(fork, true) процессится параллельно
+            // и далее будет слив разом без вызова pipe
+
             // проверка силы цепочки на уровне нашего блока и если высота новой цепочки меньше нашей
             if (height - 1 == myHeight && myWeight > block.blockHead.totalWinValue
             ) {
@@ -565,17 +568,12 @@ public class Synchronizer extends Thread {
                                 break;
                             }
 
-                            try {
-                                DB database = DCSet.makeDBinMemory();
-                                try {
-                                    if (!blockFromPeer.isValid(dcSet.fork(database), false)) {
+                            try (DCSet fork = dcSet.fork(DCSet.makeDBinMemory())) {
+                                if (!blockFromPeer.isValid(fork, false)) {
 
-                                        errorMess = "invalid BLOCK";
-                                        banTime = BAN_BLOCK_TIMES;
-                                        break;
-                                    }
-                                } finally {
-                                    database.close();
+                                    errorMess = "invalid BLOCK";
+                                    banTime = BAN_BLOCK_TIMES;
+                                    break;
                                 }
                             } catch (Exception e) {
 
@@ -1025,15 +1023,7 @@ public class Synchronizer extends Thread {
                 } else {
                     try {
                         // здесь просто заливаем все данные из Форка в цепочку - без процессинга - он уже был в Валидации
-                        long start = System.currentTimeMillis();
                         block.saveToChainFromvalidatedForkDB();
-                        long tickets = System.currentTimeMillis() - start;
-                        if (block.blockHead.transactionsCount > 0 && tickets > 0 || tickets > 10) {
-                            LOGGER.debug("[" + block.heightBlock + "] TOTAL processing time: " + tickets
-                                    + " ms, TXs= " + block.blockHead.transactionsCount
-                                    + (block.blockHead.transactionsCount == 0 ? "" :
-                                    " - " + (block.blockHead.transactionsCount * 1000 / tickets) + " tx/sec"));
-                        }
                     } finally {
                         // закрываем чуть позже тут - а то в MapDB в кэше ошибка может вылететь что база уже закрыта
                         block.close();
@@ -1059,6 +1049,7 @@ public class Synchronizer extends Thread {
                     return;
 
             } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
                 error = new Exception(e);
 
             } catch (Exception e) {
@@ -1066,12 +1057,14 @@ public class Synchronizer extends Thread {
                 if (ctrl.isOnStopping()) {
                     return;
                 } else {
+                    LOGGER.error(e.getMessage(), e);
                     error = new Exception(e);
                 }
             } catch (Throwable e) {
                 if (ctrl.isOnStopping()) {
                     return;
                 } else {
+                    LOGGER.error(e.getMessage(), e);
                     thrown = new Throwable(e);
                 }
             } finally {
@@ -1083,7 +1076,6 @@ public class Synchronizer extends Thread {
                 }
 
                 if (error != null) {
-                    LOGGER.error(error.getMessage(), error);
 
                     try {
                         // was BREAK - try ROLLBACK
@@ -1102,8 +1094,6 @@ public class Synchronizer extends Thread {
                     }
 
                 } else if (thrown != null) {
-
-                    LOGGER.error(thrown.getMessage(), thrown);
 
                     try {
                         // was BREAK - try ROLLBACK

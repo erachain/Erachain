@@ -65,7 +65,7 @@ public class Sender extends MonitoredThread {
         this.setName("Sender-" + this.getId() + " for: " + peer.getName());
     }
 
-    public boolean offer(Message message) {
+    public synchronized boolean offer(Message message) {
         boolean result = blockingQueue.offer(message);
         if (!result) {
             this.peer.network.missedSendes.incrementAndGet();
@@ -73,46 +73,42 @@ public class Sender extends MonitoredThread {
         return result;
     }
 
-    public void sendGetHWeight(GetHWeightMessage getHWeightMessage) {
-        if (true) {
-            if (this.blockingQueue.isEmpty()) {
-                if (logPings)
-                    LOGGER.debug(this.peer + " to blockingQueue " + getHWeightMessage.viewPref(true) + getHWeightMessage);
-                if (USE_MONITOR)
-                    this.setMonitorStatus("to blockingQueue " + getHWeightMessage.viewPref(true) + getHWeightMessage);
-                blockingQueue.offer(getHWeightMessage);
-            } else {
-                if (logPings)
-                    LOGGER.debug(this.peer + " to getHWeightMessage " + getHWeightMessage.viewPref(true) + getHWeightMessage);
-                if (USE_MONITOR)
-                    this.setMonitorStatus("to getHWeightMessage " + getHWeightMessage.viewPref(true) + getHWeightMessage);
-                this.getHWeightMessage = getHWeightMessage;
-            }
-        } else
+    public synchronized void sendGetHWeight(GetHWeightMessage getHWeightMessage) {
+        if (this.blockingQueue.isEmpty() || this.getHWeightMessage != null) {
+            if (logPings)
+                LOGGER.debug(this.peer + " to blockingQueue " + getHWeightMessage.viewPref(true) + getHWeightMessage);
+            if (USE_MONITOR)
+                this.setMonitorStatus("to blockingQueue " + getHWeightMessage.viewPref(true) + getHWeightMessage);
             blockingQueue.offer(getHWeightMessage);
+        } else {
+            if (logPings)
+                LOGGER.debug(this.peer + " to getHWeightMessage " + getHWeightMessage.viewPref(true) + getHWeightMessage);
+            if (USE_MONITOR)
+                this.setMonitorStatus("to getHWeightMessage " + getHWeightMessage.viewPref(true) + getHWeightMessage);
+            this.getHWeightMessage = getHWeightMessage;
+        }
     }
 
-    public void sendHWeight(HWeightMessage hWeightMessage) {
-        if (true) {
-            if (this.blockingQueue.isEmpty()) {
-                if (logPings)
-                    LOGGER.debug(this.peer + " to blockingQueue " + hWeightMessage.viewPref(true) + getHWeightMessage);
-                if (USE_MONITOR)
-                    this.setMonitorStatus("to blockingQueue " + hWeightMessage.viewPref(true) + getHWeightMessage);
-                blockingQueue.offer(hWeightMessage);
-            } else {
-                if (logPings)
-                    LOGGER.debug(this.peer + " to getHWeightMessage " + hWeightMessage.viewPref(true) + getHWeightMessage);
-                if (USE_MONITOR)
-                    this.setMonitorStatus("to getHWeightMessage " + hWeightMessage.viewPref(true) + getHWeightMessage);
-                this.hWeightMessage = hWeightMessage;
-            }
-        } else
+    public synchronized void sendHWeight(HWeightMessage hWeightMessage) {
+        if (this.blockingQueue.isEmpty() || this.hWeightMessage != null) {
+            if (logPings)
+                LOGGER.debug(this.peer + " to blockingQueue " + hWeightMessage.viewPref(true) + getHWeightMessage);
+            if (USE_MONITOR)
+                this.setMonitorStatus("to blockingQueue " + hWeightMessage.viewPref(true) + getHWeightMessage);
             blockingQueue.offer(hWeightMessage);
+        } else {
+            if (logPings)
+                LOGGER.debug(this.peer + " to getHWeightMessage " + hWeightMessage.viewPref(true) + getHWeightMessage);
+            if (USE_MONITOR)
+                this.setMonitorStatus("to getHWeightMessage " + hWeightMessage.viewPref(true) + getHWeightMessage);
+            this.hWeightMessage = hWeightMessage;
+        }
     }
 
-    public void sendWinBlock(BlockWinMessage winBlock) {
-        if (this.blockingQueue.isEmpty()) {
+    public synchronized void sendWinBlock(BlockWinMessage winBlock) {
+        if (this.blockingQueue.isEmpty()
+                || this.winBlockToSend != null // если там уже занято
+        ) {
             blockingQueue.offer(winBlock);
         } else {
             this.winBlockToSend = winBlock;

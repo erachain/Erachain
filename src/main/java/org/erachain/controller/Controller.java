@@ -56,7 +56,6 @@ import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -94,7 +93,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.22.03 hf beta";
+    public static String version = "4.22.03 DEV hf2 beta";
     public static String buildTime = "2020-02-20 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -204,16 +203,16 @@ public class Controller extends Observable {
         String dbs;
         switch (getInstance().databaseSystem) {
             case DCSet.DBS_ROCK_DB:
-                dbs = "RocksDB";
+                dbs = "R";
                 break;
             case DCSet.DBS_MAP_DB:
-                dbs = "MapDB";
+                dbs = "M";
                 break;
             case DCSet.DBS_FAST:
-                dbs = "fast";
+                dbs = "f";
                 break;
             default:
-                dbs = "MapDB";
+                dbs = "M";
 
         }
 
@@ -839,7 +838,7 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Wallet OK")));
 
-            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE && this.wallet.isWalletDatabaseExisting()
+            if (false && !BlockChain.DEMO_MODE && BlockChain.TEST_MODE && this.wallet.isWalletDatabaseExisting()
                     && !this.wallet.getAccounts().isEmpty()) {
                 this.wallet.synchronize(true);
             }
@@ -2061,6 +2060,13 @@ public class Controller extends Observable {
                         null // если блок не верный - не баним ПИР может просто он отстал
                 );
             }
+            // если все же он не подошел или не было победного то вышлем всеим запрос на "Порделитесль последним блоком"
+            if (this.blockChain.popWaitWinBuffer() == null) {
+                // TODO тут сделать стандартный пустой блок для запроса или новую команду сетевую
+                winBlockUnchecked = getBlockByHeight(2);
+                if (winBlockUnchecked != null)
+                    broadcastWinBlock(winBlockUnchecked);
+            }
 
         }
 
@@ -2729,12 +2735,15 @@ public class Controller extends Observable {
                 // или при добавлении моего сгнерированного блока т.к. он не проверился?
 
                 // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-                DB database = DCSet.makeDBinMemory();
+                DCSet forked = dcSet.fork(DCSet.makeDBinMemory());
                 // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
-                if (!newBlock.isValid(dcSet.fork(database), true)) {
+                if (!newBlock.isValid(forked, true)) {
                     // тогда проверим заново полностью
+                    forked.close();
                     return false;
                 }
+                // запоним что в этой базе проверку сделали с Процессингом чтобы потом быстро слить в основную базу
+                newBlock.setValidatedForkDB(forked);
             }
 
             try {

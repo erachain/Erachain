@@ -71,15 +71,25 @@ public class WinBlockSelector extends MonitoredThread {
             LOGGER.info("ADD unchecked on Synchronizing - " + info);
             blockChain.setWaitWinBufferUnchecked(newBlock);
             // и разошлем его дальше тоже, так как если мы выпали в оставание то всем свои перешлем все равно
-            message.getSender().network.broadcastWinBlock(blockWinMessage, false);
+            controller.network.broadcastWinBlock(blockWinMessage, false);
             return;
         }
+
         LOGGER.info(info);
 
         if (!newBlock.isValidHead(dcSet)) {
             // то проверим заголовок
             info = "Block HEAD is Invalid - ignore " + newBlock.toString();
             LOGGER.info(info);
+
+            // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока
+            // а если у нас уже в буфере нет, то пошлем наш последний блок
+            Block myWinBlock = blockChain.getWaitWinBuffer();
+            myWinBlock = myWinBlock == null ? blockChain.getLastBlock(dcSet) : myWinBlock;
+            if (myWinBlock != null) {
+                message.getSender().sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
+            }
+
             return;
         }
 
@@ -91,7 +101,7 @@ public class WinBlockSelector extends MonitoredThread {
             // BROADCAST
             //List<Peer> excludes = new ArrayList<Peer>();
             //excludes.add(message.getSender());
-            message.getSender().network.broadcastWinBlock(blockWinMessage, false);
+            controller.network.broadcastWinBlock(blockWinMessage, false);
 
             onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
             if (onMessageProcessTiming < 999999999999l) {
@@ -101,10 +111,12 @@ public class WinBlockSelector extends MonitoredThread {
             }
 
         } else {
-            // SEND my BLOCK
+            // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока
+            // а если у нас уже в буфере нет, то пошлем наш последний блок
             Block myWinBlock = blockChain.getWaitWinBuffer();
+            myWinBlock = myWinBlock == null ? blockChain.getLastBlock(dcSet) : myWinBlock;
             if (myWinBlock != null) {
-                message.getSender().sendWinBlock((BlockWinMessage)MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
+                message.getSender().sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
             }
         }
     }

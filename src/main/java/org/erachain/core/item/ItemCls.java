@@ -214,7 +214,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
             case ItemCls.PERSON_TYPE:
                 return "P";
             case ItemCls.POLL_TYPE:
-                return "O"; // Opinion
+                return "V"; // Vote
             case ItemCls.UNION_TYPE:
                 return "U";
             case ItemCls.STATEMENT_TYPE:

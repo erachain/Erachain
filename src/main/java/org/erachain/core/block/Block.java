@@ -1932,20 +1932,19 @@ import java.util.*;
         }
 
         this.wasValidated = true;
-        if (andProcess) {
-            validatedForkDB = dcSetPlace;
-        }
         return true;
     }
 
-    /**
-     * Скорее всего база уже закрыта выше - очистим
-     */
-    public void clearValidatedForkDB() {
-        validatedForkDB = null;
+    public synchronized void setValidatedForkDB(DCSet validatedForkDB) {
+        if (this.validatedForkDB != null) {
+            this.validatedForkDB.close();
+            LOGGER.debug("validatedForkDB is closed on SET: " + this.toString());
+        }
+        this.validatedForkDB = validatedForkDB;
     }
 
     private boolean isClosed;
+
     /**
      * Закрывает базу в котрой производилась проверка блока
      */
@@ -1954,7 +1953,7 @@ import java.util.*;
         if (validatedForkDB != null) {
             try {
                 validatedForkDB.close();
-                ///LOGGER.debug("validatedForkDB [" + heightBlock + "] is closed");
+                LOGGER.debug("validatedForkDB is closed: " + this.toString());
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
@@ -1969,7 +1968,7 @@ import java.util.*;
         if (!isClosed) {
             close();
             if (BlockChain.CHECK_BUGS > 5) {
-                LOGGER.debug("validatedForkDB [" + heightBlock + "] is FINALIZED " + creator.getAddress());
+                LOGGER.debug("validatedForkDB is FINALIZED: " + this.toString());
             }
         }
         super.finalize();

@@ -16,7 +16,6 @@ import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
-import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
@@ -91,7 +90,7 @@ public class BlockChain {
      */
     public static final boolean ERA_COMPU_ALL_UP = TEST_MODE || TEST_DB > 0;
 
-    public static final int TESTNET_PORT = TEST_DB > 0 ? 9006 : DEMO_MODE ? 9066 : 9065; // TESTNET - 95
+    public static final int TESTNET_PORT = TEST_DB > 0 ? 9006 : DEMO_MODE ? 9066 : 9066; // TESTNET - 95
     public static final int MAINNET_PORT = TEST_DB > 0 ? 9006 : 9046;
 
     public static final int DEFAULT_WEB_PORT = TEST_DB > 0 ? 9007 : TEST_MODE ? 9067 : 9047;
@@ -1131,15 +1130,22 @@ public class BlockChain {
 
     public void clearWaitWinBuffer() {
         if (this.waitWinBuffer != null) {
-            waitWinBuffer.close();
+            synchronized (waitWinBuffer) {
+                waitWinBuffer.close();
+                this.waitWinBuffer = null;
+            }
         }
-        this.waitWinBuffer = null;
     }
 
     public Block popWaitWinBuffer() {
-        Block block = this.waitWinBuffer;
-        this.waitWinBuffer = null;
-        return block;
+        if (waitWinBuffer == null)
+            return null;
+
+        synchronized (waitWinBuffer) {
+            Block block = this.waitWinBuffer;
+            this.waitWinBuffer = null;
+            return block;
+        }
     }
 
     // SOLVE WON BLOCK
@@ -1161,18 +1167,23 @@ public class BlockChain {
         }
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-        DB database = DCSet.makeDBinMemory();
         boolean noValid = true;
+        DCSet fork = dcSet.fork(DCSet.makeDBinMemory());
         try {
-            noValid = !block.isValid(dcSet.fork(database), true);
-        } finally {
-            // если невалидная то закроем Форк базы, иначе базу храним для последующего слива
-            if (noValid)
-                database.close();
+            noValid = !block.isValid(fork, true);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            Controller.getInstance().stopAll(1104);
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
+            Controller.getInstance().stopAll(1105);
         }
 
         // FULL VALIDATE because before was only HEAD validating
         if (noValid) {
+
+            // если невалидная то закроем Форк базы, иначе базу храним для последующего слива
+            fork.close();
 
             LOGGER.info("new winBlock is BAD!");
             if (peer != null)
@@ -1183,8 +1194,12 @@ public class BlockChain {
             return false;
         }
 
+        // иначе запоним форкнутую СУБД чтобы потом быстро слить
+        block.setValidatedForkDB(fork);
+
         // set and close OLD
         setWaitWinBufferUnchecked(block);
+
 
         LOGGER.info("new winBlock setted!!!" + block.toString());
         return true;
@@ -1196,14 +1211,19 @@ public class BlockChain {
      *
      * @param block
      */
-    public void setWaitWinBufferUnchecked(Block block) {
+    public synchronized void setWaitWinBufferUnchecked(Block block) {
+
         if (true || // тут же мы без проверки должны вносить любой блок
                 // иначе просто прилетевший блок в момент синхронизации не будет принят
                 this.waitWinBuffer == null || block.compareWin(waitWinBuffer) > 0) {
             if (this.waitWinBuffer != null) {
-                waitWinBuffer.close();
+                synchronized (waitWinBuffer) {
+                    waitWinBuffer.close();
+                    this.waitWinBuffer = block;
+                }
+            } else {
+                this.waitWinBuffer = block;
             }
-            this.waitWinBuffer = block;
         }
     }
 
