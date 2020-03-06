@@ -131,8 +131,10 @@ public class GenesisBlock extends Block {
             generalGenesisUsers.add(Arrays.asList("7CMGxqHPGy7MmRaJfLCAK3AApF9edcf95e", "100000"));
             generalGenesisUsers.add(Arrays.asList("7F5gYLdBYhUeseoC9ZPiA5LZkbdwkRGqWM", "100000"));
 
-            generalGenesisUsers.add(Arrays.asList("74ULDk7gvZGMLMjhNvpNpucDUXTPVcL3ZE", "300000"));
+            //generalGenesisUsers.add(Arrays.asList("74ULDk7gvZGMLMjhNvpNpucDUXTPVcL3ZE", "300000"));
 
+            // FOR ERACHAIN MASTERs
+            generalGenesisUsers.add(Arrays.asList("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "500000"));
 
             /////////// MAJOR
             List<List<Object>> majorGenesisUsers = Arrays.asList(
@@ -176,8 +178,11 @@ public class GenesisBlock extends Block {
                 // buffer for CREDIT sends
                 sends_toUsers.add(new Tuple2<Account, BigDecimal>(recipient, bdAmount0));
 
-                bdAmount1 = BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-                transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
+                // COMPU
+                if (false) {
+                    bdAmount1 = BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                    transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
+                }
 
             }
 
@@ -223,7 +228,7 @@ public class GenesisBlock extends Block {
 
             // ADJUST end
             transactions.add(new GenesisTransferAssetTransaction(
-                    new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe"), AssetCls.ERA_KEY,
+                    new Account(grands[0]), AssetCls.ERA_KEY,
                     new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
 
 
