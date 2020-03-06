@@ -681,6 +681,10 @@ public class RSendResource {
     }
 
     /**
+     * Multi send scrip for send asset for many addresses or persons filtered by some parameters.
+     * This command will run as test for calculate FEE and total AMOUNT by default. For run real send set parameter `test=false`.
+     * Unlock wallet.
+     * <br>
      * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1036/2?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1577712486&password=123
      * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1069/1036?amount=0.001&title=probe-multi&onlyperson=true&activeafter=2018-01-01 00:00&activebefore=2019-01-01 00:00&greatequal=0&activetypetx=24&password=1
      * GET r_send/multisend/7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1/1/2?amount=0.001&title=probe-multi&onlyperson=true&gender=0&password=1
@@ -689,6 +693,8 @@ public class RSendResource {
      * @param assetKey        asset Key that send
      * @param forAssetKey     asset key of holders test
      * @param amount          absolute amount to send
+     * @param onlyPerson      Default: false. Use only person accounts
+     * @param gender          Filter by gender. -1 = all, 0 - man, 1 - woman. Default: -1.
      * @param position        test balance position. 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other
      * @param greatEqual      test balance is great or equal
      * @param selfPay         if set - pay to self address too. Default = true
