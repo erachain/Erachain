@@ -122,13 +122,18 @@ public class GenesisBlock extends Block {
             /*
              */
             ///////// GENEGAL
-            List<List<Object>> generalGenesisUsers = Arrays.asList(
-                    ///Arrays.asList("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ", "800000"),
-            );
+            List<List<Object>> generalGenesisUsers = new ArrayList();
 
             for (String address: grands) {
-                generalGenesisUsers.add(Arrays.asList(address, "1000000"));
+                generalGenesisUsers.add(Arrays.asList(address, "100000"));
             }
+
+            generalGenesisUsers.add(Arrays.asList("7CMGxqHPGy7MmRaJfLCAK3AApF9edcf95e", "100000"));
+            generalGenesisUsers.add(Arrays.asList("7F5gYLdBYhUeseoC9ZPiA5LZkbdwkRGqWM", "100000"));
+
+            generalGenesisUsers.add(Arrays.asList("74ULDk7gvZGMLMjhNvpNpucDUXTPVcL3ZE", "300000"));
+
+
             /////////// MAJOR
             List<List<Object>> majorGenesisUsers = Arrays.asList(
             );
@@ -351,7 +356,7 @@ public class GenesisBlock extends Block {
         //asset1 = makeAsset(AssetCls.FEE_KEY);
         //transactions.add(new GenesisIssueAssetTransaction(asset1));
         // ASSET OTHER
-        for (int i = 1; i <= AssetCls.REAL_KEY + 5; i++) {
+        for (int i = 1; i <= AssetCls.FEE_KEY; i++) {
             AssetVenture asset = makeAsset(i);
             // MAKE OLD STYLE ASSET with DEVISIBLE:
             // PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
