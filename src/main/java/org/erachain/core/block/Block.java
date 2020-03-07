@@ -1792,15 +1792,18 @@ import java.util.*;
                         processTimingLocal = System.nanoTime();
                         try {
                             if (!unconfirmedMap.isClosed()) {
+                                // так как здесь форкнутая база то напрямую - а не через Очередь
                                 unconfirmedMap.deleteDirect(transactionSignature);
                             } else {
                                 unconfirmedMap = dcSetPlace.getTransactionTab();
+                                // так как здесь форкнутая база то напрямую - а не через Очередь
                                 unconfirmedMap.deleteDirect(transactionSignature);
                             }
                         } catch (java.lang.Throwable e) {
                             if (e instanceof java.lang.IllegalAccessError) {
                                 // налетели на закрытую таблицу
                                 unconfirmedMap = dcSetPlace.getTransactionTab();
+                                // так как здесь форкнутая база то напрямую - а не через Очередь
                                 unconfirmedMap.deleteDirect(transactionSignature);
                             } else {
                                 LOGGER.error(e.getMessage(), e);
