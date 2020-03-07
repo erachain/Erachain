@@ -2265,11 +2265,7 @@ import java.util.*;
                 ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                 timerStart = System.currentTimeMillis();
                 try {
-                    if (!unconfirmedMap.isClosed()) {
-                        unconfirmedMap.delete(transactionSignature);
-                    } else {
-                        unconfirmedMap = dcSet.getTransactionTab();
-                    }
+                    unconfirmedMap.delete(transactionSignature);
                 } catch (java.lang.Throwable e) {
                     if (e instanceof java.lang.IllegalAccessError) {
                         // налетели на закрытую таблицу

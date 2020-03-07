@@ -44,10 +44,10 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  */
 @Slf4j
 public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
-        implements TransactionMap
-{
+        implements TransactionMap {
 
-    TransactionsPool pool = Controller.getInstance().transactionsPool;
+    TransactionsPool pool;
+
     //public int TIMESTAMP_INDEX = 1;
 
     public int totalDeleted = 0;
@@ -100,12 +100,22 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         }
     }
 
-    public void setTotalDeleted(int value) { totalDeleted = value; }
-    public int getTotalDeleted() { return totalDeleted; }
+    public void setPool(TransactionsPool pool) {
+        this.pool = pool;
+    }
+
+    public int getTotalDeleted() {
+        return totalDeleted;
+    }
+
+    public void setTotalDeleted(int value) {
+        totalDeleted = value;
+    }
 
     //private static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
 
     private boolean clearProcessed = false;
+
     private synchronized boolean isClearProcessedAndSet() {
 
         if (clearProcessed)
@@ -239,6 +249,9 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
      */
     @Override
     public void put(Long key, Transaction transaction) {
+        if (pool == null)
+            return;
+
         pool.offerMessage(transaction);
     }
 
@@ -273,6 +286,9 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
      */
     @Override
     public Transaction remove(Long key) {
+        if (pool == null)
+            return null;
+
         try {
 
             Transaction transactionOld = null;
@@ -298,6 +314,9 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
      */
     @Override
     public void delete(Long key) {
+        if (pool == null)
+            return;
+
         pool.offerMessage(key);
         totalDeleted++;
     }

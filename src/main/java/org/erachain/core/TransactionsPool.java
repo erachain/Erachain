@@ -41,6 +41,9 @@ public class TransactionsPool extends MonitoredThread {
         this.setName("Transactions Pool[" + this.getId() + "]");
 
         this.start();
+
+        dcSet.getTransactionTab().setPool(this);
+
     }
 
     /**
