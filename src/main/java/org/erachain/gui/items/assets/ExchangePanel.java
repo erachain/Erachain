@@ -2,6 +2,7 @@ package org.erachain.gui.items.assets;
 
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -11,10 +12,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ExchangePanel extends JPanel {
+public class ExchangePanel extends JPanel implements MainPanelInterface {
     private static final long serialVersionUID = -7052380905136603354L;
     //public CreateOrderPanel buyOrderPanel;
     //EchangeSellBuyPanel tt;
+    private String iconFile = "images/pageicons/ExchangePanel.png";
     String action;
     String account;
     java.awt.GridBagConstraints gridBagConstraints;
@@ -208,5 +210,14 @@ public class ExchangePanel extends JPanel {
         // tt = new pane_Tab(have, want, action, account);
         add(jScrollPane_jPanel_RightPanel, gridBagConstraints);
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

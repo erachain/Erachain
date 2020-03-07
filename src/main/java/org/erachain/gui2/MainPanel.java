@@ -44,6 +44,7 @@ import org.erachain.gui.items.unions.IssueUnionPanel;
 import org.erachain.gui.items.unions.MyUnionsTab;
 import org.erachain.gui.items.unions.SearchUnionSplitPanel;
 import org.erachain.gui.library.MSplitPane;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.telegrams.ALLTelegramPanel;
 import org.erachain.gui.telegrams.TelegramSplitPanel;
 import org.erachain.lang.Lang;
@@ -321,11 +322,11 @@ public class MainPanel extends javax.swing.JPanel {
 
             }
 
-            if (str.equals(Lang.getInstance().translate("Insert Person")) || str.equals("InsertPersonPanel")) {
-                insertTab(Lang.getInstance().translate("Insert Person"), new InsertPersonPanel());
-                return;
+         //   if (str.equals(Lang.getInstance().translate("Insert Person")) || str.equals("InsertPersonPanel")) {
+         //       insertTab(Lang.getInstance().translate("Insert Person"), new InsertPersonPanel());
+         //       return;
 
-            }
+         //   }
 
             if (str.equals(Lang.getInstance().translate("My Accounts")) || str.equals("MyAccountsSplitPanel")) {
                 insertTab(Lang.getInstance().translate("My Accounts"), new MyAccountsSplitPanel());
@@ -583,11 +584,11 @@ public class MainPanel extends javax.swing.JPanel {
     }
 
     // insert tab in tabbedpane
-    public boolean insertTab(String str, JPanel pp) {
+    public boolean insertTab(String str, MainPanelInterface pp) {
         int index = jTabbedPane1.indexOfTab(str);
         boolean inserted = false;
         if (index == -1) {
-            jTabbedPane1.addTabWithCloseButton(str, pp);
+            jTabbedPane1.addTabWithCloseButton(str, pp.getIcon(), (JPanel) pp);
             index = jTabbedPane1.indexOfTab(str);
             inserted = true;
         }
@@ -598,7 +599,8 @@ public class MainPanel extends javax.swing.JPanel {
     }
 
     // insert tab in tabbedpane
-    public boolean insertTab(JPanel panel) {
+    public boolean insertTab(MainPanelInterface pp) {
+        JPanel panel = (JPanel) pp;
         String name = panel.getName();
         if (name == null)
             name = panel.getClass().getSimpleName();
@@ -606,7 +608,7 @@ public class MainPanel extends javax.swing.JPanel {
         int index = jTabbedPane1.indexOfTab(name);
         boolean inserted = false;
         if (index == -1) {
-            jTabbedPane1.addTabWithCloseButton(name, panel);
+            jTabbedPane1.addTabWithCloseButton(name, pp.getIcon(),panel);
             index = jTabbedPane1.indexOfTab(name);
             inserted = true;
         }

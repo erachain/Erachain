@@ -9,17 +9,21 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
+
+import javax.swing.*;
+import java.awt.*;
 
 
 @SuppressWarnings("serial")
 
-public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
+public class AccountAssetSendPanel extends AccountAssetActionPanelCls implements MainPanelInterface {
 
     //private AccountAssetSendPanel th;
     public boolean noRecive;
-
+    private String iconFile = "images/pageicons/AccountAssetSendPanel.png";
     public AccountAssetSendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person, String message) {
         super(false, null, assetIn, null, TransactionAmount.ACTION_SEND, accountFrom, accountTo, message);
 
@@ -75,6 +79,16 @@ public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
 
         // ENABLE
         this.jButton_ok.setEnabled(true);
+    }
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 }

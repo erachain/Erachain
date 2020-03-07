@@ -5,6 +5,7 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -26,7 +27,7 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class IncomingMailsSplitPanel extends SplitPanel {
+public class IncomingMailsSplitPanel extends SplitPanel implements MainPanelInterface {
     private static final long serialVersionUID = 2717571093561259483L;
     // для прозрачности
     int alpha = 255;
@@ -34,6 +35,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
     private TableModelMails incoming_Mails_Model;
     private MTable inciming_Mail_Table;
     private TableRowSorter my_Sorter;
+    private String iconFile = "images/pageicons/IncomingMailsSplitPanel.png";
 
     public IncomingMailsSplitPanel() {
         super("IncomingMailsSplitPanel");
@@ -246,6 +248,15 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
         }
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 
 }

@@ -6,6 +6,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.records.SearchTransactionsSplitPanel;
 import org.erachain.gui.library.FileChooser;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -19,8 +20,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class OtherSearchBlocks extends SplitPanel {
+public class OtherSearchBlocks extends SplitPanel implements MainPanelInterface {
 
+    private String iconFile = "images/pageicons/OtherSearchBlocks.png";
     SearchTransactionsSplitPanel rp = new SearchTransactionsSplitPanel();
     private OtherSeasrchBlocksTableModel tamleModel;
     private JTable Table_Hash;
@@ -196,6 +198,16 @@ public class OtherSearchBlocks extends SplitPanel {
 
         }
 
+    }
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 }

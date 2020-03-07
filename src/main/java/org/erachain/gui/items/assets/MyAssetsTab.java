@@ -5,6 +5,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui.models.WalletItemAssetsTableModel;
 import org.erachain.gui2.MainPanel;
@@ -23,8 +24,9 @@ import java.awt.event.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class MyAssetsTab extends SplitPanel {
+public class MyAssetsTab extends SplitPanel implements MainPanelInterface {
 
+    private String iconFile = "images/pageicons/MyAssetsTab.png";
     private static final long serialVersionUID = 1L;
     final MTable table;
     protected int row;
@@ -487,5 +489,14 @@ public class MyAssetsTab extends SplitPanel {
         panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
         MainPanel.getInstance().insertTab(panel);
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

@@ -6,6 +6,7 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -26,9 +27,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class SearchStatementsSplitPanel extends SplitPanel {
+public class SearchStatementsSplitPanel extends SplitPanel implements MainPanelInterface {
 
     private static final long serialVersionUID = 2717571093561259483L;
+    private String iconFile = "images/pageicons/SearchStatementsSplitPanel.png";
     // для прозрачности
     int alpha = 255;
     int alpha_int;
@@ -323,6 +325,16 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             jScrollPaneJPanelRightPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             // jSplitPanel.setRightComponent(info_panel);
+        }
+    }
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
         }
     }
 }

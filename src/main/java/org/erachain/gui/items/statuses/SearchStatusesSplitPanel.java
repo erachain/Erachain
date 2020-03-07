@@ -5,6 +5,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.gui.items.SearchItemSplitPanel;
 import org.erachain.gui.items.assets.ExchangePanel;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -17,11 +18,12 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SearchStatusesSplitPanel extends SearchItemSplitPanel {
+public class SearchStatusesSplitPanel extends SearchItemSplitPanel implements MainPanelInterface {
 
     /**
      *
      */
+    private String iconFile = "images/pageicons/SearchStatusesSplitPanel.png";
     private static final long serialVersionUID = 1L;
     private static StatusesItemsTableModel tableModelUnions = new StatusesItemsTableModel();
 
@@ -56,6 +58,15 @@ public class SearchStatusesSplitPanel extends SearchItemSplitPanel {
         return info;
 
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 
 }

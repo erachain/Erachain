@@ -16,6 +16,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -44,11 +45,12 @@ import java.nio.charset.StandardCharsets;
 *
 * @author Саша
 */
-public class TelegramSplitPanel extends SplitPanel {
+public class TelegramSplitPanel extends SplitPanel implements MainPanelInterface {
 
    /**
     * Creates new form TelegramSplitPanel
     */
+   private String iconFile = "images/pageicons/TelegramSplitPanel.png";
     LeftTelegram leftTelegram;
     RightTelegramPanel rightTelegramPanel;
     private static final long serialVersionUID = 1L;
@@ -579,6 +581,15 @@ public boolean cheskError(){
    
     return true;
 }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 
 }

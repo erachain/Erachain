@@ -5,6 +5,7 @@ import org.erachain.core.block.Block;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.library.WalletOrphanButton;
 import org.erachain.gui.library.WalletSyncButton;
 import org.erachain.gui.models.BlocksTableModel;
@@ -27,10 +28,10 @@ import java.net.URL;
 import java.util.Observable;
 import java.util.Observer;
 
-public class OtherSplitPanel extends SplitPanel implements Observer {
+public class OtherSplitPanel extends SplitPanel implements Observer, MainPanelInterface {
 
     private PeersTableModel peersTableModel = new PeersTableModel();
-
+    private String iconFile = "images/pageicons/OtherSplitPanel.png";
     private JPanel jPanel2 = new JPanel();
     private GridBagConstraints gridBagConstraints;
     private JLabel jLabelPeerTitle = new JLabel();
@@ -284,5 +285,15 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
         if (jLabelAllBlocksSum != null)
             jLabelAllBlocksSum.setText(String.valueOf(Controller.getInstance().getBlockChain().
                  getFullWeight(DCSet.getInstance())));
+    }
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

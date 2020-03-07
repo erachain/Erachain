@@ -6,6 +6,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.FileChooser;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun.Tuple3;
@@ -21,8 +22,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class SearchLinkedHash extends SplitPanel {
+public class SearchLinkedHash extends SplitPanel implements MainPanelInterface {
 
+    private String iconFile = "images/pageicons/SearchLinkedHash.png";
     private TableModelSearchHash tamleModel;
     private JTable Table_Hash;
 
@@ -197,6 +199,16 @@ public class SearchLinkedHash extends SplitPanel {
 
         }
 
+    }
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 }

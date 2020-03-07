@@ -5,6 +5,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemSplitPanel;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -18,14 +19,14 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
+public class SearchAssetsSplitPanel extends SearchItemSplitPanel implements MainPanelInterface {
     /**
      *
      */
     private static final long serialVersionUID = 1L;
     //private static ItemAssetsTableModel tableModelItemAssets = ;
     ///private SearchAssetsSplitPanel th;
-
+    private String iconFile = "images/pageicons/SearchAssetsSplitPanel.png";
 
     public SearchAssetsSplitPanel(boolean search_and_exchange) {
         super(new ItemAssetsTableModel(), "SearchAssetsSplitPanel", "SearchAssetsSplitPanel");
@@ -129,5 +130,14 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         MainPanel.getInstance().insertTab(panel);
 
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

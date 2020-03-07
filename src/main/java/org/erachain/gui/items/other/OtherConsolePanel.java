@@ -1,15 +1,18 @@
 package org.erachain.gui.items.other;
 
 import org.erachain.gui.ConsolePanel;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 
 import javax.swing.*;
+import java.awt.*;
 
 @SuppressWarnings("serial")
-public class OtherConsolePanel extends JPanel {
+public class OtherConsolePanel extends JPanel  implements MainPanelInterface {
 
     private ConsolePanel debugTabPane;
+    private String iconFile = "images/pageicons/OtherConsolePanel.png";
 
     public OtherConsolePanel() {
         //CREATE FRAME
@@ -47,5 +50,15 @@ public class OtherConsolePanel extends JPanel {
 
         this.setVisible(true);
 
+    }
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

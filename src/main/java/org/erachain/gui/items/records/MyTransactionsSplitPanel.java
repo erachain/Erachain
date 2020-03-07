@@ -4,10 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.library.Library;
-import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.SetIntervalPanel;
-import org.erachain.gui.library.VouchLibraryPanel;
+import org.erachain.gui.library.*;
 import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -29,10 +26,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-public class MyTransactionsSplitPanel extends SplitPanel {
+public class MyTransactionsSplitPanel extends SplitPanel implements MainPanelInterface {
 
     private static final long serialVersionUID = 2717571093561259483L;
-
+    private String iconFile = "images/pageicons/MyTransactionsSplitPanel.png";
     private static MyTransactionsSplitPanel instance;
     public VouchLibraryPanel voush_Library_Panel;
     protected Tuple2<Long, Long> selectedTransactionKey;
@@ -362,5 +359,14 @@ public class MyTransactionsSplitPanel extends SplitPanel {
             this.records_model.fireTableDataChanged();
         }
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

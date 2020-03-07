@@ -6,6 +6,7 @@ import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.BalanceFromAddressTableModel;
 import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui2.MainPanel;
@@ -25,12 +26,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 
-public class MyBalanceTab extends SplitPanel {
+public class MyBalanceTab extends SplitPanel implements MainPanelInterface {
 
     /**
      *
      */
-
+    private String iconFile = "images/pageicons/MyBalanceTab.png";
     private static final long serialVersionUID = 1L;
     final MTable table;
     protected int row;
@@ -446,5 +447,14 @@ if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
         panel.setName(asset.getTickerName() + "/" + compu.getTickerName());
         MainPanel.getInstance().insertTab(panel);
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

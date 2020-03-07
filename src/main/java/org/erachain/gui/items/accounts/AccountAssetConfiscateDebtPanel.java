@@ -8,14 +8,19 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
+
+import javax.swing.*;
+import java.awt.*;
 
 //import org.erachain.settings.Settings;
 
 @SuppressWarnings("serial")
 
-public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls {
+public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls implements MainPanelInterface {
+    private String iconFile = "images/pageicons/AccountAssetConfiscateDebtPanel.png";
 
     public AccountAssetConfiscateDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
         super(true, null, assetIn, null,
@@ -57,5 +62,14 @@ public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls 
         // ENABLE
         this.jButton_ok.setEnabled(true);
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

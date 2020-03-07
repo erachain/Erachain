@@ -15,6 +15,7 @@ import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.library.AddImageLabel;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
@@ -37,8 +38,9 @@ import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
-public class IssuePersonPanel extends JPanel {
+public class IssuePersonPanel extends JPanel implements MainPanelInterface {
     private static final Logger logger = LoggerFactory.getLogger(IssuePersonPanel.class);
+    private String iconFile = "images/pageicons/IssuePersonPanel.png";
     protected JLabel titleJLabel = new JLabel();
     protected JComboBox<Account> cbxFrom = new JComboBox<>();
     protected JComboBox<String> txtFeePow = new JComboBox<>();
@@ -639,6 +641,17 @@ public class IssuePersonPanel extends JPanel {
         }
         // ENABLE
         copyButton.setEnabled(true);
+    }
+
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 

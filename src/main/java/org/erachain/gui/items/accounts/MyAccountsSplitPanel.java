@@ -4,17 +4,21 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.lang.Lang;
+
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 
 
-public class MyAccountsSplitPanel extends SplitPanel {
+public class MyAccountsSplitPanel extends SplitPanel implements MainPanelInterface {
 
     /**
      * 
      */
+    private String iconFile = "images/pageicons/send.png"; //MyAccountsSplitPanel.png";
     private static final long serialVersionUID = 1L;
     public AccountsPanel accountPanel;
     public AssetCls assetSelect;
@@ -76,6 +80,17 @@ public class MyAccountsSplitPanel extends SplitPanel {
             
         }
 
+    }
+
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 

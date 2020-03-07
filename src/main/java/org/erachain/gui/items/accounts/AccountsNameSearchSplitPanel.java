@@ -13,6 +13,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.WalletItemImprintsTableModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -45,11 +46,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class AccountsNameSearchSplitPanel extends SplitPanel {
+public class AccountsNameSearchSplitPanel extends SplitPanel implements MainPanelInterface {
 
     /**
      *
      */
+    private String iconFile = "images/pageicons/AccountsNameSearchSplitPanel.png";
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = LoggerFactory.getLogger(AccountsNameSearchSplitPanel.class);
     protected FileChooser chooser;
@@ -460,6 +462,16 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
         // if (c1 instanceof ImprintsInfoPanel) (
         // (ImprintsInfoPanel)c1).delay_on_Close();
 
+    }
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 }

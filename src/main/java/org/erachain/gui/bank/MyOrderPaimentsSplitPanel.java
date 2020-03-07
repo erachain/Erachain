@@ -3,6 +3,7 @@ package org.erachain.gui.bank;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -15,7 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 
-public class MyOrderPaimentsSplitPanel extends SplitPanel {
+public class MyOrderPaimentsSplitPanel extends SplitPanel implements MainPanelInterface {
     private static final long serialVersionUID = 2717571093561259483L;
     // для прозрачности
     int alpha = 255;
@@ -23,6 +24,7 @@ public class MyOrderPaimentsSplitPanel extends SplitPanel {
     private PaymentOrdersTableModel payment_Orders_model;
     private MTable payment_Orders_table;
     private TableRowSorter my_Sorter;
+    private String iconFile = "images/pageicons/MyOrderPaimentsSplitPanel.png";
 
 
     public MyOrderPaimentsSplitPanel() {
@@ -176,6 +178,16 @@ public class MyOrderPaimentsSplitPanel extends SplitPanel {
 
             payment_Orders_model.fireTableDataChanged();
 
+        }
+    }
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
         }
     }
 

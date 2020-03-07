@@ -10,6 +10,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.ItemSplitPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui.models.WalletItemPersonsTableModel;
 import org.erachain.gui.models.WalletItemPollsTableModel;
@@ -33,7 +34,9 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Polls_My_SplitPanel extends ItemSplitPanel {
+public class Polls_My_SplitPanel extends ItemSplitPanel implements MainPanelInterface {
+
+    private String iconFile = "images/pageicons/Polls_My_SplitPanel.png";
 
     public Polls_My_SplitPanel() {
         super(new WalletItemPollsTableModel(), "Polls_My_SplitPanel");
@@ -92,6 +95,15 @@ public class Polls_My_SplitPanel extends ItemSplitPanel {
 
         return pollInfo;
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 
 }

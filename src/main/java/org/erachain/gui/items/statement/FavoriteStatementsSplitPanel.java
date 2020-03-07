@@ -7,6 +7,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.items.records.FavoriteTransactionTableModel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -28,9 +29,11 @@ import java.net.URL;
 import java.util.ArrayList;
 
 
-public class FavoriteStatementsSplitPanel extends SplitPanel {
+public class FavoriteStatementsSplitPanel extends SplitPanel implements MainPanelInterface {
 
     private static final long serialVersionUID = 2717571093561259483L;
+    private String iconFile = "images/pageicons/FavoriteStatementsSplitPanel.png";
+
     // для прозрачности
     int alpha = 255;
     int alpha_int;
@@ -230,6 +233,16 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
             info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             //	jSplitPanel.setRightComponent(info_panel);
+        }
+    }
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
         }
     }
 

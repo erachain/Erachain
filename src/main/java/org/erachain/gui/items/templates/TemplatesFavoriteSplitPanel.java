@@ -5,6 +5,7 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -17,8 +18,9 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
+public class TemplatesFavoriteSplitPanel extends ItemSplitPanel implements MainPanelInterface {
     private static final long serialVersionUID = 2717571093561259483L;
+    private String iconFile = "images/pageicons/TemplatesFavoriteSplitPanel.png";
 
     public TemplatesFavoriteSplitPanel() {
         super(new FavoriteTemplatesTableModel(), "TemplatesFavoriteSplitPanel");
@@ -61,5 +63,14 @@ public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
     public Component getShow(ItemCls item) {
         return new InfoTemplates((TemplateCls) item);
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

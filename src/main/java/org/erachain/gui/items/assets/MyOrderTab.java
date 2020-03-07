@@ -10,6 +10,7 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.library.SetIntervalPanel;
 import org.erachain.gui.models.WalletOrdersTableModel;
 import org.erachain.gui.transaction.CreateOrderDetailsFrame;
@@ -26,8 +27,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class MyOrderTab extends SplitPanel {
+public class MyOrderTab extends SplitPanel implements MainPanelInterface {
 
+    private String iconFile = "images/pageicons/MyOrderTab.png";
     private static final long serialVersionUID = 1L;
     protected int row;
     /**
@@ -328,5 +330,14 @@ public class MyOrderTab extends SplitPanel {
         panel.setName(haveAsset.getTickerName() + "/" + wantAsset.getTickerName());
         MainPanel.getInstance().insertTab(panel);
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

@@ -7,6 +7,7 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -19,8 +20,9 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class PollsFavoriteSplitPanel extends ItemSplitPanel {
+public class PollsFavoriteSplitPanel extends ItemSplitPanel implements MainPanelInterface {
     private static final long serialVersionUID = 2717571093561259483L;
+    private String iconFile = "images/pageicons/PollsFavoriteSplitPanel.png";
 
     public PollsFavoriteSplitPanel() {
         super(new FavoritePollsTableModel(), "PollsFavoriteSplitPanel");
@@ -80,5 +82,14 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel {
 
         return pollInfo;
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

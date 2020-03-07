@@ -6,6 +6,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -19,8 +20,9 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
+public class AssetsFavoriteSplitPanel extends ItemSplitPanel  implements MainPanelInterface {
     private static final long serialVersionUID = 2717571093561259483L;
+    private String iconFile = "images/pageicons/AssetsFavoriteSplitPanel.png";
 
     public AssetsFavoriteSplitPanel() {
         super(new FavoriteAssetsTableModel(), "AssetsFavoriteSplitPanel");
@@ -99,5 +101,14 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
         panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
         MainPanel.getInstance().insertTab(panel);
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

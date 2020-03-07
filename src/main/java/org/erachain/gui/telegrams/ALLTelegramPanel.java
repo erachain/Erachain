@@ -3,12 +3,14 @@ package org.erachain.gui.telegrams;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -16,12 +18,13 @@ import java.awt.event.ActionListener;
 *
 * @author Саша
 */
-public class ALLTelegramPanel extends javax.swing.JPanel {
+public class ALLTelegramPanel extends javax.swing.JPanel implements MainPanelInterface {
 
    /**
     * Creates new form rightTelegramPanel
     */
     JPopupMenu menu;
+    private String iconFile = "images/pageicons/ALLTelegramPanel.png";
     
     public TelegramsTableModel walletTelegramsFilterTableModel;
 protected int row;
@@ -216,6 +219,16 @@ public ALLTelegramPanel() {
 
     
    }
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
    // Variables declaration - do not modify                     
    public javax.swing.JButton jButtonSendTelegram;
    public javax.swing.JLabel jLabelCenter;

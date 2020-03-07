@@ -3,6 +3,7 @@ package org.erachain.gui.items.unions;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.gui.items.SearchItemSplitPanel;
+import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.URLViewer;
@@ -14,10 +15,11 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SearchUnionSplitPanel extends SearchItemSplitPanel {
+public class SearchUnionSplitPanel extends SearchItemSplitPanel implements MainPanelInterface {
     /**
      *
      */
+    private String iconFile = "images/pageicons/SearchUnionSplitPanel.png";
     private static final long serialVersionUID = 1L;
     private static TableModelUnionsItemsTableModel tableModelUnions = new TableModelUnionsItemsTableModel();
     private SearchUnionSplitPanel th;
@@ -75,5 +77,14 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel {
         return union_Info;
 
     }
-
+    @Override
+    public Icon getIcon() {
+        {
+            try {
+                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }
