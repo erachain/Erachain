@@ -1,27 +1,12 @@
-# idea
-.idea/
-# eclipse
-/.classpath
-/.project
-# project
-*.class
 /data*
-ERA/settings.json
-ERA/*.jar
-/build/
-/logs/
-.gradle
-/ERA/logs
-/ERA/build/
-settings.json
-gui_settings.json
-*.xml
-/out/
-.settings
-/bin*
+/Data Files
+*back*
 /bin/
-/gradle/
-/ERA/temp/
-/ERA/wallet*/
-/ERA/telegram/
-*.log
+/ACCOUNTS.txt
+/*.jar
+/*.iml
+*.iml
+log.txt
+log.txt.*
+*.zip
+/*.theme

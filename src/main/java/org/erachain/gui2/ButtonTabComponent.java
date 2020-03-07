@@ -34,6 +34,7 @@ package org.erachain.gui2;
 
 import org.erachain.gui.*;
 import org.erachain.gui.items.other.OtherSplitPanel;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SaveStrToFile;
@@ -109,7 +110,7 @@ public class ButtonTabComponent extends JPanel {
             int size = UIManager.getFont("TextField.font").getSize() + 4;
             if (size < 10) size = 10;
             setPreferredSize(new Dimension(size, size));
-            setToolTipText("close this tab");
+            setToolTipText(Lang.getInstance().translate("close this tab"));
             //Make the button looks the same for all Laf's
             setUI(new BasicButtonUI());
             //Make it transparent
