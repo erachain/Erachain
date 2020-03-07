@@ -377,11 +377,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
 
                     if (BlockChain.CHECK_BUGS > 7) {
-                        LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()));
+                        LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()) + " " + transaction.getCreator().getAddress());
                         if (testTime > transaction.getTimestamp()) {
                             LOGGER.error(" ERROR testTIME " + new Timestamp(testTime));
-                            testTime = transaction.getTimestamp();
                         }
+                        testTime = transaction.getTimestamp();
                     }
 
                     if (transaction.getTimestamp() > timestamp) {
@@ -493,16 +493,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (ctrl.isOnStopping()) {
                     return;
                 }
-                try {
-                    if (!transactionsMap.isClosed() && transactionsMap.contains(signature))
-                        transactionsMap.delete(signature);
-                } catch (java.lang.Throwable e) {
-                    if (e instanceof java.lang.IllegalAccessError) {
-                        // налетели на закрытую таблицу
-                    } else {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
+                transactionsMap.delete(signature);
             }
             LOGGER.debug("clear INVALID Transactions = " + (System.currentTimeMillis() - start) + "ms for removed: " + needRemoveInvalids.size()
                     + " LEFT: " + transactionsMap.size());

@@ -11,7 +11,6 @@ import org.erachain.core.TransactionsPool;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.*;
-import org.erachain.dbs.mapDB.TransactionSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBFork;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBinMem;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
@@ -82,7 +81,8 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                     map = new TransactionSuitMapDBinMem(databaseSet, database);
                     break;
                 default:
-                    map = new TransactionSuitMapDB(databaseSet, database);
+                    //map = new TransactionSuitMapDB(databaseSet, database);
+                    map = new TransactionSuitMapDBinMem(databaseSet, database);
             }
         } else {
             switch (dbsUsed) {
@@ -263,6 +263,10 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     @Override
     public void delete(byte[] signature) {
         this.delete(Longs.fromByteArray(signature));
+    }
+
+    public void deleteDirect(byte[] signature) {
+        super.delete(Longs.fromByteArray(signature));
     }
 
     public void putDirect(Transaction transaction) {
