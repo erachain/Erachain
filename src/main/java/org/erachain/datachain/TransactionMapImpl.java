@@ -176,13 +176,15 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                                 || size - deletions >
                                 (cutMaximum ? BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 3
                                         : BlockChain.MAX_UNCONFIGMED_MAP_SIZE)) {
-                            this.delete(key);
+                            // обязательно прямая чиста из таблицы иначе опять сюда в очередь прилетит и не сработает
+                            this.deleteDirect(key);
                             deletions++;
                         } else {
                             break;
                         }
                     }
                 } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
                 }
 
                 long ticker = System.currentTimeMillis() - realTime;
@@ -294,12 +296,10 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
      *
      * @param key
      */
+    @Override
     public void delete(Long key) {
-        try {
-            pool.offerMessage(key);
-            totalDeleted++;
-        } catch (Exception e) {
-        }
+        pool.offerMessage(key);
+        totalDeleted++;
     }
 
     public boolean contains(Long key) {
