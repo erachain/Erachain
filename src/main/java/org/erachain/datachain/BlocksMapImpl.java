@@ -174,6 +174,9 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
         dcSet.getBlockSignsMap().put(signature, height);
         if (dcSet.getBlockSignsMap().size() != height) {
+            logger.error("getBlockSignsMap().size() != height : "
+                    + dcSet.getBlockSignsMap().size() + " != " + height
+                    + " : " + block);
             Long error = null;
             ++error;
         }
