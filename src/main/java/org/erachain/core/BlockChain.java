@@ -1447,13 +1447,6 @@ public class BlockChain {
         return block.getTarget();
     }
 
-    // CLEAR UNCONFIRMED TRANSACTION from Invalid and DEAD
-    public void clearUnconfirmedRecords(DCSet dcSet, boolean cutDeadTime) {
-
-        dcSet.getTransactionTab().clearByDeadTimeAndLimit(this.getTimestamp(dcSet), cutDeadTime);
-
-    }
-
     public String blockFromFuture(int height) {
         long blockTimestamp = getTimestamp(height);
         if (blockTimestamp + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
