@@ -217,4 +217,26 @@ public class CoreResource {
         thread.start();
         return "run";
     }
+
+    @GET
+    @Path("/dc/clearcache")
+    public String dcClearCache() {
+        Controller.getInstance().getDCSet().clearCache();
+        return "run";
+    }
+
+    @GET
+    @Path("/dl/clearcache")
+    public String dlClearCache() {
+        Controller.getInstance().getDLSet().clearCache();
+        return "run";
+    }
+
+    @GET
+    @Path("/dw/clearcache")
+    public String dwClearCache() {
+        Controller.getInstance().wallet.database.clearCache();
+        return "run";
+    }
+
 }
