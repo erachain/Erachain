@@ -688,6 +688,7 @@ public class RSendResource {
      * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1036/2?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1577712486&password=123
      * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1069/1036?amount=0.001&title=probe-multi&onlyperson=true&activeafter=2018-01-01 00:00&activebefore=2019-01-01 00:00&greatequal=0&activetypetx=24&password=1
      * GET r_send/multisend/7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1/1/2?amount=0.001&title=probe-multi&onlyperson=true&gender=0&password=1
+     * get r_send/multisend/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1072/2?amount=1&title=С 8 Марта!&onlyperson=true&gender=1&password=123&test=false
      *
      * @param fromAddress     my address in Wallet
      * @param assetKey        asset Key that send
