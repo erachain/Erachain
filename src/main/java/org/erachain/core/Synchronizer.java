@@ -899,6 +899,7 @@ public class Synchronizer extends Thread {
         }
 
         long processTiming = System.nanoTime();
+        int txCount = block.getTransactionCount();
 
         dcSet.getBlockMap().setProcessing(true);
         boolean observOn = ctrl.doesWalletExists() && ctrl.useGui;
@@ -921,8 +922,7 @@ public class Synchronizer extends Thread {
                 dcSet.getBlockMap().setProcessing(false);
                 //dcSet.updateTxCounter(-block.getTransactionCount());
                 // FARDFLUSH not use in each case - only after accumulate size
-                int blockSize = 3 + block.getTransactionCount();
-                dcSet.flush(blockSize, false, doOrphan);
+                dcSet.flush(txCount + 3, false, doOrphan);
 
                 if (ctrl.isOnStopping())
                     return;
@@ -1034,9 +1034,7 @@ public class Synchronizer extends Thread {
                 //dcSet.updateTxCounter(block.getTransactionCount());
 
                 // FLUSH not use in each case - only after accumulate size
-                int blockSize = 3 + block.getTransactionCount();
-
-                dcSet.flush(blockSize, false, doOrphan);
+                dcSet.flush(txCount + 3, false, doOrphan);
 
                 if (ctrl.isOnStopping())
                     return;
@@ -1137,13 +1135,16 @@ public class Synchronizer extends Thread {
         if (!dcSet.isFork()) {
             // только запись в нашу цепочку
             processTiming = System.nanoTime() - processTiming;
-            if (processTiming < 999999999999l) {
+            if (processTiming < 999999999999L) {
                 // при переполнении может быть минус
                 // в миеросекундах подсчет делаем
-                bchain.updateTXProcessTimingAverage(processTiming, block.getTransactionCount());
+                bchain.updateTXProcessTimingAverage(processTiming, txCount);
+
+                LOGGER.debug("PROCESS SPEED: " + (txCount + Controller.BLOCK_AS_TX_COUNT) * 1000000000L
+                        / processTiming
+                        + " tx/s");
             }
         }
-
 
     }
 
