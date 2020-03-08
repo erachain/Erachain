@@ -1140,7 +1140,7 @@ public class Synchronizer extends Thread {
                 // в миеросекундах подсчет делаем
                 bchain.updateTXProcessTimingAverage(processTiming, txCount);
 
-                LOGGER.debug("PROCESS SPEED: " + (txCount + Controller.BLOCK_AS_TX_COUNT) * 1000000000L
+                LOGGER.debug("PROCESS SPEED for: " + txCount + "tx is :" + (txCount + Controller.BLOCK_AS_TX_COUNT) * 1000000000L
                         / processTiming
                         + " tx/s");
             }
