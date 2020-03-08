@@ -357,6 +357,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         boolean updated = false;
 
+        // важно параметризовать чтобы вызоб был на который мы написали под этот параметр а не в обход delete<Object>
         Iterator<T> iterator = this.map.keySet().iterator();
 
         while (iterator.hasNext()) {
@@ -366,7 +367,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         }
 
         if (deleted != null) {
-            Iterator iteratorDeleted = this.deleted.keySet().iterator();
+            // важно параметризовать чтобы вызоб был на который мы написали под этот параметр а не в обход delete<Object>
+            Iterator<T> iteratorDeleted = this.deleted.keySet().iterator();
             while (iteratorDeleted.hasNext()) {
                 parent.getSuit().delete(iteratorDeleted.next());
                 updated = true;

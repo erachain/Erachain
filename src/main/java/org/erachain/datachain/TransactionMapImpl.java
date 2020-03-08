@@ -11,6 +11,7 @@ import org.erachain.core.TransactionsPool;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.*;
+import org.erachain.dbs.mapDB.TransactionSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBFork;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBinMem;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
@@ -81,15 +82,14 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                     map = new TransactionSuitMapDBinMem(databaseSet, database);
                     break;
                 default:
-                    //map = new TransactionSuitMapDB(databaseSet, database);
-                    map = new TransactionSuitMapDBinMem(databaseSet, database);
+                    map = new TransactionSuitMapDB(databaseSet, database);
             }
         } else {
             switch (dbsUsed) {
                 //case DBS_MAP_DB:
                 case DBS_MAP_DB_IN_MEM:
-                    map = new TransactionSuitMapDBFork((TransactionMap) parent, databaseSet);
-                    break;
+                    //map = new TransactionSuitMapDBFork((TransactionMap) parent, databaseSet);
+                    //break;
                 case DBS_ROCK_DB:
                     //map = new TransactionSuitRocksDBFork((TransactionMap) parent, ((TransactionSuitRocksDB) parent).map, databaseSet);
                     //break;

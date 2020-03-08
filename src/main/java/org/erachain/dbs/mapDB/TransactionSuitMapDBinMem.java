@@ -139,7 +139,11 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     public void delete(Long key) {
         if (database.getEngine().isClosed())
             return;
-        super.delete(key);
+        try {
+            super.delete(key);
+        } catch (Exception IllegalAccessError) {
+
+        }
     }
 
     @Override
