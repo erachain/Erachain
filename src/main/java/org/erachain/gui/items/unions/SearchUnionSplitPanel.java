@@ -78,10 +78,10 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel implements MainP
 
     }
     @Override
-    public Icon getIcon() {
+    public Image getIcon() {
         {
             try {
-                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
             } catch (Exception e) {
                 return null;
             }

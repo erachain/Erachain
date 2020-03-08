@@ -51,11 +51,12 @@ public class OtherConsolePanel extends JPanel  implements MainPanelInterface {
         this.setVisible(true);
 
     }
+
     @Override
-    public Icon getIcon() {
+    public Image getIcon() {
         {
             try {
-                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
             } catch (Exception e) {
                 return null;
             }

@@ -63,10 +63,10 @@ public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls 
         this.jButton_ok.setEnabled(true);
     }
     @Override
-    public Icon getIcon() {
+    public Image getIcon() {
         {
             try {
-                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
             } catch (Exception e) {
                 return null;
             }

@@ -18,7 +18,7 @@ public class MyAccountsSplitPanel extends SplitPanel implements MainPanelInterfa
     /**
      * 
      */
-    private String iconFile = "images/pageicons/send.png"; //MyAccountsSplitPanel.png";
+    private String iconFile = "images/pageicons/MyAccountsSplitPanel.png"; //MyAccountsSplitPanel.png";
     private static final long serialVersionUID = 1L;
     public AccountsPanel accountPanel;
     public AssetCls assetSelect;
@@ -81,12 +81,11 @@ public class MyAccountsSplitPanel extends SplitPanel implements MainPanelInterfa
         }
 
     }
-
     @Override
-    public Icon getIcon() {
+    public Image getIcon() {
         {
             try {
-                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
             } catch (Exception e) {
                 return null;
             }

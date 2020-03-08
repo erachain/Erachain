@@ -46,6 +46,8 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         DefaultMutableTreeNode telegrams_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Telegrams"));
 
 
+
+
         if (BlockChain.TEST_MODE)
             root.add(bank_Tree);
 
@@ -68,7 +70,9 @@ public class tt extends JPanel { // implements TreeSelectionListener {
             root.add(linked_hashes_Node);
         if (BlockChain.TEST_MODE)
             root.add(telegrams_Tree);
-        
+
+
+
         root.add(records_Node);
         root.add(other_Node);
 

@@ -286,11 +286,12 @@ public class OtherSplitPanel extends SplitPanel implements Observer, MainPanelIn
             jLabelAllBlocksSum.setText(String.valueOf(Controller.getInstance().getBlockChain().
                  getFullWeight(DCSet.getInstance())));
     }
+
     @Override
-    public Icon getIcon() {
+    public Image getIcon() {
         {
             try {
-                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
             } catch (Exception e) {
                 return null;
             }

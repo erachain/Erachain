@@ -75,7 +75,7 @@ public class ButtonTabComponent extends JPanel {
     };
     private final JTabbedPane pane;
 
-    public ButtonTabComponent(final JTabbedPane pane) {
+    public ButtonTabComponent(final JTabbedPane pane, Image icon) {
         //unset default FlowLayout' gaps
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
         if (pane == null) {
@@ -89,12 +89,16 @@ public class ButtonTabComponent extends JPanel {
             public String getText() {
                 int i = pane.indexOfTabComponent(ButtonTabComponent.this);
                 if (i != -1) {
-                    return pane.getTitleAt(i);
+                    return " " + pane.getTitleAt(i);
                 }
                 return null;
             }
         };
-
+        // resize icon
+        int size = UIManager.getFont("TextField.font").getSize() + 4;
+        icon = icon.getScaledInstance(size,size,size);
+        Icon ic = new ImageIcon(icon);
+        label.setIcon(ic);
         add(label);
         //add more space between the label and the button
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));

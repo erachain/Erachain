@@ -63,11 +63,12 @@ public class TemplatesFavoriteSplitPanel extends ItemSplitPanel implements MainP
     public Component getShow(ItemCls item) {
         return new InfoTemplates((TemplateCls) item);
     }
+
     @Override
-    public Icon getIcon() {
+    public Image getIcon() {
         {
             try {
-                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
             } catch (Exception e) {
                 return null;
             }

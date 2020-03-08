@@ -448,10 +448,10 @@ if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
         MainPanel.getInstance().insertTab(panel);
     }
     @Override
-    public Icon getIcon() {
+    public Image getIcon() {
         {
             try {
-                return new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconFile));
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
             } catch (Exception e) {
                 return null;
             }
