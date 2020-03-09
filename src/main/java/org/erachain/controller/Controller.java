@@ -2725,6 +2725,7 @@ public class Controller extends Observable {
             // if last block is changed by core.Synchronizer.process(DLSet, Block)
             // clear this win block
             if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
+                newBlock.close();
                 return false;
             }
 

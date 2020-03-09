@@ -389,7 +389,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         break;
                     }
 
-                    // делать форк только если есть трнзакции - так как это сильно кушает память
+                    // делать форк только если есть транзакции - так как это сильно кушает память
                     if (newBlockDC == null) {
                         //CREATE FORK OF GIVEN DATABASE
                         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
@@ -506,9 +506,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public void checkForRemove(long timestamp) {
 
         //CREATE FORK OF GIVEN DATABASE
-        DB database = DCSet.makeDBinMemory();
-        try {
-            DCSet newBlockDC = dcSet.fork(database);
+        try (DCSet newBlockDC = dcSet.fork(DCSet.makeDBinMemory())) {
+
             int blockHeight = newBlockDC.getBlockSignsMap().size() + 1;
 
             //Block waitWin;
@@ -598,8 +597,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             LOGGER.debug("get check for Remove = " + (System.currentTimeMillis() - start) + "ms for trans: " + map.size()
                     + " needRemoveInvalids:" + needRemoveInvalids.size());
 
-        } finally {
-            database.close();
         }
 
     }
