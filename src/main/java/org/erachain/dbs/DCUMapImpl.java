@@ -654,7 +654,12 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     public void clearCache() {}
 
     @Override
-    public void close() {}
+    public void close() {
+        map = null;
+        parent = null;
+        deleted = null;
+        super.close();
+    }
 
     @Override
     public boolean isClosed() {

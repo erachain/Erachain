@@ -28,4 +28,10 @@ public class NativeMapHashMap<T, U> extends DBMapSuit<T, U> {
     protected void createIndexes() {
     }
 
+    @Override
+    public void close() {
+        cover = null;
+        super.close();
+    }
+
 }

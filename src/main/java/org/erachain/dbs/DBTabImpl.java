@@ -368,7 +368,13 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     public void clearCache() { map.clearCache(); }
 
     @Override
-    public void close() { map.close(); }
+    public void close() {
+        if (map != null)
+            map.close();
+        databaseSet = null;
+        database = null;
+        map = null;
+    }
 
     @Override
     public boolean isClosed() {

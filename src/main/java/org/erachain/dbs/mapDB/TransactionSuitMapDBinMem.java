@@ -190,6 +190,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
         } catch (Exception e) {
 
         }
+        super.close();
     }
 
     @Override

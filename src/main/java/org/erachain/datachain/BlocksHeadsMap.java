@@ -113,14 +113,6 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
 
     }
 
-    @Override
-    public boolean writeToParent() {
-        boolean updated = super.writeToParent();
-        //((BlocksHeadsMap) parent).fullWeightVar.set(this.fullWeight);
-        //((BlocksHeadsMap) parent).fullWeight = this.fullWeight;
-        return updated;
-    }
-
     /**
      * Если откатить базу данных то нужно и локальные значения сбросить
      */

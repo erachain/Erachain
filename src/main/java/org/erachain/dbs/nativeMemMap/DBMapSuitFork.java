@@ -284,6 +284,13 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     }
 
     @Override
+    public void close() {
+        parent = null;
+        deleted = null;
+        super.close();
+    }
+
+    @Override
     public String toString() {
         return getClass().getName() + ".FORK";
     }
