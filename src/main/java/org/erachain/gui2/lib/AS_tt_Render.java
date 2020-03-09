@@ -18,7 +18,7 @@ public class AS_tt_Render extends DefaultTreeCellRenderer {
             if ( selected || expanded || hasFocus || tree.isCollapsed(row) || tree.isExpanded(row) || tree.isRowSelected(row) || tree.isSelectionEmpty())
             {
                 ASMutableTreeNode vv = (ASMutableTreeNode) value;
-                setText(" " + vv.getViewName());
+                setText( vv.getViewName());
                 Image im = vv.getImage();
                 int size1 = UIManager.getFont("TextField.font").getSize();
                 setIcon(new ImageIcon(im.getScaledInstance(size1, size1, 0)));
