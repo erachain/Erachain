@@ -1587,6 +1587,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         dcSet = null;
     }
 
+    // ПРОЫЕРЯЛОСЬ! действует в совокупк с Финализе в Блоке
     @Override
     protected void finalize() throws Throwable {
         dcSet = null;
