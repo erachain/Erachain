@@ -1579,6 +1579,12 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     @Override
+    protected void finalize() throws Throwable {
+        dcSet = null;
+        super.finalize();
+    }
+
+    @Override
     public String toString() {
         if (signature == null) {
             return getClass().getName() + ":" + viewFullTypeName();
