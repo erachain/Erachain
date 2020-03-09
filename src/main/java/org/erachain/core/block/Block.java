@@ -1961,6 +1961,16 @@ import java.util.*;
                 LOGGER.error(e.getMessage(), e);
             }
             validatedForkDB = null;
+
+        }
+
+        try {
+            // ОЧЕНЬ ВАЖНО чтобы Finalizer мог спокойно удалять их и DCSet.fork
+            // иначе Финализер не можеи зацикленные сслки порвать и не очищает HEAP
+            for (Transaction transaction : transactions) {
+                transaction.resetDCSet();
+            }
+        } catch (Exception e) {
         }
 
         isClosed = true;
