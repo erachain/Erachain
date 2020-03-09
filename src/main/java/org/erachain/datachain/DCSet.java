@@ -1699,12 +1699,14 @@ public class DCSet extends DBASet implements Closeable {
                         LOGGER.error(e.getMessage(), e);
                     }
                 }
+                // улучшает работу финализера
                 tables = null;
                 try {
                     this.database.close();
                 } catch (IOError e) {
                     LOGGER.error(e.getMessage(), e);
                 }
+                // улучшает работу финализера
                 this.database = null;
 
                 this.uses = 0;
