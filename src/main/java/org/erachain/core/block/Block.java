@@ -1962,7 +1962,7 @@ import java.util.*;
             }
             validatedForkDB = null;
         }
-        transactions = null;
+
         isClosed = true;
     }
 
@@ -1974,6 +1974,12 @@ import java.util.*;
                 LOGGER.debug("validatedForkDB is FINALIZED: " + this.toString());
             }
         }
+
+        rawTransactions = null;
+        parentBlockHead = null;
+        blockHead = null;
+        transactions = null;
+
         super.finalize();
     }
 

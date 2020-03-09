@@ -1699,11 +1699,13 @@ public class DCSet extends DBASet implements Closeable {
                         LOGGER.error(e.getMessage(), e);
                     }
                 }
+                tables = null;
                 try {
                     this.database.close();
                 } catch (IOError e) {
                     LOGGER.error(e.getMessage(), e);
                 }
+                this.database = null;
 
                 this.uses = 0;
             }
@@ -1711,6 +1713,15 @@ public class DCSet extends DBASet implements Closeable {
             logger.info("closed " + (parent == null ? "Main" : "parent " + toString()));
         }
 
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        close();
+        if (BlockChain.CHECK_BUGS > 5) {
+            LOGGER.debug("DCSet is FINALIZED: " + this.toString());
+        }
+        super.finalize();
     }
 
     @Override
