@@ -10,6 +10,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.TreeMap;
 
 /**
  * @author DarkRaha
@@ -28,7 +29,6 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         // -------------------------------------------
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Erachain");
-
         DefaultMutableTreeNode account_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Accounts"));
         DefaultMutableTreeNode person_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Persons"));
         DefaultMutableTreeNode document_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Documents"));
@@ -45,7 +45,23 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         DefaultMutableTreeNode bank_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Bank"));
         DefaultMutableTreeNode telegrams_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Telegrams"));
 
-
+        TreeMap<String, DefaultMutableTreeNode> nodeList = new TreeMap<String, DefaultMutableTreeNode>();
+        nodeList.put("account_Node",account_Node);
+        nodeList.put("person_Node",person_Node);
+        nodeList.put("document_Node",document_Node);
+        nodeList.put("mails_Node",mails_Node);
+        nodeList.put("assets_Node",assets_Node);
+        nodeList.put("templates_Node",templates_Node);
+        nodeList.put("statuses_Node",statuses_Node);
+        nodeList.put("unions_Node",unions_Node);
+        nodeList.put("polls_Node",polls_Node);
+        nodeList.put("hashes_Node",hashes_Node);
+        nodeList.put("linked_hashes_Node",linked_hashes_Node);
+        nodeList.put("records_Node",records_Node);
+        nodeList.put("other_Node",other_Node);
+        nodeList.put("other_Node",other_Node);
+        nodeList.put("bank_Tree",bank_Tree);
+        nodeList.put("telegrams_Tree",telegrams_Tree);
 
 
         if (BlockChain.TEST_MODE)
@@ -70,8 +86,6 @@ public class tt extends JPanel { // implements TreeSelectionListener {
             root.add(linked_hashes_Node);
         if (BlockChain.TEST_MODE)
             root.add(telegrams_Tree);
-
-
 
         root.add(records_Node);
         root.add(other_Node);
