@@ -5,7 +5,6 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui.models.WalletItemAssetsTableModel;
 import org.erachain.gui2.MainPanel;
@@ -24,9 +23,9 @@ import java.awt.event.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class MyAssetsTab extends SplitPanel implements MainPanelInterface {
+public class MyAssetsTab extends SplitPanel {
 
-    private String iconFile = "images/pageicons/MyAssetsTab.png";
+    private static String iconFile = "images/pageicons/MyAssetsTab.png";
     private static final long serialVersionUID = 1L;
     final MTable table;
     protected int row;
@@ -239,7 +238,7 @@ public class MyAssetsTab extends SplitPanel implements MainPanelInterface {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = assetsModel.getItem(row).b;
-                MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "To sell", ""));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel(asset, null, "To sell", ""), ExchangePanel.getIcon());
 
             }
 
@@ -251,7 +250,7 @@ public class MyAssetsTab extends SplitPanel implements MainPanelInterface {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = assetsModel.getItem(row).b;
-                MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "", ""));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
             }
         });
         assetsMenu.add(excahge);
@@ -261,7 +260,7 @@ public class MyAssetsTab extends SplitPanel implements MainPanelInterface {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = assetsModel.getItem(row).b;
-                MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "Buy", ""));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel(asset, null, "Buy", ""), ExchangePanel.getIcon());
 
             }
         });
@@ -391,7 +390,7 @@ public class MyAssetsTab extends SplitPanel implements MainPanelInterface {
                 if (e.getClickCount() == 2) {
                     row = table.convertRowIndexToModel(row);
                     AssetCls asset = assetsModel.getItem(row).b;
-                    MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "", ""));
+                    MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
 
                     //		new AssetFrame(asset);
                 }
@@ -487,10 +486,11 @@ public class MyAssetsTab extends SplitPanel implements MainPanelInterface {
         String action = null;
         ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");
         panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
-        MainPanel.getInstance().insertTab(panel);
+        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),panel, ExchangePanel.getIcon());
     }
-    @Override
-    public Image getIcon() {
+
+
+    public static  Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

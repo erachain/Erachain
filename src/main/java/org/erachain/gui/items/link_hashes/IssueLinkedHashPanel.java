@@ -11,7 +11,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.FileChooser;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Pair;
@@ -31,8 +30,8 @@ import java.util.List;
 
 //import java.awt.GridBagConstraints;
 
-public class IssueLinkedHashPanel extends SplitPanel implements MainPanelInterface {
-    private String iconFile = "images/pageicons/IssueLinkedHashPanel.png";
+public class IssueLinkedHashPanel extends SplitPanel {
+    private static String iconFile = "images/pageicons/IssueLinkedHashPanel.png";
 
     TableModelIssueHashes table_Model;
     IssueHashImprint issue_Hash_Imprint;
@@ -347,8 +346,8 @@ public class IssueLinkedHashPanel extends SplitPanel implements MainPanelInterfa
             Table_Hash.setRowSelectionInterval(table_Model.getRowCount() - 1, table_Model.getRowCount() - 1);
         }
     }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

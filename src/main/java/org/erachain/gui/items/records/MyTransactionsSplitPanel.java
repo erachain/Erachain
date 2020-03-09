@@ -26,10 +26,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-public class MyTransactionsSplitPanel extends SplitPanel implements MainPanelInterface {
+public class MyTransactionsSplitPanel extends SplitPanel  {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    private String iconFile = "images/pageicons/MyTransactionsSplitPanel.png";
+    private static String iconFile = "images/pageicons/MyTransactionsSplitPanel.png";
     private static MyTransactionsSplitPanel instance;
     public VouchLibraryPanel voush_Library_Panel;
     protected Tuple2<Long, Long> selectedTransactionKey;
@@ -359,8 +359,8 @@ public class MyTransactionsSplitPanel extends SplitPanel implements MainPanelInt
             this.records_model.fireTableDataChanged();
         }
     }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

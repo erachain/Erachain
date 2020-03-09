@@ -3,7 +3,6 @@ package org.erachain.gui.items.unions;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.WalletItemUnionsTableModel;
 import org.erachain.lang.Lang;
 
@@ -18,9 +17,9 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 
-public class MyUnionsTab extends SplitPanel implements MainPanelInterface {
+public class MyUnionsTab extends SplitPanel {
 
-    private String iconFile = "images/pageicons/MyUnionsTab.png";
+    private static String iconFile = "images/pageicons/MyUnionsTab.png";
     final WalletItemUnionsTableModel unionsModel;
     private TableColumnModel columnModel;
     private TableColumn favoriteColumn;
@@ -126,8 +125,8 @@ public class MyUnionsTab extends SplitPanel implements MainPanelInterface {
         //  if (c1 instanceof StatementInfo) ( (StatementInfo)c1).delay_on_Close();
 
     }
-    @Override
-    public Image getIcon() {
+
+    public static  Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

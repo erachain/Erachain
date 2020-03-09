@@ -3,7 +3,6 @@ package org.erachain.gui.items.templates;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.gui.items.ItemSplitPanel;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.WalletItemTemplatesTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -17,9 +16,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 
-public class TemplateMySplitPanel extends ItemSplitPanel implements MainPanelInterface {
+public class TemplateMySplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private String iconFile = "images/pageicons/TemplateMySplitPanel.png";
+    private static String iconFile = "images/pageicons/TemplateMySplitPanel.png";
     //private TemplateMySplitPanel th;
 
     public TemplateMySplitPanel() {
@@ -54,8 +53,8 @@ public class TemplateMySplitPanel extends ItemSplitPanel implements MainPanelInt
         return new InfoTemplates((TemplateCls) item);
     }
 
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

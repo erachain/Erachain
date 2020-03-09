@@ -7,7 +7,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemSplitPanel;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -21,10 +20,10 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SearchPersonsSplitPanel extends SearchItemSplitPanel implements MainPanelInterface {
+public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    private String iconFile = "images/pageicons/SearchPersonsSplitPanel.png";
+    private static String iconFile = "images/pageicons/SearchPersonsSplitPanel.png";
 
     public SearchPersonsSplitPanel() {
         super(new ItemsPersonsTableModel(), "SearchPersonsSplitPanel", "SearchPersonsSplitPanel");
@@ -35,8 +34,8 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel implements Mai
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
-                        null, null, (PersonCls) itemTableSelected, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"),new AccountAssetSendPanel(null,
+                        null, null, (PersonCls) itemTableSelected, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -49,7 +48,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel implements Mai
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) itemTableSelected));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, null, (PersonCls) itemTableSelected), MailSendPanel.getIcon());
             }
         });
 
@@ -130,8 +129,8 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel implements Mai
 
     }
 
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

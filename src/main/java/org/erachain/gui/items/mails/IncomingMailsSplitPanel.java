@@ -5,7 +5,6 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -27,7 +26,7 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class IncomingMailsSplitPanel extends SplitPanel implements MainPanelInterface {
+public class IncomingMailsSplitPanel extends SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
     // для прозрачности
     int alpha = 255;
@@ -35,7 +34,7 @@ public class IncomingMailsSplitPanel extends SplitPanel implements MainPanelInte
     private TableModelMails incoming_Mails_Model;
     private MTable inciming_Mail_Table;
     private TableRowSorter my_Sorter;
-    private String iconFile = "images/pageicons/IncomingMailsSplitPanel.png";
+    private static String iconFile = "images/pageicons/IncomingMailsSplitPanel.png";
 
     public IncomingMailsSplitPanel() {
         super("IncomingMailsSplitPanel");
@@ -97,7 +96,7 @@ public class IncomingMailsSplitPanel extends SplitPanel implements MainPanelInte
                 row = inciming_Mail_Table.convertRowIndexToModel(row);
                 Account account = incoming_Mails_Model.getTransaction(row).getCreator();
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, account, null), MailSendPanel.getIcon());
 
             }
         });
@@ -248,8 +247,8 @@ public class IncomingMailsSplitPanel extends SplitPanel implements MainPanelInte
 
         }
     }
-    @Override
-    public Image getIcon() {
+
+    public static  Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

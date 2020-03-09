@@ -1,6 +1,54 @@
 package org.erachain.gui2;
 
 import org.erachain.core.BlockChain;
+import org.erachain.gui.Wallets.WalletsManagerSplitPanel;
+import org.erachain.gui.bank.IssueSendPaymentOrder;
+import org.erachain.gui.bank.MyOrderPaimentsSplitPanel;
+import org.erachain.gui.items.accounts.AccountsNameSearchSplitPanel;
+import org.erachain.gui.items.accounts.MyAccountsSplitPanel;
+import org.erachain.gui.items.accounts.MyLoansSplitPanel;
+import org.erachain.gui.items.assets.*;
+import org.erachain.gui.items.imprints.ImprintsFavoriteSplitPanel;
+import org.erachain.gui.items.imprints.ImprintsSearchSplitPanel;
+import org.erachain.gui.items.imprints.IssueImprintPanel;
+import org.erachain.gui.items.imprints.MyImprintsTab;
+import org.erachain.gui.items.link_hashes.IssueLinkedHashPanel;
+import org.erachain.gui.items.link_hashes.SearchLinkedHash;
+import org.erachain.gui.items.mails.IncomingMailsSplitPanel;
+import org.erachain.gui.items.mails.MailSendPanel;
+import org.erachain.gui.items.mails.OutcomingMailsSplitPanel;
+import org.erachain.gui.items.other.OtherConsolePanel;
+import org.erachain.gui.items.other.OtherSearchBlocks;
+import org.erachain.gui.items.other.OtherSplitPanel;
+import org.erachain.gui.items.persons.IssuePersonPanel;
+import org.erachain.gui.items.persons.PersonsFavoriteSplitPanel;
+import org.erachain.gui.items.persons.PersonsMySplitPanel;
+import org.erachain.gui.items.persons.SearchPersonsSplitPanel;
+import org.erachain.gui.items.polls.IssuePollPanel;
+import org.erachain.gui.items.polls.PollsFavoriteSplitPanel;
+import org.erachain.gui.items.polls.Polls_My_SplitPanel;
+import org.erachain.gui.items.polls.SearchPollsSplitPanel;
+import org.erachain.gui.items.records.FavoriteTransactionsSplitPanel;
+import org.erachain.gui.items.records.MyTransactionsSplitPanel;
+import org.erachain.gui.items.records.SearchTransactionsSplitPanel;
+import org.erachain.gui.items.records.UnconfirmedTransactionsPanel;
+import org.erachain.gui.items.statement.FavoriteStatementsSplitPanel;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
+import org.erachain.gui.items.statement.SearchStatementsSplitPanel;
+import org.erachain.gui.items.statement.StatementsMySplitPanel;
+import org.erachain.gui.items.statuses.IssueStatusPanel;
+import org.erachain.gui.items.statuses.SearchStatusesSplitPanel;
+import org.erachain.gui.items.statuses.StatusesFavoriteSplitPanel;
+import org.erachain.gui.items.templates.IssueTemplatePanel;
+import org.erachain.gui.items.templates.SearchTemplatesSplitPanel;
+import org.erachain.gui.items.templates.TemplatesFavoriteSplitPanel;
+import org.erachain.gui.items.unions.IssueUnionPanel;
+import org.erachain.gui.items.unions.MyUnionsTab;
+import org.erachain.gui.items.unions.SearchUnionSplitPanel;
+import org.erachain.gui.library.ASMutableTreeNode;
+import org.erachain.gui.telegrams.ALLTelegramPanel;
+import org.erachain.gui.telegrams.TelegramSplitPanel;
+import org.erachain.gui2.lib.AS_tt_Render;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -28,22 +76,22 @@ public class tt extends JPanel { // implements TreeSelectionListener {
 
         // -------------------------------------------
 
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Erachain");
-        DefaultMutableTreeNode account_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Accounts"));
-        DefaultMutableTreeNode person_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Persons"));
-        DefaultMutableTreeNode document_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Documents"));
-        DefaultMutableTreeNode mails_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Mails"));
-        DefaultMutableTreeNode assets_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Assets"));
-        DefaultMutableTreeNode templates_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Templates"));
-        DefaultMutableTreeNode statuses_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Statuses"));
-        DefaultMutableTreeNode unions_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Unions"));
-        DefaultMutableTreeNode polls_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Polls"));
-        DefaultMutableTreeNode hashes_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Unique Hashes"));
-        DefaultMutableTreeNode linked_hashes_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Linked Hashes"));
-        DefaultMutableTreeNode records_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Records"));
-        DefaultMutableTreeNode other_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Network DashBoard"));
-        DefaultMutableTreeNode bank_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Bank"));
-        DefaultMutableTreeNode telegrams_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Telegrams"));
+        ASMutableTreeNode root = new ASMutableTreeNode("root", Lang.getInstance().translate("Erachain"), getIcon("images/pageicons/SearchPersonsSplitPanel.png"));
+        ASMutableTreeNode account_Node = new ASMutableTreeNode("account_Node",Lang.getInstance().translate("Accounts"), getIcon("images/pageicons/account_Node.png"));
+        ASMutableTreeNode person_Node = new ASMutableTreeNode("person_Node",Lang.getInstance().translate("Persons"),  getIcon("images/pageicons/person_Node.png"));
+        ASMutableTreeNode document_Node = new ASMutableTreeNode("document_Node",Lang.getInstance().translate("Documents"),  getIcon("images/pageicons/document_Node.png"));
+        ASMutableTreeNode mails_Node = new ASMutableTreeNode("mails_Node",Lang.getInstance().translate("Mails"),  getIcon("images/pageicons/mails_Node.png"));
+        ASMutableTreeNode assets_Node = new ASMutableTreeNode("assets_Node",Lang.getInstance().translate("Assets"),  getIcon("images/pageicons/assets_Node.png"));
+        ASMutableTreeNode templates_Node = new ASMutableTreeNode("templates_Node",Lang.getInstance().translate("Templates"),  getIcon("images/pageicons/templates_Node.png"));
+        ASMutableTreeNode statuses_Node = new ASMutableTreeNode("statuses_Node",Lang.getInstance().translate("Statuses"),  getIcon("images/pageicons/statuses_Node.png"));
+        ASMutableTreeNode unions_Node = new ASMutableTreeNode("unions_Node",Lang.getInstance().translate("Unions"),  getIcon("images/pageicons/unions_Node.png"));
+        ASMutableTreeNode polls_Node = new ASMutableTreeNode("polls_Node",Lang.getInstance().translate("Polls"),  getIcon("images/pageicons/polls_Node.png"));
+        ASMutableTreeNode hashes_Node = new ASMutableTreeNode("hashes_Node",Lang.getInstance().translate("Unique Hashes"),  getIcon("images/pageicons/hashes_Node.png"));
+        ASMutableTreeNode linked_hashes_Node = new ASMutableTreeNode("linked_hashes_Node",Lang.getInstance().translate("Linked Hashes"),  getIcon("images/pageicons/linked_hashes_Node.png"));
+        ASMutableTreeNode records_Node = new ASMutableTreeNode("records_Node",Lang.getInstance().translate("Records"),  getIcon("images/pageicons/records_Node.png"));
+        ASMutableTreeNode other_Node = new ASMutableTreeNode("other_Node",Lang.getInstance().translate("Network DashBoard"),  getIcon("images/pageicons/other_Node.png"));
+        ASMutableTreeNode bank_Tree = new ASMutableTreeNode("bank_Tree",Lang.getInstance().translate("Bank"),  getIcon("images/pageicons/bank_Tree.png"));
+        ASMutableTreeNode telegrams_Tree = new ASMutableTreeNode("telegrams_Tree",Lang.getInstance().translate("Telegrams"),  getIcon("images/pageicons/telegrams_Tree.png"));
 
         TreeMap<String, DefaultMutableTreeNode> nodeList = new TreeMap<String, DefaultMutableTreeNode>();
         nodeList.put("account_Node",account_Node);
@@ -90,85 +138,85 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         root.add(records_Node);
         root.add(other_Node);
 
-        bank_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send payment order")));
-        bank_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Payments Orders")));
+        bank_Tree.add(new ASMutableTreeNode("IssueSendPaymentOrder",Lang.getInstance().translate("Send payment order"), IssueSendPaymentOrder.getIcon()));
+        bank_Tree.add(new ASMutableTreeNode("MyOrderPaimentsSplitPanel",Lang.getInstance().translate("My Payments Orders"), MyOrderPaimentsSplitPanel.getIcon()));
+        person_Node.add(new ASMutableTreeNode("PersonsFavoriteSplitPanel",Lang.getInstance().translate("Favorite Persons"), PersonsFavoriteSplitPanel.getIcon()));
+        person_Node.add(new ASMutableTreeNode("PersonsMySplitPanel",Lang.getInstance().translate("My Persons"), PersonsMySplitPanel.getIcon()));
+        person_Node.add(new ASMutableTreeNode("SearchPersonsSplitPanel",Lang.getInstance().translate("Search Persons"), SearchPersonsSplitPanel.getIcon()));
+        person_Node.add(new ASMutableTreeNode("IssuePersonPanel",Lang.getInstance().translate("Issue Person"), IssuePersonPanel.getIcon()));
+    //    person_Node.add(new ASMutableTreeNode("Insert Person",Lang.getInstance().translate("Insert Person")));
 
-        person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Persons")));
-        person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Persons")));
-        person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Persons")));
-        person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Person")));
-        person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Insert Person")));
-
-        account_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Accounts")));
-        account_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Loans")));
-        account_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Accounts")));
+        account_Node.add(new ASMutableTreeNode("MyAccountsSplitPanel",Lang.getInstance().translate("My Accounts"), MyAccountsSplitPanel.getIcon()));
+        account_Node.add(new ASMutableTreeNode("MyLoansSplitPanel",Lang.getInstance().translate("My Loans"), MyLoansSplitPanel.getIcon()));
+        account_Node.add(new ASMutableTreeNode("AccountsNameSearchSplitPanel",Lang.getInstance().translate("Favorite Accounts"), AccountsNameSearchSplitPanel.getIcon()));
 
         // account_Node.add(new
         // DefaultMutableTreeNode(Lang.getInstance().translate("Search
         // Accounts")));
         // account_Node.add(new DefaultMutableTreeNode("Issue Account"));
 
-        document_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Documents")));
-        document_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Documents")));
-        document_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Documents")));
-        document_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Document")));
+        document_Node.add(new ASMutableTreeNode("FavoriteStatementsSplitPanel",Lang.getInstance().translate("Favorite Documents"), FavoriteStatementsSplitPanel.getIcon()));
+        document_Node.add(new ASMutableTreeNode("StatementsMySplitPanel",Lang.getInstance().translate("My Documents"), StatementsMySplitPanel.getIcon()));
+        document_Node.add(new ASMutableTreeNode("SearchStatementsSplitPanel",Lang.getInstance().translate("Search Documents"), SearchStatementsSplitPanel.getIcon()));
+        document_Node.add(new ASMutableTreeNode("IssueDocumentPanel",Lang.getInstance().translate("Issue Document"), IssueDocumentPanel.getIcon()));
 
-        mails_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Incoming Mails")));
-        mails_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Outcoming Mails")));
-        mails_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send Mail")));
+        mails_Node.add(new ASMutableTreeNode("IncomingMailsSplitPanel",Lang.getInstance().translate("Incoming Mails"), IncomingMailsSplitPanel.getIcon()));
+        mails_Node.add(new ASMutableTreeNode("OutcomingMailsSplitPanel",Lang.getInstance().translate("Outcoming Mails"), OutcomingMailsSplitPanel.getIcon()));
+        mails_Node.add(new ASMutableTreeNode("MailSendPanel",Lang.getInstance().translate("Send Mail"), MailSendPanel.getIcon()));
 
-        assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Assets")));
-        assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Assets")));
-        assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Assets")));
-        assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Asset")));
-        //assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Orders")));
-        assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Balance")));
-        //assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Exchange")));
+        assets_Node.add(new ASMutableTreeNode("AssetsFavoriteSplitPanel",Lang.getInstance().translate("Favorite Assets"), AssetsFavoriteSplitPanel.getIcon()));
+        assets_Node.add(new ASMutableTreeNode("MyAssetsTab",Lang.getInstance().translate("My Assets"), MyAssetsTab.getIcon()));
+        assets_Node.add(new ASMutableTreeNode("SearchAssetsSplitPanel", Lang.getInstance().translate("Search Assets"), SearchAssetsSplitPanel.getIcon()));
+        assets_Node.add(new ASMutableTreeNode("IssueAssetPanel",Lang.getInstance().translate("Issue Asset"), IssueAssetPanel.getIcon()));
+        //assets_Node.add(new ASMutableTreeNode(Lang.getInstance().translate("My Orders")));
+        assets_Node.add(new ASMutableTreeNode("MyBalanceTab",Lang.getInstance().translate("My Balance"), MyBalanceTab.getIcon()));
+        //assets_Node.add(new ASMutableTreeNode(Lang.getInstance().translate("Exchange")));
 
-        templates_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Templates")));
-        templates_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Templates")));
-        templates_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Template")));
+        templates_Node.add(new ASMutableTreeNode("TemplatesFavoriteSplitPanel",Lang.getInstance().translate("Favorite Templates"), TemplatesFavoriteSplitPanel.getIcon()));
+        templates_Node.add(new ASMutableTreeNode("SearchTemplatesSplitPanel",Lang.getInstance().translate("Search Templates"), SearchTemplatesSplitPanel.getIcon()));
+        templates_Node.add(new ASMutableTreeNode("IssueTemplatePanel",Lang.getInstance().translate("Issue Template"), IssueTemplatePanel.getIcon()));
 
-        statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Statuses")));
-        statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Statuses")));
-        statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Create Status")));
+        statuses_Node.add(new ASMutableTreeNode("StatusesFavoriteSplitPanel",Lang.getInstance().translate("Favorite Statuses"), StatusesFavoriteSplitPanel.getIcon()));
+        statuses_Node.add(new ASMutableTreeNode("SearchStatusesSplitPanel",Lang.getInstance().translate("Search Statuses"), SearchStatusesSplitPanel.getIcon()));
+        statuses_Node.add(new ASMutableTreeNode("IssueStatusPanel",Lang.getInstance().translate("Create Status"), IssueStatusPanel.getIcon()));
 
-        unions_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Unions")));
-        unions_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Unions")));
-        unions_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Union")));
+        unions_Node.add(new ASMutableTreeNode("MyUnionsTab", Lang.getInstance().translate("My Unions"), MyUnionsTab.getIcon()));
+        unions_Node.add(new ASMutableTreeNode("SearchUnionSplitPanel", Lang.getInstance().translate("Search Unions"), SearchUnionSplitPanel.getIcon()));
+        unions_Node.add(new ASMutableTreeNode("IssueUnionPanel",Lang.getInstance().translate("Issue Union"), IssueUnionPanel.getIcon()));
 
-        polls_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Polls")));
-        polls_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Polls")));
-        polls_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Poll")));
-        polls_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Polls")));
+        polls_Node.add(new ASMutableTreeNode("Polls_My_SplitPanel", Lang.getInstance().translate("My Polls"), Polls_My_SplitPanel.getIcon()));
+        polls_Node.add(new ASMutableTreeNode("SearchPollsSplitPanel",Lang.getInstance().translate("Search Polls"), SearchPollsSplitPanel.getIcon()));
+        polls_Node.add(new ASMutableTreeNode("IssuePollPanel",Lang.getInstance().translate("Issue Poll"), IssuePollPanel.getIcon()));
+        polls_Node.add(new ASMutableTreeNode("PollsFavoriteSplitPanel",Lang.getInstance().translate("Favorite Polls"), PollsFavoriteSplitPanel.getIcon()));
 
-        records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Records")));
-        records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Records")));
-        records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Records")));
-        records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Unconfirmed Records")));
+        records_Node.add(new ASMutableTreeNode("FavoriteTransactionsSplitPanel",Lang.getInstance().translate("Favorite Records"), FavoriteTransactionsSplitPanel.getIcon()));
+        records_Node.add(new ASMutableTreeNode("MyTransactionsSplitPanel",Lang.getInstance().translate("My Records"), MyTransactionsSplitPanel.getIcon()));
+        records_Node.add(new ASMutableTreeNode("SearchTransactionsSplitPanel",Lang.getInstance().translate("Search Records"), SearchTransactionsSplitPanel.getIcon()));
+        records_Node.add(new ASMutableTreeNode("UnconfirmedTransactionsPanel",Lang.getInstance().translate("Unconfirmed Records"), UnconfirmedTransactionsPanel.getIcon()));
 
-        other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Other")));
+        other_Node.add(new ASMutableTreeNode("OtherSplitPanel",Lang.getInstance().translate("Other"), OtherSplitPanel.getIcon()));
         if (BlockChain.TEST_MODE)
-            other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Wallets Manager")));
+            other_Node.add(new ASMutableTreeNode("WalletsManagerSplitPanel",Lang.getInstance().translate("Wallets Manager"), WalletsManagerSplitPanel.getIcon()));
         
-        other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Console")));
-        other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Blocks")));
+        other_Node.add(new ASMutableTreeNode("OtherConsolePanel", Lang.getInstance().translate("Console"), OtherConsolePanel.getIcon()));
+        other_Node.add(new ASMutableTreeNode("OtherSearchBlocks",Lang.getInstance().translate("Blocks"), OtherSearchBlocks.getIcon()));
 
-        hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Unique Hashes")));
-        hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Unique Hashes")));
-        hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Unique Hashes")));
-        hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Unique Hash")));
+        hashes_Node.add(new ASMutableTreeNode("ImprintsFavoriteSplitPanel",Lang.getInstance().translate("Favorite Unique Hashes"), ImprintsFavoriteSplitPanel.getIcon()));
+        hashes_Node.add(new ASMutableTreeNode("MyImprintsTab",Lang.getInstance().translate("My Unique Hashes"), MyImprintsTab.getIcon()));
+        hashes_Node.add(new ASMutableTreeNode("ImprintsSearchSplitPanel", Lang.getInstance().translate("Search Unique Hashes"), ImprintsSearchSplitPanel.getIcon()));
+        hashes_Node.add(new ASMutableTreeNode("IssueImprintPanel",Lang.getInstance().translate("Issue Unique Hash"), IssueImprintPanel.getIcon()));
 
-        linked_hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Linked Hash")));
-        linked_hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Linked Hash")));
+        linked_hashes_Node.add(new ASMutableTreeNode("IssueLinkedHashPanel",Lang.getInstance().translate("Issue Linked Hash"), IssueLinkedHashPanel.getIcon()));
+        linked_hashes_Node.add(new ASMutableTreeNode("SearchLinkedHash",Lang.getInstance().translate("Search Linked Hash"), SearchLinkedHash.getIcon()));
         
        //telegram
-        telegrams_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Telegrams Panel")));
-        telegrams_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("All Telegrams Panel")));
+        telegrams_Tree.add(new ASMutableTreeNode("TelegramSplitPanel",Lang.getInstance().translate("Telegrams Panel"), TelegramSplitPanel.getIcon()));
+        telegrams_Tree.add(new ASMutableTreeNode("ALLTelegramPanel",Lang.getInstance().translate("All Telegrams Panel"), ALLTelegramPanel.getIcon()));
         
         tree = new JTree(root);
+       tree.setCellRenderer(new AS_tt_Render());
         // tree.addTreeSelectionListener(this);
-        double dd = (double) UIManager.getFont("TextField.font").getSize() * 1.2;
+        double dd = (double) UIManager.getFont("TextField.font").getSize() * 1.5;
         tree.setRowHeight((int) dd);
         tree.setRootVisible(false);
         for (int i = 0; i < tree.getRowCount(); i++)
@@ -235,6 +283,16 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         // pack(); // ������������� ����������� �������
         setVisible(true); // ���������� ����
 
+    }
+
+    public static Image getIcon(String iconFile) {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
     /*

@@ -10,7 +10,6 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -26,9 +25,9 @@ import java.util.List;
 //import org.erachain.settings.Settings;
 
 @SuppressWarnings("serial")
-public class IssueImprintPanel extends JPanel implements MainPanelInterface {
+public class IssueImprintPanel extends JPanel {
 
-    private String iconFile = "images/pageicons/IssueImprintPanel.png";
+    private static String iconFile = "images/pageicons/IssueImprintPanel.png";
 
     private JComboBox<Account> cbxFrom;
     private JComboBox<String> txtFeePow;
@@ -384,8 +383,8 @@ public class IssueImprintPanel extends JPanel implements MainPanelInterface {
         //ENABLE
         this.issueButton.setEnabled(true);
     }
-    @Override
-    public Image getIcon() {
+
+    public static  Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

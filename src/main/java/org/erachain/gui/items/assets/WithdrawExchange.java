@@ -6,7 +6,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.library.MButton;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -33,10 +32,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
-public class WithdrawExchange extends JPanel implements MainPanelInterface {
+public class WithdrawExchange extends JPanel {
 
     // private JComboBox<Account> accountLBox;
-    private String iconFile = "images/pageicons/WithdrawExchange.png";
+    private static String iconFile = "images/pageicons/WithdrawExchange.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(WithdrawExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
@@ -174,7 +173,7 @@ public class WithdrawExchange extends JPanel implements MainPanelInterface {
             panel.jLabel_Title.setText("<html><h2>" + formTitle + "</h2></html>");
             panel.setName(Lang.getInstance().translate("Withdraw"));
             MainPanel.getInstance().removeTab(panel.getName());
-            MainPanel.getInstance().insertTab(panel);
+            MainPanel.getInstance().insertTab( Lang.getInstance().translate("Send asset") ,panel, AccountAssetSendPanel.getIcon());
 
         }
 
@@ -393,8 +392,8 @@ public class WithdrawExchange extends JPanel implements MainPanelInterface {
         add(jText_History, gridBagConstraints);
 
     }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

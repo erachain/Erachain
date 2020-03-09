@@ -3,20 +3,18 @@ package org.erachain.gui.items.accounts;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.lang.Lang;
 
-import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 
 // панель моих адресов
-public class MyLoansSplitPanel extends SplitPanel implements MainPanelInterface {
+public class MyLoansSplitPanel extends SplitPanel  {
 
     public AccountsPanel accountPanel;
     public AccountsRightPanel rightPanel;
-    private String iconFile = "images/pageicons/MyLoansSplitPanel.png";
+    private static String iconFile = "images/pageicons/MyLoansSplitPanel.png";
 
     public MyLoansSplitPanel() {
         super("MyLoansSplitPanel");
@@ -70,8 +68,8 @@ public class MyLoansSplitPanel extends SplitPanel implements MainPanelInterface 
         }
 
     }
-    @Override
-    public Image getIcon() {
+
+    public static  Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

@@ -24,9 +24,9 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 /**
  * @author Саша
  */
-public class IssueAssetPanel extends JPanel implements MainPanelInterface {
+public class IssueAssetPanel extends JPanel  {
 
-    private String iconFile = "images/pageicons/IssueAssetPanel.png";
+    private static String iconFile = "images/pageicons/IssueAssetPanel.png";
     private JLabel titleJLabel = new JLabel();
     private JLabel accountJLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
     private JLabel descriptionJLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
@@ -429,8 +429,8 @@ public class IssueAssetPanel extends JPanel implements MainPanelInterface {
         // ENABLE
         issueJButton.setEnabled(true);
     }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

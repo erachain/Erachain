@@ -22,7 +22,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -34,11 +33,11 @@ import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings("serial")
-public class UnconfirmedTransactionsPanel extends JPanel implements MainPanelInterface
+public class UnconfirmedTransactionsPanel extends JPanel
 
 {
     protected Logger logger;
-    private String iconFile = "images/pageicons/UnconfirmedTransactionsPanel.png";
+    private static String iconFile = "images/pageicons/UnconfirmedTransactionsPanel.png";
     private static UnconfirmedTransactionsPanel instance;
     private UnconfirmedTransactionsTableModel transactionsModel;
     private MTable transactionsTable;
@@ -280,8 +279,8 @@ public class UnconfirmedTransactionsPanel extends JPanel implements MainPanelInt
         return instance;
 
     }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

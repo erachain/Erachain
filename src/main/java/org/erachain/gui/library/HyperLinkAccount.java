@@ -77,8 +77,8 @@ public class HyperLinkAccount {
         JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_Crator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
-                        null, account, null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
+                        null, account, null, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -88,7 +88,7 @@ public class HyperLinkAccount {
         Send_Mail_Creator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, account, null), MailSendPanel.getIcon());
                 //new MailSendDialog(null, null, account, null);
             }
         });

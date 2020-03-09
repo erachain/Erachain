@@ -5,7 +5,6 @@ import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.gui.items.ItemSplitPanel;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
@@ -14,10 +13,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ImprintsFavoriteSplitPanel extends ItemSplitPanel implements MainPanelInterface {
+public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
     //private ImprintsFavoriteSplitPanel th;
-    private String iconFile = "images/pageicons/ImprintsFavoriteSplitPanel.png";
+    private static String iconFile = "images/pageicons/ImprintsFavoriteSplitPanel.png";
     public ImprintsFavoriteSplitPanel() {
         super(new FavoriteImprintsTableModel(), "PersonsFavoriteSplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Persons"));
@@ -28,8 +27,8 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel implements MainPa
             @Override
             public void actionPerformed(ActionEvent e) {
                 //new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
-                        null, itemTableSelected.getOwner(), null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
+                        null, itemTableSelected.getOwner(), null, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -39,7 +38,7 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel implements MainPa
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, itemTableSelected.getOwner(), null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, itemTableSelected.getOwner(), null), MailSendPanel.getIcon());
             }
         });
 
@@ -51,8 +50,8 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel implements MainPa
     public Component getShow(ItemCls item) {
         return new ImprintsInfoPanel((ImprintCls) item);
     }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

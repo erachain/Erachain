@@ -11,7 +11,6 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -24,9 +23,9 @@ import java.awt.event.ActionListener;
 /**
  * @author Саша
  */
-public class IssueDocumentPanel extends javax.swing.JPanel implements MainPanelInterface {
+public class IssueDocumentPanel extends javax.swing.JPanel {
 
-    private String iconFile = "images/pageicons/IssueDocumentPanel.png";
+    private static String iconFile = "images/pageicons/IssueDocumentPanel.png";
     private IssueDocumentPanel th;
     private ExDataPanel exData_Panel;
     private MButton jButton_Work_Cancel;
@@ -325,8 +324,8 @@ public class IssueDocumentPanel extends javax.swing.JPanel implements MainPanelI
         this.jButton_Work_OK.setEnabled(true);
         this.jButton_Work_OK1.setEnabled(true);
     }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

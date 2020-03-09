@@ -96,7 +96,7 @@ public class ButtonTabComponent extends JPanel {
         };
         // resize icon
         int size = UIManager.getFont("TextField.font").getSize() + 4;
-        icon = icon.getScaledInstance(size,size,size);
+        icon = icon.getScaledInstance(size,size,0);
         Icon ic = new ImageIcon(icon);
         label.setIcon(ic);
         add(label);

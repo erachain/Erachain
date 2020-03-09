@@ -5,7 +5,6 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemSplitPanel;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -19,10 +18,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 @SuppressWarnings("serial")
-public class SearchTemplatesSplitPanel extends SearchItemSplitPanel implements MainPanelInterface {
+public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
     private static TemplatesItemsTableModel tableModelTemplates = new TemplatesItemsTableModel();
     private SearchTemplatesSplitPanel th;
-    private String iconFile = "images/pageicons/SearchTemplatesSplitPanel.png";
+    private static String iconFile = "images/pageicons/SearchTemplatesSplitPanel.png";
 
     public SearchTemplatesSplitPanel() {
         super(tableModelTemplates, "SearchTemplatesSplitPanel", "SearchTemplatesSplitPanel");
@@ -72,8 +71,8 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel implements M
         return new InfoTemplates((TemplateCls) item);
 
     }
-    @Override
-    public Image getIcon() {
+
+    public static  Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

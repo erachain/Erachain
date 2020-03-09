@@ -23,8 +23,8 @@ public class PersonListAddPopupMenuItem {
             public void actionPerformed(ActionEvent e) {
 
                 //new AccountSendDialog(null, null, null, person);
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
-                        null, null, person, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"),new AccountAssetSendPanel(null,
+                        null, null, person, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -37,7 +37,7 @@ public class PersonListAddPopupMenuItem {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) person));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, null, (PersonCls) person), MailSendPanel.getIcon());
             }
         });
 

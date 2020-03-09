@@ -3,7 +3,6 @@ package org.erachain.gui.telegrams;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -18,13 +17,13 @@ import java.awt.event.ActionListener;
 *
 * @author Саша
 */
-public class ALLTelegramPanel extends javax.swing.JPanel implements MainPanelInterface {
+public class ALLTelegramPanel extends javax.swing.JPanel {
 
    /**
     * Creates new form rightTelegramPanel
     */
     JPopupMenu menu;
-    private String iconFile = "images/pageicons/ALLTelegramPanel.png";
+    private static String iconFile = "images/pageicons/ALLTelegramPanel.png";
     
     public TelegramsTableModel walletTelegramsFilterTableModel;
 protected int row;
@@ -219,8 +218,8 @@ public ALLTelegramPanel() {
 
     
    }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

@@ -13,7 +13,6 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.mails.MailInfo;
 import org.erachain.gui.library.IssueConfirmDialog;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
@@ -27,7 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.charset.StandardCharsets;
 
-public class IssueSendPaymentOrder extends javax.swing.JPanel implements MainPanelInterface {
+public class IssueSendPaymentOrder extends javax.swing.JPanel  {
 
     /**
      *
@@ -35,7 +34,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel implements MainPan
     private static final long serialVersionUID = 1L;
     private IssueSendPaymentOrder1 issue_Panel;
     private IssueSendPaymentOrder th;
-    private String iconFile = "images/pageicons/IssueSendPaymentOrder.png";
+    private static String iconFile = "images/pageicons/IssueSendPaymentOrder.png";
 
 
     /*
@@ -313,8 +312,8 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel implements MainPan
         return a;
     }
 
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

@@ -4,7 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.WalletItemImprintsTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -16,9 +15,9 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
 
-public class MyImprintsTab extends SplitPanel implements MainPanelInterface {
+public class MyImprintsTab extends SplitPanel  {
 
-    private String iconFile = "images/pageicons/MyImprintsTab.png";
+    private static String iconFile = "images/pageicons/MyImprintsTab.png";
     private static final long serialVersionUID = 1L;
     final MTable table;
     protected int row;
@@ -344,8 +343,8 @@ public class MyImprintsTab extends SplitPanel implements MainPanelInterface {
         }
 
     }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

@@ -8,7 +8,6 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.library.VouchLibraryPanel;
 import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
@@ -34,9 +33,9 @@ import java.util.List;
 /**
  * search transactions
  */
-public class SearchTransactionsSplitPanel extends SplitPanel implements MainPanelInterface {
+public class SearchTransactionsSplitPanel extends SplitPanel {
 
-    private String iconFile = "images/pageicons/SearchTransactionsSplitPanel.png";
+    private static String iconFile = "images/pageicons/SearchTransactionsSplitPanel.png";
     public JPanel info_Panel;
     public VouchLibraryPanel voush_Library_Panel;
     SearchTransactionsTableModel transactionsTableModel;
@@ -322,8 +321,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel implements MainPane
         jTableJScrollPanelLeftPanel.repaint();
 
     }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

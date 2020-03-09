@@ -5,7 +5,6 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.WalletItemPersonsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
@@ -20,9 +19,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 
-public class PersonsMySplitPanel extends ItemSplitPanel implements MainPanelInterface {
+public class PersonsMySplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private String iconFile = "images/pageicons/PersonsMySplitPanel.png";
+    private static String iconFile = "images/pageicons/PersonsMySplitPanel.png";
 
     public PersonsMySplitPanel() {
         super(new WalletItemPersonsTableModel(), "PersonsMySplitPanel");
@@ -101,8 +100,8 @@ public class PersonsMySplitPanel extends ItemSplitPanel implements MainPanelInte
         return new PersonInfo002((PersonCls) item, true);
     }
 
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

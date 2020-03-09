@@ -7,7 +7,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -21,10 +20,10 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class PersonsFavoriteSplitPanel extends ItemSplitPanel implements MainPanelInterface {
+public class PersonsFavoriteSplitPanel extends ItemSplitPanel  {
     private static final long serialVersionUID = 2717571093561259483L;
     //private PersonsFavoriteSplitPanel th;
-    private String iconFile = "images/pageicons/PersonsFavoriteSplitPanel.png";
+    private static String iconFile = "images/pageicons/PersonsFavoriteSplitPanel.png";
 
 
     public PersonsFavoriteSplitPanel() {
@@ -36,8 +35,8 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel implements MainPan
         vsend_Coins_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
-                        null, null, (PersonCls) itemTableSelected, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"),new AccountAssetSendPanel(null,
+                        null, null, (PersonCls) itemTableSelected, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -47,7 +46,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel implements MainPan
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) itemTableSelected));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, null, (PersonCls) itemTableSelected), MailSendPanel.getIcon());
             }
         });
 
@@ -125,8 +124,8 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel implements MainPan
         return new PersonInfo002((PersonCls) item, true);
     }
 
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

@@ -5,7 +5,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemSplitPanel;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -19,14 +18,14 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SearchAssetsSplitPanel extends SearchItemSplitPanel implements MainPanelInterface {
+public class SearchAssetsSplitPanel extends SearchItemSplitPanel  {
     /**
      *
      */
     private static final long serialVersionUID = 1L;
     //private static ItemAssetsTableModel tableModelItemAssets = ;
     ///private SearchAssetsSplitPanel th;
-    private String iconFile = "images/pageicons/SearchAssetsSplitPanel.png";
+    private static String iconFile = "images/pageicons/SearchAssetsSplitPanel.png";
 
     public SearchAssetsSplitPanel(boolean search_and_exchange) {
         super(new ItemAssetsTableModel(), "SearchAssetsSplitPanel", "SearchAssetsSplitPanel");
@@ -54,7 +53,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel implements Main
         sell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //new ExchangeFrame((AssetCls) th.itemMenu, null, "To sell", "");
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "To sell", ""));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel((AssetCls) itemTableSelected, null, "To sell", ""), ExchangePanel.getIcon());
 
             }
         });
@@ -62,7 +61,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel implements Main
         JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "", ""));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel((AssetCls) itemTableSelected, null, "", ""), ExchangePanel.getIcon());
 
             }
         });
@@ -70,7 +69,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel implements Main
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", ""));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", ""), ExchangePanel.getIcon());
 
             }
         });
@@ -127,11 +126,11 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel implements Main
         String action = null;
         ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");
         panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
-        MainPanel.getInstance().insertTab(panel);
+        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),panel, ExchangePanel.getIcon());
 
     }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

@@ -17,7 +17,6 @@ import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.items.accounts.AccountsComboBoxModel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.SendTableModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -42,9 +41,9 @@ import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("serial")
 
-public class MailSendPanel extends JPanel implements MainPanelInterface {
+public class MailSendPanel extends JPanel {
 
-    private String iconFile = "images/pageicons/MailSendPanel.png";
+    private static String iconFile = "images/pageicons/MailSendPanel.png";
     // TODO - "A" - &
     final static String wrongFirstCharOfAddress = "A";
     // private final MessagesTableModel messagesTableModel;
@@ -795,8 +794,8 @@ public class MailSendPanel extends JPanel implements MainPanelInterface {
         // ENABLE
         this.sendButton.setEnabled(true);
     }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

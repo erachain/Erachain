@@ -10,7 +10,6 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.library.SetIntervalPanel;
 import org.erachain.gui.models.WalletOrdersTableModel;
 import org.erachain.gui.transaction.CreateOrderDetailsFrame;
@@ -27,9 +26,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class MyOrderTab extends SplitPanel implements MainPanelInterface {
+public class MyOrderTab extends SplitPanel {
 
-    private String iconFile = "images/pageicons/MyOrderTab.png";
+    private static String iconFile = "images/pageicons/MyOrderTab.png";
     private static final long serialVersionUID = 1L;
     protected int row;
     /**
@@ -328,10 +327,10 @@ public class MyOrderTab extends SplitPanel implements MainPanelInterface {
         AssetCls wantAsset = Controller.getInstance().getAsset(order.getWantAssetKey());
         ExchangePanel panel = new ExchangePanel(haveAsset, wantAsset, action, "");
         panel.setName(haveAsset.getTickerName() + "/" + wantAsset.getTickerName());
-        MainPanel.getInstance().insertTab(panel);
+        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),panel,ExchangePanel.getIcon());
     }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

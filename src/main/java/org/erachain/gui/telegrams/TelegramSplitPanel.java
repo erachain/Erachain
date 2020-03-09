@@ -16,7 +16,6 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -45,12 +44,12 @@ import java.nio.charset.StandardCharsets;
 *
 * @author Саша
 */
-public class TelegramSplitPanel extends SplitPanel implements MainPanelInterface {
+public class TelegramSplitPanel extends SplitPanel {
 
    /**
     * Creates new form TelegramSplitPanel
     */
-   private String iconFile = "images/pageicons/TelegramSplitPanel.png";
+   private static String iconFile = "images/pageicons/TelegramSplitPanel.png";
     LeftTelegram leftTelegram;
     RightTelegramPanel rightTelegramPanel;
     private static final long serialVersionUID = 1L;
@@ -344,8 +343,8 @@ public class TelegramSplitPanel extends SplitPanel implements MainPanelInterface
         public void actionPerformed(ActionEvent e) {
             Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
-            MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
-                    null, account, null, null));
+            MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"),new AccountAssetSendPanel(null,
+                    null, account, null, null), AccountAssetSendPanel.getIcon());
 
 
         }
@@ -357,7 +356,7 @@ public class TelegramSplitPanel extends SplitPanel implements MainPanelInterface
         public void actionPerformed(ActionEvent e) {
             Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
-            MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
+            MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, account, null), MailSendPanel.getIcon());
 
         }
     });
@@ -581,8 +580,8 @@ public boolean cheskError(){
    
     return true;
 }
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

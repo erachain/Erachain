@@ -5,7 +5,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemSplitPanel;
-import org.erachain.gui.library.MainPanelInterface;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.URLViewer;
@@ -17,11 +16,11 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SearchPollsSplitPanel extends SearchItemSplitPanel implements MainPanelInterface {
+public class SearchPollsSplitPanel extends SearchItemSplitPanel {
     /**
      *
      */
-    private String iconFile = "images/pageicons/SearchPollsSplitPanel.png";
+    private static String iconFile = "images/pageicons/SearchPollsSplitPanel.png";
     private static final long serialVersionUID = 1L;
     private static PollsItemsTableModel tableModelPolls = new PollsItemsTableModel();
 
@@ -116,8 +115,8 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel implements MainP
 
     }
 
-    @Override
-    public Image getIcon() {
+
+    public static Image getIcon() {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconFile);

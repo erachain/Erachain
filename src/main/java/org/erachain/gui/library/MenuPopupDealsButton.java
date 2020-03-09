@@ -56,7 +56,7 @@ public class MenuPopupDealsButton extends JButton {
         Send_Mail_Creator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, null, null), MailSendPanel.getIcon());
             }
         });
         dealsMenu.add(Send_Mail_Creator);
@@ -67,7 +67,7 @@ public class MenuPopupDealsButton extends JButton {
         dealsMenuSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, null, null, null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Asset and Message"),new AccountAssetSendPanel(null, null, null, null, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -94,7 +94,7 @@ public class MenuPopupDealsButton extends JButton {
         dealsMenu_Take_On_Hold.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountAssetHoldPanel(null, null, null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Take on Hold"),new AccountAssetHoldPanel(null, null, null, null), AccountAssetHoldPanel.getIcon());
 
             }
         });
@@ -110,7 +110,7 @@ public class MenuPopupDealsButton extends JButton {
         dealsMenuLend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountAssetLendPanel(null, null, null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Lend"), new AccountAssetLendPanel(null, null, null, null), AccountAssetLendPanel.getIcon());
 
             }
         });
@@ -124,7 +124,7 @@ public class MenuPopupDealsButton extends JButton {
         dealsMenu_Confiscate_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountAssetConfiscateDebtPanel(null, null, null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Confiscate Debt"),new AccountAssetConfiscateDebtPanel(null, null, null, null),AccountAssetConfiscateDebtPanel.getIcon());
 
             }
         });
@@ -137,7 +137,7 @@ public class MenuPopupDealsButton extends JButton {
         dealsMenu_Repay_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountAssetRepayDebtPanel(null, null, null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Repay Debt"),new AccountAssetRepayDebtPanel(null, null, null, null), AccountAssetRepayDebtPanel.getIcon());
 
             }
         });
