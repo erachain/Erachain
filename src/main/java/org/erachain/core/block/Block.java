@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
+import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -1058,6 +1059,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     //PARSE TRANSACTION
                     byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position, position + transactionLength);
                     Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
+                    WeakReference<Object> weakRef = new WeakReference<>(transaction);
 
                     //ADD TO TRANSACTIONS
                     this.transactions.add(transaction);
