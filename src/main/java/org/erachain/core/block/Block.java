@@ -33,6 +33,7 @@ import org.mapdb.Fun.Tuple5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -42,7 +43,7 @@ import java.util.*;
 /**
  * обработка блоков - все что с ними связано. Без базы данных - сухие данные в вакууме
  */
-    public class Block implements ExplorerJsonLine {
+public class Block implements Closeable, ExplorerJsonLine {
 
     static private HashMap totalCOMPUtest = new HashMap();
 

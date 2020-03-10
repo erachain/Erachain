@@ -721,18 +721,19 @@ public class Wallet extends Observable implements Observer {
         	if (getAccounts() != null && !getAccounts().isEmpty()) {
 				do {
 
-					Block block = blockMap.getAndProcess(height);
+					try (Block block = blockMap.getAndProcess(height)) {
 
-					if (block == null) {
-						break;
-					}
+						if (block == null) {
+							break;
+						}
 
-					try {
-						this.processBlock(dcSet, block);
-					} catch (java.lang.OutOfMemoryError e) {
-						LOGGER.error(e.getMessage(), e);
-						Controller.getInstance().stopAll(644);
-						return;
+						try {
+							this.processBlock(dcSet, block);
+						} catch (java.lang.OutOfMemoryError e) {
+							LOGGER.error(e.getMessage(), e);
+							Controller.getInstance().stopAll(644);
+							return;
+						}
 					}
 
 					if (System.currentTimeMillis() - timePoint > 10000
