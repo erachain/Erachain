@@ -11,11 +11,14 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 
+import java.awt.*;
+
 //import org.erachain.settings.Settings;
 
 @SuppressWarnings("serial")
 
-public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls {
+public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls  {
+    private static String iconFile = "images/pageicons/AccountAssetConfiscateDebtPanel.png";
 
     public AccountAssetConfiscateDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
         super(true, null, assetIn, null,
@@ -58,4 +61,13 @@ public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls 
         this.jButton_ok.setEnabled(true);
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

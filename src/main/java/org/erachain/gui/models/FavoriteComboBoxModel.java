@@ -133,7 +133,8 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
             byte[] iconBytes = ((ItemCls) value).getIcon();
             if (iconBytes != null && iconBytes.length > 0) {
                 ImageIcon image = new ImageIcon(iconBytes);
-                Image Im = image.getImage().getScaledInstance(25, 25, 1);
+                int size = UIManager.getFont("TextField.font").getSize() + 4;
+                Image Im = image.getImage().getScaledInstance(size, size, 1);
                 label.setIcon(new ImageIcon(Im));
             }
 

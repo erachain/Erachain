@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
  */
 public class IssueDocumentPanel extends javax.swing.JPanel {
 
+    private static String iconFile = "images/pageicons/IssueDocumentPanel.png";
     private IssueDocumentPanel th;
     private ExDataPanel exData_Panel;
     private MButton jButton_Work_Cancel;
@@ -322,5 +323,15 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         }
         this.jButton_Work_OK.setEnabled(true);
         this.jButton_Work_OK1.setEnabled(true);
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

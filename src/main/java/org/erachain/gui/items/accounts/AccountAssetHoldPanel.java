@@ -11,9 +11,12 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 
+import java.awt.*;
 import java.math.BigDecimal;
 
-public class AccountAssetHoldPanel extends AccountAssetActionPanelCls {
+public class AccountAssetHoldPanel extends AccountAssetActionPanelCls  {
+
+    private static String iconFile = "images/pageicons/AccountAssetHoldPanel.png";
 
     public AccountAssetHoldPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
         super(true, null, assetIn, null, TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
@@ -59,6 +62,15 @@ public class AccountAssetHoldPanel extends AccountAssetActionPanelCls {
         this.jButton_ok.setEnabled(true);
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }
 
 

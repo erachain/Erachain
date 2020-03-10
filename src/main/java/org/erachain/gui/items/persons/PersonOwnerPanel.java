@@ -123,8 +123,8 @@ public class PersonOwnerPanel extends JPanel {
         JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
-                        null, null, person_Accounts_Model.getItem(row), null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"),new AccountAssetSendPanel(null,
+                        null, null, person_Accounts_Model.getItem(row), null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -133,7 +133,7 @@ public class PersonOwnerPanel extends JPanel {
         JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, person_Accounts_Model.getItem(row)));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, null, person_Accounts_Model.getItem(row)),MailSendPanel.getIcon());
 
             }
         });

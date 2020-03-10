@@ -42,6 +42,8 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("serial")
 
 public class MailSendPanel extends JPanel {
+
+    private static String iconFile = "images/pageicons/MailSendPanel.png";
     // TODO - "A" - &
     final static String wrongFirstCharOfAddress = "A";
     // private final MessagesTableModel messagesTableModel;
@@ -793,4 +795,13 @@ public class MailSendPanel extends JPanel {
         this.sendButton.setEnabled(true);
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

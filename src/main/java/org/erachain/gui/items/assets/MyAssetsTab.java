@@ -25,6 +25,7 @@ import java.net.URL;
 
 public class MyAssetsTab extends SplitPanel {
 
+    private static String iconFile = "images/pageicons/MyAssetsTab.png";
     private static final long serialVersionUID = 1L;
     final MTable table;
     protected int row;
@@ -237,7 +238,7 @@ public class MyAssetsTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = assetsModel.getItem(row).b;
-                MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "To sell", ""));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel(asset, null, "To sell", ""), ExchangePanel.getIcon());
 
             }
 
@@ -249,7 +250,7 @@ public class MyAssetsTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = assetsModel.getItem(row).b;
-                MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "", ""));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
             }
         });
         assetsMenu.add(excahge);
@@ -259,7 +260,7 @@ public class MyAssetsTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = assetsModel.getItem(row).b;
-                MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "Buy", ""));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel(asset, null, "Buy", ""), ExchangePanel.getIcon());
 
             }
         });
@@ -389,7 +390,7 @@ public class MyAssetsTab extends SplitPanel {
                 if (e.getClickCount() == 2) {
                     row = table.convertRowIndexToModel(row);
                     AssetCls asset = assetsModel.getItem(row).b;
-                    MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "", ""));
+                    MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
 
                     //		new AssetFrame(asset);
                 }
@@ -485,7 +486,17 @@ public class MyAssetsTab extends SplitPanel {
         String action = null;
         ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");
         panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
-        MainPanel.getInstance().insertTab(panel);
+        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),panel, ExchangePanel.getIcon());
     }
 
+
+    public static  Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

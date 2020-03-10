@@ -20,9 +20,11 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
+public class PersonsFavoriteSplitPanel extends ItemSplitPanel  {
     private static final long serialVersionUID = 2717571093561259483L;
     //private PersonsFavoriteSplitPanel th;
+    private static String iconFile = "images/pageicons/PersonsFavoriteSplitPanel.png";
+
 
     public PersonsFavoriteSplitPanel() {
         super(new FavoritePersonsTableModel(), "PersonsFavoriteSplitPanel");
@@ -33,8 +35,8 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
         vsend_Coins_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
-                        null, null, (PersonCls) itemTableSelected, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"),new AccountAssetSendPanel(null,
+                        null, null, (PersonCls) itemTableSelected, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -44,7 +46,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) itemTableSelected));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, null, (PersonCls) itemTableSelected), MailSendPanel.getIcon());
             }
         });
 
@@ -122,4 +124,14 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
         return new PersonInfo002((PersonCls) item, true);
     }
 
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

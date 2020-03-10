@@ -35,6 +35,7 @@ import java.util.List;
  */
 public class SearchTransactionsSplitPanel extends SplitPanel {
 
+    private static String iconFile = "images/pageicons/SearchTransactionsSplitPanel.png";
     public JPanel info_Panel;
     public VouchLibraryPanel voush_Library_Panel;
     SearchTransactionsTableModel transactionsTableModel;
@@ -321,4 +322,13 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

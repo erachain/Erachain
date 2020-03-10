@@ -26,6 +26,9 @@ import java.util.List;
 
 @SuppressWarnings("serial")
 public class IssueImprintPanel extends JPanel {
+
+    private static String iconFile = "images/pageicons/IssueImprintPanel.png";
+
     private JComboBox<Account> cbxFrom;
     private JComboBox<String> txtFeePow;
     private JTextField txtNumber;
@@ -379,5 +382,15 @@ public class IssueImprintPanel extends JPanel {
 
         //ENABLE
         this.issueButton.setEnabled(true);
+    }
+
+    public static  Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

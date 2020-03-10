@@ -15,8 +15,9 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
 
-public class MyImprintsTab extends SplitPanel {
+public class MyImprintsTab extends SplitPanel  {
 
+    private static String iconFile = "images/pageicons/MyImprintsTab.png";
     private static final long serialVersionUID = 1L;
     final MTable table;
     protected int row;
@@ -343,5 +344,14 @@ public class MyImprintsTab extends SplitPanel {
 
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 
 }

@@ -23,6 +23,7 @@ import java.net.URL;
 public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
+    private static String iconFile = "images/pageicons/SearchPersonsSplitPanel.png";
 
     public SearchPersonsSplitPanel() {
         super(new ItemsPersonsTableModel(), "SearchPersonsSplitPanel", "SearchPersonsSplitPanel");
@@ -33,8 +34,8 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
-                        null, null, (PersonCls) itemTableSelected, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"),new AccountAssetSendPanel(null,
+                        null, null, (PersonCls) itemTableSelected, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -47,7 +48,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) itemTableSelected));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, null, (PersonCls) itemTableSelected), MailSendPanel.getIcon());
             }
         });
 
@@ -126,5 +127,16 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
         return new PersonInfo002((PersonCls) item, true);
 
+    }
+
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

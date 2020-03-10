@@ -16,7 +16,7 @@ import java.awt.event.ActionListener;
 public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
     //private ImprintsFavoriteSplitPanel th;
-
+    private static String iconFile = "images/pageicons/ImprintsFavoriteSplitPanel.png";
     public ImprintsFavoriteSplitPanel() {
         super(new FavoriteImprintsTableModel(), "PersonsFavoriteSplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Persons"));
@@ -27,8 +27,8 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
-                        null, itemTableSelected.getOwner(), null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
+                        null, itemTableSelected.getOwner(), null, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -38,7 +38,7 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, itemTableSelected.getOwner(), null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, itemTableSelected.getOwner(), null), MailSendPanel.getIcon());
             }
         });
 
@@ -51,4 +51,13 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
         return new ImprintsInfoPanel((ImprintCls) item);
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

@@ -20,6 +20,7 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
     /**
      *
      */
+    private static String iconFile = "images/pageicons/SearchPollsSplitPanel.png";
     private static final long serialVersionUID = 1L;
     private static PollsItemsTableModel tableModelPolls = new PollsItemsTableModel();
 
@@ -114,4 +115,14 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
 
     }
 
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

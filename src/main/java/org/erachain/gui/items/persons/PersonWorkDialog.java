@@ -110,8 +110,8 @@ public class PersonWorkDialog extends JDialog {
                     if (addresses.isEmpty()) {
 
                     } else {
-                        MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
-                                null, null, person, null));
+                        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Asset to Person"),new AccountAssetSendPanel(null,
+                                null, null, person, null), AccountAssetSendPanel.getIcon());
 
                     }
                     dispose();
@@ -129,7 +129,7 @@ public class PersonWorkDialog extends JDialog {
                     if (addresses.isEmpty()) {
 
                     } else {
-                        MainPanel.getInstance().insertTab(new MailSendPanel(null, null, person));
+                        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail to Person"),new MailSendPanel(null, null, person), MailSendPanel.getIcon());
                     }
                     dispose();
                 }

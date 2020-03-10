@@ -28,9 +28,10 @@ import java.net.URL;
 import java.util.ArrayList;
 
 
-public class FavoriteTransactionsSplitPanel extends SplitPanel {
+public class FavoriteTransactionsSplitPanel extends SplitPanel  {
 
     private static final long serialVersionUID = 2717571093561259483L;
+    private static String iconFile = "images/pageicons/FavoriteTransactionsSplitPanel.png";
     // для прозрачности
     int alpha = 255;
     int alpha_int;
@@ -231,4 +232,13 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
         }
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

@@ -28,6 +28,7 @@ import java.awt.event.MouseEvent;
 
 public class MyOrderTab extends SplitPanel {
 
+    private static String iconFile = "images/pageicons/MyOrderTab.png";
     private static final long serialVersionUID = 1L;
     protected int row;
     /**
@@ -326,7 +327,16 @@ public class MyOrderTab extends SplitPanel {
         AssetCls wantAsset = Controller.getInstance().getAsset(order.getWantAssetKey());
         ExchangePanel panel = new ExchangePanel(haveAsset, wantAsset, action, "");
         panel.setName(haveAsset.getTickerName() + "/" + wantAsset.getTickerName());
-        MainPanel.getInstance().insertTab(panel);
+        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),panel,ExchangePanel.getIcon());
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

@@ -15,7 +15,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 
-public class MyOrderPaimentsSplitPanel extends SplitPanel {
+public class MyOrderPaimentsSplitPanel extends SplitPanel  {
     private static final long serialVersionUID = 2717571093561259483L;
     // для прозрачности
     int alpha = 255;
@@ -23,6 +23,7 @@ public class MyOrderPaimentsSplitPanel extends SplitPanel {
     private PaymentOrdersTableModel payment_Orders_model;
     private MTable payment_Orders_table;
     private TableRowSorter my_Sorter;
+    private static String iconFile = "images/pageicons/MyOrderPaimentsSplitPanel.png";
 
 
     public MyOrderPaimentsSplitPanel() {
@@ -176,6 +177,17 @@ public class MyOrderPaimentsSplitPanel extends SplitPanel {
 
             payment_Orders_model.fireTableDataChanged();
 
+        }
+    }
+
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
         }
     }
 

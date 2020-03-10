@@ -31,6 +31,8 @@ import java.util.ArrayList;
 public class FavoriteStatementsSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
+    private static String iconFile = "images/pageicons/FavoriteStatementsSplitPanel.png";
+
     // для прозрачности
     int alpha = 255;
     int alpha_int;
@@ -230,6 +232,16 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
             info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             //	jSplitPanel.setRightComponent(info_panel);
+        }
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
         }
     }
 

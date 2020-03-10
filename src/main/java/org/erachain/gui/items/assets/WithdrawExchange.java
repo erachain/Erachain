@@ -35,7 +35,7 @@ import java.net.URL;
 public class WithdrawExchange extends JPanel {
 
     // private JComboBox<Account> accountLBox;
-
+    private static String iconFile = "images/pageicons/WithdrawExchange.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(WithdrawExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
@@ -173,7 +173,7 @@ public class WithdrawExchange extends JPanel {
             panel.jLabel_Title.setText("<html><h2>" + formTitle + "</h2></html>");
             panel.setName(Lang.getInstance().translate("Withdraw"));
             MainPanel.getInstance().removeTab(panel.getName());
-            MainPanel.getInstance().insertTab(panel);
+            MainPanel.getInstance().insertTab( Lang.getInstance().translate("Send asset") ,panel, AccountAssetSendPanel.getIcon());
 
         }
 
@@ -391,6 +391,16 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_History, gridBagConstraints);
 
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 }

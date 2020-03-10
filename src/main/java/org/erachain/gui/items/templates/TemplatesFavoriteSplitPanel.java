@@ -19,6 +19,7 @@ import java.net.URL;
 
 public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
+    private static String iconFile = "images/pageicons/TemplatesFavoriteSplitPanel.png";
 
     public TemplatesFavoriteSplitPanel() {
         super(new FavoriteTemplatesTableModel(), "TemplatesFavoriteSplitPanel");
@@ -62,4 +63,14 @@ public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
         return new InfoTemplates((TemplateCls) item);
     }
 
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

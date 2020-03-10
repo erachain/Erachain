@@ -17,23 +17,25 @@ public class MTabbedPanel extends JTabbedPane {
         // add tab to tabbed panel
         this.addTab(str, comp);
 
-        init(comp);
+        //init(comp);
 
     }
 
-    public void addTabWithCloseButton(String str, Icon icon, Component comp) {
-        this.addTab(str, icon, comp);
-        init(comp);
+    public void addTabWithCloseButton(String str, Image icon,  JPanel comp) {
+
+        this.addTab(str, comp);
+        init(comp, icon );
     }
 
-    public void addTabWithCloseButton(String str, Icon icon, Component comp, String tip) {
-        this.addTab(str, icon, comp, tip);
-        init(comp);
+    public void addTabWithCloseButton(String str, Image icon, Component comp, String tip) {
+      //  this.addTab(str, icon, comp, tip);
+        init(comp, icon);
     }
 
-    private void init(Component comp) {
+    private void init(Component comp, Image icon) {
+
         // set for tab view close buton
-        ButtonTabComponent button_Comp = new ButtonTabComponent(this);
+        ButtonTabComponent button_Comp = new ButtonTabComponent(this, icon);
         this.setTabComponentAt(this.indexOfComponent(comp), button_Comp);
         // write info to tabbed setting object
         button_Comp = null;

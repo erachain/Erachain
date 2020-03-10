@@ -11,11 +11,14 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 
+import java.awt.*;
+
 @SuppressWarnings("serial")
 
-public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls {
-    // private final MessagesTableModel messagesTableModel;
+public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls  {
 
+    // private final MessagesTableModel messagesTableModel;
+    private static String iconFile = "images/pageicons/AccountAssetRepayDebtPanel.png";
     public AccountAssetRepayDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
         super(false, null, assetIn, null,
                 TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
@@ -57,4 +60,13 @@ public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls {
         this.jButton_ok.setEnabled(true);
     }
 
+    public static  Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

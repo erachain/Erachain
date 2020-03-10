@@ -226,7 +226,7 @@ public class AssetDetailsPanel extends JPanel {
         AssetCls assetSell = Settings.getInstance().getDefaultPairAsset();
         ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");
         panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
-        MainPanel.getInstance().insertTab(panel);
+        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),panel, ExchangePanel.getIcon());
 
     }
 

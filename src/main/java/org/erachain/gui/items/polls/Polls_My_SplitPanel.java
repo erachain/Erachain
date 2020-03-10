@@ -1,32 +1,18 @@
 package org.erachain.gui.items.polls;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.polls.PollCls;
-import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.ItemSplitPanel;
-import org.erachain.gui.library.MTable;
-import org.erachain.gui.models.RendererIcon;
-import org.erachain.gui.models.WalletItemPersonsTableModel;
 import org.erachain.gui.models.WalletItemPollsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.TableMenuPopupUtil;
 import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +20,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Polls_My_SplitPanel extends ItemSplitPanel {
+
+    private static String iconFile = "images/pageicons/Polls_My_SplitPanel.png";
 
     public Polls_My_SplitPanel() {
         super(new WalletItemPollsTableModel(), "Polls_My_SplitPanel");
@@ -93,5 +81,14 @@ public class Polls_My_SplitPanel extends ItemSplitPanel {
         return pollInfo;
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 
 }

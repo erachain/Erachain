@@ -34,10 +34,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
-public class DepositExchange extends JPanel {
+public class DepositExchange extends JPanel   {
 
     // private JComboBox<Account> accountLBox;
-
+    private static String iconFile = "images/pageicons/DepositExchange.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(DepositExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
@@ -762,4 +762,13 @@ public class DepositExchange extends JPanel {
         }
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

@@ -168,8 +168,8 @@ public class AccountsLibraryPanel extends JPanel {
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account accountTo = person_Accounts_Model.getAccount(row);
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
-                        null, accountTo, person, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
+                        null, accountTo, person, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -180,7 +180,7 @@ public class AccountsLibraryPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Account account = person_Accounts_Model.getAccount(row);
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send mail"),new MailSendPanel(null, account, null), MailSendPanel.getIcon());
 
             }
         });

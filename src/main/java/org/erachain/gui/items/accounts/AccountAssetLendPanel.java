@@ -11,12 +11,15 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 
+import java.awt.*;
+
 //import org.erachain.settings.Settings;
 
 @SuppressWarnings("serial")
 
-public class AccountAssetLendPanel extends AccountAssetActionPanelCls {
+public class AccountAssetLendPanel extends AccountAssetActionPanelCls  {
 
+    private static String iconFile = "images/pageicons/AccountAssetLendPanel.png";
     public AccountAssetLendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
         // "If You want to give a loan asset %asset%, fill in this form"
         super(false, null, assetIn,
@@ -62,6 +65,15 @@ public class AccountAssetLendPanel extends AccountAssetActionPanelCls {
         this.jButton_ok.setEnabled(true);
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }
 
 

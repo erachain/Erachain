@@ -31,6 +31,8 @@ import java.util.List;
 //import java.awt.GridBagConstraints;
 
 public class IssueLinkedHashPanel extends SplitPanel {
+    private static String iconFile = "images/pageicons/IssueLinkedHashPanel.png";
+
     TableModelIssueHashes table_Model;
     IssueHashImprint issue_Hash_Imprint;
     private JTable Table_Hash;
@@ -342,6 +344,16 @@ public class IssueLinkedHashPanel extends SplitPanel {
             table_Model.addRow(new Object[]{"", ""});
             table_Model.fireTableDataChanged();
             Table_Hash.setRowSelectionInterval(table_Model.getRowCount() - 1, table_Model.getRowCount() - 1);
+        }
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
         }
     }
 }

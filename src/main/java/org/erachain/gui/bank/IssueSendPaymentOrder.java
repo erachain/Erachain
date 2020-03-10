@@ -26,7 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.charset.StandardCharsets;
 
-public class IssueSendPaymentOrder extends javax.swing.JPanel {
+public class IssueSendPaymentOrder extends javax.swing.JPanel  {
 
     /**
      *
@@ -34,6 +34,8 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     private IssueSendPaymentOrder1 issue_Panel;
     private IssueSendPaymentOrder th;
+    private static String iconFile = "images/pageicons/IssueSendPaymentOrder.png";
+
 
     /*
      * To change this license header, choose License Headers in Project
@@ -41,6 +43,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel {
      * open the template in the editor.
      */
     public IssueSendPaymentOrder() {
+
         th = this;
         setLayout(new java.awt.BorderLayout());
         JScrollPane scroll = new JScrollPane();
@@ -307,6 +310,17 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel {
 
         String a = new String(messageBytes, StandardCharsets.UTF_8);
         return a;
+    }
+
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }
 
