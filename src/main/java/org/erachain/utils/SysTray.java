@@ -49,7 +49,7 @@ public class SysTray implements Observer {
         Controller.getInstance().addObserver(this);
     }
 
-    public static SysTray getInstance() {
+    public synchronized static SysTray getInstance() {
         if (systray == null) {
             systray = new SysTray();
         }

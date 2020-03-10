@@ -23,7 +23,6 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Settings {
 
@@ -158,15 +157,8 @@ public class Settings {
     }
 
     public synchronized static Settings getInstance() {
-        ReentrantLock lock = new ReentrantLock();
-        lock.lock();
-        try {
-            if (instance == null) {
-
-                instance = new Settings();
-            }
-        } finally {
-            lock.unlock();
+        if (instance == null) {
+            instance = new Settings();
         }
         return instance;
     }

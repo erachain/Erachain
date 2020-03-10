@@ -280,7 +280,7 @@ public class Controller extends Observable {
         return buildTimestamp;
     }
 
-    public static Controller getInstance() {
+    public synchronized static Controller getInstance() {
         if (instance == null) {
             instance = new Controller();
             instance.setDCSetWithObserver(Settings.getInstance().isGuiEnabled());
