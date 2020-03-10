@@ -47,11 +47,13 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
-            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+            if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                    + Controller.MIN_MEMORY_TAIL) {
                 // у родителя чистим - у себя нет, так как только создали
-                ((DCSet)parent.getDBSet()).clearCache();
+                ((DCSet) parent.getDBSet()).clearCache();
                 System.gc();
-                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1)) {
                     logger.error("Heap Memory Overflow");
                     Controller.getInstance().stopAll(1011);
                 }

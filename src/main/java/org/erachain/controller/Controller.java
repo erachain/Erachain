@@ -105,7 +105,7 @@ public class Controller extends Observable {
     public static TreeMap<String, Tuple2<BigDecimal, String>> COMPU_RATES = new TreeMap();
 
     public final String APP_NAME;
-    public final static long MIN_MEMORY_TAIL = 1 << 23;
+    public final static long MIN_MEMORY_TAIL = 64 * (1 << 20); // Машина Явы вылетает если меньше 50 МБ
 
     public static final Integer MUTE_PEER_COUNT = 6;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
