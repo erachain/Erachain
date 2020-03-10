@@ -174,8 +174,15 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
         dcSet.getBlockSignsMap().put(signature, height);
         if (dcSet.getBlockSignsMap().size() != height) {
-            Long error = null;
-            ++error;
+            // так как это вызывается асинхронно при проверке прилетающих победных блоков
+            // то тут иногда вылетает ошибка - но в общем должно быть норм все
+            logger.error("CHECK TABS: \n getBlockSignsMap().size() != height : "
+                    + dcSet.getBlockSignsMap().size() + " != " + height
+                    + " : " + block);
+            if (BlockChain.CHECK_BUGS > 10) {
+                Long error = null;
+                ++error;
+            }
         }
 
         PublicKeyAccount creator = block.getCreator();

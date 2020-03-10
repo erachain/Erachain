@@ -72,7 +72,7 @@ function template(data) {
 
     output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
     output += '<tr><td align=left>';
-    output += '<table><tr>';
+    output += '<table><tr style="vertical-align:top">';
 
     if (data.template.image.length > 0) {
         output += '<td><img src="data:image/gif;base64,' + data.template.image + '" width = "350" /></td><td style ="padding-left:20px">';

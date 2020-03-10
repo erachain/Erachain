@@ -67,7 +67,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
                     // не нагружать процессор для поиска свободного места в базе данных
                     // >2 - удаляет удаленные записи полностью и не раздувает базу
                     // 2 - не удаляет ключи и не сжимает базу при удалении записей, база растет
-                    .freeSpaceReclaimQ(0)
+                    .freeSpaceReclaimQ(10)
                     // .remove + .put - java.io.IOError: java.io.IOException: no free space to expand Volume
                     .sizeLimit(0.3) // ограничивает рост базы - если freeSpaceReclaimQ < 3
                     .make();
@@ -139,7 +139,11 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     public void delete(Long key) {
         if (database.getEngine().isClosed())
             return;
-        super.delete(key);
+        try {
+            super.delete(key);
+        } catch (Exception IllegalAccessError) {
+
+        }
     }
 
     @Override

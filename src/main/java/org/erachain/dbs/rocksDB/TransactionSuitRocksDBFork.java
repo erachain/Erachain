@@ -13,7 +13,7 @@ import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
 import org.rocksdb.WriteOptions;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 
 @Slf4j
 public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction> implements TransactionSuit
@@ -55,5 +55,30 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
         return null;
     }
 
+    @Override
+    public boolean writeToParent() {
+
+        boolean updated = false;
+
+        Iterator<Long> iterator = this.map.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            Long key = iterator.next();
+            // тут через Очередь сработает - без ошибок от закрытия
+            parent.put(key, this.map.get(key));
+            updated = true;
+        }
+
+        if (deleted != null) {
+            Iterator<Long> iteratorDeleted = this.deleted.keySet().iterator();
+            while (iteratorDeleted.hasNext()) {
+                // тут через Очередь сработает - без ошибок от закрытия
+                parent.delete(iteratorDeleted.next());
+                updated = true;
+            }
+        }
+
+        return updated;
+    }
 
 }

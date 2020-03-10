@@ -366,7 +366,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         }
 
         if (deleted != null) {
-            Iterator iteratorDeleted = this.deleted.keySet().iterator();
+            Iterator<T> iteratorDeleted = this.deleted.keySet().iterator();
             while (iteratorDeleted.hasNext()) {
                 parent.getSuit().delete(iteratorDeleted.next());
                 updated = true;

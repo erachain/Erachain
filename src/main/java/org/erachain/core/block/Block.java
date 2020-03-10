@@ -1667,7 +1667,7 @@ import java.util.*;
             long processTimingLocal;
             long processTimingLocalDiff;
 
-            TransactionMap unconfirmedMap = dcSetPlace.getTransactionTab();
+            TransactionMapImpl unconfirmedMap = dcSetPlace.getTransactionTab();
             TransactionFinalMapImpl finalMap = dcSetPlace.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSigns = dcSetPlace.getTransactionFinalMapSigns();
 
@@ -1792,16 +1792,19 @@ import java.util.*;
                         processTimingLocal = System.nanoTime();
                         try {
                             if (!unconfirmedMap.isClosed()) {
-                                unconfirmedMap.delete(transactionSignature);
+                                // так как здесь форкнутая база то напрямую - а не через Очередь
+                                unconfirmedMap.deleteDirect(transactionSignature);
                             } else {
                                 unconfirmedMap = dcSetPlace.getTransactionTab();
-                                unconfirmedMap.delete(transactionSignature);
+                                // так как здесь форкнутая база то напрямую - а не через Очередь
+                                unconfirmedMap.deleteDirect(transactionSignature);
                             }
                         } catch (java.lang.Throwable e) {
                             if (e instanceof java.lang.IllegalAccessError) {
                                 // налетели на закрытую таблицу
                                 unconfirmedMap = dcSetPlace.getTransactionTab();
-                                unconfirmedMap.delete(transactionSignature);
+                                // так как здесь форкнутая база то напрямую - а не через Очередь
+                                unconfirmedMap.deleteDirect(transactionSignature);
                             } else {
                                 LOGGER.error(e.getMessage(), e);
                             }
@@ -2265,11 +2268,7 @@ import java.util.*;
                 ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                 timerStart = System.currentTimeMillis();
                 try {
-                    if (!unconfirmedMap.isClosed()) {
-                        unconfirmedMap.delete(transactionSignature);
-                    } else {
-                        unconfirmedMap = dcSet.getTransactionTab();
-                    }
+                    unconfirmedMap.delete(transactionSignature);
                 } catch (java.lang.Throwable e) {
                     if (e instanceof java.lang.IllegalAccessError) {
                         // налетели на закрытую таблицу

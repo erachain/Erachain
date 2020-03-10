@@ -41,6 +41,9 @@ public class TransactionsPool extends MonitoredThread {
         this.setName("Transactions Pool[" + this.getId() + "]");
 
         this.start();
+
+        dcSet.getTransactionTab().setPool(this);
+
     }
 
     /**
@@ -81,14 +84,16 @@ public class TransactionsPool extends MonitoredThread {
                     clearCount++;
                 }
             } else {
-                utxMap.put((Transaction) item);
+                utxMap.putDirect((Transaction) item);
                 clearCount++;
             }
+        } else if (item instanceof Long) {
+            utxMap.deleteDirect((Long) item);
 
         } else if (item instanceof TransactionMessage) {
 
-            long timeCheck = System.nanoTime();
-            long onMessageProcessTiming = timeCheck;
+            long timeCheck = System.currentTimeMillis();
+            long onMessageProcessTiming = System.nanoTime();
 
             TransactionMessage transactionMessage = (TransactionMessage) item;
 
@@ -117,13 +122,11 @@ public class TransactionsPool extends MonitoredThread {
                 if (timeCheck > 10) {
                     LOGGER.debug("TRANSACTION_TYPE proccess 1 period: " + timeCheck);
                 }
+                timeCheck = System.currentTimeMillis();
             }
 
             // ALREADY EXIST
             byte[] signature = transaction.getSignature();
-
-            if (LOG_UNCONFIRMED_PROCESS)
-                timeCheck = System.currentTimeMillis();
 
             // проверка на двойной ключ в таблице ожидания транзакций
             if (utxMap.contains(signature)) {
@@ -141,10 +144,8 @@ public class TransactionsPool extends MonitoredThread {
                 if (timeCheck > 20) {
                     LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
                 }
-            }
-
-            if (LOG_UNCONFIRMED_PROCESS)
                 timeCheck = System.currentTimeMillis();
+            }
 
             // проверка на двойной ключ в основной таблице транзакций
             if (this.controller.isOnStopping()
@@ -159,6 +160,7 @@ public class TransactionsPool extends MonitoredThread {
                 if (timeCheck > 30) {
                     LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
                 }
+                timeCheck = System.currentTimeMillis();
             }
 
             // ADD TO UNCONFIRMED TRANSACTIONS
@@ -171,7 +173,7 @@ public class TransactionsPool extends MonitoredThread {
                     clearCount++;
                 }
             } else {
-                utxMap.put(transaction);
+                utxMap.putDirect(transaction);
                 clearCount++;
             }
 
