@@ -15,6 +15,7 @@ import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.SignaturesMessage;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.erachain.utils.Pair;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
@@ -1134,6 +1135,11 @@ public class Synchronizer extends Thread {
 
         if (!dcSet.isFork()) {
             // только запись в нашу цепочку
+
+            if (ctrl.doesWalletExists() && !ctrl.noDataWallet) {
+                ctrl.wallet.walletUpdater.offerMessage(new Pair(doOrphan, block));
+            }
+
             processTiming = System.nanoTime() - processTiming;
             if (processTiming < 999999999999L) {
                 // при переполнении может быть минус
