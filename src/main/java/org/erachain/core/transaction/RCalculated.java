@@ -4,7 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Base58;
+import org.erachain.core.block.Block;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -50,6 +50,18 @@ public class RCalculated extends TransactionAmount {
     // GETTERS/SETTERS
 
     @Override
+    public int hashCode() {
+        return Long.hashCode(dbRef);
+    }
+
+    @Override
+    public boolean equals(Object transaction) {
+        if (transaction instanceof RCalculated)
+            return dbRef == ((Transaction) transaction).getDBRef();
+        return false;
+    }
+
+    @Override
     public String viewTypeName() {
         return NAME_ID;
     }
@@ -67,6 +79,11 @@ public class RCalculated extends TransactionAmount {
     @Override
     public boolean hasPublicText() {
         return false;
+    }
+
+    @Override
+    public String getTitle() {
+        return this.message;
     }
 
     public String getMessage() {
@@ -142,6 +159,9 @@ public class RCalculated extends TransactionAmount {
         // GET BASE
         JSONObject transaction = this.getJsonBase();
 
+        transaction.put("asset", this.getAbsKey());
+        transaction.put("amount", this.amount.toPlainString());
+
         if (message.length() > 0) {
             transaction.put("message", this.message);
         }
@@ -204,11 +224,27 @@ public class RCalculated extends TransactionAmount {
         return data;
     }
 
+    //PROCESS/ORPHAN
+
+    @Override
+    public void process(Block block, int asDeal) {
+        // ввобщето тут вызов ошибки должен быть
+        Long error = null;
+        error++;
+    }
+
+    @Override
+    public void orphan(Block block, int asDeal) {
+        // ввобщето тут вызов ошибки должен быть
+        Long error = null;
+        error++;
+    }
+
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
 
         return TYPE_LENGTH + REFERENCE_LENGTH + RECIPIENT_LENGTH
-                + (this.amount == null? 0 : AMOUNT_LENGTH + KEY_LENGTH)
+                + (this.amount == null ? 0 : AMOUNT_LENGTH + KEY_LENGTH)
                 + 1 + message.getBytes(StandardCharsets.UTF_8).length;
     }
 

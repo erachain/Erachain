@@ -21,19 +21,23 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
-public class DepositExchange extends JPanel {
+public class DepositExchange extends JPanel   {
 
     // private JComboBox<Account> accountLBox;
-
+    private static String iconFile = "images/pageicons/DepositExchange.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(DepositExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
@@ -128,7 +132,7 @@ public class DepositExchange extends JPanel {
         }
 
         if (jsonObject != null && jsonObject.containsKey("addr_in")) {
-            if (BlockChain.DEVELOP_USE) {
+            if (BlockChain.TEST_MODE) {
                 jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
@@ -575,7 +579,7 @@ public class DepositExchange extends JPanel {
 
         if (jsonObject != null) {
             if (jsonObject.containsKey("deal")) {
-                if (BlockChain.DEVELOP_USE) {
+                if (BlockChain.TEST_MODE) {
                     tip.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
                 }
 
@@ -758,4 +762,13 @@ public class DepositExchange extends JPanel {
         }
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

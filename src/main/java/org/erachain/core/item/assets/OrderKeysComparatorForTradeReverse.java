@@ -20,7 +20,7 @@ public class OrderKeysComparatorForTradeReverse implements Comparator<Long> {
         Order order1 = map.get(orderKey1);
         Order order2 = map.get(orderKey2);
 
-        int compare = order1.getPrice().compareTo(order2.getPrice());
+        int compare = order1.calcLeftPrice().compareTo(order2.calcLeftPrice());
         if (compare != 0)
             return -compare;
 

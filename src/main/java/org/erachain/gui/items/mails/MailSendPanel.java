@@ -11,18 +11,18 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.items.accounts.AccountsComboBoxModel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.SendTableModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
+import org.mapdb.Fun.Tuple2;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -32,7 +32,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -43,6 +42,8 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("serial")
 
 public class MailSendPanel extends JPanel {
+
+    private static String iconFile = "images/pageicons/MailSendPanel.png";
     // TODO - "A" - &
     final static String wrongFirstCharOfAddress = "A";
     // private final MessagesTableModel messagesTableModel;
@@ -633,7 +634,7 @@ public class MailSendPanel extends JPanel {
 
         if (message != null && message.length() > 0) {
             if (isTextB) {
-                messageBytes = message.getBytes(Charset.forName("UTF-8"));
+                messageBytes = message.getBytes(StandardCharsets.UTF_8);
             } else {
                 try {
                     messageBytes = Converter.parseHexString(message);
@@ -739,7 +740,7 @@ public class MailSendPanel extends JPanel {
 
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(creator, feePow, recipient, key,
-                amount, head, messageBytes, isTextByte, encrypted);
+                amount, head, messageBytes, isTextByte, encrypted, 0);
         // test result = new Pair<Transaction, Integer>(null,
         // Transaction.VALIDATE_OK);
 
@@ -794,4 +795,13 @@ public class MailSendPanel extends JPanel {
         this.sendButton.setEnabled(true);
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

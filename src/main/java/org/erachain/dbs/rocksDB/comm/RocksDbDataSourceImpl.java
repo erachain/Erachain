@@ -4,8 +4,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.dbs.rocksDB.common.RockStoreIterator;
-import org.erachain.dbs.rocksDB.common.RockStoreIteratorFilter;
+import org.erachain.dbs.rocksDB.RockStoreIterator;
+import org.erachain.dbs.rocksDB.RockStoreIteratorFilter;
+import org.erachain.dbs.rocksDB.RockStoreIteratorStart;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.utils.ByteUtil;
@@ -26,6 +27,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
+import static org.erachain.utils.ByteArrayUtils.areEqualMask;
 
 /**
  * Самый низкий уровень доступа к функциям RocksDB
@@ -35,14 +37,15 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         // DB<byte[], byte[]>, Flusher, DbSourceInter<byte[]>
 {
     protected String dataBaseName;
-    public static final byte[] SIZE_BYTE_KEY = new byte[]{0};
 
     //Глеб * эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
     // Это включает логирование данных на диск синхронизированно - защищает от утрат при КРАХЕ но чуть медленне работает
     // Если ЛОЖЬ то данные утрачиваются при КРАХЕ
     //protected boolean dbSync = true;
 
+    Options options;
     public WriteOptions writeOptions;
+    public DBOptions dbOptions;
     protected boolean enableSize;
 
     /**
@@ -50,7 +53,6 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
      */
     @Getter
     public RocksDB dbCore;
-    Options options;
 
     protected boolean alive;
     protected String pathName;
@@ -186,6 +188,11 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                                 dbOptions.setCreateMissingColumnFamilies(true);
                                 dbOptions.setIncreaseParallelism(3);
                                 dbOptions.setMaxOpenFiles(settings.getMaxOpenFiles());
+
+                                //dbOptions.setNumLevels(settings.getLevelNumber());
+                                //dbOptions.setMaxBytesForLevelMultiplier(settings.getMaxBytesForLevelMultiplier());
+                                //dbOptions.setMaxBytesForLevelBase(settings.getMaxBytesForLevelBase());
+
                                 dbOptions.setMaxBackgroundCompactions(settings.getCompactThreads());
                                 dbOptions.setAllowConcurrentMemtableWrite(true);
                                 dbOptions.setMaxManifestFileSize(0);
@@ -348,7 +355,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         resetDbLock.readLock().lock();
         Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         try (final RocksIterator iter = getIterator()) {
-            for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
+            for (iter.seek(filter); iter.isValid() && areEqualMask(iter.key(), filter); iter.next()) {
                 result.add(iter.key());
             }
             return result;
@@ -365,7 +372,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         resetDbLock.readLock().lock();
         List<byte[]> result = new ArrayList<byte[]>();
         try (final RocksIterator iter = getIterator()) {
-            for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
+            for (iter.seek(filter); iter.isValid() && areEqualMask(iter.key(), filter); iter.next()) {
                 result.add(iter.value());
             }
             return result;
@@ -382,7 +389,8 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         resetDbLock.readLock().lock();
         Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         try (final RocksIterator iter = getIterator(indexDB)) {
-            for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
+            for (iter.seek(filter); iter.isValid()
+                    && areEqualMask(iter.key(), filter); iter.next()) {
                 result.add(iter.value());
             }
             return result;
@@ -471,6 +479,10 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     final StringBuilder inCache = new StringBuilder();
+    DBOptions optionsDBcont = (options == null ? new DBOptions() : new DBOptions(options)).setAllowMmapReads(true);
+    ReadOptions optionsReadDBcont = new ReadOptions(false, false)
+            .setIgnoreRangeDeletions(true).setReadaheadSize(100);
+    byte[] containsBuff = new byte[0];
 
     @Override
     public boolean contains(byte[] key) {
@@ -481,8 +493,8 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         try {
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(key, inCache)) return false;
-            // теперь ищем по настоящему
-            return dbCore.get(key) != null;
+            // теперь ищем по настоящему - без получения данных
+            return dbCore.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -500,8 +512,8 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         try {
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) return false;
-            // теперь ищем по настоящему
-            return dbCore.get(columnFamilyHandle, key) != null;
+            // теперь ищем по настоящему - без получения данных
+            return dbCore.get(columnFamilyHandle, optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -527,6 +539,22 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
+    public byte[] get(ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCore.get(readOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
     public byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return null;
@@ -534,6 +562,22 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         resetDbLock.readLock().lock();
         try {
             return dbCore.get(columnFamilyHandle, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
+    public byte[] get(ColumnFamilyHandle columnFamilyHandle, ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCore.get(columnFamilyHandle, readOptions, key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -603,6 +647,36 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
+    public void deleteRange(byte[] keyFrom, byte[] keyToExclude) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            dbCore.deleteRange(keyFrom, keyToExclude);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public void deleteRange(ColumnFamilyHandle columnFamilyHandle, byte[] keyFrom, byte[] keyToExclude) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            dbCore.deleteRange(columnFamilyHandle, keyFrom, keyToExclude);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+
+    @Override
     public void delete(byte[] key, WriteOptions writeOptions) {
         if (quitIfNotAlive()) {
             return;
@@ -633,28 +707,38 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
-    public RockStoreIterator iterator(boolean descending) {
-        return new RockStoreIterator(getIterator(), descending, false);
+    public RockStoreIterator iterator(boolean descending, boolean isIndex) {
+        return new RockStoreIterator(getIterator(), descending, isIndex);
     }
 
     @Override
-    public RockStoreIterator indexIterator(boolean descending, int indexDB) {
-        return new RockStoreIterator(getIterator(columnFamilyHandles.get(indexDB)), descending, true);
+    public RockStoreIterator indexIterator(boolean descending, int indexDB, boolean isIndex) {
+        return new RockStoreIterator(getIterator(columnFamilyHandles.get(indexDB)), descending, isIndex);
     }
 
     @Override
-    public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle) {
-        return new RockStoreIterator(getIterator(columnFamilyHandle), descending, true);
+    public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle, boolean isIndex) {
+        return new RockStoreIterator(getIterator(columnFamilyHandle), descending, isIndex);
     }
 
     @Override
-    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter) {
-        return new RockStoreIteratorFilter(getIterator(), descending, true, filter);
+    public RockStoreIterator indexIteratorFilter(boolean descending, byte[] filter, boolean isIndex) {
+        return new RockStoreIteratorFilter(getIterator(), descending, isIndex, filter);
     }
 
     @Override
-    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter) {
-        return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, true, filter);
+    public RockStoreIterator indexIteratorFilter(boolean descending, byte[] start, byte[] stop, boolean isIndex) {
+        return new RockStoreIteratorStart(getIterator(), descending, isIndex, start, stop);
+    }
+
+    @Override
+    public RockStoreIterator indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter, boolean isIndex) {
+        return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, isIndex, filter);
+    }
+
+    @Override
+    public RockStoreIterator indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] start, byte[] stop, boolean isIndex) {
+        return new RockStoreIteratorStart(getIterator(columnFamilyHandle), descending, isIndex, start, stop);
     }
 
     @Override
@@ -674,7 +758,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         if (quitIfNotAlive()) {
             return;
         }
-        try (WriteBatch batch = new WriteBatch()) {
+        try (final WriteBatch batch = new WriteBatch()) {
             for (Entry<byte[], byte[]> entry : rows.entrySet()) {
                 if (entry.getValue() == null) {
                     batch.delete(entry.getKey());
@@ -691,7 +775,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         if (quitIfNotAlive()) {
             return;
         }
-        try (WriteBatch batch = new WriteBatch()) {
+        try (final WriteBatch batch = new WriteBatch()) {
             for (Entry<byte[], byte[]> entry : rows.entrySet()) {
                 if (entry.getValue() == null) {
                     batch.delete(entry.getKey());
@@ -757,7 +841,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
             return Collections.emptyMap();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = getIterator()) {
+        try (final RocksIterator iter = getIterator()) {
             Map<byte[], byte[]> result = new HashMap<>();
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
@@ -778,7 +862,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
             return new ArrayList<>();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = getIterator()) {
+        try (final RocksIterator iter = getIterator()) {
             List<byte[]> result = new ArrayList<>();
             long i = 0;
             for (iter.seekToLast(); iter.isValid() && i < limit; iter.prev(), i++) {
@@ -799,7 +883,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
             return new ArrayList<>();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = getIterator()) {
+        try (final RocksIterator iter = getIterator()) {
             List<byte[]> result = new ArrayList<>();
             long i = 0;
             byte[] data = get(key);
@@ -825,7 +909,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
             return new ArrayList<>();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = getIterator()) {
+        try (final RocksIterator iter = getIterator()) {
             List<byte[]> result = new ArrayList<>();
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
@@ -846,7 +930,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
             return new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = getIterator()) {
+        try (final RocksIterator iter = getIterator()) {
             Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
@@ -867,7 +951,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
             return new TreeSet(Fun.BYTE_ARRAY_COMPARATOR);
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = getIterator(columnFamilyHandle)) {
+        try (final RocksIterator iter = getIterator(columnFamilyHandle)) {
             Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
@@ -896,7 +980,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
             return Collections.emptyMap();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iterator = getIterator()) {
+        try (final RocksIterator iterator = getIterator()) {
             Map<byte[], byte[]> result = new HashMap<>();
             long i = 0;
             for (iterator.seekToFirst(); iterator.isValid() && i++ < limit; iterator.next()) {
@@ -925,10 +1009,12 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         return FileUtil.deleteDir(new File(dir + getDBName()));
     }
 
+    byte[] sizeBytes = new byte[4];
+
     @Override
     public int size() {
         if (enableSize) {
-            byte[] sizeBytes = get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+            sizeBytes = get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
             return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
         } else return -1;
     }

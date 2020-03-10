@@ -41,9 +41,6 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
         super(parent, dcSet);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP
@@ -55,11 +52,6 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
     @Override
     protected void getMemoryMap() {
         map = new TreeMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>>();
-    }
-
-    @Override
-    protected Stack<Tuple2<Integer, Integer>> getDefaultValue() {
-        return null;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -93,11 +85,11 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public NavigableSet<Tuple3<Long, Integer, BigInteger>> getVotes(Long pollKey, Integer option) {
+    public NavigableSet<Tuple3> getVotes(Long pollKey, Integer option) {
         BTreeMap map = (BTreeMap) this.map;
 
         //FILTER ALL KEYS
-        NavigableSet<Tuple3<Long, Integer, BigInteger>> keys = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
+        NavigableSet<Tuple3> keys = ((BTreeMap<Tuple3, Tuple2>) map).subMap(
                 Fun.t3(pollKey, option, null),
                 Fun.t3(pollKey, option, Fun.HI())).keySet();
 
@@ -110,9 +102,9 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
         BTreeMap map = (BTreeMap) this.map;
 
         //FILTER ALL KEYS
-        Tuple3<Long, Integer, BigInteger> key = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
+        Tuple3<Long, Integer, BigInteger> key = ((BTreeMap<Tuple3, Tuple2>) map).subMap(
                 Fun.t3(pollKey, null, null),
-                Fun.t3(pollKey, Fun.HI(), Fun.HI())).firstKey();
+                Fun.t3(pollKey, Integer.MAX_VALUE, Fun.HI())).firstKey();
 
         //RETURN
         return key != null;
@@ -122,9 +114,9 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
         BTreeMap map = (BTreeMap) this.map;
 
         //FILTER ALL KEYS
-        return  ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
+        return ((BTreeMap<Tuple3, Tuple2>) map).subMap(
                 Fun.t3(pollKey, null, null),
-                Fun.t3(pollKey, Fun.HI(), Fun.HI())).size();
+                Fun.t3(pollKey, Integer.MAX_VALUE, Fun.HI())).size();
 
     }
 
@@ -133,7 +125,7 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
         BTreeMap map = (BTreeMap) this.map;
 
         //FILTER ALL KEYS
-        Tuple3<Long, Integer, BigInteger> key = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
+        Tuple3 key = ((BTreeMap<Tuple3, Tuple2>) map).subMap(
                 Fun.t3(pollKey, option, null),
                 Fun.t3(pollKey, option, Fun.HI())).firstKey();
 
@@ -154,7 +146,9 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
 
         Stack<Tuple2<Integer, Integer>> new_stack;
 
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             new_stack = stack;
         else {
             // !!!! NEEED .clone() !!!
@@ -180,7 +174,9 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
             return null;
 
         Stack<Tuple2<Integer, Integer>> new_stack;
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             new_stack = stack;
         else {
             // !!!! NEEED .clone() !!!

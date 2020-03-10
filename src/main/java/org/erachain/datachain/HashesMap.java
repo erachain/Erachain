@@ -18,9 +18,6 @@ public class HashesMap extends DCUMap<byte[], byte[]> {
         super(parent, dcSet);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP
@@ -33,11 +30,6 @@ public class HashesMap extends DCUMap<byte[], byte[]> {
     @Override
     protected void getMemoryMap() {
         map = new TreeMap<byte[], byte[]>(UnsignedBytes.lexicographicalComparator());
-    }
-
-    @Override
-    protected byte[] getDefaultValue() {
-        return null;
     }
 
 }

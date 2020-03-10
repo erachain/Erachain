@@ -52,7 +52,7 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
 
             case COLUMN_AMOUNT:
 
-                return asset.getTotalQuantity(DCSet.getInstance());
+                return asset.getQuantity();
 
             case COLUMN_FAVORITE:
 

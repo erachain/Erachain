@@ -33,7 +33,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -52,9 +51,10 @@ public class TelegramsResource {
     @GET
     public String getTelegrams(
             @QueryParam("filter") String filter,
+            @QueryParam("outcomes") boolean outcomes,
             @QueryParam("decrypt") boolean decrypt,
             @QueryParam("password") String password) {
-        return this.getTelegramsLimited(NTP.getTime() - 6000000, null, filter, decrypt, password);
+        return this.getTelegramsLimited(NTP.getTime() - 6000000, null, filter, decrypt, outcomes, password);
     }
 
     @GET
@@ -62,9 +62,10 @@ public class TelegramsResource {
     public String getTelegramsTwo(@PathParam("address") String address,
                                   @QueryParam("timestamp") long timestamp,
                                   @QueryParam("filter") String filter,
+                                  @QueryParam("outcomes") boolean outcomes,
                                   @QueryParam("decrypt") boolean decrypt,
                                   @QueryParam("password") String password) {
-        return this.getTelegramsTimestamp(address, timestamp, filter, decrypt, password);
+        return this.getTelegramsTimestamp(address, timestamp, filter, decrypt, outcomes, password);
     }
 
     private JSONObject decrypt(TelegramMessage telegram, JSONObject item) {
@@ -111,6 +112,7 @@ public class TelegramsResource {
     public String getTelegramsLimited(@PathParam("timestamp") long timestamp,
                                       @QueryParam("recipient") String recipient,
                                       @QueryParam("filter") String filter,
+                                      @QueryParam("outcomes") boolean outcomes,
                                       @QueryParam("decrypt") boolean decrypt,
                                       @QueryParam("password") String password) {
 
@@ -122,7 +124,7 @@ public class TelegramsResource {
         if (decrypt)
             APIUtils.askAPICallAllowed(password, "GET telegrams decrypt", request, true);
 
-        for (TelegramMessage telegram : controller.getLastTelegrams(timestamp, recipient, filter)) {
+        for (TelegramMessage telegram : controller.getLastTelegrams(timestamp, recipient, filter, outcomes)) {
 
             item = telegram.toJson();
             if (decrypt) {
@@ -139,6 +141,7 @@ public class TelegramsResource {
      * @param address   its e recipient
      * @param timestamp the value more than which will be searched
      * @param filter    is title in telegram
+     * @param outcomes    if set True - use outcomes too
      * @return Array all telegram by recipient in format JSON
      *
      * <h2>Example request</h2>
@@ -176,6 +179,7 @@ public class TelegramsResource {
     public String getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") long timestamp,
                                         @QueryParam("filter") String filter,
                                         @QueryParam("decrypt") boolean decrypt,
+                                        @QueryParam("outcomes") boolean outcomes,
                                         @QueryParam("password") String password) {
 
         Tuple2<Account, String> account = Account.tryMakeAccount(address);
@@ -189,7 +193,7 @@ public class TelegramsResource {
         JSONArray array = new JSONArray();
         JSONObject item;
         Transaction transaction;
-        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(account.a, timestamp, filter)) {
+        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, account.a.getAddress(), filter, outcomes)) {
 
             item = telegram.toJson();
 
@@ -305,7 +309,7 @@ public class TelegramsResource {
 
         if (message != null && message.length() > 0) {
             if (encoding == 0) {
-                messageBytes = message.getBytes(Charset.forName("UTF-8"));
+                messageBytes = message.getBytes(StandardCharsets.UTF_8);
             } else {
                 try {
                     if (encoding == 16) {
@@ -379,7 +383,7 @@ public class TelegramsResource {
         try {
             transaction = cntr.r_Send(
                     account, feePow, recipient, assetKey, amount,
-                    title, messageBytes, isTextByte, encrypted);
+                    title, messageBytes, isTextByte, encrypted, 0);
         } catch (Exception e) {
             out.put("status_code", Transaction.INVALID_RETURN);
             out.put("error_message", e.getMessage());
@@ -656,8 +660,8 @@ public class TelegramsResource {
     public String test1(@PathParam("delay") long delay, @QueryParam("password") String password) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
-                && !BlockChain.DEVELOP_USE)
-            return "not LOCAL && not DEVELOP";
+                && !BlockChain.TEST_MODE)
+            return "not LOCAL && not testnet";
 
         APIUtils.askAPICallAllowed(password, "GET telegrams/test1\n ", request, true);
 
@@ -714,7 +718,7 @@ public class TelegramsResource {
 
                     // MAKE TELEGRAM
                     Transaction transaction = new RSend(creator, (byte) 0, recipient, 0, null,
-                            "TEST 1", "TEST TEST TEST".getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                            "TEST 1", "TEST TEST TEST".getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
                             new byte[]{(byte) 1},
                             NTP.getTime(), 0l);
                     transaction.sign(creator, Transaction.FOR_NETWORK);

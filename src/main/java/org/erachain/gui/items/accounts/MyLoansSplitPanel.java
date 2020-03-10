@@ -10,14 +10,15 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 
 // панель моих адресов
-public class MyLoansSplitPanel extends SplitPanel {
+public class MyLoansSplitPanel extends SplitPanel  {
 
     public AccountsPanel accountPanel;
     public AccountsRightPanel rightPanel;
+    private static String iconFile = "images/pageicons/MyLoansSplitPanel.png";
 
     public MyLoansSplitPanel() {
         super("MyLoansSplitPanel");
-        //	LayoutManager favoritesGBC = this.getLayout();
+         //	LayoutManager favoritesGBC = this.getLayout();
         this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
         this.toolBarLeftPanel.setVisible(false);
@@ -66,6 +67,16 @@ public class MyLoansSplitPanel extends SplitPanel {
 
         }
 
+    }
+
+    public static  Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 

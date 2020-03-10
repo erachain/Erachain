@@ -12,22 +12,21 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.mails.MailInfo;
-import org.erachain.gui.library.*;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.Converter;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class IssueSendPaymentOrder extends javax.swing.JPanel {
+public class IssueSendPaymentOrder extends javax.swing.JPanel  {
 
     /**
      *
@@ -35,6 +34,8 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     private IssueSendPaymentOrder1 issue_Panel;
     private IssueSendPaymentOrder th;
+    private static String iconFile = "images/pageicons/IssueSendPaymentOrder.png";
+
 
     /*
      * To change this license header, choose License Headers in Project
@@ -42,6 +43,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel {
      * open the template in the editor.
      */
     public IssueSendPaymentOrder() {
+
         th = this;
         setLayout(new java.awt.BorderLayout());
         JScrollPane scroll = new JScrollPane();
@@ -146,7 +148,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel {
 
         if (message != null && message.length() > 0) {
             if (isTextB) {
-                messageBytes = message.getBytes(Charset.forName("UTF-8"));
+                messageBytes = message.getBytes(StandardCharsets.UTF_8);
             } else {
                 try {
                     messageBytes = Converter.parseHexString(message);
@@ -234,7 +236,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel {
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(
                 Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), 0, recipient, key,
-                null, head, messageBytes, isTextByte, encrypted);
+                null, head, messageBytes, isTextByte, encrypted, 0);
         // test result = new Pair<Transaction, Integer>(null,
         // Transaction.VALIDATE_OK);
 
@@ -303,11 +305,22 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel {
         jSON_Message.put("3", issue_Panel.jTextField_Doc_Num.getText());
         jSON_Message.put("4", issue_Panel.jTextField_Doc_Date.getText()); // date
 
-        byte[] messageBytes = StrJSonFine.convert(jSON_Message).getBytes(Charset.forName("UTF-8"));
+        byte[] messageBytes = StrJSonFine.convert(jSON_Message).getBytes(StandardCharsets.UTF_8);
 
 
-        String a = new String(messageBytes, Charset.forName("UTF-8"));
+        String a = new String(messageBytes, StandardCharsets.UTF_8);
         return a;
+    }
+
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }
 

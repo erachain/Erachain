@@ -35,6 +35,8 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
 public class IssueUnionPanel extends JPanel {
+
+    private static String iconFile = "images/pageicons/IssueUnionPanel.png";
     private static Logger logger = LoggerFactory.getLogger(IssueUnionPanel.class);
 
     private JComboBox<Account> cbxFrom;
@@ -346,4 +348,13 @@ public class IssueUnionPanel extends JPanel {
 
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

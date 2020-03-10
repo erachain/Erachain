@@ -55,9 +55,6 @@ public class ATMap extends DCUMapImpl<String, AT> {
 
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP
@@ -212,11 +209,6 @@ public class ATMap extends DCUMapImpl<String, AT> {
         @SuppressWarnings("unchecked")
         Collection<String> keys = Lists.newArrayList(Fun.filter(this.typeATs, type));
         return keys;
-    }
-
-    @Override
-    protected AT getDefaultValue() {
-        return null;
     }
 
     public boolean add(AT at) {

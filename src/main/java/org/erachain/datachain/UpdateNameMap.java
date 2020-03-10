@@ -20,9 +20,6 @@ public class UpdateNameMap extends DCUMap<byte[], Name> {
         super(parent, null);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP
@@ -36,11 +33,6 @@ public class UpdateNameMap extends DCUMap<byte[], Name> {
     @Override
     protected void getMemoryMap() {
         map = new TreeMap<byte[], Name>(UnsignedBytes.lexicographicalComparator());
-    }
-
-    @Override
-    protected Name getDefaultValue() {
-        return null;
     }
 
     public Name get(Transaction transaction) {

@@ -4,10 +4,14 @@ package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.OrderSerializer;
 import org.erachain.datachain.OrderSuit;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -15,8 +19,8 @@ import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 
 ;
 
@@ -70,10 +74,15 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
                         Order>() {
                     @Override
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
-                            Long key, Order value) {
-                        return new Fun.Tuple4<>(value.getHaveAssetKey(), value.getWantAssetKey(),
-                                value.calcPrice(),
-                                value.getId());
+                            Long key, Order order) {
+                        return new Fun.Tuple4<>(order.getHaveAssetKey(), order.getWantAssetKey(),
+
+                                // по остаткам цены НЕЛЬЗЯ! так как при изменении цены после покусывания стрый ключ не находится!
+                                // и потом при поиске по итераторы находятся эти неудалившиеся ключи!
+                                key > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPrice() : order.getPrice(),
+                                //// теперь можно - в Обработке ордера сделал решение этой проблемы value.getPrice(),
+
+                                order.getId());
                     }
                 });
 
@@ -113,7 +122,7 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
                         return new Fun.Tuple4<>(value.getWantAssetKey(), value.getHaveAssetKey(),
-                                value.calcPrice(),
+                                value.getPrice(),
                                 value.getId());
                     }
                 });
@@ -125,55 +134,110 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
     }
 
     @Override
-    public Iterator<Long> getHaveWantIterator(long have, long want) {
+    public Order getHaveWanFirst(long have, long want) {
 
-        return ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
+        Map.Entry<Fun.Tuple4, Long> first = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
-                Fun.t4(have, want, Fun.HI(), Fun.HI())).values().iterator();
+                Fun.t4(have, want, Fun.HI(), Fun.HI())).firstEntry();
+
+        if (first == null)
+            return null;
+
+        return get(first.getValue());
 
     }
 
     @Override
-    public Iterator<Long> getHaveWantIterator(long have) {
-        return ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
+    public IteratorCloseable<Long> getHaveWantIterator(long have, long want) {
+
+        return new IteratorCloseableImpl(((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
+                Fun.t4(have, want, null, null),
+                Fun.t4(have, want, Fun.HI(), Fun.HI())).values().iterator());
+
+    }
+
+    @Override
+    public IteratorCloseable<Long> getHaveWantIterator(long have) {
+        return new IteratorCloseableImpl(((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, null, null, null),
-                Fun.t4(have, Fun.HI(), Fun.HI(), Fun.HI())).values().iterator();
+                Fun.t4(have, Fun.HI(), Fun.HI(), Fun.HI())).values().iterator());
     }
 
     @Override
-    public Iterator<Long> getWantHaveIterator(long want, long have) {
+    public IteratorCloseable<Long> getWantHaveIterator(long want, long have) {
 
-        return ((BTreeMap<Fun.Tuple4, Long>) this.wantHaveKeyMap).subMap(
+        return new IteratorCloseableImpl(((BTreeMap<Fun.Tuple4, Long>) this.wantHaveKeyMap).subMap(
                 Fun.t4(want, have, null, null),
-                Fun.t4(want, have, Fun.HI(), Fun.HI())).values().iterator();
+                Fun.t4(want, have, Fun.HI(), Fun.HI())).values().iterator());
 
     }
 
     @Override
-    public Iterator<Long> getWantHaveIterator(long want) {
-        return ((BTreeMap<Fun.Tuple4, Long>) this.wantHaveKeyMap).subMap(
+    public IteratorCloseable<Long> getWantHaveIterator(long want) {
+        return new IteratorCloseableImpl(((BTreeMap<Fun.Tuple4, Long>) this.wantHaveKeyMap).subMap(
                 Fun.t4(want, null, null, null),
-                Fun.t4(want, Fun.HI(), Fun.HI(), Fun.HI())).values().iterator();
+                Fun.t4(want, Fun.HI(), Fun.HI(), Fun.HI())).values().iterator());
     }
 
     @Override
-    public Iterator<Long> getAddressHaveWantIterator(String address, long have, long want) {
-        return ((BTreeMap<Fun.Tuple5, Long>) this.addressHaveWantKeyMap).subMap(
+    public IteratorCloseable<Long> getAddressHaveWantIterator(String address, long have, long want) {
+
+        return new IteratorCloseableImpl(((BTreeMap<Fun.Tuple5, Long>) this.addressHaveWantKeyMap).subMap(
                 Fun.t5(address, have, want, null, null),
-                Fun.t5(address, have, want, Fun.HI(), Fun.HI())).values().iterator();
+                Fun.t5(address, have, want, Fun.HI(), Fun.HI())).values().iterator());
     }
 
     @Override
-    public HashSet<Long> getUnsortedKeysWithParent(long have, long want, BigDecimal limit) {
+    public IteratorCloseable<Long> getAddressIterator(String address) {
 
-        Object limitOrHI = limit == null ? Fun.HI() : limit; // надо тут делать выбор иначе ошибка преобразования в subMap
+        return new IteratorCloseableImpl(((BTreeMap<Fun.Tuple5, Long>) this.addressHaveWantKeyMap).subMap(
+                Fun.t5(address, null, null, null, null),
+                Fun.t5(address, Fun.HI(), Fun.HI(), Fun.HI(), Fun.HI())).values().iterator());
+    }
+
+    @Override
+    public HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal stopPrice, Map deleted) {
+
+        // берем все сейчас! так как тут просто перебьор будет и нам надо вщять + одну выше цены
+        // Object limitOrHI = stopPrice == null ? Fun.HI() : stopPrice; // надо тут делать выбор иначе ошибка преобразования в subMap
         Collection<Long> keys = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
-                Fun.t4(have, want, limitOrHI, Fun.HI()))
-                //Fun.t4(have, want, limit, Fun.HI()))
+                Fun.t4(have, want, Fun.HI(), Fun.HI()))
                 .values();
 
-        return new HashSet<>(keys);
+        HashMap<Long, Order> result = new HashMap<>();
+        for (Long key : keys) {
+            if (deleted != null && deleted.containsKey(key)) {
+                // SKIP deleted in FORK
+                continue;
+            }
+
+            Order order = get(key);
+            result.put(key, order);
+            // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
+            // причем берем по Остаткам Цену теперь
+            if (stopPrice != null && order.calcLeftPrice().compareTo(stopPrice) > 0) {
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public void delete(Long key) {
+        if (BlockChain.CHECK_BUGS > 33 && Transaction.viewDBRef(key).equals("176395-2")) {
+            boolean debug = true;
+        }
+        super.delete(key);
+    }
+
+    @Override
+    public Order remove(Long key) {
+        if (BlockChain.CHECK_BUGS > 33 && Transaction.viewDBRef(key).equals("176395-2")) {
+            boolean debug = true;
+        }
+        return super.remove(key);
     }
 
 }

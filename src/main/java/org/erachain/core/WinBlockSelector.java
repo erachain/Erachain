@@ -62,30 +62,46 @@ public class WinBlockSelector extends MonitoredThread {
         // ASK BLOCK FROM BLOCKCHAIN
         Block newBlock = blockWinMessage.getBlock();
 
+        String info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
+                + newBlock.toString();
+
         // если мы синхронизируемся - то берем победный блок а потои
         // его перепроверим при выходе из синхронизации
         if (this.controller.isStatusSynchronizing()) {
+            LOGGER.info("ADD unchecked on Synchronizing - " + info);
             blockChain.setWaitWinBufferUnchecked(newBlock);
+            // и разошлем его дальше тоже, так как если мы выпали в оставание то всем свои перешлем все равно
+            controller.network.broadcastWinBlock(blockWinMessage, false);
             return;
         }
-        String info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
-                + newBlock.toString();
+
         LOGGER.info(info);
 
         if (!newBlock.isValidHead(dcSet)) {
             // то проверим заголовок
             info = "Block HEAD is Invalid - ignore " + newBlock.toString();
             LOGGER.info(info);
+
+            // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока
+            // а если у нас уже в буфере нет, то пошлем наш последний блок
+            Block myWinBlock = blockChain.getWaitWinBuffer();
+            myWinBlock = myWinBlock == null ? blockChain.getLastBlock(dcSet) : myWinBlock;
+            if (myWinBlock != null) {
+                message.getSender().sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
+            }
+
             return;
         }
 
         // тут внутри проверка полной валидности
-        if (blockChain.setWaitWinBuffer(dcSet, newBlock, message.getSender())) {
+        if (blockChain.setWaitWinBuffer(dcSet, newBlock,
+                message.getSender() // тут забаним пир если не сошелся так ка заголовок то верный был
+        )) {
             // IF IT WIN
             // BROADCAST
             //List<Peer> excludes = new ArrayList<Peer>();
             //excludes.add(message.getSender());
-            message.getSender().network.broadcastWinBlock(blockWinMessage, false);
+            controller.network.broadcastWinBlock(blockWinMessage, false);
 
             onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
             if (onMessageProcessTiming < 999999999999l) {
@@ -95,10 +111,12 @@ public class WinBlockSelector extends MonitoredThread {
             }
 
         } else {
-            // SEND my BLOCK
+            // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока
+            // а если у нас уже в буфере нет, то пошлем наш последний блок
             Block myWinBlock = blockChain.getWaitWinBuffer();
+            myWinBlock = myWinBlock == null ? blockChain.getLastBlock(dcSet) : myWinBlock;
             if (myWinBlock != null) {
-                message.getSender().sendWinBlock((BlockWinMessage)MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
+                message.getSender().sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
             }
         }
     }
@@ -106,17 +124,21 @@ public class WinBlockSelector extends MonitoredThread {
     public void run() {
 
         runned = true;
-        //Message message;
+
         while (runned) {
             try {
                 processMessage(blockingQueue.take());
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(86);
-                return;
+                blockingQueue = null;
+                Controller.getInstance().stopAll(566);
+                break;
             } catch (java.lang.IllegalMonitorStateException e) {
+                blockingQueue = null;
+                Controller.getInstance().stopAll(567);
                 break;
             } catch (java.lang.InterruptedException e) {
+                blockingQueue = null;
                 break;
             }
 

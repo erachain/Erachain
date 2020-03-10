@@ -1,7 +1,6 @@
 package org.erachain.dbs;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -15,7 +14,7 @@ public interface IMap<T, U> {
 
     void openMap();
 
-    IMap getSource();
+    U getDefaultValue();
 
     int size();
 
@@ -73,9 +72,15 @@ public interface IMap<T, U> {
 
     boolean contains(T key);
 
-    Iterator<T> getIterator(int index, boolean descending);
+    /**
+     *
+     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
+     * @param descending true if need descending sort
+     * @return
+     */
+    IteratorCloseable<T> getIterator(int index, boolean descending);
 
-    Iterator<T> getIterator();
+    IteratorCloseable<T> getIterator();
 
     int getDefaultIndex();
 
@@ -84,6 +89,11 @@ public interface IMap<T, U> {
     void commit();
 
     void rollback();
+
+    /**
+     * Нужно для восстановления локальных переменных после отката - из переменных Базы Данных
+     */
+    void afterRollback();
 
     void clearCache();
 

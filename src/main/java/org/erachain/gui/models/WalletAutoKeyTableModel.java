@@ -2,8 +2,8 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.AutoKeyDBMap;
-import org.erachain.dbs.DBTab;
 import org.erachain.database.SortableList;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
 
 import java.util.ArrayList;
@@ -75,10 +75,10 @@ public abstract class WalletAutoKeyTableModel<T, U> extends WalletSortedTableMod
     }
 
     @Override
-    public void getIntervalThis(long startBack, long endBack) {
+    public void getIntervalThis(long startBack, int limit) {
 
         // тут могут быть пустые элементы - пропустим их
-        Collection<T> keys = ((AutoKeyDBMap)map).getFromToKeys(startBack, endBack);
+        Collection<T> keys = ((AutoKeyDBMap) map).getFromToKeys(startBack, limit);
         listSorted = new SortableList<T, U>(map, keys);
 
     }

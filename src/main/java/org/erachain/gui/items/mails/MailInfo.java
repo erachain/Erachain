@@ -3,15 +3,15 @@ package org.erachain.gui.items.mails;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.RSend;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.library.MAccoutnTextField;
-import org.erachain.gui.library.VoushLibraryPanel;
+import org.erachain.gui.library.MTextPane;
+import org.erachain.gui.library.VouchLibraryPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MenuPopupUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -33,7 +33,7 @@ import java.nio.charset.Charset;
 public class MailInfo extends javax.swing.JPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MailInfo.class);
-    public VoushLibraryPanel voush_Library_Panel;
+    public VouchLibraryPanel voush_Library_Panel;
     public JTabbedPane jTabbedPane1;
     RSend trans;
     boolean encrypted;
@@ -280,7 +280,7 @@ public class MailInfo extends javax.swing.JPanel {
 
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        voush_Library_Panel = new VoushLibraryPanel(trans);
+        voush_Library_Panel = new VouchLibraryPanel(trans);
         jTabbedPane1.add(voush_Library_Panel);
         add(jTabbedPane1, gridBagConstraints);
 
@@ -316,7 +316,7 @@ public class MailInfo extends javax.swing.JPanel {
                 jTextArea_Messge.setText(Lang.getInstance().translate("Decrypt Error!"));
             } else {
                 jTextArea_Messge.setText(trans.isText() ?
-                        new String(decryptedData, Charset.forName("UTF-8"))
+                        new String(decryptedData, StandardCharsets.UTF_8)
                         : Converter.toHex(decryptedData));
 
                 jButton1.setText(Lang.getInstance().translate("Encrypt message"));
@@ -349,7 +349,7 @@ public class MailInfo extends javax.swing.JPanel {
         if ( trans.isText() ) {
             //jTextArea_Messge.setContentType("text");
             //jTextArea_Messge.setContentType("text/html");
-            return Processor.process(new String(trans.getData(), Charset.forName("UTF-8")));
+            return Processor.process(new String(trans.getData(), StandardCharsets.UTF_8));
         }
         //jTextArea_Messge.setContentType("text/html");
 

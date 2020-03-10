@@ -5,17 +5,25 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +31,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Path("r_send")
@@ -49,7 +60,14 @@ public class RSendResource {
         help.put("POST r_send/raw {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": <encoding>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
                 "make RAW for SEND asset amount and mail");
         help.put("GET r_send/test1/{delay}?password={password}",
-                "Stert test; dekay = 0 - stop");
+                "Start test; dekay = 0 - stop");
+        help.put("GET multisend/{fromAddress}/{assetKey}/{forAssetKey}?position=1&amount=0&test=true&feePow=0&activeafter=[date]&activebefore=[date]&greatequal=[amount]&koeff=1&title=&onlyperson=false&selfpay=false&password=",
+                "Muli-send from Address [fromAddress] the asset [assetKey] by filter: Who has positive balance by asset [forAssetKey] where "
+                        + " position - balance position for test, amount and koeff: sensed AMOUNT = amount + koeff * BALANCE, test - set false for real send or true for statistics, activeafter and activebefore - check activity for address in format: [timestamp_in_sec | YYYY-MM-DD HH:MM],"
+                        + " greatequal=0 - if set balance in position must be great or equal this amount, activeTypeTX=0 - if set test activity on this type transactions,"
+                        + "selfPay=true - if set pay to self address too. Default = true"
+                        + " title=, onlyperson - get only personalized addresses, password=");
+        //
 
         return StrJSonFine.convert(help);
     }
@@ -97,7 +115,7 @@ public class RSendResource {
         Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
                 assetKey, true,
                 amount, needAmount,
-                title, message, encoding, encrypt);
+                title, message, encoding, encrypt, 0);
 
         Transaction transaction = result.getB();
         if (transaction == null) {
@@ -224,7 +242,7 @@ public class RSendResource {
         Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
                 assetKey, true,
                 amountStr, needAmount,
-                title, message, encoding, encrypt);
+                title, message, encoding, encrypt, 0);
 
         Transaction transaction = result.getB();
         if (transaction == null) {
@@ -309,10 +327,10 @@ public class RSendResource {
     @Path("test1/{probability}/{delay}")
     public String test1(@PathParam("probability") float probability, @PathParam("delay") long delay, @QueryParam("password") String password) {
 
-        if (!BlockChain.DEVELOP_USE
+        if (!BlockChain.TEST_MODE
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
-            return "not LOCAL && not DEVELOP";
+            return "not LOCAL && not testnet";
 
         APIUtils.askAPICallAllowed(password, "GET test1\n ", request, true);
 
@@ -393,8 +411,8 @@ public class RSendResource {
                         Transaction transaction = cnt.r_Send(creator,
                                 0, recipient,
                                 2l, null, "LoadTest_" + address.substring(1, 5) + " " + counter,
-                                (address + counter + "TEST TEST TEST").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
-                                new byte[]{(byte) 1});
+                                (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
+                                new byte[]{(byte) 1}, 0);
 
                         if (cnt.isOnStopping())
                             return;
@@ -435,9 +453,9 @@ public class RSendResource {
                         }
                     } else {
 
-                        RSend transaction = new RSend(creator, (byte) 0, recipient,2l, null,
+                        RSend transaction = new RSend(creator, (byte) 0, recipient, 2l, null,
                                 "LoadTest_" + address.substring(1, 5) + " " + counter,
-                                (address + counter + "TEST TEST TEST").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                                (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
                                 new byte[]{(byte) 1}, NTP.getTime(), 0l);
 
                         transaction.sign(creator, Transaction.FOR_NETWORK);
@@ -492,10 +510,10 @@ public class RSendResource {
     @Path("test2/{probability}/{delay}")
     public String test2(@PathParam("probability") float probability, @PathParam("delay") long delay, @QueryParam("password") String password) {
 
-        if (!BlockChain.DEVELOP_USE
+        if (!BlockChain.TEST_MODE
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
-            return "not LOCAL && not DEVELOP";
+            return "not LOCAL && not testnet";
 
         APIUtils.askAPICallAllowed(password, "GET test2\n ", request, true);
 
@@ -583,8 +601,8 @@ public class RSendResource {
                         Transaction transaction = cnt.r_Send(creator,
                                 0, recipient,
                                 2l, amount, "LoadTestSend_" + address.substring(1, 5) + " " + counter,
-                                (address + counter + "TEST SEND ERA").getBytes(Charset.forName("UTF-8")), encryptMessage,
-                                new byte[]{(byte) 1});
+                                (address + counter + "TEST SEND ERA").getBytes(StandardCharsets.UTF_8), encryptMessage,
+                                new byte[]{(byte) 1}, 0);
 
                         Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
                         // CLEAR for HEAP
@@ -660,6 +678,267 @@ public class RSendResource {
 
         return out.toJSONString();
 
+    }
+
+    /**
+     * Multi send scrip for send asset for many addresses or persons filtered by some parameters.
+     * This command will run as test for calculate FEE and total AMOUNT by default. For run real send set parameter `test=false`.
+     * Unlock wallet.
+     * <br>
+     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1036/2?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1577712486&password=123
+     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1069/1036?amount=0.001&title=probe-multi&onlyperson=true&activeafter=2018-01-01 00:00&activebefore=2019-01-01 00:00&greatequal=0&activetypetx=24&password=1
+     * GET r_send/multisend/7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1/1/2?amount=0.001&title=probe-multi&onlyperson=true&gender=0&password=1
+     * get r_send/multisend/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1072/2?amount=1&title=С 8 Марта!&onlyperson=true&gender=1&password=123&test=false
+     *
+     * @param fromAddress     my address in Wallet
+     * @param assetKey        asset Key that send
+     * @param forAssetKey     asset key of holders test
+     * @param amount          absolute amount to send
+     * @param onlyPerson      Default: false. Use only person accounts
+     * @param gender          Filter by gender. -1 = all, 0 - man, 1 - woman. Default: -1.
+     * @param position        test balance position. 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other
+     * @param greatEqual      test balance is great or equal
+     * @param selfPay         if set - pay to self address too. Default = true
+     * @param test            default - true. test=false - real send
+     * @param feePow
+     * @param activeAfterStr  timestamp after that is filter - yyyy-MM-dd hh:mm or timestamp(sec)
+     * @param activeBeforeStr timestamp before that is filter - yyyy-MM-dd hh:mm or timestamp(sec) activetypetx
+     * @param activeTypeTX    if set - test only that type transactions
+     * @param koeff           koefficient for amount in balance position of forAssetKey
+     * @param title
+     * @param password
+     * @return
+     */
+    @GET
+    @Path("multisend/{fromAddress}/{assetKey}/{forAssetKey}")
+    public String multiSend(@PathParam("fromAddress") String fromAddress, @PathParam("assetKey") long assetKey, @PathParam("forAssetKey") long forAssetKey,
+                            @DefaultValue("1") @QueryParam("position") Integer position,
+                            @DefaultValue("0") @QueryParam("greatequal") BigDecimal greatEqual, // больше или равно чем
+                            @DefaultValue("0") @QueryParam("amount") BigDecimal amount,
+                            @DefaultValue("true") @QueryParam("test") Boolean test,
+                            @DefaultValue("true") @QueryParam("selfpay") Boolean selfPay,
+                            @DefaultValue("0") @QueryParam("feePow") Integer feePow,
+                            @DefaultValue("-1") @QueryParam("gender") Byte gender,
+                            @DefaultValue("0") @QueryParam("activeafter") String activeAfterStr,
+                            @DefaultValue("0") @QueryParam("activebefore") String activeBeforeStr,
+                            @DefaultValue("0") @QueryParam("activetypetx") int activeTypeTX, // активность по заданному типу транзакции
+                            @DefaultValue("0") @QueryParam("koeff") BigDecimal koeff,
+                            @QueryParam("title") String title,
+                            @DefaultValue("false") @QueryParam("onlyperson") Boolean onlyPerson,
+                            @QueryParam("password") String password) {
+
+        if (!test && !BlockChain.TEST_MODE
+                && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
+        )
+            return "not LOCAL && not testnet";
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        Long activeAfter;
+        try {
+            Date parsedDate = dateFormat.parse(activeAfterStr);
+            Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+            activeAfter = timestamp.getTime();
+        } catch(Exception e) {
+            try {
+                activeAfter = Long.parseLong(activeAfterStr) * 1000L;
+            } catch (Exception e1) {
+                activeAfter = null;
+            }
+        }
+
+        Long activeBefore;
+        try {
+            Date parsedDate = dateFormat.parse(activeBeforeStr);
+            Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+            activeBefore = timestamp.getTime();
+        } catch(Exception e) {
+            try {
+                activeBefore = Long.parseLong(activeBeforeStr) * 1000L;
+            } catch (Exception e1) {
+                activeBefore = null;
+            }
+        }
+
+        Controller cntr = Controller.getInstance();
+        BlockChain chain = cntr.getBlockChain();
+
+        // преобразуем в seqNo
+        Long fromSeqNo = null;
+        if (activeAfter != null && activeAfter > 0) {
+            fromSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestamp(activeAfter), 0);
+        }
+        Long toSeqNo = null;
+        if (activeBefore != null && activeBefore > 0) {
+            toSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestamp(activeBefore), 0);
+        }
+
+        if (!test) {
+            // так как тут может очень долго работать то откроем на долго
+            APIUtils.askAPICallAllowed(password, "GET multisend\n ", request, false);
+        }
+        try {
+
+            JSONObject out = new JSONObject();
+            JSONArray outResult = new JSONArray();
+
+            Fun.Tuple2<Account, String> accResult = Account.tryMakeAccount(fromAddress);
+            if (accResult.b != null) {
+                out.put("error", -123);
+                out.put("error_message", accResult);
+                return out.toJSONString();
+            }
+
+            Account accountFrom = accResult.a;
+
+            BigDecimal totalSendAmount = BigDecimal.ZERO;
+
+            DCSet dcSet = DCSet.getInstance();
+            ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
+            TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
+
+            byte[] key;
+            Crypto crypto = Crypto.getInstance();
+            Fun.Tuple2<BigDecimal, BigDecimal> balance;
+
+            int count = 0;
+            BigDecimal totalFee = BigDecimal.ZERO;
+
+            HashSet<Long> usedPersons = new HashSet<>();
+            boolean needAmount = true;
+            long timestampThis = NTP.getTime() - 10000L;
+            PersonCls person;
+
+            try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(forAssetKey)) {
+                while (iterator.hasNext()) {
+                    key = iterator.next();
+                    if (!selfPay && accountFrom.equals(key)) {
+                        // сами себе не платим?
+                        continue;
+                    }
+
+                    try {
+
+                        balance = Account.getBalanceInPosition(balancesMap.get(key), position);
+
+                        // только тем у кого положительный баланс и больше чем задано
+                        if (balance.b.compareTo(greatEqual) < 0)
+                            continue;
+
+                        byte[] recipentShort = ItemAssetBalanceMap.getShortAccountFromKey(key);
+
+                        Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
+                        if (onlyPerson) {
+                            // так как тут сортировка по убыванию значит первым встретится тот счет на котром больше всего актива
+                            // - он и будет выбран куда 1 раз пошлем актив свой
+                            addressDuration = dcSet.getAddressPersonMap().getItem(recipentShort);
+                            if (addressDuration == null)
+                                continue;
+                            if (usedPersons.contains(addressDuration.a))
+                                continue;
+
+                            person = (PersonCls) dcSet.getItemPersonMap().get(addressDuration.a);
+
+                            if (gender >= 0) {
+                                if (person.getGender() != gender) {
+                                    continue;
+                                }
+                            }
+                        } else {
+                            addressDuration = null;
+                            person = null;
+                        }
+
+                        /// если задано то проверим - входит ли в в диаппазон
+                        // - собранные блоки учитываем? да - иначе долго будет делать поиск
+                        if (fromSeqNo != null || toSeqNo != null) {
+                            // на счете должна быть активность в заданном диаппазоне для данного типа
+                            if (!txMap.isCreatorWasActive(recipentShort, fromSeqNo, activeTypeTX, toSeqNo))
+                                continue;
+                        }
+
+                        JSONArray resultOne = new JSONArray();
+
+                        BigDecimal sendAmount;
+                        if (amount.signum() > 0) {
+                            sendAmount = amount;
+                        } else {
+                            sendAmount = BigDecimal.ZERO;
+                        }
+
+                        if (koeff.signum() > 0) {
+                            sendAmount = sendAmount.add(balance.b.multiply(koeff));
+                        }
+
+                        String recipientStr = Crypto.getInstance().getAddressFromShort(recipentShort);
+                        resultOne.add(recipientStr);
+                        resultOne.add(sendAmount.toPlainString());
+                        if (person != null) {
+                            resultOne.add(person.toString());
+                        }
+
+
+                        Pair<Integer, Transaction> result = cntr.make_R_Send(null, accountFrom, recipientStr, feePow,
+                                assetKey, true,
+                                sendAmount, needAmount,
+                                title, null, 0, false, timestampThis++);
+
+                        Transaction transaction = result.getB();
+                        if (transaction == null) {
+                            resultOne.add(OnDealClick.resultMess(result.getA()));
+
+                            if (test) {
+                                // просчитаем тоже даже если ошибка
+                                totalSendAmount = totalSendAmount.add(sendAmount);
+                                ///totalFee = totalFee.add(transaction.getFee());
+                                count++;
+                            }
+
+                        } else {
+
+                            int validate = cntr.getTransactionCreator().afterCreate(transaction,
+                                    // если проба то не шлем в реальности
+                                    test ? Transaction.FOR_PACK : Transaction.FOR_NETWORK);
+
+                            if (validate != Transaction.VALIDATE_OK) {
+                                resultOne.add(OnDealClick.resultMess(validate));
+
+                            } else {
+                                // УСПЕХ! учтем все
+                                totalSendAmount = totalSendAmount.add(transaction.getAmount());
+                                totalFee = totalFee.add(transaction.getFee());
+                                count++;
+                                if (onlyPerson) {
+                                    // учтем что такой персоне давали
+                                    usedPersons.add(addressDuration.a);
+                                }
+                            }
+                        }
+
+                        outResult.add(resultOne);
+
+                    } catch (java.lang.ArrayIndexOutOfBoundsException e) {
+                        LOGGER.error("Wrong key raw: " + Base58.encode(key));
+                    }
+                }
+
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+
+            out.put("_results", outResult);
+            out.put("asset", assetKey);
+            out.put("count", count);
+            out.put("totalFee", totalFee.toPlainString());
+            out.put("totalSendAmount", totalSendAmount.toPlainString());
+
+            if (test)
+                out.put("status", "TEST");
+
+            return out.toJSONString();
+
+        } finally {
+            Controller.getInstance().lockWallet();
+        }
     }
 
 }

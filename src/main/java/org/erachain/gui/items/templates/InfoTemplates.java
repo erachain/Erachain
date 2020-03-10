@@ -3,10 +3,9 @@ package org.erachain.gui.items.templates;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.gui.library.MTextPane;
-import org.erachain.gui.library.VoushLibraryPanel;
+import org.erachain.gui.library.VouchLibraryPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -95,6 +94,7 @@ public class InfoTemplates extends javax.swing.JPanel {
         add(jLabel_Account_Creator, gridBagConstraints);
 
         jTextField_Account_Creator = new MAccoutnTextField(template.getOwner());
+        jTextField_Account_Creator.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
@@ -115,6 +115,7 @@ public class InfoTemplates extends javax.swing.JPanel {
         add(jLabel_Title, gridBagConstraints);
 
         jTextField_Title.setToolTipText("");
+        jTextField_Title.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 2;
@@ -198,7 +199,7 @@ public class InfoTemplates extends javax.swing.JPanel {
 
         // vouch panel
         Transaction trans = Transaction.findByDBRef(DCSet.getInstance(), template.getReference());
-        jTabbedPane1.add(new VoushLibraryPanel(trans));
+        jTabbedPane1.add(new VouchLibraryPanel(trans));
 
     }
 

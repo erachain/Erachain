@@ -77,7 +77,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
                     //map = new BlocksSuitMapDBFotk((TransactionMap) parent, databaseSet);
                     //break;
                 default:
-                    map = new NativeMapHashMapFork(parent, databaseSet, null);
+                    map = new NativeMapHashMapFork(parent, databaseSet, this);
             }
         }
     }
@@ -136,22 +136,25 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         if (block == null)
             return null;
 
+        if (false) {
+            // проверим занятую память и очистим если что
+            // это не Форк базы и большой блок взяли - наверно надо чистить КЭШ
+            if (parent == null && System.currentTimeMillis() - cacheClearedTime > 10000
+                    && block.getTransactionCount() > 10
+                    && Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()
+                    && Runtime.getRuntime().freeMemory() <
+                    (Runtime.getRuntime().totalMemory() >> 10)
+                            + Controller.MIN_MEMORY_TAIL
+            ) {
+                cacheClearedTime = System.currentTimeMillis();
+                databaseSet.clearCache();
+                System.gc();
+            }
+        }
+
         // LOAD HEAD
         block.loadHeadMind((DCSet) databaseSet);
 
-        // проверим занятую память и очистим если что
-        // это не Форк базы и большой блок взяли - наверно надо чистить КЭШ
-        if (parent == null && System.currentTimeMillis() - cacheClearedTime > 10000
-                && block.getTransactionCount() > 10
-                && Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()
-                && Runtime.getRuntime().freeMemory() <
-                        Controller.MIN_MEMORY_TAIL << 3
-                        //(Runtime.getRuntime().totalMemory() >> 1)
-                ) {
-            cacheClearedTime = System.currentTimeMillis();
-            databaseSet.clearCache();
-            System.gc();
-        }
         return block;
 
     }
@@ -174,8 +177,15 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
         dcSet.getBlockSignsMap().put(signature, height);
         if (dcSet.getBlockSignsMap().size() != height) {
-            Long error = null;
-            ++error;
+            // так как это вызывается асинхронно при проверке прилетающих победных блоков
+            // то тут иногда вылетает ошибка - но в общем должно быть норм все
+            logger.error("CHECK TABS: \n getBlockSignsMap().size() != height : "
+                    + dcSet.getBlockSignsMap().size() + " != " + height
+                    + " : " + block);
+            if (BlockChain.CHECK_BUGS > 10) {
+                Long error = null;
+                ++error;
+            }
         }
 
         PublicKeyAccount creator = block.getCreator();
@@ -190,7 +200,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
         if (BlockChain.CHECK_BUGS > 5) {
             Block.BlockHead head = block.blockHead;
-            Fun.Tuple2<Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(block.getCreator().getAddress());
+            Fun.Tuple3<Integer, Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(block.getCreator().getAddress());
             if (lastPoint.a > head.heightBlock) {
                 LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + head.heightBlock);
                 Long i = null;
@@ -222,7 +232,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         creator.delForgingData(dcSet, height);
 
         if (BlockChain.CHECK_BUGS > 5) {
-            Fun.Tuple2<Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(creator.getAddress());
+            Fun.Tuple3<Integer, Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(creator.getAddress());
             if (lastPoint.a > height) {
                 LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + height);
                 Long i = null;
@@ -251,12 +261,15 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             return;
         }
 
-        logger.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE");
+        long time = System.currentTimeMillis();
         this.setChanged();
         // NEED in BLOCK!
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block));
+        time -= System.currentTimeMillis();
+        if (time < -1) {
+            logger.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE period: " + -time);
+        }
 
-        logger.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE END");
     }
 
     @Override
@@ -266,12 +279,15 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             return;
         }
 
-        logger.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE");
+        long time = System.currentTimeMillis();
         this.setChanged();
         // NEED in BLOCK!
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block));
+        time -= System.currentTimeMillis();
+        if (time < -1) {
+            logger.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE period: " + -time);
+        }
 
-        logger.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE END");
     }
 
 }

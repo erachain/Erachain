@@ -1,42 +1,24 @@
 package org.erachain.gui.items.accounts;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
-import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.*;
 
 @SuppressWarnings("serial")
 public class CreditsPanel extends JPanel // implements ItemListener
@@ -136,7 +118,7 @@ public class CreditsPanel extends JPanel // implements ItemListener
                 //Menu.selectOrAdd( new AccountSendDialog(asset, account), null);
 
                 //new AccountSendDialog(asset, account, null, null);
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(asset, TransactionAmount.ACTION_SEND, account, null, null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send"),new AccountAssetSendPanel(asset, account, null, null, null), AccountAssetSendPanel.getIcon());
 
 
             }
@@ -161,7 +143,7 @@ public class CreditsPanel extends JPanel // implements ItemListener
                 AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
                 Account account = tableModel.getAccount(row);
 
-                MainPanel.getInstance().insertTab(new AccountAssetHoldPanel(asset, account, null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate(hold_check_label), new AccountAssetHoldPanel(asset, account, null, null),AccountAssetHoldPanel.getIcon());
 
 
             }
@@ -179,7 +161,7 @@ public class CreditsPanel extends JPanel // implements ItemListener
                 AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
                 Account account = tableModel.getAccount(row);
 
-                MainPanel.getInstance().insertTab(new AccountAssetLendPanel(asset, account, null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate(asset.isOutsideType()? "Предявить требование к погашению" : "Lend"),new AccountAssetLendPanel(asset, account, null, null), AccountAssetLendPanel.getIcon());
 
             }
         });
@@ -194,7 +176,7 @@ public class CreditsPanel extends JPanel // implements ItemListener
     
                     AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
                     Account account = tableModel.getAccount(row);
-                    MainPanel.getInstance().insertTab(new AccountAssetRepayDebtPanel(asset, account, null, null));
+                    MainPanel.getInstance().insertTab(Lang.getInstance().translate("Repay Debt"), new AccountAssetRepayDebtPanel(asset, account, null, null), AccountAssetRepayDebtPanel.getIcon());
 
                 }
             });
@@ -209,7 +191,7 @@ public class CreditsPanel extends JPanel // implements ItemListener
 
                 AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
                 Account account = tableModel.getAccount(row);
-                MainPanel.getInstance().insertTab(new AccountAssetConfiscateDebtPanel(asset, account, null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate(asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"),new AccountAssetConfiscateDebtPanel(asset, account, null, null), AccountAssetConfiscateDebtPanel.getIcon());
 
             }
         });

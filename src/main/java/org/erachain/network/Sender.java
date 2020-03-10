@@ -27,7 +27,7 @@ public class Sender extends MonitoredThread {
     private final static boolean logPings = false;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class.getSimpleName());
-    private static final int QUEUE_LENGTH = 256 << (Controller.HARD_WORK >> 1);
+    private static final int QUEUE_LENGTH = 1024 + (256 << (Controller.HARD_WORK >> 1));
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private Peer peer;
@@ -65,7 +65,7 @@ public class Sender extends MonitoredThread {
         this.setName("Sender-" + this.getId() + " for: " + peer.getName());
     }
 
-    public boolean offer(Message message) {
+    public synchronized boolean offer(Message message) {
         boolean result = blockingQueue.offer(message);
         if (!result) {
             this.peer.network.missedSendes.incrementAndGet();
@@ -73,30 +73,42 @@ public class Sender extends MonitoredThread {
         return result;
     }
 
-    public void sendGetHWeight(GetHWeightMessage getHWeightMessage) {
-        if (true) {
-            if (this.blockingQueue.isEmpty()) {
-                blockingQueue.offer(getHWeightMessage);
-            } else {
-                this.getHWeightMessage = getHWeightMessage;
-            }
-        } else
+    public synchronized void sendGetHWeight(GetHWeightMessage getHWeightMessage) {
+        if (this.blockingQueue.isEmpty() || this.getHWeightMessage != null) {
+            if (logPings)
+                LOGGER.debug(this.peer + " to blockingQueue " + getHWeightMessage.viewPref(true) + getHWeightMessage);
+            if (USE_MONITOR)
+                this.setMonitorStatus("to blockingQueue " + getHWeightMessage.viewPref(true) + getHWeightMessage);
             blockingQueue.offer(getHWeightMessage);
+        } else {
+            if (logPings)
+                LOGGER.debug(this.peer + " to getHWeightMessage " + getHWeightMessage.viewPref(true) + getHWeightMessage);
+            if (USE_MONITOR)
+                this.setMonitorStatus("to getHWeightMessage " + getHWeightMessage.viewPref(true) + getHWeightMessage);
+            this.getHWeightMessage = getHWeightMessage;
+        }
     }
 
-    public void sendHWeight(HWeightMessage hWeightMessage) {
-        if (true) {
-            if (this.blockingQueue.isEmpty()) {
-                blockingQueue.offer(hWeightMessage);
-            } else {
-                this.hWeightMessage = hWeightMessage;
-            }
-        } else
+    public synchronized void sendHWeight(HWeightMessage hWeightMessage) {
+        if (this.blockingQueue.isEmpty() || this.hWeightMessage != null) {
+            if (logPings)
+                LOGGER.debug(this.peer + " to blockingQueue " + hWeightMessage.viewPref(true) + getHWeightMessage);
+            if (USE_MONITOR)
+                this.setMonitorStatus("to blockingQueue " + hWeightMessage.viewPref(true) + getHWeightMessage);
             blockingQueue.offer(hWeightMessage);
+        } else {
+            if (logPings)
+                LOGGER.debug(this.peer + " to getHWeightMessage " + hWeightMessage.viewPref(true) + getHWeightMessage);
+            if (USE_MONITOR)
+                this.setMonitorStatus("to getHWeightMessage " + hWeightMessage.viewPref(true) + getHWeightMessage);
+            this.hWeightMessage = hWeightMessage;
+        }
     }
 
-    public void sendWinBlock(BlockWinMessage winBlock) {
-        if (this.blockingQueue.isEmpty()) {
+    public synchronized void sendWinBlock(BlockWinMessage winBlock) {
+        if (this.blockingQueue.isEmpty()
+                || this.winBlockToSend != null // если там уже занято
+        ) {
             blockingQueue.offer(winBlock);
         } else {
             this.winBlockToSend = winBlock;
@@ -128,22 +140,27 @@ public class Sender extends MonitoredThread {
                 }
 
                 // FLUSH if NEED
+                long currentTime = System.currentTimeMillis();
                 if (needFlush
                         || blockingQueue.isEmpty() ?
-                        System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME
+                        currentTime - out_flush_time > MAX_FLUSH_TIME
                                 || out_flush_length > MAX_FLUSH_LENGTH_EMPTY
                         :
                         out_flush_length > MAX_FLUSH_LENGTH
 
                 ) {
                     this.out.flush();
+                    if (logPings)
+                        LOGGER.debug(peer + " FLUSHED OUT sizs:" + out_flush_length + " time: " + (currentTime - out_flush_time));
+                    if (USE_MONITOR)
+                        this.setMonitorStatus("FLUSHED OUT size: " + out_flush_length + " time: " + (currentTime - out_flush_time));
                     out_flush_time = System.currentTimeMillis();
                     out_flush_length = 0;
                 }
 
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(85);
+                Controller.getInstance().stopAll(277);
                 return false;
             } catch (java.lang.NullPointerException e) {
                 return false;
@@ -193,126 +210,136 @@ public class Sender extends MonitoredThread {
             return false;
         }
 
-        if (logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
-            LOGGER.debug(this.peer + message.viewPref(true) + message);
-        }
+        int messageType = message.getType();
 
-        if (peer.getPing() < -10 && message.getType() == Message.WIN_BLOCK_TYPE) {
+        if (peer.getPing() < -10 && messageType == Message.WIN_BLOCK_TYPE) {
             // если пинг хреновый то ничего не шлем кроме пингования
             return false;
         }
 
         if (USE_MONITOR) this.setMonitorStatusBefore("write");
+        try {
 
-        byte[] bytes = message.toBytes();
+            byte[] bytes = message.toBytes();
+            if (logPings && message.hasId() && (messageType == Message.GET_HWEIGHT_TYPE || messageType == Message.HWEIGHT_TYPE))
+                LOGGER.debug(this.peer + message.viewPref(true) + message + " to BYTES");
 
-        // проверим - может уже такое сообщение было нами принято, или
-        // если нет - то оно будет запомнено уже в списке обработанных входящих сообщений
-        // и не будет повторно обрабатываться при прилете к нас опять
-        if (message.isHandled()) {
-            switch (message.getId()) {
-                case Message.TELEGRAM_TYPE:
-                    // может быть это повтор?
+            // проверим - может уже такое сообщение было нами принято, или
+            // если нет - то оно будет запомнено уже в списке обработанных входящих сообщений
+            // и не будет повторно обрабатываться при прилете к нас опять
+            if (message.isHandled()) {
+                switch (message.getId()) {
+                    case Message.TELEGRAM_TYPE:
+                        // может быть это повтор?
 
-                    if (!this.peer.network.checkHandledTelegramMessages(message.getLoadBytes(), this.peer, true)) {
-                        LOGGER.debug(this.peer + " --> Telegram ALREADY SENDED...");
-                        return true;
-                    }
-                    break;
-                case Message.TRANSACTION_TYPE:
-                    // может быть это повтор?
-                    if (!this.peer.network.checkHandledTransactionMessages(message.getLoadBytes(), this.peer, true)) {
-                        LOGGER.debug(this.peer + " --> Transaction ALREADY SENDED...");
-                        return true;
-                    }
-                    break;
-                case Message.WIN_BLOCK_TYPE:
-                    // может быть это повтор?
-                    if (!this.peer.network.checkHandledWinBlockMessages(message.getLoadBytes(), this.peer, true)) {
-                        LOGGER.debug(this.peer + " --> Win Block ALREADY SENDED...");
-                        return true;
-                    }
-                    break;
+                        if (!this.peer.network.checkHandledTelegramMessages(message.getLoadBytes(), this.peer, true)) {
+                            LOGGER.debug(this.peer + " --> Telegram ALREADY SENDED...");
+                            return true;
+                        }
+                        break;
+                    case Message.TRANSACTION_TYPE:
+                        // может быть это повтор?
+                        if (!this.peer.network.checkHandledTransactionMessages(message.getLoadBytes(), this.peer, true)) {
+                            LOGGER.debug(this.peer + " --> Transaction ALREADY SENDED...");
+                            return true;
+                        }
+                        break;
+                    case Message.WIN_BLOCK_TYPE:
+                        // может быть это повтор?
+                        if (!this.peer.network.checkHandledWinBlockMessages(message.getLoadBytes(), this.peer, true)) {
+                            LOGGER.debug(this.peer + " --> Win Block ALREADY SENDED...");
+                            return true;
+                        }
+                        break;
+                }
             }
+
+            long checkTime = System.currentTimeMillis();
+
+            if (!writeAndFlush(bytes,
+                    message.quickSend() // все что нужно быстро отправлять
+            )) {
+                LOGGER.debug(this.peer + message.viewPref(true) + message + " NOT send ((");
+                return false;
+            }
+
+            checkTime = System.currentTimeMillis() - checkTime;
+            if (logPings && message.hasId() && (messageType == Message.GET_HWEIGHT_TYPE || messageType == Message.HWEIGHT_TYPE)
+                    || checkTime - 3 > (bytes.length >> 3) && loggedPoint - System.currentTimeMillis() > 1000
+            ) {
+                loggedPoint = System.currentTimeMillis();
+                LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by ms: " + checkTime);
+            }
+
+            return true;
+
+        } finally {
+            if (USE_MONITOR) this.setMonitorStatusAfter();
         }
 
-        long checkTime = System.currentTimeMillis();
-
-        if (!writeAndFlush(bytes, message.getType() == Message.GET_HWEIGHT_TYPE
-                || message.getType() == Message.HWEIGHT_TYPE
-                || message.getType() == Message.WIN_BLOCK_TYPE))
-            return false;
-
-        checkTime = System.currentTimeMillis() - checkTime;
-        if (checkTime - 3 > (bytes.length >> 3) && loggedPoint - System.currentTimeMillis() > 1000
-                || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
-            loggedPoint = System.currentTimeMillis();
-            LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by period: " + checkTime);
-        }
-
-        if (USE_MONITOR) this.setMonitorStatusAfter();
-
-
-        return true;
     }
 
     public void run() {
 
         //Controller cnt = Controller.getInstance();
 
-        Message message = null;
+        Message message;
 
         while (this.peer.network.run) {
 
-            if (this.out == null) {
-                // очистить остатки запросов если обнулили вывод
-                blockingQueue.clear();
-            }
-
             try {
-                message = blockingQueue.poll(100, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                break;
-            }
+                if (this.out == null) {
+                    // очистить остатки запросов если обнулили вывод
+                    // и стандартное ожидание пуска дальше. То есть Сендер должен ожидать прилета на вход чего-то
+                    blockingQueue.clear();
+                }
 
-            if (getHWeightMessage != null) {
-                if (!sendMessage(getHWeightMessage)) {
+                try {
+                    message = blockingQueue.poll(100, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    break;
+                }
+
+                if (getHWeightMessage != null) {
+                    if (!sendMessage(getHWeightMessage)) {
+                        getHWeightMessage = null;
+                    }
                     getHWeightMessage = null;
                 }
-                getHWeightMessage = null;
-            }
 
-            if (hWeightMessage != null) {
-                if (!sendMessage(hWeightMessage)) {
+                if (hWeightMessage != null) {
+                    if (!sendMessage(hWeightMessage)) {
+                        hWeightMessage = null;
+                    }
                     hWeightMessage = null;
                 }
-                hWeightMessage = null;
-            }
 
-            if (winBlockToSend != null) {
-                if (!sendMessage(winBlockToSend)) {
+                if (winBlockToSend != null) {
+                    if (!sendMessage(winBlockToSend)) {
+                        winBlockToSend = null;
+                    }
                     winBlockToSend = null;
                 }
-                winBlockToSend = null;
-            }
 
-            if (message == null) {
-                // FLUSH if NEED
-                if (out_flush_length > 0 && System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME) {
-                    writeAndFlush(null, true);
+                if (message == null) {
+                    // FLUSH if NEED
+                    if (out_flush_length > 0 && System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME) {
+                        writeAndFlush(null, true);
+                    }
+                    continue;
                 }
-                continue;
+
+                if (message.isRequest() && !this.peer.requests.containsKey(message.getId())) {
+                    // просроченный запрос - можно не отправлять его
+                    continue;
+                }
+
+                if (!sendMessage(message))
+                    continue;
+
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
-
-            if (message.isRequest() && !this.peer.messages.containsKey(message.getId())) {
-                // просроченный запрос - можно не отправлять его
-                continue;
-            }
-
-            if (!sendMessage(message))
-                continue;
-
-
         }
 
         //logger.debug(this + " - halted");

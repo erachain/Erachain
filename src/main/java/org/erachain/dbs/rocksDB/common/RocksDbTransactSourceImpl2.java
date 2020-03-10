@@ -5,6 +5,10 @@ import com.google.common.primitives.Ints;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.Transacted;
+import org.erachain.dbs.rocksDB.RockStoreIterator;
+import org.erachain.dbs.rocksDB.RockStoreIteratorFilter;
+import org.erachain.dbs.rocksDB.RockStoreIteratorStart;
+import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.utils.ByteUtil;
@@ -24,8 +28,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl.SIZE_BYTE_KEY;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
+import static org.erachain.utils.ByteArrayUtils.areEqualMask;
 
 /**
  * Самый низкий уровень доступа к функциям RocksDB
@@ -159,7 +163,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         resetDbLock.readLock().lock();
         Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         try (final RocksIterator iter = getIterator()) {
-            for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
+            for (iter.seek(filter); iter.isValid() && areEqualMask(iter.key(), filter); iter.next()) {
                 result.add(iter.key());
             }
             return result;
@@ -176,7 +180,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         resetDbLock.readLock().lock();
         List<byte[]> result = new ArrayList<byte[]>();
         try (final RocksIterator iter = getIterator()) {
-            for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
+            for (iter.seek(filter); iter.isValid() && areEqualMask(iter.key(), filter); iter.next()) {
                 result.add(iter.value());
             }
             return result;
@@ -193,7 +197,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         resetDbLock.readLock().lock();
         Set<byte[]> result = new TreeSet<>();
         try (final RocksIterator iter = getIterator(indexDB)) {
-            for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
+            for (iter.seek(filter); iter.isValid() && areEqualMask(iter.key(), filter); iter.next()) {
                 result.add(iter.value());
             }
             return result;
@@ -463,6 +467,10 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
      * if a value is found in block-cache
      */
     final StringBuilder inCache = new StringBuilder();
+    DBOptions optionsDBcont = new DBOptions().setAllowMmapReads(true);
+    ReadOptions optionsReadDBcont = new ReadOptions(false, false);
+    byte[] containsBuff = new byte[0];
+
     @Override
     public boolean contains(byte[] key) {
         if (quitIfNotAlive()) {
@@ -472,8 +480,8 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         try {
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCoreParent.keyMayExist(key, inCache)) return false;
-            // теперь ищем по настоящему
-            return dbCoreParent.get(key) != null;
+            // теперь ищем по настоящему - без получения данных
+            return dbCoreParent.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -491,8 +499,8 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         try {
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCoreParent.keyMayExist(columnFamilyHandle, key, inCache)) return false;
-            // теперь ищем по настоящему
-            return dbCoreParent.get(columnFamilyHandle, key) != null;
+            // теперь ищем по настоящему - без получения данных
+            return dbCoreParent.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -518,6 +526,22 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     }
 
     @Override
+    public byte[] get(ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCore.get(readOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
     public byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return null;
@@ -525,6 +549,22 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         resetDbLock.readLock().lock();
         try {
             return dbCore.get(columnFamilyHandle, transactReadOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
+    public byte[] get(ColumnFamilyHandle columnFamilyHandle, ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCore.get(columnFamilyHandle, readOptions, key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -624,27 +664,47 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     }
 
     @Override
-    public RockStoreIterator iterator(boolean descending) {
+    public void deleteRange(byte[] keyFrom, byte[] keyToExclude) {
+        throw new UnsupportedRocksDBOperationException();
+    }
+
+    @Override
+    public void deleteRange(ColumnFamilyHandle columnFamilyHandle, byte[] keyFrom, byte[] keyToExclude) {
+        throw new UnsupportedRocksDBOperationException();
+    }
+
+    @Override
+    public RockStoreIterator iterator(boolean descending, boolean isIndex) {
         return new RockStoreIterator(getIterator(), descending, false);
     }
 
     @Override
-    public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle) {
+    public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle, boolean isIndex) {
         return new RockStoreIterator(getIterator(columnFamilyHandle), descending, true);
     }
 
     @Override
-    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter) {
+    public RockStoreIterator indexIteratorFilter(boolean descending, byte[] filter, boolean isIndex) {
         return new RockStoreIteratorFilter(getIterator(), descending, true, filter);
     }
 
     @Override
-    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter) {
-        return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, true, filter);
+    public RockStoreIterator indexIteratorFilter(boolean descending, byte[] start, byte[] stop, boolean isIndex) {
+        return new RockStoreIteratorStart(getIterator(), descending, isIndex, start, stop);
     }
 
     @Override
-    public RockStoreIterator indexIterator(boolean descending, int indexDB) {
+    public RockStoreIterator indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter, boolean isIndex) {
+        return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, isIndex, filter);
+    }
+
+    @Override
+    public RockStoreIterator indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] start, byte[] stop, boolean isIndex) {
+        return new RockStoreIteratorStart(getIterator(columnFamilyHandle), descending, isIndex, start, stop);
+    }
+
+    @Override
+    public RockStoreIterator indexIterator(boolean descending, int indexDB, boolean isIndex) {
         return new RockStoreIterator(getIterator(columnFamilyHandles.get(indexDB)), descending, true);
     }
 
@@ -739,7 +799,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
             return Collections.emptyMap();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = getIterator()) {
+        try (final RocksIterator iter = getIterator()) {
             Map<byte[], byte[]> result = new HashMap<>();
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
@@ -760,7 +820,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
             return new ArrayList<>();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = getIterator()) {
+        try (final RocksIterator iter = getIterator()) {
             List<byte[]> result = new ArrayList<>();
             long i = 0;
             for (iter.seekToLast(); iter.isValid() && i < limit; iter.prev(), i++) {
@@ -781,7 +841,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
             return new ArrayList<>();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = getIterator()) {
+        try (final RocksIterator iter = getIterator()) {
             List<byte[]> result = new ArrayList<>();
             long i = 0;
             byte[] data = get(key);
@@ -807,7 +867,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
             return new ArrayList<>();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = getIterator()) {
+        try (final RocksIterator iter = getIterator()) {
             List<byte[]> result = new ArrayList<>();
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
@@ -828,7 +888,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
             return new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = getIterator()) {
+        try (final RocksIterator iter = getIterator()) {
             Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
@@ -849,7 +909,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
             return new TreeSet(Fun.BYTE_ARRAY_COMPARATOR);
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = getIterator(columnFamilyHandle)) {
+        try (final RocksIterator iter = getIterator(columnFamilyHandle)) {
             Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
@@ -878,7 +938,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
             return Collections.emptyMap();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iterator = getIterator()) {
+        try (final RocksIterator iterator = getIterator()) {
             Map<byte[], byte[]> result = new HashMap<>();
             long i = 0;
             for (iterator.seekToFirst(); iterator.isValid() && i++ < limit; iterator.next()) {
@@ -907,9 +967,11 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         return FileUtil.deleteDir(new File(dir + getDBName()));
     }
 
+    byte[] sizeBytes = new byte[4];
+
     @Override
     public int size() {
-        byte[] sizeBytes = get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+        sizeBytes = get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
         return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
     }
 

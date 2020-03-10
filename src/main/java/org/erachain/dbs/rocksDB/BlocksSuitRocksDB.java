@@ -13,8 +13,6 @@ import org.mapdb.DB;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
 
-import java.util.ArrayList;
-
 @Slf4j
 public class BlocksSuitRocksDB extends DBMapSuit<Integer, Block> implements BlocksSuit {
 
@@ -46,13 +44,6 @@ public class BlocksSuitRocksDB extends DBMapSuit<Integer, Block> implements Bloc
                     databaseSet, sizeEnable);
         }
 
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes() {
-        // SIZE need count - make not empty LIST
-        indexes = new ArrayList<>();
     }
 
 }

@@ -4,6 +4,8 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedBytes;
 import org.erachain.dbs.DCUMapImpl;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
@@ -27,9 +29,6 @@ public class PeerMap extends DCUMapImpl<byte[], byte[]> {
         super(databaseSet, database);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP
@@ -44,15 +43,9 @@ public class PeerMap extends DCUMapImpl<byte[], byte[]> {
         map = new TreeMap<byte[], byte[]>(UnsignedBytes.lexicographicalComparator());
     }
 
-    @Override
-    protected byte[] getDefaultValue() {
-        return null;
-    }
-
     public List<Peer> getAllPeers(int amount) {
-        try {
+        try (IteratorCloseable<byte[]> iterator = IteratorCloseableImpl.make(this.keySet().iterator())) {
             //GET ITERATOR
-            Iterator<byte[]> iterator = this.keySet().iterator();
 
             //PEERS
             List<Peer> peers = new ArrayList<Peer>();

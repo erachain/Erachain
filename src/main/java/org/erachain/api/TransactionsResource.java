@@ -25,7 +25,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -343,7 +342,7 @@ public class TransactionsResource {
     @Path("recipient/{address}/limit/{limit}")
     public String getTransactionsByRecipient(@PathParam("address") String address, @PathParam("limit") int limit) {
         JSONArray array = new JSONArray();
-        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(address, limit);
+        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(Account.makeShortBytes(address), limit);
         for (Transaction transaction : txs) {
             array.add(transaction.toJson());
         }
@@ -478,7 +477,7 @@ public class TransactionsResource {
     public String getTransactionsBySender(@PathParam("address") String address, @PathParam("limit") int limit) {
 
         JSONArray array = new JSONArray();
-        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsBySender(address, limit);
+        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByCreator(Account.makeShortBytes(address), limit, 0);
         for (Transaction transaction : txs) {
             array.add(transaction.toJson());
         }
@@ -493,8 +492,8 @@ public class TransactionsResource {
                                                   @PathParam("limit") int limit) {
 
         JSONArray array = new JSONArray();
-        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address,
-                type, limit);
+        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(Account.makeShortBytes(address),
+                type, limit, 0);
         for (Transaction transaction : txs) {
             array.add(transaction.toJson());
         }
@@ -777,7 +776,7 @@ public class TransactionsResource {
         try {
             transaction = Controller.getInstance().r_Send(
                     Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), 0, recip, asset1, amount,
-                    head, message.getBytes(Charset.forName("UTF-8")), isTextByte, encrypted);
+                    head, message.getBytes(StandardCharsets.UTF_8), isTextByte, encrypted, 0);
             // test result = new Pair<Transaction, Integer>(null,
             // Transaction.VALIDATE_OK);
             if (transaction == null)

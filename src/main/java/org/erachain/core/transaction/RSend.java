@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -358,16 +357,16 @@ public class RSend extends TransactionAmount {
                 return "encrypted";
             } else {
                 if (this.data.length > MAX_DATA_VIEW << 4) {
-                    return new String(data, Charset.forName("UTF-8")); // "{{" +
+                    return new String(data, StandardCharsets.UTF_8); // "{{" +
                     // new
                     // String(Arrays.copyOfRange(data,
                     // 0,
                     // MAX_DATA_VIEW),
-                    // Charset.forName("UTF-8"))
+                    // StandardCharsets.UTF_8)
                     // +
                     // "...}}";
                 }
-                return new String(this.data, Charset.forName("UTF-8"));
+                return new String(this.data, StandardCharsets.UTF_8);
             }
         } else {
             if (this.data.length > MAX_DATA_VIEW) {
@@ -405,7 +404,7 @@ public class RSend extends TransactionAmount {
             if (Base58.isExtraSymbols(word)) {
                 // все слова сложим по длинне
                 length += word.length();
-                if (length > (BlockChain.DEVELOP_USE? 100 : 100))
+                if (length > (BlockChain.TEST_MODE ? 100 : 100))
                     return true;
             }
         }
@@ -414,7 +413,7 @@ public class RSend extends TransactionAmount {
             return false;
 
         if (this.isText() && !this.isEncrypted()) {
-            String text = new String(this.data, Charset.forName("UTF-8"));
+            String text = new String(this.data, StandardCharsets.UTF_8);
             if (text.contains(" ") || text.contains("_"))
                 return true;
         }
@@ -431,18 +430,15 @@ public class RSend extends TransactionAmount {
 
         if (head.length() > 0) {
             transaction.put("title", this.head);
-            transaction.put("head", this.head);
         }
 
         if (data != null && data.length > 0) {
 
             // ADD CREATOR/SERVICE/DATA
             if (this.isText() && !this.isEncrypted()) {
-                transaction.put("message", new String(this.data, Charset.forName("UTF-8")));
-                transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
+                transaction.put("message", new String(this.data, StandardCharsets.UTF_8));
             } else {
                 transaction.put("message", Base58.encode(this.data));
-                transaction.put("data", Base58.encode(this.data));
             }
             transaction.put("encrypted", this.isEncrypted());
             transaction.put("isText", this.isText());
@@ -496,7 +492,7 @@ public class RSend extends TransactionAmount {
     @Override
     public int isValid(int asDeal, long flags) {
 
-        if (head.getBytes(StandardCharsets.UTF_8).length > 256)
+        if (head.getBytes(StandardCharsets.UTF_8).length > 255)
             return INVALID_HEAD_LENGTH;
 
         if (this.data != null) {
@@ -510,22 +506,7 @@ public class RSend extends TransactionAmount {
         // PUBLIC TEXT only from PERSONS
         if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
                 && this.hasPublicText() && !isPerson) {
-            if (BlockChain.DEVELOP_USE) {
-                if (height < 495000) { // TODO: delete for new CHAIN
-                    ;
-                } else if (height > BlockChain.ALL_BALANCES_OK_TO) { // TODO: delete for new CHAIN
-                    boolean good = false;
-                    for (String admin : BlockChain.GENESIS_ADMINS) {
-                        if (this.creator.equals(admin)) {
-                            good = true;
-                            break;
-                        }
-                    }
-                    if (!good) {
-                        return CREATOR_NOT_PERSONALIZED;
-                    }
-                }
-            } else if (Base58.encode(this.getSignature()).equals( // TODO: remove on new CHAIN
+            if (Base58.encode(this.getSignature()).equals( // TODO: remove on new CHAIN
                     "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")) {
                 ;
             } else {

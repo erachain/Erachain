@@ -140,11 +140,12 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         ObserverMessage message = (ObserverMessage) arg;
 
         if (message.getType() == ADD_EVENT
-                        || message.getType() == DELETE_EVENT) {
+                || message.getType() == DELETE_EVENT) {
             needUpdate = true;
         } else if (message.getType() == LIST_EVENT
-                    || message.getType() == RESET_EVENT
-                    || message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
+                || message.getType() == RESET_EVENT) {
+            needUpdate = true;
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
             needUpdate = false;
             getInterval();
             this.fireTableDataChanged();
@@ -152,7 +153,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     }
 
     //public abstract void getIntervalThis(int startBack, int endBack);
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
     }
 
     public int getMapDefaultIndex() {
@@ -178,9 +179,9 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
 
         if (descending) {
             long startBack = -getMapSize() + start;
-            getIntervalThis(startBack, startBack + step);
+            getIntervalThis(startBack, step);
         } else {
-            getIntervalThis(start, start + step);
+             getIntervalThis(start, step);
         }
 
     }

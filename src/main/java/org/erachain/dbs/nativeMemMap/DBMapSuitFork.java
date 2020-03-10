@@ -32,29 +32,37 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     protected Comparator COMPARATOR;
 
     //ConcurrentHashMap deleted;
-    HashMap deleted;
+    Map<T, Boolean> deleted;
     Boolean EXIST = true;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Comparator comparator, Logger logger, U defaultValue) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Comparator comparator, Logger logger, DBTab cover) {
         this.logger = logger;
         this.databaseSet = dcSet;
         this.database = dcSet.database;
-        this.defaultValue = defaultValue;
+        this.cover = cover;
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
-            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+            if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                    + (Controller.MIN_MEMORY_TAIL)) {
                 databaseSet.clearCache();
                 System.gc();
-                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL)
-                    Controller.getInstance().stopAll(1391);
+                if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1))
+                    Controller.getInstance().stopAll(1021);
             }
         }
 
         this.parent = parent;
+
         COMPARATOR = comparator;
+        if (COMPARATOR == null) {
+            this.deleted = new HashMap(1024, 0.75f);
+        } else {
+            this.deleted = new TreeMap<T, Boolean>(COMPARATOR);
+        }
 
         this.openMap();
 
@@ -196,10 +204,6 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         // это форкнутая таблица
 
-        if (this.deleted == null) {
-            this.deleted = new HashMap(1024 , 0.75f);
-        }
-
         // добавляем в любом случае, так как
         // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
         // и это есть в основной базе, то в воркнутую будет помещена так же запись.
@@ -258,19 +262,34 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     }
 
     @Override
-    public void writeToParent() {
+    public boolean writeToParent() {
+
+        boolean updated = false;
+
         Iterator<T> iterator = this.map.keySet().iterator();
         while (iterator.hasNext()) {
             T key = iterator.next();
             parent.put(key, this.map.get(key));
+            updated = true;
         }
 
         if (deleted != null) {
             iterator = this.deleted.keySet().iterator();
             while (iterator.hasNext()) {
                 parent.delete(iterator.next());
+                updated = true;
             }
         }
+
+        return updated;
+
+    }
+
+    @Override
+    public void close() {
+        parent = null;
+        deleted = null;
+        super.close();
     }
 
     @Override

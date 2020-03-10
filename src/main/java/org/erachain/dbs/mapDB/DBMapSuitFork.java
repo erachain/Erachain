@@ -1,13 +1,11 @@
 package org.erachain.dbs.mapDB;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterators;
 import lombok.Getter;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
-import org.erachain.dbs.DBTab;
-import org.erachain.dbs.ForkedMap;
+import org.erachain.dbs.*;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
 
@@ -25,33 +23,39 @@ import java.util.*;
  */
 public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements ForkedMap {
 
+    Comparator<? super T> comparator;
+
     @Getter
     protected DBTab<T, U> parent;
 
     //ConcurrentHashMap deleted;
     ///////// - если ключи набор байт или других примитивов - то неверный поиск в этом виде таблиц HashMap deleted;
     /// поэтому берем медленный но правильный TreeMap
-    TreeMap<T, Boolean> deleted;
+    /// НЕТ - это определяется на лету при созданий - по типу ключа
+    Map<T, Boolean> deleted;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, boolean sizeEnable, DBTab cover) {
         assert (parent != null);
 
         this.databaseSet = dcSet;
         this.database = dcSet.database;
         this.logger = logger;
-        this.defaultValue = defaultValue;
+        this.cover = cover;
+        this.sizeEnable = sizeEnable;
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
-            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+            if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                    + Controller.MIN_MEMORY_TAIL) {
                 // у родителя чистим - у себя нет, так как только создали
-                ((DCSet)parent.getDBSet()).clearCache();
+                ((DCSet) parent.getDBSet()).clearCache();
                 System.gc();
-                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1)) {
                     logger.error("Heap Memory Overflow");
-                    Controller.getInstance().stopAll(1291);
+                    Controller.getInstance().stopAll(1011);
                 }
             }
         }
@@ -60,6 +64,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         this.openMap();
 
+    }
+
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, DBTab cover) {
+        this(parent, dcSet, logger, false, cover);
+    }
+
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger) {
+        this(parent, dcSet, logger, false, null);
     }
 
 
@@ -79,6 +91,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         u += this.parent.size();
 
         return u;
+    }
+
+    public void makeDeletedMap(T key) {
+        if (key instanceof byte[]) {
+            this.deleted = new TreeMap(Fun.BYTE_ARRAY_COMPARATOR);
+        } else {
+            this.deleted = new HashMap(1024, 0.75f);
+        }
     }
 
     @Override
@@ -175,8 +195,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         U value = this.map.remove(key);
 
         if (this.deleted == null) {
-            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
-            this.deleted = new TreeMap<T, Boolean>();
+            makeDeletedMap(key);
         }
 
         // добавляем в любом случае, так как
@@ -206,8 +225,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         U value = this.map.remove(key);
 
         if (this.deleted == null) {
-            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
-            this.deleted = new TreeMap<T, Boolean>();
+            makeDeletedMap(key);
         }
 
         // добавляем в любом случае, так как
@@ -237,8 +255,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this.map.remove(key);
 
         if (this.deleted == null) {
-            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
-            this.deleted = new TreeMap<T, Boolean>();
+            makeDeletedMap(key);
         }
 
         // добавляем в любом случае, так как
@@ -261,8 +278,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this.map.remove(key);
 
         if (this.deleted == null) {
-            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
-            this.deleted = new TreeMap<T, Boolean>();
+            makeDeletedMap(key);
         }
 
         // добавляем в любом случае, так как
@@ -291,21 +307,12 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     }
 
     @Override
-    public Iterator<T> getIterator() {
+    public IteratorCloseable<T> getIterator() {
         this.addUses();
 
-        List<T> list = new ArrayList<>();
         Iterator<T> parentIterator = parent.getIterator();
-        while (parentIterator.hasNext()) {
-            T key = parentIterator.next();
-            // пропустим если он есть в удаленных
-            if (deleted != null && deleted.containsKey(key))
-                continue;
-            list.add(key);
-        }
-
-        //Map uncastedMap = this.map;
-        Iterator<T> iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
+        IteratorCloseable<T> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                parentIterator, map.keySet().iterator()), Fun.COMPARATOR, deleted);
 
         this.outUses();
         return iterator;
@@ -314,20 +321,11 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     // TODO надо рекурсию к Родителю по итератору делать
     @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIterator(int index, boolean descending) {
         this.addUses();
 
-        List<T> list = new ArrayList<>();
         Iterator<T> parentIterator = parent.getIterator(index, descending);
-        while (parentIterator.hasNext()) {
-            T key = parentIterator.next();
-            // пропустим если он есть в удаленных
-            if (deleted != null && deleted.containsKey(key))
-                continue;
-            list.add(key);
-        }
-
-        Iterator<T> iterator;
+        IteratorCloseable<T> iterator;
 
         if (index > 0) {
             // 0 - это главный индекс - он не в списке indexes
@@ -336,40 +334,56 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
                 iterator = new org.erachain.datachain.IndexIterator<>(this.indexes.get(index));
             } else {
                 if (descending) {
-                    iterator = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+                    iterator = new IteratorCloseableImpl(((NavigableMap<T, U>) this.map).descendingKeySet().iterator());
                 } else {
-                    iterator = this.map.keySet().iterator();
+                    iterator = new IteratorCloseableImpl(this.map.keySet().iterator());
                 }
             }
         } else {
             if (descending) {
-                iterator = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+                iterator = new IteratorCloseableImpl(((NavigableMap<T, U>) this.map).descendingKeySet().iterator());
             } else {
-                iterator = this.map.keySet().iterator();
+                iterator = new IteratorCloseableImpl(this.map.keySet().iterator());
             }
         }
 
-        iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), iterator), Fun.COMPARATOR);
+        IteratorCloseable iteratorMerged = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                parentIterator, iterator), Fun.COMPARATOR, deleted);
 
         this.outUses();
-        return iterator;
-
+        return iteratorMerged;
     }
 
     @Override
-    public void writeToParent() {
+    public boolean writeToParent() {
+
+        boolean updated = false;
+
         Iterator<T> iterator = this.map.keySet().iterator();
+
         while (iterator.hasNext()) {
             T key = iterator.next();
-            parent.getSource().put(key, this.map.get(key));
+            parent.getSuit().put(key, this.map.get(key));
+            updated = true;
         }
 
         if (deleted != null) {
-            iterator = this.deleted.keySet().iterator();
-            while (iterator.hasNext()) {
-                parent.getSource().delete(iterator.next());
+            Iterator<T> iteratorDeleted = this.deleted.keySet().iterator();
+            while (iteratorDeleted.hasNext()) {
+                parent.getSuit().delete(iteratorDeleted.next());
+                updated = true;
             }
         }
+
+        return updated;
+    }
+
+    @Override
+    public void close() {
+        // у всей базы чистится parent.clearCache();
+        parent = null;
+        deleted = null;
+        super.close();
     }
 
     @Override

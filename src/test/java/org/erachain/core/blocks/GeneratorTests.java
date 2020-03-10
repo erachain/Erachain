@@ -19,6 +19,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -132,7 +133,7 @@ public class GeneratorTests {
             //GENERATE NEXT BLOCK
             Block newBlock = blockGenerator.generateNextBlock(generator,
                     lastBlock, orderedTransactions,
-                    height,  1000, 1000l, 1000l);
+                    1000, 1000l, 1000l);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -401,7 +402,7 @@ public class GeneratorTests {
             //GENERATE NEXT BLOCK
             Block newBlock = blockGenerator.generateNextBlock(generator,
                     lastBlock, orderedTransactions,
-                    height,  1000, 1000l, 1000l);
+                    1000, 1000l, 1000l);
 
             //ADD TRANSACTION SIGNATURE
             byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -579,14 +580,14 @@ public class GeneratorTests {
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000), NTP.getTime());
         //transaction.process(databaseSet, false);
         generator.setLastTimestamp(new long[]{genesisBlock.getTimestamp(), 0}, dcSet);
-        generator.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(10000), false);
-        generator.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(10000), false);
+        generator.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(10000), false, false);
+        generator.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10000), false, false);
 
         //GENERATE NEXT BLOCK
         BlockGenerator blockGenerator = new BlockGenerator(dcSet, null, false);
         Block newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
-                2,  1000, 1000l, 1000l);
+                1000, 1000l, 1000l);
 
 
         int height = 2;
@@ -619,7 +620,7 @@ public class GeneratorTests {
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
-                2,  1000, 1000l, 1000l);
+                1000, 1000l, 1000l);
         newBlock.setTransactionsForTests(transactions);
 
         //CHECK IF BLOCK IS VALID
@@ -651,15 +652,15 @@ public class GeneratorTests {
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000), NTP.getTime());
         //transaction.process(databaseSet, false);
         generator.setLastTimestamp(new long[]{genesisBlock.getTimestamp(), 0}, dcSet);
-        generator.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(10000), false);
-        generator.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(100000), false);
+        generator.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(10000), false, false);
+        generator.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(100000), false, false);
 
 
         //GENERATE NEXT BLOCK
         BlockGenerator blockGenerator = new BlockGenerator(dcSet, null, false);
         Block newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
-                2,  1000, 1000l, 1000l);
+                1000, 1000l, 1000l);
 
         int height = 2;
         // get timestamp for block
@@ -701,7 +702,7 @@ public class GeneratorTests {
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
-                2,  1000, 1000l, 1000l);
+                1000, 1000l, 1000l);
         newBlock.setTransactionsForTests(transactions);
 
         //CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
@@ -743,7 +744,7 @@ public class GeneratorTests {
         BlockGenerator blockGenerator = new BlockGenerator(dcSet, blockchain, false);
         Block newBlock = blockGenerator.generateNextBlock(userAccount1,
                 genesisBlock, orderedTransactions,
-                2,  1000, 1000l, 1000l);
+                1000, 1000l, 1000l);
 
         int height = 2;
         // get timestamp for block
@@ -768,7 +769,7 @@ public class GeneratorTests {
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(userAccount1,
                 genesisBlock, orderedTransactions,
-                2,  1000, 1000l, 1000l);
+                1000, 1000l, 1000l);
         newBlock.setTransactionsForTests(transactions);
         try {
             newBlock.process(dcSet);
@@ -779,7 +780,7 @@ public class GeneratorTests {
 
         height = newBlock.getHeight();
         //CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
-        Tuple2<Integer, Integer> forgingData = userAccount1.getForgingData(dcSet, height);
+        Tuple3<Integer, Integer, Integer> forgingData = userAccount1.getForgingData(dcSet, height);
         assertEquals((int) forgingData.a, 2);
 
         forgingData = recipient.getForgingData(dcSet, height);
@@ -806,7 +807,7 @@ public class GeneratorTests {
                 previousForgingHeight = BlockChain.REPEAT_WIN + (BlockChain.BASE_TARGET >> 1) + (height >> 2);
 
             previousForgingHeight = height;
-            winned_value = BlockChain.calcWinValue(dcSet, generator1, height, generator1.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue());
+            winned_value = BlockChain.calcWinValue(dcSet, generator1, height, generator1.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue(), null);
             base = BlockChain.getTargetedMin(height);
             targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winned_value, target);
 

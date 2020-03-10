@@ -22,7 +22,9 @@ import java.awt.*;
 import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
-public class IssueStatusPanel extends JPanel {
+public class IssueStatusPanel extends JPanel  {
+
+    private static String iconFile = "images/pageicons/IssueStatusPanel.png";
     private JComboBox<Account> cbxFrom;
     private JComboBox<String> txtFeePow = new JComboBox<String>();
     private JTextField txtName = new JTextField();
@@ -241,5 +243,15 @@ public class IssueStatusPanel extends JPanel {
         txtName.setText("");
         txtareaDescription.setText("");
         txtFeePow.setSelectedItem("0");
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

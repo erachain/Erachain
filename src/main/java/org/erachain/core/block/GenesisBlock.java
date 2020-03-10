@@ -61,7 +61,7 @@ public class GenesisBlock extends Block {
         // ISSUE ITEMS
         this.initItems();
 
-        if (genesisTimestamp != BlockChain.DEFAULT_MAINNET_STAMP) {
+        if (false && genesisTimestamp != Settings.DEFAULT_MAINNET_STAMP) {
             this.testnetInfo = "";
 
             //ADD TESTNET GENESIS TRANSACTIONS
@@ -89,13 +89,17 @@ public class GenesisBlock extends Block {
 				 */
 
 
-                //CREATE ISSUE PERSON TRANSACTION
-                //this.addTransaction(new GenesisIssuePersonRecord(user));
+                if (false) {
+                    //CREATE ISSUE PERSON TRANSACTION
+                    ////this.addTransaction(new GenesisIssuePersonRecord(user));
 
-                // CERTIFY PERSON
-                transactions.add(new GenesisCertifyPersonRecord(recipient, nonce++));
+                    // CERTIFY PERSON
+                    // TODO: тут ошибка сериализации транзакции - поидее нужно проверить и чтобы она работала
+                    // а лучше разрешить создание персон и так
+                    transactions.add(new GenesisCertifyPersonRecord(recipient, nonce++));
 
-                this.testnetInfo += "\ngenesisAccount(" + String.valueOf(nonce) + "): " + address + " / POST addresses " + Base58.encode(accountSeed);
+                    this.testnetInfo += "\ngenesisAccount(" + String.valueOf(nonce) + "): " + address + " / POST addresses " + Base58.encode(accountSeed);
+                }
 
                 // SEND GENESIS ASSETS
                 transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
@@ -509,7 +513,7 @@ public class GenesisBlock extends Block {
         switch (key) {
             case (int) TemplateCls.LICENSE_KEY:
                 String license = "";
-                if(!(BlockChain.TESTS_VERS!=0 && BlockChain.DEVELOP_USE==true)) {
+                if (!(BlockChain.TESTS_VERS != 0 && BlockChain.TEST_MODE)) {
                     try {
                         //File file = new File("License Erachain.txt");
                         File file = new File("Erachain Licence Agreement (genesis).txt");

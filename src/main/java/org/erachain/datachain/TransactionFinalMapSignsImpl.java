@@ -10,8 +10,7 @@ import org.erachain.dbs.rocksDB.TransactionFinalSignsSuitRocksDB;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 
-import static org.erachain.database.IDB.DBS_MAP_DB;
-import static org.erachain.database.IDB.DBS_ROCK_DB;
+import static org.erachain.database.IDB.*;
 
 /**
  * Поиск по подписи ссылки на транзакцию
@@ -19,15 +18,12 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  */
 public class TransactionFinalMapSignsImpl extends DBTabImpl<byte[], Long> implements TransactionFinalMapSigns {
 
-    static int KEY_LEN = 12;
-    static final boolean SIZE_ENABLE = true;
-
-    public TransactionFinalMapSignsImpl(int dbs, DCSet databaseSet, DB database) {
-        super(dbs, databaseSet, database, SIZE_ENABLE);
+    public TransactionFinalMapSignsImpl(int dbs, DCSet databaseSet, DB database, boolean sizeEnable) {
+        super(dbs, databaseSet, database, sizeEnable, null, null);
     }
 
-    public TransactionFinalMapSignsImpl(int dbs, TransactionFinalMapSigns parent, DCSet dcSet) {
-        super(dbs, parent, dcSet, SIZE_ENABLE);
+    public TransactionFinalMapSignsImpl(int dbs, TransactionFinalMapSigns parent, DCSet dcSet, boolean sizeEnable) {
+        super(dbs, parent, dcSet, sizeEnable);
     }
 
     @Override
@@ -36,69 +32,22 @@ public class TransactionFinalMapSignsImpl extends DBTabImpl<byte[], Long> implem
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    map = new TransactionFinalSignsSuitRocksDB(databaseSet, database);
+                    map = new TransactionFinalSignsSuitRocksDB(databaseSet, database, sizeEnable);
                     break;
                 default:
-                    map = new TransactionFinalSignsSuitMapDB(databaseSet, database);
+                    map = new TransactionFinalSignsSuitMapDB(databaseSet, database, sizeEnable);
             }
         } else {
             switch (dbsUsed) {
-                case DBS_MAP_DB:
-                    map = new TransactionFinalSignsSuitMapDBFork((TransactionFinalMapSigns) parent, databaseSet);
+                case DBS_NATIVE_MAP:
+                    map = new NativeMapTreeMapFork<>(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, this);
                     break;
                 case DBS_ROCK_DB:
-                    //map = new TransactionFinalSignsSuitRocksDBFork((TransactionFinalMapSigns) parent, databaseSet);
-                    //break;
+                case DBS_MAP_DB:
                 default:
-                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, null);
+                    // поидее это самая быстрая реализация для больших блоков
+                    map = new TransactionFinalSignsSuitMapDBFork((TransactionFinalMapSigns) parent, databaseSet, false);
             }
         }
     }
-
-
-    @Override
-    public boolean contains(byte[] signature) {
-
-        byte[] key = new byte[KEY_LEN];
-        System.arraycopy(signature, 0, key, 0, KEY_LEN);
-        return super.contains(key);
-    }
-
-    @Override
-    public Long get(byte[] signature) {
-        byte[] key = new byte[KEY_LEN];
-        System.arraycopy(signature, 0, key, 0, KEY_LEN);
-        return super.get(key);
-    }
-
-    @Override
-    public void delete(byte[] signature) {
-        byte[] key = new byte[KEY_LEN];
-        System.arraycopy(signature, 0, key, 0, KEY_LEN);
-        super.delete(key);
-    }
-
-    @Override
-    public Long remove(byte[] signature) {
-        byte[] key = new byte[KEY_LEN];
-        System.arraycopy(signature, 0, key, 0, KEY_LEN);
-        return super.remove(key);
-    }
-
-    @Override
-    public boolean set(byte[] signature, Long refernce) {
-        byte[] key = new byte[KEY_LEN];
-        System.arraycopy(signature, 0, key, 0, KEY_LEN);
-        return super.set(key, refernce);
-
-    }
-
-    @Override
-    public void put(byte[] signature, Long refernce) {
-        byte[] key = new byte[KEY_LEN];
-        System.arraycopy(signature, 0, key, 0, KEY_LEN);
-        super.put(key, refernce);
-
-    }
-
 }

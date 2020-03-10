@@ -25,7 +25,7 @@ import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import java.awt.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -175,13 +175,13 @@ public class PersonSetStatusDialog extends JDialog {
         long value_1 = 0l;
         long value_2 = 0l;
         byte[] data_1 = jAData1Txt.getText().length() == 0 ? null :
-                jAData1Txt.getText().getBytes(Charset.forName("UTF-8"));
+                jAData1Txt.getText().getBytes(StandardCharsets.UTF_8);
         byte[] data_2 = jAData2Txt.getText().length() == 0 ? null :
-                jAData2Txt.getText().getBytes(Charset.forName("UTF-8"));
+                jAData2Txt.getText().getBytes(StandardCharsets.UTF_8);
         long refParent = 0l;
 
         byte[] description = jTextArea_Description.getText().length() == 0 ? null :
-                jTextArea_Description.getText().getBytes(Charset.forName("UTF-8"));
+                jTextArea_Description.getText().getBytes(StandardCharsets.UTF_8);
 
         try {
 

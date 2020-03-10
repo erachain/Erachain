@@ -1,6 +1,5 @@
 package org.erachain.core;
 
-import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
@@ -8,7 +7,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ReferenceMapImpl;
-import org.erachain.datachain.TransactionMap;
 import org.erachain.dbs.DBTab;
 import org.erachain.network.Peer;
 import org.erachain.network.message.BlockMessage;
@@ -23,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,12 +42,12 @@ public class Synchronizer extends Thread {
     // private boolean run = true;
     // private Block runedBlock;
     private Peer fromPeer;
-    Controller cnt;
+    Controller ctrl;
     BlockChain bchain;
 
-    public Synchronizer(Controller cnt, BlockChain bchain) {
-        this.cnt = cnt;
-        this.bchain = bchain;
+    public Synchronizer(Controller ctrl) {
+        this.ctrl = ctrl;
+        this.bchain = ctrl.getBlockChain();
 
         this.start();
     }
@@ -117,7 +114,7 @@ public class Synchronizer extends Thread {
 
         LOGGER.debug("*** core.Synchronizer.checkNewBlocks - START");
 
-        Controller cnt = Controller.getInstance();
+        //Controller cnt = Controller.getInstance();
         BlockMap blockMap = fork.getBlockMap();
 
         // ORPHAN MY BLOCKS IN FORK TO VALIDATE THE NEW BLOCKS
@@ -158,7 +155,7 @@ public class Synchronizer extends Thread {
             }
             // logger.debug("*** core.Synchronizer.checkNewBlocks - try orphan:
             // " + lastBlock.getHeight(fork));
-            if (cnt.isOnStopping())
+            if (ctrl.isOnStopping())
                 throw new Exception("on stopping");
 
             int height = lastBlock.getHeight();
@@ -175,13 +172,20 @@ public class Synchronizer extends Thread {
 
             if (++countOrphanedTransactions < MAX_ORPHAN_TRANSACTIONS_MY) {
                 // сохраним откаченные транзакции - может их потом включим в очередь
-                for (Transaction transaction: lastBlock.getTransactions()) {
+                for (Transaction transaction : lastBlock.getTransactions()) {
                     orphanedTransactions.put(transaction.getDBRef(), transaction);
                 }
                 countOrphanedTransactions += lastBlock.getTransactionCount();
             }
 
-            lastBlock.orphan(fork, true);
+            // Так как откаченные транзакций мы копим тут локально в orphanedTransactions
+            // И с учетом что ниже сразу процессим
+            try {
+                lastBlock.orphan(fork, true);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                ctrl.stopAll(311);
+            }
 
             DCSet.getInstance().clearCache();
 
@@ -202,7 +206,12 @@ public class Synchronizer extends Thread {
         }
 
         LOGGER.debug("*** checkNewBlocks - lastBlock[" + lastBlock.getHeight() + "]");
+        if (false) {
+            // Тест откатов чтобы откатиться 1 раз и больше не синхриться - для проверки удаления
+            test2 = true;
+            return orphanedTransactions;
 
+        }
         // VALIDATE THE NEW BLOCKS
 
         //////// здесь надо обновить для валидании ссылки счетов на поледние трнзакции за последние Х блоков\
@@ -221,13 +230,13 @@ public class Synchronizer extends Thread {
 
         LOGGER.debug("*** checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
-        boolean isFromTrustedPeer = cnt.getBlockChain().isPeerTrusted(peer);
+        boolean isFromTrustedPeer = bchain.isPeerTrusted(peer);
 
         for (Block block : newBlocks) {
             int height = block.getHeight();
-            int bbb = fork.getBlockMap().size();
-            int hhh = fork.getBlocksHeadsMap().size();
-            int sss = fork.getBlockSignsMap().size();
+            int bbb = fork.getBlockMap().size() + 1;
+            int hhh = fork.getBlocksHeadsMap().size() + 1;
+            int sss = fork.getBlockSignsMap().size() + 1;
             assert (height == hhh);
             assert (bbb == hhh);
             assert (sss == hhh);
@@ -266,7 +275,7 @@ public class Synchronizer extends Thread {
                     // все же может не просчитаться высота блока м цель его из-за ошибки валидации
                     // поэтому делаем проверку все равно
                     // INVALID BLOCK THROW EXCEPTION
-                    String mess = "Dishonest peer by not is Valid block, heigh: " + height;
+                    String mess = "Dishonest peer by not is Valid block, height: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
                     throw new Exception(mess);
                 }
@@ -279,7 +288,7 @@ public class Synchronizer extends Thread {
                 // CHECK IF VALID
                 if (!block.isSignatureValid()) {
                     // INVALID BLOCK THROW EXCEPTION
-                    String mess = "Dishonest peer by not is Valid block, heigh: " + height;
+                    String mess = "Dishonest peer by not is Valid block, height: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
                     throw new Exception(mess);
                 }
@@ -295,24 +304,40 @@ public class Synchronizer extends Thread {
 
                 if (!block.isValid(fork, true)) {
                     // INVALID BLOCK THROW EXCEPTION
-                    String mess = "Dishonest peer by not is Valid block, heigh: " + height;
+                    String mess = "Dishonest peer by not is Valid block, height: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
                     throw new Exception(mess);
                 }
             }
 
-            // проверка силы цепочки на уровне нашего блока и если высота новой цепочки чуть больше нашей
-            if (myHeight == height && myHeight > newHeight - 2) {
-                if (myWeight > fork.getBlocksHeadsMap().getFullWeight()) {
-                    // суть в том что тут цепоска на этой высоте слабже моей,
-                    // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
-                    // - может мы лучше цепочку собрем еще
+            // далее тут блок не Процессим так как он в isValid(fork, true) процессится параллельно
+            // и далее будет слив разом без вызова pipe
 
-                    // INVALID BLOCK THROW EXCEPTION
-                    String mess = "Dishonest peer by weak FullWeight, height: " + height
-                            + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
+            // проверка силы цепочки на уровне нашего блока и если высота новой цепочки меньше нашей
+            if (height - 1 == myHeight && myWeight > block.blockHead.totalWinValue
+            ) {
+                String mess = "Weak FullWeight, height: " + height
+                        + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
+                LOGGER.debug(peer + " " + mess);
+                // суть в том что тут цепочка на этой высоте слабже моей,
+                // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
+                // - может мы лучше цепочку собрем еще
+                // тут нельзя НЕ банить - будет циклическая синхронизация с этим узлом
+                int peersCount = ctrl.network.getActivePeersCounter(false, true);
+                if (peersCount < Settings.getInstance().getMinConnections()) {
+                    // ничего не делаем - пиров и так мало - синхримся с этого пира иначе будет нестабильная вся сеть
+                    // догонять и откатываться все узлы начнут
+                    ;
+                } else if (peersCount > Settings.getInstance().getMaxConnections() - 3) {
+                    // и так дофига пиров - можно и забанить
+                    mess = "Dishonest peer by " + mess;
                     peer.ban(mess);
                     throw new Exception(mess);
+                } else {
+                    // пиров еще достаточно но заткнем ему рот - не будем по нему ориентироваться
+                    peer.setMute(Controller.MUTE_PEER_COUNT);
+                    return null;
+
                 }
             }
 
@@ -327,423 +352,338 @@ public class Synchronizer extends Thread {
     // process new BLOCKS to DB and orphan DB
     public void synchronizeNewBlocks(DCSet dcSet, Block lastCommonBlock, int checkPointHeight,
                                      List<Block> newBlocks, Peer peer) throws Exception {
-        Controller cnt = Controller.getInstance();
+        //Controller cnt = Controller.getInstance();
 
-        Tuple2<Integer, Long> myHW = cnt.getBlockChain().getHWeightFull(dcSet);
+        Tuple2<Integer, Long> myHW = bchain.getHWeightFull(dcSet);
 
         /**
          * если в конце взведено - значит в момент слива какие-то таблицы не залились
          */
-        boolean broken = false;
+        boolean dbsBroken = false;
 
-        DCSet fork;
         // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
         DB database = DCSet.getHardBaseForFork();
-        fork = dcSet.fork(database);
-        try {
+        try (DCSet fork = dcSet.fork(database)) {
 
             ConcurrentHashMap<Long, Transaction> orphanedTransactions
                     = checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
 
+            if (orphanedTransactions == null) {
+                // это такая же как у нас цепочка - MUTE ее
+                return;
+            }
+
+            LOGGER.debug("*** TRY writeToParent");
+
             // сюда может прити только если проверка прошла успешно
 
             // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
+
             // если проверка прошла успешно то значит Форк базы готов для слива в оснонвую
             // И без пересчета заново сделаем слив
             // Но сначала откаченные транзакции сохраним
             // соберем транзакции с блоков которые будут откачены в нашей цепочке
 
             // теперь сливаем изменения
-            broken = true; // если останется взведенным значит что-то не залилось правильно
+            dbsBroken = true; // если останется взведенным значит что-то не залилось правильно
             fork.writeToParent();
-            broken = false;
+            dbsBroken = false;
 
             // теперь все транзакции в пул опять закидываем
-            for (Transaction transaction: orphanedTransactions.values()) {
-                if (cnt.isOnStopping())
+            for (Transaction transaction : orphanedTransactions.values()) {
+                if (ctrl.isOnStopping())
                     throw new Exception("on stopping");
 
-                Controller.getInstance().transactionsPool.offerMessage(transaction);
+                ctrl.transactionsPool.offerMessage(transaction);
             }
-
         } finally {
-            // здесь нужно закрывать весь набор - так как он на диске с внешнимии СУБД может быть
-            // и файл надо освободить
-            fork.close();
-
+            LOGGER.debug("*** END writeToParent");
         }
 
-        if (broken) {
+        if (dbsBroken) {
             // TODO: нужно откатить чтоли все или там и так атомарно - но у кадой таблицы своя атомарность ((
         }
 
     }
 
-    // process new BLOCKS to DB and orphan DB
-    public List<Transaction> synchronizeNewBlocks_old(DCSet dcSet, Block lastCommonBlock, int checkPointHeight,
-                                                List<Block> newBlocks, Peer peer) throws Exception {
-        ConcurrentHashMap<Long, Transaction> orphanedTransactions = new ConcurrentHashMap<Long, Transaction>();
-        Controller cnt = Controller.getInstance();
+    boolean test2;
+    public void synchronize(DCSet dcSet, int checkPointHeight, Peer peer, int peerHeight, byte[] lastCommonBlockSignature_in) throws Exception {
 
-        Tuple2<Integer, Long> myHW = cnt.getBlockChain().getHWeightFull(dcSet);
-
-        DCSet fork;
-        // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
-        DB database = DCSet.getHardBaseForFork();
-        fork = dcSet.fork(database);
-        boolean blocksChecked = false;
         try {
-            checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
-            blocksChecked = true;
-        } finally {
-            //blocksChecked
-            // здесь нужно закрывать весь набор - так как он на диске с внешнимии СУБД может быть
-            fork.close();
-        }
+            fromPeer = peer;
 
-        // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
-        //// Map<String, byte[]> states = new TreeMap<String, byte[]>();
+            //Controller cnt = Controller.getInstance();
+            boolean isFromTrustedPeer = bchain.isPeerTrusted(peer);
 
-        // GET LAST BLOCK
-        Block lastBlock = dcSet.getBlockMap().last();
-
-        // ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in MAIN DB
-        // ============ by EQUAL SIGNATURE !!!!!
-        byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
-        int countOrphanedTransactions = 0;
-        while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
-            if (cnt.isOnStopping())
+            if (ctrl.isOnStopping())
                 throw new Exception("on stopping");
 
-            // THROWN is new Better Peer
-            cnt.checkNewBetterPeer(peer);
+            /*
+             * logger.error("Synchronizing from peer: " + peer.toString() + ":" +
+             * peer);
+             */
 
-            // ADD ORPHANED TRANSACTIONS
-            // orphanedTransactions.addAll(lastBlock.getTransactions());
-            for (Transaction transaction : lastBlock.getTransactions()) {
-                if (cnt.isOnStopping())
-                    throw new Exception("on stopping");
-                if (countOrphanedTransactions < MAX_ORPHAN_TRANSACTIONS_MY) {
-                    countOrphanedTransactions++;
-                    orphanedTransactions.put(Longs.fromByteArray(transaction.getSignature()), transaction);
+            // освободим HEAP и память - нам не нужна она все равно
+            dcSet.clearCache();
+
+            fromPeer = peer;
+
+            byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
+
+            // FIND HEADERS for common CHAIN
+            if (true || Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
+                LOGGER.info("Synchronizing from peer: " + peer.toString() + ":" + peer
+                        + " my HEIGHT: " + dcSet.getBlocksHeadsMap().size());
+            }
+
+            byte[] lastCommonBlockSignature;
+            List<byte[]> signatures;
+            if (lastCommonBlockSignature_in == null) {
+                Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
+                lastCommonBlockSignature = headers.a;
+                signatures = headers.b;
+            } else {
+                // уже задана точка отката - тест
+                lastCommonBlockSignature = lastCommonBlockSignature_in;
+                signatures = this.getBlockSignatures(lastCommonBlockSignature, peer);
+                signatures.remove(0);
+            }
+
+            if (lastCommonBlockSignature == null) {
+
+                if (test2) {
+                    throw new Exception("STOP on DEBUG");
                 }
-            }
 
-            LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
-            LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
+                // simple ACCEPT tail CHAIN - MY LAST block founded in PEER
+                if (signatures == null || signatures.isEmpty())
+                    return;
 
-            // так как выше мы запоминаем откаченные транзакции то тут их не будем сохранять в базу
+                // CREATE BLOCK BUFFER
+                LOGGER.debug(
+                        "START BUFFER" + " peer: " + peer + " for blocks: " + signatures.size());
 
-            // Надо очистить что брали базу форкнутую - она уже закрыта
-            lastBlock.clearValidatedForkDB();
-            this.pipeProcessOrOrphan(dcSet, lastBlock, true, false, true);
+                BlockBuffer blockBuffer = new BlockBuffer(signatures, peer);
+                Block blockFromPeer = null;
+                String errorMess = null;
+                int banTime = BAN_BLOCK_TIMES >> 2;
 
-            lastBlock = dcSet.getBlockMap().last();
-        }
+                try {
 
-        LOGGER.debug("*** chain size after orphan " + dcSet.getBlockMap().size());
-
-
-        // PROCESS THE NEW BLOCKS
-        LOGGER.debug("*** synchronize PROCESS NEW blocks.size:" + newBlocks.size());
-        for (Block block : newBlocks) {
-
-            // THROWN is new Better Peer
-            cnt.checkNewBetterPeer(peer);
-
-            if (cnt.isOnStopping())
-                throw new Exception("on stopping");
-
-            if (dcSet.getBlockSignsMap().contains(block.getSignature())) {
-                LOGGER.error("*** add CHAIN - DUPLICATE SIGN! [" + block.getHeight() + "] "
-                        + Base58.encode(block.getSignature())
-                        + " from peer: " + peer);
-                continue;
-            }
-
-            // SYNCHRONIZED PROCESSING
-            LOGGER.debug("*** begin PIPE");
-
-            // Надо очистить что брали базу форкнутую - она уже закрыта
-            block.clearValidatedForkDB();
-            this.pipeProcessOrOrphan(dcSet, block, false, false, false);
-
-            LOGGER.debug("*** begin REMOVE orphanedTransactions");
-            for (Transaction transaction : block.getTransactions()) {
-                if (cnt.isOnStopping())
-                    throw new Exception("on stopping");
-
-                String key = new BigInteger(1, transaction.getSignature()).toString(16);
-                if (orphanedTransactions.containsKey(key))
-                    orphanedTransactions.remove(key);
-            }
-
-        }
-
-        // CLEAR for DEADs
-        TransactionMap map = dcSet.getTransactionTab();
-        List<Transaction> orphanedTransactionsList = new ArrayList<Transaction>();
-        for (Transaction transaction : orphanedTransactions.values()) {
-            if (cnt.isOnStopping())
-                throw new Exception("on stopping");
-
-            // CHECK IF DEADLINE PASSED
-            try {
-                if (!map.isClosed() && !map.contains(transaction.getSignature())) {
-                    orphanedTransactionsList.add(transaction);
-                }
-            } catch (java.lang.Throwable e) {
-                if (e instanceof java.lang.IllegalAccessError) {
-                    // налетели на закрытую таблицу
-                } else {
-                    LOGGER.error(e.getMessage(), e);
-                }
-            }
-        }
-
-        return orphanedTransactionsList;
-    }
-
-    public void synchronize(DCSet dcSet, int checkPointHeight, Peer peer, int peerHeight) throws Exception {
-
-        Controller cnt = Controller.getInstance();
-        boolean isFromTrustedPeer = cnt.getBlockChain().isPeerTrusted(peer);
-
-        if (cnt.isOnStopping())
-            throw new Exception("on stopping");
-
-        /*
-         * logger.error("Synchronizing from peer: " + peer.toString() + ":" +
-         * peer);
-         */
-
-        // освободим HEAP и память - нам не нужна она все равно
-        dcSet.clearCache();
-
-        fromPeer = peer;
-
-        byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
-
-        // FIND HEADERS for common CHAIN
-        if (true || Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
-            LOGGER.info("Synchronizing from peer: " + peer.toString() + ":" + peer
-                    + " my HEIGHT: " + dcSet.getBlocksHeadsMap().size());
-        }
-
-        Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
-        byte[] lastCommonBlockSignature = headers.a;
-        List<byte[]> signatures = headers.b;
-
-        if (lastCommonBlockSignature == null) {
-            // simple ACCEPT tail CHAIN - MY LAST block founded in PEER
-            if (signatures == null || signatures.isEmpty())
-                return;
-
-            // CREATE BLOCK BUFFER
-            LOGGER.debug(
-                    "START BUFFER" + " peer: " + peer + " for blocks: " + signatures.size());
-
-            BlockBuffer blockBuffer = new BlockBuffer(signatures, peer);
-            Block blockFromPeer = null;
-            String errorMess = null;
-            int banTime = BAN_BLOCK_TIMES >> 2;
-
-            try {
-
-
-                // GET AND PROCESS BLOCK BY BLOCK
-                for (byte[] signature : signatures) {
-                    if (cnt.isOnStopping()) {
-                        // STOP BLOCKBUFFER
-                        blockBuffer.stopThread();
-                        throw new Exception("on stopping");
-                    }
-
-                    // THROWN is new Better Peer
-                    cnt.checkNewBetterPeer(peer);
-
-                    // GET BLOCK
-                    LOGGER.debug("try get BLOCK from BUFFER");
-
-                    long time1 = System.currentTimeMillis();
-                    try {
-                        blockFromPeer = blockBuffer.getBlock(signature);
-                        if (isFromTrustedPeer) {
-                            blockFromPeer.setFromTrustedPeer();
-                        }
-                    } catch (Exception e) {
-                        blockBuffer.stopThread();
-                        peer.ban("get block BUFFER - " + e.getMessage());
-                        throw new Exception(e);
-                    }
-
-                    if (blockFromPeer == null) {
-
-                        // INVALID BLOCK THROW EXCEPTION
-                        errorMess = "Dishonest peer on block null";
-                        banTime = BAN_BLOCK_TIMES >> 2;
-                        break;
-                    }
-
-                    if (cnt.isOnStopping()) {
-                        // STOP BLOCKBUFFER
-                        blockBuffer.stopThread();
-                        throw new Exception("on stopping");
-                    }
-
-                    ///blockFromPeer.setCalcGeneratingBalance(dcSet); // NEED SET it
-                    ///logger.debug("BLOCK Calc Generating Balance");
-
-                    if (cnt.isOnStopping()) {
-                        // STOP BLOCKBUFFER
-                        blockBuffer.stopThread();
-                        throw new Exception("on stopping");
-                    }
-
-                    if (blockFromPeer.isFromTrustedPeer()) {
-                        // нужно все равно просчитать заголовок блока
-                        if (!blockFromPeer.isValidHead(dcSet)) {
-                            // все же может не просчитаться высота блока м цель его из-за ошибки валидации
-                            // поэтому делаем проверку все равно
-                            // INVALID BLOCK THROW EXCEPTION
-                            errorMess = "Dishonest peer by not is Valid block";
-                            banTime = BAN_BLOCK_TIMES << 1;
-                            break;
-                        }
-                        LOGGER.debug("*** checkNewBlocks - not VALIDATE from trusted PEER");
-                    } else {
-                        // если это не довернный узел то полная проверка
-                        if (!blockFromPeer.isSignatureValid()) {
-                            errorMess = "invalid Sign!";
-                            banTime = BAN_BLOCK_TIMES << 1;
-                            break;
-                        }
-                        LOGGER.debug("BLOCK Signature is Valid");
-
-                        if (blockFromPeer.getTimestamp() + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
-                            errorMess = "invalid Timestamp from FUTURE: "
-                                    + (blockFromPeer.getTimestamp() + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) - NTP.getTime());
-                            break;
+                    // GET AND PROCESS BLOCK BY BLOCK
+                    for (byte[] signature : signatures) {
+                        if (ctrl.isOnStopping()) {
+                            // STOP BLOCKBUFFER
+                            blockBuffer.stopThread();
+                            throw new Exception("on stopping");
                         }
 
+                        // THROWN is new Better Peer
+                        ctrl.checkNewBetterPeer(peer);
+
+                        // GET BLOCK
+                        LOGGER.debug("try get BLOCK from BUFFER");
+
+                        long time1 = System.currentTimeMillis();
                         try {
-                            // тут может парсинг транзакций упасть
-                            blockFromPeer.getTransactions();
+                            blockFromPeer = blockBuffer.getBlock(signature);
+                            if (isFromTrustedPeer) {
+                                blockFromPeer.setFromTrustedPeer();
+                            }
                         } catch (Exception e) {
-                            LOGGER.debug(e.getMessage(), e);
-                            errorMess = "invalid PARSE! " + e.getMessage();
-                            banTime = BAN_BLOCK_TIMES << 1;
-                            break;
-                        } catch (Throwable e) {
-                            LOGGER.debug(e.getMessage(), e);
-                            errorMess = "invalid PARSE! " + e.getMessage();
-                            banTime = BAN_BLOCK_TIMES << 1;
+                            if (ctrl.isOnStopping()) {
+                                throw new Exception("on stopping");
+                            }
+
+                            blockBuffer.stopThread();
+                            peer.ban("get block BUFFER - " + e.getMessage());
+                            throw new Exception(e);
+                        }
+
+                        if (blockFromPeer == null) {
+
+                            // INVALID BLOCK THROW EXCEPTION
+                            errorMess = "Dishonest peer on block null";
+                            banTime = BAN_BLOCK_TIMES >> 2;
                             break;
                         }
 
-                        try {
-                            DB database = DCSet.makeDBinMemory();
+                        if (ctrl.isOnStopping()) {
+                            // STOP BLOCKBUFFER
+                            blockBuffer.stopThread();
+                            throw new Exception("on stopping");
+                        }
+
+                        ///blockFromPeer.setCalcGeneratingBalance(dcSet); // NEED SET it
+                        ///logger.debug("BLOCK Calc Generating Balance");
+
+                        if (ctrl.isOnStopping()) {
+                            // STOP BLOCKBUFFER
+                            blockBuffer.stopThread();
+                            throw new Exception("on stopping");
+                        }
+
+                        if (blockFromPeer.isFromTrustedPeer()) {
+                            // нужно все равно просчитать заголовок блока
+                            if (!blockFromPeer.isValidHead(dcSet)) {
+                                // все же может не просчитаться высота блока м цель его из-за ошибки валидации
+                                // поэтому делаем проверку все равно
+                                // INVALID BLOCK THROW EXCEPTION
+                                errorMess = "Dishonest peer by not is Valid block";
+                                banTime = BAN_BLOCK_TIMES << 1;
+                                break;
+                            }
+                            LOGGER.debug("*** checkNewBlocks - not VALIDATE from trusted PEER");
+                        } else {
+                            // если это не довернный узел то полная проверка
+                            if (!blockFromPeer.isSignatureValid()) {
+                                errorMess = "invalid Sign!";
+                                banTime = BAN_BLOCK_TIMES << 1;
+                                break;
+                            }
+                            LOGGER.debug("BLOCK Signature is Valid");
+
+                            errorMess = bchain.blockFromFuture(blockFromPeer.heightBlock);
+                            if (errorMess != null) {
+                                break;
+                            }
+
                             try {
-                                if (!blockFromPeer.isValid(dcSet.fork(database), false)) {
+                                // тут может парсинг транзакций упасть
+                                blockFromPeer.getTransactions();
+                            } catch (Exception e) {
+                                if (ctrl.isOnStopping()) {
+                                    throw new Exception("on stopping");
+                                }
+
+                                LOGGER.debug(e.getMessage(), e);
+                                errorMess = "invalid PARSE! " + e.getMessage();
+                                banTime = BAN_BLOCK_TIMES << 1;
+                                break;
+                            } catch (Throwable e) {
+                                LOGGER.debug(e.getMessage(), e);
+                                errorMess = "invalid PARSE! " + e.getMessage();
+                                banTime = BAN_BLOCK_TIMES << 1;
+                                ctrl.stopAll(339);
+                                break;
+                            }
+
+                            try (DCSet fork = dcSet.fork(DCSet.makeDBinMemory())) {
+                                if (!blockFromPeer.isValid(fork, false)) {
 
                                     errorMess = "invalid BLOCK";
                                     banTime = BAN_BLOCK_TIMES;
                                     break;
                                 }
-                            } finally {
-                                database.close();
+                            } catch (Exception e) {
+
+                                if (ctrl.isOnStopping()) {
+                                    throw new Exception("on stopping");
+                                }
+
+                                LOGGER.debug(e.getMessage(), e);
+                                errorMess = "error io isValid! " + e.getMessage();
+                                banTime = BAN_BLOCK_TIMES;
+                                ctrl.stopAll(340);
+                                break;
+                            } catch (Throwable e) {
+                                LOGGER.debug(e.getMessage(), e);
+                                errorMess = "error io isValid! " + e.getMessage();
+                                banTime = BAN_BLOCK_TIMES;
+                                ctrl.stopAll(341);
+                                break;
                             }
-                        } catch (Exception e) {
-                            LOGGER.debug(e.getMessage(), e);
-                            errorMess = "error io isValid! " + e.getMessage();
-                            banTime = BAN_BLOCK_TIMES;
-                            break;
-                        } catch (Throwable e) {
-                            LOGGER.debug(e.getMessage(), e);
-                            errorMess = "error io isValid! " + e.getMessage();
-                            banTime = BAN_BLOCK_TIMES;
-                            break;
+                            LOGGER.debug("BLOCK is Valid");
                         }
-                        LOGGER.debug("BLOCK is Valid");
-                    }
 
-                    if (cnt.isOnStopping()) {
-                        blockBuffer.stopThread();
-                        throw new Exception("on stopping");
-                    }
-
-                    try {
-                        // PROCESS BLOCK
-
-                        LOGGER.debug("try PROCESS");
-                        this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false, false);
-
-                        LOGGER.debug("synchronize BLOCK END process");
-                        blockBuffer.clearBlock(blockFromPeer.getSignature());
-                        LOGGER.debug("synchronize clear from BLOCK BUFFER");
-                        continue;
-
-                    } catch (Exception e) {
-
-                        // STOP BLOCKBUFFER
-                        blockBuffer.stopThread();
-
-                        if (cnt.isOnStopping()) {
+                        if (ctrl.isOnStopping()) {
+                            blockBuffer.stopThread();
                             throw new Exception("on stopping");
-                        } else {
-                            throw new Exception(e);
                         }
+
+                        try {
+                            // PROCESS BLOCK
+
+                            LOGGER.debug("try PROCESS");
+                            this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false, false);
+
+                            LOGGER.debug("synchronize BLOCK END process");
+                            blockBuffer.clearBlock(blockFromPeer.getSignature());
+                            LOGGER.debug("synchronize clear from BLOCK BUFFER");
+                            continue;
+
+                        } catch (Exception e) {
+
+                            // STOP BLOCKBUFFER
+                            blockBuffer.stopThread();
+
+                            if (ctrl.isOnStopping()) {
+                                throw new Exception("on stopping");
+                            } else {
+                                throw new Exception(e);
+                            }
+                        } catch (Throwable e) {
+
+                            // STOP BLOCKBUFFER
+                            blockBuffer.stopThread();
+
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(343);
+
+                        }
+
                     }
 
+                } finally {
+                    // STOP BLOCKBUFFER
+                    blockBuffer.stopThread();
                 }
 
-            } finally {
-                // STOP BLOCKBUFFER
-                blockBuffer.stopThread();
+                if (errorMess != null) {
+                    // INVALID BLOCK THROW EXCEPTION
+                    String mess = "Dishonest peer on SYNCHRONIZE block " + errorMess;
+                    peer.ban(banTime, mess);
+                    throw new Exception(mess);
+                }
+
+                if (ctrl.isOnStopping()) {
+                    throw new Exception("on stopping");
+                }
+
+                // RECURSIVE CALL if new block is GENERATED
+                /////synchronize(dcSet, checkPointHeight, peer, peerHeight);
+
+                LOGGER.debug(
+                        "STOP BUFFER" + " peer: " + peer + " for blocks: " + signatures.size());
+
+
+            } else {
+
+                // GET THE BLOCKS FROM SIGNATURES
+                List<Block> blocks = this.getBlocks(dcSet, signatures, peer);
+
+                if (ctrl.isOnStopping()) {
+                    throw new Exception("on stopping");
+                }
+
+                Block lastCommonBlock = dcSet.getBlockSignsMap().getBlock(lastCommonBlockSignature);
+
+                // SYNCHRONIZE BLOCKS
+                LOGGER.info("synchronize with OPRHAN from common block [" + lastCommonBlock.getHeight()
+                        + "] for blocks: " + blocks.size());
+                synchronizeNewBlocks(dcSet, lastCommonBlock, checkPointHeight, blocks, peer);
+
+                if (ctrl.isOnStopping()) {
+                    throw new Exception("on stopping");
+                }
             }
-
-            if (errorMess != null) {
-                // INVALID BLOCK THROW EXCEPTION
-                String mess = "Dishonest peer on SYNCHRONIZE block " + errorMess;
-                peer.ban(banTime, mess);
-                throw new Exception(mess);
-            }
-
-            if (cnt.isOnStopping()) {
-                throw new Exception("on stopping");
-            }
-
-            // RECURSIVE CALL if new block is GENERATED
-            /////synchronize(dcSet, checkPointHeight, peer, peerHeight);
-
-            LOGGER.debug(
-                    "STOP BUFFER" + " peer: " + peer + " for blocks: " + signatures.size());
-
-
-        } else {
-
-            // GET THE BLOCKS FROM SIGNATURES
-            List<Block> blocks = this.getBlocks(dcSet, signatures, peer);
-
-            if (cnt.isOnStopping()) {
-                throw new Exception("on stopping");
-            }
-
-            Block lastCommonBlock = dcSet.getBlockSignsMap().getBlock(lastCommonBlockSignature);
-
-            // SYNCHRONIZE BLOCKS
-            LOGGER.info("synchronize with OPRHAN from common block [" + lastCommonBlock.getHeight()
-                    + "] for blocks: " + blocks.size());
-            synchronizeNewBlocks(dcSet, lastCommonBlock, checkPointHeight, blocks, peer);
-
-            if (cnt.isOnStopping()) {
-                throw new Exception("on stopping");
-            }
+        } finally {
+            this.fromPeer = null;
         }
 
     }
 
-    private List<byte[]> getBlockSignatures(byte[] header, Peer peer) throws Exception {
+    public List<byte[]> getBlockSignatures(byte[] header, Peer peer) throws Exception {
 
         /*
          * logger.
@@ -776,7 +716,8 @@ public class Synchronizer extends Thread {
     static byte[] badCheck = Base58.decode("5SxUGJcgS29XA5rGGhTu9RnjSdoK4qtA8AgHEtANdLei11f386P6Net8MPPBVNKKJqkGKeHoAWg6N116fhCRrh2f");
     public void checkBadBlock(Peer peer) throws Exception {
 
-        if (BlockChain.DEVELOP_USE) {
+        if (false && BlockChain.DEMO_MODE) {
+            // TODO тут только в Девелопе такой блок - если убьем то удалить эту проверку
             List<byte[]> headersCheck = this.getBlockSignatures(badCheck, peer);
             if (!headersCheck.isEmpty()) {
                 String mess = "Dishonest peer: my CHECKPOINT SIGNATURE -> BAD FORK";
@@ -790,7 +731,6 @@ public class Synchronizer extends Thread {
                                                      int checkPointHeight) throws Exception {
 
         DCSet dcSet = DCSet.getInstance();
-        Controller cnt = Controller.getInstance();
 
         LOGGER.info("findHeaders(Peer: " + peer + ", peerHeight: " + peerHeight
                 + ", checkPointHeight: " + checkPointHeight);
@@ -807,11 +747,14 @@ public class Synchronizer extends Thread {
                 headers.remove(0);
             } while (headers.size() > 0 && dcSet.getBlockSignsMap().contains(headers.get(0)));
 
-            if (headers.size() == 0) {
-                cnt.resetWeightOfPeer(peer);
+            if (headers.isEmpty()) {
+                peer.setMute(Controller.MUTE_PEER_COUNT);
+
                 String mess = "Peer is SAME as me";
+                LOGGER.debug(peer + " " + mess);
                 //peer.ban(0, mess);
-                throw new Exception(mess);
+                //throw new Exception(mess);
+                return new Tuple2<byte[], List<byte[]>>(null, null);
             }
 
             // null - not need orphan my CHAIN
@@ -847,7 +790,7 @@ public class Synchronizer extends Thread {
         int step = 2;
         int currentCheckChainHeight = myChainHeight;
         do {
-            if (cnt.isOnStopping()) {
+            if (ctrl.isOnStopping()) {
                 throw new Exception("on stopping");
             }
 
@@ -911,11 +854,11 @@ public class Synchronizer extends Thread {
         LOGGER.debug("try get BLOCKS from common block SIZE:" + signatures.size() + " - " + peer);
 
         List<Block> blocks = new ArrayList<Block>();
-        Controller cnt = Controller.getInstance();
+        //Controller cnt = Controller.getInstance();
 
         int bytesGet = 0;
         for (byte[] signature : signatures) {
-            if (cnt.isOnStopping()) {
+            if (ctrl.isOnStopping()) {
                 throw new Exception("on stopping");
             }
 
@@ -948,17 +891,18 @@ public class Synchronizer extends Thread {
     public synchronized void pipeProcessOrOrphan(DCSet dcSet, Block block, boolean doOrphan, boolean hardFlush,
                                                  boolean notStoreTXs)
             throws Exception {
-        Controller cnt = Controller.getInstance();
+        //Controller cnt = Controller.getInstance();
 
         // CHECK IF WE ARE STILL PROCESSING BLOCKS
-        if (cnt.isOnStopping()) {
+        if (ctrl.isOnStopping()) {
             throw new Exception("on stopping");
         }
 
         long processTiming = System.nanoTime();
+        int txCount = block.getTransactionCount();
 
         dcSet.getBlockMap().setProcessing(true);
-        boolean observOn = cnt.doesWalletExists() && cnt.useGui;
+        boolean observOn = ctrl.doesWalletExists() && ctrl.useGui;
         Integer countObserv_ADD = null;
         Integer countObserv_REMOVE = null;
         Integer countObserv_COUNT = null;
@@ -978,10 +922,9 @@ public class Synchronizer extends Thread {
                 dcSet.getBlockMap().setProcessing(false);
                 //dcSet.updateTxCounter(-block.getTransactionCount());
                 // FARDFLUSH not use in each case - only after accumulate size
-                int blockSize = 3 + block.getTransactionCount();
-                dcSet.flush(blockSize, false, doOrphan);
+                dcSet.flush(txCount + 3, false, doOrphan);
 
-                if (cnt.isOnStopping())
+                if (ctrl.isOnStopping())
                     return;
 
             } catch (IOException e) {
@@ -990,21 +933,21 @@ public class Synchronizer extends Thread {
 
             } catch (Exception e) {
 
-                if (cnt.isOnStopping()) {
+                if (ctrl.isOnStopping()) {
                     return;
                 } else {
                     LOGGER.error(e.getMessage(), e);
                     error = new Exception(e);
                 }
             } catch (Throwable e) {
-                if (cnt.isOnStopping()) {
+                if (ctrl.isOnStopping()) {
                     return;
                 } else {
                     thrown = new Throwable(e);
                 }
             } finally {
 
-                if (cnt.isOnStopping()) {
+                if (ctrl.isOnStopping()) {
                     // was BREAK - try ROLLBACK
                     dcSet.rollback();
                     throw new Exception("on stopping");
@@ -1017,13 +960,15 @@ public class Synchronizer extends Thread {
                         dcSet.rollback();
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(22);
+                        ctrl.stopAll(322);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(27);
+                        ctrl.stopAll(327);
                         return;
                     }
+
+                    ctrl.stopAll(323);
 
                     throw error;
 
@@ -1036,15 +981,15 @@ public class Synchronizer extends Thread {
                         dcSet.rollback();
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(22);
+                        ctrl.stopAll(324);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(27);
+                        ctrl.stopAll(337);
                         return;
                     }
 
-                    cnt.stopAll(27);
+                    ctrl.stopAll(335);
 
                     throw new Exception(thrown);
 
@@ -1076,14 +1021,12 @@ public class Synchronizer extends Thread {
                 if (block.getValidatedForkDB() == null) {
                     block.process(dcSet);
                 } else {
-                    // здесь просто заливаем все данные из Форка в цепочку - без процессинга - он уже был в Валидации
-                    long start = System.currentTimeMillis();
-                    block.saveToChainFromvalidatedForkDB();
-                    long tickets = System.currentTimeMillis() - start;
-                    if (block.blockHead.transactionsCount > 0 || tickets > 10) {
-                        LOGGER.debug("[" + block.heightBlock + "] TOTAL processing time: " + tickets
-                                + " ms, TXs= " + block.blockHead.transactionsCount
-                                + (block.blockHead.transactionsCount == 0 ? "" : " - " + (block.blockHead.transactionsCount * 1000 / tickets) + " tx/sec"));
+                    try {
+                        // здесь просто заливаем все данные из Форка в цепочку - без процессинга - он уже был в Валидации
+                        block.saveToChainFromvalidatedForkDB();
+                    } finally {
+                        // закрываем чуть позже тут - а то в MapDB в кэше ошибка может вылететь что база уже закрыта
+                        block.close();
                     }
                 }
 
@@ -1091,80 +1034,79 @@ public class Synchronizer extends Thread {
                 //dcSet.updateTxCounter(block.getTransactionCount());
 
                 // FLUSH not use in each case - only after accumulate size
-                int blockSize = 3 + block.getTransactionCount();
+                dcSet.flush(txCount + 3, false, doOrphan);
 
-                dcSet.flush(blockSize, false, doOrphan);
-
-                if (cnt.isOnStopping())
+                if (ctrl.isOnStopping())
                     return;
 
                 if (Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
-                    cnt.NotifyIncoming(block.getTransactions());
+                    ctrl.NotifyIncoming(block.getTransactions());
                 }
 
-                if (cnt.isOnStopping())
+                if (ctrl.isOnStopping())
                     return;
 
             } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
                 error = new Exception(e);
 
             } catch (Exception e) {
 
-                if (cnt.isOnStopping()) {
+                if (ctrl.isOnStopping()) {
                     return;
                 } else {
+                    LOGGER.error(e.getMessage(), e);
                     error = new Exception(e);
                 }
             } catch (Throwable e) {
-                if (cnt.isOnStopping()) {
+                if (ctrl.isOnStopping()) {
                     return;
                 } else {
+                    LOGGER.error(e.getMessage(), e);
                     thrown = new Throwable(e);
                 }
             } finally {
 
-                if (cnt.isOnStopping()) {
+                if (ctrl.isOnStopping()) {
                     // was BREAK - try ROLLBACK
                     dcSet.rollback();
                     throw new Exception("on stopping");
                 }
 
                 if (error != null) {
-                    LOGGER.error(error.getMessage(), error);
 
                     try {
                         // was BREAK - try ROLLBACK
                         dcSet.rollback();
+                        ctrl.stopAll(345);
+                        return;
+
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(22);
+                        ctrl.stopAll(346);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(27);
+                        ctrl.stopAll(347);
                         return;
                     }
-
-                    throw error;
 
                 } else if (thrown != null) {
 
-                    LOGGER.error(thrown.getMessage(), thrown);
-
                     try {
                         // was BREAK - try ROLLBACK
                         dcSet.rollback();
+                        ctrl.stopAll(351);
+                        return;
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(22);
+                        ctrl.stopAll(352);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(27);
+                        ctrl.stopAll(353);
                         return;
                     }
-
-                    throw new Exception(thrown);
 
                 }
 
@@ -1193,13 +1135,16 @@ public class Synchronizer extends Thread {
         if (!dcSet.isFork()) {
             // только запись в нашу цепочку
             processTiming = System.nanoTime() - processTiming;
-            if (processTiming < 999999999999l) {
+            if (processTiming < 999999999999L) {
                 // при переполнении может быть минус
                 // в миеросекундах подсчет делаем
-                cnt.getBlockChain().updateTXProcessTimingAverage(processTiming, block.blockHead.transactionsCount);
+                bchain.updateTXProcessTimingAverage(processTiming, txCount);
+
+                LOGGER.debug("PROCESS SPEED for: " + txCount + "tx is :" + (txCount + Controller.BLOCK_AS_TX_COUNT) * 1000000000L
+                        / processTiming
+                        + " tx/s");
             }
         }
-
 
     }
 
@@ -1212,44 +1157,70 @@ public class Synchronizer extends Thread {
         long timePoint = 0;
         BlockGenerator blockGenerator;
 
-        long shiftPoint = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1)
-                + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) >> 1) - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) >> 2);
+        int blockTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1);
+        long shiftPoint = blockTime + (blockTime >> 1) - (blockTime >> 2);
         // INIT wait START
         do {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 return;
             }
 
-            blockGenerator = cnt.getBlockGenerator();
+            blockGenerator = ctrl.getBlockGenerator();
         } while (blockGenerator == null);
 
         boolean needCheck = false;
 
         DCSet dcSet = DCSet.getInstance();
-        while (!cnt.isOnStopping()) {
+        while (!ctrl.isOnStopping()) {
+
             try {
 
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     break;
                 }
 
                 timeTmp = bchain.getTimestamp(dcSet) + shiftPoint;
-
-                if (timePoint == timeTmp || timeTmp > NTP.getTime() || !cnt.isStatusOK())
+                if (timeTmp > NTP.getTime())
                     continue;
 
+                if (timeTmp + (blockTime << 1) < NTP.getTime()) {
+                    // мы встали - проверяем в любом случае
+                    needCheck = true;
+                    try {
+                        // подождем чуток еще иначе очень часто будет опрос
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                } else {
+
+                    if (timePoint == timeTmp)
+                        // новый блок не прилетал - ждем
+                        continue;
+
+                    // иначе просиходит сброс и синхронизация новая
+                    if (blockGenerator.getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_WAIT)
+                        continue;
+                }
                 timePoint = timeTmp;
 
 
-                if (BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS < 2) {
+                // снизим ожижание блокировки с "сильных но таких же как мы" узлов
+                ctrl.network.decrementWeightOfPeerMutes();
+
+                if (!ctrl.isStatusOK())
+                    continue;
+
+
+                if (needCheck || BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS < 2) {
                     // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
                     needCheck = true;
                 } else {
-                    Tuple2<Integer, Long> myHW = cnt.getBlockChain().getHWeightFull(dcSet);
+                    Tuple2<Integer, Long> myHW = bchain.getHWeightFull(dcSet);
                     if (myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
                         // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
                         needCheck = true;
@@ -1267,7 +1238,7 @@ public class Synchronizer extends Thread {
 
             } catch (OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(46);
+                ctrl.stopAll(396);
                 return;
             } catch (IllegalMonitorStateException e) {
                 break;

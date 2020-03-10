@@ -77,7 +77,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
                 // MyTransactionsSplitPanel.getInstance());
 
                 MainPanel.getInstance().insertTab(Lang.getInstance().translate("Unconfirmed Records"),
-                        UnconfirmedTransactionsPanel.getInstance());
+                        UnconfirmedTransactionsPanel.getInstance(), UnconfirmedTransactionsPanel.getIcon());
             }
 
         });
@@ -102,6 +102,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
                 needUpdate = true;
                 return;
             case ObserverMessage.CHAIN_RESET_BLOCK_TYPE:
+            case ObserverMessage.LIST_UNC_TRANSACTION_TYPE:
             case ObserverMessage.RESET_UNC_TRANSACTION_TYPE:
                 counter = 0;
                 needUpdate = true;
@@ -136,7 +137,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
             mess = "| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0";
         }
 
-        if (BlockChain.DEVELOP_USE) {
+        if (BlockChain.TEST_MODE) {
             // MISSED TELEGRAMS
             long missedMessagesTmp = Controller.getInstance().network.missedTelegrams.get();
             if (missedMessagesTmp > 0)
@@ -155,7 +156,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
             // MISSED MESSAGES
             missedMessagesTmp = Controller.getInstance().network.missedMessages.get();
             if (missedMessagesTmp > 0)
-                mess += " " + missedMessagesTmp + "-me";
+                mess += " " + missedMessagesTmp + "-ms";
 
             // MISSED SENDS
             missedMessagesTmp = Controller.getInstance().network.missedSendes.get();

@@ -5,7 +5,6 @@ import com.google.common.io.Files;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.AccountsPropertisMap;
 import org.erachain.gui.MainFrame;
@@ -46,11 +45,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class AccountsNameSearchSplitPanel extends SplitPanel {
+public class AccountsNameSearchSplitPanel extends SplitPanel  {
 
     /**
      *
      */
+    private static String iconFile = "images/pageicons/AccountsNameSearchSplitPanel.png";
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = LoggerFactory.getLogger(AccountsNameSearchSplitPanel.class);
     protected FileChooser chooser;
@@ -227,7 +227,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
                 Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
                 Account account = new Account(account1.getA());
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, account, null), MailSendPanel.getIcon());
             }
         });
         menu.add(Send_Mail_item_Menu);
@@ -239,8 +239,8 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
             public void actionPerformed(ActionEvent e) {
                 Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
                 Account accountTo = new Account(account1.getA());
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
-                        null, accountTo, null, null));
+                MainPanel.getInstance().insertTab( Lang.getInstance().translate("Send"),new AccountAssetSendPanel(null,
+                        null, accountTo, null, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -461,6 +461,16 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
         // if (c1 instanceof ImprintsInfoPanel) (
         // (ImprintsInfoPanel)c1).delay_on_Close();
 
+    }
+
+    public static  Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 }

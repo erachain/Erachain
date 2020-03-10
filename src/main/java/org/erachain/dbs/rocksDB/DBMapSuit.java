@@ -1,8 +1,9 @@
 package org.erachain.dbs.rocksDB;
 
 import org.erachain.database.DBASet;
-import org.erachain.dbs.DBMapSuitImpl;
-import org.erachain.dbs.IMap;
+import org.erachain.dbs.DBSuitImpl;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -10,7 +11,6 @@ import org.mapdb.DB;
 import org.slf4j.Logger;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -21,7 +21,7 @@ import java.util.Set;
  * @param <U>
  */
 
-public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
+public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
 
     protected Logger logger;
     protected DBASet databaseSet;
@@ -34,13 +34,13 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public DBMapSuit() {
     }
 
-    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, U defaultValue, boolean sizeEnable) {
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean sizeEnable, DBTab cover) {
 
         this.databaseSet = databaseSet;
         // database - is null
         this.database = database;
         this.logger = logger;
-        this.defaultValue = defaultValue;
+        this.cover = cover;
         this.sizeEnable = sizeEnable;
 
         // create INDEXES before
@@ -53,12 +53,28 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean sizeEnable) {
-        this(databaseSet, database, logger, null, sizeEnable);
+        this(databaseSet, database, logger, sizeEnable, null);
     }
 
     @Override
-    public IMap getSource() {
-        return (IMap) map;
+    public Object getSource() {
+        return map;
+    }
+
+    public IndexDB getIndexByName(String name) {
+        return indexes.stream().filter(indexDB -> indexDB.getNameIndex().equals(name)).findFirst().get();
+    }
+
+    /**
+     * @param index only Secondary indexes [0...]
+     * @return
+     */
+    public IndexDB getIndex(int index) {
+        return indexes.get(index);
+    }
+
+    public void addIndex(IndexDB indexes) {
+        this.indexes.add(indexes);
     }
 
     @Override
@@ -91,9 +107,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public boolean set(T key, U value) {
-        boolean old = contains(key);
-        map.put(key, value);
-        return old;
+        return map.set(key, value);
     }
 
     @Override
@@ -103,30 +117,19 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public U remove(T key) {
-        U value = null;
-        if (map.containsKey(key)) {
-            value = map.get(key);
-            map.delete(key);
-        }
-        return value;
+        return map.remove(key);
     }
 
     // TODO сделать это у РоксДБ есть
     @Override
     public U removeValue(T key) {
-        U value = null;
-        if (map.containsKey(key)) {
-            value = map.get(key);
-            map.deleteValue(key);
-        }
-        return value;
+        return map.removeValue(key);
     }
 
     @Override
     public void delete(T key) {
         map.delete(key);
     }
-
 
     // TODO сделать это у РоксДБ есть
     @Override
@@ -140,19 +143,28 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
-        return map.getIndexIterator(index, descending);
+    public IteratorCloseable<T> getIterator(int index, boolean descending) {
+        if (index == 0) {
+            // тут берем сами ключи у записей
+            return map.getIterator(descending, false);
+        }
+
+        // это вторичные индексы, потому как результат нужно взять не сами ключи а значения у записей
+        return map.getIndexIterator(index, descending, true);
     }
 
     @Override
-    public Iterator<T> getIterator() {
-        return map.getIterator(false);
+    public IteratorCloseable<T> getIterator() {
+        return map.getIterator(false, false);
     }
 
     @Override
     public void close() {
         map.close();
         //logger.info("closed");
+        databaseSet = null;
+        database = null;
+        super.close();
     }
 
     @Override
@@ -168,6 +180,10 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     @Override
     public void rollback() {
         ((Transacted) map).rollback();
+    }
+
+    @Override
+    public void afterRollback() {
     }
 
     @Override

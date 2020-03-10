@@ -9,11 +9,11 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.datachain.VoteOnItemPollMap;
+import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
-import org.erachain.utils.Pair;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -300,7 +300,7 @@ public abstract class PollCls extends ItemCls {
     }
 
     public String viewOption(int option) {
-        return option + ": " + this.options.get(option);
+        return (option + 1) + ": " + this.options.get(option);
     }
 
     // PARSE

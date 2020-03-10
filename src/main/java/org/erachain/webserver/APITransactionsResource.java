@@ -39,6 +39,8 @@ public class APITransactionsResource {
                 Lang.getInstance().translate("Get Record by sigmature."));
         help.put("apirecords/getbynumber/{height-sequence}",
                 "GET Record by Height and Sequence");
+        help.put("apirecords/getsignature/{height-sequence}",
+                "GET Record Signature by Height and Sequence");
         help.put("apirecords/incomingfromblock/{address}/{blockStart}?type={type}",
                 Lang.getInstance().translate("Get Incoming Records for Address from {blockStart}. Filter by type. Limit checked blocks = 2000 or 100 found records. If blocks not end at height - NEXT parameter was set."));
         help.put("apirecords/getbyaddress?address={address}&asset={asset}&recordType={recordType}&unconfirmed=true",
@@ -133,6 +135,47 @@ public class APITransactionsResource {
                 .build();
     }
 
+    // getsignature
+    @GET
+    @Path("getsignature/{number}")
+    public Response getSignByNumber(@PathParam("number") String numberStr) {
+
+        int step = 1;
+
+        try {
+
+            String[] strA = numberStr.split("\\-");
+            int height = Integer.parseInt(strA[0]);
+            int seq = Integer.parseInt(strA[1]);
+
+            ++step;
+            Transaction record = DCSet.getInstance().getTransactionFinalMap().get(height, seq);
+
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(record.viewSignature())
+                    .build();
+
+        } catch (Exception e) {
+
+            Map out = new LinkedHashMap();
+            out.put("error", step);
+            if (step == 1)
+                out.put("message", "height-sequence error, use integer-integer value");
+            else if (step == 2)
+                out.put("message", "record not found");
+            else
+                out.put("message", e.getMessage());
+
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(StrJSonFine.convert(out))
+                    .build();
+        }
+    }
+
     /**
      * по блокам проходится и берет записи в них пока не просмотрит 2000 блоков и не насобирвет 100 записей. Если при этом не достигнут конец цепочи,
      * то выдаст в ответе параметр next со значением блока с которого нужно начать новый поиск.
@@ -214,7 +257,7 @@ public class APITransactionsResource {
                     .entity(ff.toJSONString()).build();
         }
 
-        result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(address, 1000, true);
+        result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), 1000, true);
         if (unconfirmed)
             result.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
@@ -258,7 +301,7 @@ public class APITransactionsResource {
             limit = 20;
         List<Transaction> transs = new ArrayList<Transaction>();
 
-        List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(address, 1000, true);
+        List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), 1000, true);
         if (unconfirmed)
             trans.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
@@ -305,11 +348,11 @@ public class APITransactionsResource {
         Integer type;
         try {
             type = Integer.valueOf(type1);
-            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address, type, 1000);
+            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(Account.makeShortBytes(address), type, 1000, 0);
 
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
-            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(address, 1000, true);
+            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), 1000, true);
             // e.printStackTrace();
         }
 
@@ -437,7 +480,7 @@ public class APITransactionsResource {
     ) {
 
         List<Transaction> result = DCSet.getInstance().getTransactionFinalMap().findTransactions(address, sender,
-                recipient, minHeight, maxHeight, type, 0, false, offset, limit);
+                recipient, minHeight, maxHeight, type, 0, desc, offset, limit);
 
         JSONArray array = new JSONArray();
         for (Transaction trans : result) {
@@ -446,7 +489,7 @@ public class APITransactionsResource {
 
         if (unconfirmed) {
             List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionTab().findTransactions(address, sender,
-                    recipient, type, false, 0, limit, 0);
+                    recipient, type, desc, 0, limit, 0);
             for (Transaction trans : resultUnconfirmed) {
                 array.add(trans.toJson());
             }

@@ -8,10 +8,12 @@ import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalSuit;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
 
-import java.util.Iterator;
+import java.io.IOException;
 
 //import java.math.BigDecimal;
 
@@ -37,13 +39,11 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
         implements TransactionFinalSuit {
 
     public TransactionFinalSuitMapDBFork(TransactionFinalMap parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null);
+        super(parent, databaseSet, logger, false, null);
     }
 
     @Override
     public void openMap() {
-
-        sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
 
         // OPEN MAP
         // TREE MAP for sortable search
@@ -51,43 +51,71 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
                 .keySerializer(BasicKeySerializer.BASIC)
                 //.keySerializer(BTreeKeySerializer.ZERO_OR_POSITIVE_LONG)
                 .valueSerializer(new TransactionSerializer())
-                .counterEnable()
                 .makeOrGet();
 
     }
 
     @Override
-    public Iterator<Long> getBlockIterator(Integer height) {
+    public void deleteForBlock(Integer height) {
+        try (IteratorCloseable<Long> iterator = getBlockIterator(height)) {
+            while (iterator.hasNext()) {
+                map.remove(iterator.next());
+            }
+        } catch (IOException e) {
+        }
+    }
+
+    @Override
+    public IteratorCloseable<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-         return  ((BTreeMap<Long, Transaction>) map)
+        return new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
                 .subMap(Transaction.makeDBRef(height, 0),
-                        Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator();
+                        Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator());
 
     }
 
     @Override
-    public Iterator<Long> getIteratorByRecipient(String address) {
+    public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorBySender(String address) {
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByAddressAndType(String address, Integer type) {
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
+    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByAddress(String address) {
+    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Long fromID) {
         return null;
     }
 
+    @Override
+    public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending) {
+        return null;
+    }
+
+    @Override
+    public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort) {
+        return null;
+    }
+
+    @Override
+    public IteratorCloseable<Long> getBiDirectionIterator(Long fromSeqNo, boolean descending) {
+        return null;
+    }
+
+    @Override
+    public IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending) {
+        return null;
+    }
 }

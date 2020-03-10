@@ -62,12 +62,4 @@ public class SharedPostsMap extends DCUMap<byte[], List<String>> {
         put(postSignature, list);
     }
 
-    @Override
-    protected void createIndexes() {
-    }
-
-    @Override
-    protected List<String> getDefaultValue() {
-        return null;
-    }
 }

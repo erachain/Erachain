@@ -11,23 +11,19 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 
-//import org.erachain.settings.Settings;
+import java.awt.*;
 
 @SuppressWarnings("serial")
 
-public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls {
+public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls  {
+
     // private final MessagesTableModel messagesTableModel;
-
+    private static String iconFile = "images/pageicons/AccountAssetRepayDebtPanel.png";
     public AccountAssetRepayDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super("Repay Debt", assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
-
-        this.jLabel_Title.setText(Lang.getInstance()
-                .translate("If You want to give the borrowed asset %asset%, fill in this form").replace("%asset%", asset.viewName()));
+        super(false, null, assetIn, null,
+                TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         // icon.setIcon(null);
-        this.jButton_ok.setText(Lang.getInstance().translate("Repay Debt"));
-        this.jLabel_To.setText(Lang.getInstance().translate("Lender Account") + ":");
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Lender Details") + ":");
 
     }
 
@@ -39,11 +35,11 @@ public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls {
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(
                 Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, -key,
-                amount, head, messageBytes, isTextByte, encrypted);
+                amount, head, messageBytes, isTextByte, encrypted, 0);
 
         String Status_text = "";
         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,
-                Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2),
+                Lang.getInstance().translate("Repay Debt"), (int) (this.getWidth() / 1.2),
                 (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
 
@@ -64,4 +60,13 @@ public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls {
         this.jButton_ok.setEnabled(true);
     }
 
+    public static  Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

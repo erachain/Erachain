@@ -38,9 +38,6 @@ public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransac
 
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP
@@ -49,7 +46,6 @@ public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransac
 
     @Override
     protected void getMemoryMap() {
-        database = DCSet.makeDBinMemory();
         openMap();
     }
 
@@ -90,12 +86,6 @@ public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransac
 
         //RETURN
         return map;
-    }
-
-
-    @Override
-    protected ATTransaction getDefaultValue() {
-        return null;
     }
 
     public boolean add(Integer blockHeight, int seq, ATTransaction atTx) {

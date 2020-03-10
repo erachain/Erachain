@@ -90,7 +90,7 @@ public class DebugTabPane extends JTabbedPane {
         //ADD BLOCK TABLE
         this.addTab(Lang.getInstance().translate("Blocks"), new JScrollPane(blocksTable));
         //
-        if (BlockChain.DEVELOP_USE) {
+        if (BlockChain.TEST_MODE) {
             JPanel pppp = new JPanel();
             JButton bb = new JButton("OffRun");
             bb.addActionListener(new ActionListener() {

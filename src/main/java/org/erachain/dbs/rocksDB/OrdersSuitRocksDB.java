@@ -2,10 +2,13 @@ package org.erachain.dbs.rocksDB;
 
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.util.Arrays;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.OrderSuit;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
@@ -18,21 +21,25 @@ import org.mapdb.Fun;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 @Slf4j
 public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSuit {
 
     private final String NAME_TABLE = "ORDERS_TABLE";
 
-    SimpleIndexDB<Long, Order, Fun.Tuple4<Long, Long, BigDecimal, Long>> haveWantKeyIndex;
+    SimpleIndexDB<Long, Order, byte[]> haveWantKeyIndex;
     SimpleIndexDB<Long, Order, Fun.Tuple4<Long, Long, BigDecimal, Long>> wantHaveKeyIndex;
     SimpleIndexDB<Long, Order, Fun.Tuple5<String, Long, Long, BigDecimal, Long>> addressHaveWantKeyIndex;
 
     IndexByteableBigDecimal bgToBytes = new IndexByteableBigDecimal();
+    ByteableLong byteableLong = new ByteableLong();
+
     public OrdersSuitRocksDB(DBASet databaseSet, DB database) {
         super(databaseSet, database, logger, false);
     }
@@ -56,21 +63,24 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
         // SIZE need count - make not empty LIST
         indexes = new ArrayList<>();
 
-        haveWantKeyIndex = new SimpleIndexDB<Long, Order, Fun.Tuple4<Long, Long, BigDecimal, Long>>("orders_key_have_want",
-                (aLong, order) -> new Fun.Tuple4<>(
-                        order.getHaveAssetKey(),
-                        order.getWantAssetKey(),
-                        Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 0),
-                        order.getId()),
-                (result) ->
-                {
-                    ByteableLong byteableLong = new ByteableLong();
-                    return org.bouncycastle.util.Arrays.concatenate(
-                            byteableLong.toBytesObject(result.a),
-                            byteableLong.toBytesObject(result.b),
-                            bgToBytes.toBytes(result.c),
-                            byteableLong.toBytesObject(result.d));
-                });
+        haveWantKeyIndex = new SimpleIndexDB<Long, Order, byte[]>("orders_key_have_want",
+                (aLong, order) ->
+                        org.bouncycastle.util.Arrays.concatenate(
+                                byteableLong.toBytesObject(order.getHaveAssetKey()),
+                                byteableLong.toBytesObject(order.getWantAssetKey()),
+
+                                // по остаткам цены НЕЛЬЗЯ! так как при изменении цены после покусывания стрый ключ не находится!
+                                // и потом при поиске по итераторы находятся эти неудалившиеся ключи!
+                                //// теперь можно - в Обработке ордера сделал решение этой проблемы value.getPrice(),
+                                // и включим это после переключения
+                                bgToBytes.toBytes(aLong > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPrice() : order.getPrice()),
+                                /////bgToBytes.toBytes(order.getPrice()),
+                                //bgToBytes.toBytes(Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 0)),
+
+                                byteableLong.toBytesObject(order.getId())
+                        ),
+                result -> result
+        );
 
         indexes.add(haveWantKeyIndex);
 
@@ -89,7 +99,6 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                                 aLong),
                 (result) ->
                 {
-                    ByteableLong byteableLong = new ByteableLong();
                     return org.bouncycastle.util.Arrays.concatenate(org.bouncycastle.util.Arrays.concatenate(
                             new ByteableString().toBytesObject(result.a),
                             byteableLong.toBytesObject(result.b)),
@@ -103,11 +112,11 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                 (aLong, order) -> new Fun.Tuple4<>(
                         order.getWantAssetKey(),
                         order.getHaveAssetKey(),
-                        Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 0),
+                        //Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 0),
+                        order.getPrice(),
                         order.getId()),
                 (result) ->
                 {
-                    ByteableLong byteableLong = new ByteableLong();
                     return org.bouncycastle.util.Arrays.concatenate(
                             byteableLong.toBytesObject(result.a),
                             byteableLong.toBytesObject(result.b),
@@ -119,63 +128,92 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
         indexes.add(wantHaveKeyIndex);
     }
 
+    // TODO тут можно заменить на быстрый поиск по org.rocksdb.RocksDB.get(org.rocksdb.ReadOptions, byte[], int, int, byte[], int, int)
     @Override
-    public Iterator<Long> getHaveWantIterator(long have, long want) {
+    public Order getHaveWanFirst(long have, long want) {
+
+        try (IteratorCloseable<Long> iter = map.getIndexIteratorFilter(haveWantKeyIndex.getColumnFamilyHandle(), Arrays.concatenate(
+                Longs.toByteArray(have),
+                Longs.toByteArray(want)), false, true)) {
+            if (iter.hasNext()) {
+                return get(iter.next());
+            }
+
+        } catch (IOException e) {
+        }
+
+        return null;
+
+    }
+
+    @Override
+    public IteratorCloseable<Long> getHaveWantIterator(long have, long want) {
         return map.getIndexIteratorFilter(haveWantKeyIndex.getColumnFamilyHandle(), org.bouncycastle.util.Arrays.concatenate(
                 Longs.toByteArray(have),
-                Longs.toByteArray(want)), false);
+                Longs.toByteArray(want)), false, true);
     }
 
     @Override
-    public Iterator<Long> getHaveWantIterator(long have) {
+    public IteratorCloseable<Long> getHaveWantIterator(long have) {
         return map.getIndexIteratorFilter(haveWantKeyIndex.getColumnFamilyHandle(),
                 Longs.toByteArray(have),
-                false);
+                false, true);
     }
 
     @Override
-    public Iterator<Long> getWantHaveIterator(long want, long have) {
+    public IteratorCloseable<Long> getWantHaveIterator(long want, long have) {
         return map.getIndexIteratorFilter(wantHaveKeyIndex.getColumnFamilyHandle(), org.bouncycastle.util.Arrays.concatenate(
                 Longs.toByteArray(want),
-                Longs.toByteArray(have)), false);
+                Longs.toByteArray(have)), false, true);
     }
 
     @Override
-    public Iterator<Long> getWantHaveIterator(long want) {
+    public IteratorCloseable<Long> getWantHaveIterator(long want) {
         return map.getIndexIteratorFilter(wantHaveKeyIndex.getColumnFamilyHandle(),
                 Longs.toByteArray(want),
-                false);
+                false, true);
     }
 
     @Override
-    public Iterator<Long> getAddressHaveWantIterator(String address, long have, long want) {
+    public IteratorCloseable<Long> getAddressHaveWantIterator(String address, long have, long want) {
         return map.getIndexIteratorFilter(
                 addressHaveWantKeyIndex.getColumnFamilyHandle(),
                 org.bouncycastle.util.Arrays.concatenate(address.getBytes(),
                         Longs.toByteArray(have),
                         Longs.toByteArray(want)),
-                false);
+                false, true);
     }
 
     @Override
-    public HashSet<Long> getUnsortedKeysWithParent(long have, long want, BigDecimal limit) {
+    public IteratorCloseable<Long> getAddressIterator(String address) {
+        return map.getIndexIteratorFilter(
+                addressHaveWantKeyIndex.getColumnFamilyHandle(),
+                address.getBytes(), false, true);
+    }
 
-        if (limit == null) {
-            // без учета максимума по значению
-            return new HashSet(map.filterAppropriateValuesAsKeys(
-                    org.bouncycastle.util.Arrays.concatenate(
-                            Longs.toByteArray(have),
-                            Longs.toByteArray(want)),
-                    haveWantKeyIndex.getColumnFamilyHandle()));
-        } else {
-            return new HashSet(map.filterAppropriateValuesAsKeys(
-                    org.bouncycastle.util.Arrays.concatenate(
-                            Longs.toByteArray(have),
-                            Longs.toByteArray(want),
-                            bgToBytes.toBytes(limit)),
-                    haveWantKeyIndex.getColumnFamilyHandle()));
+    @Override
+    public HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal stopPrice, Map deleted) {
+
+        Iterator<Long> iterator = getHaveWantIterator(have, want);
+
+        HashMap<Long, Order> result = new HashMap();
+        while (iterator.hasNext()) {
+            Long key = iterator.next();
+            if (deleted != null && deleted.containsKey(key)) {
+                // SKIP deleted in FORK
+                continue;
+            }
+
+            Order order = get(key);
+            result.put(key, order);
+            // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
+            // причем берем по Остаткам Цену теперь
+            if (stopPrice != null && order.calcLeftPrice().compareTo(stopPrice) > 0) {
+                break;
+            }
         }
 
+        return result;
     }
 
 }

@@ -58,10 +58,6 @@ public class KKMap extends DCUMap<
         super(parent, dcSet);
     }
 
-
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP
@@ -78,7 +74,7 @@ public class KKMap extends DCUMap<
     }
 
     @Override
-    protected TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> getDefaultValue() {
+    public TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> getDefaultValue() {
         return new TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>();
     }
 
@@ -88,7 +84,9 @@ public class KKMap extends DCUMap<
         TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
 
         TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             value_new = value;
         else {
             // !!!! NEEED .clone() !!!
@@ -103,7 +101,9 @@ public class KKMap extends DCUMap<
             stack.push(item);
             value_new.put(itemKey, stack);
         } else {
-            if (this.parent == null) {
+            if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                    // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                    && this.parent == null) {
                 stack.push(item);
                 value_new.put(itemKey, stack);
             } else {
@@ -145,7 +145,9 @@ public class KKMap extends DCUMap<
         TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
 
         TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             value_new = value;
         else {
             // !!!! NEEED .clone() !!!
@@ -159,7 +161,9 @@ public class KKMap extends DCUMap<
             stack.push(item);
             value_new.put(itemKey, stack);
         } else {
-            if (this.parent == null) {
+            if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                    // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                    && this.parent == null) {
                 stack.push(item);
                 value_new.put(itemKey, stack);
             } else {
@@ -190,7 +194,9 @@ public class KKMap extends DCUMap<
         TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
 
         TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             value_new = value;
         else {
             value_new = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) value.clone();
@@ -200,7 +206,9 @@ public class KKMap extends DCUMap<
         if (stack == null || stack.isEmpty())
             return;
 
-        if (this.parent == null) {
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null) {
             stack.pop();
             value_new.put(itemKey, stack);
         } else {

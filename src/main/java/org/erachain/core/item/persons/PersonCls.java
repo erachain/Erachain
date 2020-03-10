@@ -2,10 +2,10 @@ package org.erachain.core.item.persons;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemAssetBalanceMap;
@@ -28,7 +28,7 @@ import java.util.Set;
 //birthLatitude -90..90; birthLongitude -180..180
 public abstract class PersonCls extends ItemCls {
 
-    public static int MAX_IMAGE_LENGTH = BlockChain.DEVELOP_USE? 20480 : 28000;
+    public static int MAX_IMAGE_LENGTH = 28000;
     public static int MIN_IMAGE_LENGTH = 10240;
 
     public static final int HUMAN = 1;
@@ -190,7 +190,11 @@ public abstract class PersonCls extends ItemCls {
 
     }
 
-    public static BigDecimal getBalance(long personKey, long assetKey, int pos) {
+    public Set<String> getPubKeys(DCSet dcSet) {
+        return dcSet.getPersonAddressMap().getItems(this.getKey(dcSet)).keySet();
+    }
+
+    public static BigDecimal getBalance(long personKey, long assetKey, int pos, int side) {
 
         Set<String> addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey).keySet();
 
@@ -203,15 +207,60 @@ public abstract class PersonCls extends ItemCls {
                 .map((balances) -> {
                     switch (pos) {
                         case 1:
-                            return balances.a.b;
+                            switch (side) {
+                                case Transaction.BALANCE_SIDE_DEBIT:
+                                    return balances.a.a;
+                                case Transaction.BALANCE_SIDE_LEFT:
+                                    return balances.a.b;
+                                case Transaction.BALANCE_SIDE_CREDIT:
+                                    return balances.a.a.subtract(balances.a.b);
+                                default:
+                                    return BigDecimal.ZERO;
+                            }
                         case 2:
-                            return balances.b.b;
+                            switch (side) {
+                                case Transaction.BALANCE_SIDE_DEBIT:
+                                    return balances.b.a;
+                                case Transaction.BALANCE_SIDE_LEFT:
+                                    return balances.b.b;
+                                case Transaction.BALANCE_SIDE_CREDIT:
+                                    return balances.b.a.subtract(balances.b.b);
+                                default:
+                                    return BigDecimal.ZERO;
+                            }
                         case 3:
-                            return balances.c.b;
+                            switch (side) {
+                                case Transaction.BALANCE_SIDE_DEBIT:
+                                    return balances.c.a;
+                                case Transaction.BALANCE_SIDE_LEFT:
+                                    return balances.c.b;
+                                case Transaction.BALANCE_SIDE_CREDIT:
+                                    return balances.c.a.subtract(balances.c.b);
+                                default:
+                                    return BigDecimal.ZERO;
+                            }
                         case 4:
-                            return balances.d.b;
+                            switch (side) {
+                                case Transaction.BALANCE_SIDE_DEBIT:
+                                    return balances.d.a;
+                                case Transaction.BALANCE_SIDE_LEFT:
+                                    return balances.d.b;
+                                case Transaction.BALANCE_SIDE_CREDIT:
+                                    return balances.d.a.subtract(balances.d.b);
+                                default:
+                                    return BigDecimal.ZERO;
+                            }
                         case 5:
-                            return balances.e.b;
+                            switch (side) {
+                                case Transaction.BALANCE_SIDE_DEBIT:
+                                    return balances.e.a;
+                                case Transaction.BALANCE_SIDE_LEFT:
+                                    return balances.e.b;
+                                case Transaction.BALANCE_SIDE_CREDIT:
+                                    return balances.e.a.subtract(balances.e.b);
+                                default:
+                                    return BigDecimal.ZERO;
+                            }
                         default:
                             return BigDecimal.ZERO;
                     }

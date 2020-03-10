@@ -9,10 +9,7 @@ import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
-import org.mapdb.BTreeMap;
-import org.mapdb.Bind;
-import org.mapdb.DB;
-import org.mapdb.Fun;
+import org.mapdb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +31,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>();
 
     //protected ConcurrentHashMap deleted;
-    protected HashMap deleted;
+    protected Map deleted;
     protected Boolean EXIST = true;
     protected int shiftSize;
 
@@ -42,13 +39,22 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
     public DCUMapImpl(DBASet databaseSet) {
         super(databaseSet);
+        createIndexes();
+    }
+
+    public DCUMapImpl(DBASet databaseSet, DB database, String tabName, Serializer tabSerializer, boolean sizeEnable) {
+        super(databaseSet, database, tabName, tabSerializer, sizeEnable);
+        createIndexes();
     }
 
     public DCUMapImpl(DBASet databaseSet, DB database, boolean sizeEnable) {
         super(databaseSet, database, sizeEnable);
+        createIndexes();
     }
     public DCUMapImpl(DBASet databaseSet, DB database) {
         super(databaseSet, database, false);
+        createIndexes();
+
     }
 
     public DCUMapImpl(DCUMapImpl<T, U> parent, DBASet dcSet, boolean sizeEnable) {
@@ -57,13 +63,15 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
-            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+            if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                    + (Controller.MIN_MEMORY_TAIL)) {
                 // у родителя чистим - у себя нет, так как только создали
-                ((DBASet)parent.getDBSet()).clearCache();
+                ((DBASet) parent.getDBSet()).clearCache();
                 System.gc();
-                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1)) {
                     LOGGER.error("Heap Memory Overflow");
-                    Controller.getInstance().stopAll(1191);
+                    Controller.getInstance().stopAll(1192);
                 }
             }
         }
@@ -75,7 +83,9 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             this.getMemoryMap();
         } else {
             this.openMap();
+            createIndexes();
         }
+
     }
 
     public DCUMapImpl(DCUMapImpl<T, U> parent, DBASet dcSet) {
@@ -84,7 +94,6 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
     public abstract void openMap();
     protected abstract void getMemoryMap();
-    protected abstract U getDefaultValue();
 
     protected void createIndexes() {
     }
@@ -148,14 +157,14 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         return null;
     }
 
-    // TODO: сделать два итератора и удаленные чтобы без создания новых списков работало
+    // TODO: сделать два итератора и удаленные чтобы без создания новых списков работало иначе сломшком большой LIST делается
     @Override
-    public Iterator<T> getIterator() {
+    public IteratorCloseable<T> getIterator() {
         this.addUses();
 
         try {
             if (parent == null) {
-                return map.keySet().iterator();
+                return new IteratorCloseableImpl(map.keySet().iterator());
             }
 
             List<T> list = new ArrayList<>();
@@ -163,12 +172,15 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             while (parentIterator.hasNext()) {
                 T key = parentIterator.next();
                 // пропустим если он есть в удаленных
-                if (deleted != null && deleted.containsKey(key))
+                if (deleted != null && deleted.containsKey(key)
+                        || map.containsKey(key))
                     continue;
                 list.add(key);
             }
 
-            return Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
+            /// тут нет дублей они уже удалены и дубли не взяты
+            /// return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
+            return new IteratorCloseableImpl(Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR));
 
         } finally {
             this.outUses();
@@ -183,14 +195,14 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
      * @return
      */
     @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIterator(int index, boolean descending) {
         this.addUses();
 
         // 0 - это главный индекс - он не в списке indexes
         NavigableSet<Fun.Tuple2<?, T>> indexSet = getIndex(index, descending);
         if (indexSet != null) {
 
-            org.erachain.datachain.IndexIterator<T> u = new org.erachain.datachain.IndexIterator<T>(this.indexes.get(index));
+            org.erachain.datachain.IndexIterator<T> u = new org.erachain.datachain.IndexIterator<T>(indexSet);
             this.outUses();
             return u;
 
@@ -198,12 +210,12 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             if (descending) {
                 Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
                 this.outUses();
-                return u;
+                return new IteratorCloseableImpl(u);
             }
 
             Iterator<T> u = ((NavigableMap<T, U>) this.map).keySet().iterator();
             this.outUses();
-            return u;
+            return new IteratorCloseableImpl(u);
 
         }
     }
@@ -219,6 +231,14 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         }
 
         return list;
+    }
+
+    public void makeDeletedMap(T key) {
+        if (key instanceof byte[]) {
+            this.deleted = new TreeMap(Fun.BYTE_ARRAY_COMPARATOR);
+        } else {
+            this.deleted = new HashMap(1024, 0.75f);
+        }
     }
 
     // ERROR if key is not unique for each value:
@@ -429,7 +449,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             // это форкнутая таблица
 
             if (this.deleted == null) {
-                this.deleted = new HashMap(1024 , 0.75f);
+                makeDeletedMap(key);
             }
 
             // добавляем в любом случае, так как
@@ -594,14 +614,19 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
     /**
      * ВНИМАНИЕ!!! в связи с работой этого метода при сливе - нельяза в стандартных методах
+     * @return
      */
     @Override
-    public void writeToParent() {
+    public boolean writeToParent() {
+
+        boolean updated = false;
+
         Iterator<T> iterator = this.map.keySet().iterator();
         while (iterator.hasNext()) {
             T key = iterator.next();
             // напрямую в карту сливаем чтобы логику Таблицы не повторить дважды
             parent.map.put(key, this.map.get(key));
+            updated = true;
         }
 
         // нужно очистить сразу так как общий размер изменится иначе будет ++ больше
@@ -614,8 +639,11 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                 T key = iterator.next();
                 // напрямую в карту сливаем чтобы логику Таблицы не повторить дважды
                 parent.map.remove(key);
+                updated = true;
             }
         }
+
+        return updated;
     }
 
     @Override
@@ -628,7 +656,12 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     public void clearCache() {}
 
     @Override
-    public void close() {}
+    public void close() {
+        map = null;
+        parent = null;
+        deleted = null;
+        super.close();
+    }
 
     @Override
     public boolean isClosed() {

@@ -10,7 +10,7 @@ import org.mapdb.Fun.Tuple4;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -21,7 +21,7 @@ public class ExData {
     private static final int DATA_VERSION_PART_LENGTH = 6; // size version part
 
     /*
-     * Charset.forName("UTF-8") JSON "TM" - template key "PR" - template params
+     * StandardCharsets.UTF_8 JSON "TM" - template key "PR" - template params
      * "HS" - Hashes "MS" - message
      *
      * PARAMS template:TemplateCls param_keys: [id:text] hashes_Set: [name:hash]
@@ -36,11 +36,11 @@ public class ExData {
                                                HashMap<String, Tuple2<Boolean, byte[]>> files) throws Exception {
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        outStream.write("v 2.00".getBytes(Charset.forName("UTF-8"))); // only 6
+        outStream.write("v 2.00".getBytes(StandardCharsets.UTF_8)); // only 6
         // simbols!!!
-        byte[] title_Bytes = "".getBytes(Charset.forName("UTF-8"));
+        byte[] title_Bytes = "".getBytes(StandardCharsets.UTF_8);
         if (title != null) {
-            title_Bytes = title.getBytes(Charset.forName("UTF-8"));
+            title_Bytes = title.getBytes(StandardCharsets.UTF_8);
         }
 
         byte[] size_Title = ByteBuffer.allocate(DATA_TITLE_PART_LENGTH).putInt(title_Bytes.length).array();
@@ -55,7 +55,7 @@ public class ExData {
         byte[] size_Json;
 
         if (files == null || files.isEmpty()) {
-            JSON_Bytes = json.toString().getBytes(Charset.forName("UTF-8"));
+            JSON_Bytes = json.toString().getBytes(StandardCharsets.UTF_8);
             // convert int to byte
             size_Json = ByteBuffer.allocate(DATA_JSON_PART_LENGTH).putInt(JSON_Bytes.length).array();
             outStream.write(size_Json);
@@ -78,7 +78,7 @@ public class ExData {
             i++;
         }
         json.put("F", files_Json);
-        JSON_Bytes = json.toString().getBytes(Charset.forName("UTF-8"));
+        JSON_Bytes = json.toString().getBytes(StandardCharsets.UTF_8);
         // convert int to byte
         size_Json = ByteBuffer.allocate(DATA_JSON_PART_LENGTH).putInt(JSON_Bytes.length).array();
         outStream.write(size_Json);
@@ -121,10 +121,10 @@ public class ExData {
         // READ JSON
         byte[] arbitraryData = Arrays.copyOfRange(data, position, position + JSONSize);
         JSONObject json = (JSONObject) JSONValue
-                .parseWithException(new String(arbitraryData, Charset.forName("UTF-8")));
+                .parseWithException(new String(arbitraryData, StandardCharsets.UTF_8));
 
-        String title = new String(titleByte, Charset.forName("UTF-8"));
-        String version = new String(version_Byte, Charset.forName("UTF-8"));
+        String title = new String(titleByte, StandardCharsets.UTF_8);
+        String version = new String(version_Byte, StandardCharsets.UTF_8);
         position += JSONSize;
         HashMap<String, Tuple2<Boolean, byte[]>> out_Map = new HashMap<String, Tuple2<Boolean, byte[]>>();
         JSONObject files;
@@ -202,10 +202,10 @@ public class ExData {
         // READ JSON
         byte[] arbitraryData = Arrays.copyOfRange(data, position, position + JSONSize);
         JSONObject json = (JSONObject) JSONValue
-                .parseWithException(new String(arbitraryData, Charset.forName("UTF-8")));
+                .parseWithException(new String(arbitraryData, StandardCharsets.UTF_8));
 
-        String title = new String(titleByte, Charset.forName("UTF-8"));
-        String version = new String(version_Byte, Charset.forName("UTF-8"));
+        String title = new String(titleByte, StandardCharsets.UTF_8);
+        String version = new String(version_Byte, StandardCharsets.UTF_8);
 
         return new Tuple3(version, title, json);
     }
@@ -216,7 +216,7 @@ public class ExData {
                                    HashMap<String, String> hashes_Map, String message, Set<Tuple3<String, Boolean, byte[]>> files_Set)
             throws Exception {
         // messageBytes = StrJSonFine.convert(out_Map).getBytes(
-        // Charset.forName("UTF-8") );
+        // StandardCharsets.UTF_8 );
         JSONObject out_Map = new JSONObject();
         JSONObject params_Map = new JSONObject();
         JSONObject hashes_JSON = new JSONObject();
@@ -267,10 +267,10 @@ public class ExData {
 
         // isTextB = this.jCheckBox_Message_Public.isSelected();
 
-        // messageBytes = message.getBytes( Charset.forName("UTF-8") );
+        // messageBytes = message.getBytes( StandardCharsets.UTF_8 );
 
         // fileData = StrJSonFine.convert(out_Files_data).getBytes(
-        // Charset.forName("UTF-8") );
+        // StandardCharsets.UTF_8 );
 
         return json_Files_to_Byte_V2(title, new JSONObject(out_Map), files_1);
 

@@ -11,27 +11,22 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 
+import java.awt.*;
+
 //import org.erachain.settings.Settings;
 
 @SuppressWarnings("serial")
 
-public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls {
+public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls  {
+    private static String iconFile = "images/pageicons/AccountAssetConfiscateDebtPanel.png";
 
     public AccountAssetConfiscateDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super("Confiscate Debt", assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
-
-        this.jButton_ok.setText(Lang.getInstance().translate(asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
-        this.jLabel_Title.setText(Lang.getInstance()
-                .translate(asset.isOutsideType()? "Если Вы хотите подтвердить погашение требования %asset%, заполните эту форму"
-                        : "If You want to confiscate in debt issued asset %asset%, fill in this form")
-                .replace("%asset%", asset.viewName()));
+        super(true, null, assetIn, null,
+                TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         // icon.setIcon(null);
 
-        this.jLabel_To.setText(Lang.getInstance().translate(asset.isOutsideType()?"Счет эмитента" : "Debtor Account") + ":");
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate(asset.isOutsideType()?"Детали эмитента" : "Debtor Details") + ":");
-
-      }
+    }
 
     @Override
     public void onSendClick() {
@@ -66,4 +61,13 @@ public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls 
         this.jButton_ok.setEnabled(true);
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

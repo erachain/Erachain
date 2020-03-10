@@ -2,7 +2,6 @@ package org.erachain.datachain;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import org.erachain.controller.Controller;
@@ -10,12 +9,16 @@ import org.erachain.core.account.Account;
 import org.erachain.core.transCalculated.Calculated;
 import org.erachain.database.serializer.CalculatedSerializer;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
+import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -63,9 +66,6 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
 
     public TransactionFinalCalculatedMap(TransactionFinalCalculatedMap parent, DCSet dcSet) {
         super(parent, dcSet);
-    }
-
-    protected void createIndexes() {
     }
 
     @SuppressWarnings("unchecked")
@@ -151,18 +151,13 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         this.openMap();
     }
 
-    @Override
-    protected Calculated getDefaultValue() {
-        return null;
-    }
-
     // TODO сделать удаление по фильтру разом - как у RocksDB - deleteRange(final byte[] beginKey, final byte[] endKey)
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Integer height) {
         BTreeMap map = (BTreeMap) this.map;
         // GET ALL CalculatedS THAT BELONG TO THAT ADDRESS
         Collection<Tuple3> keys = ((BTreeMap<Tuple3, Calculated>) map)
-                .subMap(Fun.t3(height, null, null), Fun.t3(height, Fun.HI(), Fun.HI())).keySet();
+                .subMap(Fun.t3(height, null, null), Fun.t3(height, Integer.MAX_VALUE, Long.MAX_VALUE)).keySet();
 
         // DELETE CalculatedS
         for (Tuple3<Integer, Integer, Long> key : keys) {
@@ -181,13 +176,15 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Calculated> getCalculatedsByRecipient(String address, int limit) {
-        Iterator iterator = Fun.filter(this.recipientKey, address).iterator();
 
         List<Calculated> txs = new ArrayList<>();
         int counter = 0;
-        while (iterator.hasNext() && (limit == 0 || counter < limit)) {
-            txs.add(this.map.get(iterator.next()));
-            counter++;
+        try (IteratorCloseable iterator = IteratorCloseableImpl.make(Fun.filter(this.recipientKey, address).iterator())) {
+            while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+                txs.add(this.map.get(iterator.next()));
+                counter++;
+            }
+        } catch (IOException e) {
         }
         return txs;
     }
@@ -198,30 +195,16 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Calculated> getCalculatedsByBlock(Integer block, int limit) {
-		/*
-		Iterable keys = Fun.filter(this.block_Key, block);
-		Iterator iter = keys.iterator();
-		keys = null;
-		List<Calculated> txs = new ArrayList<>();
-		int counter = 0;
-		while (iter.hasNext() && (limit == 0 || counter < limit)) {
-			txs.add(this.map.get(iter.next()));
-			counter++;
-		}
-		iter = null;
-		*/
         //BTreeMap map = (BTreeMap) this.map;
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
         Collection<Calculated> keys1 = ((BTreeMap) map)
-                .subMap(Fun.t2(block, null), Fun.t2(block, Fun.HI())).values();
+                .subMap(Fun.t2(block, null), Fun.t2(block, Integer.MAX_VALUE)).values();
 
 
         List<Calculated> txs = new ArrayList<>();
         for (Calculated bb : keys1) {
             txs.add(bb);
-            bb = null;
         }
-        keys1 = null;
         return txs;
 
     }
@@ -263,9 +246,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         Iterator recipientKeys = Fun.filter(this.recipientKey, address).iterator();
 
         //iterator = Iterators.concat(senderKeys, recipientKeys);
-        Iterable mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-        Iterator<Tuple2<Integer, Integer>> iterator = mergedIterable.iterator();
-
+        Iterator<Tuple2<Integer, Integer>> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         Set<BlExpUnit> txs = new TreeSet<>();
         while (iterator.hasNext()) {
@@ -282,8 +263,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         Iterator recipientKeys = Fun.filter(this.recipientKey, address).iterator();
 
         //iterator = Iterators.concat(senderKeys, recipientKeys);
-        Iterable mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-        Iterator<Tuple2<Integer, Integer>> iterator = mergedIterable.iterator();
+        Iterator<Tuple2<Integer, Integer>> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         List<Calculated> txs = new ArrayList<>();
         while (iterator.hasNext()) {
@@ -301,9 +281,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         //Set<Tuple2<Integer, Integer>> treeKeys = new TreeSet<>();
 
         //iterator = Iterators.concat(senderKeys, recipientKeys);
-        Iterable mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-
-        return Iterators.size(mergedIterable.iterator());
+        return Iterators.size(new MergedIteratorNoDuplicates((Iterable) ImmutableList.of((Iterable) senderKeys, recipientKeys), Fun.COMPARATOR));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -386,8 +364,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
 
         if (address != null) {
             //iterator = Iterators.concat(senderKeys, recipientKeys);
-            Iterable mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-            iterator = mergedIterable.iterator();
+            iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of((Iterable) senderKeys, recipientKeys), Fun.COMPARATOR);
 
         } else if (sender != null && recipient != null) {
             iterator = senderKeys;

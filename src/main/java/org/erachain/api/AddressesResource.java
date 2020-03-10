@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -191,7 +192,7 @@ public class AddressesResource {
 
     @GET
     @Path("/private/{address}")
-    public String getPrivate(@PathParam("address") String address, @QueryParam("password") String password) {
+    public Response getPrivate(@PathParam("address") String address, @QueryParam("password") String password) {
 
         // CHECK IF VALID ADDRESS
         if (!Crypto.getInstance().isValidAddress(address)) {
@@ -221,8 +222,11 @@ public class AddressesResource {
                     ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
         }
 
-        byte[] seed = Controller.getInstance().getPrivateKeyAccountByAddress(address).getPrivateKey();
-        return Base58.encode(seed);
+        byte[] privateKey = Controller.getInstance().getPrivateKeyAccountByAddress(address).getPrivateKey();
+        return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
+                //.header("Access-Control-Allow-Origin", "*")
+                .entity(Base58.encode(privateKey)).build(); // " ! " + Base58.encode(privateKey) - норм работает
+
     }
 
     @GET
@@ -269,7 +273,7 @@ public class AddressesResource {
 
             return Controller.getInstance().generateNewAccount();
         } else {
-            APIUtils.askAPICallAllowed(password, "POST addresses import seed\n " + x, request, true);
+            APIUtils.askAPICallAllowed(password, "POST addresses import Account seed\n " + x, request, true);
 
             String seed = x;
 
@@ -288,7 +292,7 @@ public class AddressesResource {
             // DECODE SEED
             byte[] seedBytes;
             try {
-                seedBytes = Base58.decode(seed);
+                seedBytes = Base58.decode(seed, Crypto.HASH_LENGTH);
             } catch (Exception e) {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_INVALID_SEED);
@@ -353,7 +357,7 @@ public class AddressesResource {
         Account account = new Account(address);
         return "" + BlockChain.calcWinValue(DCSet.getInstance(),
                 account, Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()),
-                account.getBalanceUSE(Transaction.RIGHTS_KEY, DCSet.getInstance()).intValue());
+                account.getBalanceUSE(Transaction.RIGHTS_KEY, DCSet.getInstance()).intValue(), null);
     }
 
     public JSONArray tuple5_toJson(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance) {
@@ -671,6 +675,42 @@ public class AddressesResource {
         PublicKeyAccount publicKey = new PublicKeyAccount(publicKeyBytes);
 
         return publicKey.getAddress();
+    }
+
+    @GET
+    @Path("/importprivatekey/{privatekey}")
+    public String importPrivate(@PathParam("privatekey") String privateKey) {
+
+        // CHECK IF WALLET EXISTS
+        if (!Controller.getInstance().doesWalletExists()) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+        }
+
+        // CHECK WALLET UNLOCKED
+        if (!Controller.getInstance().isWalletUnlocked()) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_WALLET_LOCKED);
+        }
+
+        // DECODE SEED
+        byte[] privatekeyBytes64;
+        try {
+            privatekeyBytes64 = Base58.decode(privateKey, Crypto.SIGNATURE_LENGTH);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_INVALID_SEED);
+        }
+
+        // CHECK SEED LENGTH
+        if (privatekeyBytes64 == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_INVALID_SEED);
+
+        }
+
+        // CONVERT TO BYTE
+        return Controller.getInstance().importPrivateKey(privatekeyBytes64);
     }
 
 }

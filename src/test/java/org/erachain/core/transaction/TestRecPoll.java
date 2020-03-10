@@ -13,6 +13,7 @@ import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
+import org.erachain.settings.Settings;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -81,8 +82,8 @@ public class TestRecPoll {
     @Before
     public void init() {
 
-        if (BlockChain.DEVELOP_USE == false)
-            fail("You need change the key 'BlockChain.DEVELOP_USE=true'");
+        if (!Settings.getInstance().isTestNet())
+            fail("You need switch key '-testnet'");
 
         if (BlockChain.TESTS_VERS == 0)
             fail("You need change key 'BlockChain.TESTS_VERS' to current version");
@@ -108,14 +109,14 @@ public class TestRecPoll {
 
         // GET RIGHTS TO CERTIFIER
         pollGeneral = new Poll(certifier, "СССР", icon, image, "wqeqwe", options);
-        //GenesisIssuePollRecord genesis_issue_poll = new GenesisIssuePollRecord(pollGeneral, certifier);
+        //GenesisIssuePollRecord genesis_issue_poll = new GenesisIssuePollRecord(pollGeneral, registrar);
         //genesis_issue_poll.process(db, false);
-        //GenesisCertifyPollRecord genesis_certify = new GenesisCertifyPollRecord(certifier, 0L);
+        //GenesisCertifyPollRecord genesis_certify = new GenesisCertifyPollRecord(registrar, 0L);
         //genesis_certify.process(db, false);
 
         certifier.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        certifier.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false);
-        certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        certifier.changeBalance(db, false, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false, false);
+        certifier.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         poll = new Poll(certifier, "РСФСР", icon, image, "Россия", options);
 
@@ -173,18 +174,18 @@ public class TestRecPoll {
         //CREATE INVALID ISSUE POLL - INVALID POLLALIZE
         issuePollTransaction = new IssuePollRecord(userAccount1, poll, FEE_POWER, timestamp, 0l, new byte[64]);
         issuePollTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
-        if (!BlockChain.DEVELOP_USE)
+        if (!Settings.getInstance().isTestNet())
             assertEquals(Transaction.NOT_ENOUGH_FEE, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
         // ADD FEE
-        userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        userAccount1.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
         assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CHECK IF ISSUE POLL IS VALID
-        userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MINOR_ERA_BALANCE_BD, false);
+        userAccount1.changeBalance(db, false, false, ERM_KEY, BlockChain.MINOR_ERA_BALANCE_BD, false, false);
         assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CHECK
-        userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false);
+        userAccount1.changeBalance(db, false, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false, false);
         assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
     }
@@ -298,8 +299,8 @@ public class TestRecPoll {
         LOGGER.info("poll KEY: " + poll.getKey(db));
 
         //CHECK BALANCE ISSUER
-        //assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));
-        //assertEquals(issuePollTransaction.getFee().setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, db));
+        //assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, registrar.getBalanceUSE(ERM_KEY, db));
+        //assertEquals(issuePollTransaction.getFee().setScale(BlockChain.AMOUNT_DEDAULT_SCALE), registrar.getBalanceUSE(FEE_KEY, db));
 
         //CHECK POLL EXISTS DB AS CONFIRMED:  key > -1
         long key = db.getIssuePollMap().get(issuePollTransaction);
@@ -316,7 +317,7 @@ public class TestRecPoll {
         issuePollTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
-        if (!BlockChain.DEVELOP_USE)
+        if (!Settings.getInstance().isTestNet())
             assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));
         assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, db));
 
@@ -324,7 +325,7 @@ public class TestRecPoll {
         assertEquals(false, db.getItemPollMap().contains(pollKey));
 
         //CHECK REFERENCE ISSUER
-        //assertEquals(issuePollTransaction.getReference(), certifier.getLastReference(db));
+        //assertEquals(issuePollTransaction.getReference(), registrar.getLastReference(db));
     }
 
 

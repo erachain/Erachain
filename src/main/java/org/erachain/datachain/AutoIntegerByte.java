@@ -69,14 +69,6 @@ public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
         this.key = size;
     }
 
-    protected void createIndexes() {
-    }
-
-    @Override
-    protected byte[] getDefaultValue() {
-        return null;
-    }
-
     public long add(byte[] item) {
         // INCREMENT ATOMIC KEY IF EXISTS
         if (this.atomicKey != null) {
@@ -110,10 +102,19 @@ public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
     }
 
     @Override
-    public void writeToParent() {
-        super.writeToParent();
+    public boolean writeToParent() {
+        boolean result = super.writeToParent();
         ((AutoIntegerByte) parent).atomicKey.set(this.key);
         ((AutoIntegerByte) parent).key = this.key;
+        return result;
+    }
+
+    /**
+     * Если откатить базу данных то нужно и локальные значения сбросить
+     */
+    @Override
+    public void afterRollback() {
+        this.key = atomicKey.get();
     }
 
 }

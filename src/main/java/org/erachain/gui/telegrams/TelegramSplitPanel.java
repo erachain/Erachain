@@ -10,7 +10,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.SplitPanel;
@@ -39,7 +38,6 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -51,6 +49,7 @@ public class TelegramSplitPanel extends SplitPanel {
    /**
     * Creates new form TelegramSplitPanel
     */
+   private static String iconFile = "images/pageicons/TelegramSplitPanel.png";
     LeftTelegram leftTelegram;
     RightTelegramPanel rightTelegramPanel;
     private static final long serialVersionUID = 1L;
@@ -344,8 +343,8 @@ public class TelegramSplitPanel extends SplitPanel {
         public void actionPerformed(ActionEvent e) {
             Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
-            MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
-                    null, account, null, null));
+            MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"),new AccountAssetSendPanel(null,
+                    null, account, null, null), AccountAssetSendPanel.getIcon());
 
 
         }
@@ -357,7 +356,7 @@ public class TelegramSplitPanel extends SplitPanel {
         public void actionPerformed(ActionEvent e) {
             Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
-            MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
+            MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, account, null), MailSendPanel.getIcon());
 
         }
     });
@@ -499,7 +498,7 @@ public void onSendClick() {
    
     if (message != null && message.length() > 0) {
         if (isTextB) {
-            messageBytes = message.getBytes(Charset.forName("UTF-8"));
+            messageBytes = message.getBytes(StandardCharsets.UTF_8);
         } else {
             try {
                 messageBytes = Converter.parseHexString(message);
@@ -569,7 +568,7 @@ public void onSendClick() {
    // CREATE TX MESSAGE
     Transaction transaction = Controller.getInstance().r_Send(
             Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key,
-            amount, head, messageBytes, isTextByte, encrypted);
+            amount, head, messageBytes, isTextByte, encrypted, 0);
     
     Controller.getInstance().broadcastTelegram(transaction, true);
        
@@ -582,5 +581,14 @@ public boolean cheskError(){
     return true;
 }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 
 }

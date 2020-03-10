@@ -13,8 +13,8 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.json.simple.JSONObject;
 import org.erachain.utils.ByteArrayUtils;
+import org.json.simple.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -49,7 +49,8 @@ public class PersonHuman extends PersonCls {
 
     public PersonHuman(byte[] typeBytes, PublicKeyAccount owner, String fullName, long birthday, long deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
-                       String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description, byte[] ownerSignature) {
+                       String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image,
+                       String description, byte[] ownerSignature) {
         super(typeBytes, owner, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);

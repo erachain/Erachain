@@ -14,7 +14,10 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
 
 /**
  * Используется для хранения последней ссылки на трнзакцию со счета либо истории трнзакций по счету
- * Для ускорения работы протокола сохранение Истории выключено с 4.20+ .
+ * Для ускорения работы протокола сохранение Истории может быть выключено - смотри core.BlockChain#NOT_STORE_REFFS_HISTORY.
+ * Поидее раз запоминание истории выключено то можно использовать HashMap для ускорения. И всегда ее использовать для протокольных индексов,
+ * а для поиска по диаппазону всегда использовать вторичный индекс, который можно и отключить для скорости.
+ * И так как список трнзакций по создателю уже есть во сторичных ключах (datachain.TransactionFinalMapImpl#getTransactionsBySender)
  * seek reference to tx_Parent by address+timestamp
  * account.address -> LAST[TX.timestamp + TX.dbRef]
  * account.address + TX.timestamp -> PARENT[TX.timestamp + TX.dbRef]
@@ -51,7 +54,7 @@ public class ReferenceMapImpl extends DBTabImpl<byte[], long[]>
                     //break;
                 default:
                     //map = new ReferenceSuitMapDBFork((ReferenceMap) parent, databaseSet);
-                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, null);
+                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, this);
             }
         }
     }

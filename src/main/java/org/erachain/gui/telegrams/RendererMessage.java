@@ -1,34 +1,23 @@
 package org.erachain.gui.telegrams;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
+import org.erachain.controller.Controller;
+import org.erachain.core.transaction.RSend;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.library.Library;
+import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
+import org.erachain.utils.Converter;
+import org.erachain.utils.DateTimeFormat;
+import org.mapdb.Fun.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.text.View;
-
-import org.erachain.core.transaction.RSend;
-import org.erachain.utils.Converter;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.erachain.gui.library.Library;
-import org.mapdb.Fun.Tuple3;
-
-import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.crypto.AEScrypto;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
-import org.erachain.utils.DateTimeFormat;
+import java.awt.*;
+import java.nio.charset.StandardCharsets;
 
 public class RendererMessage extends JLabel implements TableCellRenderer {
     private static final long serialVersionUID = 1L;
@@ -173,7 +162,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
             isScriptImage = Settings.getInstance().getUserPath() + "images/messages/unlockedred.png";
 
             return trans.isText() ?
-                    new String(decryptedData, Charset.forName("UTF-8"))
+                    new String(decryptedData, StandardCharsets.UTF_8)
                     : Converter.toHex(decryptedData);
         }
 

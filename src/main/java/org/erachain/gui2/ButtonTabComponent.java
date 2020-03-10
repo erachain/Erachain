@@ -34,6 +34,7 @@ package org.erachain.gui2;
 
 import org.erachain.gui.*;
 import org.erachain.gui.items.other.OtherSplitPanel;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SaveStrToFile;
@@ -74,7 +75,7 @@ public class ButtonTabComponent extends JPanel {
     };
     private final JTabbedPane pane;
 
-    public ButtonTabComponent(final JTabbedPane pane) {
+    public ButtonTabComponent(final JTabbedPane pane, Image icon) {
         //unset default FlowLayout' gaps
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
         if (pane == null) {
@@ -88,12 +89,16 @@ public class ButtonTabComponent extends JPanel {
             public String getText() {
                 int i = pane.indexOfTabComponent(ButtonTabComponent.this);
                 if (i != -1) {
-                    return pane.getTitleAt(i);
+                    return " " + pane.getTitleAt(i);
                 }
                 return null;
             }
         };
-
+        // resize icon
+        int size = UIManager.getFont("TextField.font").getSize() + 4;
+        icon = icon.getScaledInstance(size,size,0);
+        Icon ic = new ImageIcon(icon);
+        label.setIcon(ic);
         add(label);
         //add more space between the label and the button
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
@@ -109,7 +114,7 @@ public class ButtonTabComponent extends JPanel {
             int size = UIManager.getFont("TextField.font").getSize() + 4;
             if (size < 10) size = 10;
             setPreferredSize(new Dimension(size, size));
-            setToolTipText("close this tab");
+            setToolTipText(Lang.getInstance().translate("close this tab"));
             //Make the button looks the same for all Laf's
             setUI(new BasicButtonUI());
             //Make it transparent

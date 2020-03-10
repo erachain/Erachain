@@ -21,7 +21,7 @@ import java.net.URL;
 public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
     private static TemplatesItemsTableModel tableModelTemplates = new TemplatesItemsTableModel();
     private SearchTemplatesSplitPanel th;
-
+    private static String iconFile = "images/pageicons/SearchTemplatesSplitPanel.png";
 
     public SearchTemplatesSplitPanel() {
         super(tableModelTemplates, "SearchTemplatesSplitPanel", "SearchTemplatesSplitPanel");
@@ -72,5 +72,13 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
 
     }
 
-
+    public static  Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

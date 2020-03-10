@@ -67,12 +67,17 @@ public class API {
 
         Map help = new LinkedHashMap();
 
+        help.put("see /apiasset", "Help for assets API");
         help.put("see /apidocuments", "Help for documents API");
         help.put("see /apiperson", "Help for person API");
         help.put("see /apipoll", "Help for polls API");
         help.put("see /apitelegrams", "Help for telegrams API");
         help.put("see /apiexchange", "Help for exchange API");
         help.put("see /apirecords", "Help for transactions API");
+
+        help.put("*** BALANCE SYSTEM ***", "");
+        help.put("bal 1", "Balance Components - {Total_Income, Remaining_Balance]");
+        help.put("bal 2", "Balances Array - [Balance in Own, Balance in Debt, Balance on Hold, Balance of Consumer]");
 
         help.put("*** CHAIN ***", "");
         help.put("GET Height", "height");
@@ -166,9 +171,11 @@ public class API {
     @GET
     @Path("firstblock")
     public Response getFirstBlock() {
-        Map out = new LinkedHashMap();
+        //Map out = new LinkedHashMap();
 
-        out = Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
+        //JSONObject out = Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
+
+        JSONObject out = dcSet.getBlockMap().get(1).toJson();
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -341,7 +348,6 @@ public class API {
     }
 
     @GET
-    // 		this.getIterator(23, true)
     @Path("blockbyheight2/{height}")
     public Response blockByHeight2(@PathParam("height") String heightStr) {
 
@@ -396,7 +402,8 @@ public class API {
         if (limit > 30)
             limit = 30;
 
-        Map out = new LinkedHashMap();
+        //Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -404,8 +411,8 @@ public class API {
             JSONArray array = new JSONArray();
             BlockMap blockMap = dcSet.getBlockMap();
             int max = blockMap.size();
-            for (int i = height; i < height + limit + 1; ++i) {
-                if (height >= max) {
+            for (int i = height; i < height + limit; i++) {
+                if (i > max) {
                     out.put("end", 1);
                     break;
                 }
@@ -427,7 +434,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toString())
                 .build();
     }
 
@@ -447,8 +454,8 @@ public class API {
             JSONArray array = new JSONArray();
             BlocksHeadsMap blocksHeadsMap = dcSet.getBlocksHeadsMap();
             int max = dcSet.getBlockMap().size();
-            for (int i = height; i < height + limit + 1; ++i) {
-                if (height >= max) {
+            for (int i = height; i < height + limit; i++) {
+                if (i > max) {
                     out.put("end", 1);
                     break;
                 }
@@ -481,7 +488,7 @@ public class API {
 
     @POST
     @Path("recordparse")
-    public Response recordParse(@QueryParam("raw") String raw) // throws JSONException
+    public Response recordParse(String raw) // throws JSONException
     {
 
         JSONObject out = new JSONObject();
@@ -971,7 +978,7 @@ public class API {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity("" + BlockChain.calcWinValue(DCSet.getInstance(),
                         account, Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()),
-                        account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue()))
+                        account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue(), null))
                 .build();
     }
 
@@ -1331,7 +1338,8 @@ public class API {
         for (Order order : orders) {
             JSONArray itemJson = new JSONArray();
             itemJson.add(order.getAmountHaveLeft());
-            itemJson.add(order.getPrice());
+            itemJson.add(order.calcLeftPrice());
+            itemJson.add(order.getAmountWantLeft());
 
             arraySell.add(itemJson);
 
@@ -1342,7 +1350,8 @@ public class API {
         for (Order order : orders) {
             JSONArray itemJson = new JSONArray();
             itemJson.add(order.getAmountHaveLeft());
-            itemJson.add(order.calcPriceReverse()); // REVERSE
+            itemJson.add(order.calcLeftPriceReverse()); // REVERSE
+            itemJson.add(order.getAmountWantLeft());
 
             arrayBuy.add(itemJson);
 
@@ -1549,7 +1558,7 @@ public class API {
 
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
-        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
+        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getShortAddressBytes());
 
         if (personItem == null) {
             throw ApiErrorFactory.getInstance().createError(
@@ -1668,7 +1677,7 @@ public class API {
 
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
-        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
+        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getShortAddressBytes());
         //Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
 
         if (personItem == null) {

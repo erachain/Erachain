@@ -1,7 +1,6 @@
 package org.erachain.datachain;
 
-import com.google.common.primitives.UnsignedBytes;
-import org.mapdb.BTreeKeySerializer;
+import org.erachain.core.item.ItemCls;
 import org.mapdb.DB;
 
 /**
@@ -11,21 +10,11 @@ import org.mapdb.DB;
 public class IssuePollMap extends IssueItemMap {
 
     public IssuePollMap(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
+        super(databaseSet, database, ItemCls.POLL_TYPE);
     }
 
     public IssuePollMap(IssuePollMap parent, DCSet dcSet) {
         super(parent, dcSet);
-    }
-
-    @Override
-    public void openMap() {
-
-        //OPEN MAP
-        map = database.createTreeMap("poll_OrphanData")
-                .keySerializer(BTreeKeySerializer.BASIC)
-                .comparator(UnsignedBytes.lexicographicalComparator())
-                .makeOrGet();
     }
 
 }

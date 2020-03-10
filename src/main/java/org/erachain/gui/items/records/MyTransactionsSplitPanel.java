@@ -4,10 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.library.Library;
-import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.SetIntervalPanel;
-import org.erachain.gui.library.VoushLibraryPanel;
+import org.erachain.gui.library.*;
 import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -29,12 +26,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-public class MyTransactionsSplitPanel extends SplitPanel {
+public class MyTransactionsSplitPanel extends SplitPanel  {
 
     private static final long serialVersionUID = 2717571093561259483L;
-
+    private static String iconFile = "images/pageicons/MyTransactionsSplitPanel.png";
     private static MyTransactionsSplitPanel instance;
-    public VoushLibraryPanel voush_Library_Panel;
+    public VouchLibraryPanel voush_Library_Panel;
     protected Tuple2<Long, Long> selectedTransactionKey;
     protected Transaction selectedTransaction;
     private JPanel records_Info_Panel;
@@ -330,7 +327,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
                     gridBagConstraints.weightx = 1.0;
                     gridBagConstraints.weighty = 1.0;
-                    voush_Library_Panel = new VoushLibraryPanel(trans);
+                    voush_Library_Panel = new VouchLibraryPanel(trans);
                     records_Info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
                 }
@@ -363,4 +360,13 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         }
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

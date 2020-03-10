@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.dbs.rocksDB.DBMapSuit;
 import org.erachain.dbs.rocksDB.ItemAssetBalanceSuitRocksDB;
 import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -66,6 +67,7 @@ public class DBRocksDBTableTest {
     public void get() {
     }
 
+    // TODO надо сделать проверку добавления и удаления с вторичными ключами и с учетом размера твблици - чтобы вторичные ключи правильно удалялись
     @Test
     public void put() {
     }
@@ -95,7 +97,7 @@ public class DBRocksDBTableTest {
 
         init();
 
-        ItemAssetBalanceSuitRocksDB tab = new ItemAssetBalanceSuitRocksDB(null, null);
+        ItemAssetBalanceSuitRocksDB tab = new ItemAssetBalanceSuitRocksDB(null, null, null);
 
         long assetKey1 = 1L;
 
@@ -131,33 +133,34 @@ public class DBRocksDBTableTest {
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                 balanceTmp;
 
-        ColumnFamilyHandle indexDB = ((DBRocksDBTable) tab.map).getIndex(1).getColumnFamilyHandle();
-        RocksIterator iteratorFilteredNative = ((TransactionDB) ((DBRocksDBTable) tab.map).dbSource.getDbCore()).newIterator(indexDB);
-        iteratorFilteredNative.seek(account1.getShortAddressBytes());
+        ColumnFamilyHandle indexDB = ((DBMapSuit) tab).getIndex(1).getColumnFamilyHandle();
 
         long assetKeyTMP = 0;
         int iteratorSize = 0;
-        while (iteratorFilteredNative.isValid()) {
-            byte[] keyIter = iteratorFilteredNative.key();
-            byte[] valueIter = iteratorFilteredNative.value();
-            iteratorSize++;
-            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(valueIter);
-            byte[] addressKey = ItemAssetBalanceMap.getShortAccountFromKey(valueIter);
-            assertEquals(account1.equals(addressKey), true);
+        try (RocksIterator iteratorFilteredNative = ((TransactionDB) ((DBRocksDBTable) tab.map).dbSource.getDbCore()).newIterator(indexDB)) {
+            iteratorFilteredNative.seek(account1.getShortAddressBytes());
+            while (iteratorFilteredNative.isValid()) {
+                byte[] keyIter = iteratorFilteredNative.key();
+                byte[] valueIter = iteratorFilteredNative.value();
+                iteratorSize++;
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(valueIter);
+                byte[] addressKey = ItemAssetBalanceMap.getShortAccountFromKey(valueIter);
+                assertEquals(account1.equals(addressKey), true);
 
-            balanceTmp = tab.get(valueIter);
+                balanceTmp = tab.get(valueIter);
 
-            // Нужно положить их с отсутпом
-            logger.error(" assetKey sorted: " + assetKey + " for bal:" + balanceTmp.a.b);
-
-            if (assetKeyTMP > 0 && assetKeyTMP > assetKey) {
+                // Нужно положить их с отсутпом
                 logger.error(" assetKey sorted: " + assetKey + " for bal:" + balanceTmp.a.b);
-                // всегда идем по возрастанию
-                assertEquals(assetKeyTMP > assetKey, false);
-            }
-            balance = balanceTmp;
 
-            iteratorFilteredNative.next();
+                if (assetKeyTMP > 0 && assetKeyTMP > assetKey) {
+                    logger.error(" assetKey sorted: " + assetKey + " for bal:" + balanceTmp.a.b);
+                    // всегда идем по возрастанию
+                    assertEquals(assetKeyTMP > assetKey, false);
+                }
+                balance = balanceTmp;
+
+                iteratorFilteredNative.next();
+            }
         }
         logger.error(" NATIVE completed ");
 
@@ -222,7 +225,7 @@ public class DBRocksDBTableTest {
     public void assetIteratorAndReplace() {
         init();
 
-        ItemAssetBalanceSuitRocksDB tab = new ItemAssetBalanceSuitRocksDB(null, null);
+        ItemAssetBalanceSuitRocksDB tab = new ItemAssetBalanceSuitRocksDB(null, null, null);
 
         int size = tab.size();
 

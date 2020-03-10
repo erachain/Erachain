@@ -41,9 +41,6 @@ public abstract class AddressItemRefs extends DCUMap<Tuple2<byte[], Long>, byte[
         super(parent, dcSet);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP
@@ -58,11 +55,6 @@ public abstract class AddressItemRefs extends DCUMap<Tuple2<byte[], Long>, byte[
     protected void getMemoryMap() {
         //return new TreeMap<Tuple2<byte[], Long>, byte[]>(UnsignedBytes.lexicographicalComparator());
         map = new TreeMap<Tuple2<byte[], Long>, byte[]>();
-    }
-
-    @Override
-    protected byte[] getDefaultValue() {
-        return null;
     }
 
     public byte[] get(String address, Long key) {

@@ -26,19 +26,23 @@ import org.mapdb.SerializerBase;
 public class TransactionFinalSignsSuitMapDB extends DBMapSuit<byte[], Long> implements TransactionFinalMapSignsSuit {
 
 
-    public TransactionFinalSignsSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger);
+    public TransactionFinalSignsSuitMapDB(DBASet databaseSet, DB database, boolean sizeEnable) {
+        super(databaseSet, database, logger, sizeEnable);
     }
 
     @Override
     public void openMap() {
         //OPEN MAP
         // HASH map is so QUICK
-        map = database.createHashMap("signature_final_tx")
+        DB.HTreeMapMaker mapConstruct = database.createHashMap("signature_final_tx")
                 .keySerializer(SerializerBase.BYTE_ARRAY)
                 .hasher(Hasher.BYTE_ARRAY)
-                .valueSerializer(SerializerBase.LONG)
-                .makeOrGet();
+                .valueSerializer(SerializerBase.LONG);
+
+        if (sizeEnable)
+            mapConstruct = mapConstruct.counterEnable();
+
+        map = mapConstruct.makeOrGet();
     }
 
 }

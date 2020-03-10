@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class CancelOrderTransaction extends Transaction {
 
-    static Logger LOGGER = LoggerFactory.getLogger(Transaction.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(CancelOrderTransaction.class.getName());
 
     // TODO убрать в новой цепочке
     public static final byte[][] VALID_REC = new byte[][]{
@@ -72,7 +72,13 @@ public class CancelOrderTransaction extends Transaction {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
 
         Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
-        //Transaction createOrder = this.dcSet.getTransactionMap().get(this.orderSignature);
+        if (createDBRef == null && blockHeight > BlockChain.CANCEL_ORDERS_ALL_VALID) {
+            LOGGER.error("ORDER transaction not found: " + Base58.encode(this.orderSignature));
+            if (BlockChain.CHECK_BUGS > 8) {
+                Long error = null;
+                error++;
+            }
+        }
         this.orderID = createDBRef;
 
     }
@@ -258,25 +264,18 @@ public class CancelOrderTransaction extends Transaction {
 
     }
 
-    public static void process_it(DCSet db, Order order) {
-
-        //DELETE FROM DATABASE FIRST - иначе сработает проверка внутри
-        db.getOrderMap().delete(order.getId());
-
-        //SET ORPHAN DATA
-        db.getCompletedOrderMap().put(order.getId(), order);
-
-        //UPDATE BALANCE OF CREATOR
-        //creator.setBalance(orderSignature.getHaveAssetKey(), creator.getBalance(db, orderSignature.getHaveAssetKey()).add(orderSignature.getAmountHaveLeft()), db);
-        order.getCreator().changeBalance(db, false, order.getHaveAssetKey(), order.getAmountHaveLeft(), false);
-
-    }
-
     //@Override
     @Override
     public void process(Block block, int asDeal) {
         //UPDATE CREATOR
         super.process(block, asDeal);
+
+        if (this.orderID == null) {
+            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
+                return;
+            Long error = null;
+            error++;
+        }
 
         // TODO - CANCEL для транзакции в том же блоке???
         //Transaction createOrder = this.dcSet.getTransactionFinalMap().get(this.orderSignature);
@@ -286,24 +285,23 @@ public class CancelOrderTransaction extends Transaction {
         Order order = this.dcSet.getOrderMap().get(this.orderID);
 
         if (order == null) {
-            return;
+            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
+                return;
+            Long error = null;
+            error++;
         }
 
-        process_it(this.dcSet, order);
-        this.addCalculated(block, this.creator, order.getHaveAssetKey(), order.getAmountHave(),
-                "cancel order @" + Transaction.viewDBRef(order.getId()));
-    }
+        //DELETE FROM DATABASE FIRST - иначе сработает проверка внутри
+        dcSet.getOrderMap().delete(order.getId());
 
-    public static void orphan_it(DCSet db, Order order) {
-        //DELETE ORPHAN DATA FIRST - иначе ошибка будет при добавлении в таблицу ордеров
-        db.getCompletedOrderMap().delete(order.getId());
+        //SET ORPHAN DATA
+        dcSet.getCompletedOrderMap().put(order.getId(), order);
 
-        db.getOrderMap().put(order.getId(), order);
-
-        //REMOVE BALANCE OF CREATOR
-        //creator.setBalance(orderID.getHaveAssetKey(), creator.getBalance(db, orderID.getHaveAssetKey()).subtract(orderID.getAmountHaveLeft()), db);
-        order.getCreator().changeBalance(db, true, order.getHaveAssetKey(), order.getAmountHaveLeft(), false);
-
+        //UPDATE BALANCE OF CREATOR
+        BigDecimal left = order.getAmountHaveLeft();
+        order.getCreator().changeBalance(dcSet, false, false, order.getHaveAssetKey(), left, false, false);
+        this.addCalculated(block, this.creator, order.getHaveAssetKey(), left,
+                "Cancel Order @" + Transaction.viewDBRef(order.getId()));
     }
 
     //@Override
@@ -315,14 +313,34 @@ public class CancelOrderTransaction extends Transaction {
         // ORPHAN
         super.orphan(block, asDeal);
 
+        if (this.orderID == null) {
+            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
+                return;
+            Long error = null;
+            error++;
+        }
+
         //REMOVE ORDER DATABASE
         Order order = this.dcSet.getCompletedOrderMap().get(this.orderID);
 
         if (order == null) {
-           return;
+            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
+                return;
+            Long error = null;
+            error++;
         }
 
-        orphan_it(this.dcSet, order);
+        if (Transaction.viewDBRef(this.orderID).equals("776446-1")) {
+            boolean debug = true;
+        }
+
+        //DELETE ORPHAN DATA FIRST - иначе ошибка будет при добавлении в таблицу ордеров
+        dcSet.getCompletedOrderMap().delete(order.getId());
+
+        dcSet.getOrderMap().put(order.getId(), order);
+
+        //REMOVE BALANCE OF CREATOR
+        order.getCreator().changeBalance(dcSet, true, false, order.getHaveAssetKey(), order.getAmountHaveLeft(), false, false);
     }
 
     @Override
@@ -366,7 +384,6 @@ public class CancelOrderTransaction extends Transaction {
     //@Override
     public Map<String, Map<Long, BigDecimal>> getAssetAmount() {
         Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
-
 
         assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 

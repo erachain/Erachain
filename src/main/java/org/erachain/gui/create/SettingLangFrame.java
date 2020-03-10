@@ -2,22 +2,23 @@ package org.erachain.gui.create;
 // 30/03
 
 import com.google.common.base.Charsets;
+import org.apache.commons.io.IOUtils;
 import org.erachain.controller.Controller;
 import org.erachain.lang.Lang;
 import org.erachain.lang.LangFile;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SaveStrToFile;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -31,7 +32,7 @@ public class SettingLangFrame extends JDialog {
     private JList<LangFile> listLang;
     private JComboBox<String> size_Font;
     private JButton nextButton;
-    private SettingLangFrame th;
+    //private SettingLangFrame th;
     private JLabel labelSelect;
     private JLabel label_font_size;
 
@@ -40,7 +41,7 @@ public class SettingLangFrame extends JDialog {
         this.setTitle("Erachain.org" + " - " + "Language select");
         this.setModal(true);
         this.isAlwaysOnTop();
-        th = this;
+        //th = this;
         //ICON
         List<Image> icons = new ArrayList<Image>();
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -188,7 +189,7 @@ public class SettingLangFrame extends JDialog {
                     size_Font.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
                     nextButton.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
                     pack();
-                    th.repaint();
+                    repaint();
                 }
             }
         });
@@ -215,7 +216,7 @@ public class SettingLangFrame extends JDialog {
                 settingsLangJSON.put("font_size", size_Font.getSelectedItem().toString());
             }
             SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsLangJSON);
-            Settings.FreeInstance();
+            Settings.freeInstance();
             Lang.getInstance().loadLang();
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);

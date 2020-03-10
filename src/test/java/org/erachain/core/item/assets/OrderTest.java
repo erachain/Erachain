@@ -1,6 +1,8 @@
 package org.erachain.core.item.assets;
 
+import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
@@ -12,10 +14,9 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.datachain.TransactionFinalMapSigns;
-import org.erachain.dbs.rocksDB.OrdersSuitRocksDB;
-import org.erachain.dbs.rocksDB.common.RockStoreIterator;
-import org.erachain.dbs.rocksDB.common.RocksDbDataSource;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
+import org.erachain.dbs.DBSuit;
+import org.erachain.dbs.rocksDB.DBMapSuit;
+import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -25,6 +26,7 @@ import org.mapdb.Fun;
 import java.io.File;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -35,8 +37,10 @@ import static org.junit.Assert.assertEquals;
 public class OrderTest {
 
     int[] TESTED_DBS = new int[]{
-            //IDB.DBS_MAP_DB,
+            IDB.DBS_MAP_DB,
             IDB.DBS_ROCK_DB};
+
+    int height;
 
     Long releaserReference = null;
     long ERM_KEY = Transaction.RIGHTS_KEY;
@@ -76,6 +80,9 @@ public class OrderTest {
         } catch (Throwable e) {
         }
 
+        BlockChain.CHECK_BUGS = 10;
+        height = BlockChain.ALL_BALANCES_OK_TO + 2;
+
         dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(null, dbs);
         gb = new GenesisBlock();
 
@@ -95,18 +102,18 @@ public class OrderTest {
 
         // FEE FUND
         accountA.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
-        accountA.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(100), false);
-        accountA.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(10), false);
+        accountA.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false);
+        accountA.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false);
 
         accountB.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
-        accountB.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(100), false);
-        accountB.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(10), false);
+        accountB.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false);
+        accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false);
 
         assetA = new AssetVenture(new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
 
         issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
-        issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+        issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
         keyA = issueAssetTransaction.getAssetKey(dcSet);
         balanceA = accountA.getBalance(dcSet, keyA);
@@ -114,8 +121,8 @@ public class OrderTest {
         assetB = new AssetVenture(new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 0L, new byte[64]);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
-        issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+        issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
         keyB = issueAssetTransaction.getAssetKey(dcSet);
 
         // CREATE ORDER TRANSACTION
@@ -176,10 +183,10 @@ public class OrderTest {
                     orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
                             amountSell, (byte) 0, timestamp++, 0L);
                     orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
                     orderCreation.process(null, Transaction.FOR_NETWORK);
 
-                    iterator = ordersMap.getIterator(1, false);
+                    iterator = ordersMap.getIterator(0, false);
                     count = 0;
                     while (iterator.hasNext()) {
                         Long key = iterator.next();
@@ -191,22 +198,21 @@ public class OrderTest {
 
                 }
 
-                OrdersSuitRocksDB source = (OrdersSuitRocksDB) ordersMap.getSource();
-                DBRocksDBTable<Long, Order> mapRocks = source.map;
-                RocksDbDataSource mapSource = mapRocks.dbSource;
-                RockStoreIterator iteratorRocks = mapSource.indexIterator(false, 1);
+                DBSuit suit = ordersMap.getSuit();
+                iterator = suit.getIterator(1, false);
+
                 count = 0;
-                while (iteratorRocks.hasNext()) {
-                    byte[] key = iteratorRocks.next();
+                while (iterator.hasNext()) {
+                    Long key = iterator.next();
                     count++;
                 }
                 assertEquals(count, len);
 
-                iterator = ordersMap.getIterator(1, false);
+                iterator = ordersMap.getIterator(0, false);
                 count = 0;
                 while (iterator.hasNext()) {
                     Long key = iterator.next();
-                    Order value = ((OrdersSuitRocksDB) ordersMap.getSource()).get(key);
+                    Order value = ordersMap.get(key);
                     String price = value.viewPrice();
                     count++;
                 }
@@ -223,7 +229,7 @@ public class OrderTest {
                         new BigDecimal("10"),
                         new BigDecimal("10"), (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountB, Transaction.FOR_NETWORK);
-                orderCreation.setDC(forkDC, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.setDC(forkDC, Transaction.FOR_NETWORK, height, ++seqNo);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
 
                 ordersMap = forkDC.getOrderMap();
@@ -331,7 +337,7 @@ public class OrderTest {
                     orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
                             amountSell, (byte) 0, timestamp++, 0L);
                     orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
                     orderCreation.process(null, Transaction.FOR_NETWORK);
 
                 }
@@ -399,6 +405,69 @@ public class OrderTest {
     }
 
     @Test
+    public void iteratorRocks() {
+
+        try {
+            init(IDB.DBS_ROCK_DB);
+
+            long have = assetB.getKey(dcSet);
+            long want = assetA.getKey(dcSet);
+
+            int count = 0;
+
+            OrderMap ordersMap = dcSet.getOrderMap();
+
+            // создадим много ордеров
+            int len = 10;
+            for (int i = 0; i < len; i++) {
+                BigDecimal amountSell = new BigDecimal("100");
+                BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
+
+                orderCreation = new CreateOrderTransaction(accountA, have, want, amountBuy,
+                        amountSell, (byte) 0, timestamp++, 0L);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+                orderCreation.process(null, Transaction.FOR_NETWORK);
+
+            }
+
+            byte[] filter = org.bouncycastle.util.Arrays.concatenate(
+                    Longs.toByteArray(have),
+                    Longs.toByteArray(want));
+
+            IndexDB indexDB = ((DBMapSuit) ordersMap.getSuit()).getIndex(0);
+            assertEquals(indexDB.getNameIndex(), "orders_key_have_want");
+            Iterator iterator = ((DBMapSuit) ordersMap.getSuit()).map.getIndexIteratorFilter(indexDB.getColumnFamilyHandle(), filter, false, true);
+
+            List<Order> result = new ArrayList<>();
+            count = 0;
+            while (iterator.hasNext()) {
+                count++;
+                result.add(ordersMap.get((Long) iterator.next()));
+
+            }
+            assertEquals(result.size(), len);
+
+            List<Order> orders = ordersMap.getOrdersForTradeWithFork(have, want, null);
+            assertEquals(orders.size(), len);
+
+            /////////////// SEEK price
+            orders = ordersMap.getOrdersForTradeWithFork(have, want, new BigDecimal("100"));
+            assertEquals(orders.size(), len);
+
+            orders = ordersMap.getOrdersForTradeWithFork(have, want, new BigDecimal("-100"));
+            assertEquals(orders.size(), 1);
+
+            orders = ordersMap.getOrdersForTradeWithFork(have, want, new BigDecimal("1.00"));
+            assertEquals(orders.size(), 6);
+
+        } finally {
+            dcSet.close();
+        }
+    }
+
+    @Test
     public void orphan() {
     }
+
 }

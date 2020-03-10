@@ -9,12 +9,14 @@ import org.erachain.core.item.assets.OrderComparatorForTradeReverse;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.mapDB.OrdersSuitMapDB;
 import org.erachain.dbs.mapDB.OrdersSuitMapDBFork;
 import org.erachain.dbs.rocksDB.OrdersSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -77,7 +79,11 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
-        return Iterators.size(((OrderSuit) map).getHaveWantIterator(have, want));
+        try (IteratorCloseable iterator = ((OrderSuit) map).getHaveWantIterator(have, want)) {
+            return Iterators.size(iterator);
+        } catch (IOException e) {
+            return 0;
+        }
     }
 
     @Override
@@ -85,12 +91,20 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
-        return Iterators.size(((OrderSuit) map).getHaveWantIterator(have));
+        try (IteratorCloseable iterator = ((OrderSuit) map).getHaveWantIterator(have)) {
+            return Iterators.size(iterator);
+        } catch (IOException e) {
+            return 0;
+        }
     }
 
     @Override
     public long getCountWant(long want) {
-        return Iterators.size(((OrderSuit) map).getWantHaveIterator(want));
+        try (IteratorCloseable iterator = ((OrderSuit) map).getWantHaveIterator(want)) {
+            return Iterators.size(iterator);
+        } catch (IOException e) {
+            return 0;
+        }
     }
 
     @Override
@@ -103,16 +117,18 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
 
-        Iterator<Long> iterator = ((OrderSuit) map).getHaveWantIterator(haveWant);
-
-        while (iterator.hasNext()) {
-            orders.add(map.get(iterator.next()));
+        try (IteratorCloseable<Long> iterator = ((OrderSuit) map).getHaveWantIterator(haveWant)) {
+            while (iterator.hasNext()) {
+                orders.add(map.get(iterator.next()));
+            }
+        } catch (IOException e) {
         }
 
-        iterator = ((OrderSuit) map).getWantHaveIterator(haveWant);
-
-        while (iterator.hasNext()) {
-            orders.add(map.get(iterator.next()));
+        try (IteratorCloseable<Long> iterator = ((OrderSuit) map).getWantHaveIterator(haveWant)) {
+            while (iterator.hasNext()) {
+                orders.add(map.get(iterator.next()));
+            }
+        } catch (IOException e) {
         }
 
         return orders;
@@ -129,21 +145,20 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
 
     @Override
-    public HashSet<Long> getProtocolKeys(long have, long want, BigDecimal limit) {
-        return ((OrderSuit) map).getUnsortedKeysWithParent(have, want, limit);
+    public HashMap<Long, Order> getProtocolEntries(long have, long want, BigDecimal stopPrice, Map deleted) {
+        return ((OrderSuit) map).getUnsortedEntries(have, want, stopPrice, deleted);
     }
 
     @Override
-    public List<Order> getOrdersForTradeWithFork(long have, long want, BigDecimal limit) {
+    public List<Order> getOrdersForTradeWithFork(long have, long want, BigDecimal stopPrice) {
 
         //FILTER ALL KEYS
-        HashSet<Long> keys = ((OrderSuit) map).getUnsortedKeysWithParent(have, want, limit);
+        HashMap<Long, Order> unsortedEntries = ((OrderSuit) map).getUnsortedEntries(have, want, stopPrice, null);
 
         //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
 
-        for (Long key : keys) {
-            Order order = this.get(key);
+        for (Order order : unsortedEntries.values()) {
             if (order != null) {
                 orders.add(order);
             } else {
@@ -160,13 +175,12 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     @Override
     public List<Order> getOrdersForTrade(long have, long want, boolean reverse) {
         //FILTER ALL KEYS
-        Collection<Long> keys = ((OrderSuit) map).getUnsortedKeysWithParent(have, want, null);
+        HashMap<Long, Order> unsortedEntries = ((OrderSuit) map).getUnsortedEntries(have, want, null, null);
 
         //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
 
-        for (Long key : keys) {
-            Order order = this.get(key);
+        for (Order order : unsortedEntries.values()) {
             if (order != null) {
                 orders.add(order);
             } else {
@@ -190,42 +204,139 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
         }
-        Iterator<Long> iterator = ((OrderSuit) map).getHaveWantIterator(have, want);
-
-        iterator = Iterators.limit(iterator, limit);
 
         List<Order> orders = new ArrayList<>();
-        while (iterator.hasNext()) {
-            orders.add(get(iterator.next()));
+        try (IteratorCloseable<Long> iterator = ((OrderSuit) map).getHaveWantIterator(have, want)) {
+
+            int counter = limit;
+            while (iterator.hasNext()) {
+                orders.add(get(iterator.next()));
+                if (limit > 0 && --counter < 0)
+                    break;
+            }
+        } catch (IOException e) {
         }
 
         return orders;
     }
 
     @Override
+    public Order getHaveWanFirst(long have, long want) {
+        return ((OrderSuit) map).getHaveWanFirst(have, want);
+    }
+
+
+    @Override
     public List<Order> getOrdersForAddress(
-            String address, Long have, Long want) {
+            String address, Long have, Long want, int limit) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
         }
-        Iterator<Long> iterator = ((OrderSuit) map).getAddressHaveWantIterator(address, have, want);
 
-        //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
+        try (IteratorCloseable<Long> iterator = ((OrderSuit) map).getAddressHaveWantIterator(address, have, want)) {
 
-        while (iterator.hasNext()) {
+            //GET ALL ORDERS FOR KEYS
 
-            Long key = iterator.next();
-            Order order = this.get(key);
+            int counter = limit;
+            while (iterator.hasNext()) {
 
-            // MAY BE NULLS!!!
-            if (order != null)
-                orders.add(this.get(key));
+                Long key = iterator.next();
+                Order order = this.get(key);
+
+                // MAY BE NULLS!!!
+                if (order != null)
+                    orders.add(this.get(key));
+
+                if (limit > 0 && --counter < 0)
+                    break;
+            }
+        } catch (IOException e) {
         }
 
         return orders;
 
+    }
+
+    @Override
+    public Set<Long> getKeysForAddressFromID(String address, long fromOrder, int limit) {
+
+        Set<Long> keys = new TreeSet<Long>();
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return keys;
+        }
+
+        try (IteratorCloseable<Long> iterator = ((OrderSuit) map).getAddressIterator(address)) {
+
+            //GET ALL ORDERS FOR KEYS
+            int counter = limit;
+            while (iterator.hasNext()) {
+
+                Long key = iterator.next();
+                if (fromOrder > 0 && key < fromOrder)
+                    continue;
+
+                Order order = this.get(key);
+
+                // MAY BE NULLS!!!
+                if (order != null)
+                    keys.add(key);
+
+                if (limit > 0 && --counter < 0)
+                    break;
+
+            }
+        } catch (IOException e) {
+        }
+
+        return keys;
+    }
+
+    @Override
+    public List<Order> getOrdersForAddress(String address, int limit) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return new ArrayList<>();
+        }
+
+        List<Order> orders = new ArrayList<Order>();
+        try (IteratorCloseable<Long> iterator = ((OrderSuit) map).getAddressIterator(address)) {
+
+            //GET ALL ORDERS FOR KEYS
+            int counter = limit;
+            while (iterator.hasNext()) {
+
+                Long key = iterator.next();
+                Order order = this.get(key);
+
+                // MAY BE NULLS!!!
+                if (order != null)
+                    orders.add(this.get(key));
+
+                if (limit > 0 && --counter < 0)
+                    break;
+
+            }
+        } catch (IOException e) {
+        }
+
+        return orders;
+
+    }
+
+    @Override
+    public Order get(Long id) {
+        Order order = super.get(id);
+        if (order != null) {
+            if (order.isNotTraded()) {
+                order.setStatus(Order.ACTIVE);
+            } else {
+                order.setStatus(Order.FULFILLED);
+            }
+        }
+        return order;
     }
 
     @Override
@@ -284,7 +395,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public void put(Order order) {
-        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(order.getId()).equals("178617-18")) {
+        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(order.getId()).equals("176395-2")) {
             boolean debug = true;
         }
         this.put(order.getId(), order);
@@ -292,7 +403,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public void delete(Order order) {
-        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(order.getId()).equals("178617-18")) {
+        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(order.getId()).equals("176395-2")) {
             boolean debug = true;
         }
         this.delete(order.getId());

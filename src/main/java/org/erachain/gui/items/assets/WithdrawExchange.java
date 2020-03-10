@@ -4,14 +4,11 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.URLViewer;
 import org.json.simple.JSONObject;
@@ -22,8 +19,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.Style;
-import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,7 +35,7 @@ import java.net.URL;
 public class WithdrawExchange extends JPanel {
 
     // private JComboBox<Account> accountLBox;
-
+    private static String iconFile = "images/pageicons/WithdrawExchange.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(WithdrawExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
@@ -133,7 +128,7 @@ public class WithdrawExchange extends JPanel {
 
             jsonObject = (JSONObject) JSONValue.parse(inputText);
 
-            if (BlockChain.DEVELOP_USE) {
+            if (BlockChain.TEST_MODE) {
                 jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
@@ -151,7 +146,7 @@ public class WithdrawExchange extends JPanel {
         if (assetIn != null && accountTo != null) {
 
             message += ":" + jTextField_Address.getText();
-            AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn, TransactionAmount.ACTION_SEND,
+            AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn,
                     null, new Account(accountTo), null, message);
 
             String rate = jsonObject.get("rate").toString();
@@ -178,7 +173,7 @@ public class WithdrawExchange extends JPanel {
             panel.jLabel_Title.setText("<html><h2>" + formTitle + "</h2></html>");
             panel.setName(Lang.getInstance().translate("Withdraw"));
             MainPanel.getInstance().removeTab(panel.getName());
-            MainPanel.getInstance().insertTab(panel);
+            MainPanel.getInstance().insertTab( Lang.getInstance().translate("Send asset") ,panel, AccountAssetSendPanel.getIcon());
 
         }
 
@@ -396,6 +391,16 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_History, gridBagConstraints);
 
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 }

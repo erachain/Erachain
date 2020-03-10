@@ -5,6 +5,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -12,7 +14,6 @@ import org.mapdb.SerializerBase;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -66,7 +67,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
                     // не нагружать процессор для поиска свободного места в базе данных
                     // >2 - удаляет удаленные записи полностью и не раздувает базу
                     // 2 - не удаляет ключи и не сжимает базу при удалении записей, база растет
-                    .freeSpaceReclaimQ(0)
+                    .freeSpaceReclaimQ(10)
                     // .remove + .put - java.io.IOError: java.io.IOException: no free space to expand Volume
                     .sizeLimit(0.3) // ограничивает рост базы - если freeSpaceReclaimQ < 3
                     .make();
@@ -94,7 +95,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     @Override
     public Transaction get(Long key) {
         if (database.getEngine().isClosed())
-            return defaultValue;
+            return getDefaultValue();
 
         return super.get(key);
     }
@@ -130,7 +131,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     @Override
     public Transaction remove(Long key) {
         if (database.getEngine().isClosed())
-            return defaultValue;
+            return getDefaultValue();
         return super.remove(key);
     }
 
@@ -138,13 +139,17 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     public void delete(Long key) {
         if (database.getEngine().isClosed())
             return;
-        super.delete(key);
+        try {
+            super.delete(key);
+        } catch (Exception IllegalAccessError) {
+
+        }
     }
 
     @Override
     public Transaction removeValue(Long key) {
         if (database.getEngine().isClosed())
-            return defaultValue;
+            return getDefaultValue();
         return super.removeValue(key);
     }
 
@@ -163,16 +168,16 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     }
 
     @Override
-    public Iterator<Long> getIterator(int index, boolean descending) {
+    public IteratorCloseable<Long> getIterator(int index, boolean descending) {
         if (database.getEngine().isClosed())
-            return new TreeSet<Long>().iterator();
+            return new IteratorCloseableImpl(new TreeSet<Long>().iterator());
         return super.getIterator(index, descending);
     }
 
     @Override
-    public Iterator<Long> getIterator() {
+    public IteratorCloseable<Long> getIterator() {
         if (database.getEngine().isClosed())
-            return new TreeSet<Long>().iterator();
+            return new IteratorCloseableImpl(new TreeSet<Long>().iterator());
         return super.getIterator();
     }
 
@@ -181,10 +186,16 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
         try {
             // может быть ошибка
             database.getEngine().clearCache();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        try {
             database.close();
         } catch (Exception e) {
-
+            logger.error(e.getMessage(), e);
         }
+        super.close();
     }
 
     @Override

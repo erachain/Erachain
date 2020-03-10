@@ -21,7 +21,14 @@ public class TransactionMessage extends Message {
     }
 
     @Override
-    public boolean isHandled() { return true; }
+    public boolean isHandled() {
+        return true;
+    }
+
+    @Override
+    public boolean quickSend() {
+        return false;
+    }
 
     // берем подпись с транзакции и трансформируем в Целое
     public static Long getHandledID(byte[] data) {

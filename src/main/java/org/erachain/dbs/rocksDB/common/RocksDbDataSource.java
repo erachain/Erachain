@@ -1,5 +1,6 @@
 package org.erachain.dbs.rocksDB.common;
 
+import org.erachain.dbs.rocksDB.RockStoreIterator;
 import org.rocksdb.*;
 
 import java.nio.file.Path;
@@ -8,6 +9,9 @@ import java.util.Map;
 import java.util.Set;
 
 public interface RocksDbDataSource {
+
+    byte[] SIZE_BYTE_KEY = new byte[]{0};
+
     Path getDbPathAndFile();
 
     boolean isAlive();
@@ -46,11 +50,19 @@ public interface RocksDbDataSource {
 
     byte[] get(byte[] key);
 
+    byte[] get(final ReadOptions readOptions, final byte[] key);
+
     byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key);
+
+    byte[] get(ColumnFamilyHandle columnFamilyHandle, ReadOptions readOptions, byte[] key);
 
     void delete(byte[] key);
 
     void delete(ColumnFamilyHandle columnFamilyHandle, byte[] key);
+
+    void deleteRange(byte[] keyFrom, byte[] keyToExclude);
+
+    void deleteRange(ColumnFamilyHandle columnFamilyHandle, byte[] keyFrom, byte[] keyToExclude);
 
     void delete(byte[] key, WriteOptions writeOptions);
 
@@ -60,15 +72,25 @@ public interface RocksDbDataSource {
 
     void deleteValue(byte[] key, WriteOptions writeOptions);
 
-    RockStoreIterator iterator(boolean descending);
+    RockStoreIterator iterator(boolean descending, boolean isIndex);
 
-    RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle);
+    RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle, boolean isIndex);
 
-    RockStoreIterator indexIterator(boolean descending, int indexDB);
+    /**
+     * @param descending
+     * @param indexDB    primary & secondary index No
+     * @param isIndex use Values or Keys in as result value in NEXT
+     * @return
+     */
+    RockStoreIterator indexIterator(boolean descending, int indexDB, boolean isIndex);
 
-    RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter);
+    RockStoreIterator indexIteratorFilter(boolean descending, byte[] filter, boolean isIndex);
 
-    RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter);
+    RockStoreIterator indexIteratorFilter(boolean descending, byte[] start, byte[] stop, boolean isIndex);
+
+    RockStoreIterator indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter, boolean isIndex);
+
+    RockStoreIterator indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] start, byte[] stop, boolean isIndex);
 
     void write(WriteBatch batch);
 

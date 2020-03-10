@@ -85,8 +85,7 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long
         asset_Key = asset.getKey();
         cred.clear();
         for (PublicKeyAccount account : this.publicKeyAccounts) {
-            List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getAddress(), 1000, true);
-            //cred.addAll(DLSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
+            List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getShortAddressBytes(), 1000, true);
             cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
         }
 		/*		for (Pair<Tuple2<Long, Long>, Transaction> trans:this.transactions){

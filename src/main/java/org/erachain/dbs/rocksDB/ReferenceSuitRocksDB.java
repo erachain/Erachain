@@ -32,8 +32,4 @@ public class ReferenceSuitRocksDB extends DBMapSuit<byte[], long[]> implements R
                 databaseSet, sizeEnable);
     }
 
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes() {
-    }
 }

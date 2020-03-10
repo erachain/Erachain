@@ -103,15 +103,36 @@ public class Trade {
         return timestamp; // + this.sequence;
     }
 
+    public static long[] parseID(String ordersID) {
+        try {
+            String[] strA = ordersID.split("/");
+            long orderIDinitiator = Transaction.parseDBRef(strA[0]);
+            long orderIDtarget = Transaction.parseDBRef(strA[1]);
+            return new long[]{orderIDinitiator, orderIDtarget};
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @SuppressWarnings("unchecked")
-    public JSONObject toJson(long keyForBuySell) {
+    public JSONObject toJson(long keyForBuySell, boolean withCreators) {
 
         JSONObject trade = new JSONObject();
         trade.put("initiator", Transaction.viewDBRef(initiator));
         trade.put("target", Transaction.viewDBRef(target));
+
+        int height = Transaction.parseDBRefHeight(initiator);
+        trade.put("height", height);
+        trade.put("timestamp", Controller.getInstance().blockChain.getTimestamp(height));
+
         trade.put("sequence", sequence);
-        if (keyForBuySell == haveKey) {
-            trade.put("type", "sell");
+
+        if (keyForBuySell == 0 || keyForBuySell == haveKey) {
+
+            if (keyForBuySell != 0) {
+                // задана пара и направление можно давать
+                trade.put("type", "sell");
+            }
 
             trade.put("haveKey", haveKey);
             trade.put("wantKey", wantKey);
@@ -132,6 +153,15 @@ public class Trade {
 
             trade.put("price", calcPrice());
             trade.put("reversePrice", calcPriceRevers());
+
+        }
+
+        if (withCreators) {
+            Order order = getInitiatorOrder(DCSet.getInstance());
+            trade.put("initiatorCreator", order.getCreator().getAddress());
+
+            order = getTargetOrder(DCSet.getInstance());
+            trade.put("targetCreator", order.getCreator().getAddress());
 
         }
 
@@ -301,9 +331,9 @@ public class Trade {
 
         //TRANSFER FUNDS
         //initiator.getCreator().setBalance(initiator.getWantAssetKey(), initiator.getCreator().getBalance(db, initiator.getWantAssetKey()).add(this.amountHave), db);
-        initiator.getCreator().changeBalance(db, false, initiator.getWantAssetKey(), this.amountHave, false);
+        initiator.getCreator().changeBalance(db, false, false, initiator.getWantAssetKey(), this.amountHave, false, false);
         //target.getCreator().setBalance(target.getWantAssetKey(), target.getCreator().getBalance(db, target.getWantAssetKey()).add(this.amountWant), db);
-        target.getCreator().changeBalance(db, false, target.getWantAssetKey(), this.amountWant, false);
+        target.getCreator().changeBalance(db, false, false, target.getWantAssetKey(), this.amountWant, false, false);
     }
 
     public void orphan_old(DCSet db) {
@@ -312,9 +342,9 @@ public class Trade {
 
         //REVERSE FUNDS
         //initiator.getCreator().setBalance(initiator.getWantAssetKey(), initiator.getCreator().getBalance(db, initiator.getWantAssetKey()).subtract(this.amountHave), db);
-        initiator.getCreator().changeBalance(db, true, initiator.getWantAssetKey(), this.amountHave, false);
+        initiator.getCreator().changeBalance(db, true, false, initiator.getWantAssetKey(), this.amountHave, false, false);
         //target.getCreator().setBalance(target.getWantAssetKey(), target.getCreator().getBalance(db, target.getWantAssetKey()).subtract(this.amountWant), db);
-        target.getCreator().changeBalance(db, true, target.getWantAssetKey(), this.amountWant, false);
+        target.getCreator().changeBalance(db, true, false, target.getWantAssetKey(), this.amountWant, false, false);
 
         //CHECK IF ORDER IS FULFILLED
         if (initiator.isFulfilled()) {

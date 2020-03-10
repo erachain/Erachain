@@ -89,7 +89,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
         // lblTitle.setFont(new Font("Serif", Font.PLAIN, 18));
         // jPanel_Trade.add(lblTitle, labelGBC);
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             lblTitle.setVisible(false);
 
         // CREATE BUY LABEL
@@ -98,14 +98,14 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 .replace("%want%", this.want.toString()));
         // lblBuy.setFont(new Font("Serif", Font.PLAIN, 18));
         // jPanel_Trade.add(lblBuy, labelGBC);
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             lblBuy.setVisible(false);
 
         // CREATE SELL LABEL
 
         labelGBC.gridy = 0;
         labelGBC.gridx = 1;
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             labelGBC.gridx = 0;
 
         // CREATE TITLE LABEL
@@ -114,7 +114,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
         // lblTitle1.setFont(new Font("Serif", Font.PLAIN, 18));
         // jPanel_Trade.add(lblTitle1, labelGBC);
-        if (action == "Buy")
+        if (action != null && action.equals("Buy"))
             lblTitle1.setVisible(false);
 
         labelGBC.gridy = 1;
@@ -124,14 +124,14 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
         // lblSell.setFont(new Font("Serif", Font.PLAIN, 18));
         // jPanel_Trade.add(lblSell, labelGBC);
-        if (action == "Buy")
+        if (action != null && action.equals("Buy"))
             lblSell.setVisible(false);
 
         // CREATE BUY PANEL
         buyOrderPanel = new CreateOrderPanel(this.want, this.have, true, account);
         jPanel_Trade.add(buyOrderPanel, orderGBC);
         // buyOrderPanel.setBackground(Color.BLUE);
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             buyOrderPanel.setVisible(false);
 
         // CREATE SELL PANEL
@@ -142,14 +142,14 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         // sellOrderPanel.setBackground(Color.BLUE);
 
         orderGBC.fill = GridBagConstraints.BOTH;
-        if (action == "To sell") {
+        if (action != null && action.equals("To sell")) {
             orderGBC.gridx = 0;
             orderGBC.fill = GridBagConstraints.BOTH;
 
         }
 
         jPanel_Trade.add(sellOrderPanel, orderGBC);
-        if (action == "Buy")
+        if (action != null && action.equals("Buy"))
             sellOrderPanel.setVisible(false);
 
         // sellOrderPanel.setPreferredSize(new
@@ -167,17 +167,17 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         JLabel lblSellOrders = new JLabel(Lang.getInstance().translate("Sell Orders"));
         // lblSellOrders.setFont(new Font("Serif", Font.PLAIN, 18));
         jPanel_Trade.add(lblSellOrders, labelGBC);
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             lblSellOrders.setVisible(false);
 
         // CREATE BUY ORDERS LABEL
         labelGBC.gridx = 1;
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             labelGBC.gridx = 0;
         JLabel lblBuyOrders = new JLabel(Lang.getInstance().translate("Buy Orders"));
         // lblBuyOrders.setFont(new Font("Serif", Font.PLAIN, 18));
         jPanel_Trade.add(lblBuyOrders, labelGBC);
-        if (action == "Buy")
+        if (action != null && action.equals("Buy"))
             lblBuyOrders.setVisible(false);
 
         // CREATE SELL ORDERS TABLE
@@ -300,10 +300,8 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 if (e.getClickCount() == 2) {
 
                     if (row < sellOrdersTableModel.getRowCount()) {
-                        buyOrderPanel.calculateWant(order.getAmountHaveLeft(), order.getPrice(), true);
-                        ///buyOrderPanel.txtAmountHave.setText(order.getAmountHaveLeft().toPlainString()); buy
-                        ///buyOrderPanel.txtPrice.setText(order.calcPrice().toPlainString());
-
+                        ///buyOrderPanel.calculateWant(order.getAmountHaveLeft(), order.calcLeftPrice(), true);
+                        buyOrderPanel.setFields(order.getAmountHaveLeft(), order.calcLeftPrice(), order.getAmountWantLeft());
                     }
                 }
             }
@@ -313,12 +311,12 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
         jPanel_Trade.add(sellScrollPane, tableGBC);
 
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             sellScrollPane.setVisible(false);
 
         // CREATE BUY ORDERS TABLE
         tableGBC.gridx = 1;
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             tableGBC.gridx = 0;
         this.buyOrdersTableModel = new BuyOrdersTableModel(this.want, this.have);
         final MTable buyOrdersTable = new MTable(this.buyOrdersTableModel);
@@ -343,9 +341,8 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                     buyOrdersMenu.getComponent(2).setEnabled(false);
 
                 if (e.getClickCount() == 2) {
-                    sellOrderPanel.calculateWant(order.getAmountWantLeft(), order.calcPriceReverse(), false);
-                    ///sellOrderPanel.txtAmountHave.setText(order.getAmountWantLeft().toPlainString()); sell
-                    ///sellOrderPanel.txtPrice.setText(order.calcPriceReverse().toPlainString());
+                    ///sellOrderPanel.calculateWant(order.getAmountWantLeft(), order.calcLeftPriceReverse(), false);
+                    sellOrderPanel.setFields(order.getAmountWantLeft(), order.calcLeftPriceReverse(), order.getAmountHaveLeft());
                 }
             }
         });
@@ -426,7 +423,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         JScrollPane buyScrollPane = new JScrollPane(buyOrdersTable);
         jPanel_Trade.add(buyScrollPane, tableGBC);
 
-        if (action == "Buy")
+        if (action != null && action.equals("Buy"))
             buyScrollPane.setVisible(false);
 
         addTab(Lang.getInstance().translate("Trade"), jPanel_Trade);
@@ -470,22 +467,18 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
                     if (type) {
                         BigDecimal price = trade.calcPriceRevers();
-                        sellOrderPanel.calculateWant(trade.getAmountWant(), price, type);
-                        //sellOrderPanel.txtAmountHave.setText(trade.getAmountWant().toPlainString());
-                        //sellOrderPanel.txtPrice.setText(price.toPlainString());
+                        ///sellOrderPanel.calculateWant(trade.getAmountWant(), price, type);
+                        sellOrderPanel.setFields(trade.getAmountWant(), price, trade.getAmountHave());
 
-                        buyOrderPanel.calculateWant(trade.getAmountWant(), price, type);
-                        //buyOrderPanel.txtAmountHave.setText(trade.getAmountWant().toPlainString());
-                        //buyOrderPanel.txtPrice.setText(price.toPlainString());
+                        //buyOrderPanel.calculateWant(trade.getAmountWant(), price, type);
+                        buyOrderPanel.setFields(trade.getAmountWant(), price, trade.getAmountHave());
                     } else {
                         BigDecimal price = trade.calcPrice();
-                        sellOrderPanel.calculateWant(trade.getAmountHave(), price, type);
-                        //sellOrderPanel.txtAmountHave.setText(trade.getAmountHave().toPlainString());
-                        //sellOrderPanel.txtPrice.setText(price.toPlainString());
+                        //sellOrderPanel.calculateWant(trade.getAmountHave(), price, type);
+                        sellOrderPanel.setFields(trade.getAmountHave(), price, trade.getAmountWant());
 
-                        buyOrderPanel.calculateWant(trade.getAmountHave(), price, type);
-                        //buyOrderPanel.txtAmountHave.setText(trade.getAmountHave().toPlainString());
-                        //buyOrderPanel.txtPrice.setText(price.toPlainString());
+                        //buyOrderPanel.calculateWant(trade.getAmountHave(), price, type);
+                        buyOrderPanel.setFields(trade.getAmountHave(), price, trade.getAmountWant());
                     }
                 }
             }

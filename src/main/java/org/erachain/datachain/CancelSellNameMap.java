@@ -27,9 +27,6 @@ public class CancelSellNameMap extends DCUMap<byte[], BigDecimal> {
         super(parent, null);
     }
 
-    protected void createIndexes() {
-    }
-
     public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("cancelNameOrphanData")
@@ -41,11 +38,6 @@ public class CancelSellNameMap extends DCUMap<byte[], BigDecimal> {
     @Override
     protected void getMemoryMap() {
         map = new TreeMap<byte[], BigDecimal>(UnsignedBytes.lexicographicalComparator());
-    }
-
-    @Override
-    protected BigDecimal getDefaultValue() {
-        return null;
     }
 
     public void delete(CancelSellNameTransaction transaction) {

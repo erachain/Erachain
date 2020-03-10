@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
@@ -77,8 +77,8 @@ public class TestRecSetStatusToItem {
 
         // FEE FUND
         maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
         //statusMap = db.getItemStatusMap();
         //mapSize = statusMap.size();
 
@@ -99,10 +99,10 @@ public class TestRecSetStatusToItem {
                 person.getItemType(), person.getKey(db),
                 to_date, birthDay + 1000,
                 45646533, 987978972,
-                "teasdsdst TEST".getBytes(Charset.forName("UTF-8")),
-                "teasdskkj kjh kj EST".getBytes(Charset.forName("UTF-8")),
+                "teasdsdst TEST".getBytes(StandardCharsets.UTF_8),
+                "teasdskkj kjh kj EST".getBytes(StandardCharsets.UTF_8),
                 0l,
-                "DESCRIPTION".getBytes(Charset.forName("UTF-8")),
+                "DESCRIPTION".getBytes(StandardCharsets.UTF_8),
                 timestamp, maker.getLastTimestamp(db)[0]);
         timestamp += 100;
 
@@ -125,7 +125,7 @@ public class TestRecSetStatusToItem {
         //INVALID SIGNATURE
         setStatusTransaction = new RSetStatusToItem(maker, FEE_POWER, status_key,
                 person.getItemType(), person.getKey(db), to_date, null,
-                323234, 2342342, null, "test TEST 11".getBytes(Charset.forName("UTF-8")), 0l, null,
+                323234, 2342342, null, "test TEST 11".getBytes(StandardCharsets.UTF_8), 0l, null,
                 timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF ISSUE STATUS IS INVALID
@@ -226,10 +226,10 @@ public class TestRecSetStatusToItem {
         RSetStatusToItem setStatusTransaction_2 = new RSetStatusToItem(maker, FEE_POWER, status_key,
                 person.getItemType(), person.getKey(db), to_date, null,
                 234354, 546567,
-                "wersdfsdfsdftest TEST".getBytes(Charset.forName("UTF-8")),
-                "test TEST".getBytes(Charset.forName("UTF-8")),
+                "wersdfsdfsdftest TEST".getBytes(StandardCharsets.UTF_8),
+                "test TEST".getBytes(StandardCharsets.UTF_8),
                 0l,
-                "tasasdasdasfsdfsfdsdfest TEST".getBytes(Charset.forName("UTF-8")),
+                "tasasdasdasfsdfsfdsdfest TEST".getBytes(StandardCharsets.UTF_8),
                 timestamp + 10, maker.getLastTimestamp(db)[0]);
         setStatusTransaction_2.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         setStatusTransaction_2.sign(maker, Transaction.FOR_NETWORK);

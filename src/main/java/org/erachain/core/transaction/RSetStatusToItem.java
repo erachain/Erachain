@@ -18,7 +18,7 @@ import org.mapdb.Fun.Tuple5;
 import org.mapdb.Fun.Tuple6;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -203,8 +203,8 @@ public class RSetStatusToItem extends Transaction {
 
     @Override
     public String getTitle() {
-        String title = ItemCls.getItemTypeName(ItemCls.STATUS_TYPE) + key + " > ";
-        title += ItemCls.getItemTypeName(itemType) + itemKey + " = ";
+        String title = TYPE_NAME + ": " + ItemCls.getItemTypeChar2(ItemCls.STATUS_TYPE) + key + " > ";
+        title += ItemCls.getItemTypeChar2(itemType) + itemKey + " = ";
         title += getStatus().toStringNoKey(packData());
 
         return title;
@@ -306,36 +306,79 @@ public class RSetStatusToItem extends Transaction {
         return item == null ? "null" : item.toString();
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public JSONObject toJson() {
-        //GET BASE
-        JSONObject transaction = this.getJsonBase();
+    public static JSONArray unpackDataJSON(byte[] data_add) {
 
-        //ADD CREATOR/SERVICE/DATA
-        transaction.put("key", this.key);
-        transaction.put("itemType", this.itemType);
-        transaction.put("itemKey", this.itemKey);
-        transaction.put("begin_date", this.beg_date);
-        transaction.put("end_date", this.end_date);
+        if (data_add.length == 0) {
+            // in Sertify Person = null
+            return null;
+        }
 
-        if (this.value_1 != 0)
-            transaction.put("value1", this.value_1);
+        int position = 0;
 
-        if (this.value_2 != 0)
-            transaction.put("value2", this.value_2);
+        byte[] value_1Bytes = Arrays.copyOfRange(data_add, position, position + VALUE_LENGTH);
+        long value_1 = Longs.fromByteArray(value_1Bytes);
+        position += VALUE_LENGTH;
 
-        if (this.data_1 != null)
-            transaction.put("data1", new String(this.data_1, Charset.forName("UTF-8")));
-        if (this.data_2 != null)
-            transaction.put("data2", new String(this.data_2, Charset.forName("UTF-8")));
-        if (this.description != null)
-            transaction.put("description", new String(this.description, Charset.forName("UTF-8")));
+        byte[] value_2Bytes = Arrays.copyOfRange(data_add, position, position + VALUE_LENGTH);
+        long value_2 = Longs.fromByteArray(value_2Bytes);
+        position += VALUE_LENGTH;
 
-        if (this.ref_to_parent != 0l)
-            transaction.put("ref_parent", this.ref_to_parent);
+        //READ DATA 1 SIZE
+        byte[] data_1SizeBytes = Arrays.copyOfRange(data_add, position, position + 1);
+        int data_1Size = Byte.toUnsignedInt(data_1SizeBytes[0]);
+        position += 1;
 
-        return transaction;
+        //READ ADDITIONAL DATA 1
+        byte[] data_1 = null;
+        if (data_1Size > 0) {
+            data_1 = Arrays.copyOfRange(data_add, position, position + data_1Size);
+            position += data_1Size;
+        }
+
+        //READ DATA 2 SIZE
+        byte[] data_2SizeBytes = Arrays.copyOfRange(data_add, position, position + 1);
+        int data_2Size = Byte.toUnsignedInt(data_2SizeBytes[0]);
+        position += 1;
+
+        //READ ADDITIONAL DATA 2
+        byte[] data_2 = null;
+        if (data_2Size > 0) {
+            data_2 = Arrays.copyOfRange(data_add, position, position + data_2Size);
+            position += data_2Size;
+        }
+
+        // READ REFFERENCE TO PARENT RECORD
+        byte[] ref_to_recordBytes = Arrays.copyOfRange(data_add, position, position + REF_LENGTH);
+        long ref_to_parent = Longs.fromByteArray(ref_to_recordBytes);
+        position += REF_LENGTH;
+
+        //READ ADDITIONAL DATA
+        byte[] description = null;
+        if (position > data_add.length)
+            description = Arrays.copyOfRange(data_add, position, data_add.length);
+
+
+        JSONArray out = new JSONArray();
+        out.add(value_1);
+        out.add(value_2);
+        if (data_1 == null)
+            out.add("");
+        else
+            out.add(new String(data_1, StandardCharsets.UTF_8));
+
+        if (data_2 == null)
+            out.add("");
+        else
+            out.add(new String(data_2, StandardCharsets.UTF_8));
+
+        out.add(ref_to_parent);
+
+        if (description == null)
+            out.add("");
+        else
+            out.add(new String(description, StandardCharsets.UTF_8));
+
+        return out;
     }
 
     // Unpack data from DB
@@ -398,79 +441,36 @@ public class RSetStatusToItem extends Transaction {
         );
     }
 
-    public static JSONArray unpackDataJSON(byte[] data_add) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public JSONObject toJson() {
+        //GET BASE
+        JSONObject transaction = this.getJsonBase();
 
-        if (data_add.length == 0) {
-            // in Sertify Person = null
-            return null;
-        }
+        //ADD CREATOR/SERVICE/DATA
+        transaction.put("key", this.key);
+        transaction.put("itemType", this.itemType);
+        transaction.put("itemKey", this.itemKey);
+        transaction.put("begin_date", this.beg_date);
+        transaction.put("end_date", this.end_date);
 
-        int position = 0;
+        if (this.value_1 != 0)
+            transaction.put("value1", this.value_1);
 
-        byte[] value_1Bytes = Arrays.copyOfRange(data_add, position, position + VALUE_LENGTH);
-        long value_1 = Longs.fromByteArray(value_1Bytes);
-        position += VALUE_LENGTH;
+        if (this.value_2 != 0)
+            transaction.put("value2", this.value_2);
 
-        byte[] value_2Bytes = Arrays.copyOfRange(data_add, position, position + VALUE_LENGTH);
-        long value_2 = Longs.fromByteArray(value_2Bytes);
-        position += VALUE_LENGTH;
+        if (this.data_1 != null)
+            transaction.put("data1", new String(this.data_1, StandardCharsets.UTF_8));
+        if (this.data_2 != null)
+            transaction.put("data2", new String(this.data_2, StandardCharsets.UTF_8));
+        if (this.description != null)
+            transaction.put("description", new String(this.description, StandardCharsets.UTF_8));
 
-        //READ DATA 1 SIZE
-        byte[] data_1SizeBytes = Arrays.copyOfRange(data_add, position, position + 1);
-        int data_1Size = Byte.toUnsignedInt(data_1SizeBytes[0]);
-        position += 1;
+        if (this.ref_to_parent != 0l)
+            transaction.put("ref_parent", this.ref_to_parent);
 
-        //READ ADDITIONAL DATA 1
-        byte[] data_1 = null;
-        if (data_1Size > 0) {
-            data_1 = Arrays.copyOfRange(data_add, position, position + data_1Size);
-            position += data_1Size;
-        }
-
-        //READ DATA 2 SIZE
-        byte[] data_2SizeBytes = Arrays.copyOfRange(data_add, position, position + 1);
-        int data_2Size = Byte.toUnsignedInt(data_2SizeBytes[0]);
-        position += 1;
-
-        //READ ADDITIONAL DATA 2
-        byte[] data_2 = null;
-        if (data_2Size > 0) {
-            data_2 = Arrays.copyOfRange(data_add, position, position + data_2Size);
-            position += data_2Size;
-        }
-
-        // READ REFFERENCE TO PARENT RECORD
-        byte[] ref_to_recordBytes = Arrays.copyOfRange(data_add, position, position + REF_LENGTH);
-        long ref_to_parent = Longs.fromByteArray(ref_to_recordBytes);
-        position += REF_LENGTH;
-
-        //READ ADDITIONAL DATA
-        byte[] description = null;
-        if (position > data_add.length)
-            description = Arrays.copyOfRange(data_add, position, data_add.length);
-
-
-        JSONArray out = new JSONArray();
-        out.add(value_1);
-        out.add(value_2);
-        if (data_1 == null)
-            out.add("");
-        else
-            out.add(new String(data_1, Charset.forName("UTF-8")));
-
-        if (data_2 == null)
-            out.add("");
-        else
-            out.add(new String(data_2, Charset.forName("UTF-8")));
-
-        out.add(ref_to_parent);
-
-        if (description == null)
-            out.add("");
-        else
-            out.add(new String(description, Charset.forName("UTF-8")));
-
-        return out;
+        return transaction;
     }
 
     // releaserReference = null - not a pack

@@ -30,11 +30,13 @@ public class RocksDbDataSourceDB extends RocksDbDataSourceImpl {
     @Override
     protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         dbCore = RocksDB.open(options, getDbPathAndFile().toString());
+        dbOptions = new DBOptions(options);
     }
 
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         dbCore = RocksDB.open(dbOptions, getDbPathAndFile().toString(), columnFamilyDescriptors, columnFamilyHandles);
+        this.dbOptions = dbOptions;
 
     }
 }

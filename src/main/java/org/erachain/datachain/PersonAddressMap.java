@@ -51,9 +51,6 @@ public class PersonAddressMap extends DCUMap<
         super(parent, dcSet);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP
@@ -68,7 +65,7 @@ public class PersonAddressMap extends DCUMap<
     }
 
     @Override
-    protected TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> getDefaultValue() {
+    public TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> getDefaultValue() {
         return new TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>();
     }
 
@@ -78,7 +75,9 @@ public class PersonAddressMap extends DCUMap<
         TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> value = this.get(person);
 
         TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> value_new;
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             value_new = value;
         else {
             // !!!! NEEED .clone() !!!
@@ -92,7 +91,9 @@ public class PersonAddressMap extends DCUMap<
             stack.push(item);
             value_new.put(address, stack);
         } else {
-            if (this.parent == null) {
+            if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                    // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                    && this.parent == null) {
                 stack.push(item);
                 value_new.put(address, stack);
             } else {
@@ -126,7 +127,9 @@ public class PersonAddressMap extends DCUMap<
         TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> value = this.get(person);
 
         TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> value_new;
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             value_new = value;
         else {
             // !!!! NEEED .clone() !!!
@@ -137,7 +140,9 @@ public class PersonAddressMap extends DCUMap<
         Stack<Tuple3<Integer, Integer, Integer>> stack = value_new.get(address);
         if (stack == null || stack.isEmpty()) return;
 
-        if (this.parent == null) {
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null) {
             stack.pop();
             value_new.put(address, stack);
         } else {

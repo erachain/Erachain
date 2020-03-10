@@ -323,7 +323,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
             ColumnFamilyHandle columnFamilyHandleDef = (ColumnFamilyHandle) rocksDB.columnFamilyHandles.get(0);
             ColumnFamilyHandle columnFamilyHandle = (ColumnFamilyHandle) rocksDB.columnFamilyHandles.get(1);
 
-            Iterator iterator = rocksDB.getIterator(false);
+            Iterator iterator = rocksDB.getIterator(false, true);
             int size = 0;
             while (iterator.hasNext()) {
                 iterator.next();
@@ -332,7 +332,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
             logger.info("iterator 1 SIZE = " + size);
             assertEquals(size, twice? step : 0);
 
-            iterator = rocksDB.getIndexIterator(columnFamilyHandle, false);
+            iterator = rocksDB.getIndexIterator(columnFamilyHandle, false, true);
             size = 0;
             while (iterator.hasNext()) {
                 iterator.next();

@@ -38,12 +38,6 @@ public class TelegramsMap extends DCUMapImpl<String, Transaction> {
         map = null;
     }
 
-    @Override
-    protected Transaction getDefaultValue() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public boolean add(String signature, Transaction telegramMessage) {
         return this.set(signature, telegramMessage);
     }

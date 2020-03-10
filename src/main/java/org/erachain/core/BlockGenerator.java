@@ -13,6 +13,7 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ReferenceMapImpl;
 import org.erachain.datachain.TransactionMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.network.message.MessageFactory;
@@ -52,6 +53,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     private boolean walletOnceUnlocked = false;
     private int orphanto = 0;
     private static List<byte[]> needRemoveInvalids;
+
+    private int syncTo = 0;
+    private Peer syncFromPeer;
+
 
     private final DCSet dcSet;
     private final BlockChain bchain;
@@ -114,21 +119,24 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         //logger.debug("try check better WEIGHT peers");
 
-        Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-
         betterPeer = null;
 
         Peer peer;
         this.setMonitorStatus("checkWeightPeers");
 
-        //byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
-        byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
-
         int counter = 0;
         // на всякий случай поставим ораничение
         while (counter++ < 30) {
 
-            Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true);
+            Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+            if (myHW.a < 5)
+                break;
+            byte[] lastSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 2).signature;
+            //byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
+
+            // не тестируем те узлы которые мы заткунули по Силе - они выдаются Силу выше хотя цепочка та же
+            Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true, true);
+
             peer = maxPeer.c;
 
             if (peer == null) {
@@ -144,54 +152,41 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         MessageFactory.getInstance().createGetHeadersMessage(lastSignature),
                         Synchronizer.GET_BLOCK_TIMEOUT >> 2);
             } catch (Exception e) {
-                ///LOGGER.debug("RESPONSE error " + peer + " " + e.getMessage());
+                LOGGER.debug("RESPONSE error " + peer + " " + e.getMessage());
                 // remove HW from peers
-                ctrl.resetWeightOfPeer(peer);
+                peer.setCorrectionWeight(myHW);
                 continue;
             }
 
             if (response == null) {
-                ///LOGGER.debug("peer RESPONSE is null " + peer);
+                LOGGER.debug("peer RESPONSE is null " + peer);
                 // remove HW from peers
-                ctrl.resetWeightOfPeer(peer);
+                peer.setCorrectionWeight(myHW);
                 continue;
             }
 
             List<byte[]> headers = response.getSignatures();
-            int headersSize = headers.size();
-            ///LOGGER.debug("FOUND head SIZE: " + headersSize);
+            if (headers.isEmpty()) {
+                // общего блока не найдено - значит цепочка уже разошлась - делаем откат своего блока???
+                // Или ждем когда сами встанем
+                LOGGER.debug("I to orphan - Peer has DEEP different CHAIN " + maxPeer);
+                betterPeer = peer;
+                return true;
+            }
 
-            if (headersSize > 0) {
-                boolean isSame = false;
-                for (byte[] signature : headers) {
-                    if (Arrays.equals(signature, lastSignature)) {
-                        isSame = true;
-                        break;
-                    }
-                }
+            // Удалим то что унас тоже есть
+            do {
+                headers.remove(0);
+            } while (!headers.isEmpty() && dcSet.getBlockSignsMap().contains(headers.get(0)));
 
-                if (isSame) {
-                    // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
-                    ///LOGGER.debug("peer has same Weight " + maxPeer);
-                    ctrl.resetWeightOfPeer(peer);
-                    // продолжим поиск дальше
-                    continue;
-                } else {
-                    LOGGER.debug("I to orphan - peer has better Weight " + maxPeer);
-                    try {
-                        // да - там другой блок - откатим тогда свой
-                        //// ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                        betterPeer = peer;
-                        return true;
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
-                        ctrl.resetWeightOfPeer(peer);
-                    }
-                }
+            if (headers.isEmpty()) {
+                // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
+                LOGGER.debug("peer has same Weight " + maxPeer);
+                peer.setCorrectionWeight(myHW);
+                // продолжим поиск дальше
+                continue;
             } else {
-                // more then 2 - need to UPDATE
-                LOGGER.debug("to update - peers " + maxPeer
-                        + " headers: " + headersSize);
+                LOGGER.debug("I to orphan - Peer has different CHAIN " + maxPeer);
                 betterPeer = peer;
                 return true;
             }
@@ -203,7 +198,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     }
 
     public Block generateNextBlock(PrivateKeyAccount account,
-                                   Block parentBlock, Tuple2<List<Transaction>, Integer> transactionsItem, int height, int forgingValue, long winValue, long previousTarget) {
+                                   Block parentBlock, Tuple2<List<Transaction>, Integer> transactionsItem, int forgingValue, long winValue, long previousTarget) {
 
         if (transactionsItem == null) {
             return null;
@@ -214,7 +209,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         atBytes = new byte[0];
 
         //CREATE NEW BLOCK
-        Block newBlock = new Block(version, parentBlock, account, height,
+        Block newBlock = new Block(version, parentBlock, account,
                 transactionsItem, atBytes,
                 forgingValue, winValue, previousTarget);
         newBlock.sign(account);
@@ -346,13 +341,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         try {
             TransactionMap map = dcSet.getTransactionTab();
-            Iterator<Long> iterator = map.getTimestampIterator(false);
-
             needRemoveInvalids = new ArrayList<byte[]>();
 
             this.setMonitorStatusBefore("getUnconfirmedTransactions");
 
-            try {
+            try (IteratorCloseable<Long> iterator = map.getTimestampIterator(false)) {
+
                 long testTime = 0;
                 while (iterator.hasNext()) {
 
@@ -383,11 +377,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
 
                     if (BlockChain.CHECK_BUGS > 7) {
-                        LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()));
+                        LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()) + " " + transaction.getCreator().getAddress());
                         if (testTime > transaction.getTimestamp()) {
                             LOGGER.error(" ERROR testTIME " + new Timestamp(testTime));
-                            testTime = transaction.getTimestamp();
                         }
+                        testTime = transaction.getTimestamp();
                     }
 
                     if (transaction.getTimestamp() > timestamp) {
@@ -395,7 +389,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         break;
                     }
 
-                    // делать форк только если есть трнзакции - так как это сильно кушает память
+                    // делать форк только если есть транзакции - так как это сильно кушает память
                     if (newBlockDC == null) {
                         //CREATE FORK OF GIVEN DATABASE
                         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
@@ -499,16 +493,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (ctrl.isOnStopping()) {
                     return;
                 }
-                try {
-                    if (!transactionsMap.isClosed() && transactionsMap.contains(signature))
-                        transactionsMap.delete(signature);
-                } catch (java.lang.Throwable e) {
-                    if (e instanceof java.lang.IllegalAccessError) {
-                        // налетели на закрытую таблицу
-                    } else {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
+                transactionsMap.delete(signature);
             }
             LOGGER.debug("clear INVALID Transactions = " + (System.currentTimeMillis() - start) + "ms for removed: " + needRemoveInvalids.size()
                     + " LEFT: " + transactionsMap.size());
@@ -521,9 +506,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public void checkForRemove(long timestamp) {
 
         //CREATE FORK OF GIVEN DATABASE
-        DB database = DCSet.makeDBinMemory();
-        try {
-            DCSet newBlockDC = dcSet.fork(database);
+        try (DCSet newBlockDC = dcSet.fork(DCSet.makeDBinMemory())) {
+
             int blockHeight = newBlockDC.getBlockSignsMap().size() + 1;
 
             //Block waitWin;
@@ -533,14 +517,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             long start = System.currentTimeMillis();
 
             TransactionMap map = dcSet.getTransactionTab();
+            LOGGER.debug("get ITERATOR for Remove = " + (System.currentTimeMillis() - start) + " ms");
 
-            try {
-                Iterator<Long> iterator = map.getTimestampIterator(false);
-                LOGGER.debug("get ITERATOR for Remove = " + (System.currentTimeMillis() - start) + " ms");
+            needRemoveInvalids = new ArrayList<byte[]>();
 
-                needRemoveInvalids = new ArrayList<byte[]>();
+            this.setMonitorStatusBefore("checkForRemove");
 
-                this.setMonitorStatusBefore("checkForRemove");
+            try (IteratorCloseable<Long> iterator = map.getTimestampIterator(false)) {
 
                 while (iterator.hasNext()) {
 
@@ -614,8 +597,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             LOGGER.debug("get check for Remove = " + (System.currentTimeMillis() - start) + "ms for trans: " + map.size()
                     + " needRemoveInvalids:" + needRemoveInvalids.size());
 
-        } finally {
-            database.close();
         }
 
     }
@@ -631,12 +612,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         }
     }
 
-    public int getOrphanTo() {
-        return this.orphanto;
-    }
-
     public void setOrphanTo(int height) {
         this.orphanto = height;
+    }
+
+    public void setSyncTo(int height, Peer peer) {
+        this.syncTo = height;
+        this.syncFromPeer = peer;
     }
 
     public void addObserver() {
@@ -744,33 +726,33 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             for (int nonce = 0; nonce < BlockChain.TEST_DB_ACCOUNTS.length; nonce++) {
                 BlockChain.TEST_DB_ACCOUNTS[nonce] = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce));
                 // SET BALANCES
-                BlockChain.TEST_DB_ACCOUNTS[nonce].changeBalance(dcSet, false, 2, balance, true);
+                BlockChain.TEST_DB_ACCOUNTS[nonce].changeBalance(dcSet, false, false, 2, balance, true, false);
             }
         }
 
-        while (!ctrl.isOnStopping()) {
+        try {
+            // если только что была синхронизация - возьмем новый блок
+            Peer afterUpdatePeer = null;
+            while (!ctrl.isOnStopping()) {
 
-            int timeStartBroadcast = BlockChain.WIN_TIMEPOINT(height);
+                int timeStartBroadcast = BlockChain.WIN_TIMEPOINT(height);
 
-            Block waitWin = null;
-            Block generatedBlock;
-            Block solvingBlock;
-            Peer peer = null;
-            Tuple3<Integer, Long, Peer> maxPeer;
-            SignaturesMessage response;
+                Block waitWin = null;
+                Block generatedBlock;
+                Block solvingBlock;
+                Peer peer = null;
+                Tuple3<Integer, Long, Peer> maxPeer;
+                SignaturesMessage response;
 
-            try {
-                Thread.sleep(WAIT_STEP_MS);
-            } catch (InterruptedException e) {
-                break;
-            }
-
-            try {
+                try {
+                    Thread.sleep(WAIT_STEP_MS);
+                } catch (InterruptedException e) {
+                    break;
+                }
 
                 this.setMonitorPoint();
 
                 if (ctrl.isOnStopping()) {
-                    local_status = -1;
                     return;
                 }
 
@@ -785,17 +767,48 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     ctrl.pingAllPeers(false);
                 }
 
-                if (this.orphanto > 0) {
-                    this.setMonitorStatusBefore("orphan to " + orphanto);
-                    local_status = 9;
-                    ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
-
-                    // обязательно нужно чтобы память освобождать
-                    // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
-                    // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
-                    dcSet.clearCache();
-
+                if (this.syncTo > 0) {
                     try {
+                        this.setMonitorStatusBefore("Synchronize to " + syncTo + (syncFromPeer == null ? "" : " from: " + peer));
+                        if (syncFromPeer == null) {
+                            Tuple3<Integer, Long, Peer> maxPeerHW = ctrl.getMaxPeerHWeight(-5, false, false);
+                            syncFromPeer = maxPeerHW.c;
+                        }
+                        if (syncFromPeer != null) {
+
+                            try {
+                                // SYNCHRONIZE FROM PEER
+                                ctrl.synchronizer.synchronize(dcSet, syncTo, syncFromPeer, syncFromPeer.getHWeight(true).a,
+                                        dcSet.getBlocksHeadsMap().get(syncTo).signature);
+                            } catch (Exception e) {
+                                LOGGER.error(e.getMessage(), e);
+                            }
+
+                        } else {
+                            LOGGER.info("SyncTo: peer not found");
+                        }
+
+                    } finally {
+                        syncTo = 0;
+                        syncFromPeer = null;
+                        this.setMonitorStatusAfter();
+                    }
+
+                } else if (this.orphanto > 0) {
+                    try {
+                        this.setMonitorStatusBefore("orphan to " + orphanto);
+                        local_status = 9;
+                        ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
+
+                        // обязательно нужно чтобы память освобождать
+                        // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
+                        // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
+                        dcSet.clearCache();
+
+                        // и перед всем этим необходимо слить все изменения на диск чтобы потом когда откат закончился
+                        // не было остаков в пакетах RocksDB и трынзакциях MapDB
+                        dcSet.flush(0, true, true);
+
                         while (bchain.getHeight(dcSet) >= this.orphanto
                             //    && bchain.getHeight(dcSet) > 157044
                         ) {
@@ -803,25 +816,32 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             //    long iii = 11;
                             //}
                             //Block block = bchain.getLastBlock(dcSet);
-                            ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                            try {
+                                ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                            } catch (Exception e) {
+                                // если ошибка то выход делаем чтобы зарегистрировать ошибку
+                                LOGGER.error(e.getMessage(), e);
+                                ctrl.stopAll(104);
+                                return;
+
+                            }
                         }
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
+
+                        if (BlockChain.NOT_STORE_REFFS_HISTORY && BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
+                            // TODO тут нужно обновить за последние 3-10 блоков значения  если проверка используется
+                            ReferenceMapImpl map = dcSet.getReferenceMap();
+
+                            return;
+                        }
+
+
+                    } finally {
+                        this.orphanto = 0;
+                        ctrl.checkStatusAndObserve(0);
+
+                        this.setMonitorStatusAfter();
+
                     }
-
-                    if (BlockChain.NOT_STORE_REFFS_HISTORY && BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
-                        // TODO тут нужно обновить за последние 3-10 блоков значения  если проверка используется
-                        ReferenceMapImpl map = dcSet.getReferenceMap();
-
-                        return;
-                    }
-
-
-                    this.orphanto = 0;
-                    ctrl.checkStatusAndObserve(0);
-
-                    this.setMonitorStatusAfter();
-
                 }
 
                 timeTmp = bchain.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height);
@@ -865,7 +885,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     if (BlockChain.TEST_DB == 0 && forgingStatus == ForgingStatus.FORGING_WAIT
                             && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 1) < NTP.getTime()
-                            || (BlockChain.ERA_COMPU_ALL_UP || BlockChain.DEVELOP_USE) && height < 100
+                            || BlockChain.ERA_COMPU_ALL_UP && height < 100
                             || height < 10)) {
 
                         setForgingStatus(ForgingStatus.FORGING);
@@ -882,7 +902,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         /////////////////////////////// TRY FORGING ////////////////////////
 
                         if (ctrl.isOnStopping()) {
-                            local_status = -1;
                             return;
                         }
 
@@ -891,7 +910,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         solvingBlock = dcSet.getBlockMap().last();
 
                         if (ctrl.isOnStopping()) {
-                            local_status = -1;
                             return;
                         }
 
@@ -939,7 +957,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 for (PrivateKeyAccount account : knownAccounts) {
 
                                     forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-                                    winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue);
+                                    winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue, null);
                                     if (winValue < 1)
                                         continue;
 
@@ -973,7 +991,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         if (!BlockChain.STOP_GENERATE_BLOCKS && acc_winner != null) {
 
                             if (ctrl.isOnStopping()) {
-                                local_status = -1;
                                 return;
                             }
 
@@ -1013,12 +1030,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         try {
                                             Thread.sleep(WAIT_STEP_MS);
                                         } catch (InterruptedException e) {
-                                            local_status = -1;
                                             return;
                                         }
 
                                         if (ctrl.isOnStopping()) {
-                                            local_status = -1;
                                             return;
                                         }
 
@@ -1030,14 +1045,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         }
 
                                     }
-                                    while (this.orphanto <= 0 && wait_step-- > 0
+                                    while (this.orphanto <= 0 && this.syncTo <= 0 && wait_step-- > 0
                                             && NTP.getTime() < timePoint + wait_new_block_broadcast
                                             && betterPeer == null && !ctrl.needUpToDate());
                                 }
 
                             }
 
-                            if (this.orphanto > 0) {
+                            if (this.orphanto > 0 || this.syncTo > 0) {
                                 continue;
                             } else if (ctrl.needUpToDate()) {
                                 LOGGER.info("skip GENERATING block - need UPDATE");
@@ -1060,7 +1075,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         processTiming = System.nanoTime();
                                         generatedBlock = generateNextBlock(acc_winner, solvingBlock,
                                                 unconfirmedTransactions,
-                                                height, winned_forgingValue, winned_winValue, previousTarget);
+                                                winned_forgingValue, winned_winValue, previousTarget);
 
                                         processTiming = System.nanoTime() - processTiming;
 
@@ -1084,9 +1099,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         }
 
                                     } catch (java.lang.OutOfMemoryError e) {
-                                        local_status = -1;
                                         LOGGER.error(e.getMessage(), e);
-                                        ctrl.stopAll(234);
+                                        ctrl.stopAll(105);
                                         return;
                                     }
                                     LOGGER.info("GENERATE done");
@@ -1095,7 +1109,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                                     if (generatedBlock == null) {
                                         if (ctrl.isOnStopping()) {
-                                            this.local_status = -1;
                                             return;
                                         }
 
@@ -1110,7 +1123,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         //PASS BLOCK TO CONTROLLER
                                         try {
                                             LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
-                                            if (bchain.setWaitWinBuffer(dcSet, generatedBlock, peer)) {
+                                            if (bchain.setWaitWinBuffer(dcSet, generatedBlock,
+                                                    null // не надо банить тут - может цепочка ушла ужеи это мой блок же
+                                            )) {
 
                                                 // need to BROADCAST
                                                 local_status = 8;
@@ -1125,9 +1140,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                             }
                                             generatedBlock = null;
                                         } catch (java.lang.OutOfMemoryError e) {
-                                            local_status = -1;
                                             LOGGER.error(e.getMessage(), e);
-                                            ctrl.stopAll(235);
+                                            ctrl.stopAll(135);
                                             return;
                                         }
                                     }
@@ -1141,12 +1155,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 ////////////////////////////  FLUSH NEW BLOCK /////////////////////////
                 // сдвиг 0 делаем
-                ctrl.checkStatusAndObserve(0);
-                if (betterPeer != null || orphanto > 0
+                ctrl.checkStatusAndObserve(bchain.getWaitWinBuffer() == null ? 0 : 1);
+                if (betterPeer != null || orphanto > 0 || this.syncTo > 0
                         || timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) < NTP.getTime()
                         && ctrl.needUpToDate()) {
 
-                    if (System.currentTimeMillis() - pointLogWaitFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2 ) {
+                    if (System.currentTimeMillis() - pointLogWaitFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2) {
                         pointLogWaitFlush = System.currentTimeMillis();
                         LOGGER.info("To late for FLUSH - need UPDATE !");
                     }
@@ -1156,27 +1170,25 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     // FLUSH WINER to DB MAP
                     if (this.solvingReference != null)
-                        if (System.currentTimeMillis() - pointLogWaitFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2 ) {
+                        if (System.currentTimeMillis() - pointLogWaitFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2) {
                             pointLogWaitFlush = System.currentTimeMillis();
                             LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
                         }
 
                     // ждем основное время просто
-                    while (BlockChain.TEST_DB == 0 && this.orphanto <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
+                    while (BlockChain.TEST_DB == 0 && this.orphanto <= 0 && this.syncTo <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
                         try {
                             Thread.sleep(WAIT_STEP_MS);
                         } catch (InterruptedException e) {
-                            local_status = -1;
                             return;
                         }
 
                         if (ctrl.isOnStopping()) {
-                            local_status = -1;
                             return;
                         }
                     }
 
-                    if (this.orphanto > 0)
+                    if (this.orphanto > 0 || this.syncTo > 0)
                         continue;
 
                     // если нет ничего в буфере то еще несного подождем
@@ -1184,33 +1196,42 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                         waitWin = bchain.getWaitWinBuffer();
                         if (waitWin != null) {
+                            LOGGER.debug("wait WniBlock get: " + waitWin);
                             break;
                         }
 
                         try {
                             Thread.sleep(WAIT_STEP_MS);
                         } catch (InterruptedException e) {
-                            local_status = -1;
                             return;
                         }
 
                         if (ctrl.isOnStopping()) {
-                            local_status = -1;
                             return;
                         }
-                    } while (this.orphanto <= 0
+                    } while (this.orphanto <= 0 && this.syncTo <= 0
                             && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) > NTP.getTime()
                             // возможно уже надо обновиться - мы отстали
                             && betterPeer == null
                             && !ctrl.needUpToDate());
 
-                    if (this.orphanto > 0)
+                    if (this.orphanto > 0 || this.syncTo > 0)
                         continue;
+
+                    if (waitWin == null && afterUpdatePeer != null) {
+                        waitWin = ctrl.checkNewPeerUpdates(afterUpdatePeer);
+                        afterUpdatePeer = null;
+                    }
+
+                    // если есть уже победный блок то посчитаем что у нас цепочка на 1 выше
+                    ctrl.checkStatusAndObserve(waitWin == null ? 0 : 1);
 
                     if (waitWin == null) {
                         if (this.solvingReference != null) {
-                            if (System.currentTimeMillis() - pointLogGoUpdate > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2 ) {
+                            if (System.currentTimeMillis() - pointLogGoUpdate > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2) {
                                 pointLogGoUpdate = System.currentTimeMillis();
+                                // сбросим и ссылку для генератора
+                                this.solvingReference = null;
                                 LOGGER.debug("WIN BUFFER is EMPTY - go to UPDATE");
                                 // обнулим - чтобы потом сработало новое создание
                                 this.solvingReference = null;
@@ -1221,7 +1242,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
-                            local_status = -1;
                             return;
                         }
                         LOGGER.debug("need UPDATE! skip FLUSH BLOCK");
@@ -1229,7 +1249,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
-                            local_status = -1;
                             return;
                         }
                         LOGGER.debug("found better PEER! skip FLUSH BLOCK " + betterPeer);
@@ -1251,7 +1270,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     // победные блоки не спеша
                                     Thread.sleep(1000);
                                 } catch (InterruptedException e) {
-                                    local_status = -1;
                                     return;
                                 }
                             }
@@ -1270,27 +1288,22 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         setForgingStatus(ForgingStatus.FORGING);
                                 }
                             } catch (java.lang.OutOfMemoryError e) {
-                                local_status = -1;
                                 LOGGER.error(e.getMessage(), e);
-                                ctrl.stopAll(235);
+                                ctrl.stopAll(135);
                                 return;
                             }
 
                             if (ctrl.isOnStopping()) {
-                                local_status = -1;
                                 return;
                             }
 
                         } catch (Exception e) {
                             // TODO Auto-generated catch block
                             if (ctrl.isOnStopping()) {
-                                local_status = -1;
                                 return;
                             }
                             LOGGER.error(e.getMessage(), e);
                         }
-
-                        bchain.clearWaitWinBuffer();
 
                         if (needRemoveInvalids != null) {
                             clearInvalids();
@@ -1307,7 +1320,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 ////////////////////////// UPDATE ////////////////////
 
-                if (orphanto > 0 || betterPeer == null &&
+                if (orphanto > 0 || syncTo > 0 || betterPeer == null &&
                         timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) > NTP.getTime())
                     continue;
 
@@ -1317,8 +1330,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 //CHECK IF WE ARE NOT UP TO DATE
                 if (betterPeer != null || ctrl.needUpToDate()) {
 
+                    LOGGER.info("update by " + (betterPeer != null ? "better PEER: " + betterPeer : "controller status"));
+
                     if (ctrl.isOnStopping()) {
-                        local_status = -1;
                         return;
                     }
 
@@ -1326,15 +1340,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     this.setMonitorStatus("local_status " + viewStatus());
 
                     this.solvingReference = null;
-                    bchain.clearWaitWinBuffer();
 
-                    ctrl.update(shift_height);
+                    afterUpdatePeer = ctrl.update(shift_height);
 
                     local_status = 0;
                     this.setMonitorStatus("local_status " + viewStatus());
 
                     if (ctrl.isOnStopping()) {
-                        local_status = -1;
                         return;
                     }
 
@@ -1343,37 +1355,32 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     setForgingStatus(ForgingStatus.FORGING_WAIT);
 
-                } else {
-
                 }
-
-            } catch (java.lang.OutOfMemoryError e) {
-                this.local_status = -1;
-                LOGGER.error(e.getMessage(), e);
-                ctrl.stopAll(96);
-                return;
-            } catch (Exception e) {
-                if (ctrl.isOnStopping()) {
-                    this.local_status = -1;
-                    return;
-                }
-
-                LOGGER.error(e.getMessage(), e);
-
-            } catch (Throwable e) {
-                if (ctrl.isOnStopping()) {
-                    this.local_status = -1;
-                    return;
-                }
-
-                LOGGER.error(e.getMessage(), e);
-
             }
-        }
 
-        // EXITED
-        this.local_status = -1;
-        this.setMonitorStatus("local_status " + viewStatus());
+        } catch (java.lang.OutOfMemoryError e) {
+            LOGGER.error(e.getMessage(), e);
+            ctrl.stopAll(196);
+            return;
+        } catch (Exception e) {
+            if (ctrl.isOnStopping()) {
+                return;
+            }
+
+            LOGGER.error(e.getMessage(), e);
+
+        } catch (Throwable e) {
+            if (ctrl.isOnStopping()) {
+                return;
+            }
+
+            LOGGER.error(e.getMessage(), e);
+
+        } finally {
+            // EXITED
+            this.local_status = -1;
+            this.setMonitorStatus("local_status " + viewStatus());
+        }
 
     }
 

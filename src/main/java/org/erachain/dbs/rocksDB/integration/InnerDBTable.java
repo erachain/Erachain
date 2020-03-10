@@ -1,9 +1,9 @@
 package org.erachain.dbs.rocksDB.integration;
 
+import org.erachain.dbs.IteratorCloseable;
 import org.rocksdb.ColumnFamilyHandle;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,7 +25,13 @@ public interface InnerDBTable<K, V> {
 
     V get(Object key);
 
+    boolean set(K key, V value);
+
     void put(K key, V value);
+
+    V remove(Object key);
+
+    V removeValue(Object key);
 
     void delete(Object key);
 
@@ -43,14 +49,18 @@ public interface InnerDBTable<K, V> {
 
     //NavigableSet<Fun.Tuple2<?, K>> getIndex(int index, boolean descending);
 
-    Iterator<K> getIterator(boolean descending);
+    IteratorCloseable<K> getIterator(boolean descending, boolean isIndex);
 
-    Iterator<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending);
+    IteratorCloseable<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending, boolean isIndex);
 
-    Iterator<K> getIndexIteratorFilter(byte[] filter, boolean descending);
+    IteratorCloseable<K> getIndexIteratorFilter(byte[] filter, boolean descending, boolean isIndex);
 
-    Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending);
+    IteratorCloseable<K> getIndexIteratorFilter(byte[] start, byte[] stop, boolean descending, boolean isIndex);
 
-    Iterator<K> getIndexIterator(int indexDB, boolean descending);
+    IteratorCloseable<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending, boolean isIndex);
+
+    IteratorCloseable<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] start, byte[] stop, boolean descending, boolean isIndex);
+
+    IteratorCloseable<K> getIndexIterator(int indexDB, boolean descending, boolean isIndex);
 
 }

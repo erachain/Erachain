@@ -3,13 +3,13 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
-import org.erachain.database.wallet.BlocksHeadMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Observable;
 
 @SuppressWarnings("serial")
@@ -81,10 +81,12 @@ public class WalletBlocksTableModel extends WalletTableModel<Block.BlockHead> {
                 || message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE) {
             needUpdate = false;
             list = new ArrayList<>();
-            Iterator iterator = map.getIterator(BlocksHeadMap.TIMESTAMP_INDEX, true);
-            int count = 50;
-            while (iterator.hasNext() && --count > 0) {
-                list.add((Block.BlockHead) map.get(iterator.next()));
+            try (IteratorCloseable iterator = map.getIterator(0,true)) {
+                int count = 50;
+                while (iterator.hasNext() && --count > 0) {
+                    list.add((Block.BlockHead) map.get(iterator.next()));
+                }
+            } catch (IOException e) {
             }
             fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE

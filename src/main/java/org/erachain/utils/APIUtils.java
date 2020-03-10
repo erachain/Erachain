@@ -126,7 +126,7 @@ public class APIUtils {
                 min_length = 8;
             }
 
-            if (BlockChain.DEVELOP_USE)
+            if (BlockChain.TEST_MODE)
                 min_length = 0;
 
             if (password != null) {
@@ -299,7 +299,7 @@ public class APIUtils {
         // SEND ASSET PAYMENT
         Transaction transaction = Controller.getInstance().r_Send(account, feePow, new Account(recipient),
                 asset.getKey(DCSet.getInstance()), bdAmount, title,
-                message, isText, isEncrypted);
+                message, isText, isEncrypted, 0);
         
         boolean confirmed = true;
         if (Gui.isGuiStarted()) {

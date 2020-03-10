@@ -30,7 +30,7 @@ import java.util.Observer;
 public class OtherSplitPanel extends SplitPanel implements Observer {
 
     private PeersTableModel peersTableModel = new PeersTableModel();
-
+    private static String iconFile = "images/pageicons/OtherSplitPanel.png";
     private JPanel jPanel2 = new JPanel();
     private GridBagConstraints gridBagConstraints;
     private JLabel jLabelPeerTitle = new JLabel();
@@ -284,5 +284,16 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
         if (jLabelAllBlocksSum != null)
             jLabelAllBlocksSum.setText(String.valueOf(Controller.getInstance().getBlockChain().
                  getFullWeight(DCSet.getInstance())));
+    }
+
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

@@ -19,6 +19,8 @@ public interface DBTab<T, U> extends IMap<T, U>, ForkedMap {
 
     IDB getDBSet();
 
+    DBSuit getSuit();
+
     Map<Integer, Integer> getObservableData();
 
     Integer deleteObservableData(int index);
@@ -30,5 +32,7 @@ public interface DBTab<T, U> extends IMap<T, U>, ForkedMap {
     //NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending);
 
     SortableList<T, U> getList();
+
+    void notifyObserverList();
 
 }

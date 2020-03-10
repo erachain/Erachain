@@ -48,6 +48,11 @@ public abstract class Transaction implements ExplorerJsonLine {
      * };
      */
 
+    public static final int BALANCE_SIDE_DEBIT = 1;
+    public static final int BALANCE_SIDE_LEFT = 2;
+    public static final int BALANCE_SIDE_CREDIT = 3;
+    public static final int BALANCE_SIDE_FORGED = 4;
+
     // toBYTE & PARSE fields for different DEALs
     public static final int FOR_MYPACK = 1; // not use this.timestamp & this.feePow
     public static final int FOR_PACK = 2; // not use feePow
@@ -120,6 +125,11 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public static final int NO_INCLAIM_BALANCE = 49;
 
+    public static final int NOT_ENOUGH_ERA_OWN_10 = 101;
+    public static final int NOT_ENOUGH_ERA_USE_10 = 102;
+    public static final int NOT_ENOUGH_ERA_OWN_100 = 103;
+    public static final int NOT_ENOUGH_ERA_USE_100 = 104;
+
     public static final int INVALID_BACKWARD_ACTION = 117;
     public static final int NOT_SELF_PERSONALIZY = 118;
     public static final int PUB_KEY_NOT_PERSONALIZED = 119;
@@ -141,6 +151,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int NOT_HOLDABLE_ASSET = 172;
     public static final int NOT_SPENDABLE_ASSET = 173;
 
+    /**
+     * Прровека на коллизию ключа по подписи - проверяем только если усекаем его и нетпроверки на двойную трату -
+     * BlockChain#CHECK_DOUBLE_SPEND_DEEP
+     */
     public static final int KEY_COLLISION = 194;
 
     public static final int INVALID_MESSAGE_FORMAT = 195;
@@ -225,12 +239,12 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int GENESIS_ISSUE_TEMPLATE_TRANSACTION = 2;
     public static final int GENESIS_ISSUE_PERSON_TRANSACTION = 3;
     public static final int GENESIS_ISSUE_STATUS_TRANSACTION = 4;
-    public static final int GENESIS_ISSUE_UNION_TRANSACTION = 5; //
+    public static final int GENESIS_ISSUE_UNION_TRANSACTION = 5;
     public static final int GENESIS_SEND_ASSET_TRANSACTION = 6;
-    public static final int GENESIS_SIGN_NOTE_TRANSACTION = 7; //
-    public static final int GENESIS_CERTIFY_PERSON_TRANSACTION = 8; // нет в гуи
-    public static final int GENESIS_ASSIGN_STATUS_TRANSACTION = 9;//
-    public static final int GENESIS_ADOPT_UNION_TRANSACTION = 10;//
+    public static final int GENESIS_SIGN_NOTE_TRANSACTION = 7;
+    public static final int GENESIS_CERTIFY_PERSON_TRANSACTION = 8;
+    public static final int GENESIS_ASSIGN_STATUS_TRANSACTION = 9;
+    public static final int GENESIS_ADOPT_UNION_TRANSACTION = 10;
     // ISSUE ITEMS
     public static final int ISSUE_ASSET_TRANSACTION = 21;
     public static final int ISSUE_IMPRINT_TRANSACTION = 22;
@@ -238,25 +252,19 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int ISSUE_PERSON_TRANSACTION = 24;
     public static final int ISSUE_STATUS_TRANSACTION = 25;
     public static final int ISSUE_UNION_TRANSACTION = 26;
-    public static final int ISSUE_STATEMENT_TRANSACTION = 27; // not in gui
+    public static final int ISSUE_STATEMENT_TRANSACTION = 27;
     public static final int ISSUE_POLL_TRANSACTION = 28;
     // SEND ASSET
     public static final int SEND_ASSET_TRANSACTION = 31;
-    // RENT ASSET
-    //public static final int RENT_ASSET_TRANSACTION = 32; //
-    // HOLD ASSET
-    //public static final int HOLD_ASSET_TRANSACTION = 33; // not in gui
     // OTHER
-    public static final int SIGN_NOTE2_TRANSACTION = 34;
     public static final int SIGN_NOTE_TRANSACTION = 35;
     public static final int CERTIFY_PUB_KEYS_TRANSACTION = 36;
     public static final int SET_STATUS_TO_ITEM_TRANSACTION = 37;
     public static final int SET_UNION_TO_ITEM_TRANSACTION = 38;
-    public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 39; // not in
-    // confirms other transactions
-    // NOT EDIT - fkr CONCORCIUM = 40 !!!
+    public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 39;
+    // confirm other transactions
     public static final int VOUCH_TRANSACTION = 40;
-    // gui
+    // HASHES
     public static final int HASHES_RECORD = 41;
     // exchange of assets
     public static final int CREATE_ORDER_TRANSACTION = 50;
@@ -369,6 +377,11 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected byte[] signature;
     protected long timestamp;
     protected PublicKeyAccount creator;
+
+    /**
+     * если да то значит взята из Пула трнзакций и на двойную трату проверялась
+     */
+    public boolean checkedByPool;
 
     // need for genesis
     protected Transaction(byte type, String type_name) {
@@ -661,7 +674,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public String getTitle() {
-        return null;
+        return viewTypeName();
     }
 
     /*
@@ -748,9 +761,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     // GET only INVITED FEE
     public long getInvitedFee() {
 
-        if (true)
+        if (!BlockChain.REFERAL_BONUS_FOR_PERSON(height)) {
             // SWITCH OFF REFERRAL
             return 0l;
+        }
 
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         if (personDuration == null
@@ -762,9 +776,14 @@ public abstract class Transaction implements ExplorerJsonLine {
         long fee = this.fee.unscaledValue().longValue();
 
         // Если слишком большая комиссия, то и награду чуток увеличим
-        if (fee > BlockChain.BONUS_REFERAL << 3)
+        if (fee > BlockChain.BONUS_REFERAL << 4)
             return BlockChain.BONUS_REFERAL << 1;
+        else if (fee < BlockChain.BONUS_REFERAL << 2) {
+            // стандартно если обычная то половину отправим на подарки
+            return fee >> 1;
+        }
 
+        // если повышенная то не будем изменять
         return BlockChain.BONUS_REFERAL;
     }
 
@@ -822,6 +841,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         return this.dbRef;
     }
 
+    public byte[] getDBRefAsBytes() {
+        return Longs.toByteArray(this.dbRef);
+    }
+
     // reference in Map - or as signatire or as BlockHeight + seqNo
     public byte[] getDBRef(DCSet db) {
         if (this.getConfirmations(db) < BlockChain.MAX_ORPHAN) {
@@ -856,15 +879,22 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public static Long parseDBRef(String refStr) {
+        if (refStr == null)
+            return null;
+
         try {
             String[] strA = refStr.split("\\-");
             int height = Integer.parseInt(strA[0]);
             int seq = Integer.parseInt(strA[1]);
             byte[] ref = Ints.toByteArray(height);
             return Longs.fromByteArray(Bytes.concat(ref, Ints.toByteArray(seq)));
-        } catch (Exception e1) {
-            return null;
+        } catch (Exception e) {
+            try {
+                return Long.parseLong(refStr);
+            } catch (Exception e1) {
+            }
         }
+        return null;
     }
 
     public static Tuple2<Integer, Integer> parseDBRef(Long dbRef) {
@@ -876,6 +906,10 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         return new Tuple2<Integer, Integer>(blockHeight, seqNo);
 
+    }
+
+    public static int parseDBRefHeight(long dbRef) {
+        return (int) (dbRef >> 32);
     }
 
     public boolean addCalculated(Block block, Account creator, long assetKey, BigDecimal amount,
@@ -1035,6 +1069,9 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (this.height > 0) {
                 transaction.put("height", this.height);
                 transaction.put("sequence", this.seqNo);
+                if (isWiped()) {
+                    transaction.put("wiped", true);
+                }
             }
         }
 
@@ -1155,14 +1192,11 @@ public abstract class Transaction implements ExplorerJsonLine {
     public abstract int getDataLength(int forDeal, boolean withSignature);
 
     // PROCESS/ORPHAN
-
     public boolean isWiped() {
-        for (byte[] wiped : BlockChain.WIPED_RECORDS) {
-            if (Arrays.equals(this.signature, wiped)) {
-                return true;
-            }
-        }
-        return false;
+        if (getType() == CALCULATED_TRANSACTION)
+            return false;
+
+        return BlockChain.isWiped(this.signature);
     }
 
     public boolean isSignatureValid(DCSet dcSet) {
@@ -1226,20 +1260,20 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         // CHECK IF REFERENCE IS OK
         //Long reference = asDeal == null ? this.creator.getLastTimestamp(dcSet) : asDeal;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (asDeal > Transaction.FOR_MYPACK && height > BlockChain.ALL_BALANCES_OK_TO) {
             if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
                 /// вообще не проверяем в тесте
                 if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
                     if (BlockChain.CHECK_BUGS > 0)
-                        LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                        LOGGER.debug("diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
                     return INVALID_TIMESTAMP;
                 }
             } else if (BlockChain.CHECK_DOUBLE_SPEND_DEEP > 0) {
                 if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
                     if (BlockChain.CHECK_BUGS > 0)
-                        LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                        LOGGER.debug("diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
                     return INVALID_TIMESTAMP;
                 }
 
@@ -1247,12 +1281,12 @@ public abstract class Transaction implements ExplorerJsonLine {
                 long[] reference = this.creator.getLastTimestamp(dcSet);
                 if (reference != null && reference[0] >= this.timestamp
                         && height > BlockChain.VERS_4_11
-                        && (!BlockChain.DEVELOP_USE || height < 495000)) {
+                ) {
                     if (BlockChain.TEST_DB == 0) {
                         if (BlockChain.CHECK_BUGS > 1)
                             LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
-                                + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
-                                + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+                                    + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                                    + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
                     }
 
                     return INVALID_TIMESTAMP;
@@ -1277,27 +1311,19 @@ public abstract class Transaction implements ExplorerJsonLine {
             return NOT_ENOUGH_FEE;
         }
 
-        if ((flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0l
+        if ((flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0L
                 && this.hasPublicText()
                 && !BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
                 && !this.creator.isPerson(dcSet, height)) {
-            if (BlockChain.DEVELOP_USE) {
-                boolean good = false;
-                for (String admin : BlockChain.GENESIS_ADMINS) {
-                    if (this.creator.equals(admin)) {
-                        good = true;
-                        break;
-                    }
-                }
-                if (!good)
-                    return CREATOR_NOT_PERSONALIZED;
-            } else {
-                return CREATOR_NOT_PERSONALIZED;
-            }
+            return CREATOR_NOT_PERSONALIZED;
         }
 
-        if ((flags & NOT_VALIDATE_KEY_COLLISION) == 0l
-                && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0 && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
+        if (false &&  // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
+                (flags & NOT_VALIDATE_KEY_COLLISION) == 0l
+                && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0
+                && !checkedByPool // транзакция не существует в ожидании - иначе там уже проверили
+                && this.signature != null
+                && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
             // потому что мы ключ урезали до 12 байт - могут быть коллизии
             return KEY_COLLISION;
         }
@@ -1310,7 +1336,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                                    long invitedPersonKey, boolean asOrphan,
                                    List<RCalculated> txCalculated, String message) {
 
-        if (fee_gift <= 0l)
+        if (fee_gift <= 0L)
             return;
 
         String messageLevel;
@@ -1323,22 +1349,29 @@ public abstract class Transaction implements ExplorerJsonLine {
         Transaction issueRecord = this.dcSet.getTransactionFinalMap().get(inviteredDBRef);
         Account issuerAccount = issueRecord.getCreator();
         Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = issuerAccount.getPersonDuration(this.dcSet);
-        long issuerPersonKey = issuerPersonDuration.a;
-
-        if (issuerPersonKey == invitedPersonKey) {
-            // loop ??
-            return;
+        long issuerPersonKey;
+        if (issuerPersonDuration == null) {
+            // в тестовой сети возможно что каждый создает с неудостоверенного
+            issuerPersonKey = -1;
+        } else {
+            issuerPersonKey = issuerPersonDuration.a;
         }
 
-        if (issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
+        if (issuerPersonKey < 0 // это возможно только для певой персоны и то если не она сама себя зарегала и в ДЕВЕЛОПЕ так что пусть там и будет
+                || issuerPersonKey == invitedPersonKey // это возможно только в ДЕВЕЛОПЕ так что пусть там и будет
+                || issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
         ) {
-            // IT IS ME - all fee to INVITED
+            // break loop
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
+            invitedAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false, true);
+            // учтем что получили бонусы
+            invitedAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
+
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " top level";
                 txCalculated.add(new RCalculated(invitedAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
+
             }
             return;
         }
@@ -1357,9 +1390,13 @@ public abstract class Transaction implements ExplorerJsonLine {
             long fee_gift_get = fee_gift - fee_gift_next;
 
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false, true);
+
+            // учтем что получили бонусы
+            issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
+
             if (txCalculated != null && !asOrphan) {
-                messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
+                messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
                 txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
@@ -1372,10 +1409,14 @@ public abstract class Transaction implements ExplorerJsonLine {
             // this is END LEVEL
             // GET REST of GIFT
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY,
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false, true);
+
+            // учтем что получили бонусы
+            issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
 
             if (txCalculated != null && !asOrphan) {
-                messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
+                messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
                 txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
@@ -1394,8 +1435,9 @@ public abstract class Transaction implements ExplorerJsonLine {
                 || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY) {
 
             // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
-            GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, FEE_KEY,
-                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), true);
+            GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), true, false);
+
             return;
         }
 
@@ -1421,18 +1463,23 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, true, FEE_KEY, this.fee, true);
-
+                this.creator.changeBalance(this.dcSet, true, false, FEE_KEY, this.fee, true, true);
+                // учтем траты
+                this.creator.changeCOMPUBonusBalances(this.dcSet, true, this.fee, BALANCE_SIDE_CREDIT);
             }
 
             // Multi Level Referal
-            long invitedFee = getInvitedFee();
-            if (invitedFee > 0)
-                process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
-                        block != null && block.txCalculated != null ?
-                                block.txCalculated : null, "@" + this.viewHeightSeq() + " referal");
-
-            String creatorAddress = this.creator.getAddress();
+            if (BlockChain.FEE_INVITED_DEEP > 0) {
+                long invitedFee = getInvitedFee();
+                if (invitedFee > 0) {
+                    if (BlockChain.CHECK_BUGS > 3 && height == 3104) {
+                        boolean debug = true;
+                    }
+                    process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
+                            block != null && block.txCalculated != null ?
+                                    block.txCalculated : null, "Referal bonus " + "@" + this.viewHeightSeq());
+                }
+            }
 
             // UPDATE REFERENCE OF SENDER
             this.creator.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
@@ -1442,10 +1489,11 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public void orphan(Block block, int asDeal) {
 
-        if (false
-                //Base58.encode(this.signature)
-                //.equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
-                ) {
+        if (false && BlockChain.CHECK_BUGS > 1
+            ///&& viewHeightSeq().equals("628853-1") // is forging 628853-1
+            //Base58.encode(this.signature)
+            //.equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
+        ) {
             int error = 0;
             error++;
         }
@@ -1453,19 +1501,23 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (asDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, true);
+                this.creator.changeBalance(this.dcSet, false, false, FEE_KEY, this.fee, true, true);
+                // учтем траты
+                this.creator.changeCOMPUBonusBalances(this.dcSet, false, this.fee, BALANCE_SIDE_CREDIT);
 
             }
 
             // calc INVITED FEE
-            long invitedFee = getInvitedFee();
-            if (invitedFee > 0)
-                process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, true,
-                        null, null);
+            if (BlockChain.FEE_INVITED_DEEP > 0) {
+                long invitedFee = getInvitedFee();
+                if (invitedFee > 0)
+                    process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, true,
+                            null, null);
+            }
 
             // UPDATE REFERENCE OF SENDER
             // set last transaction signature for this ACCOUNT
-            this.creator.removeLastTimestamp(this.dcSet);
+            this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
         }
 
@@ -1509,22 +1561,37 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public int getConfirmations(int chainHeight) {
 
-        if (this.height == 0) {
+        if (this.height == 0)
             return 0;
-        } else {
-            return chainHeight - this.height;
-        }
+
+        return 1 + chainHeight - this.height;
     }
 
     public int getConfirmations(DCSet db) {
 
         // CHECK IF IN UNCONFIRMED TRANSACTION
 
-        if (this.height > 0)
-            return 1 + db.getBlockMap().size() - this.height;
+        if (this.height == 0)
+            return 0;
 
-        return 0;
+        return 1 + db.getBlockMap().size() - this.height;
 
+    }
+
+    /**
+     * ОЧЕНЬ ВАЖНО чтобы Finalizer мог спокойно удалять их и DCSet.fork
+     * иначе Финализер не можеи зацикленные сслки порвать и не очищает HEAP.
+     * Возможно можно еще освободить объекты
+     */
+    public void resetDCSet() {
+        dcSet = null;
+    }
+
+    // ПРОЫЕРЯЛОСЬ! действует в совокупк с Финализе в Блоке
+    @Override
+    protected void finalize() throws Throwable {
+        dcSet = null;
+        super.finalize();
     }
 
     @Override

@@ -1,8 +1,11 @@
 package org.erachain.dbs.mapDB;
 
 import org.erachain.database.DBASet;
-import org.erachain.dbs.DBMapSuitImpl;
-import org.erachain.dbs.IMap;
+import org.erachain.datachain.IndexIterator;
+import org.erachain.dbs.DBSuitImpl;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -19,7 +22,7 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
+public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
 
     protected Logger logger;
     public int DESCENDING_SHIFT_INDEX = 10000;
@@ -40,28 +43,34 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     /**
-     *
      * @param databaseSet
      * @param database - общая база данных для данного набора - вообще надо ее в набор свтавить и все.
      *                 У каждой таблицы внутри может своя база данных открытьваться.
      *                 А команды базы данных типа close commit должны из таблицы передаваться в свою.
      *                 Если в общей базе таблица, то не нужно обработка так как она делается в наборе наверху
      * @param logger
+     * @param sizeEnable
+     * @param cover
      */
-    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, U defaultValue) {
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean sizeEnable, DBTab cover) {
 
         this.databaseSet = databaseSet;
         this.database = database;
         this.logger = logger;
-        this.defaultValue = defaultValue;
+        this.cover = cover;
+        this.sizeEnable = sizeEnable;
 
         openMap();
         createIndexes();
         logger.info("USED");
     }
 
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean sizeEnable) {
+        this(databaseSet, database, logger, sizeEnable, null);
+    }
+
     public DBMapSuit(DBASet databaseSet, DB database, Logger logger) {
-        this(databaseSet, database, logger, null);
+        this(databaseSet, database, logger, false, null);
     }
 
     /**
@@ -106,8 +115,8 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     @Override
-    public IMap getSource() {
-        return (IMap) map;
+    public Object getSource() {
+        return map;
     }
 
     //@Override
@@ -128,21 +137,15 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         return null;
     }
 
-    /**
-     *
-     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
-     * @param descending true if need descending sort
-     * @return
-     */
     @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIterator(int index, boolean descending) {
         this.addUses();
 
         // 0 - это главный индекс - он не в списке indexes
         NavigableSet<Tuple2<?, T>> indexSet = getIndex(index, descending);
         if (indexSet != null) {
 
-            org.erachain.datachain.IndexIterator<T> u = new org.erachain.datachain.IndexIterator<>(this.indexes.get(index));
+            IndexIterator<T> u = new org.erachain.datachain.IndexIterator<>(this.indexes.get(index));
             this.outUses();
             return u;
 
@@ -150,24 +153,24 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
             if (descending) {
                 Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
                 this.outUses();
-                return u;
+                return new IteratorCloseableImpl(u);
             }
 
             Iterator<T> u = this.map.keySet().iterator();
             this.outUses();
-            return u;
+            return new IteratorCloseableImpl(u);
 
         }
     }
 
     @Override
-    public Iterator<T> getIterator() {
+    public IteratorCloseable<T> getIterator() {
         this.addUses();
 
         Iterator<T> u = map.keySet().iterator();
 
         this.outUses();
-        return u;
+        return new IteratorCloseableImpl(u);
 
     }
 
@@ -366,15 +369,16 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     @Override
-    public U getDefaultValue() {
-        return defaultValue;
+    public void clearCache() {
+        // систится у всей базы
     }
 
     @Override
-    public void clearCache() {}
-
-    @Override
-    public void close() {}
+    public void close() {
+        databaseSet = null;
+        database = null;
+        map = null;
+    }
 
     @Override
     public boolean isClosed() {
@@ -386,5 +390,9 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public void rollback() {}
+
+    @Override
+    public void afterRollback() {
+    }
 
 }

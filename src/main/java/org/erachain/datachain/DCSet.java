@@ -27,6 +27,7 @@ import org.mapdb.DBMaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOError;
 import java.nio.file.Files;
@@ -38,7 +39,7 @@ import java.util.Random;
  * а в ней уже хранится объект набора DCSet
  */
 @Slf4j
-public class DCSet extends DBASet {
+public class DCSet extends DBASet implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN
@@ -47,6 +48,13 @@ public class DCSet extends DBASet {
     private static final long MAX_ENGINE_BEFORE_COMMIT_KB = 999999999999999L; ///BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 5;
     private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
     public static final long DELETIONS_BEFORE_COMPACT = (long) ACTIONS_BEFORE_COMMIT;
+
+    /**
+     * Включает подсчет количество в основной таблице трнзакций или в Таблице с подписями
+     */
+    static private boolean SIZE_ENABLE_IN_FINAL = true;
+
+    // эти настройки по умолчанию при ФАСТ режиме пойдут
 
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
@@ -62,8 +70,8 @@ public class DCSet extends DBASet {
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
      */
-    public static final int FINAL_TX_SIGNS_MAP = DBS_ROCK_DB;
-    public static final int FINAL_TX_SIGNS_MAP_FORK = DBS_NATIVE_MAP;
+    public static final int FINAL_TX_SIGNS_MAP = DBS_MAP_DB;
+    public static final int FINAL_TX_SIGNS_MAP_FORK = DBS_MAP_DB;
 
     /**
      * DBS_MAP_DB - slow, DBS_ROCK_DB - crash, DBS_MAP_DB_IN_MEM - fast
@@ -77,17 +85,17 @@ public class DCSet extends DBASet {
     /**
      * DBS_MAP_DB - good, DBS_ROCK_DB - very SLOW потому что BigDecimal 20 байт - хотя с -opi это не делаем
      */
-    public static final int ACCOUNT_BALANCES = DBS_ROCK_DB;
+    public static final int ACCOUNT_BALANCES = DBS_MAP_DB;
     public static final int ACCOUNT_BALANCES_FORK = DBS_NATIVE_MAP;
 
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
      */
-    public static final int ACCOUNTS_REFERENCES = DBS_ROCK_DB;
+    public static final int ACCOUNTS_REFERENCES = DBS_MAP_DB;
 
-    public static final int ORDERS_MAP = DBS_ROCK_DB;
+    public static final int ORDERS_MAP = DBS_MAP_DB;
     public static final int COMPLETED_ORDERS_MAP = DBS_ROCK_DB;
-    public static final int TRADES_MAP = DBS_ROCK_DB;
+    public static final int TRADES_MAP = DBS_MAP_DB;
 
     /**
      * если задано то выбран такой КЭШ который нужно самим чистить иначе реперолнение будет
@@ -101,7 +109,7 @@ public class DCSet extends DBASet {
     // % и @ и # - пусть они будут служебные и по ним не делать разделения
     // так чтобы можно было найти @P указатель на персон например
     // % - это указатель на параметр например иак - %1
-    public static String SPLIT_CHARS = "[!?/_., \\-~`+&^№*()<>\\\"\\'|\\[\\]{}=;:\\\\]";
+    public static String SPLIT_CHARS = "[!?/_., \\~`+&^№*()<>\\\"\\'|\\[\\]{}=;:\\\\]";
 
     private boolean inMemory = false;
 
@@ -119,7 +127,7 @@ public class DCSet extends DBASet {
     private KKPersonUnionMap kKPersonUnionMap;
     private KKPollUnionMap kKPollUnionMap;
     private KKStatusUnionMap kKStatusUnionMap;
-    private AddressPersonMap addressPersonMap;
+    private AddressPersonMapImpl addressPersonMap;
     private PersonAddressMap personAddressMap;
     private KKKMapPersonStatusUnion kK_KPersonStatusUnionMapPersonStatusUnionTable;
     private VouchRecordMap vouchRecordMap;
@@ -199,40 +207,41 @@ public class DCSet extends DBASet {
 
         try {
             // переделанные таблицы
-            this.assetBalanceMap = new ItemAssetBalanceMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.assetBalanceMap = new ItemAssetBalanceMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     ACCOUNT_BALANCES
                     , this, database);
 
-            this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     FINAL_TX_MAP
-                    , this, database);
+                    , this, database, SIZE_ENABLE_IN_FINAL);
 
             this.transactionTab = new TransactionMapImpl(UNCONF_TX_MAP, this, database);
 
-            this.referenceMap = new ReferenceMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.referenceMap = new ReferenceMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     ACCOUNTS_REFERENCES
                     , this, database);
 
-            this.blockMap = new BlocksMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.blockMap = new BlocksMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     BLOCKS_MAP
                     , this, database);
 
-            this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS > 0 ? defaultDBS :
+            this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     FINAL_TX_SIGNS_MAP
-                    , this, database);
+                    , this, database, !SIZE_ENABLE_IN_FINAL);
 
-            this.orderMap = new OrderMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.orderMap = new OrderMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     ORDERS_MAP
                     , this, database);
 
-            this.completedOrderMap = new CompletedOrderMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.completedOrderMap = new CompletedOrderMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     COMPLETED_ORDERS_MAP
                     , this, database);
 
-            this.tradeMap = new TradeMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.tradeMap = new TradeMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     TRADES_MAP
                     , this, database);
 
+            this.addressPersonMap = new AddressPersonMapImpl(defaultDBS != DBS_FAST ? defaultDBS : DBS_MAP_DB, this, database);
 
             this.actions = 0L;
 
@@ -250,7 +259,6 @@ public class DCSet extends DBASet {
             this.kKPersonUnionMap = new KKPersonUnionMap(this, database);
             this.kKPollUnionMap = new KKPollUnionMap(this, database);
             this.kKStatusUnionMap = new KKStatusUnionMap(this, database);
-            this.addressPersonMap = new AddressPersonMap(this, database);
             this.personAddressMap = new PersonAddressMap(this, database);
             this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(this, database);
             this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(this, database);
@@ -338,7 +346,7 @@ public class DCSet extends DBASet {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
             if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
-                        + (Controller.MIN_MEMORY_TAIL << 1)) {
+                    + (Controller.MIN_MEMORY_TAIL)) {
                 // у родителя чистим - у себя нет, так как только создали
                 parent.clearCache();
                 System.gc();
@@ -379,7 +387,7 @@ public class DCSet extends DBASet {
 
         this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(
                 FINAL_TX_SIGNS_MAP_FORK
-                , parent.transactionFinalMapSigns, this);
+                , parent.transactionFinalMapSigns, this, true);
 
         this.orderMap = new OrderMapImpl(
                 DBS_MAP_DB
@@ -397,6 +405,8 @@ public class DCSet extends DBASet {
                 //DBS_NATIVE_MAP
                 , parent.tradeMap, this);
 
+        this.addressPersonMap = new AddressPersonMapImpl(DBS_MAP_DB, parent.addressPersonMap, this);
+
 
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
@@ -409,7 +419,6 @@ public class DCSet extends DBASet {
         this.kKPollUnionMap = new KKPollUnionMap(parent.kKPollUnionMap, this);
         this.kKStatusUnionMap = new KKStatusUnionMap(parent.kKStatusUnionMap, this);
 
-        this.addressPersonMap = new AddressPersonMap(parent.addressPersonMap, this);
         this.personAddressMap = new PersonAddressMap(parent.personAddressMap, this);
         this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(parent.kK_KPersonStatusUnionMapPersonStatusUnionTable, this);
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
@@ -595,7 +604,8 @@ public class DCSet extends DBASet {
     public static boolean needResetUTXPoolMap = false;
     public static DB makeDBinMemory() {
 
-        int freeSpaceReclaimQ = 3;
+        // лучше для памяти ставить наилучшее сжатие чтобы память не кушать лишний раз
+        int freeSpaceReclaimQ = 10;
         needResetUTXPoolMap = freeSpaceReclaimQ < 3;
         return DBMaker
                 .newMemoryDB()
@@ -1592,7 +1602,7 @@ public class DCSet extends DBASet {
 
             this.outUses();
 
-            Controller.getInstance().stopAll(13);
+            Controller.getInstance().stopAll(1113);
             return null;
         }
 
@@ -1611,16 +1621,48 @@ public class DCSet extends DBASet {
      * Нужно незабыть переменные внктри каждой таблицы тоже в Родителя скинуть
      */
     @Override
-    public void writeToParent() {
+    public synchronized void writeToParent() {
 
-        // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
-        // иначе размер больше будет в форке и не то значение
-        ((BlockMap) blockMap.getParent()).setLastBlockSignature(blockMap.getLastBlockSignature());
-
-        for (DBTab table : tables) {
-            table.writeToParent();
+        // проверим сначала тут память чтобы посередине не вылететь
+        if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+            // System.out.println("########################### Free Memory:"
+            // + Runtime.getRuntime().freeMemory());
+            if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                    + (Controller.MIN_MEMORY_TAIL)) {
+                // у родителя чистим - у себя нет, так как только создали
+                parent.clearCache();
+                System.gc();
+                if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1)) {
+                    logger.error("Heap Memory Overflow");
+                    Controller.getInstance().stopAll(9618);
+                    return;
+                }
+            }
         }
-        // теперь нужно все общие переменные переопределить
+
+        try {
+            // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
+            // иначе размер больше будет в форке и не то значение
+            ((BlockMap) blockMap.getParent()).setLastBlockSignature(blockMap.getLastBlockSignature());
+
+            for (DBTab table : tables) {
+                table.writeToParent();
+            }
+            // теперь нужно все общие переменные переопределить
+        } catch (Exception e) {
+
+            LOGGER.error(e.getMessage(), e);
+
+            // база битая полуяается !? хотя rollback должен сработать
+            Controller.getInstance().stopAll(9613);
+            return;
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
+
+            // база битая полуяается !? хотя rollback должен сработать
+            Controller.getInstance().stopAll(9615);
+        }
 
     }
 
@@ -1675,18 +1717,31 @@ public class DCSet extends DBASet {
                         LOGGER.error(e.getMessage(), e);
                     }
                 }
+                // улучшает работу финализера
+                tables = null;
                 try {
                     this.database.close();
                 } catch (IOError e) {
                     LOGGER.error(e.getMessage(), e);
                 }
+                // улучшает работу финализера
+                this.database = null;
 
                 this.uses = 0;
             }
 
-            logger.info("closed");
+            logger.info("closed " + (parent == null ? "Main" : "parent " + toString()));
         }
 
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        close();
+        if (BlockChain.CHECK_BUGS > 5) {
+            LOGGER.debug("DCSet is FINALIZED: " + this.toString());
+        }
+        super.finalize();
     }
 
     @Override
@@ -1701,7 +1756,13 @@ public class DCSet extends DBASet {
         }
 
         this.database.rollback();
+
         getBlockMap().resetLastBlockSignature();
+
+        for (DBTab tab : tables) {
+            tab.afterRollback();
+        }
+
         this.actions = 0l;
         this.outUses();
     }

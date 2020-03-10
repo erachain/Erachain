@@ -83,7 +83,7 @@ public class WebResource {
             "17_message_in.png", "17_message_out.png", "asset_trade.png",
             "at_tx_in.png", "at_tx_out.png", "grleft.png", "grright.png",
             "redleft.png", "redright.png", "bar.gif", "bar_left.gif",
-            "bar_right.gif", "locked.png", "unlocked.png"};
+            "bar_right.gif", "locked.png", "unlocked.png", "exchange.png"};
 
     public static String selectTitleOpt(Document htmlDoc) {
         String title = selectFirstElementOpt(htmlDoc, "title");
@@ -1101,7 +1101,7 @@ public class WebResource {
                     Controller.getInstance().getForgingStatus().getName());
             pebbleHelper.getContextMap().put(
                     "version",
-                    "Erachain.org " + Controller.getInstance().getVersion());
+                    Controller.getInstance().getApplicationName(true));
 
             int status = Controller.getInstance().getStatus();
             String statustext = "";
@@ -1111,7 +1111,7 @@ public class WebResource {
             if (Controller.getInstance().getWalletSyncHeight() > 0) {
                 statustext = "<span class=\"translate\">Wallet Synchronizing</span> ";
                 statustext += 100 * Controller.getInstance().getWalletSyncHeight() / HWeight.a + "%<br>";
-                statustext += "<span class=\"translate\">Height</span>: " + Controller.getInstance().getWalletSyncHeight() + "/" + HWeight.a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false).a;
+                statustext += "<span class=\"translate\">Height</span>: " + Controller.getInstance().getWalletSyncHeight() + "/" + HWeight.a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false, false).a;
             } else if (status == Controller.STATUS_OK) {
                 statustext = "OK<br>";
                 statustext += "<span class=\"translate\">Height</span>: " + HWeight.a;
@@ -1122,8 +1122,8 @@ public class WebResource {
                 statustext += " <span class=\"translate\">Weight</span>: " + HWeight.b;
             } else if (status == Controller.STATUS_SYNCHRONIZING) {
                 statustext = "<span class=\"translate\">Synchronizing</span> ";
-                statustext += 100 * HWeight.a / Controller.getInstance().getMaxPeerHWeight(0, false).a + "%<br>";
-                statustext += "<span class=\"translate\">Height</span>: " + HWeight.a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false).a;
+                statustext += 100 * HWeight.a / Controller.getInstance().getMaxPeerHWeight(0, false, false).a + "%<br>";
+                statustext += "<span class=\"translate\">Height</span>: " + HWeight.a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false, false).a;
             }
 
             pebbleHelper.getContextMap().put(
@@ -1169,7 +1169,8 @@ public class WebResource {
         File file = new File("web/favicon.ico");
 
         if (file.exists()) {
-            return Response.ok(file, "image/vnd.microsoft.icon").build();
+            return Response.ok(file, "image/png").build();
+            //return Response.ok(file, "image/vnd.microsoft.icon").build();
         } else {
             return error404(request, null);
         }
@@ -1181,7 +1182,8 @@ public class WebResource {
         File file = new File("web/favicon.ico");
 
         if (file.exists()) {
-            return Response.ok(file, "image/vnd.microsoft.icon").build();
+            return Response.ok(file, "image/png").build();
+            //return Response.ok(file, "image/vnd.microsoft.icon").build();
         } else {
             return error404(request, null);
         }

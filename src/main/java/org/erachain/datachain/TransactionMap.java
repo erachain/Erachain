@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -31,7 +32,7 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
 
     Integer setObservableData(int index, Integer data);
 
-    Iterator<Long> getTimestampIterator(boolean descending);
+    IteratorCloseable<Long> getTimestampIterator(boolean descending);
 
     int clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime);
 
@@ -47,11 +48,11 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
 
     Transaction get(byte[] signature);
 
-    Collection<Long> getFromToKeys(long fromKey, long toKey);
+    Collection<Long> getFromToKeys(long fromKey, int limit);
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    Iterator findTransactionsKeys(String address, String sender, String recipient,
-                                  int type, boolean desc, int offset, int limit, long timestamp);
+    IteratorCloseable findTransactionsKeys(String address, String sender, String recipient,
+                                           int type, boolean desc, int offset, int limit, long timestamp);
 
     List<Transaction> findTransactions(String address, String sender, String recipient,
                                        int type, boolean desc, int offset, int limit, long timestamp);
@@ -72,9 +73,9 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
     int getTotalDeleted();
 
     int size();
-    ///Iterator<Long> getIterator(int index, boolean descending);
+    ///IteratorCloseable<Long> getIterator(int index, boolean descending);
 
-    ///Iterator<Long> getIterator();
+    ///IteratorCloseable<Long> getIterator();
 
     Collection<Transaction> values();
 

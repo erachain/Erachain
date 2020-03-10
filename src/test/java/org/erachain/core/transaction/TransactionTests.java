@@ -85,12 +85,12 @@ public class TransactionTests {
 
         // FEE FUND
         maker.setLastTimestamp(new long[]{last_ref, 0}, db);
-        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
         new_ref = maker.getLastTimestamp(db)[0];
 
         buyer.setLastTimestamp(new long[]{last_ref, 0}, db);
-        buyer.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        buyer.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(2000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false); // for bye
+        buyer.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        buyer.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(2000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false); // for bye
 
 
     }
@@ -640,7 +640,7 @@ String  s= "";
         nameRegistration.sign(maker, Transaction.FOR_NETWORK);
         nameRegistration.process(gb, Transaction.FOR_NETWORK);
         // set FEE
-        maker.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(databaseSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         //CREATE NAME UPDATE
         name = new Name(new Account("Qj5Aq4P4ehXaCEmi6vqVrFQDecpPXKSi8z"), "test", "new value");
@@ -680,7 +680,7 @@ String  s= "";
         nameRegistration.sign(maker, Transaction.FOR_NETWORK);
         nameRegistration.process(gb, Transaction.FOR_NETWORK);
         // set FEE
-        maker.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(databaseSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         //CREATE NAME UPDATE
         name = new Name(new Account("XYLEQnuvhracK2WMN3Hjif67knkJe9hTQn"), "test", "new value");
@@ -1281,14 +1281,14 @@ String  s= "";
         assertEquals(Transaction.BUYER_ALREADY_OWNER, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME UPDATE NO BALANCE
-        buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        buyer.changeBalance(databaseSet, false, false, FEE_KEY, BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
         namePurchaseTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet)[0]);
 
         //CHECK IF NAME UPDATE IS INVALID
         assertEquals(Transaction.NO_BALANCE, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         // setConfirmedBalance(long key, BigDecimal amount, DLSet db)
-        buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(2000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        buyer.changeBalance(databaseSet, false, false, FEE_KEY, BigDecimal.valueOf(2000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         //CREATE NAME UPDATE INVALID REFERENCE
         namePurchaseTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, -123L);

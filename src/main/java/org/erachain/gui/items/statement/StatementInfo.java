@@ -9,16 +9,16 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.*;
 import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.lang.Lang;
+import org.erachain.utils.MenuPopupUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;
-import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -43,7 +43,7 @@ public class StatementInfo extends javax.swing.JPanel {
     RSignNote statement;
     Transaction transaction;
     private MAttachedFilesPanel file_Panel;
-    private VoushLibraryPanel voush_Library_Panel;
+    private VouchLibraryPanel voush_Library_Panel;
     private javax.swing.JLabel jLabel_Title;
     private javax.swing.JPanel jPanel1;
     private MSplitPane jSplitPane1;
@@ -90,7 +90,7 @@ public class StatementInfo extends javax.swing.JPanel {
 
             try {
                 JSONObject data = (JSONObject) JSONValue
-                        .parseWithException(new String(statement.getData(), Charset.forName("UTF-8")));
+                        .parseWithException(new String(statement.getData(), StandardCharsets.UTF_8));
                 // params
 
                 if (data.containsKey("Statement_Params")) {
@@ -131,7 +131,7 @@ public class StatementInfo extends javax.swing.JPanel {
                 List<String> vars = template.getVarNames();
                 if (vars != null && !vars.isEmpty()) {
                     // try replace variables
-                    String dataVars = new String(statement.getData(), Charset.forName("UTF-8"));
+                    String dataVars = new String(statement.getData(), StandardCharsets.UTF_8);
                     String[] rows = dataVars.split("\n");
                     Map<String, String> varsArray = new HashMap<String, String>();
                     for (String row : rows) {
@@ -151,7 +151,7 @@ public class StatementInfo extends javax.swing.JPanel {
 
                 jTextArea_Body.setText(template.viewName() + "<br><br>"
                         + Library.to_HTML(description) + "<br><br>"
-                        + new String(statement.getData(), Charset.forName("UTF-8")));
+                        + new String(statement.getData(), StandardCharsets.UTF_8));
 
             }
 
@@ -267,7 +267,7 @@ public class StatementInfo extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 11, 11, 11);
-        voush_Library_Panel = new VoushLibraryPanel(transaction);
+        voush_Library_Panel = new VouchLibraryPanel(transaction);
         jPanel2.add(voush_Library_Panel, gridBagConstraints);
         //
 

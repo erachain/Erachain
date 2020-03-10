@@ -105,6 +105,11 @@ abstract public class DBASet implements IDB {
         this.database.getEngine().clearCache();
     }
 
+    /**
+     * !!! ВНИМАНИЕ !!! В общем в записях (трнзакциях) нельзя делать индексы на основе других записей,
+     * иначе в момент слива форкнутой базы если запись по ссылке была удалена ранее чем удаляется текущая,
+     * то ключи будут битые или с Нуль и ошибку вызовут.
+     */
     public void writeToParent() {
         this.addUses();
 
@@ -113,7 +118,7 @@ abstract public class DBASet implements IDB {
         } catch (java.lang.OutOfMemoryError e) {
             logger.error(e.getMessage(), e);
             this.outUses();
-            Controller.getInstance().stopAll(13);
+            Controller.getInstance().stopAll(1013);
         } finally {
             this.outUses();
         }

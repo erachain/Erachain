@@ -18,10 +18,9 @@ public class Pinger extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class.getSimpleName());
     private int DEFAULT_PING_TIMEOUT;
-    private static final int DEFAULT_QUICK_PING_TIMEOUT = 5000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 4;
+    private static final int DEFAULT_QUICK_PING_TIMEOUT = 5000;
 
     private Peer peer;
-    //private boolean needPing = false;
     private int ping;
 
     BlockingQueue<Integer> startPinging = new ArrayBlockingQueue<Integer>(1);
@@ -31,7 +30,7 @@ public class Pinger extends Thread {
         this.ping = Integer.MAX_VALUE;
         this.setName("Pinger-" + this.getId() + " for: " + peer.getName());
 
-        DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(Controller.getInstance().getMyHeight());
+        DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(Controller.getInstance().getMyHeight()) << 2;
 
         this.start();
     }
@@ -56,7 +55,9 @@ public class Pinger extends Thread {
 
     private boolean tryPing(long timeSOT) {
 
-        //logger.info("try PING " + this.peer);
+        if (peer.LOG_GET_HWEIGHT_TYPE) {
+            LOGGER.info("try PING " + this.peer);
+        }
 
         peer.addPingCounter();
 
@@ -82,11 +83,13 @@ public class Pinger extends Thread {
             } else
                 this.ping = -1;
 
-            //PING FAILES
-            // чем меньше пиров на связи тем дольше пингуем перед разрвом
-            if (this.ping < -10 -20/(1 + peer.network.banForActivePeersCounter())) {
+            //PING FAILS
+            // чем меньше пиров на связи тем дольше пингуем перед разрывом
+            if (this.ping < -30 - 60 / (1 + peer.network.banForActivePeersCounter())) {
                 // если полный отказ уже больше чем ХХХ секнд то ИМЕННО БАН
-                this.peer.ban("on PING FAILES");
+
+                // И если тут не оборать, то на этапе получения подписей по блокам тогда разрыв будет - ответ не получается
+                this.peer.ban("on PING FAILS");
             }
 
             return false;
@@ -103,7 +106,7 @@ public class Pinger extends Thread {
             HWeightMessage hWeightMessage = (HWeightMessage) response;
             Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
 
-            Controller.getInstance().setWeightOfPeer(peer, hW);
+            peer.setHWeight(hW);
         }
 
         return ping >= 0;
@@ -119,11 +122,6 @@ public class Pinger extends Thread {
         Controller cnt = Controller.getInstance();
         BlockChain chain = cnt.getBlockChain();
 
-        int sleepTimestep = 100;
-        int sleepsteps = DEFAULT_PING_TIMEOUT / sleepTimestep;
-        int sleepStepTimeCounter;
-        boolean resultSend;
-
         Integer deal = 0;
         while (this.peer.network.run) {
 
@@ -131,6 +129,13 @@ public class Pinger extends Thread {
                 startPinging.take();
             } catch (InterruptedException e) {
                 break;
+            }
+
+            try {
+                // дадм время на запуск с той тороны
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                return;
             }
 
             Controller.getInstance().onConnect(this.peer);

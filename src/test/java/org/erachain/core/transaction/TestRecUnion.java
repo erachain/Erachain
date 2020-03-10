@@ -94,14 +94,14 @@ public class TestRecUnion {
         // GET RIGHTS TO CERTIFIER
         unionGeneral = new Union(certifier, "СССР", timestamp - 12345678,
                 parent, icon, image, "Союз Совестких Социалистических Республик");
-        //GenesisIssueUnionRecord genesis_issue_union = new GenesisIssueUnionRecord(unionGeneral, certifier);
+        //GenesisIssueUnionRecord genesis_issue_union = new GenesisIssueUnionRecord(unionGeneral, registrar);
         //genesis_issue_union.process(db, false);
-        //GenesisCertifyUnionRecord genesis_certify = new GenesisCertifyUnionRecord(certifier, 0L);
+        //GenesisCertifyUnionRecord genesis_certify = new GenesisCertifyUnionRecord(registrar, 0L);
         //genesis_certify.process(db, false);
 
         certifier.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        certifier.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false);
-        certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        certifier.changeBalance(db, false, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false, false);
+        certifier.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         union = new Union(certifier, "РСФСР", timestamp - 1234567,
                 parent + 1, icon, image, "Россия");
@@ -170,15 +170,15 @@ public class TestRecUnion {
         issueUnionTransaction = new IssueUnionRecord(userAccount1, union, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db)[0], new byte[64]);
         assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
         // ADD FEE
-        userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        userAccount1.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
         assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CHECK IF ISSUE UNION IS VALID
-        userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MINOR_ERA_BALANCE_BD, false);
+        userAccount1.changeBalance(db, false, false, ERM_KEY, BlockChain.MINOR_ERA_BALANCE_BD, false, false);
         assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CHECK
-        userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false);
+        userAccount1.changeBalance(db, false, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false, false);
         assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
     }
@@ -321,7 +321,7 @@ public class TestRecUnion {
         assertEquals(false, db.getItemUnionMap().contains(unionKey));
 
         //CHECK REFERENCE ISSUER
-        //assertEquals(issueUnionTransaction.getReference(), certifier.getLastReference(db));
+        //assertEquals(issueUnionTransaction.getReference(), registrar.getLastReference(db));
     }
 
 

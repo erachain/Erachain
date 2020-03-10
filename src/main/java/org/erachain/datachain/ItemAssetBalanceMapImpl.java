@@ -8,6 +8,7 @@ import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDB;
 import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDBFork;
 import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
@@ -18,10 +19,10 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import static org.erachain.database.IDB.DBS_MAP_DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
@@ -45,19 +46,6 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // it DO
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
         >> implements ItemAssetBalanceMap {
-
-    public final static
-    Fun.Tuple5<
-            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
-            DEFAULT_VALUE = new Fun.Tuple5<
-            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
-            (new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
-                    new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
-                    new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
-                    new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
-                    new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
 
     static final boolean SIZE_ENABLE = false;
 
@@ -85,23 +73,37 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
+                    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database, this);
                     break;
                 default:
-                    map = new ItemAssetBalanceSuitMapDB(databaseSet, database);
+                    map = new ItemAssetBalanceSuitMapDB(databaseSet, database, this);
             }
         } else {
             switch (dbsUsed) {
                 case DBS_MAP_DB:
-                    map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceMap) parent, databaseSet);
+                    map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceMap) parent, databaseSet, this);
                     break;
-                //case DBS_ROCK_DB:
-                //    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database, DEFAULT_VALUE);
-                //    break;
+                case DBS_ROCK_DB:
+                    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database, this);
+                    break;
                 default:
-                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, DEFAULT_VALUE);
+                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, this);
             }
         }
+    }
+
+    @Override
+    public Fun.Tuple5<
+            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> getDefaultValue() {
+        return new Fun.Tuple5<
+                Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+                Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                (new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+                        new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+                        new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+                        new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+                        new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
     }
 
     public boolean contains(byte[] address, long key) {
@@ -150,9 +152,11 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         if (map instanceof ItemAssetBalanceSuitRocksDB) {
             //FILTER ALL KEYS
             keys = new ArrayList<>();
-            Iterator<byte[]> iterator = ((ItemAssetBalanceSuit) map).assetIterator(assetKey);
-            while (iterator.hasNext()) {
-                keys.add(iterator.next());
+            try (IteratorCloseable<byte[]> iterator = ((ItemAssetBalanceSuit) map).assetIterator(assetKey)) {
+                while (iterator.hasNext()) {
+                    keys.add(iterator.next());
+                }
+            } catch (IOException e) {
             }
         } else {
             keys = ((ItemAssetBalanceSuit)map).assetKeys(assetKey);
@@ -176,9 +180,11 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         if (map instanceof ItemAssetBalanceSuitRocksDB) {
             //FILTER ALL KEYS
             keys = new ArrayList<>();
-            Iterator<byte[]> iterator = ((ItemAssetBalanceSuit) map).accountIterator(account);
-            while (iterator.hasNext()) {
-                keys.add(iterator.next());
+            try (IteratorCloseable<byte[]> iterator = ((ItemAssetBalanceSuit) map).accountIterator(account)) {
+                while (iterator.hasNext()) {
+                    keys.add(iterator.next());
+                }
+            } catch (IOException e) {
             }
         } else {
             keys = ((ItemAssetBalanceSuit)map).accountKeys(account);
@@ -187,6 +193,27 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         //RETURN
         return new SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
+    }
+
+    public IteratorCloseable<byte[]> getIteratorByAccount(Account account) {
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            return null;
+
+        return ((ItemAssetBalanceSuit) map).accountIterator(account);
+
+    }
+
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            return null;
+
+        if (assetKey < 0)
+            assetKey = -assetKey;
+
+        return ((ItemAssetBalanceSuit) map).assetIterator(assetKey);
+
     }
 
 }

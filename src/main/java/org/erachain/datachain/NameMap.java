@@ -18,9 +18,6 @@ public class NameMap extends DCUMap<String, Name> {
         super(parent, null);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP
@@ -32,11 +29,6 @@ public class NameMap extends DCUMap<String, Name> {
     @Override
     protected void getMemoryMap() {
         map = new HashMap<String, Name>();
-    }
-
-    @Override
-    protected Name getDefaultValue() {
-        return null;
     }
 
     public boolean contains(Name name) {

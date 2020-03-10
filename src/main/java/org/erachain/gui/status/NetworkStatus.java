@@ -2,7 +2,6 @@ package org.erachain.gui.status;
 // 30/03
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
@@ -37,7 +36,7 @@ public class NetworkStatus extends JLabel implements Observer {
            ToolTipManager.sharedInstance().setDismissDelay((int) TimeUnit.SECONDS.toMillis(5));
         this.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent mEvt) {
-                String mess = Lang.getInstance().translate("Network Port") + ": " + BlockChain.getNetworkPort()
+                String mess = Lang.getInstance().translate("Network Port") + ": " + Controller.getInstance().getNetworkPort()
                         + ", " + Lang.getInstance().translate("target")
                         + ": " + Controller.getInstance().getBlockChain().getTarget(DCSet.getInstance()) + ", ";
 
@@ -45,10 +44,10 @@ public class NetworkStatus extends JLabel implements Observer {
                     if (Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
                         mess += Lang.getInstance().translate("Block height") + ": " + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
                     } else if (Controller.getInstance().getWalletSyncHeight() > 0) {
-                        mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false);
+                        mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false, false);
                     } else {
-                        Tuple3<Integer, Long, Peer> mm = Controller.getInstance().getMaxPeerHWeight(0, false);
-                        Integer mmm=0;
+                        Tuple3<Integer, Long, Peer> mm = Controller.getInstance().getMaxPeerHWeight(0, false, false);
+                        Integer mmm = 0;
                         if (mm!=null)mmm = mm.a;
                         mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + mmm;
                     }
@@ -70,7 +69,7 @@ public class NetworkStatus extends JLabel implements Observer {
 
     private void viewProgress() {
         currentHeight = Controller.getInstance().getMyHeight();
-        Tuple3<Integer, Long, Peer> heightW = Controller.getInstance().getMaxPeerHWeight(0, false);
+        Tuple3<Integer, Long, Peer> heightW = Controller.getInstance().getMaxPeerHWeight(0, false, false);
         if (heightW == null)
             return;
 

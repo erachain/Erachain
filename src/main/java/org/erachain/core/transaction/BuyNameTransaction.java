@@ -247,12 +247,12 @@ public class BuyNameTransaction extends Transaction {
         //UPDATE CREATOR
         super.process(block, asDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).subtract(this.nameSale.getAmount()), db);
-        this.creator.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.nameSale.getAmount(), false);
+        this.creator.changeBalance(this.dcSet, true, false, Transaction.FEE_KEY, this.nameSale.getAmount(), false, false);
 
         //UPDATE SELLER
         Name name = this.nameSale.getName(this.dcSet);
         //this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalance(db, Transaction.FEE_KEY).add(this.nameSale.getAmount()), db);
-        this.seller.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.nameSale.getAmount(), false);
+        this.seller.changeBalance(this.dcSet, false, false, Transaction.FEE_KEY, this.nameSale.getAmount(), false, false);
 
         //UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
         name = new Name(this.creator, name.getName(), name.getValue());
@@ -269,11 +269,11 @@ public class BuyNameTransaction extends Transaction {
         //UPDATE CREATOR
         super.orphan(block, asDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.nameSale.getAmount()), db);
-        this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.nameSale.getAmount(), false);
+        this.creator.changeBalance(this.dcSet, false, false, Transaction.FEE_KEY, this.nameSale.getAmount(), false, false);
 
         //UPDATE SELLER
         //this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalance(db, Transaction.FEE_KEY).subtract(this.nameSale.getAmount()), db);
-        this.seller.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.nameSale.getAmount(), false);
+        this.seller.changeBalance(this.dcSet, true, false, Transaction.FEE_KEY, this.nameSale.getAmount(), false, false);
 
         //UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
         Name name = this.nameSale.getName(this.dcSet);

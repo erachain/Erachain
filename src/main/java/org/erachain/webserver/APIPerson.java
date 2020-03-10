@@ -32,8 +32,8 @@ public class APIPerson {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
-        help.put("apiperson/balance/{personKey}/{assetKey}/{position}",
-                "Get Asset Key balance in Position [1..5] for Person Key.");
+        help.put("apiperson/balance/{personKey}/{assetKey}/{position}?side=[]side",
+                "Get Asset Key balance in Position [1..5] for Person Key. Balance Side =0 - total debit; =1 - left; =2 - total credit");
         help.put("apiperson/status/{personKey}/{statusKey}?history=true",
                 "Get Status data for Person Key. JSON ARRAY format: [timeFrom, timeTo, [par1, par2, str1, str2, reference, description], block, txNo]");
 
@@ -45,15 +45,16 @@ public class APIPerson {
     /**
      * @param personKey
      * @param assetKey
-     * @param pos 1..5
+     * @param pos       1..5
      * @return
      */
     @GET
     @Path("balance/{person}/{asset}/{position}")
     public Response getBalance(@PathParam("person") long personKey, @PathParam("asset") long assetKey,
-                               @PathParam("position") int pos) {
+                               @PathParam("position") int pos,
+                               @DefaultValue("1") @QueryParam("side") int side) {
 
-        BigDecimal sum = PersonCls.getBalance(personKey, assetKey, pos);
+        BigDecimal sum = PersonCls.getBalance(personKey, assetKey, pos, side);
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")

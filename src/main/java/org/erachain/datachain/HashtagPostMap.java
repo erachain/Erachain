@@ -31,15 +31,6 @@ public class HashtagPostMap extends DCUMap<String, List<byte[]>> {
         map = new HashMap<>();
     }
 
-    @Override
-    protected List<byte[]> getDefaultValue() {
-        return null;
-    }
-
-    @Override
-    protected void createIndexes() {
-    }
-
 
     public void add(String hashtag, byte[] signature) {
         //no difference between lower and uppercase here

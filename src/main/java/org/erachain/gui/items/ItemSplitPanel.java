@@ -31,7 +31,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
     protected JMenuItem favoriteMenuItems;
     protected JPopupMenu menuTable;
     //protected ItemCls itemMenu;
-    protected ItemCls itemTableSelected = null;
+    protected ItemCls itemTableSelected;
     protected static Logger logger = LoggerFactory.getLogger(ItemSplitPanel.class);
 
 

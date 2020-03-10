@@ -3,17 +3,16 @@ package org.erachain.gui.library;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.*;
 import org.erachain.gui.create.LicenseJFrame;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.settings.SettingsFrame;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.erachain.settings.Settings;
 import org.erachain.utils.URLViewer;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +21,6 @@ import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -213,9 +211,9 @@ public class MenuFiles extends JMenu {
                     String head = (String) js.get("head");
                     if (!js.containsKey("amount")) return;
                     String amount = (String) js.get("amount");
-                    AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey), TransactionAmount.ACTION_SEND,
+                    AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey),
                             ct.getAccountByAddress(creator), ct.getAccountByAddress(recipient), null, null);
-                    MainPanel.getInstance().insertTab(panel);
+                    MainPanel.getInstance().insertTab(Lang.getInstance().translate("Read Transaction"),panel, AccountAssetSendPanel.getIcon() );
 
                     AssetCls asset = ct.getAsset(assetKey);
                     panel.jTextField_To.setText(recipient);
@@ -244,13 +242,13 @@ public class MenuFiles extends JMenu {
                 //  new SettingsFrame();
                 // no receive
                 //AccountSendDialog dd = new AccountSendDialog(null, null, null, null, false);
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
-                        null, null, null, null));
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Write Transaction"),new AccountAssetSendPanel(null,
+                        null, null, null, null), AccountAssetSendPanel.getIcon());
 
 
             }
         });
-        if (BlockChain.DEVELOP_USE) add(writeTransItem);
+        if (BlockChain.TEST_MODE) add(writeTransItem);
 
         //WEB SERVER
         webServerItem = new JMenuItem(Lang.getInstance().translate("Decentralized Web server"));

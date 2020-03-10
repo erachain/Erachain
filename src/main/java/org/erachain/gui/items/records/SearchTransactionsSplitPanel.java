@@ -8,16 +8,16 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.VoushLibraryPanel;
+import org.erachain.gui.library.VouchLibraryPanel;
 import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.URLViewer;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
+import org.mapdb.Fun.Tuple2;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -35,8 +35,9 @@ import java.util.List;
  */
 public class SearchTransactionsSplitPanel extends SplitPanel {
 
+    private static String iconFile = "images/pageicons/SearchTransactionsSplitPanel.png";
     public JPanel info_Panel;
-    public VoushLibraryPanel voush_Library_Panel;
+    public VouchLibraryPanel voush_Library_Panel;
     SearchTransactionsTableModel transactionsTableModel;
     JScrollPane jScrollPane4;
     private JTextField searchString;
@@ -67,7 +68,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 transactionsTableModel.clear();
-                transactionsTableModel.find(searchString.getText());
+                transactionsTableModel.find(searchString.getText(), null);
 
             }
 
@@ -295,7 +296,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
                     gridBagConstraints.weightx = 1.0;
                     gridBagConstraints.weighty = 1.0;
-                    voush_Library_Panel = new VoushLibraryPanel(voting);
+                    voush_Library_Panel = new VouchLibraryPanel(voting);
                     info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
                 }
@@ -321,4 +322,13 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

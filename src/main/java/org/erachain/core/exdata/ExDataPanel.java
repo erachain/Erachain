@@ -1,19 +1,15 @@
 package org.erachain.core.exdata;
 
 import org.erachain.core.item.templates.TemplateCls;
-
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
-import org.erachain.gui.items.templates.ComboBoxModelItemsTemplates;
 import org.erachain.gui.library.*;
 import org.erachain.lang.Lang;
+import org.erachain.utils.FileHash;
 import org.erachain.utils.ZipBytes;
 import org.mapdb.Fun.Tuple3;
-import org.erachain.utils.FileHash;
-
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -720,7 +716,7 @@ public class ExDataPanel extends javax.swing.JPanel {
 
     public byte[] getExData() throws Exception {
 
-        // hashes Charset.forName("UTF-8")
+        // hashes StandardCharsets.UTF_8
         HashMap<String, String> hashes_Map = new HashMap<String, String>();
         int hR = hashes_Table_Model.getRowCount();
         for (int i = 0; i < hR; i++) {

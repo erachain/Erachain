@@ -252,6 +252,48 @@ public class Wallet extends Observable implements Observer {
 		return this.database.getTransactionMap().get(accounts, limit);
 	}
 
+	public List<Transaction> getTransactionsByType(int type, int offset, int limit, boolean descending) {
+		if (!this.exists()) {
+			new ArrayList<Transaction>();
+		}
+
+		Iterator<Tuple2<Long, Long>> iterator = this.database.getTransactionMap().getTypeIterator((byte) type, descending);
+		List<Transaction> result = new ArrayList<Transaction>();
+		int count = limit;
+		while (iterator.hasNext()) {
+			if (offset > 0) {
+				offset--;
+				iterator.next();
+				continue;
+			}
+			if (limit > 0) {
+				if (count-- == 0)
+					break;
+			}
+			result.add(this.database.getTransactionMap().get(iterator.next()).b);
+		}
+
+		return result;
+	}
+
+	public Iterator<Tuple2<Long, Long>> getTransactionsIteratorByType(int type, boolean descending) {
+		if (!this.exists()) {
+			return null;
+		}
+
+		return this.database.getTransactionMap().getTypeIterator((byte) type, descending);
+
+	}
+
+	public Tuple2<Long, Transaction> getTransaction(Tuple2<Long, Long> key) {
+		if (!this.exists()) {
+			return null;
+		}
+
+		return this.database.getTransactionMap().get(key);
+
+	}
+
 	public List<Transaction> getLastTransactions(Account account, int limit) {
 		if (!this.exists()) {
 			return new ArrayList<Transaction>();
@@ -400,17 +442,17 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	// CREATE
-	public boolean create(byte[] seed, String password, int depth, boolean synchronize, String path,
-						  boolean withObserver, boolean dynamicGUI) {
-		String oldPath = Settings.getInstance().getWalletDir();
-		// set wallet dir
-		Settings.getInstance().setWalletDir(path);
-		// OPEN WALLET
-		DWSet database = DWSet.reCreateDB(withObserver, dynamicGUI);
+    public synchronized boolean create(byte[] seed, String password, int depth, boolean synchronize, String path,
+                                       boolean withObserver, boolean dynamicGUI) {
+        String oldPath = Settings.getInstance().getWalletDir();
+        // set wallet dir
+        Settings.getInstance().setWalletDir(path);
+        // OPEN WALLET
+        DWSet database = DWSet.reCreateDB(withObserver, dynamicGUI);
 
-		if (this.secureDatabase != null) {
-			// CLOSE secured WALLET
-			lock();
+        if (this.secureDatabase != null) {
+            // CLOSE secured WALLET
+            lock();
 		}
 
 		// OPEN SECURE WALLET
@@ -427,26 +469,26 @@ public class Wallet extends Observable implements Observer {
 			settingsLangJSON.put("walletdir", Settings.getInstance().getWalletDir());
 			try {
 				SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsLangJSON);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		} else {
-			Settings.getInstance().setWalletDir(oldPath);
-		}
-		return res;
-	}
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        } else {
+            Settings.getInstance().setWalletDir(oldPath);
+        }
+        return res;
+    }
 
-	public boolean create(DWSet database, SecureWalletDatabase secureDatabase, byte[] seed, int depth,
-						  boolean synchronize) {
-		// CREATE WALLET
-		this.database = database;
+    public synchronized boolean create(DWSet database, SecureWalletDatabase secureDatabase, byte[] seed, int depth,
+                                       boolean synchronize) {
+        // CREATE WALLET
+        this.database = database;
 
-		// CREATE SECURE WALLET
-		this.secureDatabase = secureDatabase;
+        // CREATE SECURE WALLET
+        this.secureDatabase = secureDatabase;
 
-		// ADD VERSION
-		this.database.setVersion(1);
+        // ADD VERSION
+        this.database.setVersion(1);
 
 		// SET LICENSE KEY
 		this.setLicenseKey(Controller.LICENSE_VERS);
@@ -590,7 +632,7 @@ public class Wallet extends Observable implements Observer {
 
         for (Tuple2<Account, Long> account_asset : accounts_assets) {
             this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
-                    BigDecimal.ZERO);
+					BigDecimal.ZERO, false);
         }
 
 	}
@@ -689,7 +731,7 @@ public class Wallet extends Observable implements Observer {
 						this.processBlock(dcSet, block);
 					} catch (java.lang.OutOfMemoryError e) {
 						LOGGER.error(e.getMessage(), e);
-						Controller.getInstance().stopAll(44);
+						Controller.getInstance().stopAll(644);
 						return;
 					}
 
@@ -974,20 +1016,56 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	// IMPORT/EXPORT
-
 	public String importAccountSeed(byte[] accountSeed) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.isUnlocked()) {
-			return "";
+			return "Wallet is locked";
 		}
 
 		// CHECK LENGTH
 		if (accountSeed.length != Crypto.HASH_LENGTH) {
-			return "";
+			return "Wrong length != 32";
 		}
 
 		// CREATE ACCOUNT
 		PrivateKeyAccount account = new PrivateKeyAccount(accountSeed);
+
+		// CHECK IF ACCOUNT ALREADY EXISTS
+		if (!this.accountExists(account.getAddress())) {
+			// ADD TO DATABASE
+			this.secureDatabase.getAccountSeedMap().add(account);
+			this.database.getAccountMap().add(account, -1);
+
+			// SAVE TO DISK
+			this.database.hardFlush();
+
+			// SYNCHRONIZE
+			this.synchronize(true);
+
+			// NOTIFY
+			this.setChanged();
+			this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
+
+			// RETURN
+			return account.getAddress();
+		}
+
+		return "";
+	}
+
+	public String importPrivateKey(byte[] privateKey64) {
+		// CHECK IF WALLET IS OPEN
+		if (!this.isUnlocked()) {
+			return "Wallet is locked";
+		}
+
+		// CHECK LENGTH
+		if (privateKey64.length != Crypto.SIGNATURE_LENGTH) {
+			return "Wrong length != 64";
+		}
+
+		// CREATE ACCOUNT
+		PrivateKeyAccount account = new PrivateKeyAccount(privateKey64);
 
 		// CHECK IF ACCOUNT ALREADY EXISTS
 		if (!this.accountExists(account.getAddress())) {
@@ -1142,20 +1220,24 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		BigDecimal fee = transaction.getFee(account);
+		boolean isBackward = false;
 		if (absKey != 0) {
 			// ASSET TRANSFERED + FEE
 			BigDecimal amount = transaction.getAmount(account);
+			if (transaction instanceof RSend) {
+				isBackward = ((RSend) transaction).isBackward();
+			}
 
 			if (fee.compareTo(BigDecimal.ZERO) != 0) {
 				if (absKey == FEE_KEY) {
 					amount = amount.subtract(fee);
 				}
 			}
-			this.database.getAccountMap().changeBalance(address, !asOrphan, key, amount);
+			this.database.getAccountMap().changeBalance(address, !asOrphan, key, amount, isBackward);
 		} else {
 			// ONLY FEE
 			if (fee.compareTo(BigDecimal.ZERO) != 0) {
-				this.database.getAccountMap().changeBalance(address, !asOrphan, FEE_KEY, fee);
+				this.database.getAccountMap().changeBalance(address, !asOrphan, FEE_KEY, fee, isBackward);
 			}
 		}
 
@@ -1198,7 +1280,7 @@ public class Wallet extends Observable implements Observer {
 				// account.getAddress() ))
 				if (atTx.b.getRecipient() == account.getAddress()) {
 					this.database.getAccountMap().changeBalance(account.getAddress(), false, atTx.b.getKey(),
-							BigDecimal.valueOf(atTx.b.getAmount()));
+							BigDecimal.valueOf(atTx.b.getAmount()), false);
 
 				}
 			}
@@ -1242,7 +1324,7 @@ public class Wallet extends Observable implements Observer {
 				// CHECK IF INVOLVED
 				if (atTx.b.getRecipient().equalsIgnoreCase(account.getAddress())) {
 					this.database.getAccountMap().changeBalance(account.getAddress(), true, atTx.b.getKey(),
-							BigDecimal.valueOf(atTx.b.getAmount()));
+							BigDecimal.valueOf(atTx.b.getAmount()), false);
 				}
 			}
 		}
@@ -1291,7 +1373,7 @@ public class Wallet extends Observable implements Observer {
 
         */
 		this.database.getAccountMap().changeBalance(blockGenerator.getAddress(), asOrphan, FEE_KEY,
-				new BigDecimal(blockFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE));
+				new BigDecimal(blockFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
 	}
 
@@ -1352,7 +1434,7 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK IF SERTIFY PErSON
 			else if (transaction instanceof RSertifyPubKeys) {
-				this.processSertifyPerson((RSertifyPubKeys) transaction);
+				this.processSertifyPerson((RSertifyPubKeys) transaction, height);
 			}
 
 			// CHECK IF ORDER CREATION
@@ -1368,12 +1450,12 @@ public class Wallet extends Observable implements Observer {
 		}
 
         if (block.blockHead.transactionsCount > 0
-				&& start - processBlockLogged > (BlockChain.DEVELOP_USE ? 30000 : 30000)) {
+				&& start - processBlockLogged > 30000) {
 			long tickets = System.currentTimeMillis() - start;
 			processBlockLogged = start;
-            LOGGER.debug("WALLET [" + block.blockHead.heightBlock + "] processing time: " + tickets * 0.001
-                    + " TXs = " + block.blockHead.transactionsCount + " millsec/record:"
-                    + tickets / (block.blockHead.transactionsCount + 1));
+			LOGGER.debug("WALLET [" + block.blockHead.heightBlock + "] processing time: " + tickets * 0.001
+					+ " TXs = " + block.blockHead.transactionsCount + " millsec/record:"
+					+ tickets / (block.blockHead.transactionsCount + 1));
 		}
 
     }
@@ -1388,6 +1470,7 @@ public class Wallet extends Observable implements Observer {
 		if (block == null)
 			return;
 
+		int height = block.heightBlock;
 		List<Transaction> transactions = block.getTransactions();
 		int seqNo;
         for (int i = block.blockHead.transactionsCount - 1; i >= 0; i--) {
@@ -1415,7 +1498,7 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK IF SERTIFY PErSON
 			else if (transaction instanceof RSertifyPubKeys) {
-				this.orphanSertifyPerson((RSertifyPubKeys) transaction);
+				this.orphanSertifyPerson((RSertifyPubKeys) transaction, height);
 			}
 
 			// CHECK IF ORDER CREATION
@@ -1509,7 +1592,7 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	private void processSertifyPerson(RSertifyPubKeys sertifyPubKeys) {
+	private void processSertifyPerson(RSertifyPubKeys sertifyPubKeys, int height) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1542,22 +1625,22 @@ public class Wallet extends Observable implements Observer {
 				///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
 				// ISSUE NEW COMPU in chain
-				BigDecimal issued_FEE_BD = sertifyPubKeys.getBonuses();
+				BigDecimal issued_FEE_BD = BlockChain.BONUS_FOR_PERSON(height);
 
 				// GIFTs
 				if (this.accountExists(transPersonIssue.getCreator().getAddress())) {
 					this.database.getAccountMap().changeBalance(transPersonIssue.getCreator().getAddress(),
-							false, FEE_KEY, issued_FEE_BD);
+							false, FEE_KEY, issued_FEE_BD, false);
 				}
 
 				// GIFTs
 				if (this.accountExists(creator.getAddress())) {
-					this.database.getAccountMap().changeBalance(creator.getAddress(), false, FEE_KEY, issued_FEE_BD);
+					this.database.getAccountMap().changeBalance(creator.getAddress(), false, FEE_KEY, issued_FEE_BD, false);
 				}
 
 				PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
 				if (this.accountExists(pkAccount.getAddress())) {
-					this.database.getAccountMap().changeBalance(pkAccount.getAddress(), false, FEE_KEY, issued_FEE_BD);
+					this.database.getAccountMap().changeBalance(pkAccount.getAddress(), false, FEE_KEY, issued_FEE_BD, false);
 				}
 			}
 		}
@@ -1575,7 +1658,7 @@ public class Wallet extends Observable implements Observer {
         }
     }
 
-    private void orphanSertifyPerson(RSertifyPubKeys sertifyPubKeys) {
+    private void orphanSertifyPerson(RSertifyPubKeys sertifyPubKeys, int height) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1608,22 +1691,22 @@ public class Wallet extends Observable implements Observer {
 			///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
 			// ISSUE NEW COMPU in chain
-			BigDecimal issued_FEE_BD = sertifyPubKeys.getBonuses();
+			BigDecimal issued_FEE_BD = BlockChain.BONUS_FOR_PERSON(height);
 
 			// GIFTs
 			if (this.accountExists(transPersonIssue.getCreator().getAddress())) {
 				this.database.getAccountMap().changeBalance(transPersonIssue.getCreator().getAddress(),
-						true, FEE_KEY, issued_FEE_BD);
+						true, FEE_KEY, issued_FEE_BD, false);
 			}
 
 			// GIFTs
 			if (this.accountExists(creator.getAddress())) {
-				this.database.getAccountMap().changeBalance(creator.getAddress(), true, FEE_KEY, issued_FEE_BD);
+				this.database.getAccountMap().changeBalance(creator.getAddress(), true, FEE_KEY, issued_FEE_BD, false);
 			}
 
 			PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
 			if (this.accountExists(creator.getAddress())) {
-				this.database.getAccountMap().changeBalance(pkAccount.getAddress(), true, FEE_KEY, issued_FEE_BD);
+				this.database.getAccountMap().changeBalance(pkAccount.getAddress(), true, FEE_KEY, issued_FEE_BD, false);
 			}
 		}
 	}
@@ -1787,6 +1870,7 @@ public class Wallet extends Observable implements Observer {
         }
 
         //////////// PROCESS BLOCKS ////////////
+		DCSet dcSet = DCSet.getInstance();
 
         if (this.synchronizeStatus) {
             // идет синхронизация кошелька уже - не обрабатываем блоки тут
@@ -1806,7 +1890,7 @@ public class Wallet extends Observable implements Observer {
             }
 
             // CHECK BLOCK
-            this.orphanBlock(block);
+			this.orphanBlock(dcSet, block);
 
             //this.database.clearCache();
             //this.database.commit();

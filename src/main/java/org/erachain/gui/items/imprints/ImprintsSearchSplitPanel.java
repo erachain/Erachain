@@ -6,10 +6,10 @@ import org.erachain.gui.items.SearchItemSplitPanel;
 
 import java.awt.*;
 
-public class ImprintsSearchSplitPanel extends SearchItemSplitPanel {
+public class ImprintsSearchSplitPanel extends SearchItemSplitPanel  {
 
     private static final long serialVersionUID = 2717571093561259483L;
-
+    private static String iconFile = "images/pageicons/ImprintsSearchSplitPanel.png";
     private static ImprintsSearchTableModel search_Table_Model = new ImprintsSearchTableModel();
 
     public ImprintsSearchSplitPanel() {
@@ -23,5 +23,15 @@ public class ImprintsSearchSplitPanel extends SearchItemSplitPanel {
 
         return new ImprintsInfoPanel((ImprintCls) item);
 
+    }
+
+    public static  Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

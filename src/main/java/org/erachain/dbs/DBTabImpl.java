@@ -7,6 +7,7 @@ import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.DB;
+import org.mapdb.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,13 +15,16 @@ import java.util.*;
 
 /**
  * К Обработке данных добалены события. Это Суперкласс для таблиц проекта.
- * Однако в каждой таблице есть еще обертка для каждой СУБД отдельно - DBMapSuit
+ * Однако в каждой таблице есть еще обертка для каждой СУБД отдельно - DBSuit
  * @param <T>
  * @param <U>
  */
 public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
+
+    protected final String TAB_NAME;
+    protected final Serializer TAB_SERIALIZER;
 
     public int DESCENDING_SHIFT_INDEX = 10000;
 
@@ -30,9 +34,9 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     protected DBASet databaseSet;
     protected DB database;
 
-    protected IMap<T, U> map;
+    protected DBSuit<T, U> map;
     // Эта Карта не должна путаться вверху с DCU картой - иначе НУЛ при заходе в DBMapCommonImpl
-    ////protected DBMapSuit<T, U> map;
+    ////protected DBSuit<T, U> map;
 
     @Getter
     protected DBTab<T, U> parent;
@@ -41,12 +45,15 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
 
     protected Map<Integer, Integer> observableData;
 
-
     public DBTabImpl() {
+        TAB_NAME = null;
+        TAB_SERIALIZER = null;
         databaseSet.addTable(this);
     }
 
     public DBTabImpl(DBASet databaseSet) {
+        TAB_NAME = null;
+        TAB_SERIALIZER = null;
 
         this.databaseSet = databaseSet;
         databaseSet.addTable(this);
@@ -56,11 +63,13 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
         }
     }
 
-    public DBTabImpl(int dbsUsed, DBASet databaseSet, DB database, boolean sizeEnable) {
+    public DBTabImpl(int dbsUsed, DBASet databaseSet, DB database, boolean sizeEnable, String tabName, Serializer serializer) {
         this.dbsUsed = dbsUsed;
         this.databaseSet = databaseSet;
         this.database = database;
         this.sizeEnable = sizeEnable;
+        TAB_NAME = tabName;
+        TAB_SERIALIZER = serializer;
         databaseSet.addTable(this);
 
         //OPEN MAP
@@ -73,11 +82,15 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     public DBTabImpl(int dbsUsed, DBASet databaseSet, DB database) {
-        this(dbsUsed, databaseSet, database, false);
+        this(dbsUsed, databaseSet, database, false, null, null);
+    }
+
+    public DBTabImpl(DBASet databaseSet, DB database, String tabName, Serializer tabSerializer, boolean sizeEnable) {
+        this(IDB.DBS_MAP_DB, databaseSet, database, sizeEnable, tabName, tabSerializer);
     }
 
     public DBTabImpl(DBASet databaseSet, DB database, boolean sizeEnable) {
-        this(IDB.DBS_MAP_DB, databaseSet, database, sizeEnable);
+        this(IDB.DBS_MAP_DB, databaseSet, database, sizeEnable, null, null);
     }
 
     /**
@@ -92,6 +105,9 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
         this.database = databaseSet.database;
         this.sizeEnable = sizeEnable;
         this.parent = parent;
+        TAB_NAME = ((DBTabImpl) parent).TAB_NAME;
+        TAB_SERIALIZER = ((DBTabImpl) parent).TAB_SERIALIZER;
+
         databaseSet.addTable(this);
 
         // OPEN MAP
@@ -113,6 +129,8 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
         this.databaseSet = databaseSet;
         this.database = databaseSet.database;
         this.parent = parent;
+        TAB_NAME = ((DBTabImpl) parent).TAB_NAME;
+        TAB_SERIALIZER = ((DBTabImpl) parent).TAB_SERIALIZER;
         this.sizeEnable = sizeEnable;
         databaseSet.addTable(this);
 
@@ -122,10 +140,12 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     // for TESTS etc.
-    public void setSource(IMap map) { this.map = map; }
+    public void setSource(DBSuit map) {
+        this.map = map;
+    }
 
     @Override
-    public IMap getSource() {
+    public DBSuit getSuit() {
         return map;
     }
 
@@ -142,6 +162,11 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     @Override
     public boolean isSizeEnable() {
         return sizeEnable;
+    }
+
+    @Override
+    public U getDefaultValue() {
+        return null;
     }
 
     @Override
@@ -286,12 +311,12 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
      * @return
      */
     @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIterator(int index, boolean descending) {
         return map.getIterator(index, descending);
     }
 
     @Override
-    public Iterator<T> getIterator() {
+    public IteratorCloseable<T> getIterator() {
         return map.getIterator();
     }
 
@@ -310,20 +335,46 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_RESET), this));
             }
-
         }
     }
 
     @Override
-    public void writeToParent() {
-        ((ForkedMap) this.map).writeToParent();
+    public void notifyObserverList() {
+        // NOTYFIES
+        if (this.observableData != null) {
+            //NOTIFY LIST
+            if (this.observableData.containsKey(NOTIFY_LIST)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_LIST), this));
+            }
+        }
+    }
+
+    @Override
+    public boolean writeToParent() {
+
+        if (((ForkedMap) this.map).writeToParent()) {
+            if (parent != null) {
+                // нужно кинуть событие обновления в ГУИ родителя - если при сливе были изменения
+                parent.notifyObserverList();
+            }
+            return true;
+        }
+        return false;
+
     }
 
     @Override
     public void clearCache() { map.clearCache(); }
 
     @Override
-    public void close() { map.close(); }
+    public void close() {
+        if (map != null)
+            map.close();
+        databaseSet = null;
+        database = null;
+        map = null;
+    }
 
     @Override
     public boolean isClosed() {
@@ -335,6 +386,11 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
 
     @Override
     public void rollback() { map.rollback(); }
+
+    @Override
+    public void afterRollback() {
+    }
+
     /////////////////
 ///////////////
 

@@ -6,21 +6,20 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalSuit;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
 import org.rocksdb.WriteOptions;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.io.IOException;
 
 @Slf4j
 public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transaction> implements TransactionFinalSuit {
 
     public TransactionFinalSuitRocksDBFork(TransactionFinalMap parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null, false);
+        super(parent, databaseSet, logger, false, null);
     }
 
     @Override
@@ -34,39 +33,63 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
     }
 
     @Override
-    protected void createIndexes() {
-        // USE counter index
-        indexes = new ArrayList<>();
+    public void deleteForBlock(Integer height) {
+        try (IteratorCloseable<Long> iterator = getBlockIterator(height)) {
+            while (iterator.hasNext()) {
+                map.remove(iterator.next());
+            }
+        } catch (IOException e) {
+        }
     }
 
     @Override
-    public Iterator<Long> getBlockIterator(Integer height) {
+    public IteratorCloseable<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(Ints.toByteArray(height), false);
+        return map.getIndexIteratorFilter(Ints.toByteArray(height), false, false);
     }
 
     @Override
-    public Iterator<Long> getIteratorBySender(String address) {
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByRecipient(String address) {
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByAddressAndType(String address, Integer type) {
+    public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
+    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByAddress(String address) {
+    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Long fromID) {
+        return null;
+    }
+
+    @Override
+    public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending) {
+        return null;
+    }
+
+    @Override
+    public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort) {
+        return null;
+    }
+
+    @Override
+    public IteratorCloseable<Long> getBiDirectionIterator(Long fromSeqNo, boolean descending) {
+        return null;
+    }
+
+    @Override
+    public IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending) {
         return null;
     }
 

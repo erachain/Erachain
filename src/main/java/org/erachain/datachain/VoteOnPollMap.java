@@ -18,9 +18,6 @@ public class VoteOnPollMap extends DCUMap<byte[], Integer> {
         super(parent, null);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP
@@ -36,7 +33,7 @@ public class VoteOnPollMap extends DCUMap<byte[], Integer> {
     }
 
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
         return -1;
     }
 

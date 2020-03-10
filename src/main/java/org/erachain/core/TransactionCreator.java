@@ -30,14 +30,19 @@ import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Pair;
 import org.erachain.utils.TransactionTimestampComparator;
 import org.mapdb.DB;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -49,7 +54,6 @@ import java.util.*;
 @Slf4j
 public class TransactionCreator {
     private DCSet fork;
-    DB database;
     private Block lastBlock;
     private int blockHeight;
     private int seqNo;
@@ -72,13 +76,13 @@ public class TransactionCreator {
 
     private synchronized void updateFork() {
         //CREATE NEW FORK
-        if (this.database != null) {
+        if (this.fork != null) {
             // закроем сам файл базы - закрывать DCSet.fork - не нужно - он сам очистится
-            this.database.close();
+            this.fork.close();
         }
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-        this.database = DCSet.makeDBinMemory();
+        DB database = DCSet.makeDBinMemory();
         this.fork = DCSet.getInstance().fork(database);
 
         //UPDATE LAST BLOCK
@@ -95,9 +99,8 @@ public class TransactionCreator {
         if (false) {
             // У форка нет вторичных индексов поэтому этот вариант не покатит
             for (Account account: Controller.getInstance().getAccounts()) {
-                try {
-                    Iterator<Long> iterator = transactionTab.findTransactionsKeys(account.getAddress(), null, null,
-                            0, false, 0, 0, 0L);
+                try (IteratorCloseable<Long> iterator = transactionTab.findTransactionsKeys(account.getAddress(), null, null,
+                        0, false, 0, 0, 0L)) {
                     while (iterator.hasNext()) {
                         transaction = transactionTab.get(iterator.next());
                         accountTransactions.add(transaction);
@@ -113,14 +116,17 @@ public class TransactionCreator {
 
         } else {
             // здесь нужен протокольный итератор!
-            Iterator<Long> iterator = transactionTab.getIterator();
-            List<Account> accountMap = Controller.getInstance().getAccounts();
 
-            while (iterator.hasNext()) {
-                transaction = transactionTab.get(iterator.next());
-                if (accountMap.contains(transaction.getCreator())) {
-                    accountTransactions.add(transaction);
+            try (IteratorCloseable<Long> iterator = transactionTab.getIterator()) {
+                List<Account> accountMap = Controller.getInstance().getAccounts();
+
+                while (iterator.hasNext()) {
+                    transaction = transactionTab.get(iterator.next());
+                    if (accountMap.contains(transaction.getCreator())) {
+                        accountTransactions.add(transaction);
+                    }
                 }
+            } catch (IOException e) {
             }
         }
 
@@ -723,13 +729,13 @@ public class TransactionCreator {
 
     public Transaction r_Send(PrivateKeyAccount creator,
                               Account recipient, long key, BigDecimal amount, int feePow, String title, byte[] message, byte[] isText,
-                              byte[] encryptMessage) {
+                              byte[] encryptMessage, long timestamp_in) {
 
         this.checkUpdate();
 
         Transaction messageTx;
 
-        long timestamp = NTP.getTime();
+        long timestamp = timestamp_in > 0 ? timestamp_in : NTP.getTime();
 
         //CREATE MESSAGE TRANSACTION
         //messageTx = new RSend(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
@@ -984,7 +990,8 @@ public class TransactionCreator {
     public Integer afterCreate(Transaction transaction, int asDeal) {
         //CHECK IF PAYMENT VALID
 
-        if (this.fork.getTransactionTab().contains(transaction.getSignature())) {
+        if (false && // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
+                this.fork.getTransactionTab().contains(transaction.getSignature())) {
             // если случилась коллизия по подписи усеченной
             // в базе неподтвержденных транзакций -то выдадим ошибку
             return Transaction.KEY_COLLISION;

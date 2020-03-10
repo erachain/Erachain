@@ -3,7 +3,6 @@ package org.erachain.gui.items.polls;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.polls.PollCls;
-import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
@@ -19,8 +18,9 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class PollsFavoriteSplitPanel extends ItemSplitPanel {
+public class PollsFavoriteSplitPanel extends ItemSplitPanel  {
     private static final long serialVersionUID = 2717571093561259483L;
+    private static String iconFile = "images/pageicons/PollsFavoriteSplitPanel.png";
 
     public PollsFavoriteSplitPanel() {
         super(new FavoritePollsTableModel(), "PollsFavoriteSplitPanel");
@@ -81,4 +81,13 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel {
         return pollInfo;
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

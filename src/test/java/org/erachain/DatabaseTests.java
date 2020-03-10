@@ -49,7 +49,6 @@ public class DatabaseTests {
     PersonCls person;
     long personKey = -1;
     IssuePersonRecord issuePersonTransaction;
-    RSertifyPubKeys r_SertifyPubKeys;
     //int version = 0; // without signs of person
     int version = 1; // with signs of person
     private byte[] icon = new byte[0]; // default value
@@ -87,8 +86,8 @@ public class DatabaseTests {
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
         maker.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
-        maker.changeBalance(dcSet, true, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        maker.changeBalance(dcSet, true, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(dcSet, true, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(dcSet, true, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         person = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
@@ -215,7 +214,7 @@ public class DatabaseTests {
             //db.add(asset);
         }
 
-        dbMap.add(dbMap.get(1l));
+        dbMap.incrementPut(dbMap.get(1l));
         LOGGER.info("keys " + dbMap.keySet());
 
         //Collection<Asset> issues = DLSet.getInstance().getIssueAssetMap.getValuesAll();

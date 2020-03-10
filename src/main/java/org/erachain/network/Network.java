@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,6 +28,16 @@ public class Network extends Observable {
     private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = 1024 << (3 + Controller.HARD_WORK);
     private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = 256 + BlockChain.MAX_BLOCK_SIZE_GEN;
     private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = 128 >> (Controller.HARD_WORK >> 1);
+
+    /**
+     * Если включено то при входящем запросе на коннект от пира, который уже на связи
+     * разрываем текущий коннект и пересоздаем на новый входящий. Таким обраом если под одним IP
+     * будет к нам стучасять несколько отдельных нод то каждая из них будет забирать себе соединение.
+     * Но на самом деле сначала происходит обрыв на некотрое время - поэтому кодна нод мало - это плохо.
+     * Так что лучше не включать. И зачем разрывать - по-новой слать транзакции накладно.
+     */
+    private static final boolean BREAK_PEER_ON_NEW_INCOME = false;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class.getSimpleName());
 
     private Controller controller;
@@ -108,17 +119,19 @@ public class Network extends Observable {
 
     private void start() {
 
-
         //START ConnectionCreator THREAD
         creator = new ConnectionCreator(this);
-        creator.start();
+        if (controller.useNet)
+            creator.start();
 
         //START ConnectionAcceptor THREAD
         acceptor = new ConnectionAcceptor(this);
-        acceptor.start();
+        if (controller.useNet)
+            acceptor.start();
 
         peerManager = new PeerManager(this);
-        peerManager.start();
+        if (controller.useNet)
+            peerManager.start();
 
         telegramer = new TelegramManager(controller,
                 controller.getBlockChain(),
@@ -127,9 +140,10 @@ public class Network extends Observable {
 
         messagesProcessor = new MessagesProcessor(this);
 
-        if (Settings.getInstance().isLocalPeersScannerEnabled()){
+        if (Settings.getInstance().isLocalPeersScannerEnabled()) {
             localPeerScanner = new LocalPeerScanner(this);
-            localPeerScanner.start();
+            if (controller.useNet)
+                localPeerScanner.start();
         }
 
     }
@@ -194,12 +208,17 @@ public class Network extends Observable {
         //PASS TO CONTROLLER
         controller.afterDisconnect(peer);
 
-        //NOTIFY OBSERVERS
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.UPDATE_PEER_TYPE, peer));
+        try {
+            // внутри могут быть ошибки отображения
+            //NOTIFY OBSERVERS
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.UPDATE_PEER_TYPE, peer));
 
-        //this.setChanged();
-        //this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
+            //this.setChanged();
+            //this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     public boolean isKnownAddress(InetAddress address, boolean andUsed) {
@@ -223,11 +242,9 @@ public class Network extends Observable {
     }
 
     // IF PEER in exist in NETWORK - get it
-    public Peer getKnownPeer(Peer peer, int type) {
+    public Peer getKnownPeer(byte[] address, int type) {
 
-        //Peer knowmPeer = null;
         try {
-            byte[] address = peer.getAddress().getAddress();
             //FOR ALL connectedPeers
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
@@ -244,7 +261,27 @@ public class Network extends Observable {
             //logger.error(e.getMessage(),e);
         }
 
-        return peer;
+        return null;
+    }
+
+    // IF PEER in exist in NETWORK - get it
+    public Peer getKnownPeer(Peer peer, int type) {
+        Peer findPeer = getKnownPeer(peer.getAddress().getAddress(), type);
+        if (findPeer == null) {
+            return peer;
+        }
+        return findPeer;
+    }
+
+    // IF PEER in exist in NETWORK - get it
+    public Peer getKnownPeer(String peerIP, int type) {
+        InetAddress address = null;
+        try {
+            address = InetAddress.getByName(peerIP);
+        } catch (UnknownHostException e) {
+            return null;
+        }
+        return getKnownPeer(address.getAddress(), type);
     }
 
     // IF PEER in exist in NETWORK - get it
@@ -315,7 +352,25 @@ public class Network extends Observable {
         return activePeers;
     }
 
-    public int getActivePeersCounter(boolean onlyWhite) {
+    public List<Peer> getKnownPeers() {
+
+        return this.knownPeers;
+    }
+
+    public int getActivePeersCounter(boolean onlyWhite, boolean excludeMute) {
+
+        int counter = 0;
+        for (Peer peer : this.knownPeers) {
+            if (peer.isUsed())
+                if (!onlyWhite || peer.isWhite()) {
+                    if (!excludeMute || peer.getMute() > 0)
+                        counter++;
+                }
+        }
+        return counter;
+    }
+
+    public boolean noActivePeers(boolean onlyWhite) {
 
         int counter = 0;
         for (Peer peer : this.knownPeers) {
@@ -323,14 +378,21 @@ public class Network extends Observable {
                 if (!onlyWhite || peer.isWhite())
                     counter++;
         }
-        return counter;
+        return counter == 0;
+    }
+
+    public void decrementWeightOfPeerMutes() {
+        for (Peer peer : knownPeers) {
+            if (peer.getMute() > 0)
+                peer.setMute(peer.getMute() - 1);
+        }
     }
 
     public List<Peer> getBestPeers() {
         return this.peerManager.getBestPeers();
     }
 
-    public List<Peer> getKnownPeers() {
+    public List<Peer> getAllPeers() {
         List<Peer> knownPeers = new ArrayList<Peer>();
         //ASK DATABASE FOR A LIST OF PEERS
         if (!controller.isOnStopping()) {
@@ -354,7 +416,7 @@ public class Network extends Observable {
      */
     public int banForActivePeersCounter() {
 
-        int active = getActivePeersCounter(false);
+        int active = getActivePeersCounter(false, false);
         int difference = Settings.getInstance().getMinConnections() - active;
         if (difference > 0)
             return 0;
@@ -396,8 +458,8 @@ public class Network extends Observable {
         return this.telegramer.deleteForRecipient(recipient, timestamp, title);
     }
 
-    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter) {
-        return this.telegramer.getTelegramsFromTimestamp(timestamp, recipient, filter);
+    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes) {
+        return this.telegramer.getTelegramsFromTimestamp(timestamp, recipient, filter, outcomes);
     }
     //public TelegramMessage getTelegram64(String signature) {
     //	return this.telegramer.getTelegram64(signature);
@@ -429,8 +491,13 @@ public class Network extends Observable {
             //CHECK IF ADDRESS IS THE SAME
             if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
 
-                if (knownPeer.isUsed()) {
-                    knownPeer.close("before accept anew");
+                if (knownPeer.isUsed() || knownPeer.isOnUsed()) {
+                    if (BREAK_PEER_ON_NEW_INCOME) {
+                        knownPeer.close("before accept anew");
+                    } else {
+                        /// зачем разрывать - поновой слать транзакции накладн - используем его же
+                        return knownPeer;
+                    }
                 }
                 // IF PEER not USED and not onUSED
                 knownPeer.connect(socket, this, "connected by restore!!! ");
@@ -439,7 +506,7 @@ public class Network extends Observable {
         }
 
         // Если пустых мест уже мало то начинаем переиспользовать
-        if (this.getActivePeersCounter(false) + 3 > Settings.getInstance().getMaxConnections() ) {
+        if (this.getActivePeersCounter(false, false) + 3 > Settings.getInstance().getMaxConnections()) {
             // use UNUSED peers
             for (Peer knownPeer : this.knownPeers) {
                 if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
@@ -555,25 +622,35 @@ public class Network extends Observable {
 
             case Message.TELEGRAM_TYPE:
 
-                this.telegramer.offerMessage(message);
+                if (telegramer != null)
+                    this.telegramer.offerMessage(message);
 
                 return;
 
             case Message.TRANSACTION_TYPE:
 
-                controller.transactionsPool.offerMessage(message);
+                if (controller.transactionsPool != null)
+                    controller.transactionsPool.offerMessage(message);
 
                 return;
 
             case Message.WIN_BLOCK_TYPE:
 
-                controller.winBlockSelector.offerMessage(message);
+                Peer syncFromPeer = controller.synchronizer.getPeer();
+                if (syncFromPeer != null && !syncFromPeer.equals(message.getSender())) {
+                    // если синхримся то победные от других пиров не принимаем так как они нас в форк уводят
+                    return;
+                }
+
+                if (controller.winBlockSelector != null)
+                    controller.winBlockSelector.offerMessage(message);
 
                 return;
 
             case Message.GET_BLOCK_TYPE:
 
-                controller.blockRequester.offerMessage(message);
+                if (controller.blockRequester != null)
+                    controller.blockRequester.offerMessage(message);
 
                 return;
 
@@ -601,13 +678,13 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                peerHWeight = controller.getHWeightOfPeer(peer);
+                peerHWeight = peer.getHWeight(false);
                 if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
                     continue;
                 }
             }
 
-            peer.setNeedPing();
+            ///peer.setNeedPing();
 
         }
 
@@ -616,7 +693,8 @@ public class Network extends Observable {
 
     public void broadcast(Message message, boolean onlySynchronized) {
         BlockChain chain = controller.getBlockChain();
-        Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
+
+        Integer myHeight = onlySynchronized ? chain.getHWeightFull(DCSet.getInstance()).a : null;
 
         HashSet exclude;
         if (message.isHandled()) {
@@ -624,7 +702,7 @@ public class Network extends Observable {
             switch (message.getType()) {
                 case Message.TELEGRAM_TYPE:
                     // может быть это повтор?
-                    exclude = (HashSet<Peer>)this.handledTelegramMessages.get(message.getHandledID());
+                    exclude = (HashSet<Peer>) this.handledTelegramMessages.get(message.getHandledID());
                     break;
                 case Message.TRANSACTION_TYPE:
                     // может быть это повтор?
@@ -655,8 +733,8 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                Tuple2<Integer, Long> peerHWeight = controller.getHWeightOfPeer(peer);
-                if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
+                Tuple2<Integer, Long> peerHWeight = peer.getHWeight(false);
+                if (peerHWeight == null || myHeight > peerHWeight.a + 300) {
                     continue;
                 }
             }
@@ -689,8 +767,9 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                Tuple2<Integer, Long> peerHWeight = controller.getHWeightOfPeer(peer);
-                if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
+                Tuple2<Integer, Long> peerHWeight = peer.getHWeight(false);
+                /// Сейчас нужно всем передавать свой победный блок - так как они сразу его подхватывают
+                if (peerHWeight == null || peerHWeight.a + 100 < myHeight) {
                     continue;
                 }
             }

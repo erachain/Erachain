@@ -29,6 +29,49 @@ function makePageUri(page, linkName) {
     return uri;
 }
 
+function makePageUri2(seqNo, offset) {
+    // parse url
+    var urlParams;
+    var match,
+        pl = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) {
+            return decodeURIComponent(s.replace(pl, " "));
+        },
+        query = window.location.search.substring(1);
+
+    urlParams = {};
+    while (match = search.exec(query))
+        urlParams[decode(match[1])] = decode(match[2]);
+
+    if (seqNo == 0)
+        urlParams['seqNo'] = null;
+    else
+        urlParams['seqNo'] = seqNo;
+
+    if (offset == 0)
+        urlParams['offset'] = null;
+    else
+        urlParams['offset'] = offset;
+
+    var uri = '';
+
+    for (var paramKey in urlParams) {
+        if (urlParams[paramKey] == null)
+            continue;
+
+        if (uri === '') {
+            uri += '?';
+        } else {
+            uri += '&';
+        }
+
+        uri += paramKey + '=' + encodeURIComponent(urlParams[paramKey]);
+    }
+
+    return uri;
+}
+
 function pagesComponent(data) {
     var output = '';
 
@@ -49,9 +92,34 @@ function pagesComponent(data) {
 function pagesComponent2(data) {
     var output = '';
 
-    var listSize = data.listSize;
-    var pageSize = data.pageSize;
+    var listSize = 0 + data.listSize;
+    var pageSize = 0 + data.pageSize;
     var start = data.start;
+
+    if (data.hasOwnProperty('useoffset')) {
+        // в начало прыгнуть
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, 0) + '"><b><span class="glyphicon glyphicon-fast-backward"></span></b></a>';
+
+        var fromSeqNo = data.fromSeqNo;
+        if (fromSeqNo != null) {
+            // это не самое начало значит можно скакать вверх
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(fromSeqNo, -pageSize - 1) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
+        }
+
+        output += '&emsp; [ <input size="10" type="text" value="' + (fromSeqNo == null? 'seqNo' : fromSeqNo) + '" class="" style="font-size: 1em;"'
+                   + ' onkeydown="if (event.keyCode == 13) document.location = makePageUri2(this.value.trim(), 0)"> ] ';
+
+        var toSeqNo = data.toSeqNo;
+        if (toSeqNo != null) {
+            // листнуть ниже
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(toSeqNo, 1) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
+        }
+
+        // в конец прыгнуть
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, -pageSize) + '"><b><span class="glyphicon glyphicon-fast-forward"></span></b></a>';
+
+        return output;
+    }
 
     if (data.hasOwnProperty('start')) {
         start = data.start;
@@ -267,11 +335,28 @@ function pagesComponentBeauty(start, label, numberLast, step, linkName) {
     return output;
 }
 
+function filterTX() {
+    if ($('#useForge').is(':checked')) {
+        window.location = updateURLParameter(window.location.href, 'forge', 'yes')
+    } else {
+        window.location = updateURLParameter(window.location.href, 'forge', 'no')
+    }
+
+    //window.location.reload(true);
+
+}
+
 function transactions_Table(data) {
 
+    var output = '';
     //console.log("data=")
     //console.log(data)
-    var output = data.Transactions.label_transactions_table + ':<br>';
+    output += '<h4>' + data.Transactions.label_transactions_table + '</h4>';
+
+    var useForgeChecked = getQueryParams('forge') == 'yes'? 'checked' : '';
+
+    output += '<input id="useForge" type="checkbox" name="option1" value="useForge" ' + useForgeChecked + ' onClick="filterTX()">' + data.Transactions.label_useForge + '<br>';
+
     output += pagesComponent2(data);
 
     output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
@@ -281,7 +366,8 @@ function transactions_Table(data) {
         data.Transactions.label_title + '<td><b>' + data.Transactions.label_type_transaction + '<td><b>' +
         data.Transactions.label_amount_key + '<td><b>' + data.Transactions.label_date + '<td><b>' +
         data.Transactions.label_atside + '<td><b>' + data.Transactions.label_size + '<td><b>' +
-        data.Transactions.label_fee + '<td><b>' + data.Transactions.label_confirmations + '</tr>';
+        data.Transactions.label_fee + '</tr>';
+         //+ '<td><b>' + data.Transactions.label_confirmations + '</tr>';
 
     for (key in data.Transactions.transactions) {
         var item = data.Transactions.transactions[key];
@@ -290,7 +376,7 @@ function transactions_Table(data) {
 
         if (item.title != null) {
             output += '<a href="?tx=' + item.signature + get_lang() + '">'
-                + escapeHtml(cutBlank(item.title, 30)) + '</a><td>';
+                + escapeHtml(cutBlank(item.title, 40)) + '</a><td>';
         } else {
             output += '<td>';
         }
@@ -305,7 +391,7 @@ function transactions_Table(data) {
 
             if (item.hasOwnProperty('itemName')) {
                 output += '<a href ="?' + item.itemType + '=' + item.itemKey + get_lang() + '">' +
-                    item.itemName + '</a>';
+                    cut(cutBlank(item.itemName, 40), 35) + '</a>';
             } else {
                 output += '[' + item.itemKey + ']';
             }
@@ -313,10 +399,10 @@ function transactions_Table(data) {
 
         output += '<td>' + convertTimestamp(item.timestamp, true);
         output += '<td><a href ="?address=' + item.creator_addr + get_lang() + '">' +
-            cut(cutBlank(item.creator, 30), 35) + '</a><td>';
+            cut(cutBlank(item.creator, 40), 35) + '</a><td>';
         output += item.size
             + '<td>'+ item.fee
-            + '<td>' + item.confirmations + '</td>'
+            //+ '<td>' + item.confirmations + '</td>'
             + '</tr>';
 
     }

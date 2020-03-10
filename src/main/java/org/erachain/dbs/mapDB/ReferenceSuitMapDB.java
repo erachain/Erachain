@@ -18,7 +18,7 @@ public class ReferenceSuitMapDB extends DBMapSuit<byte[], long[]>
         implements ReferenceSuit {
 
     public ReferenceSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, null);
+        super(databaseSet, database, logger);
     }
 
     @Override

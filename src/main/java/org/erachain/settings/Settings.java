@@ -1,6 +1,4 @@
 package org.erachain.settings;
-// 17/03 Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP
-// 30/03 ++
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -25,12 +23,15 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
-
-//import java.util.Arrays;
-// import org.slf4j.LoggerFactory;
 
 public class Settings {
+
+    public static final long DEFAULT_MAINNET_STAMP = 1487844793333L;
+    public static final long DEFAULT_DEMO_NET_STAMP = 1581001700000L; // default for developers test net
+
+    // FOR TEST by default
+    public static long genesisStamp = DEFAULT_MAINNET_STAMP;
+
     //private static final String[] DEFAULT_PEERS = { };
     public static final String DEFAULT_THEME = "System";
     public static final int DEFAULT_ACCOUNTS = 1;
@@ -65,7 +66,7 @@ public class Settings {
     //GUI CONSOLE
     private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
     //WEB
-    private static final String DEFAULT_WEB_ALLOWED = BlockChain.DEVELOP_USE? ";" : "127.0.0.1";
+    private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
     private static final boolean DEFAULT_WEB_ENABLED = true;
     // 19 03
     //GUI
@@ -99,11 +100,10 @@ public class Settings {
     public static final int TELEGRAM_STORE_PERIOD = 5; // in days
 
 
-
     private static Settings instance;
+
     List<Peer> cacheInternetPeers;
     long timeLoadInternetPeers;
-    private long genesisStamp = -1;
     private JSONObject settingsJSON;
     private JSONObject peersJSON;
     private String userPath = "";
@@ -119,7 +119,7 @@ public class Settings {
     private String telegramDefaultReciever;
     private String telegramRatioReciever = null;
     private String getTelegramPath;
-    
+
     private String telegramtPath;
 
     private Settings() {
@@ -150,30 +150,21 @@ public class Settings {
             }
 
         } catch (Exception e) {
-            LOGGER.info("Error while reading peers.json " + file.getAbsolutePath() + " using default!");
+            LOGGER.info("Error while reading PEERS " + file.getAbsolutePath() + ", using default!");
             LOGGER.error(e.getMessage(), e);
             this.peersJSON = new JSONObject();
         }
     }
 
-    public static Settings getInstance() {
-        ReentrantLock lock = new ReentrantLock();
-        lock.lock();
-        try {
-            if (instance == null) {
-
-                instance = new Settings();
-            }
-        } finally {
-            lock.unlock();
+    public synchronized static Settings getInstance() {
+        if (instance == null) {
+            instance = new Settings();
         }
         return instance;
     }
 
-    public static void FreeInstance() {
-        if (instance != null) {
-            instance = null;
-        }
+    public synchronized static void freeInstance() {
+        instance = null;
     }
 
     public JSONObject Dump() {
@@ -195,7 +186,7 @@ public class Settings {
     }
 
     public String getPeersPath() {
-        return this.userPath + (BlockChain.DEVELOP_USE ? "peers-dev.json" : "peers.json");
+        return this.userPath + (isDemoNet() ? "peers-demo.json" : isTestNet() ? "peers-test.json" : "peers.json");
     }
 
     public String getWalletDir() {
@@ -356,7 +347,7 @@ public class Settings {
         try {
 
             File file = new File(this.userPath
-                    + (BlockChain.DEVELOP_USE ? "peers-trusted-dev.json" : "peers-trusted.json"));
+                    + (BlockChain.TEST_MODE ? "peers-trusted-test.json" : "peers-trusted.json"));
 
             //CREATE FILE IF IT DOESNT EXIST
             if (file.exists()) {
@@ -389,7 +380,7 @@ public class Settings {
             List<Peer> knownPeers = new ArrayList<>();
             JSONArray peersArray = new JSONArray();
 
-            if (!BlockChain.DEVELOP_USE) {
+            if (!BlockChain.TEST_MODE) {
                 try {
                     JSONArray peersArraySettings = (JSONArray) this.settingsJSON.get("knownpeers");
 
@@ -426,7 +417,7 @@ public class Settings {
 
             knownPeers.addAll(getKnownPeersFromJSONArray(peersArray));
 
-            if (!BlockChain.DEVELOP_USE && (knownPeers.isEmpty() || loadPeersFromInternet)) {
+            if (!BlockChain.TEST_MODE && (knownPeers.isEmpty() || loadPeersFromInternet)) {
                 knownPeers.addAll(getKnownPeersFromInternet());
             }
 
@@ -524,29 +515,16 @@ public class Settings {
         }
     }
 
-    public boolean isTestnet() {
-        return this.getGenesisStamp() != BlockChain.DEFAULT_MAINNET_STAMP;
+    public boolean isTestNet() {
+        return this.getGenesisStamp() != DEFAULT_MAINNET_STAMP;
+    }
+
+    public boolean isDemoNet() {
+        return this.getGenesisStamp() == DEFAULT_DEMO_NET_STAMP;
     }
 
     public long getGenesisStamp() {
-        if (this.genesisStamp == -1) {
-            if (this.settingsJSON.containsKey("testnetstamp")) {
-                if (this.settingsJSON.get("testnetstamp").toString().equals("now") ||
-                        ((Long) this.settingsJSON.get("testnetstamp")).longValue() == 0) {
-                    this.genesisStamp = System.currentTimeMillis();
-                } else {
-                    this.genesisStamp = ((Long) this.settingsJSON.get("testnetstamp")).longValue();
-                }
-            } else {
-                this.genesisStamp = BlockChain.DEFAULT_MAINNET_STAMP;
-            }
-        }
-
         return this.genesisStamp;
-    }
-
-    public void setGenesisStamp(long testNetStamp) {
-        this.genesisStamp = testNetStamp;
     }
 
     public int getMaxConnections() {
@@ -737,7 +715,8 @@ public class Settings {
             }
 
             //RETURN
-            return DEFAULT_WEB_ALLOWED.split(";");
+            return (BlockChain.TEST_MODE ? ";" : DEFAULT_WEB_ALLOWED).split(";");
+
         } catch (Exception e) {
             //RETURN EMPTY LIST
             return new String[0];
@@ -1012,8 +991,6 @@ public class Settings {
 
 
     }
-    
-   
 
     public String cutPath(String path) {
 

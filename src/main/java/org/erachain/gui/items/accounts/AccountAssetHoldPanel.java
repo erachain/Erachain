@@ -1,7 +1,5 @@
 package org.erachain.gui.items.accounts;
 
-import java.math.BigDecimal;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
@@ -13,23 +11,18 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 
-//import org.erachain.settings.Settings;
+import java.awt.*;
+import java.math.BigDecimal;
 
-@SuppressWarnings("serial")
+public class AccountAssetHoldPanel extends AccountAssetActionPanelCls  {
 
-public class AccountAssetHoldPanel extends AccountAssetActionPanelCls {
+    private static String iconFile = "images/pageicons/AccountAssetHoldPanel.png";
 
     public AccountAssetHoldPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super("Take on Hold", assetIn, TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
-
-        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to take on hold issued asset %asset%, fill in this form")
-                .replace("%asset%", asset.viewName()));
+        super(true, null, assetIn, null, TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
 
         //	icon.setIcon(null);
-        this.jButton_ok.setText(Lang.getInstance().translate("Hold Asset"));
-        this.jLabel_To.setText(Lang.getInstance().translate("Vendor Account") + ":");
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Vendor Details") + ":");
-      
+
     }
 
     @Override
@@ -69,6 +62,15 @@ public class AccountAssetHoldPanel extends AccountAssetActionPanelCls {
         this.jButton_ok.setEnabled(true);
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }
 
 

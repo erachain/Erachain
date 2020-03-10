@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.database.DBASet;
-import org.erachain.datachain.ItemAssetBalanceMapImpl;
 import org.erachain.datachain.ItemAssetBalanceSuit;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -21,9 +23,10 @@ import org.rocksdb.WriteOptions;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import static org.erachain.utils.ByteArrayUtils.areEqualMask;
 
 @Slf4j
 public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
@@ -59,8 +62,8 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     Tuple2<BigDecimal, BigDecimal>>,
             byte[]> balanceAddressIndex;
 
-    public ItemAssetBalanceSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, ItemAssetBalanceMapImpl.DEFAULT_VALUE, false);
+    public ItemAssetBalanceSuitRocksDB(DBASet databaseSet, DB database, DBTab cover) {
+        super(databaseSet, database, logger, false, cover);
     }
 
     @Override
@@ -141,28 +144,29 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                 balanceKeyAssetIndex.getColumnFamilyHandle());
     }
 
-
     @Override
-    public Iterator<byte[]> assetIterator(long assetKey) {
-        return assetKeys(assetKey).iterator();
+    public IteratorCloseable<byte[]> assetIterator(long assetKey) {
+        return new IteratorCloseableImpl(assetKeys(assetKey).iterator());
     }
 
     public List<byte[]> accountKeys(Account account) {
-        RocksIterator iterator = map.dbSource.getDbCore().newIterator(
-                balanceAddressIndex.getColumnFamilyHandle());
+
         List<byte[]> result = new ArrayList<>();
 
-        for (iterator.seek(account.getShortAddressBytes()); iterator.isValid() && new String(iterator.key())
-                .startsWith(new String(account.getShortAddressBytes())); iterator.next()) {
-            result.add(iterator.value());
+        try (final RocksIterator iterator = map.dbSource.getDbCore().newIterator(
+                balanceAddressIndex.getColumnFamilyHandle())) {
+            for (iterator.seek(account.getShortAddressBytes()); iterator.isValid()
+                    && areEqualMask(iterator.key(), account.getShortAddressBytes()); iterator.next()) {
+                result.add(iterator.value());
+            }
         }
 
         return result;
     }
 
     @Override
-    public Iterator<byte[]> accountIterator(Account account) {
-        return accountKeys(account).iterator();
+    public IteratorCloseable<byte[]> accountIterator(Account account) {
+        return ((DBRocksDBTable) map).getIndexIteratorFilter(balanceAddressIndex.getColumnFamilyHandle(), account.getShortAddressBytes(), false, true);
     }
 
 }

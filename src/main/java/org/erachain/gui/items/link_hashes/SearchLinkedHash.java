@@ -23,6 +23,7 @@ import java.io.IOException;
 
 public class SearchLinkedHash extends SplitPanel {
 
+    private static String iconFile = "images/pageicons/SearchLinkedHash.png";
     private TableModelSearchHash tamleModel;
     private JTable Table_Hash;
 
@@ -197,6 +198,16 @@ public class SearchLinkedHash extends SplitPanel {
 
         }
 
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 }

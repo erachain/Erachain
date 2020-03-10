@@ -3,6 +3,7 @@ package org.erachain.dbs.rocksDB.comm;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
+import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.settings.Settings;
 import org.rocksdb.*;
@@ -134,6 +135,16 @@ public abstract class RocksDbDataSourceTransactionedImpl extends RocksDbDataSour
         } finally {
             resetDbLock.readLock().unlock();
         }
+    }
+
+    @Override
+    public void deleteRange(byte[] keyFrom, byte[] keyToExclude) {
+        throw new UnsupportedRocksDBOperationException();
+    }
+
+    @Override
+    public void deleteRange(ColumnFamilyHandle columnFamilyHandle, byte[] keyFrom, byte[] keyToExclude) {
+        throw new UnsupportedRocksDBOperationException();
     }
 
     @Override

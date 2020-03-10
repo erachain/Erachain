@@ -1,22 +1,31 @@
 package org.erachain.datachain;
 
-import java.util.Iterator;
+import org.erachain.dbs.IteratorCloseable;
 
 /**
  * Iterators for this TAB
  */
 public interface TransactionFinalSuit {
 
-    Iterator<Long> getBlockIterator(Integer height);
+    void deleteForBlock(Integer height);
 
-    Iterator<Long> getIteratorByRecipient(String address);
+    IteratorCloseable<Long> getBlockIterator(Integer height);
 
-    Iterator<Long> getIteratorBySender(String address);
+    IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort);
 
-    Iterator<Long> getIteratorByAddressAndType(String address, Integer type);
+    IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort);
+    IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo);
 
-    Iterator<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type);
+    IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type);
 
-    Iterator<Long> getIteratorByAddress(String address);
+    IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Long fromID);
 
-}
+    IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending);
+
+    IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort);
+
+    IteratorCloseable<Long> getBiDirectionIterator(Long fromSeqNo, boolean descending);
+
+    IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending);
+
+    }

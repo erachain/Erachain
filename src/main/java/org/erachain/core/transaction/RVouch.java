@@ -242,21 +242,10 @@ public class RVouch extends Transaction {
         int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
-		/*
-		//Block block1 = Controller.getInstance().getBlockByHeight(db, height);
-		byte[] b = db.getHeightMap().getBlockByHeight(height);
-		if (b == null )
-			return INVALID_BLOCK_HEIGHT_ERROR;
-
-		Block block = db.getBlocksHeadMap().get(b);
-		if (block == null)
-			return INVALID_BLOCK_HEIGHT_ERROR;
-		Transaction tx = block.get(seq);
-		if (tx == null )
-			return INVALID_BLOCK_TRANS_SEQ_ERROR;
-		 */
-        if (!this.dcSet.getTransactionFinalMap().contains(Transaction.makeDBRef(this.vouchHeight, this.vouchSeqNo))) {
-            return INVALID_BLOCK_TRANS_SEQ_ERROR;
+        Transaction transaction = this.dcSet.getTransactionFinalMap().get(Transaction.makeDBRef(this.vouchHeight, this.vouchSeqNo));
+        if (transaction == null || transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
+            if (height > BlockChain.ALL_BALANCES_OK_TO)
+                return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
 
         return Transaction.VALIDATE_OK;
@@ -334,13 +323,20 @@ public class RVouch extends Transaction {
     public HashSet<Account> getRecipientAccounts() {
 
         HashSet<Account> accounts = new HashSet<Account>(2, 1);
-
-        Transaction record = dcSet.getTransactionFinalMap().get(vouchHeight, vouchSeqNo);
-        if (record == null) {
-            LOGGER.debug("org.erachain.core.transaction.RVouch.getRecipientAccounts() not found record: " + vouchHeight + "-" + vouchSeqNo);
+        if (isWiped())
             return accounts;
+
+        // НЕЛЬЗЯ ссылаться на новую запись см. issue #1241 - иначе при откате ссылается на уже удаленную запись
+        if (false) {
+            Transaction record = dcSet.getTransactionFinalMap().get(vouchHeight, vouchSeqNo);
+            if (record == null) {
+                ///throw new Exception(this.toString() + " - not found record: " + vouchHeight + "-" + vouchSeqNo);
+            } else {
+                accounts.addAll(record.getInvolvedAccounts());
+            }
+
         }
-        accounts.addAll(record.getInvolvedAccounts());
+
 
         return accounts;
     }

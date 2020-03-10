@@ -1,18 +1,23 @@
 package org.erachain.datachain;
 
+import org.erachain.core.item.assets.Order;
+import org.erachain.dbs.IteratorCloseable;
+
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 
 public interface OrderSuit {
 
-    Iterator<Long> getHaveWantIterator(long have, long want);
+    Order getHaveWanFirst(long have, long want);
 
-    Iterator<Long> getHaveWantIterator(long have);
+    IteratorCloseable<Long> getHaveWantIterator(long have, long want);
 
-    Iterator<Long> getWantHaveIterator(long want, long have);
+    IteratorCloseable<Long> getHaveWantIterator(long have);
 
-    Iterator<Long> getWantHaveIterator(long want);
+    IteratorCloseable<Long> getWantHaveIterator(long want, long have);
+
+    IteratorCloseable<Long> getWantHaveIterator(long want);
 
     /**
      * Unsorted if call from Forked DB
@@ -20,9 +25,12 @@ public interface OrderSuit {
      * @param have
      * @param want
      * @param limit
+     * @param deleted
      * @return
      */
-    HashSet<Long> getUnsortedKeysWithParent(long have, long want, BigDecimal limit);
+    HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal limit, Map deleted);
 
-    Iterator<Long> getAddressHaveWantIterator(String address, long have, long want);
+    IteratorCloseable<Long> getAddressIterator(String address);
+    IteratorCloseable<Long> getAddressHaveWantIterator(String address, long have, long want);
+
 }

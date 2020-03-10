@@ -18,6 +18,7 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel {
     /**
      *
      */
+    private static String iconFile = "images/pageicons/SearchUnionSplitPanel.png";
     private static final long serialVersionUID = 1L;
     private static TableModelUnionsItemsTableModel tableModelUnions = new TableModelUnionsItemsTableModel();
     private SearchUnionSplitPanel th;
@@ -76,4 +77,13 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel {
 
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

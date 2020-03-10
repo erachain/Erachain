@@ -60,10 +60,6 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         }
     }
 
-    //@SuppressWarnings({ "unchecked", "rawtypes" })
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP
@@ -82,11 +78,6 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         map = new TreeMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>>(Fun.TUPLE2_COMPARATOR);
     }
 
-    @Override
-    protected Tuple2<Long, ItemCls> getDefaultValue() {
-        return null;
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Tuple2<Long, ItemCls>> get(Account account) {
         List<Tuple2<Long, ItemCls>> items = new ArrayList<Tuple2<Long, ItemCls>>();
@@ -97,6 +88,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
                     Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
 
             //GET ITERATOR
+            // TODO Closeable добавить потом
             Iterator<Tuple2<Long, ItemCls>> iterator = accountItems.values().iterator();
 
             while (iterator.hasNext()) {
@@ -161,7 +153,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
 
     public void add(Account account, long refDB, ItemCls item) {
         this.put(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()),
-                refDB), new Tuple2<Long, ItemCls>(null, item));
+                refDB), new Tuple2<Long, ItemCls>(item.getKey(), item));
     }
 	
 	/*

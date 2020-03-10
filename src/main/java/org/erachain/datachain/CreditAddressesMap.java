@@ -34,9 +34,6 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
         super(parent, dcSet);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP
@@ -55,7 +52,7 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
     }
 
     @Override
-    protected BigDecimal getDefaultValue() {
+    public BigDecimal getDefaultValue() {
         return BigDecimal.ZERO;
     }
 

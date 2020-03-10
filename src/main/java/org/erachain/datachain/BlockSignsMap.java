@@ -27,10 +27,6 @@ public class BlockSignsMap extends DCUMap<Long, Integer> {
     }
 
     @Override
-    protected void createIndexes() {
-    }
-
-    @Override
     public void openMap() {
 
         sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
@@ -51,11 +47,6 @@ public class BlockSignsMap extends DCUMap<Long, Integer> {
     protected void getMemoryMap() {
         //return new TreeMap<long[], Integer>(UnsignedBytes.lexicographicalComparator()); // for byte[] KEYS
         map = new TreeMap<Long, Integer>();
-    }
-
-    @Override
-    protected Integer getDefaultValue() {
-        return null;
     }
 
     public Block getBlock(byte[] signature) {

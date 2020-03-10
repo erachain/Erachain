@@ -21,6 +21,7 @@ import java.io.IOException;
 
 public class OtherSearchBlocks extends SplitPanel {
 
+    private static String iconFile = "images/pageicons/OtherSearchBlocks.png";
     SearchTransactionsSplitPanel rp = new SearchTransactionsSplitPanel();
     private OtherSeasrchBlocksTableModel tamleModel;
     private JTable Table_Hash;
@@ -196,6 +197,16 @@ public class OtherSearchBlocks extends SplitPanel {
 
         }
 
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 }
