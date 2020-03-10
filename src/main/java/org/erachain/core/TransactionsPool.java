@@ -158,7 +158,7 @@ public class TransactionsPool extends MonitoredThread {
             if (LOG_UNCONFIRMED_PROCESS) {
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 30) {
-                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
+                    LOGGER.debug("TRANSACTION_TYPE process CONTAINS in FINAL period: " + timeCheck);
                 }
                 timeCheck = System.currentTimeMillis();
             }

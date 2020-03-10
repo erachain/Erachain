@@ -1578,6 +1578,22 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     }
 
+    /**
+     * ОЧЕНЬ ВАЖНО чтобы Finalizer мог спокойно удалять их и DCSet.fork
+     * иначе Финализер не можеи зацикленные сслки порвать и не очищает HEAP.
+     * Возможно можно еще освободить объекты
+     */
+    public void resetDCSet() {
+        dcSet = null;
+    }
+
+    // ПРОЫЕРЯЛОСЬ! действует в совокупк с Финализе в Блоке
+    @Override
+    protected void finalize() throws Throwable {
+        dcSet = null;
+        super.finalize();
+    }
+
     @Override
     public String toString() {
         if (signature == null) {

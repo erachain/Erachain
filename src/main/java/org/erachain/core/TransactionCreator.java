@@ -54,7 +54,6 @@ import java.util.List;
 @Slf4j
 public class TransactionCreator {
     private DCSet fork;
-    DB database;
     private Block lastBlock;
     private int blockHeight;
     private int seqNo;
@@ -77,13 +76,13 @@ public class TransactionCreator {
 
     private synchronized void updateFork() {
         //CREATE NEW FORK
-        if (this.database != null) {
+        if (this.fork != null) {
             // закроем сам файл базы - закрывать DCSet.fork - не нужно - он сам очистится
-            this.database.close();
+            this.fork.close();
         }
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-        this.database = DCSet.makeDBinMemory();
+        DB database = DCSet.makeDBinMemory();
         this.fork = DCSet.getInstance().fork(database);
 
         //UPDATE LAST BLOCK

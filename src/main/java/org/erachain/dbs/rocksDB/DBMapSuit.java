@@ -162,6 +162,9 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     public void close() {
         map.close();
         //logger.info("closed");
+        databaseSet = null;
+        database = null;
+        super.close();
     }
 
     @Override

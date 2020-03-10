@@ -1961,8 +1961,18 @@ import java.util.*;
                 LOGGER.error(e.getMessage(), e);
             }
             validatedForkDB = null;
+
         }
-        transactions = null;
+
+        try {
+            // ОЧЕНЬ ВАЖНО чтобы Finalizer мог спокойно удалять их и DCSet.fork
+            // иначе Финализер не можеи зацикленные сслки порвать и не очищает HEAP
+            for (Transaction transaction : transactions) {
+                transaction.resetDCSet();
+            }
+        } catch (Exception e) {
+        }
+
         isClosed = true;
     }
 
@@ -1974,6 +1984,15 @@ import java.util.*;
                 LOGGER.debug("validatedForkDB is FINALIZED: " + this.toString());
             }
         }
+
+        // улучшает работу финализера - так как перекрестные ссылки убирает и другие локи быстрее чистятся
+        // в close() это нельзя делать так как там тоблько база данных чиститья а блок дальше в ГУИ используется
+        // ПРОЫЕРЯЛОСЬ! действует
+        rawTransactions = null;
+        parentBlockHead = null;
+        blockHead = null;
+        transactions = null;
+
         super.finalize();
     }
 

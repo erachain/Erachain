@@ -93,7 +93,7 @@ public class DWSet extends DBASet {
 
     }
 
-    public static DWSet reCreateDB(boolean withObserver, boolean dynamicGUI) {
+    public synchronized static DWSet reCreateDB(boolean withObserver, boolean dynamicGUI) {
 
         //OPEN WALLET
         File dbFile = new File(Settings.getInstance().getDataWalletDir(), "wallet.dat");

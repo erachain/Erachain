@@ -346,7 +346,7 @@ public class DCSet extends DBASet implements Closeable {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
             if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
-                        + (Controller.MIN_MEMORY_TAIL << 1)) {
+                    + (Controller.MIN_MEMORY_TAIL)) {
                 // у родителя чистим - у себя нет, так как только создали
                 parent.clearCache();
                 System.gc();
@@ -1623,6 +1623,24 @@ public class DCSet extends DBASet implements Closeable {
     @Override
     public synchronized void writeToParent() {
 
+        // проверим сначала тут память чтобы посередине не вылететь
+        if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+            // System.out.println("########################### Free Memory:"
+            // + Runtime.getRuntime().freeMemory());
+            if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                    + (Controller.MIN_MEMORY_TAIL)) {
+                // у родителя чистим - у себя нет, так как только создали
+                parent.clearCache();
+                System.gc();
+                if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1)) {
+                    logger.error("Heap Memory Overflow");
+                    Controller.getInstance().stopAll(9618);
+                    return;
+                }
+            }
+        }
+
         try {
             // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
             // иначе размер больше будет в форке и не то значение
@@ -1699,11 +1717,15 @@ public class DCSet extends DBASet implements Closeable {
                         LOGGER.error(e.getMessage(), e);
                     }
                 }
+                // улучшает работу финализера
+                tables = null;
                 try {
                     this.database.close();
                 } catch (IOError e) {
                     LOGGER.error(e.getMessage(), e);
                 }
+                // улучшает работу финализера
+                this.database = null;
 
                 this.uses = 0;
             }
@@ -1711,6 +1733,15 @@ public class DCSet extends DBASet implements Closeable {
             logger.info("closed " + (parent == null ? "Main" : "parent " + toString()));
         }
 
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        close();
+        if (BlockChain.CHECK_BUGS > 5) {
+            LOGGER.debug("DCSet is FINALIZED: " + this.toString());
+        }
+        super.finalize();
     }
 
     @Override

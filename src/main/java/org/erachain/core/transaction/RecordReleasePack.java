@@ -232,8 +232,7 @@ public class RecordReleasePack extends Transaction {
             return INVALID_PAYMENTS_LENGTH;
         }
 
-        DCSet fork = this.dcSet.fork();
-        try {
+        try (DCSet fork = this.dcSet.fork()) {
 
             int counter = 0;
             int result = 0;
@@ -250,8 +249,6 @@ public class RecordReleasePack extends Transaction {
                 transaction.process(block, asDeal);
                 counter++;
             }
-        } finally {
-            fork.close();
         }
         // IN FORK
         return super.isValid(asDeal, flags);

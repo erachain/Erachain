@@ -33,4 +33,9 @@ public abstract class DBSuitImpl<T, U> implements DBSuit<T, U> {
         return null;
     }
 
+    @Override
+    public void close() {
+        cover = null;
+    }
+
 }

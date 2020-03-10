@@ -3,6 +3,7 @@
 For clone code:  
 1. Use InteliJ IDEA - New > Project from Version Control...
 1. After load project - import Gradle project
+1. Install Lombok (Settings - Plugins)
 1. For RUN - select Application
 
 Настройка запуска - Приложение и обязательно выбрать нативный Java SDK 1.8, использовать встроенный в IDEA нельзя! Иначе будет ошибка при коммитах базы данных.  

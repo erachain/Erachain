@@ -186,10 +186,16 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
         try {
             // может быть ошибка
             database.getEngine().clearCache();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        try {
             database.close();
         } catch (Exception e) {
-
+            logger.error(e.getMessage(), e);
         }
+        super.close();
     }
 
     @Override
