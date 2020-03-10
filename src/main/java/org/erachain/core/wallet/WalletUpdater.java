@@ -20,7 +20,7 @@ public class WalletUpdater extends MonitoredThread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WalletUpdater.class.getSimpleName());
 
-    private static final int QUEUE_LENGTH = 8 + (64 >> (Controller.HARD_WORK >> 1));
+    private static final int QUEUE_LENGTH = 1024 + (256 >> (Controller.HARD_WORK >> 1));
     BlockingQueue<Pair<Boolean, Block>> blockingQueue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
 
     private Controller controller;
@@ -32,6 +32,7 @@ public class WalletUpdater extends MonitoredThread {
         this.controller = controller;
         this.blockChain = blockChain;
         this.dcSet = dcSet;
+        this.wallet = wallet;
 
         this.setName("WalletUpdater[" + this.getId() + "]");
 
@@ -54,9 +55,13 @@ public class WalletUpdater extends MonitoredThread {
             return;
 
         if (pair.getA()) {
-            wallet.orphanBlock(dcSet, pair.getB());
+            if (wallet.checkNeedSyncWallet(pair.getB().getSignature())) {
+                wallet.orphanBlock(dcSet, pair.getB());
+            }
         } else {
-            wallet.processBlock(dcSet, pair.getB());
+            if (wallet.checkNeedSyncWallet(pair.getB().getReference())) {
+                wallet.processBlock(dcSet, pair.getB());
+            }
         }
     }
 

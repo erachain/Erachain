@@ -65,7 +65,7 @@ public class Wallet extends Observable implements Observer {
 	private int secondsToUnlock = 100;
 	private Timer lockTimer; // = new Timer();
 	private int syncHeight;
-	private WalletUpdater walletUpdater;
+	public WalletUpdater walletUpdater;
 
 	private List<ObserverWaiter> waitingObservers = new ArrayList<>();
 	// CONSTRUCTORS
@@ -1917,13 +1917,15 @@ public class Wallet extends Observable implements Observer {
 
 	public void close() {
 
-        if (this.timerSynchronize != null)
-            this.timerSynchronize.cancel();
+		walletUpdater.halt();
 
-        if (this.lockTimer != null)
-            this.lockTimer.cancel();
+		if (this.timerSynchronize != null)
+			this.timerSynchronize.cancel();
 
-        if (this.database != null) {
+		if (this.lockTimer != null)
+			this.lockTimer.cancel();
+
+		if (this.database != null) {
 			this.database.close();
 		}
 

@@ -13,6 +13,7 @@ import org.erachain.dbs.mapDB.BlocksSuitMapDB;
 import org.erachain.dbs.nativeMemMap.NativeMapHashMapFork;
 import org.erachain.dbs.rocksDB.BlocksSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -261,6 +262,10 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             return;
         }
 
+        if (Controller.getInstance().doesWalletExists() && !Controller.getInstance().noDataWallet) {
+            Controller.getInstance().wallet.walletUpdater.offerMessage(new Pair(false, block));
+        }
+
         long time = System.currentTimeMillis();
         this.setChanged();
         // NEED in BLOCK!
@@ -277,6 +282,10 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
         if (Controller.getInstance().isOnStopping()) {
             return;
+        }
+
+        if (Controller.getInstance().doesWalletExists() && !Controller.getInstance().noDataWallet) {
+            Controller.getInstance().wallet.walletUpdater.offerMessage(new Pair(true, block));
         }
 
         long time = System.currentTimeMillis();
