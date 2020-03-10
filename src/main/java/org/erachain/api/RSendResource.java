@@ -32,6 +32,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
@@ -457,6 +458,7 @@ public class RSendResource {
                                 "LoadTest_" + address.substring(1, 5) + " " + counter,
                                 (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
                                 new byte[]{(byte) 1}, NTP.getTime(), 0l);
+                        WeakReference<Object> weakRef = new WeakReference<>(transaction);
 
                         transaction.sign(creator, Transaction.FOR_NETWORK);
 
@@ -642,6 +644,7 @@ public class RSendResource {
 
                         RSend transaction = new RSend(creator, (byte) 0, recipient, 2L,
                                 amount, "TEST" + counter, null, isText, encryptMessage, NTP.getTime(), 0l);
+                        WeakReference<Object> weakRef = new WeakReference<>(transaction);
 
                         transaction.sign(creator, Transaction.FOR_NETWORK);
 
@@ -895,6 +898,7 @@ public class RSendResource {
 
                         } else {
 
+                            WeakReference<Object> weakRef = new WeakReference<>(transaction);
                             int validate = cntr.getTransactionCreator().afterCreate(transaction,
                                     // если проба то не шлем в реальности
                                     test ? Transaction.FOR_PACK : Transaction.FOR_NETWORK);
