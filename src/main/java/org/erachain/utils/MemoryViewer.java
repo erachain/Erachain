@@ -46,14 +46,16 @@ public class MemoryViewer extends Thread {
             if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
                 // System.out.println("########################### Free Memory:"
                 // + Runtime.getRuntime().freeMemory());
-                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL)) {
                     System.gc();
 
                     if (controller.isAllThreadsGood()) {
                         continue;
                     }
 
-                    if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 1)
+                    if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                            + (Controller.MIN_MEMORY_TAIL << 1))
                         Controller.getInstance().stopAll(1000);
                 }
             }

@@ -136,22 +136,25 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         if (block == null)
             return null;
 
+        if (false) {
+            // проверим занятую память и очистим если что
+            // это не Форк базы и большой блок взяли - наверно надо чистить КЭШ
+            if (parent == null && System.currentTimeMillis() - cacheClearedTime > 10000
+                    && block.getTransactionCount() > 10
+                    && Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()
+                    && Runtime.getRuntime().freeMemory() <
+                    (Runtime.getRuntime().totalMemory() >> 10)
+                            + Controller.MIN_MEMORY_TAIL
+            ) {
+                cacheClearedTime = System.currentTimeMillis();
+                databaseSet.clearCache();
+                System.gc();
+            }
+        }
+
         // LOAD HEAD
         block.loadHeadMind((DCSet) databaseSet);
 
-        // проверим занятую память и очистим если что
-        // это не Форк базы и большой блок взяли - наверно надо чистить КЭШ
-        if (parent == null && System.currentTimeMillis() - cacheClearedTime > 10000
-                && block.getTransactionCount() > 10
-                && Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()
-                && Runtime.getRuntime().freeMemory() <
-                        Controller.MIN_MEMORY_TAIL << 3
-                        //(Runtime.getRuntime().totalMemory() >> 1)
-                ) {
-            cacheClearedTime = System.currentTimeMillis();
-            databaseSet.clearCache();
-            System.gc();
-        }
         return block;
 
     }
@@ -174,8 +177,15 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
         dcSet.getBlockSignsMap().put(signature, height);
         if (dcSet.getBlockSignsMap().size() != height) {
-            Long error = null;
-            ++error;
+            // так как это вызывается асинхронно при проверке прилетающих победных блоков
+            // то тут иногда вылетает ошибка - но в общем должно быть норм все
+            logger.error("CHECK TABS: \n getBlockSignsMap().size() != height : "
+                    + dcSet.getBlockSignsMap().size() + " != " + height
+                    + " : " + block);
+            if (BlockChain.CHECK_BUGS > 10) {
+                Long error = null;
+                ++error;
+            }
         }
 
         PublicKeyAccount creator = block.getCreator();

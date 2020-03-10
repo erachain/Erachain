@@ -208,8 +208,7 @@ public class MultiPaymentTransaction extends Transaction {
 
         //REMOVE FEE
         // TODO REMOVE FORK!!!! - use calculate instead
-        DCSet fork = this.dcSet.fork();
-        try {
+        try (DCSet fork = this.dcSet.fork()) {
             //this.creator.setBalance(FEE_KEY, this.creator.getBalance(fork, FEE_KEY).subtract(this.fee), fork);
             this.creator.changeBalance(fork, true, false, FEE_KEY, this.fee, false, false);
 
@@ -244,8 +243,6 @@ public class MultiPaymentTransaction extends Transaction {
                 //PROCESS PAYMENT IN FORK
                 payment.process(this.creator, fork);
             }
-        } finally {
-            fork.close();
         }
 
         return super.isValid(asDeal, flags);

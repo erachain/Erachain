@@ -1667,7 +1667,7 @@ import java.util.*;
             long processTimingLocal;
             long processTimingLocalDiff;
 
-            TransactionMap unconfirmedMap = dcSetPlace.getTransactionTab();
+            TransactionMapImpl unconfirmedMap = dcSetPlace.getTransactionTab();
             TransactionFinalMapImpl finalMap = dcSetPlace.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSigns = dcSetPlace.getTransactionFinalMapSigns();
 
@@ -1792,16 +1792,19 @@ import java.util.*;
                         processTimingLocal = System.nanoTime();
                         try {
                             if (!unconfirmedMap.isClosed()) {
-                                unconfirmedMap.delete(transactionSignature);
+                                // так как здесь форкнутая база то напрямую - а не через Очередь
+                                unconfirmedMap.deleteDirect(transactionSignature);
                             } else {
                                 unconfirmedMap = dcSetPlace.getTransactionTab();
-                                unconfirmedMap.delete(transactionSignature);
+                                // так как здесь форкнутая база то напрямую - а не через Очередь
+                                unconfirmedMap.deleteDirect(transactionSignature);
                             }
                         } catch (java.lang.Throwable e) {
                             if (e instanceof java.lang.IllegalAccessError) {
                                 // налетели на закрытую таблицу
                                 unconfirmedMap = dcSetPlace.getTransactionTab();
-                                unconfirmedMap.delete(transactionSignature);
+                                // так как здесь форкнутая база то напрямую - а не через Очередь
+                                unconfirmedMap.deleteDirect(transactionSignature);
                             } else {
                                 LOGGER.error(e.getMessage(), e);
                             }
@@ -1958,8 +1961,18 @@ import java.util.*;
                 LOGGER.error(e.getMessage(), e);
             }
             validatedForkDB = null;
+
         }
-        transactions = null;
+
+        try {
+            // ОЧЕНЬ ВАЖНО чтобы Finalizer мог спокойно удалять их и DCSet.fork
+            // иначе Финализер не можеи зацикленные сслки порвать и не очищает HEAP
+            for (Transaction transaction : transactions) {
+                transaction.resetDCSet();
+            }
+        } catch (Exception e) {
+        }
+
         isClosed = true;
     }
 
@@ -1971,6 +1984,15 @@ import java.util.*;
                 LOGGER.debug("validatedForkDB is FINALIZED: " + this.toString());
             }
         }
+
+        // улучшает работу финализера - так как перекрестные ссылки убирает и другие локи быстрее чистятся
+        // в close() это нельзя делать так как там тоблько база данных чиститья а блок дальше в ГУИ используется
+        // ПРОЫЕРЯЛОСЬ! действует
+        rawTransactions = null;
+        parentBlockHead = null;
+        blockHead = null;
+        transactions = null;
+
         super.finalize();
     }
 
@@ -2265,11 +2287,7 @@ import java.util.*;
                 ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                 timerStart = System.currentTimeMillis();
                 try {
-                    if (!unconfirmedMap.isClosed()) {
-                        unconfirmedMap.delete(transactionSignature);
-                    } else {
-                        unconfirmedMap = dcSet.getTransactionTab();
-                    }
+                    unconfirmedMap.delete(transactionSignature);
                 } catch (java.lang.Throwable e) {
                     if (e instanceof java.lang.IllegalAccessError) {
                         // налетели на закрытую таблицу

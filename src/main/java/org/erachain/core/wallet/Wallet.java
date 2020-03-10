@@ -442,17 +442,17 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	// CREATE
-	public boolean create(byte[] seed, String password, int depth, boolean synchronize, String path,
-						  boolean withObserver, boolean dynamicGUI) {
-		String oldPath = Settings.getInstance().getWalletDir();
-		// set wallet dir
-		Settings.getInstance().setWalletDir(path);
-		// OPEN WALLET
-		DWSet database = DWSet.reCreateDB(withObserver, dynamicGUI);
+    public synchronized boolean create(byte[] seed, String password, int depth, boolean synchronize, String path,
+                                       boolean withObserver, boolean dynamicGUI) {
+        String oldPath = Settings.getInstance().getWalletDir();
+        // set wallet dir
+        Settings.getInstance().setWalletDir(path);
+        // OPEN WALLET
+        DWSet database = DWSet.reCreateDB(withObserver, dynamicGUI);
 
-		if (this.secureDatabase != null) {
-			// CLOSE secured WALLET
-			lock();
+        if (this.secureDatabase != null) {
+            // CLOSE secured WALLET
+            lock();
 		}
 
 		// OPEN SECURE WALLET
@@ -469,26 +469,26 @@ public class Wallet extends Observable implements Observer {
 			settingsLangJSON.put("walletdir", Settings.getInstance().getWalletDir());
 			try {
 				SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsLangJSON);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		} else {
-			Settings.getInstance().setWalletDir(oldPath);
-		}
-		return res;
-	}
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        } else {
+            Settings.getInstance().setWalletDir(oldPath);
+        }
+        return res;
+    }
 
-	public boolean create(DWSet database, SecureWalletDatabase secureDatabase, byte[] seed, int depth,
-						  boolean synchronize) {
-		// CREATE WALLET
-		this.database = database;
+    public synchronized boolean create(DWSet database, SecureWalletDatabase secureDatabase, byte[] seed, int depth,
+                                       boolean synchronize) {
+        // CREATE WALLET
+        this.database = database;
 
-		// CREATE SECURE WALLET
-		this.secureDatabase = secureDatabase;
+        // CREATE SECURE WALLET
+        this.secureDatabase = secureDatabase;
 
-		// ADD VERSION
-		this.database.setVersion(1);
+        // ADD VERSION
+        this.database.setVersion(1);
 
 		// SET LICENSE KEY
 		this.setLicenseKey(Controller.LICENSE_VERS);

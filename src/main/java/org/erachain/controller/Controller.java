@@ -93,7 +93,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.22.03 DEV hf2 beta";
+    public static String version = "4.22.04 DEV beta";
     public static String buildTime = "2020-02-20 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -105,7 +105,7 @@ public class Controller extends Observable {
     public static TreeMap<String, Tuple2<BigDecimal, String>> COMPU_RATES = new TreeMap();
 
     public final String APP_NAME;
-    public final static long MIN_MEMORY_TAIL = 1 << 23;
+    public final static long MIN_MEMORY_TAIL = 64 * (1 << 20); // Машина Явы вылетает если меньше 50 МБ
 
     public static final Integer MUTE_PEER_COUNT = 6;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
@@ -280,7 +280,7 @@ public class Controller extends Observable {
         return buildTimestamp;
     }
 
-    public static Controller getInstance() {
+    public synchronized static Controller getInstance() {
         if (instance == null) {
             instance = new Controller();
             instance.setDCSetWithObserver(Settings.getInstance().isGuiEnabled());
@@ -2725,6 +2725,7 @@ public class Controller extends Observable {
             // if last block is changed by core.Synchronizer.process(DLSet, Block)
             // clear this win block
             if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
+                newBlock.close();
                 return false;
             }
 

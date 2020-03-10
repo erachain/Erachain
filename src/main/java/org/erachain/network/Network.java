@@ -693,7 +693,8 @@ public class Network extends Observable {
 
     public void broadcast(Message message, boolean onlySynchronized) {
         BlockChain chain = controller.getBlockChain();
-        Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
+
+        Integer myHeight = onlySynchronized ? chain.getHWeightFull(DCSet.getInstance()).a : null;
 
         HashSet exclude;
         if (message.isHandled()) {
@@ -701,7 +702,7 @@ public class Network extends Observable {
             switch (message.getType()) {
                 case Message.TELEGRAM_TYPE:
                     // может быть это повтор?
-                    exclude = (HashSet<Peer>)this.handledTelegramMessages.get(message.getHandledID());
+                    exclude = (HashSet<Peer>) this.handledTelegramMessages.get(message.getHandledID());
                     break;
                 case Message.TRANSACTION_TYPE:
                     // может быть это повтор?
@@ -733,7 +734,7 @@ public class Network extends Observable {
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
                 Tuple2<Integer, Long> peerHWeight = peer.getHWeight(false);
-                if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
+                if (peerHWeight == null || myHeight > peerHWeight.a + 300) {
                     continue;
                 }
             }

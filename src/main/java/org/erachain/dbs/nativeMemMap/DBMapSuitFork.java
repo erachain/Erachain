@@ -45,10 +45,12 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
-            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+            if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                    + (Controller.MIN_MEMORY_TAIL)) {
                 databaseSet.clearCache();
                 System.gc();
-                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL)
+                if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1))
                     Controller.getInstance().stopAll(1021);
             }
         }
@@ -281,6 +283,13 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         return updated;
 
+    }
+
+    @Override
+    public void close() {
+        parent = null;
+        deleted = null;
+        super.close();
     }
 
     @Override

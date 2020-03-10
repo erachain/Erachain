@@ -377,11 +377,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
 
                     if (BlockChain.CHECK_BUGS > 7) {
-                        LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()));
+                        LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()) + " " + transaction.getCreator().getAddress());
                         if (testTime > transaction.getTimestamp()) {
                             LOGGER.error(" ERROR testTIME " + new Timestamp(testTime));
-                            testTime = transaction.getTimestamp();
                         }
+                        testTime = transaction.getTimestamp();
                     }
 
                     if (transaction.getTimestamp() > timestamp) {
@@ -389,7 +389,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         break;
                     }
 
-                    // делать форк только если есть трнзакции - так как это сильно кушает память
+                    // делать форк только если есть транзакции - так как это сильно кушает память
                     if (newBlockDC == null) {
                         //CREATE FORK OF GIVEN DATABASE
                         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
@@ -493,16 +493,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (ctrl.isOnStopping()) {
                     return;
                 }
-                try {
-                    if (!transactionsMap.isClosed() && transactionsMap.contains(signature))
-                        transactionsMap.delete(signature);
-                } catch (java.lang.Throwable e) {
-                    if (e instanceof java.lang.IllegalAccessError) {
-                        // налетели на закрытую таблицу
-                    } else {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
+                transactionsMap.delete(signature);
             }
             LOGGER.debug("clear INVALID Transactions = " + (System.currentTimeMillis() - start) + "ms for removed: " + needRemoveInvalids.size()
                     + " LEFT: " + transactionsMap.size());
@@ -515,9 +506,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public void checkForRemove(long timestamp) {
 
         //CREATE FORK OF GIVEN DATABASE
-        DB database = DCSet.makeDBinMemory();
-        try {
-            DCSet newBlockDC = dcSet.fork(database);
+        try (DCSet newBlockDC = dcSet.fork(DCSet.makeDBinMemory())) {
+
             int blockHeight = newBlockDC.getBlockSignsMap().size() + 1;
 
             //Block waitWin;
@@ -607,8 +597,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             LOGGER.debug("get check for Remove = " + (System.currentTimeMillis() - start) + "ms for trans: " + map.size()
                     + " needRemoveInvalids:" + needRemoveInvalids.size());
 
-        } finally {
-            database.close();
         }
 
     }

@@ -369,10 +369,16 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     }
 
     @Override
-    public void clearCache() {}
+    public void clearCache() {
+        // систится у всей базы
+    }
 
     @Override
-    public void close() {}
+    public void close() {
+        databaseSet = null;
+        database = null;
+        map = null;
+    }
 
     @Override
     public boolean isClosed() {
