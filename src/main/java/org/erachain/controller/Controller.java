@@ -2740,6 +2740,7 @@ public class Controller extends Observable {
 
                 // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
                 DCSet forked = dcSet.fork(DCSet.makeDBinMemory());
+                WeakReference<Object> weakRefForked = new WeakReference<>(forked);
                 // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
                 if (!newBlock.isValid(forked, true)) {
                     // тогда проверим заново полностью
