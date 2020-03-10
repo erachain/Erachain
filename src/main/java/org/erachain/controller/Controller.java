@@ -69,6 +69,7 @@ import java.awt.TrayIcon.MessageType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -2720,6 +2721,8 @@ public class Controller extends Observable {
         Block newBlock = this.blockChain.popWaitWinBuffer();
         if (newBlock == null)
             return false;
+
+        WeakReference<Block> weakRef = new WeakReference<>(newBlock);
 
         try {
             // if last block is changed by core.Synchronizer.process(DLSet, Block)
