@@ -2727,32 +2727,33 @@ public class Controller extends Observable {
         try {
             // if last block is changed by core.Synchronizer.process(DLSet, Block)
             // clear this win block
-            if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
-                newBlock.close();
+            if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), weakRef.get().getReference())) {
+                weakRef.get().close();
                 return false;
             }
 
-            LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
+            LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + weakRef.get().toString());
 
-            if (!newBlock.isValidated()) {
+            if (!weakRef.get().isValidated()) {
                 // это может случиться при добавлении в момент синхронизации - тогда до расчета Победы не доходит
                 // или при добавлении моего сгнерированного блока т.к. он не проверился?
 
                 // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
                 DCSet forked = dcSet.fork(DCSet.makeDBinMemory());
-                WeakReference<Object> weakRefForked = new WeakReference<>(forked);
+                WeakReference<DCSet> weakRefForked = new WeakReference<>(forked);
+                DCSet ref = weakRefForked.get();
                 // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
-                if (!newBlock.isValid(forked, true)) {
+                if (!newBlock.isValid(ref, true)) {
                     // тогда проверим заново полностью
-                    forked.close();
+                    ref.close();
                     return false;
                 }
                 // запоним что в этой базе проверку сделали с Процессингом чтобы потом быстро слить в основную базу
-                newBlock.setValidatedForkDB(forked);
+                weakRef.get().setValidatedForkDB(ref);
             }
 
             try {
-                this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true, false);
+                this.synchronizer.pipeProcessOrOrphan(this.dcSet, weakRef.get(), false, true, false);
 
             } catch (Exception e) {
                 if (this.isOnStopping()) {
@@ -2766,7 +2767,7 @@ public class Controller extends Observable {
                 this.network.clearHandledWinBlockMessages();
             }
         } finally {
-            newBlock.close();
+            weakRef.get().close();
         }
 
         LOGGER.info("+++ flushNewBlockGenerated OK");

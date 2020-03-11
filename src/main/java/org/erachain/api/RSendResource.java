@@ -454,17 +454,16 @@ public class RSendResource {
                         }
                     } else {
 
-                        RSend transaction = new RSend(creator, (byte) 0, recipient, 2l, null,
+                        WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, (byte) 0, recipient, 2l, null,
                                 "LoadTest_" + address.substring(1, 5) + " " + counter,
                                 (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
-                                new byte[]{(byte) 1}, NTP.getTime(), 0l);
-                        WeakReference<Object> weakRef = new WeakReference<>(transaction);
+                                new byte[]{(byte) 1}, NTP.getTime(), 0l));
 
-                        transaction.sign(creator, Transaction.FOR_NETWORK);
+                        weakRef.get().sign(creator, Transaction.FOR_NETWORK);
 
                         // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
-                        cnt.transactionsPool.offerMessage(transaction);
-                        cnt.broadcastTransaction(transaction);
+                        cnt.transactionsPool.offerMessage(weakRef.get());
+                        cnt.broadcastTransaction(weakRef.get());
 
                     }
 
@@ -642,15 +641,14 @@ public class RSendResource {
 
                     } else {
 
-                        RSend transaction = new RSend(creator, (byte) 0, recipient, 2L,
-                                amount, "TEST" + counter, null, isText, encryptMessage, NTP.getTime(), 0l);
-                        WeakReference<Object> weakRef = new WeakReference<>(transaction);
+                        WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, (byte) 0, recipient, 2L,
+                                amount, "TEST" + counter, null, isText, encryptMessage, NTP.getTime(), 0l));
 
-                        transaction.sign(creator, Transaction.FOR_NETWORK);
+                        weakRef.get().sign(creator, Transaction.FOR_NETWORK);
 
                         // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
-                        cnt.transactionsPool.offerMessage(transaction);
-                        cnt.broadcastTransaction(transaction);
+                        cnt.transactionsPool.offerMessage(weakRef.get());
+                        cnt.broadcastTransaction(weakRef.get());
 
                     }
 
@@ -898,8 +896,8 @@ public class RSendResource {
 
                         } else {
 
-                            WeakReference<Object> weakRef = new WeakReference<>(transaction);
-                            int validate = cntr.getTransactionCreator().afterCreate(transaction,
+                            WeakReference<Transaction> weakRef = new WeakReference<>(transaction);
+                            int validate = cntr.getTransactionCreator().afterCreate(weakRef.get(),
                                     // если проба то не шлем в реальности
                                     test ? Transaction.FOR_PACK : Transaction.FOR_NETWORK);
 
@@ -908,8 +906,8 @@ public class RSendResource {
 
                             } else {
                                 // УСПЕХ! учтем все
-                                totalSendAmount = totalSendAmount.add(transaction.getAmount());
-                                totalFee = totalFee.add(transaction.getFee());
+                                totalSendAmount = totalSendAmount.add(weakRef.get().getAmount());
+                                totalFee = totalFee.add(weakRef.get().getFee());
                                 count++;
                                 if (onlyPerson) {
                                     // учтем что такой персоне давали

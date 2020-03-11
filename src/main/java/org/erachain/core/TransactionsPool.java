@@ -99,9 +99,7 @@ public class TransactionsPool extends MonitoredThread {
             TransactionMessage transactionMessage = (TransactionMessage) item;
 
             // GET TRANSACTION
-            Transaction transaction = transactionMessage.getTransaction();
-            WeakReference<Object> weakRef = new WeakReference<>(transaction);
-
+            Transaction transaction = new WeakReference<>(transactionMessage.getTransaction()).get();
 
             // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
             if (transaction.getCreator() == null

@@ -82,7 +82,7 @@ public class WalletUpdater extends MonitoredThread {
 
             Controller.getInstance().walletSyncStatusUpdate(-1);
 
-            LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet...");
+            LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet..." + (reset ? " RESET" : ""));
 
             DCSet dcSet = DCSet.getInstance();
 

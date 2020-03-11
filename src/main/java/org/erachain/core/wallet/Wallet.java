@@ -728,12 +728,13 @@ public class Wallet extends Observable implements Observer {
 
 					try {
 						this.processBlock(dcSet, weakRef.get());
-						weakRef.get().close();
 					} catch (java.lang.OutOfMemoryError e) {
 						LOGGER.error(e.getMessage(), e);
 						Controller.getInstance().stopAll(644);
 						return;
 					}
+
+					weakRef = null;
 
 					if (System.currentTimeMillis() - timePoint > 10000
 							|| steepHeight < height - lastHeight) {

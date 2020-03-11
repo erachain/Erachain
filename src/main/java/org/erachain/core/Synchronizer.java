@@ -142,6 +142,7 @@ public class Synchronizer extends Thread {
         while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
 
             WeakReference<Block> weakRef = new WeakReference<>(lastBlock);
+            lastBlock = weakRef.get();
 
             LOGGER.debug("*** ORPHAN LAST BLOCK [" + lastBlock.getHeight() + "] in FORK_DB UNTIL WE HAVE REACHED COMMON BLOCK ["
                     + lastCommonBlock.getHeight() + "]");
@@ -240,6 +241,7 @@ public class Synchronizer extends Thread {
         for (Block block : newBlocks) {
 
             WeakReference<Block> weakRef = new WeakReference<>(block);
+            block = weakRef.get();
 
             int height = block.getHeight();
             int bbb = fork.getBlockMap().size() + 1;
@@ -472,9 +474,9 @@ public class Synchronizer extends Thread {
                         "START BUFFER" + " peer: " + peer + " for blocks: " + signatures.size());
 
                 BlockBuffer blockBuffer = new BlockBuffer(signatures, peer);
-                WeakReference<Object> weakRef = new WeakReference<>(blockBuffer);
+                WeakReference<BlockBuffer> weakRef = new WeakReference<>(blockBuffer);
+                blockBuffer = weakRef.get();
 
-                Block blockFromPeer = null;
                 String errorMess = null;
                 int banTime = BAN_BLOCK_TIMES >> 2;
 
@@ -494,9 +496,11 @@ public class Synchronizer extends Thread {
                         // GET BLOCK
                         LOGGER.debug("try get BLOCK from BUFFER");
 
+                        Block blockFromPeer = null;
                         long time1 = System.currentTimeMillis();
                         try {
-                            blockFromPeer = blockBuffer.getBlock(signature);
+                            WeakReference<Block> weakRefBlock = new WeakReference<>(blockBuffer.getBlock(signature));
+                            blockFromPeer = weakRefBlock.get();
                             if (isFromTrustedPeer) {
                                 blockFromPeer.setFromTrustedPeer();
                             }

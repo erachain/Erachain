@@ -1046,7 +1046,7 @@ public class Block implements Closeable, ExplorerJsonLine {
     public synchronized List<Transaction> getTransactions() {
         if (this.transactions == null) {
             //LOAD TRANSACTIONS
-            this.transactions = new ArrayList<Transaction>();
+            this.transactions = new WeakReference<>(new ArrayList<Transaction>()).get();
 
             int position = 0;
             for (int i = 0; i < transactionCount; i++) {
@@ -1058,11 +1058,10 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                     //PARSE TRANSACTION
                     byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position, position + transactionLength);
-                    Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
-                    WeakReference<Object> weakRef = new WeakReference<>(transaction);
 
                     //ADD TO TRANSACTIONS
-                    this.transactions.add(transaction);
+                    this.transactions.add(new WeakReference<>(
+                            TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK)).get());
 
                     //ADD TO POSITION
                     position += transactionLength;

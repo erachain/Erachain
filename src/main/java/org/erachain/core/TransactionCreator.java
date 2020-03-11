@@ -84,7 +84,8 @@ public class TransactionCreator {
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
         DB database = DCSet.makeDBinMemory();
-        WeakReference<Object> weakRef = new WeakReference<>(database);
+        WeakReference<DB> weakRef = new WeakReference<>(database);
+        database = weakRef.get();
         WeakReference<DCSet> weakRefFork = new WeakReference<>(DCSet.getInstance().fork(database));
         this.fork = weakRefFork.get();
 
@@ -125,12 +126,11 @@ public class TransactionCreator {
                 List<Account> accountMap = Controller.getInstance().getAccounts();
 
                 while (iterator.hasNext()) {
-                    transaction = transactionTab.get(iterator.next());
+                    transaction = new WeakReference<>(transactionTab.get(iterator.next())).get();
 
                     if (accountMap.contains(transaction.getCreator())) {
                         accountTransactions.add(transaction);
                     }
-                    new WeakReference<>(transaction);
                 }
             } catch (IOException e) {
             }
