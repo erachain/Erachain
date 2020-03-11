@@ -322,11 +322,11 @@ public class MainPanel extends javax.swing.JPanel {
 
             }
 
-         //   if (str.equals(Lang.getInstance().translate("Insert Person")) || str.equals("InsertPersonPanel")) {
-         //       insertTab(Lang.getInstance().translate("Insert Person"), new InsertPersonPanel());
-         //       return;
+          if (str.equals(Lang.getInstance().translate("Insert Person")) || str.equals("InsertPersonPanel")) {
+              insertTab(Lang.getInstance().translate("Insert Person"), new InsertPersonPanel(),InsertPersonPanel.getIcon());
+               return;
 
-         //   }
+           }
 
             if (str.equals(Lang.getInstance().translate("My Accounts")) || str.equals("MyAccountsSplitPanel")) {
                 insertTab(Lang.getInstance().translate("My Accounts"), new MyAccountsSplitPanel(), MyAccountsSplitPanel.getIcon());
