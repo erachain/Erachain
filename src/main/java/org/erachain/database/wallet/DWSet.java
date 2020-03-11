@@ -131,7 +131,7 @@ public class DWSet extends DBASet {
                 //.asyncWriteFlushDelay(30000)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(10) // не нагружать процессор для поиска свободного места в базе данных
 
                 .mmapFileEnablePartial()
                 //.compressionEnable()

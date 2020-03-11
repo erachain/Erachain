@@ -576,12 +576,12 @@ public class DCSet extends DBASet implements Closeable {
 
                             // это чистит сама память если соталось 25% от кучи - так что она безопасная
                             // у другого типа КЭША происходит утечка памяти
-                            .cacheHardRefEnable()
+                            ///.cacheHardRefEnable()
 
-                    ///.cacheSoftRefEnable()
-                    ///.cacheSize(32 << Controller.HARD_WORK)
+                            ///.cacheSoftRefEnable()
+                            ///.cacheSize(32 << Controller.HARD_WORK)
 
-                    ///.cacheWeakRefEnable()
+                            .cacheWeakRefEnable() // new WeakReference()
                     ///.cacheSize(32 << Controller.HARD_WORK)
                     ;
 
@@ -617,7 +617,9 @@ public class DCSet extends DBASet implements Closeable {
                 .asyncWriteFlushDelay(2)
                 // тут не влияет .commitFileSyncDisable()
 
-                .cacheHardRefEnable()
+                //.cacheHardRefEnable()
+                //.cacheLRUEnable()
+                .cacheWeakRefEnable() // new WeakReference()
                 //.cacheDisable()
 
 
