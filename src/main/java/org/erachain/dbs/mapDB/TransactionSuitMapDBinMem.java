@@ -13,7 +13,6 @@ import org.mapdb.DBMaker;
 import org.mapdb.SerializerBase;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
@@ -74,8 +73,6 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
                     .make();
         }
 
-        WeakReference<Object> weakRef = new WeakReference<>(database);
-
         sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
 
         // OPEN MAP
@@ -84,8 +81,6 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable() // разрешаем счет размера - это будет немного тормозить работу
                 .makeOrGet();
-
-        WeakReference<Object> weakRefMap = new WeakReference<>(map);
 
     }
 

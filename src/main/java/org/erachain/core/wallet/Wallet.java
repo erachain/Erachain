@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.util.Timer;
 import java.util.*;
@@ -720,21 +719,21 @@ public class Wallet extends Observable implements Observer {
         	if (getAccounts() != null && !getAccounts().isEmpty()) {
 				do {
 
-					WeakReference<Block> weakRef = new WeakReference<>(blockMap.getAndProcess(height));
+                    Block block = blockMap.getAndProcess(height);
 
-					if (weakRef.get() == null) {
-						break;
-					}
+                    if (block == null) {
+                        break;
+                    }
 
-					try {
-						this.processBlock(dcSet, weakRef.get());
-					} catch (java.lang.OutOfMemoryError e) {
-						LOGGER.error(e.getMessage(), e);
-						Controller.getInstance().stopAll(644);
+                    try {
+                        this.processBlock(dcSet, block);
+                        block.close();
+                        block = null;
+                    } catch (java.lang.OutOfMemoryError e) {
+                        LOGGER.error(e.getMessage(), e);
+                        Controller.getInstance().stopAll(644);
 						return;
 					}
-
-					weakRef = null;
 
 					if (System.currentTimeMillis() - timePoint > 10000
 							|| steepHeight < height - lastHeight) {

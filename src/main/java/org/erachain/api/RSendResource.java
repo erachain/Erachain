@@ -916,6 +916,7 @@ public class RSendResource {
                             }
                         }
 
+                        transaction = null;
                         outResult.add(resultOne);
 
                     } catch (java.lang.ArrayIndexOutOfBoundsException e) {

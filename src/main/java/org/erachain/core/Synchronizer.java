@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -139,10 +138,8 @@ public class Synchronizer extends Thread {
         // ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in FORK DB
         // ============ by EQUAL SIGNATURE !!!!!
         byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
+        int countClear = 0;
         while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
-
-            WeakReference<Block> weakRef = new WeakReference<>(lastBlock);
-            lastBlock = weakRef.get();
 
             LOGGER.debug("*** ORPHAN LAST BLOCK [" + lastBlock.getHeight() + "] in FORK_DB UNTIL WE HAVE REACHED COMMON BLOCK ["
                     + lastCommonBlock.getHeight() + "]");
@@ -179,6 +176,7 @@ public class Synchronizer extends Thread {
             if (++countOrphanedTransactions < MAX_ORPHAN_TRANSACTIONS_MY) {
                 // сохраним откаченные транзакции - может их потом включим в очередь
                 for (Transaction transaction : lastBlock.getTransactions()) {
+                    transaction.resetDCSet();
                     orphanedTransactions.put(transaction.getDBRef(), transaction);
                 }
                 countOrphanedTransactions += lastBlock.getTransactionCount();
@@ -193,7 +191,9 @@ public class Synchronizer extends Thread {
                 ctrl.stopAll(311);
             }
 
-            DCSet.getInstance().clearCache();
+            if (++countClear % 100 == 0) {
+                DCSet.getInstance().clearCache();
+            }
 
             if (BlockChain.CHECK_BUGS > 5) {
                 // TEST CORRUPT base
@@ -205,6 +205,9 @@ public class Synchronizer extends Thread {
                 assert (bbb2 == hhh2);
                 assert (sss2 == hhh2);
             }
+
+            lastBlock.close();
+            lastBlock = null;
 
             LOGGER.debug("*** checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
             lastBlock = blockMap.last();
@@ -239,9 +242,6 @@ public class Synchronizer extends Thread {
         boolean isFromTrustedPeer = bchain.isPeerTrusted(peer);
 
         for (Block block : newBlocks) {
-
-            WeakReference<Block> weakRef = new WeakReference<>(block);
-            block = weakRef.get();
 
             int height = block.getHeight();
             int bbb = fork.getBlockMap().size() + 1;
@@ -318,6 +318,9 @@ public class Synchronizer extends Thread {
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
                     throw new Exception(mess);
                 }
+
+                block.close();
+
             }
 
             // далее тут блок не Процессим так как он в isValid(fork, true) процессится параллельно
@@ -474,8 +477,6 @@ public class Synchronizer extends Thread {
                         "START BUFFER" + " peer: " + peer + " for blocks: " + signatures.size());
 
                 BlockBuffer blockBuffer = new BlockBuffer(signatures, peer);
-                WeakReference<BlockBuffer> weakRef = new WeakReference<>(blockBuffer);
-                blockBuffer = weakRef.get();
 
                 String errorMess = null;
                 int banTime = BAN_BLOCK_TIMES >> 2;
@@ -499,8 +500,6 @@ public class Synchronizer extends Thread {
                         Block blockFromPeer = null;
                         long time1 = System.currentTimeMillis();
                         try {
-                            WeakReference<Block> weakRefBlock = new WeakReference<>(blockBuffer.getBlock(signature));
-                            blockFromPeer = weakRefBlock.get();
                             if (isFromTrustedPeer) {
                                 blockFromPeer.setFromTrustedPeer();
                             }
@@ -585,6 +584,7 @@ public class Synchronizer extends Thread {
                             try (DCSet fork = dcSet.fork(DCSet.makeDBinMemory())) {
                                 if (!blockFromPeer.isValid(fork, false)) {
 
+                                    blockFromPeer.close();
                                     errorMess = "invalid BLOCK";
                                     banTime = BAN_BLOCK_TIMES;
                                     break;
@@ -644,6 +644,8 @@ public class Synchronizer extends Thread {
                             LOGGER.error(e.getMessage(), e);
                             ctrl.stopAll(343);
 
+                        } finally {
+                            blockFromPeer.close();
                         }
 
                     }

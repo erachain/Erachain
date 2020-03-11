@@ -12,7 +12,6 @@ import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -112,7 +111,6 @@ public class ConnectionCreator extends MonitoredThread {
             }
 
             newPeer = network.getKnownPeer(newPeer, Network.ANY_TYPE);
-            WeakReference<Object> weakRef = new WeakReference<>(newPeer);
 
             if (!network.isGoodForConnect(newPeer))
                 continue;
@@ -181,7 +179,6 @@ public class ConnectionCreator extends MonitoredThread {
                 // TRY CONNECT to WHITE peers of this PEER
                 try {
                     Peer startPeer = new Peer(InetAddress.getByAddress(BlockChain.START_PEER));
-                    WeakReference<Object> weakRef = new WeakReference<>(startPeer);
 
                     connectToPeersOfThisPeer(startPeer, 1, true);
                 } catch (Exception e) {
@@ -197,8 +194,6 @@ public class ConnectionCreator extends MonitoredThread {
 
                 //ITERATE knownPeers
                 for (Peer peer : knownPeers) {
-
-                    WeakReference<Object> weakRef = new WeakReference<>(peer);
 
                     //CHECK IF WE ALREADY HAVE MIN CONNECTIONS
                     if (Settings.getInstance().getMinConnections() <= network.getActivePeersCounter(true, false)) {
@@ -266,8 +261,6 @@ public class ConnectionCreator extends MonitoredThread {
                 //avoids Exception when adding new elements
                 List<Peer> peers = network.getActivePeers(false);
                 for (Peer peer : peers) {
-
-                    WeakReference<Object> weakRef = new WeakReference<>(peer);
 
                     if (!this.network.run)
                         break;

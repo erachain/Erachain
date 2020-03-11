@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
-import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -1046,7 +1045,7 @@ public class Block implements Closeable, ExplorerJsonLine {
     public synchronized List<Transaction> getTransactions() {
         if (this.transactions == null) {
             //LOAD TRANSACTIONS
-            this.transactions = new WeakReference<>(new ArrayList<Transaction>()).get();
+            this.transactions = new ArrayList<Transaction>();
 
             int position = 0;
             for (int i = 0; i < transactionCount; i++) {
@@ -1060,8 +1059,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position, position + transactionLength);
 
                     //ADD TO TRANSACTIONS
-                    this.transactions.add(new WeakReference<>(
-                            TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK)).get());
+                    this.transactions.add(TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK));
 
                     //ADD TO POSITION
                     position += transactionLength;
@@ -1975,6 +1973,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         } catch (Exception e) {
         }
 
+        transactions = null;
+
         isClosed = true;
     }
 
@@ -1990,10 +1990,9 @@ public class Block implements Closeable, ExplorerJsonLine {
         // улучшает работу финализера - так как перекрестные ссылки убирает и другие локи быстрее чистятся
         // в close() это нельзя делать так как там тоблько база данных чиститья а блок дальше в ГУИ используется
         // ПРОЫЕРЯЛОСЬ! действует
-        rawTransactions = null;
-        parentBlockHead = null;
-        blockHead = null;
-        transactions = null;
+        ///rawTransactions = null;
+        ///parentBlockHead = null;
+        ///blockHead = null;
 
         super.finalize();
     }

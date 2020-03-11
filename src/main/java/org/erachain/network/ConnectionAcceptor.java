@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
@@ -111,7 +110,6 @@ public class ConnectionAcceptor extends MonitoredThread {
 
             // проверим - может уже есть такое соединение в котром мы мнмцматор
             Peer peer = this.network.getKnownWhitePeer(connectionSocket.getInetAddress().getAddress());
-            WeakReference<Object> weakRef = new WeakReference<>(peer);
 
             if (peer != null && (peer.isOnUsed() || peer.isUsed())) {
                 try {

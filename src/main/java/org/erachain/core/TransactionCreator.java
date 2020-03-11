@@ -37,7 +37,6 @@ import org.erachain.utils.TransactionTimestampComparator;
 import org.mapdb.DB;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -84,14 +83,10 @@ public class TransactionCreator {
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
         DB database = DCSet.makeDBinMemory();
-        WeakReference<DB> weakRef = new WeakReference<>(database);
-        database = weakRef.get();
-        WeakReference<DCSet> weakRefFork = new WeakReference<>(DCSet.getInstance().fork(database));
-        this.fork = weakRefFork.get();
-
+        this.fork = DCSet.getInstance().fork(database);
 
         //UPDATE LAST BLOCK
-        this.lastBlock = new WeakReference<Block>(Controller.getInstance().getLastBlock()).get();
+        this.lastBlock = Controller.getInstance().getLastBlock();
         this.blockHeight = this.fork.getBlockMap().size() + 1;
         this.seqNo = 0; // reset sequence number
 
@@ -126,7 +121,7 @@ public class TransactionCreator {
                 List<Account> accountMap = Controller.getInstance().getAccounts();
 
                 while (iterator.hasNext()) {
-                    transaction = new WeakReference<>(transactionTab.get(iterator.next())).get();
+                    transaction = transactionTab.get(iterator.next());
 
                     if (accountMap.contains(transaction.getCreator())) {
                         accountTransactions.add(transaction);
