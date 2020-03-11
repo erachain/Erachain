@@ -20,10 +20,7 @@ import org.erachain.gui.items.mails.OutcomingMailsSplitPanel;
 import org.erachain.gui.items.other.OtherConsolePanel;
 import org.erachain.gui.items.other.OtherSearchBlocks;
 import org.erachain.gui.items.other.OtherSplitPanel;
-import org.erachain.gui.items.persons.IssuePersonPanel;
-import org.erachain.gui.items.persons.PersonsFavoriteSplitPanel;
-import org.erachain.gui.items.persons.PersonsMySplitPanel;
-import org.erachain.gui.items.persons.SearchPersonsSplitPanel;
+import org.erachain.gui.items.persons.*;
 import org.erachain.gui.items.polls.IssuePollPanel;
 import org.erachain.gui.items.polls.PollsFavoriteSplitPanel;
 import org.erachain.gui.items.polls.Polls_My_SplitPanel;
@@ -143,8 +140,8 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         person_Node.add(new ASMutableTreeNode("PersonsFavoriteSplitPanel",Lang.getInstance().translate("Favorite Persons"), PersonsFavoriteSplitPanel.getIcon()));
         person_Node.add(new ASMutableTreeNode("PersonsMySplitPanel",Lang.getInstance().translate("My Persons"), PersonsMySplitPanel.getIcon()));
         person_Node.add(new ASMutableTreeNode("SearchPersonsSplitPanel",Lang.getInstance().translate("Search Persons"), SearchPersonsSplitPanel.getIcon()));
-        person_Node.add(new ASMutableTreeNode("IssuePersonPanel",Lang.getInstance().translate("Issue Person"), IssuePersonPanel.getIcon()));
-    //    person_Node.add(new ASMutableTreeNode("Insert Person",Lang.getInstance().translate("Insert Person")));
+        person_Node.add(new ASMutableTreeNode("IssuePersonPanel", Lang.getInstance().translate("Issue Person"), IssuePersonPanel.getIcon()));
+        person_Node.add(new ASMutableTreeNode("InsertPersonPanel", Lang.getInstance().translate("Insert Person"), InsertPersonPanel.getIcon()));
 
         account_Node.add(new ASMutableTreeNode("MyAccountsSplitPanel",Lang.getInstance().translate("My Accounts"), MyAccountsSplitPanel.getIcon()));
         account_Node.add(new ASMutableTreeNode("MyLoansSplitPanel",Lang.getInstance().translate("My Loans"), MyLoansSplitPanel.getIcon()));
@@ -273,15 +270,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         add(new JScrollPane(tree));
         add(jtf, BorderLayout.SOUTH);
 
-        // -------------------------------------------
-        // ��������� ����
-        // setTitle("JTreeTest"); // ��������� ����
-        // ����������� ������� ����
-        // setPreferredSize(new Dimension(640, 480));
-        // ��������� ���������� ��� �������� ����
-        // setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // pack(); // ������������� ����������� �������
-        setVisible(true); // ���������� ����
+        setVisible(true);
 
     }
 
