@@ -137,7 +137,7 @@ public class WalletUpdater extends MonitoredThread {
                 // полная пересборка кошелька
 
                 // break current synchronization if exists
-                wallet.synchronizeBodyStop = true;
+                wallet.synchronizeBodyUsed.set(false);
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -162,7 +162,7 @@ public class WalletUpdater extends MonitoredThread {
             }
 
             // break current synchronization if exists
-            wallet.synchronizeBodyStop = true;
+            wallet.synchronizeBodyUsed.set(false);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

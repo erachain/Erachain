@@ -767,7 +767,7 @@ public class Wallet extends Observable implements Observer {
 
 					height++;
 
-				} while (synchronizeStatus.get()
+				} while (synchronizeBodyUsed.get()
 						&& !Controller.getInstance().isOnStopping()
 						&& !Controller.getInstance().needUpToDate()
 						&& Controller.getInstance().isStatusWaiting());
