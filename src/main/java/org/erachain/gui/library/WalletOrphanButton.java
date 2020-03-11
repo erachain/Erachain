@@ -29,10 +29,6 @@ public class WalletOrphanButton extends JButton implements Observer {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 // TODO Auto-generated method stub
-                // check synchronize Walet
-                if (Controller.getInstance().wallet.synchronizeBodyUsed.get()) {
-                    return;
-                }
                 // CHECK IF WALLET UNLOCKED
                 if (!Controller.getInstance().isWalletUnlocked()) {
                     // ASK FOR PASSWORD
@@ -59,8 +55,10 @@ public class WalletOrphanButton extends JButton implements Observer {
 
                             Integer retValint = Integer.valueOf(retVal);
                             int hh = DCSet.getInstance().getBlockMap().size() - retValint;
-                            if (hh > 1)
+                            if (hh > 1) {
+                                Controller.getInstance().wallet.synchronizeBodyUsed = false;
                                 Controller.getInstance().setOrphanTo(hh);
+                            }
                         }
 
                     }

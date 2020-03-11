@@ -70,7 +70,7 @@ public class WalletUpdater extends MonitoredThread {
             // synchronize
             boolean reset = (Boolean) object;
 
-            if (!reset && wallet.synchronizeBodyUsed.get()
+            if (!reset && wallet.synchronizeBodyUsed
                     || Controller.getInstance().isOnStopping()
                     || Controller.getInstance().noDataWallet || Controller.getInstance().noUseWallet) {
                 return;
@@ -133,7 +133,7 @@ public class WalletUpdater extends MonitoredThread {
                 // полная пересборка кошелька
 
                 // break current synchronization if exists
-                wallet.synchronizeBodyUsed.set(false);
+                wallet.synchronizeBodyUsed = false;
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -157,13 +157,6 @@ public class WalletUpdater extends MonitoredThread {
                 }
             }
 
-            // break current synchronization if exists
-            wallet.synchronizeBodyUsed.set(false);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                return;
-            }
             // запустим догоняние
             wallet.synchronizeBody(false);
         }

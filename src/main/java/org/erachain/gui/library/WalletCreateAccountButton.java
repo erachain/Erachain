@@ -34,7 +34,7 @@ public class WalletCreateAccountButton extends JButton implements Observer {
                 // TODO Auto-generated method stub
                 // TODO Auto-generated method stub
                 // check synchronize Walet
-                if (Controller.getInstance().wallet.synchronizeBodyUsed.get()) {
+                if (Controller.getInstance().wallet.synchronizeBodyUsed) {
                     return;
                 }
                 //CHECK IF WALLET UNLOCKED

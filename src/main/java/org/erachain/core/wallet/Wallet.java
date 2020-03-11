@@ -43,7 +43,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Timer;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * обработка секртеных ключей и моих записей, которые относятся к набору моих счетов
@@ -609,27 +608,17 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
-
-	public AtomicBoolean synchronizeStatus = new java.util.concurrent.atomic.AtomicBoolean();
-
 	/**
 	 * нужно для запрета вызова уже работающего процесса синхронизации
-	 *
-	 * @return
 	 */
-
-	public AtomicBoolean synchronizeBodyUsed = new java.util.concurrent.atomic.AtomicBoolean();
+	public boolean synchronizeBodyUsed;
 	public void synchronizeBody(boolean reset) {
-		if (synchronizeStatus.getAndSet(true))
-			return;
+
+		synchronizeBodyUsed = true;
 
 		DCSet dcSet = DCSet.getInstance();
-
-		synchronizeBodyUsed.set(true);
-
 		Block blockStart;
 		int height;
-		//synchronizeBodyStop = false;
 
 		if (reset) {
 			LOGGER.info("   >>>>  try to Reset maps");
@@ -736,7 +725,7 @@ public class Wallet extends Observable implements Observer {
 
 					height++;
 
-				} while (synchronizeBodyUsed.get()
+				} while (synchronizeBodyUsed
 						&& !Controller.getInstance().isOnStopping()
 						&& !Controller.getInstance().needUpToDate()
 						&& Controller.getInstance().isStatusWaiting());
@@ -775,18 +764,9 @@ public class Wallet extends Observable implements Observer {
 			LOGGER.info("Update Orders");
 			this.database.getOrderMap().updateLefts();
 
-			// NOW IF NOT SYNCHRONIZED SET STATUS
-			// CHECK IF WE ARE UPTODATE
-			if (false && !Controller.getInstance().checkStatus(0)) {
-				// NOTIFY
-				Controller.getInstance().notifyObservers(
-						new ObserverMessage(ObserverMessage.NETWORK_STATUS, Controller.STATUS_SYNCHRONIZING));
-			}
-
 			LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet DONE");
 
-			synchronizeStatus.set(false);
-			synchronizeBodyUsed.set(false);
+			synchronizeBodyUsed = false;
 
 		}
 
@@ -1732,27 +1712,26 @@ public class Wallet extends Observable implements Observer {
 
             Tuple2<String, Long> key = new Tuple2<String, Long>(order.getCreator().getAddress(), order.getId());
             if (this.database.getOrderMap().contains(key)) {
-                this.database.getOrderMap().set(key, order);
-            }
+				this.database.getOrderMap().set(key, order);
+			}
 
-            return;
+			return;
 
-        }
+		}
 
-        //////////// PROCESS BLOCKS ////////////
+		//////////// PROCESS BLOCKS ////////////
 		DCSet dcSet = DCSet.getInstance();
 
-		if (this.synchronizeStatus.get()) {
+		if (synchronizeBodyUsed) {
 			// идет синхронизация кошелька уже - не обрабатываем блоки тут
 			return;
 		}
 
-        if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)
-        {
+		if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
 
-            Block block = (Block) message.getValue();
+			Block block = (Block) message.getValue();
 
-            // TODO сделать фактори которая синхронно по оереди с синхронизацией это будет разруливать
+			// TODO сделать фактори которая синхронно по оереди с синхронизацией это будет разруливать
             // CHECK IF WE NEED TO RESYNC
             // BY SIGNATURE !!!!
             if (checkNeedSyncWallet(block.getSignature())) {
