@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOError;
+import java.lang.ref.WeakReference;
 import java.nio.file.Files;
 import java.util.Random;
 
@@ -362,6 +363,7 @@ public class DCSet extends DBASet implements Closeable {
         this.addUses();
 
         this.database = idDatabase;
+        WeakReference<Object> weakRef = new WeakReference<>(idDatabase);
 
         this.parent = parent;
         ///this.database = parent.database.snapshot();
@@ -1593,6 +1595,7 @@ public class DCSet extends DBASet implements Closeable {
 
         try {
             DCSet fork = new DCSet(this, database);
+            WeakReference<Object> weakRef = new WeakReference<>(fork);
 
             this.outUses();
             return fork;

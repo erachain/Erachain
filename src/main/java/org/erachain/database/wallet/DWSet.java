@@ -422,11 +422,11 @@ public class DWSet extends DBASet {
             return;
 
         int step = 0;
-        if (Controller.getInstance().wallet.synchronizeStatus) {
+        if (Controller.getInstance().wallet.synchronizeStatus.get()) {
             // STOP syncronize Wallet
-            Controller.getInstance().wallet.synchronizeBodyStop = true;
+            Controller.getInstance().wallet.synchronizeStatus.set(false);
 
-            while (Controller.getInstance().wallet.synchronizeStatus && ++step < 500) {
+            while (Controller.getInstance().wallet.synchronizeBodyUsed.get() && ++step < 500) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {

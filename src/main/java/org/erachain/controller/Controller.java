@@ -69,6 +69,7 @@ import java.awt.TrayIcon.MessageType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -2721,6 +2722,8 @@ public class Controller extends Observable {
         if (newBlock == null)
             return false;
 
+        WeakReference<Block> weakRef = new WeakReference<>(newBlock);
+
         try {
             // if last block is changed by core.Synchronizer.process(DLSet, Block)
             // clear this win block
@@ -2737,6 +2740,7 @@ public class Controller extends Observable {
 
                 // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
                 DCSet forked = dcSet.fork(DCSet.makeDBinMemory());
+                WeakReference<Object> weakRefForked = new WeakReference<>(forked);
                 // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
                 if (!newBlock.isValid(forked, true)) {
                     // тогда проверим заново полностью

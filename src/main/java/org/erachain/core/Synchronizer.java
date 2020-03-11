@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -139,6 +140,9 @@ public class Synchronizer extends Thread {
         // ============ by EQUAL SIGNATURE !!!!!
         byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
         while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
+
+            WeakReference<Block> weakRef = new WeakReference<>(lastBlock);
+
             LOGGER.debug("*** ORPHAN LAST BLOCK [" + lastBlock.getHeight() + "] in FORK_DB UNTIL WE HAVE REACHED COMMON BLOCK ["
                     + lastCommonBlock.getHeight() + "]");
             if (checkPointHeight > lastBlock.getHeight()) {
@@ -234,6 +238,9 @@ public class Synchronizer extends Thread {
         boolean isFromTrustedPeer = bchain.isPeerTrusted(peer);
 
         for (Block block : newBlocks) {
+
+            WeakReference<Block> weakRef = new WeakReference<>(block);
+
             int height = block.getHeight();
             int bbb = fork.getBlockMap().size() + 1;
             int hhh = fork.getBlocksHeadsMap().size() + 1;
@@ -465,6 +472,8 @@ public class Synchronizer extends Thread {
                         "START BUFFER" + " peer: " + peer + " for blocks: " + signatures.size());
 
                 BlockBuffer blockBuffer = new BlockBuffer(signatures, peer);
+                WeakReference<Object> weakRef = new WeakReference<>(blockBuffer);
+
                 Block blockFromPeer = null;
                 String errorMess = null;
                 int banTime = BAN_BLOCK_TIMES >> 2;

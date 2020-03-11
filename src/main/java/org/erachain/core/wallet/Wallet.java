@@ -40,9 +40,11 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.util.Timer;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * обработка секртеных ключей и моих записей, которые относятся к набору моих счетов
@@ -638,35 +640,32 @@ public class Wallet extends Observable implements Observer {
 	}
 
 
-    public static boolean synchronizeStatus;
+	public AtomicBoolean synchronizeStatus = new java.util.concurrent.atomic.AtomicBoolean();
 
-    /**
-     * нужно для запрета вызова уже работающего процесса синхронизации
-     * @return
-     */
-    public synchronized boolean synchronizeStatusCheck() {
-        if (synchronizeStatus)
-            return true;
-        synchronizeStatus = true;
-        return false;
-    }
+	/**
+	 * нужно для запрета вызова уже работающего процесса синхронизации
+	 *
+	 * @return
+	 */
 
-    public boolean synchronizeBodyStop;
+	public AtomicBoolean synchronizeBodyUsed = new java.util.concurrent.atomic.AtomicBoolean();
 	public void synchronizeBody(boolean reset) {
-	    if (!synchronizeBodyStop || synchronizeStatusCheck())
-	        return;
+		if (synchronizeStatus.getAndSet(true))
+			return;
 
 		DCSet dcSet = DCSet.getInstance();
 
+		synchronizeBodyUsed.set(true);
+
 		Block blockStart;
 		int height;
-        synchronizeBodyStop = false;
+		//synchronizeBodyStop = false;
 
 		if (reset) {
 			LOGGER.info("   >>>>  try to Reset maps");
 
-            // SAVE transactions file
-            this.database.clearCache();
+			// SAVE transactions file
+			this.database.clearCache();
             this.database.hardFlush();
 
             // RESET MAPS
@@ -721,27 +720,30 @@ public class Wallet extends Observable implements Observer {
         	if (getAccounts() != null && !getAccounts().isEmpty()) {
 				do {
 
-					Block block = blockMap.getAndProcess(height);
+                    // WeakReference<Block> refBlock = new WeakReference<>(blockMap.getAndProcess(height));
+                    // Block block = refBlock.get();
+                    Block block = blockMap.getAndProcess(height);
+                    WeakReference<Block> weakRef = new WeakReference<>(block);
 
-					if (block == null) {
-						break;
-					}
+                    if (block == null) {
+                        break;
+                    }
 
-					try {
-						this.processBlock(dcSet, block);
-					} catch (java.lang.OutOfMemoryError e) {
-						LOGGER.error(e.getMessage(), e);
-						Controller.getInstance().stopAll(644);
-						return;
-					}
+                    try {
+                        this.processBlock(dcSet, block);
+                    } catch (java.lang.OutOfMemoryError e) {
+                        LOGGER.error(e.getMessage(), e);
+                        Controller.getInstance().stopAll(644);
+                        return;
+                    }
 
-					if (System.currentTimeMillis() - timePoint > 10000
-							|| steepHeight < height - lastHeight) {
+                    if (System.currentTimeMillis() - timePoint > 10000
+                            || steepHeight < height - lastHeight) {
 
-						timePoint = System.currentTimeMillis();
-						lastHeight = height;
+                        timePoint = System.currentTimeMillis();
+                        lastHeight = height;
 
-						this.syncHeight = height;
+                        this.syncHeight = height;
 
 						//logger.debug("try Commit");
 						this.database.commit();
@@ -765,7 +767,7 @@ public class Wallet extends Observable implements Observer {
 
 					height++;
 
-				} while (!synchronizeBodyStop
+				} while (synchronizeStatus.get()
 						&& !Controller.getInstance().isOnStopping()
 						&& !Controller.getInstance().needUpToDate()
 						&& Controller.getInstance().isStatusWaiting());
@@ -787,37 +789,38 @@ public class Wallet extends Observable implements Observer {
 			dcSet.clearCache();
 
             // тут возможно цепочка синхронизировалась или начала синхронизироваться и КОММИТ вызовет ошибку
-            //  java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
+			//  java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
 			this.database.hardFlush();
 
-            this.database.clearCache();
+			this.database.clearCache();
 
-            System.gc();
+			System.gc();
 
-            synchronizeStatus = false;
+			Controller.getInstance().walletSyncStatusUpdate(height);
+			Controller.getInstance().setProcessingWalletSynchronize(false);
 
-            Controller.getInstance().walletSyncStatusUpdate(height);
-            Controller.getInstance().setProcessingWalletSynchronize(false);
+			// RESET UNCONFIRMED BALANCE for accounts + assets
+			LOGGER.info("Resetted balances");
+			update_account_assets();
+			Controller.getInstance().walletSyncStatusUpdate(0);
 
-        }
+			LOGGER.info("Update Orders");
+			this.database.getOrderMap().updateLefts();
 
-		// RESET UNCONFIRMED BALANCE for accounts + assets
-		LOGGER.info("Resetted balances");
-		update_account_assets();
-        Controller.getInstance().walletSyncStatusUpdate(0);
+			// NOW IF NOT SYNCHRONIZED SET STATUS
+			// CHECK IF WE ARE UPTODATE
+			if (false && !Controller.getInstance().checkStatus(0)) {
+				// NOTIFY
+				Controller.getInstance().notifyObservers(
+						new ObserverMessage(ObserverMessage.NETWORK_STATUS, Controller.STATUS_SYNCHRONIZING));
+			}
 
-		LOGGER.info("Update Orders");
-		this.database.getOrderMap().updateLefts();
+			LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet DONE");
 
-		// NOW IF NOT SYNCHRONIZED SET STATUS
-		// CHECK IF WE ARE UPTODATE
-		if (false && !Controller.getInstance().checkStatus(0)) {
-			// NOTIFY
-			Controller.getInstance().notifyObservers(
-					new ObserverMessage(ObserverMessage.NETWORK_STATUS, Controller.STATUS_SYNCHRONIZING));
+			synchronizeStatus.set(false);
+			synchronizeBodyUsed.set(false);
+
 		}
-
-        LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet DONE");
 
 	}
 
@@ -1772,10 +1775,10 @@ public class Wallet extends Observable implements Observer {
         //////////// PROCESS BLOCKS ////////////
 		DCSet dcSet = DCSet.getInstance();
 
-        if (this.synchronizeStatus) {
-            // идет синхронизация кошелька уже - не обрабатываем блоки тут
-            return;
-        }
+		if (this.synchronizeStatus.get()) {
+			// идет синхронизация кошелька уже - не обрабатываем блоки тут
+			return;
+		}
 
         if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)
         {
