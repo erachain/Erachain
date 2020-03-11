@@ -720,30 +720,29 @@ public class Wallet extends Observable implements Observer {
         	if (getAccounts() != null && !getAccounts().isEmpty()) {
 				do {
 
-                    // WeakReference<Block> refBlock = new WeakReference<>(blockMap.getAndProcess(height));
-                    // Block block = refBlock.get();
-                    Block block = blockMap.getAndProcess(height);
-                    WeakReference<Block> weakRef = new WeakReference<>(block);
+					//try (Block block = blockMap.getAndProcess(height)) {
+					WeakReference<Block> weakRef = new WeakReference<>(blockMap.getAndProcess(height));
 
-                    if (block == null) {
-                        break;
-                    }
+					if (weakRef.get() == null) {
+						break;
+					}
 
-                    try {
-                        this.processBlock(dcSet, block);
-                    } catch (java.lang.OutOfMemoryError e) {
-                        LOGGER.error(e.getMessage(), e);
-                        Controller.getInstance().stopAll(644);
-                        return;
-                    }
+					try {
+						this.processBlock(dcSet, weakRef.get());
+					} catch (java.lang.OutOfMemoryError e) {
+						LOGGER.error(e.getMessage(), e);
+						Controller.getInstance().stopAll(644);
+						return;
+					}
+					//}
 
-                    if (System.currentTimeMillis() - timePoint > 10000
-                            || steepHeight < height - lastHeight) {
+					if (System.currentTimeMillis() - timePoint > 10000
+							|| steepHeight < height - lastHeight) {
 
-                        timePoint = System.currentTimeMillis();
-                        lastHeight = height;
+						timePoint = System.currentTimeMillis();
+						lastHeight = height;
 
-                        this.syncHeight = height;
+						this.syncHeight = height;
 
 						//logger.debug("try Commit");
 						this.database.commit();
