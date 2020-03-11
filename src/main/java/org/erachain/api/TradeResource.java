@@ -30,6 +30,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -955,6 +956,7 @@ public class TradeResource {
                             //CREATE ORDER TRANSACTION
                             transaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(),
                                     haveAmount, wantAmount, (byte) 0, time, 0l);
+                            WeakReference<Object> weakRef = new WeakReference<>(transaction);
 
                             transaction.sign(creator, Transaction.FOR_NETWORK);
 

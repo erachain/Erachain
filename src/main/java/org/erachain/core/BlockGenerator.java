@@ -28,6 +28,7 @@ import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
@@ -371,6 +372,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
 
                     Transaction transaction = map.get(iterator.next());
+                    WeakReference<Object> weakRef = new WeakReference<>(transaction);
+
                     if (transaction == null) {
                         LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by NULL NEXT");
                         break;
@@ -532,6 +535,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
 
                     Transaction transaction = map.get(iterator.next());
+                    WeakReference<Object> weakRef = new WeakReference<>(transaction);
 
                     if (transaction.getTimestamp() > timestamp)
                         break;
@@ -816,8 +820,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             //    long iii = 11;
                             //}
                             //Block block = bchain.getLastBlock(dcSet);
+                            WeakReference<Block> weakRef = new WeakReference<>(bchain.getLastBlock(dcSet));
                             try {
-                                ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                                ctrl.orphanInPipe(weakRef.get());
                             } catch (Exception e) {
                                 // если ошибка то выход делаем чтобы зарегистрировать ошибку
                                 LOGGER.error(e.getMessage(), e);
