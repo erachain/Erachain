@@ -720,7 +720,6 @@ public class Wallet extends Observable implements Observer {
         	if (getAccounts() != null && !getAccounts().isEmpty()) {
 				do {
 
-					//try (Block block = blockMap.getAndProcess(height)) {
 					WeakReference<Block> weakRef = new WeakReference<>(blockMap.getAndProcess(height));
 
 					if (weakRef.get() == null) {
@@ -729,12 +728,12 @@ public class Wallet extends Observable implements Observer {
 
 					try {
 						this.processBlock(dcSet, weakRef.get());
+						weakRef.get().close();
 					} catch (java.lang.OutOfMemoryError e) {
 						LOGGER.error(e.getMessage(), e);
 						Controller.getInstance().stopAll(644);
 						return;
 					}
-					//}
 
 					if (System.currentTimeMillis() - timePoint > 10000
 							|| steepHeight < height - lastHeight) {
