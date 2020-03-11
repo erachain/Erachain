@@ -27,6 +27,12 @@ ERA\z_bath_examples\readme.txt
 
 > DCSet.close:1674 - java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
 
+### Запуск ноды
+Если ваша нода будет только форжить то запускайте ее с ключами:
+-nodatawallet -pass=[PASSWORD]  
+Описание ключей запуска в z_bath_examples\readme.txt
+
+
 Так же выдает предупреждения:  
 ```
 WARNING: An illegal reflective access operation has occurred
