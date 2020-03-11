@@ -116,7 +116,7 @@ public class DWSet extends DBASet {
                 //.cacheHardRefEnable()
                 //.cacheLRUEnable()
                 ///.cacheSoftRefEnable()
-                .cacheWeakRefEnable()
+                .cacheWeakRefEnable() // analog new WeakReference() - в случае нехватки ппамяти кеш сам чистится
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 .cacheSize(10000)

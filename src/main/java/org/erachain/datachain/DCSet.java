@@ -581,6 +581,7 @@ public class DCSet extends DBASet implements Closeable {
                             ///.cacheSoftRefEnable()
                             ///.cacheSize(32 << Controller.HARD_WORK)
 
+                            // analog new WeakReference() - в случае нехватки ппамяти кеш сам чистится
                             .cacheWeakRefEnable() // new WeakReference()
                     ///.cacheSize(32 << Controller.HARD_WORK)
                     ;
