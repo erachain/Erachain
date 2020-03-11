@@ -5,6 +5,7 @@ For clone code:
 1. After load project - import Gradle project
 1. Install Lombok (Settings - Plugins)
 1. For RUN - select Application
+1. Set Working Directory for new Application to \ERA
 
 Настройка запуска - Приложение и обязательно выбрать нативный Java SDK 1.8, использовать встроенный в IDEA нельзя! Иначе будет ошибка при коммитах базы данных.  
 https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#javasejdk
@@ -25,6 +26,12 @@ ERA\z_bath_examples\readme.txt
  Иначе бедет вызывать ошибка при коммите и закрывании базы:
 
 > DCSet.close:1674 - java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
+
+### Запуск ноды
+Если ваша нода будет только форжить то запускайте ее с ключами:
+-nodatawallet -pass=[PASSWORD]  
+Описание ключей запуска в z_bath_examples\readme.txt
+
 
 Так же выдает предупреждения:  
 ```

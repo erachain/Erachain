@@ -12,9 +12,9 @@ import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
+import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
-import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
@@ -652,7 +652,6 @@ public class IssuePersonPanel extends JPanel  {
             }
         }
     }
-
 
 }
 

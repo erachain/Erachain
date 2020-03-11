@@ -30,6 +30,7 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 public class InsertPersonPanel extends IssuePersonPanel {
     private static final Logger logger = LoggerFactory.getLogger(InsertPersonPanel.class);
+    private static String iconFile = "images/pageicons/InsertPersonPanel.png";
     private static final long serialVersionUID = 1L;
 
     private JTextField txtSign = new JTextField();
@@ -336,6 +337,16 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtGenderTxt.setText("");
         iconLabel.setIcon(null);
 
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 }

@@ -67,7 +67,7 @@ public class Wallet extends Observable implements Observer {
 	private int secondsToUnlock = 100;
 	private Timer lockTimer; // = new Timer();
 	private int syncHeight;
-	private WalletUpdater walletUpdater;
+	public WalletUpdater walletUpdater;
 
 	private List<ObserverWaiter> waitingObservers = new ArrayList<>();
 	// CONSTRUCTORS
@@ -720,30 +720,29 @@ public class Wallet extends Observable implements Observer {
         	if (getAccounts() != null && !getAccounts().isEmpty()) {
 				do {
 
-                    // WeakReference<Block> refBlock = new WeakReference<>(blockMap.getAndProcess(height));
-                    // Block block = refBlock.get();
-                    Block block = blockMap.getAndProcess(height);
-                    WeakReference<Block> weakRef = new WeakReference<>(block);
+					//try (Block block = blockMap.getAndProcess(height)) {
+					WeakReference<Block> weakRef = new WeakReference<>(blockMap.getAndProcess(height));
 
-                    if (block == null) {
-                        break;
-                    }
+					if (weakRef.get() == null) {
+						break;
+					}
 
-                    try {
-                        this.processBlock(dcSet, block);
-                    } catch (java.lang.OutOfMemoryError e) {
-                        LOGGER.error(e.getMessage(), e);
-                        Controller.getInstance().stopAll(644);
-                        return;
-                    }
+					try {
+						this.processBlock(dcSet, weakRef.get());
+					} catch (java.lang.OutOfMemoryError e) {
+						LOGGER.error(e.getMessage(), e);
+						Controller.getInstance().stopAll(644);
+						return;
+					}
+					//}
 
-                    if (System.currentTimeMillis() - timePoint > 10000
-                            || steepHeight < height - lastHeight) {
+					if (System.currentTimeMillis() - timePoint > 10000
+							|| steepHeight < height - lastHeight) {
 
-                        timePoint = System.currentTimeMillis();
-                        lastHeight = height;
+						timePoint = System.currentTimeMillis();
+						lastHeight = height;
 
-                        this.syncHeight = height;
+						this.syncHeight = height;
 
 						//logger.debug("try Commit");
 						this.database.commit();
@@ -767,7 +766,7 @@ public class Wallet extends Observable implements Observer {
 
 					height++;
 
-				} while (synchronizeStatus.get()
+				} while (synchronizeBodyUsed.get()
 						&& !Controller.getInstance().isOnStopping()
 						&& !Controller.getInstance().needUpToDate()
 						&& Controller.getInstance().isStatusWaiting());
@@ -826,111 +825,8 @@ public class Wallet extends Observable implements Observer {
 
     // asynchronous RUN from BlockGenerator
     public void synchronize(boolean reset) {
-        if (!reset && Controller.getInstance().isProcessingWalletSynchronize()
-                || Controller.getInstance().isOnStopping()
-			|| Controller.getInstance().noDataWallet || Controller.getInstance().noUseWallet) {
-            return;
-        }
-
-        // here ICREATOR
-        Controller.getInstance().setProcessingWalletSynchronize(true);
-        Controller.getInstance().setNeedSyncWallet(false);
-
-        Controller.getInstance().walletSyncStatusUpdate(-1);
-
-		LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet " + (reset ? "RESET" : ""));
-
-        DCSet dcSet = DCSet.getInstance();
-
-        ///////////////////////////////////// IS CHAIN VALID
-        if (CHECK_CHAIN_BROKENS_ON_SYNC_WALLET) {
-            LOGGER.info("TEST CHAIN .... ");
-            for (int i = 1; i <= dcSet.getBlockMap().size(); i++) {
-				Block block = dcSet.getBlockMap().getAndProcess(i);
-				WeakReference<Object> weakRef = new WeakReference<>(block);
-
-				if (block.getHeight() != i) {
-					Long error = null;
-					++error;
-				}
-				if (block.blockHead.heightBlock != i) {
-					Long error = null;
-					++error;
-				}
-				Block.BlockHead head = dcSet.getBlocksHeadsMap().get(i);
-				if (head.heightBlock != i) {
-					Long error = null;
-                    ++error;
-                }
-                if (i > 1) {
-					byte[] reference = block.getReference();
-					Block parent = dcSet.getBlockSignsMap().getBlock(reference);
-					WeakReference<Object> weakRefParent = new WeakReference<>(parent);
-					if (parent == null) {
-						Long error = null;
-						++error;
-					}
-					if (parent.getHeight() != i - 1) {
-						Long error = null;
-						++error;
-					}
-					parent = dcSet.getBlockMap().getAndProcess(i - 1);
-					if (!Arrays.equals(parent.getSignature(), reference)) {
-                        Long error = null;
-                        ++error;
-                    }
-                }
-                byte[] signature = block.getSignature();
-				int signHeight = dcSet.getBlockSignsMap().get(signature);
-				if (signHeight != i) {
-					Long error = null;
-					++error;
-				}
-			}
-		}
-
-		Block block;
-
-		if (reset) {
-
-			// полная пересборка кошелька
-
-			// break current synchronization if exists
-			synchronizeStatus.set(false);
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				return;
-			}
-			synchronizeBody(reset);
-			return;
-
-		} else {
-
-			byte[] lastSignature = this.database.getLastBlockSignature();
-			if (lastSignature == null) {
-				synchronize(true);
-				return;
-			}
-
-			block = dcSet.getBlockSignsMap().getBlock(lastSignature);
-			if (block == null) {
-				synchronize(true);
-				return;
-			}
-		}
-
-		// break current synchronization if exists
-		synchronizeStatus.set(false);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			return;
-		}
-		// запустим догоняние
-		synchronizeBody(false);
-
-    }
+		walletUpdater.offerMessage(reset);
+	}
 
     // UNLOCK
 	public boolean unlock(String password) {
@@ -1923,13 +1819,15 @@ public class Wallet extends Observable implements Observer {
 
 	public void close() {
 
-        if (this.timerSynchronize != null)
-            this.timerSynchronize.cancel();
+		walletUpdater.halt();
 
-        if (this.lockTimer != null)
-            this.lockTimer.cancel();
+		if (this.timerSynchronize != null)
+			this.timerSynchronize.cancel();
 
-        if (this.database != null) {
+		if (this.lockTimer != null)
+			this.lockTimer.cancel();
+
+		if (this.database != null) {
 			this.database.close();
 		}
 
