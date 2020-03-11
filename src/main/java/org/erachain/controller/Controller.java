@@ -128,7 +128,6 @@ public class Controller extends Observable {
     private static Controller instance;
     public Wallet wallet;
     public TelegramStore telegramStore;
-    private boolean processingWalletSynchronize = false;
     private int status;
     private boolean dcSetWithObserver = false;
     private boolean dynamicGUI = false;
@@ -142,7 +141,6 @@ public class Controller extends Observable {
     private BlockGenerator blockGenerator;
     public Synchronizer synchronizer;
     private TransactionCreator transactionCreator;
-    private boolean needSyncWallet = false;
     private Timer connectTimer;
     private Random random = new SecureRandom();
     private byte[] foundMyselfID = new byte[128];
@@ -288,14 +286,6 @@ public class Controller extends Observable {
         }
 
         return instance;
-    }
-
-    public boolean isProcessingWalletSynchronize() {
-        return processingWalletSynchronize;
-    }
-
-    public void setProcessingWalletSynchronize(boolean isPocessing) {
-        this.processingWalletSynchronize = isPocessing;
     }
 
     public void setDCSetWithObserver(boolean dcSetWithObserver) {
@@ -499,27 +489,6 @@ public class Controller extends Observable {
 
     public boolean isStatusSynchronizing() {
         return this.status == STATUS_SYNCHRONIZING;
-    }
-
-    public void checkNeedSyncWallet() {
-        if (this.wallet == null || this.wallet.database == null)
-            return;
-
-        // CHECK IF WE NEED TO RESYNC
-        byte[] lastBlockSignature = this.wallet.database.getLastBlockSignature();
-        if (lastBlockSignature == null
-                ///// || !findLastBlockOff(lastBlockSignature, block)
-                || !Arrays.equals(lastBlockSignature, this.getBlockChain().getLastBlockSignature(dcSet))) {
-            this.needSyncWallet = true;
-        }
-    }
-
-    public boolean isNeedSyncWallet() {
-        return this.needSyncWallet;
-    }
-
-    public void setNeedSyncWallet(boolean needSync) {
-        this.needSyncWallet = needSync;
     }
 
     private void openDataBaseFile(String name, String path, org.erachain.database.IDB dbSet) {
@@ -838,10 +807,6 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Wallet OK")));
 
-            if (false && !BlockChain.DEMO_MODE && BlockChain.TEST_MODE && this.wallet.isWalletDatabaseExisting()
-                    && !this.wallet.getAccounts().isEmpty()) {
-                this.wallet.synchronize(true);
-            }
             // create telegtam
 
             this.setChanged();
@@ -2203,9 +2168,6 @@ public class Controller extends Observable {
         if (this.wallet.create(seed, password, amount, false, path,
                 this.dcSetWithObserver, this.dynamicGUI)) {
 
-            LOGGER.info("Wallet needs to synchronize!");
-            this.setNeedSyncWallet(true);
-
             return true;
         } else
             return false;
@@ -2260,9 +2222,9 @@ public class Controller extends Observable {
     }
 
     public String generateNewAccountWithSynch() {
-        String ss = this.wallet.generateNewAccount();
-        this.wallet.synchronize(true);
-        return ss;
+        String account = this.wallet.generateNewAccount();
+        this.wallet.synchronize();
+        return account;
     }
 
     public PrivateKeyAccount getPrivateKeyAccountByAddress(String address) {
@@ -2349,10 +2311,6 @@ public class Controller extends Observable {
 
     public boolean deleteAccount(PrivateKeyAccount account) {
         return this.wallet.deleteAccount(account);
-    }
-
-    public void synchronizeWallet() {
-        this.wallet.synchronize(false);
     }
 
     /**

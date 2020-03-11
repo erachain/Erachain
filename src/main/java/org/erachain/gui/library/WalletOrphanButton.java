@@ -1,7 +1,7 @@
 package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockGenerator;;
+import org.erachain.core.BlockGenerator;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.lang.Lang;
@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
+
+;
 
 public class WalletOrphanButton extends JButton implements Observer {
 
@@ -28,7 +30,7 @@ public class WalletOrphanButton extends JButton implements Observer {
                 // TODO Auto-generated method stub
                 // TODO Auto-generated method stub
                 // check synchronize Walet
-                if (Controller.getInstance().isProcessingWalletSynchronize()) {
+                if (Controller.getInstance().wallet.synchronizeBodyUsed.get()) {
                     return;
                 }
                 // CHECK IF WALLET UNLOCKED

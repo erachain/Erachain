@@ -45,7 +45,7 @@ public class WalletUpdater extends MonitoredThread {
         blockingQueue.offer(object);
     }
 
-    public void processMessage(Object object) {
+    private void processMessage(Object object) {
 
         if (object == null)
             return;
@@ -70,15 +70,11 @@ public class WalletUpdater extends MonitoredThread {
             // synchronize
             boolean reset = (Boolean) object;
 
-            if (!reset && Controller.getInstance().isProcessingWalletSynchronize()
+            if (!reset && wallet.synchronizeBodyUsed.get()
                     || Controller.getInstance().isOnStopping()
                     || Controller.getInstance().noDataWallet || Controller.getInstance().noUseWallet) {
                 return;
             }
-
-            // here ICREATOR
-            Controller.getInstance().setProcessingWalletSynchronize(true);
-            Controller.getInstance().setNeedSyncWallet(false);
 
             Controller.getInstance().walletSyncStatusUpdate(-1);
 

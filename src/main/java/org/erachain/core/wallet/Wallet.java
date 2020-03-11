@@ -95,8 +95,6 @@ public class Wallet extends Observable implements Observer {
 
         }
 
-        startProcessForSynchronize();
-
 	}
 
 	// GETTERS/SETTERS
@@ -514,7 +512,7 @@ public class Wallet extends Observable implements Observer {
 
 		// SCAN TRANSACTIONS
 		if (synchronize) {
-			this.synchronize(true);
+			this.synchronize();
 		}
 
 		// COMMIT
@@ -531,33 +529,6 @@ public class Wallet extends Observable implements Observer {
 
 		return true;
 	}
-
-    private Timer timerSynchronize;
-
-    public void startProcessForSynchronize() {
-
-        if (this.timerSynchronize == null) {
-            this.timerSynchronize = new Timer("Wallet synchronize check");
-
-            TimerTask action = new TimerTask() {
-                @Override
-                public void run() {
-
-                    if (Controller.getInstance().isStatusWaiting()) {
-
-                        if (Controller.getInstance().isNeedSyncWallet()
-                                && !Controller.getInstance().isProcessingWalletSynchronize()) {
-
-                            Controller.getInstance().synchronizeWallet();
-                        }
-                    }
-                }
-            };
-
-            this.timerSynchronize.schedule(action, 30000, 60000);
-        }
-
-    }
 
 	public int getAccountNonce() {
 		return this.secureDatabase.getNonce();
@@ -795,7 +766,6 @@ public class Wallet extends Observable implements Observer {
 			System.gc();
 
 			Controller.getInstance().walletSyncStatusUpdate(height);
-			Controller.getInstance().setProcessingWalletSynchronize(false);
 
 			// RESET UNCONFIRMED BALANCE for accounts + assets
 			LOGGER.info("Resetted balances");
@@ -822,12 +792,11 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
-    // asynchronous RUN from BlockGenerator
-    public void synchronize(boolean reset) {
-		walletUpdater.offerMessage(reset);
+	public void synchronize() {
+		walletUpdater.offerMessage(true);
 	}
 
-    // UNLOCK
+	// UNLOCK
 	public boolean unlock(String password) {
 
 		if (Controller.getInstance().noUseWallet)
@@ -941,7 +910,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.hardFlush();
 
 			// SYNCHRONIZE
-			this.synchronize(true);
+			this.synchronize();
 
 			// NOTIFY
 			this.setChanged();
@@ -978,7 +947,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.hardFlush();
 
 			// SYNCHRONIZE
-			this.synchronize(true);
+			this.synchronize();
 
 			// NOTIFY
 			this.setChanged();
@@ -1238,7 +1207,7 @@ public class Wallet extends Observable implements Observer {
 		byte[] lastBlockSignature = this.database.getLastBlockSignature();
 		if (lastBlockSignature == null
 				|| !Arrays.equals(lastBlockSignature, signatureORreference)) {
-			Controller.getInstance().setNeedSyncWallet(true);
+			walletUpdater.offerMessage(true);
 			return true;
 		}
 
@@ -1819,9 +1788,6 @@ public class Wallet extends Observable implements Observer {
 	public void close() {
 
 		walletUpdater.halt();
-
-		if (this.timerSynchronize != null)
-			this.timerSynchronize.cancel();
 
 		if (this.lockTimer != null)
 			this.lockTimer.cancel();
