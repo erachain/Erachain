@@ -653,16 +653,24 @@ public class Wallet extends Observable implements Observer {
 
         } else {
 
-            byte[] lastSignature = this.database.getLastBlockSignature();
-            blockStart = dcSet.getBlockSignsMap().getBlock(lastSignature);
+			byte[] lastSignature = this.database.getLastBlockSignature();
 
-            if (blockStart == null) {
+			if (lastSignature == null) {
 				LOGGER.debug("   >>>>  WALLET SYNCHRONIZE cancel by lastSignature = null");
 				Controller.getInstance().walletSyncStatusUpdate(0);
 				// выходим и потом пересинхронизируемся с начала
 				return;
 			}
-        }
+
+			blockStart = dcSet.getBlockSignsMap().getBlock(lastSignature);
+
+			if (blockStart == null) {
+				LOGGER.debug("   >>>>  WALLET SYNCHRONIZE cancel by blockStart = null");
+				Controller.getInstance().walletSyncStatusUpdate(0);
+				// выходим и потом пересинхронизируемся с начала
+				return;
+			}
+		}
 
         // SAVE transactions file
         this.database.clearCache();

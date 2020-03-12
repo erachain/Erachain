@@ -187,13 +187,12 @@ public class WalletUpdater extends MonitoredThread {
                     lastCommonHeight = iterator.next();
                     Block lastBlock = lastBlocks.get(lastCommonHeight);
                     if (signsMap.contains(lastBlock.getSignature())) {
-                        LOGGER.debug(" >>>>>>>>>>>>>>> *** Synchronizing wallet... common block: " + lastCommonHeight);
+                        LOGGER.debug(" >>>>>>>>>>>>>>> *** Synchronizing wallet from COMMON block: " + lastCommonHeight);
                         // нашли общий блок
                         // перебор по новой чтобы откатить
-                        iterator = lastBlocks.descendingKeySet().iterator();
-                        while (iterator.hasNext()) {
-                            Integer key = iterator.next();
-                            if (key.equals(lastCommonHeight)) {
+                        int key = lastBlocks.lastKey();
+                        while (lastBlocks.containsKey(key)) {
+                            if (lastCommonHeight == key) {
                                 // запустим догоняние
                                 wallet.synchronizeBody(false);
                                 return;
@@ -201,6 +200,7 @@ public class WalletUpdater extends MonitoredThread {
                             lastBlock = lastBlocks.get(key);
                             wallet.orphanBlock(dcSet, lastBlock);
                             lastBlocks.remove(key);
+                            key--;
                         }
                     }
                 }
