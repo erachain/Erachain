@@ -1188,7 +1188,7 @@ public class Wallet extends Observable implements Observer {
 		byte[] lastBlockSignature = this.database.getLastBlockSignature();
 		if (lastBlockSignature == null
 				|| !Arrays.equals(lastBlockSignature, signatureORreference)) {
-			walletUpdater.setGoSynchronize(true);
+			walletUpdater.setGoSynchronize(false);
 			return true;
 		}
 
