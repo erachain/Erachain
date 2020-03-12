@@ -119,7 +119,7 @@ public class DWSet extends DBASet {
                 .cacheWeakRefEnable() // analog new WeakReference() - в случае нехватки ппамяти кеш сам чистится
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(10000)
+                .cacheSize(1 << 14)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++
