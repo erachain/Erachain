@@ -4,8 +4,16 @@ For clone code:
 1. Use InteliJ IDEA - New > Project from Version Control...
 1. After load project - import Gradle project
 1. Install Lombok (Settings - Plugins)
-1. For RUN - select Application
+
+### For Run Appllication
+1. select Application, set org.erachain.Start
 1. Set Working Directory for new Application to \ERA
+1. select ERA_main module
+
+### For Build Appllication
+1. Select Gradle build
+1. Set Task: build
+1. Set Arguments: --exclude-task test
 
 Настройка запуска - Приложение и обязательно выбрать нативный Java SDK 1.8, использовать встроенный в IDEA нельзя! Иначе будет ошибка при коммитах базы данных.  
 https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#javasejdk
