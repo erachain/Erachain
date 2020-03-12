@@ -189,8 +189,6 @@ public class Synchronizer extends Thread {
                 ctrl.stopAll(311);
             }
 
-            DCSet.getInstance().clearCache();
-
             if (BlockChain.CHECK_BUGS > 5) {
                 // TEST CORRUPT base
                 int height2 = lastBlock.getHeight();
@@ -203,6 +201,10 @@ public class Synchronizer extends Thread {
             }
 
             LOGGER.debug("*** checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
+            lastBlock.close();
+            lastBlock = null;
+            ctrl.getDCSet().clearCache();
+
             lastBlock = blockMap.last();
 
         }
@@ -344,6 +346,9 @@ public class Synchronizer extends Thread {
                 }
             }
 
+            block.close();
+            block = null;
+
             ///тут ключ по старому значению - просто так не получится найти orphanedTransactions.remove();
         }
 
@@ -367,6 +372,10 @@ public class Synchronizer extends Thread {
         // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
         DB database = DCSet.getHardBaseForFork();
         try (DCSet fork = dcSet.fork(database)) {
+
+            // освободим всю память
+            dcSet.clearCache();
+            ctrl.wallet.database.clearCache();
 
             ConcurrentHashMap<Long, Transaction> orphanedTransactions
                     = checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
