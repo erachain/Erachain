@@ -33,7 +33,7 @@ public class WalletUpdater extends MonitoredThread {
     private DCSet dcSet;
     private Wallet wallet;
 
-    private NavigableMap<Integer, Block> lastBlocks = new TreeMap<>();
+    public NavigableMap<Integer, Block> lastBlocks = new TreeMap<>();
 
     public WalletUpdater(Controller controller, BlockChain blockChain, DCSet dcSet, Wallet wallet) {
         this.controller = controller;
@@ -69,7 +69,6 @@ public class WalletUpdater extends MonitoredThread {
             if (!wallet.checkNeedSyncWallet(pair.getB().getSignature())) {
                 wallet.orphanBlock(dcSet, pair.getB());
 
-                lastBlocks.remove(lastBlocks.lastKey());
             } else {
                 // set then NEED SYNCH
                 synchronizeMode = false;
@@ -80,10 +79,6 @@ public class WalletUpdater extends MonitoredThread {
                     && !wallet.checkNeedSyncWallet(pair.getB().getReference())) {
                 wallet.processBlock(dcSet, pair.getB());
 
-                lastBlocks.put(pair.getB().getHeight(), pair.getB());
-                if (lastBlocks.size() > 100) {
-                    lastBlocks.remove(lastBlocks.firstKey());
-                }
             } else {
                 // set then NEED SYNCH
                 synchronizeMode = false;

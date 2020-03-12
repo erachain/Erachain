@@ -624,11 +624,13 @@ public class Wallet extends Observable implements Observer {
 		if (reset) {
 			LOGGER.info("   >>>>  try to Reset maps");
 
+			walletUpdater.lastBlocks.clear();
+
 			// SAVE transactions file
 			this.database.clearCache();
-            this.database.hardFlush();
+			this.database.hardFlush();
 
-            // RESET MAPS
+			// RESET MAPS
 			this.database.getTransactionMap().clear();
 			this.database.getBlocksHeadMap().clear();
 			this.database.getNameMap().clear();
@@ -1243,21 +1245,27 @@ public class Wallet extends Observable implements Observer {
 		long start = System.currentTimeMillis();
 
 		// SET AS LAST BLOCK
-        this.database.setLastBlockSignature(block.blockHead.signature);
+		this.database.setLastBlockSignature(block.blockHead.signature);
 
-        Account blockGenerator = block.blockHead.creator;
+		Account blockGenerator = block.blockHead.creator;
 		String blockGeneratorStr = blockGenerator.getAddress();
 
-        int height = block.blockHead.heightBlock;
+		int height = block.blockHead.heightBlock;
+
+		// очередь последних блоков
+		walletUpdater.lastBlocks.put(height, block);
+		if (walletUpdater.lastBlocks.size() > 100) {
+			walletUpdater.lastBlocks.remove(walletUpdater.lastBlocks.firstKey());
+		}
 
 		// CHECK IF WE ARE GENERATOR
 		if (this.accountExists(blockGeneratorStr)) {
 			// ADD BLOCK
-            this.database.getBlocksHeadMap().add(block.blockHead);
+			this.database.getBlocksHeadMap().add(block.blockHead);
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
 			// PROCESS FEE
-            feeProcess(dcSet, block.blockHead.totalFee, blockGenerator, false);
+			feeProcess(dcSet, block.blockHead.totalFee, blockGenerator, false);
 
 		}
 
@@ -1328,9 +1336,12 @@ public class Wallet extends Observable implements Observer {
 			return;
 
 		int height = block.heightBlock;
+
+		walletUpdater.lastBlocks.remove(height);
+
 		List<Transaction> transactions = block.getTransactions();
 		int seqNo;
-        for (int i = block.blockHead.transactionsCount - 1; i >= 0; i--) {
+		for (int i = block.blockHead.transactionsCount - 1; i >= 0; i--) {
 
 			seqNo = i + 1;
 
