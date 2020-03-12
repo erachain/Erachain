@@ -769,7 +769,7 @@ public class Wallet extends Observable implements Observer {
 			LOGGER.info("Update Orders");
 			this.database.getOrderMap().updateLefts();
 
-			LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet DONE");
+			LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet DONE on: " + height);
 
 			synchronizeBodyUsed = false;
 
@@ -1192,7 +1192,7 @@ public class Wallet extends Observable implements Observer {
 		byte[] lastBlockSignature = this.database.getLastBlockSignature();
 		if (lastBlockSignature == null
 				|| !Arrays.equals(lastBlockSignature, signatureORreference)) {
-			walletUpdater.setGoSynchronize(false);
+			////walletUpdater.setGoSynchronize(false);
 			return true;
 		}
 

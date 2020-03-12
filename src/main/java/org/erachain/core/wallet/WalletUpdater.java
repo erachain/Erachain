@@ -3,6 +3,7 @@ package org.erachain.core.wallet;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
+import org.erachain.datachain.BlockSignsMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.MonitoredThread;
 import org.erachain.utils.Pair;
@@ -10,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +32,8 @@ public class WalletUpdater extends MonitoredThread {
     private BlockChain blockChain;
     private DCSet dcSet;
     private Wallet wallet;
+
+    private NavigableMap<Integer, Block> lastBlocks = new TreeMap<>();
 
     public WalletUpdater(Controller controller, BlockChain blockChain, DCSet dcSet, Wallet wallet) {
         this.controller = controller;
@@ -59,30 +65,43 @@ public class WalletUpdater extends MonitoredThread {
             return;
 
         if (pair.getA()) {
+            // ORPHAN
             if (!wallet.checkNeedSyncWallet(pair.getB().getSignature())) {
                 wallet.orphanBlock(dcSet, pair.getB());
+
+                lastBlocks.remove(lastBlocks.lastKey());
+            } else {
+                // set then NEED SYNCH
+                synchronizeMode = false;
             }
         } else {
-            if (!wallet.checkNeedSyncWallet(pair.getB().getReference())) {
+            // PROCESS
+            if (controller.isStatusOK() // только если нет синхронизации
+                    && !wallet.checkNeedSyncWallet(pair.getB().getReference())) {
                 wallet.processBlock(dcSet, pair.getB());
+
+                lastBlocks.put(pair.getB().getHeight(), pair.getB());
+                if (lastBlocks.size() > 100) {
+                    lastBlocks.remove(lastBlocks.firstKey());
+                }
+            } else {
+                // set then NEED SYNCH
+                synchronizeMode = false;
             }
         }
-
     }
 
     private void trySynchronize(boolean reset) {
 
         if (!reset && wallet.synchronizeBodyUsed
-                || Controller.getInstance().isOnStopping()
-                || Controller.getInstance().noDataWallet || Controller.getInstance().noUseWallet) {
+                || controller.isOnStopping()
+                || controller.noDataWallet || controller.noUseWallet) {
             return;
         }
 
-        Controller.getInstance().walletSyncStatusUpdate(-1);
+        controller.walletSyncStatusUpdate(-1);
 
         LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet..." + (reset ? " RESET" : ""));
-
-        DCSet dcSet = DCSet.getInstance();
 
         ///////////////////////////////////// IS CHAIN VALID
         if (Wallet.CHECK_CHAIN_BROKENS_ON_SYNC_WALLET) {
@@ -165,6 +184,32 @@ public class WalletUpdater extends MonitoredThread {
             block = dcSet.getBlockSignsMap().getBlock(lastSignature);
             if (block == null) {
                 LOGGER.debug(" >>>>>>>>>>>>>>> *** Synchronizing wallet... by lastBlock = null");
+
+                Iterator<Integer> iterator = lastBlocks.descendingKeySet().iterator();
+                BlockSignsMap signsMap = dcSet.getBlockSignsMap();
+                Integer lastCommonHeight;
+                while (iterator.hasNext()) {
+                    lastCommonHeight = iterator.next();
+                    Block lastBlock = lastBlocks.get(lastCommonHeight);
+                    if (signsMap.contains(lastBlock.getSignature())) {
+                        LOGGER.debug(" >>>>>>>>>>>>>>> *** Synchronizing wallet... common block: " + lastCommonHeight);
+                        // нашли общий блок
+                        // перебор по новой чтобы откатить
+                        iterator = lastBlocks.descendingKeySet().iterator();
+                        while (iterator.hasNext()) {
+                            Integer key = iterator.next();
+                            if (key.equals(lastCommonHeight)) {
+                                // запустим догоняние
+                                wallet.synchronizeBody(false);
+                                return;
+                            }
+                            lastBlock = lastBlocks.get(key);
+                            wallet.orphanBlock(dcSet, lastBlock);
+                            lastBlocks.remove(key);
+                        }
+                    }
+                }
+
                 ///setGoSynchronize(true);
                 // break current synchronization if exists
                 wallet.synchronizeBodyUsed = false;
@@ -175,6 +220,7 @@ public class WalletUpdater extends MonitoredThread {
                 }
                 wallet.synchronizeBody(true);
                 return;
+
             }
         }
 
@@ -203,7 +249,7 @@ public class WalletUpdater extends MonitoredThread {
 
             } catch (OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(686);
+                controller.stopAll(686);
                 return;
             } catch (IllegalMonitorStateException e) {
                 break;
