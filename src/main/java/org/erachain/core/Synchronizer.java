@@ -38,8 +38,7 @@ public class Synchronizer extends Thread {
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class.getSimpleName());
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
     public static int BAN_BLOCK_TIMES = 16;
-    private static int MAX_ORPHAN_TRANSACTIONS = (BlockChain.MAX_BLOCK_SIZE_GEN << 6); // not used now
-    private static int MAX_ORPHAN_TRANSACTIONS_MY = (BlockChain.MAX_BLOCK_SIZE_GEN << 3);
+    private static int MAX_ORPHAN_TRANSACTIONS_MY = (BlockChain.MAX_BLOCK_SIZE_GEN << 2);
     // private boolean run = true;
     // private Block runedBlock;
     private Peer fromPeer;
