@@ -655,9 +655,11 @@ public class Wallet extends Observable implements Observer {
             blockStart = dcSet.getBlockSignsMap().getBlock(lastSignature);
 
             if (blockStart == null) {
-                // выходим и потом пересинхронизируемся с начала
-                return;
-            }
+				LOGGER.debug("   >>>>  WALLET SYNCHRONIZE cancel by lastSignature = null");
+				Controller.getInstance().walletSyncStatusUpdate(0);
+				// выходим и потом пересинхронизируемся с начала
+				return;
+			}
         }
 
         // SAVE transactions file
@@ -674,25 +676,27 @@ public class Wallet extends Observable implements Observer {
 		long timePoint = System.currentTimeMillis();
 		BlockMap blockMap = dcSet.getBlockMap();
 
-        this.database.clearCache();
+		this.database.clearCache();
 
-        try {
-        	if (getAccounts() != null && !getAccounts().isEmpty()) {
+		LOGGER.info("   >>>>  WALLET SYNCHRONIZE from: " + height);
+
+		try {
+			if (getAccounts() != null && !getAccounts().isEmpty()) {
 				do {
 
-                    Block block = blockMap.getAndProcess(height);
+					Block block = blockMap.getAndProcess(height);
 
-                    if (block == null) {
-                        break;
-                    }
+					if (block == null) {
+						break;
+					}
 
-                    try {
-                        this.processBlock(dcSet, block);
-                        block.close();
-                        block = null;
-                    } catch (java.lang.OutOfMemoryError e) {
-                        LOGGER.error(e.getMessage(), e);
-                        Controller.getInstance().stopAll(644);
+					try {
+						this.processBlock(dcSet, block);
+						block.close();
+						block = null;
+					} catch (java.lang.OutOfMemoryError e) {
+						LOGGER.error(e.getMessage(), e);
+						Controller.getInstance().stopAll(644);
 						return;
 					}
 
@@ -1719,47 +1723,6 @@ public class Wallet extends Observable implements Observer {
 			return;
 
 		}
-
-		//////////// PROCESS BLOCKS ////////////
-		DCSet dcSet = DCSet.getInstance();
-
-		if (synchronizeBodyUsed) {
-			// идет синхронизация кошелька уже - не обрабатываем блоки тут
-			return;
-		}
-
-		if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
-
-			Block block = (Block) message.getValue();
-
-			// TODO сделать фактори которая синхронно по оереди с синхронизацией это будет разруливать
-            // CHECK IF WE NEED TO RESYNC
-            // BY SIGNATURE !!!!
-            if (checkNeedSyncWallet(block.getSignature())) {
-                return;
-            }
-
-            // CHECK BLOCK
-			this.orphanBlock(dcSet, block);
-
-            //this.database.clearCache();
-            //this.database.commit();
-        } else if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
-
-            Block block = (Block) message.getValue();
-
-			// TODO сделать фактори которая синхронно по оереди с синхронизацией это будет разруливать
-
-			// CHECK IF WE NEED TO RESYNC
-			// BY REFERENCE !!!!
-            if (checkNeedSyncWallet(block.getReference())) {
-				return;
-			}
-
-			// CHECK BLOCK
-			this.processBlock(DCSet.getInstance(), block);
-
-        }
 
     }
 

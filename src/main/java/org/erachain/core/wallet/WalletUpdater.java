@@ -17,12 +17,11 @@ import java.util.concurrent.TimeUnit;
 public class WalletUpdater extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
-    private final static boolean logPings = true;
     private boolean runned;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WalletUpdater.class.getSimpleName());
 
-    private static final int QUEUE_LENGTH = 1024 + (256 >> (Controller.HARD_WORK >> 1));
+    private static final int QUEUE_LENGTH = 32 + (32 >> (Controller.HARD_WORK >> 1));
     BlockingQueue<Pair<Boolean, Block>> blockingQueue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
 
     private Controller controller;
@@ -71,9 +70,9 @@ public class WalletUpdater extends MonitoredThread {
 
     }
 
-    private void trySynchronize() {
+    private void trySynchronize(boolean reset) {
 
-        if (!synchronizeMode && wallet.synchronizeBodyUsed
+        if (!reset && wallet.synchronizeBodyUsed
                 || Controller.getInstance().isOnStopping()
                 || Controller.getInstance().noDataWallet || Controller.getInstance().noUseWallet) {
             return;
@@ -81,7 +80,7 @@ public class WalletUpdater extends MonitoredThread {
 
         Controller.getInstance().walletSyncStatusUpdate(-1);
 
-        LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet..." + (synchronizeMode ? " RESET" : ""));
+        LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet..." + (reset ? " RESET" : ""));
 
         DCSet dcSet = DCSet.getInstance();
 
@@ -131,7 +130,7 @@ public class WalletUpdater extends MonitoredThread {
 
         Block block;
 
-        if (synchronizeMode) {
+        if (reset) {
 
             // полная пересборка кошелька
 
@@ -142,20 +141,39 @@ public class WalletUpdater extends MonitoredThread {
             } catch (InterruptedException e) {
                 return;
             }
-            wallet.synchronizeBody(synchronizeMode);
+            wallet.synchronizeBody(true);
             return;
 
         } else {
 
             byte[] lastSignature = wallet.database.getLastBlockSignature();
             if (lastSignature == null) {
-                setGoSynchronize(true);
+                LOGGER.debug(" >>>>>>>>>>>>>>> *** Synchronizing wallet... by lastSignature = null");
+
+                //setGoSynchronize(true);
+                // break current synchronization if exists
+                wallet.synchronizeBodyUsed = false;
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    return;
+                }
+                wallet.synchronizeBody(true);
                 return;
             }
 
             block = dcSet.getBlockSignsMap().getBlock(lastSignature);
             if (block == null) {
-                setGoSynchronize(true);
+                LOGGER.debug(" >>>>>>>>>>>>>>> *** Synchronizing wallet... by lastBlock = null");
+                ///setGoSynchronize(true);
+                // break current synchronization if exists
+                wallet.synchronizeBodyUsed = false;
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    return;
+                }
+                wallet.synchronizeBody(true);
                 return;
             }
         }
@@ -178,8 +196,9 @@ public class WalletUpdater extends MonitoredThread {
                 }
 
                 if (synchronizeMode != null) {
-                    trySynchronize();
+                    boolean reset = synchronizeMode;
                     synchronizeMode = null;
+                    trySynchronize(reset);
                 }
 
             } catch (OutOfMemoryError e) {
