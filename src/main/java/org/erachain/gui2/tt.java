@@ -214,7 +214,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         tree = new JTree(root);
        tree.setCellRenderer(new AS_tt_Render());
         // tree.addTreeSelectionListener(this);
-        double dd = (double) UIManager.getFont("TextField.font").getSize() * 1.5;
+        double dd = (double) UIManager.getFont("TextField.font").getSize() * 2.2;
         tree.setRowHeight((int) dd);
         tree.setRootVisible(false);
         for (int i = 0; i < tree.getRowCount(); i++)
