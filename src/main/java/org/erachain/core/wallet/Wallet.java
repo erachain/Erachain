@@ -602,9 +602,9 @@ public class Wallet extends Observable implements Observer {
 		List<Tuple2<Account, Long>> accounts_assets = this.getAccountsAssets();
 
         for (Tuple2<Account, Long> account_asset : accounts_assets) {
-            this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
+			this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
 					BigDecimal.ZERO, false);
-        }
+		}
 
 	}
 
@@ -612,7 +612,8 @@ public class Wallet extends Observable implements Observer {
 	 * нужно для запрета вызова уже работающего процесса синхронизации
 	 */
 	public boolean synchronizeBodyUsed;
-	public void synchronizeBody(boolean reset) {
+
+	public synchronized void synchronizeBody(boolean reset) {
 
 		synchronizeBodyUsed = true;
 
@@ -773,7 +774,7 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	public void synchronize() {
-		walletUpdater.offerMessage(true);
+		walletUpdater.setGoSynchronize(true);
 	}
 
 	// UNLOCK
@@ -1187,7 +1188,7 @@ public class Wallet extends Observable implements Observer {
 		byte[] lastBlockSignature = this.database.getLastBlockSignature();
 		if (lastBlockSignature == null
 				|| !Arrays.equals(lastBlockSignature, signatureORreference)) {
-			walletUpdater.offerMessage(true);
+			walletUpdater.setGoSynchronize(true);
 			return true;
 		}
 
