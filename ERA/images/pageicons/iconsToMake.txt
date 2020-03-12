@@ -51,6 +51,7 @@ OtherConsolePanel.png
 OtherSearchBlocks.png
 OtherSplitPanel.png
 IssuePersonPanel.png
+InsertPersonPanel.png
 PersonsFavoriteSplitPanel.png
 PersonsMySplitPanel.png
 SearchPersonsSplitPanel.png
