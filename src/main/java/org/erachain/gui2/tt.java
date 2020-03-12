@@ -73,20 +73,21 @@ public class tt extends JPanel { // implements TreeSelectionListener {
 
         // -------------------------------------------
 
+
         ASMutableTreeNode root = new ASMutableTreeNode("root", "<html><b>" + Lang.getInstance().translate("Erachain"), getIcon("images/pageicons/SearchPersonsSplitPanel.png"));
-        ASMutableTreeNode account_Node = new ASMutableTreeNode("account_Node","<html><b>" + Lang.getInstance().translate("Accounts") + "</b></html>", getIcon("images/pageicons/account_Node.png"));
-        ASMutableTreeNode person_Node = new ASMutableTreeNode("person_Node","<html><b>" + Lang.getInstance().translate("Persons")+ "</b></html>",  getIcon("images/pageicons/person_Node.png"));
-        ASMutableTreeNode document_Node = new ASMutableTreeNode("document_Node","<html><b>" + Lang.getInstance().translate("Documents")+ "</b></html>",  getIcon("images/pageicons/document_Node.png"));
-        ASMutableTreeNode mails_Node = new ASMutableTreeNode("mails_Node","<html><b>" + Lang.getInstance().translate("Mails")+ "</b></html>",  getIcon("images/pageicons/mails_Node.png"));
-        ASMutableTreeNode assets_Node = new ASMutableTreeNode("assets_Node","<html><b>" + Lang.getInstance().translate("Assets")+ "</b></html>",  getIcon("images/pageicons/assets_Node.png"));
-        ASMutableTreeNode templates_Node = new ASMutableTreeNode("templates_Node","<html><b>" + Lang.getInstance().translate("Templates")+ "</b></html>",  getIcon("images/pageicons/templates_Node.png"));
-        ASMutableTreeNode statuses_Node = new ASMutableTreeNode("statuses_Node","<html><b>" + Lang.getInstance().translate("Statuses")+ "</b></html>",  getIcon("images/pageicons/statuses_Node.png"));
-        ASMutableTreeNode unions_Node = new ASMutableTreeNode("unions_Node","<html><b>" + Lang.getInstance().translate("Unions")+ "</b></html>",  getIcon("images/pageicons/unions_Node.png"));
-        ASMutableTreeNode polls_Node = new ASMutableTreeNode("polls_Node","<html><b>" + Lang.getInstance().translate("Polls")+ "</b></html>",  getIcon("images/pageicons/polls_Node.png"));
-        ASMutableTreeNode hashes_Node = new ASMutableTreeNode("hashes_Node","<html><b>" + Lang.getInstance().translate("Unique Hashes")+ "</b></html>",  getIcon("images/pageicons/hashes_Node.png"));
-        ASMutableTreeNode linked_hashes_Node = new ASMutableTreeNode("linked_hashes_Node","<html><b>" + Lang.getInstance().translate("Linked Hashes")+ "</b></html>",  getIcon("images/pageicons/linked_hashes_Node.png"));
-        ASMutableTreeNode records_Node = new ASMutableTreeNode("records_Node","<html><b>" + Lang.getInstance().translate("Records")+ "</b></html>",  getIcon("images/pageicons/records_Node.png"));
-        ASMutableTreeNode other_Node = new ASMutableTreeNode("other_Node","<html><b>" + Lang.getInstance().translate("Network DashBoard")+ "</b></html>",  getIcon("images/pageicons/other_Node.png"));
+        ASMutableTreeNode account_Node = new ASMutableTreeNode("account_Node", "<html><b>" + Lang.getInstance().translate("Accounts") + "</b></html>", getIcon("images/pageicons/account_Node.png"));
+        ASMutableTreeNode person_Node = new ASMutableTreeNode("person_Node", "<html><span style='font-size:1.25em;'><b> " + Lang.getInstance().translate("Persons") + "</b></span></html>", getIcon("images/pageicons/person_Node.png"));
+        ASMutableTreeNode document_Node = new ASMutableTreeNode("document_Node", "<html><b>" + Lang.getInstance().translate("Documents") + "</b></html>", getIcon("images/pageicons/document_Node.png"));
+        ASMutableTreeNode mails_Node = new ASMutableTreeNode("mails_Node", "<html><b>" + Lang.getInstance().translate("Mails") + "</b></html>", getIcon("images/pageicons/mails_Node.png"));
+        ASMutableTreeNode assets_Node = new ASMutableTreeNode("assets_Node", "<html><b>" + Lang.getInstance().translate("Assets") + "</b></html>", getIcon("images/pageicons/assets_Node.png"));
+        ASMutableTreeNode templates_Node = new ASMutableTreeNode("templates_Node", "<html><b>" + Lang.getInstance().translate("Templates") + "</b></html>", getIcon("images/pageicons/templates_Node.png"));
+        ASMutableTreeNode statuses_Node = new ASMutableTreeNode("statuses_Node", "<html><b>" + Lang.getInstance().translate("Statuses") + "</b></html>", getIcon("images/pageicons/statuses_Node.png"));
+        ASMutableTreeNode unions_Node = new ASMutableTreeNode("unions_Node", "<html><b>" + Lang.getInstance().translate("Unions") + "</b></html>", getIcon("images/pageicons/unions_Node.png"));
+        ASMutableTreeNode polls_Node = new ASMutableTreeNode("polls_Node", "<html><b>" + Lang.getInstance().translate("Polls") + "</b></html>", getIcon("images/pageicons/polls_Node.png"));
+        ASMutableTreeNode hashes_Node = new ASMutableTreeNode("hashes_Node", "<html><b>" + Lang.getInstance().translate("Unique Hashes") + "</b></html>", getIcon("images/pageicons/hashes_Node.png"));
+        ASMutableTreeNode linked_hashes_Node = new ASMutableTreeNode("linked_hashes_Node", "<html><b>" + Lang.getInstance().translate("Linked Hashes") + "</b></html>", getIcon("images/pageicons/linked_hashes_Node.png"));
+        ASMutableTreeNode records_Node = new ASMutableTreeNode("records_Node", "<html><b>" + Lang.getInstance().translate("Records") + "</b></html>", getIcon("images/pageicons/records_Node.png"));
+        ASMutableTreeNode other_Node = new ASMutableTreeNode("other_Node", "<html><b>" + Lang.getInstance().translate("Network DashBoard") + "</b></html>", getIcon("images/pageicons/other_Node.png"));
         ASMutableTreeNode bank_Tree = new ASMutableTreeNode("bank_Tree","<html><b>" + Lang.getInstance().translate("Bank")+ "</b></html>",  getIcon("images/pageicons/bank_Tree.png"));
         ASMutableTreeNode telegrams_Tree = new ASMutableTreeNode("telegrams_Tree","<html><b>" + Lang.getInstance().translate("Telegrams")+ "</b></html>",  getIcon("images/pageicons/telegrams_Tree.png"));
 
