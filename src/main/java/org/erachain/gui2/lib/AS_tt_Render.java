@@ -20,7 +20,7 @@ public class AS_tt_Render extends DefaultTreeCellRenderer {
                 ASMutableTreeNode vv = (ASMutableTreeNode) value;
                 setText( vv.getViewName());
                 Image im = vv.getImage();
-                int size1 = UIManager.getFont("TextField.font").getSize();
+                int size1 = UIManager.getFont("TextField.font").getSize()*180/100;
                 setIcon(new ImageIcon(im.getScaledInstance(size1, size1, 0)));
             }
         } catch (Exception e) {
