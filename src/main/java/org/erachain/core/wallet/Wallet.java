@@ -1307,10 +1307,12 @@ public class Wallet extends Observable implements Observer {
         if (block.blockHead.transactionsCount > 0
 				&& start - processBlockLogged > 30000) {
 			long tickets = System.currentTimeMillis() - start;
-			processBlockLogged = start;
-			LOGGER.debug("WALLET [" + block.blockHead.heightBlock + "] processing time: " + tickets * 0.001
-					+ " TXs = " + block.blockHead.transactionsCount + " millsec/record:"
-					+ tickets / (block.blockHead.transactionsCount + 1));
+			if (tickets > 3) {
+				processBlockLogged = start;
+				LOGGER.debug("WALLET [" + block.blockHead.heightBlock + "] processing time: " + tickets
+						+ " ms, TXs = " + block.blockHead.transactionsCount + ", TPS:"
+						+ 1000 * block.blockHead.transactionsCount / tickets);
+			}
 		}
 
     }
