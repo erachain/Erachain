@@ -238,7 +238,7 @@ public class WalletUpdater extends MonitoredThread {
                     continue;
                 }
 
-                if (synchronizeMode != null) {
+                if (synchronizeMode != null && !controller.isStatusSynchronizing()) {
                     boolean reset = synchronizeMode;
                     if (reset || !wallet.synchronizeBodyUsed) {
                         trySynchronize(reset);
