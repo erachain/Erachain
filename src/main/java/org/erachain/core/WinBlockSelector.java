@@ -77,17 +77,20 @@ public class WinBlockSelector extends MonitoredThread {
 
         LOGGER.info(info);
 
-        if (!newBlock.isValidHead(dcSet)) {
+        int invalid = newBlock.isValidHead(dcSet);
+        if (invalid > 0) {
             // то проверим заголовок
             info = "Block HEAD is Invalid - ignore " + newBlock.toString();
             LOGGER.info(info);
 
-            // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока
-            // а если у нас уже в буфере нет, то пошлем наш последний блок
-            Block myWinBlock = blockChain.getWaitWinBuffer();
-            myWinBlock = myWinBlock == null ? blockChain.getLastBlock(dcSet) : myWinBlock;
-            if (myWinBlock != null) {
-                message.getSender().sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
+            if (invalid <= Block.INVALID_REFERENCE) {
+                // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока
+                // а если у нас уже в буфере нет, то пошлем наш последний блок
+                Block myWinBlock = blockChain.getWaitWinBuffer();
+                myWinBlock = myWinBlock == null ? blockChain.getLastBlock(dcSet) : myWinBlock;
+                if (myWinBlock != null) {
+                    message.getSender().sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
+                }
             }
 
             return;
