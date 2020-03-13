@@ -1636,7 +1636,7 @@ public class DCSet extends DBASet implements Closeable {
                 System.gc();
                 if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                         + (Controller.MIN_MEMORY_TAIL << 1)) {
-                    logger.error("Heap Memory Overflow");
+                    logger.error("Heap Memory Overflow before commit");
                     Controller.getInstance().stopAll(9618);
                     return;
                 }
