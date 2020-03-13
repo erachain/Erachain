@@ -18,15 +18,17 @@ public class AS_tt_Render extends DefaultTreeCellRenderer {
         try {
             if ( selected || expanded || hasFocus || tree.isCollapsed(row) || tree.isExpanded(row) || tree.isRowSelected(row) || tree.isSelectionEmpty()) {
                 ASMutableTreeNode vv = (ASMutableTreeNode) value;
-                setText(vv.getViewName());
-                Image im = vv.getImage();
-                if (true) {
-                    int size1 = UIManager.getFont("TextField.font").getSize() * 125 / 100;
-                    setIcon(new ImageIcon(im.getScaledInstance(size1, size1, 0)));
-                } else {
-                    setIcon(new ImageIcon(im));
-                }
+                String name = vv.getViewName();
+                boolean i = tree.isCollapsed(row);
+                if(tree.isCollapsed(row)){
+                   name = name.replace("<html><b>", "<html><b><i>");
+                    name = name.replace("</b></html>", "...</b></html>");
 
+                }
+                setText(name );
+                Image im = vv.getImage();
+                int size1 = UIManager.getFont("TextField.font").getSize()*180/100;
+                setIcon(new ImageIcon(im.getScaledInstance(size1, size1, 0)));
             }
         } catch (Exception e) {
         }

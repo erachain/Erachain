@@ -15,6 +15,7 @@
     other_Node.png
     bank_Tree.png
     telegrams_Tree.png
+    exchange_Node.png
 
 иконки для закладок
 
