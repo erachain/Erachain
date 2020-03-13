@@ -4,6 +4,7 @@ import org.erachain.gui.library.ASMutableTreeNode;
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
+import java.nio.charset.Charset;
 
 public class AS_tt_Render extends DefaultTreeCellRenderer {
 
@@ -18,7 +19,14 @@ public class AS_tt_Render extends DefaultTreeCellRenderer {
             if ( selected || expanded || hasFocus || tree.isCollapsed(row) || tree.isExpanded(row) || tree.isRowSelected(row) || tree.isSelectionEmpty())
             {
                 ASMutableTreeNode vv = (ASMutableTreeNode) value;
-                setText( vv.getViewName());
+                String name = vv.getViewName();
+                boolean i = tree.isCollapsed(row);
+                if(tree.isCollapsed(row)){
+                   name = name.replace("<html><b>", "<html><b><i>");
+                    name = name.replace("</b></html>", "...</b></html>");
+
+                }
+                setText(name );
                 Image im = vv.getImage();
                 int size1 = UIManager.getFont("TextField.font").getSize()*180/100;
                 setIcon(new ImageIcon(im.getScaledInstance(size1, size1, 0)));

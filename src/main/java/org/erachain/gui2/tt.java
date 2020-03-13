@@ -76,10 +76,11 @@ public class tt extends JPanel { // implements TreeSelectionListener {
 
         ASMutableTreeNode root = new ASMutableTreeNode("root", "<html><b>" + Lang.getInstance().translate("Erachain"), getIcon("images/pageicons/SearchPersonsSplitPanel.png"));
         ASMutableTreeNode account_Node = new ASMutableTreeNode("account_Node", "<html><b>" + Lang.getInstance().translate("Accounts") + "</b></html>", getIcon("images/pageicons/account_Node.png"));
-        ASMutableTreeNode person_Node = new ASMutableTreeNode("person_Node", "<html><span style='font-size:1.25em;'><b> " + Lang.getInstance().translate("Persons") + "</b></span></html>", getIcon("images/pageicons/person_Node.png"));
+        ASMutableTreeNode person_Node = new ASMutableTreeNode("person_Node", "<html><b> " + Lang.getInstance().translate("Persons") + "</b></html>", getIcon("images/pageicons/person_Node.png"));
         ASMutableTreeNode document_Node = new ASMutableTreeNode("document_Node", "<html><b>" + Lang.getInstance().translate("Documents") + "</b></html>", getIcon("images/pageicons/document_Node.png"));
         ASMutableTreeNode mails_Node = new ASMutableTreeNode("mails_Node", "<html><b>" + Lang.getInstance().translate("Mails") + "</b></html>", getIcon("images/pageicons/mails_Node.png"));
         ASMutableTreeNode assets_Node = new ASMutableTreeNode("assets_Node", "<html><b>" + Lang.getInstance().translate("Assets") + "</b></html>", getIcon("images/pageicons/assets_Node.png"));
+        ASMutableTreeNode exchange_Node = new ASMutableTreeNode("exchange_Node", "<html><b>" + Lang.getInstance().translate("Exchange") + "</b></html>", getIcon("images/pageicons/exchange_Node.png"));
         ASMutableTreeNode templates_Node = new ASMutableTreeNode("templates_Node", "<html><b>" + Lang.getInstance().translate("Templates") + "</b></html>", getIcon("images/pageicons/templates_Node.png"));
         ASMutableTreeNode statuses_Node = new ASMutableTreeNode("statuses_Node", "<html><b>" + Lang.getInstance().translate("Statuses") + "</b></html>", getIcon("images/pageicons/statuses_Node.png"));
         ASMutableTreeNode unions_Node = new ASMutableTreeNode("unions_Node", "<html><b>" + Lang.getInstance().translate("Unions") + "</b></html>", getIcon("images/pageicons/unions_Node.png"));
@@ -97,6 +98,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         nodeList.put("document_Node",document_Node);
         nodeList.put("mails_Node",mails_Node);
         nodeList.put("assets_Node",assets_Node);
+        nodeList.put("exchange_Node",exchange_Node);
         nodeList.put("templates_Node",templates_Node);
         nodeList.put("statuses_Node",statuses_Node);
         nodeList.put("unions_Node",unions_Node);
@@ -118,6 +120,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         root.add(document_Node);
         root.add(mails_Node);
         root.add(assets_Node);
+        root.add(exchange_Node);
         root.add(templates_Node);
         root.add(statuses_Node);
 
@@ -135,6 +138,12 @@ public class tt extends JPanel { // implements TreeSelectionListener {
 
         root.add(records_Node);
         root.add(other_Node);
+
+
+        exchange_Node.add(new ASMutableTreeNode("ExchangePanel",Lang.getInstance().translate("Exchange"),ExchangePanel.getIcon()));
+        exchange_Node.add(new ASMutableTreeNode("DepositExchange", Lang.getInstance().translate("Deposit Exchange"), DepositExchange.getIcon()));
+        exchange_Node.add(new ASMutableTreeNode("WithdrawExchange", Lang.getInstance().translate("Withdraw Exchange"),WithdrawExchange.getIcon()));
+        exchange_Node.add(new ASMutableTreeNode("MyOrderTab", Lang.getInstance().translate("My Orders"),MyOrderTab.getIcon()));
 
         bank_Tree.add(new ASMutableTreeNode("IssueSendPaymentOrder",Lang.getInstance().translate("Send payment order"), IssueSendPaymentOrder.getIcon()));
         bank_Tree.add(new ASMutableTreeNode("MyOrderPaimentsSplitPanel",Lang.getInstance().translate("My Payments Orders"), MyOrderPaimentsSplitPanel.getIcon()));
