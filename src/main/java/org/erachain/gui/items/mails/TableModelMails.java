@@ -151,8 +151,8 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
     public void filter(ObserverMessage message) {
 
-        ArrayList<Transaction> all_transactions = new ArrayList<Transaction>();
 
+        ArrayList<Transaction> all_transactions = new ArrayList<Transaction>();
 
         if (false) {
             for (Account account : Controller.getInstance().getAccounts()) {
@@ -219,7 +219,12 @@ public class TableModelMails extends AbstractTableModel implements Observer {
             Fun.Tuple2<Long, Long> key;
             while (iterator.hasNext()) {
                 key = iterator.next();
-                rsend = (RSend) wallet.getTransaction(key).b;
+                try {
+                    rsend = (RSend) wallet.getTransaction(key).b;
+                } catch (Exception e) {
+                    rsend = null;
+                }
+
                 if (rsend == null)
                     continue;
                 if (rsend.hasAmount())
