@@ -40,6 +40,10 @@ ERA\z_bath_examples\readme.txt
 -nodatawallet -pass=[PASSWORD]  
 Описание ключей запуска в z_bath_examples\readme.txt
 
+## Локальная сеть
+Если после включения в настройках поиска узлов в локальной сети и перезапуска ноды локальные узлы не находятся,
+ то нужно их прописать явно в файл peers-test.json (или peer.json или peers-demo.json)
+
 
 Так же выдает предупреждения:  
 ```

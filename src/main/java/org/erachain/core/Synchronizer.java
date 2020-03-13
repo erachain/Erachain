@@ -496,7 +496,6 @@ public class Synchronizer extends Thread {
                         // GET BLOCK
                         LOGGER.debug("try get BLOCK from BUFFER");
 
-                        long time1 = System.currentTimeMillis();
                         try {
                             blockFromPeer = blockBuffer.getBlock(signature);
                             if (isFromTrustedPeer) {
@@ -618,6 +617,7 @@ public class Synchronizer extends Thread {
 
                             LOGGER.debug("try PROCESS");
                             this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false, false);
+                            blockFromPeer.close();
 
                             LOGGER.debug("synchronize BLOCK END process");
                             blockBuffer.clearBlock(blockFromPeer.getSignature());
@@ -1033,13 +1033,7 @@ public class Synchronizer extends Thread {
                 if (block.getValidatedForkDB() == null) {
                     block.process(dcSet);
                 } else {
-                    try {
-                        // здесь просто заливаем все данные из Форка в цепочку - без процессинга - он уже был в Валидации
-                        block.saveToChainFromvalidatedForkDB();
-                    } finally {
-                        // закрываем чуть позже тут - а то в MapDB в кэше ошибка может вылететь что база уже закрыта
-                        block.close();
-                    }
+                    block.saveToChainFromvalidatedForkDB();
                 }
 
                 dcSet.getBlockMap().setProcessing(false);
