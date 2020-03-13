@@ -2223,7 +2223,7 @@ public class Controller extends Observable {
 
     public String generateNewAccountWithSynch() {
         String account = this.wallet.generateNewAccount();
-        this.wallet.synchronize();
+        this.wallet.synchronizeFull();
         return account;
     }
 

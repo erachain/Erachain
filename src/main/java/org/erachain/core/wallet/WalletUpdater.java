@@ -71,7 +71,8 @@ public class WalletUpdater extends MonitoredThread {
 
             } else {
                 // set then NEED SYNCH
-                synchronizeMode = false;
+                if (!wallet.synchronizeBodyUsed && synchronizeMode == null)
+                    synchronizeMode = false;
             }
         } else {
             // PROCESS
@@ -81,12 +82,13 @@ public class WalletUpdater extends MonitoredThread {
 
             } else {
                 // set then NEED SYNCH
-                synchronizeMode = false;
+                if (!wallet.synchronizeBodyUsed && synchronizeMode == null)
+                    synchronizeMode = false;
             }
         }
     }
 
-    private void trySynchronize(boolean reset) {
+    private synchronized void trySynchronize(boolean reset) {
 
         if (!reset && wallet.synchronizeBodyUsed
                 || controller.isOnStopping()
@@ -238,8 +240,8 @@ public class WalletUpdater extends MonitoredThread {
 
                 if (synchronizeMode != null) {
                     boolean reset = synchronizeMode;
-                    synchronizeMode = null;
                     trySynchronize(reset);
+                    synchronizeMode = null;
                 }
 
             } catch (OutOfMemoryError e) {

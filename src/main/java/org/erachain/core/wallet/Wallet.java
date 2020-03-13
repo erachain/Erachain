@@ -511,7 +511,7 @@ public class Wallet extends Observable implements Observer {
 
 		// SCAN TRANSACTIONS
 		if (synchronize) {
-			this.synchronize();
+			this.synchronizeFull();
 		}
 
 		// COMMIT
@@ -790,7 +790,7 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
-	public void synchronize() {
+	public void synchronizeFull() {
 		walletUpdater.setGoSynchronize(true);
 	}
 
@@ -908,7 +908,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.hardFlush();
 
 			// SYNCHRONIZE
-			this.synchronize();
+			this.synchronizeFull();
 
 			// NOTIFY
 			this.setChanged();
@@ -945,7 +945,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.hardFlush();
 
 			// SYNCHRONIZE
-			this.synchronize();
+			this.synchronizeFull();
 
 			// NOTIFY
 			this.setChanged();
@@ -1699,31 +1699,34 @@ public class Wallet extends Observable implements Observer {
 
         if (type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
 
-            // прилетающие неподтвержденные тоже проверяем и если это относится к нам
-            // то закатываем себе в кошелек.
-            // потом они при переподтверждении обновятся
-            // но если нет то останутся висеть и пользователь сам их должен удалить
-            // это как раз сигнал что такая не подтвердилась трнзакция
+			// прилетающие неподтвержденные тоже проверяем и если это относится к нам
+			// то закатываем себе в кошелек.
+			// потом они при переподтверждении обновятся
+			// но если нет то останутся висеть и пользователь сам их должен удалить
+			// это как раз сигнал что такая не подтвердилась трнзакция
 
-            Pair<Long, Transaction> item = (Pair<Long, Transaction>) message.getValue();
-            Transaction transaction = item.getB();
+			Pair<Long, Transaction> item = (Pair<Long, Transaction>) message.getValue();
+			Transaction transaction = item.getB();
 
-            List<Account> accounts = this.getAccounts();
-            synchronized (accounts) {
-                for (Account account : accounts) {
-                    // CHECK IF INVOLVED
-                    if (transaction.isInvolved(account)) {
-                        // ADD TO ACCOUNT TRANSACTIONS
-                        if (!this.database.getTransactionMap().add(account, transaction)) {
-                            // UPDATE UNCONFIRMED BALANCE for ASSET
-                        }
-                    }
-                }
-            }
+			if (false) {
+				/// блокирует внесение блоков через вызов события!
+				List<Account> accounts = this.getAccounts();
+				synchronized (accounts) {
+					for (Account account : accounts) {
+						// CHECK IF INVOLVED
+						if (transaction.isInvolved(account)) {
+							// ADD TO ACCOUNT TRANSACTIONS
+							if (!this.database.getTransactionMap().add(account, transaction)) {
+								// UPDATE UNCONFIRMED BALANCE for ASSET
+							}
+						}
+					}
+				}
+			}
 
-            return;
+			return;
 
-        } else if (type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
+		} else if (type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
             if (Controller.getInstance().useGui) {
                 Pair<Tuple2<String, String>, Transaction> item = (Pair<Tuple2<String, String>, Transaction>) message.getValue();
                 Transaction transaction = item.getB();
