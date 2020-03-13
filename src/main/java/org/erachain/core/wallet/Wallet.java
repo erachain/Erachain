@@ -1687,6 +1687,7 @@ public class Wallet extends Observable implements Observer {
         }
     }
 
+    long notifySysTrayRecord;
     @SuppressWarnings("unchecked")
     // synchronized нужно чтобы не было конкуренции при this.database.commit();
     public synchronized void syncUpdate(Observable o, Object arg) {
@@ -1727,15 +1728,17 @@ public class Wallet extends Observable implements Observer {
 			return;
 
 		} else if (type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-            if (Controller.getInstance().useGui) {
-                Pair<Tuple2<String, String>, Transaction> item = (Pair<Tuple2<String, String>, Transaction>) message.getValue();
-                Transaction transaction = item.getB();
-                Library.notifySysTrayRecord(transaction);
-            }
+			if (Controller.getInstance().useGui
+					&& System.currentTimeMillis() - notifySysTrayRecord > 1000) {
+				notifySysTrayRecord = System.currentTimeMillis();
+				Pair<Tuple2<String, String>, Transaction> item = (Pair<Tuple2<String, String>, Transaction>) message.getValue();
+				Transaction transaction = item.getB();
+				Library.notifySysTrayRecord(transaction);
+			}
 
-            return;
+			return;
 
-        } else if (type == ObserverMessage.ADD_ORDER_TYPE
+		} else if (type == ObserverMessage.ADD_ORDER_TYPE
 				|| type == ObserverMessage.ADD_COMPL_ORDER_TYPE) {
             // UPDATE FULFILLED
             Order order = (Order) message.getValue();
