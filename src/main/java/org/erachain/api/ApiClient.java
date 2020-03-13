@@ -55,6 +55,11 @@ public class ApiClient {
                             ""
                     },
                     {
+                            "GET core/sync/{toHeight}",
+                            "Try synchronize to Height",
+                            ""
+                    },
+                    {
                             "GET core/version",
                             "Returns the version and buildtime of the running client.",
                             ""

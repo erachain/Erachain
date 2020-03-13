@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOError;
-import java.lang.ref.WeakReference;
 import java.nio.file.Files;
 import java.util.Random;
 
@@ -363,8 +362,6 @@ public class DCSet extends DBASet implements Closeable {
         this.addUses();
 
         this.database = idDatabase;
-        WeakReference<Object> weakRef = new WeakReference<>(idDatabase);
-
         this.parent = parent;
         ///this.database = parent.database.snapshot();
         this.bchain = parent.bchain;
@@ -579,12 +576,13 @@ public class DCSet extends DBASet implements Closeable {
 
                             // это чистит сама память если соталось 25% от кучи - так что она безопасная
                             // у другого типа КЭША происходит утечка памяти
-                            .cacheHardRefEnable()
+                            ///.cacheHardRefEnable()
 
-                    ///.cacheSoftRefEnable()
-                    ///.cacheSize(32 << Controller.HARD_WORK)
+                            ///.cacheSoftRefEnable()
+                            ///.cacheSize(32 << Controller.HARD_WORK)
 
-                    ///.cacheWeakRefEnable()
+                            // analog new WeakReference() - в случае нехватки ппамяти кеш сам чистится
+                            .cacheWeakRefEnable() // new WeakReference()
                     ///.cacheSize(32 << Controller.HARD_WORK)
                     ;
 
@@ -620,7 +618,9 @@ public class DCSet extends DBASet implements Closeable {
                 .asyncWriteFlushDelay(2)
                 // тут не влияет .commitFileSyncDisable()
 
-                .cacheHardRefEnable()
+                //.cacheHardRefEnable()
+                //.cacheLRUEnable()
+                .cacheWeakRefEnable() // new WeakReference()
                 //.cacheDisable()
 
 
@@ -1595,7 +1595,6 @@ public class DCSet extends DBASet implements Closeable {
 
         try {
             DCSet fork = new DCSet(this, database);
-            WeakReference<Object> weakRef = new WeakReference<>(fork);
 
             this.outUses();
             return fork;

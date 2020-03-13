@@ -9,7 +9,6 @@ import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.WeakReference;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -100,8 +99,6 @@ public class TransactionsPool extends MonitoredThread {
 
             // GET TRANSACTION
             Transaction transaction = transactionMessage.getTransaction();
-            WeakReference<Object> weakRef = new WeakReference<>(transaction);
-
 
             // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
             if (transaction.getCreator() == null

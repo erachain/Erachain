@@ -954,15 +954,14 @@ public class TradeResource {
                             long time = NTP.getTime();
 
                             //CREATE ORDER TRANSACTION
-                            transaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(),
-                                    haveAmount, wantAmount, (byte) 0, time, 0l);
-                            WeakReference<Object> weakRef = new WeakReference<>(transaction);
+                            WeakReference<Transaction> weakRef = new WeakReference<>(new CreateOrderTransaction(creator, have.getKey(), want.getKey(),
+                                    haveAmount, wantAmount, (byte) 0, time, 0l));
 
-                            transaction.sign(creator, Transaction.FOR_NETWORK);
+                            weakRef.get().sign(creator, Transaction.FOR_NETWORK);
 
                             // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
-                            cnt.transactionsPool.offerMessage(transaction);
-                            cnt.broadcastTransaction(transaction);
+                            cnt.transactionsPool.offerMessage(weakRef.get());
+                            cnt.broadcastTransaction(weakRef.get());
 
                         }
 

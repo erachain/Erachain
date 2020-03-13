@@ -40,11 +40,9 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.util.Timer;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * обработка секртеных ключей и моих записей, которые относятся к набору моих счетов
@@ -95,8 +93,6 @@ public class Wallet extends Observable implements Observer {
 					Controller.getInstance().getBlockChain(), DCSet.getInstance(), this);
 
         }
-
-        startProcessForSynchronize();
 
 	}
 
@@ -515,11 +511,14 @@ public class Wallet extends Observable implements Observer {
 
 		// SCAN TRANSACTIONS
 		if (synchronize) {
-			this.synchronize(true);
+			this.synchronize();
 		}
 
 		// COMMIT
 		this.commit();
+
+		walletUpdater = new WalletUpdater(Controller.getInstance(),
+				Controller.getInstance().getBlockChain(), DCSet.getInstance(), this);
 
 		// ADD OBSERVER
 		Controller.getInstance().addObserver(this);
@@ -532,33 +531,6 @@ public class Wallet extends Observable implements Observer {
 
 		return true;
 	}
-
-    private Timer timerSynchronize;
-
-    public void startProcessForSynchronize() {
-
-        if (this.timerSynchronize == null) {
-            this.timerSynchronize = new Timer("Wallet synchronize check");
-
-            TimerTask action = new TimerTask() {
-                @Override
-                public void run() {
-
-                    if (Controller.getInstance().isStatusWaiting()) {
-
-                        if (Controller.getInstance().isNeedSyncWallet()
-                                && !Controller.getInstance().isProcessingWalletSynchronize()) {
-
-                            Controller.getInstance().synchronizeWallet();
-                        }
-                    }
-                }
-            };
-
-            this.timerSynchronize.schedule(action, 30000, 60000);
-        }
-
-    }
 
 	public int getAccountNonce() {
 		return this.secureDatabase.getNonce();
@@ -633,42 +605,35 @@ public class Wallet extends Observable implements Observer {
 		List<Tuple2<Account, Long>> accounts_assets = this.getAccountsAssets();
 
         for (Tuple2<Account, Long> account_asset : accounts_assets) {
-            this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
+			this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
 					BigDecimal.ZERO, false);
-        }
+		}
 
 	}
 
-
-	public AtomicBoolean synchronizeStatus = new java.util.concurrent.atomic.AtomicBoolean();
-
 	/**
 	 * нужно для запрета вызова уже работающего процесса синхронизации
-	 *
-	 * @return
 	 */
+	public boolean synchronizeBodyUsed;
 
-	public AtomicBoolean synchronizeBodyUsed = new java.util.concurrent.atomic.AtomicBoolean();
-	public void synchronizeBody(boolean reset) {
-		if (synchronizeStatus.getAndSet(true))
-			return;
+	public synchronized void synchronizeBody(boolean reset) {
+
+		synchronizeBodyUsed = true;
 
 		DCSet dcSet = DCSet.getInstance();
-
-		synchronizeBodyUsed.set(true);
-
 		Block blockStart;
 		int height;
-		//synchronizeBodyStop = false;
 
 		if (reset) {
 			LOGGER.info("   >>>>  try to Reset maps");
 
+			walletUpdater.lastBlocks.clear();
+
 			// SAVE transactions file
 			this.database.clearCache();
-            this.database.hardFlush();
+			this.database.hardFlush();
 
-            // RESET MAPS
+			// RESET MAPS
 			this.database.getTransactionMap().clear();
 			this.database.getBlocksHeadMap().clear();
 			this.database.getNameMap().clear();
@@ -691,14 +656,24 @@ public class Wallet extends Observable implements Observer {
 
         } else {
 
-            byte[] lastSignature = this.database.getLastBlockSignature();
-            blockStart = dcSet.getBlockSignsMap().getBlock(lastSignature);
+			byte[] lastSignature = this.database.getLastBlockSignature();
 
-            if (blockStart == null) {
-                // выходим и потом пересинхронизируемся с начала
-                return;
-            }
-        }
+			if (lastSignature == null) {
+				LOGGER.debug("   >>>>  WALLET SYNCHRONIZE cancel by lastSignature = null");
+				Controller.getInstance().walletSyncStatusUpdate(0);
+				// выходим и потом пересинхронизируемся с начала
+				return;
+			}
+
+			blockStart = dcSet.getBlockSignsMap().getBlock(lastSignature);
+
+			if (blockStart == null) {
+				LOGGER.debug("   >>>>  WALLET SYNCHRONIZE cancel by blockStart = null");
+				Controller.getInstance().walletSyncStatusUpdate(0);
+				// выходим и потом пересинхронизируемся с начала
+				return;
+			}
+		}
 
         // SAVE transactions file
         this.database.clearCache();
@@ -714,27 +689,29 @@ public class Wallet extends Observable implements Observer {
 		long timePoint = System.currentTimeMillis();
 		BlockMap blockMap = dcSet.getBlockMap();
 
-        this.database.clearCache();
+		this.database.clearCache();
 
-        try {
-        	if (getAccounts() != null && !getAccounts().isEmpty()) {
+		LOGGER.info("   >>>>  WALLET SYNCHRONIZE from: " + height);
+
+		try {
+			if (getAccounts() != null && !getAccounts().isEmpty()) {
 				do {
 
-					//try (Block block = blockMap.getAndProcess(height)) {
-					WeakReference<Block> weakRef = new WeakReference<>(blockMap.getAndProcess(height));
+					Block block = blockMap.getAndProcess(height);
 
-					if (weakRef.get() == null) {
+					if (block == null) {
 						break;
 					}
 
 					try {
-						this.processBlock(dcSet, weakRef.get());
+						this.processBlock(dcSet, block);
+						block.close();
+						block = null;
 					} catch (java.lang.OutOfMemoryError e) {
 						LOGGER.error(e.getMessage(), e);
 						Controller.getInstance().stopAll(644);
 						return;
 					}
-					//}
 
 					if (System.currentTimeMillis() - timePoint > 10000
 							|| steepHeight < height - lastHeight) {
@@ -766,7 +743,7 @@ public class Wallet extends Observable implements Observer {
 
 					height++;
 
-				} while (synchronizeBodyUsed.get()
+				} while (synchronizeBodyUsed
 						&& !Controller.getInstance().isOnStopping()
 						&& !Controller.getInstance().needUpToDate()
 						&& Controller.getInstance().isStatusWaiting());
@@ -796,7 +773,6 @@ public class Wallet extends Observable implements Observer {
 			System.gc();
 
 			Controller.getInstance().walletSyncStatusUpdate(height);
-			Controller.getInstance().setProcessingWalletSynchronize(false);
 
 			// RESET UNCONFIRMED BALANCE for accounts + assets
 			LOGGER.info("Resetted balances");
@@ -806,29 +782,19 @@ public class Wallet extends Observable implements Observer {
 			LOGGER.info("Update Orders");
 			this.database.getOrderMap().updateLefts();
 
-			// NOW IF NOT SYNCHRONIZED SET STATUS
-			// CHECK IF WE ARE UPTODATE
-			if (false && !Controller.getInstance().checkStatus(0)) {
-				// NOTIFY
-				Controller.getInstance().notifyObservers(
-						new ObserverMessage(ObserverMessage.NETWORK_STATUS, Controller.STATUS_SYNCHRONIZING));
-			}
+			LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet DONE on: " + height);
 
-			LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet DONE");
-
-			synchronizeStatus.set(false);
-			synchronizeBodyUsed.set(false);
+			synchronizeBodyUsed = false;
 
 		}
 
 	}
 
-    // asynchronous RUN from BlockGenerator
-    public void synchronize(boolean reset) {
-		walletUpdater.offerMessage(reset);
+	public void synchronize() {
+		walletUpdater.setGoSynchronize(true);
 	}
 
-    // UNLOCK
+	// UNLOCK
 	public boolean unlock(String password) {
 
 		if (Controller.getInstance().noUseWallet)
@@ -942,7 +908,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.hardFlush();
 
 			// SYNCHRONIZE
-			this.synchronize(true);
+			this.synchronize();
 
 			// NOTIFY
 			this.setChanged();
@@ -979,7 +945,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.hardFlush();
 
 			// SYNCHRONIZE
-			this.synchronize(true);
+			this.synchronize();
 
 			// NOTIFY
 			this.setChanged();
@@ -1239,7 +1205,7 @@ public class Wallet extends Observable implements Observer {
 		byte[] lastBlockSignature = this.database.getLastBlockSignature();
 		if (lastBlockSignature == null
 				|| !Arrays.equals(lastBlockSignature, signatureORreference)) {
-			Controller.getInstance().setNeedSyncWallet(true);
+			////walletUpdater.setGoSynchronize(false);
 			return true;
 		}
 
@@ -1290,21 +1256,27 @@ public class Wallet extends Observable implements Observer {
 		long start = System.currentTimeMillis();
 
 		// SET AS LAST BLOCK
-        this.database.setLastBlockSignature(block.blockHead.signature);
+		this.database.setLastBlockSignature(block.blockHead.signature);
 
-        Account blockGenerator = block.blockHead.creator;
+		Account blockGenerator = block.blockHead.creator;
 		String blockGeneratorStr = blockGenerator.getAddress();
 
-        int height = block.blockHead.heightBlock;
+		int height = block.blockHead.heightBlock;
+
+		// очередь последних блоков
+		walletUpdater.lastBlocks.put(height, block);
+		if (walletUpdater.lastBlocks.size() > 100) {
+			walletUpdater.lastBlocks.remove(walletUpdater.lastBlocks.firstKey());
+		}
 
 		// CHECK IF WE ARE GENERATOR
 		if (this.accountExists(blockGeneratorStr)) {
 			// ADD BLOCK
-            this.database.getBlocksHeadMap().add(block.blockHead);
+			this.database.getBlocksHeadMap().add(block.blockHead);
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
 			// PROCESS FEE
-            feeProcess(dcSet, block.blockHead.totalFee, blockGenerator, false);
+			feeProcess(dcSet, block.blockHead.totalFee, blockGenerator, false);
 
 		}
 
@@ -1354,10 +1326,12 @@ public class Wallet extends Observable implements Observer {
         if (block.blockHead.transactionsCount > 0
 				&& start - processBlockLogged > 30000) {
 			long tickets = System.currentTimeMillis() - start;
-			processBlockLogged = start;
-			LOGGER.debug("WALLET [" + block.blockHead.heightBlock + "] processing time: " + tickets * 0.001
-					+ " TXs = " + block.blockHead.transactionsCount + " millsec/record:"
-					+ tickets / (block.blockHead.transactionsCount + 1));
+			if (tickets > 3) {
+				processBlockLogged = start;
+				LOGGER.debug("WALLET [" + block.blockHead.heightBlock + "] processing time: " + tickets
+						+ " ms, TXs = " + block.blockHead.transactionsCount + ", TPS:"
+						+ 1000 * block.blockHead.transactionsCount / tickets);
+			}
 		}
 
     }
@@ -1373,9 +1347,12 @@ public class Wallet extends Observable implements Observer {
 			return;
 
 		int height = block.heightBlock;
+
+		walletUpdater.lastBlocks.remove(height);
+
 		List<Transaction> transactions = block.getTransactions();
 		int seqNo;
-        for (int i = block.blockHead.transactionsCount - 1; i >= 0; i--) {
+		for (int i = block.blockHead.transactionsCount - 1; i >= 0; i--) {
 
 			seqNo = i + 1;
 
@@ -1764,54 +1741,12 @@ public class Wallet extends Observable implements Observer {
 
             Tuple2<String, Long> key = new Tuple2<String, Long>(order.getCreator().getAddress(), order.getId());
             if (this.database.getOrderMap().contains(key)) {
-                this.database.getOrderMap().set(key, order);
-            }
-
-            return;
-
-        }
-
-        //////////// PROCESS BLOCKS ////////////
-		DCSet dcSet = DCSet.getInstance();
-
-		if (this.synchronizeStatus.get()) {
-			// идет синхронизация кошелька уже - не обрабатываем блоки тут
-			return;
-		}
-
-        if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)
-        {
-
-            Block block = (Block) message.getValue();
-
-            // TODO сделать фактори которая синхронно по оереди с синхронизацией это будет разруливать
-            // CHECK IF WE NEED TO RESYNC
-            // BY SIGNATURE !!!!
-            if (checkNeedSyncWallet(block.getSignature())) {
-                return;
-            }
-
-            // CHECK BLOCK
-			this.orphanBlock(dcSet, block);
-
-            //this.database.clearCache();
-            //this.database.commit();
-        } else if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
-
-            Block block = (Block) message.getValue();
-
-			// TODO сделать фактори которая синхронно по оереди с синхронизацией это будет разруливать
-
-			// CHECK IF WE NEED TO RESYNC
-			// BY REFERENCE !!!!
-            if (checkNeedSyncWallet(block.getReference())) {
-				return;
+				this.database.getOrderMap().set(key, order);
 			}
 
-			// CHECK BLOCK
-			this.processBlock(DCSet.getInstance(), block);
+			return;
 
-        }
+		}
 
     }
 
@@ -1819,10 +1754,10 @@ public class Wallet extends Observable implements Observer {
 
 	public void close() {
 
-		walletUpdater.halt();
-
-		if (this.timerSynchronize != null)
-			this.timerSynchronize.cancel();
+		try {
+			walletUpdater.halt();
+		} catch (Exception e) {
+		}
 
 		if (this.lockTimer != null)
 			this.lockTimer.cancel();

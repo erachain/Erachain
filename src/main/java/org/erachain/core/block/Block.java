@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
-import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -1058,11 +1057,9 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                     //PARSE TRANSACTION
                     byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position, position + transactionLength);
-                    Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
-                    WeakReference<Object> weakRef = new WeakReference<>(transaction);
 
                     //ADD TO TRANSACTIONS
-                    this.transactions.add(transaction);
+                    this.transactions.add(TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK));
 
                     //ADD TO POSITION
                     position += transactionLength;
@@ -1976,6 +1973,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         } catch (Exception e) {
         }
 
+        transactions = null;
+
         isClosed = true;
     }
 
@@ -1991,10 +1990,9 @@ public class Block implements Closeable, ExplorerJsonLine {
         // улучшает работу финализера - так как перекрестные ссылки убирает и другие локи быстрее чистятся
         // в close() это нельзя делать так как там тоблько база данных чиститья а блок дальше в ГУИ используется
         // ПРОЫЕРЯЛОСЬ! действует
-        rawTransactions = null;
-        parentBlockHead = null;
-        blockHead = null;
-        transactions = null;
+        ///rawTransactions = null;
+        ///parentBlockHead = null;
+        ///blockHead = null;
 
         super.finalize();
     }

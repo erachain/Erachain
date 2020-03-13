@@ -21,7 +21,6 @@ import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -1154,8 +1153,6 @@ public class BlockChain {
     // 1 - changed, need broadcasting;
     public synchronized boolean setWaitWinBuffer(DCSet dcSet, Block block, Peer peer) {
 
-        WeakReference<Object> weakRefBlock = new WeakReference<>(block);
-
         LOGGER.info("try set new winBlock: " + block.toString());
 
         byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
@@ -1172,7 +1169,6 @@ public class BlockChain {
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
         boolean noValid = true;
         DCSet fork = dcSet.fork(DCSet.makeDBinMemory());
-        WeakReference<Object> weakRef = new WeakReference<>(fork);
 
         try {
             noValid = !block.isValid(fork, true);
@@ -1217,8 +1213,6 @@ public class BlockChain {
      * @param block
      */
     public synchronized void setWaitWinBufferUnchecked(Block block) {
-
-        WeakReference<Object> weakRefBlock = new WeakReference<>(block);
 
         if (true || // тут же мы без проверки должны вносить любой блок
                 // иначе просто прилетевший блок в момент синхронизации не будет принят

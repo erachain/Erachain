@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,8 +38,7 @@ public class Synchronizer extends Thread {
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class.getSimpleName());
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
     public static int BAN_BLOCK_TIMES = 16;
-    private static int MAX_ORPHAN_TRANSACTIONS = (BlockChain.MAX_BLOCK_SIZE_GEN << 6); // not used now
-    private static int MAX_ORPHAN_TRANSACTIONS_MY = (BlockChain.MAX_BLOCK_SIZE_GEN << 3);
+    private static int MAX_ORPHAN_TRANSACTIONS_MY = (BlockChain.MAX_BLOCK_SIZE_GEN << 2);
     // private boolean run = true;
     // private Block runedBlock;
     private Peer fromPeer;
@@ -112,7 +110,7 @@ public class Synchronizer extends Thread {
     }
 
     private ConcurrentHashMap<Long, Transaction> checkNewBlocks(Tuple2<Integer, Long> myHW, DCSet fork, Block lastCommonBlock, int checkPointHeight,
-                                List<Block> newBlocks, Peer peer) throws Exception {
+                                                                List<Block> newBlocks, Peer peer) throws Exception {
 
         LOGGER.debug("*** core.Synchronizer.checkNewBlocks - START");
 
@@ -140,8 +138,6 @@ public class Synchronizer extends Thread {
         // ============ by EQUAL SIGNATURE !!!!!
         byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
         while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
-
-            WeakReference<Block> weakRef = new WeakReference<>(lastBlock);
 
             LOGGER.debug("*** ORPHAN LAST BLOCK [" + lastBlock.getHeight() + "] in FORK_DB UNTIL WE HAVE REACHED COMMON BLOCK ["
                     + lastCommonBlock.getHeight() + "]");
@@ -192,8 +188,6 @@ public class Synchronizer extends Thread {
                 ctrl.stopAll(311);
             }
 
-            DCSet.getInstance().clearCache();
-
             if (BlockChain.CHECK_BUGS > 5) {
                 // TEST CORRUPT base
                 int height2 = lastBlock.getHeight();
@@ -206,6 +200,10 @@ public class Synchronizer extends Thread {
             }
 
             LOGGER.debug("*** checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
+            lastBlock.close();
+            lastBlock = null;
+            ctrl.getDCSet().clearCache();
+
             lastBlock = blockMap.last();
 
         }
@@ -238,8 +236,6 @@ public class Synchronizer extends Thread {
         boolean isFromTrustedPeer = bchain.isPeerTrusted(peer);
 
         for (Block block : newBlocks) {
-
-            WeakReference<Block> weakRef = new WeakReference<>(block);
 
             int height = block.getHeight();
             int bbb = fork.getBlockMap().size() + 1;
@@ -349,6 +345,9 @@ public class Synchronizer extends Thread {
                 }
             }
 
+            block.close();
+            block = null;
+
             ///тут ключ по старому значению - просто так не получится найти orphanedTransactions.remove();
         }
 
@@ -372,6 +371,10 @@ public class Synchronizer extends Thread {
         // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
         DB database = DCSet.getHardBaseForFork();
         try (DCSet fork = dcSet.fork(database)) {
+
+            // освободим всю память
+            dcSet.clearCache();
+            ctrl.wallet.database.clearCache();
 
             ConcurrentHashMap<Long, Transaction> orphanedTransactions
                     = checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
@@ -472,7 +475,6 @@ public class Synchronizer extends Thread {
                         "START BUFFER" + " peer: " + peer + " for blocks: " + signatures.size());
 
                 BlockBuffer blockBuffer = new BlockBuffer(signatures, peer);
-                WeakReference<Object> weakRef = new WeakReference<>(blockBuffer);
 
                 Block blockFromPeer = null;
                 String errorMess = null;
@@ -494,7 +496,6 @@ public class Synchronizer extends Thread {
                         // GET BLOCK
                         LOGGER.debug("try get BLOCK from BUFFER");
 
-                        long time1 = System.currentTimeMillis();
                         try {
                             blockFromPeer = blockBuffer.getBlock(signature);
                             if (isFromTrustedPeer) {
@@ -616,6 +617,7 @@ public class Synchronizer extends Thread {
 
                             LOGGER.debug("try PROCESS");
                             this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false, false);
+                            blockFromPeer.close();
 
                             LOGGER.debug("synchronize BLOCK END process");
                             blockBuffer.clearBlock(blockFromPeer.getSignature());
@@ -1031,13 +1033,7 @@ public class Synchronizer extends Thread {
                 if (block.getValidatedForkDB() == null) {
                     block.process(dcSet);
                 } else {
-                    try {
-                        // здесь просто заливаем все данные из Форка в цепочку - без процессинга - он уже был в Валидации
-                        block.saveToChainFromvalidatedForkDB();
-                    } finally {
-                        // закрываем чуть позже тут - а то в MapDB в кэше ошибка может вылететь что база уже закрыта
-                        block.close();
-                    }
+                    block.saveToChainFromvalidatedForkDB();
                 }
 
                 dcSet.getBlockMap().setProcessing(false);
@@ -1165,7 +1161,7 @@ public class Synchronizer extends Thread {
 
     /**
      * проверка отставания от сети по силе узлов рядом
-      */
+     */
     public void run() {
 
         long timeTmp;

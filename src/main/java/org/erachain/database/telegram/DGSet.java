@@ -41,7 +41,7 @@ public class DGSet extends DBASet {
                 ///.cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(1000)
+                .cacheSize(1 << 10)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported()

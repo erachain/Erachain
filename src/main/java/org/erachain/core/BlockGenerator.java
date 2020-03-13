@@ -28,7 +28,6 @@ import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
@@ -372,7 +371,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
 
                     Transaction transaction = map.get(iterator.next());
-                    WeakReference<Object> weakRef = new WeakReference<>(transaction);
 
                     if (transaction == null) {
                         LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by NULL NEXT");
@@ -535,7 +533,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
 
                     Transaction transaction = map.get(iterator.next());
-                    WeakReference<Object> weakRef = new WeakReference<>(transaction);
 
                     if (transaction.getTimestamp() > timestamp)
                         break;
@@ -813,16 +810,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         // не было остаков в пакетах RocksDB и трынзакциях MapDB
                         dcSet.flush(0, true, true);
 
-                        while (bchain.getHeight(dcSet) >= this.orphanto
-                            //    && bchain.getHeight(dcSet) > 157044
-                        ) {
-                            //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
-                            //    long iii = 11;
-                            //}
-                            //Block block = bchain.getLastBlock(dcSet);
-                            WeakReference<Block> weakRef = new WeakReference<>(bchain.getLastBlock(dcSet));
-                            try {
-                                ctrl.orphanInPipe(weakRef.get());
+                        while (bchain.getHeight(dcSet) >= this.orphanto) {
+                            try (Block block = bchain.getLastBlock(dcSet)) {
+                                ctrl.orphanInPipe(block);
                             } catch (Exception e) {
                                 // если ошибка то выход делаем чтобы зарегистрировать ошибку
                                 LOGGER.error(e.getMessage(), e);
@@ -1354,9 +1344,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     if (ctrl.isOnStopping()) {
                         return;
                     }
-
-                    // CHECK WALLET SYNCHRONIZE after UPDATE of CHAIN
-                    ctrl.checkNeedSyncWallet();
 
                     setForgingStatus(ForgingStatus.FORGING_WAIT);
 

@@ -35,7 +35,7 @@ public class DLSet extends DBASet {
                 //.cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(100)
+                .cacheSize(1 << 4)
 
                .checksumEnable()
                .mmapFileEnableIfSupported() // ++
