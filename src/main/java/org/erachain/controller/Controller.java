@@ -2138,11 +2138,11 @@ public class Controller extends Observable {
 
     public boolean doesWalletExists() {
         // CHECK IF WALLET EXISTS
-        return this.wallet != null && this.wallet.exists();
+        return !noUseWallet && this.wallet != null && this.wallet.exists();
     }
 
     public boolean doesWalletDatabaseExists() {
-        return wallet != null && this.wallet.isWalletDatabaseExisting();
+        return !noUseWallet && wallet != null && this.wallet.isWalletDatabaseExisting();
     }
 
     // use license KEY

@@ -517,6 +517,9 @@ public class Wallet extends Observable implements Observer {
 		// COMMIT
 		this.commit();
 
+		walletUpdater = new WalletUpdater(Controller.getInstance(),
+				Controller.getInstance().getBlockChain(), DCSet.getInstance(), this);
+
 		// ADD OBSERVER
 		Controller.getInstance().addObserver(this);
 		////DCSet.getInstance().getCompletedOrderMap().addObserver(this);
@@ -1751,7 +1754,10 @@ public class Wallet extends Observable implements Observer {
 
 	public void close() {
 
-		walletUpdater.halt();
+		try {
+			walletUpdater.halt();
+		} catch (Exception e) {
+		}
 
 		if (this.lockTimer != null)
 			this.lockTimer.cancel();
