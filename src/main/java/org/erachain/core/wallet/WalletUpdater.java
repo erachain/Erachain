@@ -240,7 +240,9 @@ public class WalletUpdater extends MonitoredThread {
 
                 if (synchronizeMode != null) {
                     boolean reset = synchronizeMode;
-                    trySynchronize(reset);
+                    if (reset || !wallet.synchronizeBodyUsed) {
+                        trySynchronize(reset);
+                    }
                     synchronizeMode = null;
                 }
 
