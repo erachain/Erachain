@@ -711,10 +711,10 @@ public class GenesisBlock extends Block {
     }
 
     @Override
-    public boolean isValid(DCSet db, boolean andProcess) {
+    public int isValid(DCSet db, boolean andProcess) {
         //CHECK IF NO OTHER BLOCK IN DB
         if (db.getBlockMap().last() != null) {
-            return false;
+            return INVALID_BLOCK_VERSION;
         }
 
         //VALIDATE TRANSACTIONS
@@ -722,7 +722,7 @@ public class GenesisBlock extends Block {
         for (Transaction transaction : this.getTransactions()) {
             transaction.setDC(db);
             if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
-                return false;
+                return INVALID_BLOCK_VERSION;
             }
             transactionsSignatures = Bytes.concat(transactionsSignatures, transaction.getSignature());
 
@@ -730,10 +730,10 @@ public class GenesisBlock extends Block {
         transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
         if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
             LOGGER.error("*** GenesisBlock.digest(transactionsSignatures) invalid");
-            return false;
+            return INVALID_BLOCK_VERSION;
         }
 
-        return true;
+        return INVALID_NONE;
     }
 
     public void process(DCSet dcSet) throws Exception {

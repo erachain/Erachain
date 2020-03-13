@@ -2696,7 +2696,7 @@ public class Controller extends Observable {
                 // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
                 DCSet forked = dcSet.fork(DCSet.makeDBinMemory());
                 // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
-                if (!newBlock.isValid(forked, true)) {
+                if (newBlock.isValid(forked, true) > 0) {
                     // тогда проверим заново полностью
                     forked.close();
                     return false;

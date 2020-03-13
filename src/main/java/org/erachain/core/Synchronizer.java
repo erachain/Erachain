@@ -275,12 +275,17 @@ public class Synchronizer extends Thread {
 
             if (block.isFromTrustedPeer()) {
                 // нужно все равно просчитать заголовок блока и решить блок
-                if (!block.isValidHead(fork)) {
+                int invalid = block.isValidHead(fork);
+                if (invalid > 0) {
                     // все же может не просчитаться высота блока м цель его из-за ошибки валидации
                     // поэтому делаем проверку все равно
                     // INVALID BLOCK THROW EXCEPTION
                     String mess = "Dishonest peer by not is Valid block, height: " + height;
-                    peer.ban(BAN_BLOCK_TIMES << 1, mess);
+                    if (invalid > Block.INVALID_BRANCH) {
+                        peer.ban(BAN_BLOCK_TIMES << 1, mess);
+                    } else {
+                        peer.setMute(1);
+                    }
                     throw new Exception(mess);
                 }
                 LOGGER.debug("*** not VALIDATE  [" + height + "] from trusted PEER");
@@ -306,7 +311,7 @@ public class Synchronizer extends Thread {
                     throw new Exception(mess);
                 }
 
-                if (!block.isValid(fork, true)) {
+                if (block.isValid(fork, true) > 0) {
                     // INVALID BLOCK THROW EXCEPTION
                     String mess = "Dishonest peer by not is Valid block, height: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
@@ -536,12 +541,17 @@ public class Synchronizer extends Thread {
 
                         if (blockFromPeer.isFromTrustedPeer()) {
                             // нужно все равно просчитать заголовок блока
-                            if (!blockFromPeer.isValidHead(dcSet)) {
+                            int invalid = blockFromPeer.isValidHead(dcSet);
+                            if (invalid > 0) {
                                 // все же может не просчитаться высота блока м цель его из-за ошибки валидации
                                 // поэтому делаем проверку все равно
                                 // INVALID BLOCK THROW EXCEPTION
                                 errorMess = "Dishonest peer by not is Valid block";
-                                banTime = BAN_BLOCK_TIMES << 1;
+                                if (invalid > Block.INVALID_BRANCH) {
+                                    banTime = BAN_BLOCK_TIMES << 1;
+                                } else {
+                                    banTime = 0;
+                                }
                                 break;
                             }
                             LOGGER.debug("*** checkNewBlocks - not VALIDATE from trusted PEER");
@@ -580,7 +590,7 @@ public class Synchronizer extends Thread {
                             }
 
                             try (DCSet fork = dcSet.fork(DCSet.makeDBinMemory())) {
-                                if (!blockFromPeer.isValid(fork, false)) {
+                                if (blockFromPeer.isValid(fork, false) > 0) {
 
                                     errorMess = "invalid BLOCK";
                                     banTime = BAN_BLOCK_TIMES;

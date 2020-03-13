@@ -144,8 +144,8 @@ public class GeneratorTests {
             assertEquals(true, newBlock.isSignatureValid());
 
             //CHECK IF BLOCK IS VALID
-            if (!newBlock.isValid(dcSet, false))
-                assertEquals(true, newBlock.isValid(dcSet, false));
+            if (newBlock.isValid(dcSet, false) > 0)
+                assertEquals(0, newBlock.isValid(dcSet, false));
 
             height = Controller.getInstance().getMyHeight();
             assertEquals(height, i + 1);
@@ -414,8 +414,8 @@ public class GeneratorTests {
 
             long weight_old = newBlock.calcWinValueTargeted();
             //CHECK IF BLOCK IS VALID
-            if (!newBlock.isValid(dcSet, false))
-                assertEquals(false, newBlock.isValid(dcSet, false));
+            if (newBlock.isValid(dcSet, false) > 0)
+                assertEquals(0, newBlock.isValid(dcSet, false));
 
             Tuple2<Integer, Long> hWeight_old = cntrlr.getBlockChain().getHWeightFull(dcSet);
 

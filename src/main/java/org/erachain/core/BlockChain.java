@@ -1167,11 +1167,11 @@ public class BlockChain {
         }
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-        boolean noValid = true;
+        int noValid = 99999;
         DCSet fork = dcSet.fork(DCSet.makeDBinMemory());
 
         try {
-            noValid = !block.isValid(fork, true);
+            noValid = block.isValid(fork, true);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             Controller.getInstance().stopAll(1104);
@@ -1181,16 +1181,23 @@ public class BlockChain {
         }
 
         // FULL VALIDATE because before was only HEAD validating
-        if (noValid) {
+        if (noValid > 0) {
 
             // если невалидная то закроем Форк базы, иначе базу храним для последующего слива
             fork.close();
 
-            LOGGER.info("new winBlock is BAD!");
-            if (peer != null)
-                peer.ban(10, "invalid block");
-            else
+            if (peer != null) {
+                if (noValid > Block.INVALID_REFERENCE) {
+                    peer.ban(10, "invalid block");
+                } else if (noValid > Block.INVALID_BRANCH) {
+                    peer.ban(0, "invalid block reference");
+                } else {
+                    // вообще не баним - это просто не успел блок встать в цепочку а мы ее уже обновили
+                    LOGGER.info("new winBlock is LATE");
+                }
+            } else {
                 LOGGER.error("MY WinBlock is INVALID! ignore...");
+            }
 
             return false;
         }
