@@ -149,6 +149,7 @@ public class Settings {
 
                 //CREATE JSON OBJECT
                 this.genesisJSON = (JSONObject) JSONValue.parse(jsonString);
+                NET_MODE = NET_MODE_SIDE;
 
             } catch (Exception e) {
                 LOGGER.info("Error while reading GENESIS " + file.getAbsolutePath() + ", using MAIN NET!");

@@ -34,17 +34,18 @@ public class Start {
             if (arg.equals("-testnet")) {
                 genesisStamp = -1;
                 Settings.genesisStamp = genesisStamp;
+                Settings.NET_MODE = Settings.NET_MODE_TEST;
                 break;
             } else if (arg.startsWith("-testnet=") && arg.length() > 9) {
                 try {
                     genesisStamp = Long.parseLong(arg.substring(9));
-                    Settings.NET_MODE = 1;
+                    Settings.NET_MODE = Settings.NET_MODE_TEST;
 
                 } catch (Exception e) {
                     genesisStamp = Settings.DEFAULT_DEMO_NET_STAMP;
+                    Settings.NET_MODE = Settings.NET_MODE_DEMO;
                 }
                 Settings.genesisStamp = genesisStamp;
-                Settings.NET_MODE = 2;
                 break;
             }
         }
