@@ -23,9 +23,7 @@ public class AS_tt_Render extends DefaultTreeCellRenderer {
                 boolean i = tree.isCollapsed(row);
                 if(tree.isCollapsed(row)){
                    name = name.replace("<html><b>", "<html><b><i>");
-                    name = name.replace("</b></html>", "...</b></html>");
-
-                }
+                 }
                 setText(name );
                 Image im = vv.getImage();
                 int size1 = UIManager.getFont("TextField.font").getSize()*180/100;

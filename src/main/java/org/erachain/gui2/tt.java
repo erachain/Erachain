@@ -51,6 +51,8 @@ import org.erachain.lang.Lang;
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -74,7 +76,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         // -------------------------------------------
 
 
-        ASMutableTreeNode root = new ASMutableTreeNode("root", "<html><b>" + Lang.getInstance().translate("Erachain"), getIcon("images/pageicons/SearchPersonsSplitPanel.png"));
+        ASMutableTreeNode root = new ASMutableTreeNode("root", "<html><b>" + Lang.getInstance().translate("  Erachain"), getIcon("images/pageicons/root.png"));
         ASMutableTreeNode account_Node = new ASMutableTreeNode("account_Node", "<html><b>" + Lang.getInstance().translate("Accounts") + "</b></html>", getIcon("images/pageicons/account_Node.png"));
         ASMutableTreeNode person_Node = new ASMutableTreeNode("person_Node", "<html><b> " + Lang.getInstance().translate("Persons") + "</b></html>", getIcon("images/pageicons/person_Node.png"));
         ASMutableTreeNode document_Node = new ASMutableTreeNode("document_Node", "<html><b>" + Lang.getInstance().translate("Documents") + "</b></html>", getIcon("images/pageicons/document_Node.png"));
@@ -225,9 +227,26 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         // tree.addTreeSelectionListener(this);
         double dd = (double) UIManager.getFont("TextField.font").getSize() * 2.2;
         tree.setRowHeight((int) dd);
-        tree.setRootVisible(false);
+        tree.setRootVisible(true);
         for (int i = 0; i < tree.getRowCount(); i++)
             tree.expandRow(i);
+
+// not collapse the root node
+        tree.addTreeExpansionListener(new TreeExpansionListener(){
+
+            @Override
+            public void treeExpanded(TreeExpansionEvent event) {
+
+            }
+
+            @Override
+            public void treeCollapsed(TreeExpansionEvent event) {
+               if (((ASMutableTreeNode)event.getPath().getLastPathComponent()).isRoot()) {
+                   tree.expandPath(event.getPath());
+                 }
+            }
+        } );
+
 
         JPopupMenu menu = new JPopupMenu("www");
 
