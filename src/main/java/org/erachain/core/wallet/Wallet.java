@@ -659,7 +659,6 @@ public class Wallet extends Observable /*implements Observer*/ {
 			// REPROCESS BLOCKS
             blockStart = new GenesisBlock();
 			this.database.setLastBlockSignature(blockStart.getReference());
-			height = 1;
 
         } else {
 
