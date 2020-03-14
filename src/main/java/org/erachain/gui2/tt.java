@@ -76,7 +76,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         // -------------------------------------------
 
 
-        ASMutableTreeNode root = new ASMutableTreeNode("root", "<html><b>" + Lang.getInstance().translate("  Erachain"), getIcon("images/pageicons/root.png"));
+        ASMutableTreeNode root = new ASMutableTreeNode("root", "<html><b>  " + Lang.getInstance().translate("Erachain"), getIcon("images/pageicons/root.png"));
         ASMutableTreeNode account_Node = new ASMutableTreeNode("account_Node", "<html><b>" + Lang.getInstance().translate("Accounts") + "</b></html>", getIcon("images/pageicons/account_Node.png"));
         ASMutableTreeNode person_Node = new ASMutableTreeNode("person_Node", "<html><b> " + Lang.getInstance().translate("Persons") + "</b></html>", getIcon("images/pageicons/person_Node.png"));
         ASMutableTreeNode document_Node = new ASMutableTreeNode("document_Node", "<html><b>" + Lang.getInstance().translate("Documents") + "</b></html>", getIcon("images/pageicons/document_Node.png"));
@@ -224,6 +224,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         
         tree = new JTree(root);
        tree.setCellRenderer(new AS_tt_Render());
+        tree.setToggleClickCount(1);
         // tree.addTreeSelectionListener(this);
         double dd = (double) UIManager.getFont("TextField.font").getSize() * 2.2;
         tree.setRowHeight((int) dd);
