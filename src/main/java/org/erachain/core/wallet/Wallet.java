@@ -47,7 +47,7 @@ import java.util.*;
 /**
  * обработка секртеных ключей и моих записей, которые относятся к набору моих счетов
  */
-public class Wallet extends Observable implements Observer {
+public class Wallet extends Observable /*implements Observer*/ {
 
 	static final boolean CHECK_CHAIN_BROKENS_ON_SYNC_WALLET = false;
 
@@ -84,8 +84,15 @@ public class Wallet extends Observable implements Observer {
 			if (withObserver) {
 				// ADD OBSERVER
 				// Controller.getInstance().addObserver(this);
-				DCSet.getInstance().getTransactionTab().addObserver(this);
-				DCSet.getInstance().getBlockMap().addObserver(this);
+
+				/// вешает при синхронизации ничего нельзя сделать с кошельком - ни открыть ни закрыть
+				// тем более сейчас это событие не используется в кошельке никак
+				/// DCSet.getInstance().getTransactionTab().addObserver(this);
+
+				/// вешает при синхронизации ничего нельзя сделать с кошельком - ни открыть ни закрыть
+				// тем более сейчас это событие не используется в кошельке никак
+				// DCSet.getInstance().getBlockMap().addObserver(this);
+
 				// DCSet.getInstance().getCompletedOrderMap().addObserver(this);
 			}
 
@@ -521,7 +528,7 @@ public class Wallet extends Observable implements Observer {
 				Controller.getInstance().getBlockChain(), DCSet.getInstance(), this);
 
 		// ADD OBSERVER
-		Controller.getInstance().addObserver(this);
+		////////// Controller.getInstance().addObserver(this);
 		////DCSet.getInstance().getCompletedOrderMap().addObserver(this);
 
 		// SOME
@@ -1674,18 +1681,21 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
+	/*
 	@SuppressWarnings("unchecked")
     @Override
     public void update(Observable o, Object arg) {
-    	if (Controller.getInstance().noUseWallet || Controller.getInstance().noDataWallet)
+    	if (Controller.getInstance().noUseWallet || Controller.getInstance().noDataWallet
+				|| synchronizeBodyUsed)
     		return;
 
         try {
             this.syncUpdate(o, arg);
         } catch (Exception e) {
-            //GUI ERROR
+            LOGGER.error(e.getMessage(), e);
         }
     }
+	 */
 
     long notifySysTrayRecord;
     @SuppressWarnings("unchecked")
@@ -1698,7 +1708,7 @@ public class Wallet extends Observable implements Observer {
         ObserverMessage message = (ObserverMessage) arg;
         int type = message.getType();
 
-        if (type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
+		if (false && type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
 
 			// прилетающие неподтвержденные тоже проверяем и если это относится к нам
 			// то закатываем себе в кошелек.
