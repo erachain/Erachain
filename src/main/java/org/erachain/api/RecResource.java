@@ -3,6 +3,7 @@ package org.erachain.api;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
@@ -11,13 +12,13 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.APIUtils;
+import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.APIUtils;
-import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -324,7 +325,7 @@ public class RecResource {
 
             // all test a not valid for main test
             // all other network must be invalid here!
-            int port = Controller.getInstance().getNetworkPort();
+            int port = BlockChain.NETWORK_PORT;
             return Base58.encode(Bytes.concat(record.toBytes(Transaction.FOR_NETWORK, false),
                     Ints.toByteArray(port)));
 

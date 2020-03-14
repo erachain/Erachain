@@ -99,6 +99,11 @@ public class Settings {
     public static final boolean USE_TELEGRAM_STORE = false;
     public static final int TELEGRAM_STORE_PERIOD = 5; // in days
 
+    public final static int NET_MODE_MAIN = 0;
+    public final static int NET_MODE_SIDE = 1;
+    public final static int NET_MODE_DEMO = 2;
+    public final static int NET_MODE_TEST = 3;
+    public static int NET_MODE = 0;
 
     private static Settings instance;
 
@@ -106,6 +111,7 @@ public class Settings {
     long timeLoadInternetPeers;
     private JSONObject settingsJSON;
     private JSONObject peersJSON;
+    private JSONObject genesisJSON;
     private String userPath = "";
     private InetAddress localAddress;
     private String[] defaultPeers = {};
@@ -126,8 +132,32 @@ public class Settings {
         this.localAddress = this.getCurrentIp();
         settingsJSON = read_setting_JSON();
 
+        File file = new File("", "genesis.json");
+        if (file.exists()) {
+            // START SIDE CHAIN
+            try {
+                List<String> lines = Files.readLines(file, Charsets.UTF_8);
 
-        File file = new File("");
+                String jsonString = "";
+                for (String line : lines) {
+                    if (line.trim().startsWith("//")) {
+                        // пропускаем //
+                        continue;
+                    }
+                    jsonString += line;
+                }
+
+                //CREATE JSON OBJECT
+                this.genesisJSON = (JSONObject) JSONValue.parse(jsonString);
+
+            } catch (Exception e) {
+                LOGGER.info("Error while reading GENESIS " + file.getAbsolutePath() + ", using MAIN NET!");
+                LOGGER.error(e.getMessage(), e);
+            }
+
+        }
+
+        file = new File("");
         //TRY READ PEERS.JSON
         try {
             //OPEN FILE
@@ -515,12 +545,20 @@ public class Settings {
         }
     }
 
-    public boolean isTestNet() {
-        return this.getGenesisStamp() != DEFAULT_MAINNET_STAMP;
+    public boolean isMainNet() {
+        return NET_MODE == NET_MODE_MAIN;
+    }
+
+    public boolean isSideNet() {
+        return NET_MODE == NET_MODE_SIDE;
     }
 
     public boolean isDemoNet() {
-        return this.getGenesisStamp() == DEFAULT_DEMO_NET_STAMP;
+        return NET_MODE == NET_MODE_DEMO;
+    }
+
+    public boolean isTestNet() {
+        return NET_MODE >= NET_MODE_DEMO;
     }
 
     public long getGenesisStamp() {

@@ -38,11 +38,13 @@ public class Start {
             } else if (arg.startsWith("-testnet=") && arg.length() > 9) {
                 try {
                     genesisStamp = Long.parseLong(arg.substring(9));
+                    Settings.NET_MODE = 1;
 
                 } catch (Exception e) {
                     genesisStamp = Settings.DEFAULT_DEMO_NET_STAMP;
                 }
                 Settings.genesisStamp = genesisStamp;
+                Settings.NET_MODE = 2;
                 break;
             }
         }

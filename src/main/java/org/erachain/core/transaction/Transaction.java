@@ -1125,7 +1125,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         // all test a not valid for main test
         // all other network must be invalid here!
-        int port = Controller.getInstance().getNetworkPort();
+        int port = BlockChain.NETWORK_PORT;
         data = Bytes.concat(data, Ints.toByteArray(port));
 
         this.signature = Crypto.getInstance().sign(creator, data);
@@ -1225,7 +1225,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         // all test a not valid for main test
         // all other network must be invalid here!
-        int port = Controller.getInstance().getNetworkPort();
+        int port = BlockChain.NETWORK_PORT;
         data = Bytes.concat(data, Ints.toByteArray(port));
 
         if (!Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data)) {

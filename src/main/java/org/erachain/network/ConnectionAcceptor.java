@@ -1,6 +1,7 @@
 package org.erachain.network;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.database.PeerMap;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
@@ -51,12 +52,12 @@ public class ConnectionAcceptor extends MonitoredThread {
 
                 if (socket == null) {
                     //START LISTENING
-                    socket = new ServerSocket(Controller.getInstance().getNetworkPort());
+                    socket = new ServerSocket(BlockChain.NETWORK_PORT);
                 }
 
                 //REOPEN SOCKET
                 if (socket.isClosed()) {
-                    socket = new ServerSocket(Controller.getInstance().getNetworkPort());
+                    socket = new ServerSocket(BlockChain.NETWORK_PORT);
                 }
 
                 //ACCEPT CONNECTION

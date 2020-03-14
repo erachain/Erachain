@@ -82,6 +82,7 @@ public class BlockChain {
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
 
+    public static final boolean SIDE_MODE = Settings.getInstance().isSideNet();
     public static final boolean DEMO_MODE = Settings.getInstance().isDemoNet();
     public static final boolean TEST_MODE = Settings.getInstance().isTestNet();
 
@@ -90,11 +91,10 @@ public class BlockChain {
      */
     public static final boolean ERA_COMPU_ALL_UP = TEST_MODE || TEST_DB > 0;
 
-    public static final int TESTNET_PORT = TEST_DB > 0 ? 9006 : DEMO_MODE ? 9066 : 9066; // TESTNET - 95
-    public static final int MAINNET_PORT = TEST_DB > 0 ? 9006 : 9046;
+    public static int NETWORK_PORT = TEST_DB > 0 ? 9006 : TEST_MODE ? 9066 : SIDE_MODE ? 9056 : 9046;
 
-    public static final int DEFAULT_WEB_PORT = TEST_DB > 0 ? 9007 : TEST_MODE ? 9067 : 9047;
-    public static final int DEFAULT_RPC_PORT = TEST_DB > 0 ? 9008 : TEST_MODE ? 9068 : 9048;
+    public static final int DEFAULT_WEB_PORT = NETWORK_PORT + 1;
+    public static final int DEFAULT_RPC_PORT = NETWORK_PORT + 2;
 
     public static final String DEFAULT_EXPLORER = "explorer.erachain.org";
 

@@ -3,7 +3,6 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -336,7 +335,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
         // all test a not valid for main test
         // all other network must be invalid here!
-        int port = Controller.getInstance().getNetworkPort();
+        int port = BlockChain.NETWORK_PORT;
         data = Bytes.concat(data, Ints.toByteArray(port));
 
         if (this.sertifiedSignatures == null) this.sertifiedSignatures = new ArrayList<byte[]>();
@@ -438,7 +437,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
         // all test a not valid for main test
         // all other network must be invalid here!
-        int port = Controller.getInstance().getNetworkPort();
+        int port = BlockChain.NETWORK_PORT;
         data = Bytes.concat(data, Ints.toByteArray(port));
 
         Crypto crypto = Crypto.getInstance();

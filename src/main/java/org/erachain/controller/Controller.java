@@ -217,7 +217,8 @@ public class Controller extends Observable {
 
         if (withTimestamp)
             return version + (BlockChain.DEMO_MODE ? " DEMO Net"
-                    : BlockChain.TEST_MODE ? " Test Net:" + Settings.getInstance().getGenesisStamp() : "")
+                    : BlockChain.TEST_MODE ? " Test Net:" + Settings.getInstance().getGenesisStamp()
+                    : BlockChain.TEST_MODE ? " Side Net:" + Settings.getInstance().getGenesisStamp() : "")
                     + " (" + dbs + ")";
 
         return version + " (" + dbs + ")";
@@ -226,7 +227,8 @@ public class Controller extends Observable {
 
     public String getApplicationName(boolean withVersion) {
         return APP_NAME + " " + (withVersion ? getVersion(true) :
-                BlockChain.DEMO_MODE ? "DEMO Net" : BlockChain.TEST_MODE ? "Test Net" : "");
+                BlockChain.DEMO_MODE ? "DEMO Net" : BlockChain.TEST_MODE ? "Test Net"
+                        : BlockChain.SIDE_MODE ? "Side Net" : "");
     }
 
     public static String getBuildDateTimeString() {
@@ -309,14 +311,6 @@ public class Controller extends Observable {
     }
     public DCSet getDCSet() {
         return this.dcSet;
-    }
-
-    public int getNetworkPort() {
-        if (BlockChain.TEST_MODE) {
-            return BlockChain.TESTNET_PORT;
-        } else {
-            return BlockChain.MAINNET_PORT;
-        }
     }
 
     public byte[] getMessageMagic() {
@@ -575,9 +569,9 @@ public class Controller extends Observable {
         this.random.nextBytes(this.foundMyselfID);
 
         // CHECK NETWORK PORT AVAILABLE
-        if (BlockChain.TEST_DB == 0 && !Network.isPortAvailable(Controller.getInstance().getNetworkPort())) {
+        if (BlockChain.TEST_DB == 0 && !Network.isPortAvailable(BlockChain.NETWORK_PORT)) {
             throw new Exception(Lang.getInstance().translate("Network port %port% already in use!").replace("%port%",
-                    String.valueOf(Controller.getInstance().getNetworkPort())));
+                    String.valueOf(BlockChain.NETWORK_PORT)));
         }
 
         // CHECK RPC PORT AVAILABLE
