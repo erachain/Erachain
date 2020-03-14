@@ -623,7 +623,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 	 */
 	public boolean synchronizeBodyUsed;
 
-	public synchronized void synchronizeBody(boolean reset) {
+	public void synchronizeBody(boolean reset) {
 
 		synchronizeBodyUsed = true;
 
