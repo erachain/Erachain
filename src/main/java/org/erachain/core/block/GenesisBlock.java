@@ -139,10 +139,12 @@ public class GenesisBlock extends Block {
                 }
             }
 
-            // ADJUST end
-            transactions.add(new GenesisTransferAssetTransaction(
-                    leftRecipiend, AssetCls.ERA_KEY,
-                    new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+            if (totalSended.compareTo(new BigDecimal(BlockChain.GENESIS_ERA_TOTAL)) < 0) {
+                // ADJUST end
+                transactions.add(new GenesisTransferAssetTransaction(
+                        leftRecipiend, AssetCls.ERA_KEY,
+                        new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+            }
 
         } else {
 
