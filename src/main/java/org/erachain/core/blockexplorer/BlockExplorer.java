@@ -534,7 +534,8 @@ public class BlockExplorer {
         // time guery
         output.put("queryTimeMs", stopwatchAll.elapsedTime());
         if (BlockChain.SIDE_MODE || BlockChain.TEST_MODE) {
-            output.put("network", BlockChain.DEMO_MODE ? "DEMO Net" : BlockChain.SIDE_MODE ? "SideChain: " + Settings.APP_NAME : "TEST Net");
+            output.put("network", BlockChain.DEMO_MODE ? "DEMO Net"
+                    : BlockChain.SIDE_MODE ? ("SideChain: " + Settings.APP_NAME) : "TEST Net");
         }
         return output;
     }
