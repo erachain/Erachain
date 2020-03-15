@@ -61,7 +61,7 @@ public class GenesisBlock extends Block {
         // ISSUE ITEMS
         this.initItems();
 
-        if (Settings.getInstance().isTestNet()) {
+        if (BlockChain.TEST_MODE) {
             this.testnetInfo = "";
 
             //ADD TESTNET GENESIS TRANSACTIONS
@@ -74,7 +74,7 @@ public class GenesisBlock extends Block {
             this.testnetInfo += "\nStart the other nodes with command" + ":";
             this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar erachain.jar -testnet=" + genesisTimestamp;
 
-        } else if (Settings.getInstance().isSideNet()) {
+        } else if (BlockChain.SIDE_MODE) {
 
             Account leftRecipiend = null;
             BigDecimal totalSended = BigDecimal.ZERO;

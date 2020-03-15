@@ -113,7 +113,7 @@ public class Settings {
     long timeLoadInternetPeers;
     private JSONObject settingsJSON;
     private JSONObject peersJSON;
-    public JSONArray genesisJSON;
+    public static JSONArray genesisJSON;
     private String userPath = "";
     private InetAddress localAddress;
     private String[] defaultPeers = {};
@@ -134,34 +134,7 @@ public class Settings {
         this.localAddress = this.getCurrentIp();
         settingsJSON = read_setting_JSON();
 
-        File file = new File("", "genesis.json");
-        if (file.exists()) {
-            // START SIDE CHAIN
-            try {
-                List<String> lines = Files.readLines(file, Charsets.UTF_8);
-
-                String jsonString = "";
-                for (String line : lines) {
-                    if (line.trim().startsWith("//")) {
-                        // пропускаем //
-                        continue;
-                    }
-                    jsonString += line;
-                }
-
-                //CREATE JSON OBJECT
-                this.genesisJSON = (JSONArray) JSONValue.parse(jsonString);
-                APP_NAME = genesisJSON.get(0).toString();
-                NET_MODE = NET_MODE_SIDE;
-
-            } catch (Exception e) {
-                LOGGER.info("Error while reading GENESIS " + file.getAbsolutePath() + ", using MAIN NET!");
-                LOGGER.error(e.getMessage(), e);
-            }
-
-        }
-
-        file = new File("");
+        File file = new File("");
         //TRY READ PEERS.JSON
         try {
             //OPEN FILE
@@ -220,7 +193,8 @@ public class Settings {
     }
 
     public String getPeersPath() {
-        return this.userPath + (isDemoNet() ? "peers-demo.json" : isTestNet() ? "peers-test.json" : "peers.json");
+        return this.userPath + (isDemoNet() ? "peers-demo.json" : isTestNet() ? "peers-test.json" :
+                isSideNet() ? "peers-side.json" : "peers.json");
     }
 
     public String getWalletDir() {
