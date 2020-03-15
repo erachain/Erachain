@@ -2,7 +2,7 @@
   // APP NAME
   "NOVA",
   // TIMESTAMP LONG
-  123456789000,
+  1584299880000,
   // forging addresses
   [
     /// recipient, ERA, COMPU, [DEBTORS]
@@ -14,187 +14,182 @@
       [
         // ERA, recipient
         [
-          22727,
+          227272,
           "79BXYUAA29MKa9LQntiA289rCtCREi3GPu"
         ],
         [
-          22727,
+          227272,
           "74ULDk7gvZGMLMjhNvpNpucDUXTPVcL3ZE"
         ],
         [
-          22727,
+          227272,
           "7PqDCB5YTkEye3sP3WLLP3LiRXr3kxQfVR"
         ],
         [
-          22727,
+          227272,
           "7H1SztpZd6ApLwGvSTiW8KjsibekfZHrPN"
         ],
         [
-          22727,
+          227272,
           "7Pepr5XXWQcdSCLjt1NDVRRJLWqqXLsC7V"
         ],
         [
-          22727,
+          227272,
           "7SHsASQK1QAZfCHyFjyqTQ7Uua3HS1Tpoy"
         ],
         [
-          22727,
+          227272,
           "7PN4XYXRPgpfwPwuATVvBHf7CNPKofMaTy"
         ],
         [
-          22727,
+          227272,
           "73HyN9Tv3acqa25ShFW2DRcKQwcpebQWPS"
         ],
         [
-          22727,
+          227272,
           "79voG8gQWAH1AVRTNmc5kxjYKcztVjcgV5"
         ],
         [
-          22727,
+          227272,
           "7HmEqLLLkDTePTogxruqfcNsA1XLY5iPHS"
         ],
         [
-          22727,
+          227272,
           "79vTVTdFixbsmmJssfbV2csWoFfcgh5UcA"
         ],
         [
-          22727,
+          227272,
           "7DHnRuNLEVyhk2LXmGW4DwUQQWdhmuiyfT"
         ],
         [
-          22727,
+          227272,
           "7LP4wPc6pimts6NRWM52d2x2NT4xxD4CSf"
         ],
         [
-          22727,
+          227272,
           "7AHuzbtu8yFLwn25cj27mLchGyqbRHXVtX"
         ],
         [
-          22727,
+          227272,
           "7EuBJ56kDjYsdJ1AL44EfJnr9M69Eo56sv"
         ],
         [
-          22727,
+          227272,
           "7J45P19d2mpaj2may1hbdcdUmzPgdNFan1"
         ],
         [
-          22727,
+          227272,
           "7M9BmVJFCRZwQXnG1CDugnRpMzipBGVqgH"
         ],
         [
-          22727,
+          227272,
           "7NAJrh1MAaJw5nv3AxCEdRtF4begfQ6fHc"
         ],
         [
-          22727,
+          227272,
           "76QY9uLwqiejDUtDE9VFhRT8z73uvmGrmT"
         ],
         [
-          22727,
+          227272,
           "7S6Gz8PiyGA9pxB3QehA9HYRkPvrvP9XD1"
         ],
         [
-          22727,
+          227272,
           "74iPzjC8E571CYx7sXDtXg8CTLQoevZaVt"
         ],
         [
-          22727,
+          227272,
           "7CCE4UHCBammxH5GKS5mU4ntiQhgQ9cwP2"
         ],
         [
-          22727,
+          227272,
           "78CwLuNXSyswNmL4FFiAo64R7ngAkwHWEZ"
         ],
         [
-          22727,
+          227272,
           "7MKF2vXLVnCfu6K5gCEbXt3JPT7451r4cY"
         ],
         [
-          22727,
+          227272,
           "7CBJ8NxNYiZJiTeC4ZwLF67Fk5WoVXAYoW"
         ],
         [
-          22727,
+          227272,
           "7HthA3z22Gtac9HAV2tBRGTjjaouXZeMHD"
         ],
         [
-          22727,
+          227272,
           "7APA91hHTuiKbAE2Yu1LBVcH2EfuaLPJXw"
         ],
         [
-          22727,
+          227272,
           "7Qbz14wwCWitqbydHGrMH5NZa6CduiJcjr"
         ],
         [
-          22727,
+          227272,
           "7Mz88PKEaQREmVtavFjW5KxeuN2fyCWAbG"
         ],
         [
-          22727,
+          227272,
           "73rDQtdw1nDME6bAWeTcAFwp8Zs7ZjfKzo"
         ],
         [
-          22727,
+          227272,
           "7JSbAJvDPvcrrJNocRsJvQSa6zxTuFyKxg"
         ],
         [
-          22727,
+          227272,
           "7KBgqGpXRo8g5hJSgh16wGpy6dHS1gnRfG"
         ],
         [
-          22727,
+          227272,
           "7K1hh8pYpStZJs9HHu6iy5UakwampbmtE3"
         ],
         [
-          22727,
+          227272,
           "7McqnEqL5BvgsSqj4Z3NnE5Umk4VP6ctbJ"
         ],
         [
-          22727,
+          227272,
           "7GF2tVUncP2spkfPrpyRix5Y8wGwZgjoFg"
         ],
         [
-          22727,
+          227272,
           "78aT6QKpj4giaeLNEZXG1cE7wq2dsVXuwq"
         ],
         [
-          22727,
+          227272,
           "74xLeEXbFRAyZcQLjTAMTMfWMEkVwBwH6x"
         ],
         [
-          22727,
+          227272,
           "7Gb5rssz56uPMgMzGVA8J3Tj2E2w24whiX"
         ],
         [
-          22727,
+          227272,
           "76SnV5eJk39rsbdgrJiMWT2LSPDQGFxdtA"
         ],
         [
-          22727,
+          227272,
           "7PqKCsiQRUfgTNrBFey7ys93pFvpYCRz32"
         ],
         [
-          22727,
+          227272,
           "7MMqzdrUm7vy4XkBCxCxH1Yxtk3mT1cLeh"
         ],
         [
-          22727,
+          227272,
           "7R8HX6z9h9vwEt16XcPHnEq4b9nUugET9L"
         ],
         [
-          22727,
+          227272,
           "7LcETXJETFbz5WPw6pAfS83Jb1tSWb9aLg"
         ],
         [
-          22727,
+          227272,
           "79ynTmueP2mXfS2yvtqf5yhkqE2WUS8wYa"
         ]
       ]
-    ],
-    [
-      "78cK2QS34j8cPLWwHDqCBy36ZmikiCzLcg",
-      50000,
-      0
     ]
   ],
   // ASSETS
