@@ -5,6 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.templates.TemplateFactory;
+import org.erachain.settings.Settings;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -16,7 +17,7 @@ public class IssueTemplateRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_TEMPLATE_TRANSACTION;
     private static final String NAME_ID = "Issue Template";
 
-    public static final long START_KEY = 1000L;
+    public static final long START_KEY = Settings.getInstance().isMainNet() ? 1000L : 1L << 14;
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, template, feePow, timestamp, reference);
