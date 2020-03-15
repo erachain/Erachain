@@ -15,7 +15,7 @@ import java.util.concurrent.BlockingQueue;
 public class TransactionsPool extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.TEST_MODE ? true : false;
+    private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.TEST_MODE;
     private boolean runned;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionsPool.class.getSimpleName());

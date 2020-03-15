@@ -218,7 +218,7 @@ public class Controller extends Observable {
         if (withTimestamp)
             return version + (BlockChain.DEMO_MODE ? " DEMO Net"
                     : BlockChain.TEST_MODE ? " Test Net:" + Settings.getInstance().getGenesisStamp()
-                    : BlockChain.TEST_MODE ? " Side Net:" + Settings.getInstance().getGenesisStamp() : "")
+                    : BlockChain.SIDE_MODE ? " Side Net:" + Settings.getInstance().getGenesisStamp() : "")
                     + " (" + dbs + ")";
 
         return version + " (" + dbs + ")";
@@ -316,8 +316,11 @@ public class Controller extends Observable {
     public byte[] getMessageMagic() {
         if (this.messageMagic == null) {
             long longTestNetStamp = Settings.getInstance().getGenesisStamp();
-            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE) {
+            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE || BlockChain.SIDE_MODE) {
                 byte[] seedTestNetStamp = Crypto.getInstance().digest(Longs.toByteArray(longTestNetStamp));
+                this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
+            } else if (BlockChain.SIDE_MODE) {
+                byte[] seedTestNetStamp = blockChain.getGenesisBlock().getSignature();
                 this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
             } else {
                 this.messageMagic = Message.MAINNET_MAGIC;
@@ -1360,7 +1363,7 @@ public class Controller extends Observable {
             return;
         }
 
-        if (false && BlockChain.TEST_MODE) {
+        if (false && BlockChain.DEMO_MODE) {
             try {
                 synchronizer.checkBadBlock(peer);
             } catch (Exception e) {

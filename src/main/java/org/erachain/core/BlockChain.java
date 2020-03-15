@@ -101,7 +101,7 @@ public class BlockChain {
     //public static final String TIME_ZONE = "GMT+3";
     //
     public static final boolean ROBINHOOD_USE = false;
-    public static final boolean ANONIM_SERT_USE = TEST_MODE || BlockChain.ERA_COMPU_ALL_UP ? true : false;
+    public static final boolean ANONIM_SERT_USE = TEST_MODE || BlockChain.ERA_COMPU_ALL_UP;
 
     public static final int MAX_ORPHAN = 10000; // max orphan blocks in chain for 30 sec
     public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
@@ -153,12 +153,12 @@ public class BlockChain {
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
-    public static final int VERS_4_11 = TEST_DB > 0 ? 0 : TEST_MODE ? 0 : 194400;
+    public static final int VERS_4_11 = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 194400;
 
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
 
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : TEST_MODE ? 0 : 623904;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 623904;
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : ALL_BALANCES_OK_TO; //260120;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам
@@ -169,30 +169,30 @@ public class BlockChain {
      */
     public static final long LEFT_PRICE_HEIGHT_SEQ = TEST_DB > 0 ? 0 : Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
 
-    public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0 ? 0 : TEST_MODE ? 0 : 44666;
+    public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 44666;
 
     public static final int VERS_4_12 = TEST_DB > 0 ? 0 : VERS_4_11;
 
-    public static final int VERS_30SEC = TEST_DB > 0 ? 0 : TEST_MODE ? 0 : 280785; //	2019-09-17 12:01:13
+    public static final int VERS_30SEC = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 280785; //	2019-09-17 12:01:13
 
     //public static final long VERS_30SEC_TIME = Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC
     //        * (DEVELOP_USE ? 120L : TEST_MODE? 30L : 288L);
 
     // TODO поидее отрицательное тоже работать будет как надо
     public static final long VERS_30SEC_TIME =
-            TEST_MODE ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L;
+            SIDE_MODE || TEST_MODE ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L;
 
     public static final int VERS_4_21_02 = 684000;
 
     /**
      * Включает реферальную систему
      */
-    public static final int REFERAL_BONUS_FOR_PERSON_4_21 = TEST_MODE ? 0 : Integer.MAX_VALUE;
+    public static final int REFERAL_BONUS_FOR_PERSON_4_21 = SIDE_MODE || TEST_MODE ? 0 : Integer.MAX_VALUE;
 
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
      */
-    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : TEST_MODE ? 0 : Integer.MAX_VALUE; ///VERS_4_21_02;
+    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : Integer.MAX_VALUE; ///VERS_4_21_02;
     public static final int DEFAULT_DURATION = 365 * 5; // 5 years
 
     public static final int DEVELOP_FORGING_START = 100;
@@ -241,15 +241,8 @@ public class BlockChain {
             Base58.decode("4Vo6hmojFGgAJhfjyiN8PNYktpgrdHGF8Bqe12Pk3PvcvcH8tuJTcTnnCqyGChriHTuZX1u5Qwho8BuBPT4FJ53W")
     };
 
-    public static final byte[][] VALID_BAL = TEST_DB > 0 ? new byte[][]{} : TEST_MODE ? new byte[][]{} :
+    public static final byte[][] VALID_BAL = TEST_DB > 0 ? new byte[][]{} : SIDE_MODE || TEST_MODE ? new byte[][]{} :
             new byte[][]{
-                    //Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh"),
-                    //Base58.decode("3K3QXeohM3V8beSBVKSZauSiREGtDoEqNYWLYHxdCREV7bxqE4v2VfBqSh9492dNG7ZiEcwuhhk6Y5EEt16b6sVe"),
-                    //Base58.decode("5JP71DmsBQAVTQFUHJ1LJXw4qAHHcoBCzXswN9Ez3H5KDzagtqjpWUU2UNofY2JaSC4qAzaC12ER11kbAFWPpukc"),
-                    //Base58.decode("33okYP8EdKkitutgat1PiAnyqJGnnWQHBfV7NyYndk7ZRy6NGogEoQMiuzfwumBTBwZyxchxXj82JaQiQXpFhRcs"),
-                    //Base58.decode("23bci9zcrPunGppKCm6hKvfRoAStWv4JV2xe16tBEVZSmkCrhw7bXAFzPvv2jqZJXcbA8cmr8oMUfdmS1HJGab7s"),
-
-                    //Base58.decode("54xdM25ommdxTbAVvP7C9cFYPmwaAexkWHfkhgb8yhfCVvvRNrs166q8maYuXWpk4w9ft2HvctaFaafnKNfjyoKR"),
                     //Base58.decode("61Fzu3PhsQ74EoMKrwwxKHMQi3z9fYAU5UeUfxtGdXPRfKbWdgpBQWgAojEnmDHK2LWUKtsmyqWb4WpCEatthdgK"),
             };
 
@@ -278,12 +271,11 @@ public class BlockChain {
     ///final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("2.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
     final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("0.001");
 
+    public static final int ITEM_POLL_FROM = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : VERS_4_11;
 
-    public static final int ITEM_POLL_FROM = TEST_DB > 0 ? 0 : TEST_MODE ? 0 : VERS_4_11;
-
-    public static final int AMOUNT_SCALE_FROM = TEST_DB > 0 ? 0 : TEST_MODE ? 0 : 1033;
+    public static final int AMOUNT_SCALE_FROM = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 1033;
     public static final int AMOUNT_DEDAULT_SCALE = 8;
-    public static final int FREEZE_FROM = TEST_DB > 0 ? 0 : TEST_MODE ? 0 : 249222;
+    public static final int FREEZE_FROM = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 249222;
     // только на них можно замороженные средства вернуть из списка FOUNDATION_ADDRESSES (там же и замароженные из-за утраты)
     public static final String[] TRUE_ADDRESSES = TEST_DB > 0 ? new String[]{} : new String[]{
             "7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"
@@ -322,7 +314,7 @@ public class BlockChain {
      * Stop referals system on this person Number. Причем рефералка которая должна упать этим персонам
      * (с номером ниже заданного) по сути просто сжигается - то есть идет дефляция.
      */
-    public static final long BONUS_STOP_PERSON_KEY = TEST_MODE ? 0 : 13L;
+    public static final long BONUS_STOP_PERSON_KEY = SIDE_MODE || TEST_MODE ? 0 : 13L;
 
     public static final int FEE_INVITED_SHIFT = 1;
     /**
@@ -352,9 +344,9 @@ public class BlockChain {
     public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON, FEE_SCALE);
 
     public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(
-            TEST_MODE ? 0 : 235267,
+            SIDE_MODE || TEST_MODE ? 0 : 235267,
             Base58.decode(
-                    TEST_MODE ? ""
+                    SIDE_MODE || TEST_MODE ? ""
                             : "2VTp79BBpK5E4aZYV5Tk3dYRS887W1devsrnyJeN6WTBQYQzoe2cTg819DdRs5o9Wh6tsGLsetYTbDu9okgriJce"));
 
     // issue PERSON
@@ -401,7 +393,7 @@ public class BlockChain {
         trustedPeers.addAll(Settings.getInstance().getTrustedPeers());
 
 
-        if (TEST_DB > 0 || TEST_MODE && !DEMO_MODE) {
+        if (TEST_DB > 0 || SIDE_MODE || TEST_MODE && !DEMO_MODE) {
             ;
         } else if (DEMO_MODE) {
 
@@ -610,7 +602,7 @@ public class BlockChain {
             dcSet = DCSet.getInstance();
         }
 
-        if (TEST_MODE) {
+        if (TEST_MODE || SIDE_MODE) {
             LOGGER.info(genesisBlock.getTestNetInfo());
         }
 
@@ -753,7 +745,7 @@ public class BlockChain {
 
     public static BigDecimal BONUS_FOR_PERSON(int height) {
 
-        if (START_ISSUE_RIGHTS == 0 || height > START_ISSUE_RIGHTS || TEST_MODE) {
+        if (SIDE_MODE || TEST_MODE || START_ISSUE_RIGHTS == 0 || height > START_ISSUE_RIGHTS) {
             return BigDecimal.valueOf(5000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
         } else {
             return BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
@@ -761,7 +753,7 @@ public class BlockChain {
     }
 
     public static boolean REFERAL_BONUS_FOR_PERSON(int height) {
-        return TEST_MODE || height > REFERAL_BONUS_FOR_PERSON_4_21;
+        return SIDE_MODE || TEST_MODE || height > REFERAL_BONUS_FOR_PERSON_4_21;
     }
 
     public static int getCheckPoint(DCSet dcSet, boolean useDynamic) {
@@ -1085,7 +1077,7 @@ public class BlockChain {
             return this.genesisTimestamp + (long) height * GENERATING_MIN_BLOCK_TIME_MS(height);
         }
 
-        return this.genesisTimestamp + (TEST_MODE ? 0L : 16667L)
+        return this.genesisTimestamp + (SIDE_MODE || TEST_MODE ? 0L : 16667L)
                 + (long) VERS_30SEC * GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC)
                 + (long) (height - VERS_30SEC) * GENERATING_MIN_BLOCK_TIME_MS(height);
 

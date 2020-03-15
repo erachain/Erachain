@@ -434,7 +434,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             return HAVE_EQUALS_WANT;
         }
 
-        if (haveKey == RIGHTS_KEY && !BlockChain.TEST_MODE
+        if (haveKey == RIGHTS_KEY && BlockChain.FREEZE_FROM > 0
                 && height > BlockChain.FREEZE_FROM
                 && BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
             // LOCK ERA sell

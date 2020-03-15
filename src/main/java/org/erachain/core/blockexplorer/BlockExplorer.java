@@ -532,8 +532,8 @@ public class BlockExplorer {
 
         // time guery
         output.put("queryTimeMs", stopwatchAll.elapsedTime());
-        if (BlockChain.TEST_MODE) {
-            output.put("network", BlockChain.DEMO_MODE ? "DEMO Net" : "TEST Net");
+        if (BlockChain.SIDE_MODE || BlockChain.TEST_MODE) {
+            output.put("network", BlockChain.DEMO_MODE ? "DEMO Net" : BlockChain.TEST_MODE ? "Side Net" : "TEST Net");
         }
         return output;
     }
@@ -2488,11 +2488,14 @@ public class BlockExplorer {
             list.add(new Pair<Long, Long>(1L, 12L));
             list.add(new Pair<Long, Long>(1L, 92L));
             list.add(new Pair<Long, Long>(1L, 95L));
-            list.add(new Pair<Long, Long>(1L, 1010L));
+
+            if (!BlockChain.SIDE_MODE)
+                list.add(new Pair<Long, Long>(1L, 1010L));
+
             list.add(new Pair<Long, Long>(2L, 12L));
             list.add(new Pair<Long, Long>(2L, 92L));
             list.add(new Pair<Long, Long>(2L, 95L));
-            list.add(new Pair<Long, Long>(14L, 12L ));
+            list.add(new Pair<Long, Long>(14L, 12L));
         }
 
         pairsSet.addAll(list);
