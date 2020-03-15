@@ -51,6 +51,8 @@ import org.erachain.lang.Lang;
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -107,25 +109,8 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         nodeList.put("linked_hashes_Node",linked_hashes_Node);
         nodeList.put("records_Node",records_Node);
         nodeList.put("other_Node",other_Node);
-        nodeList.put("other_Node",other_Node);
         nodeList.put("bank_Tree",bank_Tree);
         nodeList.put("telegrams_Tree",telegrams_Tree);
-        nodeList.put("account_Node", account_Node);
-        nodeList.put("person_Node", person_Node);
-        nodeList.put("document_Node", document_Node);
-        nodeList.put("mails_Node", mails_Node);
-        nodeList.put("assets_Node", assets_Node);
-        nodeList.put("templates_Node", templates_Node);
-        nodeList.put("statuses_Node", statuses_Node);
-        nodeList.put("unions_Node", unions_Node);
-        nodeList.put("polls_Node", polls_Node);
-        nodeList.put("hashes_Node", hashes_Node);
-        nodeList.put("linked_hashes_Node", linked_hashes_Node);
-        nodeList.put("records_Node", records_Node);
-        nodeList.put("other_Node", other_Node);
-        nodeList.put("other_Node", other_Node);
-        nodeList.put("bank_Tree", bank_Tree);
-        nodeList.put("telegrams_Tree", telegrams_Tree);
 
 
         if (BlockChain.TEST_MODE)
@@ -236,13 +221,31 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         telegrams_Tree.add(new ASMutableTreeNode("ALLTelegramPanel", Lang.getInstance().translate("All Telegrams Panel"), ALLTelegramPanel.getIcon()));
 
         tree = new JTree(root);
+        tree.setToggleClickCount(1);
         tree.setCellRenderer(new AS_tt_Render());
         // tree.addTreeSelectionListener(this);
         double dd = (double) UIManager.getFont("TextField.font").getSize() * 180 / 100;
         tree.setRowHeight((int) dd);
-        tree.setRootVisible(false);
+        tree.setRootVisible(true);
         for (int i = 0; i < tree.getRowCount(); i++)
             tree.expandRow(i);
+
+// not collapse the root node
+        tree.addTreeExpansionListener(new TreeExpansionListener(){
+
+            @Override
+            public void treeExpanded(TreeExpansionEvent event) {
+
+            }
+
+            @Override
+            public void treeCollapsed(TreeExpansionEvent event) {
+               if (((ASMutableTreeNode)event.getPath().getLastPathComponent()).isRoot()) {
+                   tree.expandPath(event.getPath());
+                 }
+            }
+        } );
+
 
         JPopupMenu menu = new JPopupMenu("www");
 
