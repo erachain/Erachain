@@ -25,6 +25,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,6 +45,7 @@ public class GenesisBlock extends Block {
     private static byte[] image = new byte[0];
     private String testnetInfo;
     private long genesisTimestamp;
+    private String sideSettingString;
 
     public GenesisBlock() {
 
@@ -76,11 +78,18 @@ public class GenesisBlock extends Block {
 
         } else if (BlockChain.SIDE_MODE) {
 
+            sideSettingString = "";
+            sideSettingString += Settings.genesisJSON.get(0).toString();
+            sideSettingString += Settings.genesisJSON.get(1).toString();
+
             Account leftRecipiend = null;
             BigDecimal totalSended = BigDecimal.ZERO;
-            JSONArray holders = (JSONArray) Settings.getInstance().genesisJSON.get(2);
+            JSONArray holders = (JSONArray) Settings.genesisJSON.get(2);
             for (int i = 0; i < holders.size(); i++) {
                 JSONArray holder = (JSONArray) holders.get(i);
+
+                sideSettingString += holder.get(0).toString();
+                sideSettingString += holder.get(1).toString();
 
                 // SEND FONDs
                 Account founder = new Account(holder.get(0).toString());
@@ -99,8 +108,10 @@ public class GenesisBlock extends Block {
 
                 String COMPUstr = holder.get(2).toString();
                 if (COMPUstr.length() > 0 && !COMPUstr.equals("0")) {
+                    BigDecimal compu = new BigDecimal(COMPUstr).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
                     transactions.add(new GenesisTransferAssetTransaction(founder,
-                            AssetCls.FEE_KEY, new BigDecimal(COMPUstr)));
+                            AssetCls.FEE_KEY, compu));
+                    sideSettingString += compu.toString();
                 }
 
                 if (holder.size() < 4)
@@ -113,10 +124,12 @@ public class GenesisBlock extends Block {
                     JSONArray debtor = (JSONArray) debtors.get(j);
 
                     BigDecimal creditAmount = new BigDecimal(debtor.get(0).toString()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-                    ;
                     if (totalCredit.add(creditAmount).compareTo(fondAamount) > 0) {
                         break;
                     }
+
+                    sideSettingString += creditAmount.toString();
+                    sideSettingString += debtor.get(1).toString();
 
                     transactions.add(new GenesisTransferAssetTransaction(new Account(debtor.get(1).toString()),
                             -AssetCls.ERA_KEY,
@@ -691,11 +704,16 @@ public class GenesisBlock extends Block {
         byte[] referenceBytes = Bytes.ensureCapacity(genesisReference, Crypto.SIGNATURE_LENGTH, 0);
         data = Bytes.concat(data, referenceBytes);
 
-
         //WRITE TIMESTAMP
         byte[] genesisTimestampBytes = Longs.toByteArray(this.genesisTimestamp);
         genesisTimestampBytes = Bytes.ensureCapacity(genesisTimestampBytes, 8, 0);
         data = Bytes.concat(data, genesisTimestampBytes);
+
+        if (BlockChain.SIDE_MODE) {
+            //WRITE SIDE SETTINGS
+            byte[] genesisSideBytes = this.sideSettingString.getBytes(StandardCharsets.UTF_8);
+            data = Bytes.concat(data, genesisSideBytes);
+        }
 
 		/*
 		//WRITE GENERATING BALANCE

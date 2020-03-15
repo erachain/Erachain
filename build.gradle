@@ -189,6 +189,10 @@ task CopyResourse {
         from 'ERA/z_bath_examples'
         into 'build/libs/Erachain/z_bath_examples'
     }
+    copy {
+        from 'ERA/z_genesis'
+        into 'build/libs/Erachain/z_genesis'
+    }
 }
 task CreateZip(type: Zip) {
 
