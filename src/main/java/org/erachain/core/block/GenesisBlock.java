@@ -20,6 +20,7 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
+import org.json.simple.JSONArray;
 import org.mapdb.Fun.Tuple2;
 
 import java.io.File;
@@ -73,201 +74,49 @@ public class GenesisBlock extends Block {
             this.testnetInfo += "\nStart the other nodes with command" + ":";
             this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar erachain.jar -testnet=" + genesisTimestamp;
 
-        } else if (Settings.getInstance().isTestNet()) {
-            List<Tuple2<Account, BigDecimal>> sends_toUsers = new ArrayList<Tuple2<Account, BigDecimal>>();
+        } else if (Settings.getInstance().isSideNet()) {
 
-            String[] grands = new String[]{
-                    "79BXYUAA29MKa9LQntiA289rCtCREi3GPu",
-                    "74ULDk7gvZGMLMjhNvpNpucDUXTPVcL3ZE",
-                    "7PqDCB5YTkEye3sP3WLLP3LiRXr3kxQfVR",
-                    "7H1SztpZd6ApLwGvSTiW8KjsibekfZHrPN",
-                    "7Pepr5XXWQcdSCLjt1NDVRRJLWqqXLsC7V",
-                    "7SHsASQK1QAZfCHyFjyqTQ7Uua3HS1Tpoy",
-                    "7PN4XYXRPgpfwPwuATVvBHf7CNPKofMaTy",
-                    "73HyN9Tv3acqa25ShFW2DRcKQwcpebQWPS",
-                    "79voG8gQWAH1AVRTNmc5kxjYKcztVjcgV5",
-                    "7HmEqLLLkDTePTogxruqfcNsA1XLY5iPHS",
-                    "79vTVTdFixbsmmJssfbV2csWoFfcgh5UcA",
-                    "7DHnRuNLEVyhk2LXmGW4DwUQQWdhmuiyfT",
-                    "7LP4wPc6pimts6NRWM52d2x2NT4xxD4CSf",
-                    "7AHuzbtu8yFLwn25cj27mLchGyqbRHXVtX",
-                    "7EuBJ56kDjYsdJ1AL44EfJnr9M69Eo56sv",
-                    "7J45P19d2mpaj2may1hbdcdUmzPgdNFan1",
-                    "7M9BmVJFCRZwQXnG1CDugnRpMzipBGVqgH",
-                    "7NAJrh1MAaJw5nv3AxCEdRtF4begfQ6fHc",
-                    "76QY9uLwqiejDUtDE9VFhRT8z73uvmGrmT",
-                    "7S6Gz8PiyGA9pxB3QehA9HYRkPvrvP9XD1",
-                    "74iPzjC8E571CYx7sXDtXg8CTLQoevZaVt",
-                    "7CCE4UHCBammxH5GKS5mU4ntiQhgQ9cwP2",
-                    "78CwLuNXSyswNmL4FFiAo64R7ngAkwHWEZ",
-                    "7MKF2vXLVnCfu6K5gCEbXt3JPT7451r4cY",
-                    "7CBJ8NxNYiZJiTeC4ZwLF67Fk5WoVXAYoW",
-                    "7HthA3z22Gtac9HAV2tBRGTjjaouXZeMHD",
-                    "7APA91hHTuiKbAE2Yu1LBVcH2EfuaLPJXw",
-                    "7Qbz14wwCWitqbydHGrMH5NZa6CduiJcjr",
-                    "7Mz88PKEaQREmVtavFjW5KxeuN2fyCWAbG",
-                    "73rDQtdw1nDME6bAWeTcAFwp8Zs7ZjfKzo",
-                    "7JSbAJvDPvcrrJNocRsJvQSa6zxTuFyKxg",
-                    "7KBgqGpXRo8g5hJSgh16wGpy6dHS1gnRfG",
-                    "7K1hh8pYpStZJs9HHu6iy5UakwampbmtE3",
-                    "7McqnEqL5BvgsSqj4Z3NnE5Umk4VP6ctbJ",
-                    "7GF2tVUncP2spkfPrpyRix5Y8wGwZgjoFg",
-                    "78aT6QKpj4giaeLNEZXG1cE7wq2dsVXuwq",
-                    "74xLeEXbFRAyZcQLjTAMTMfWMEkVwBwH6x",
-                    "7Gb5rssz56uPMgMzGVA8J3Tj2E2w24whiX",
-                    "76SnV5eJk39rsbdgrJiMWT2LSPDQGFxdtA",
-                    "7PqKCsiQRUfgTNrBFey7ys93pFvpYCRz32"};
-            /*
-             */
-            ///////// GENEGAL
-            List<List<Object>> generalGenesisUsers = new ArrayList();
-
-            for (String address : grands) {
-                generalGenesisUsers.add(Arrays.asList(address, "100000"));
-            }
-
-            generalGenesisUsers.add(Arrays.asList("7CMGxqHPGy7MmRaJfLCAK3AApF9edcf95e", "100000"));
-            generalGenesisUsers.add(Arrays.asList("7F5gYLdBYhUeseoC9ZPiA5LZkbdwkRGqWM", "100000"));
-
-            //generalGenesisUsers.add(Arrays.asList("74ULDk7gvZGMLMjhNvpNpucDUXTPVcL3ZE", "300000"));
-
-            // FOR ERACHAIN MASTERs
-            generalGenesisUsers.add(Arrays.asList("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "500000"));
-
-            /////////// MAJOR
-            List<List<Object>> majorGenesisUsers = Arrays.asList(
-            );
-            ////////// MINOR
-            List<List<Object>> minorGenesisUsers = Arrays.asList(
-            );
-            List<PersonCls> personGenesisUsers = Arrays.asList(
-            );
-
-            ////////// INVESTORS ICO 10%
-            List<List<Object>> genesisInvestors = Arrays.asList(
-                    //Arrays.asList("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y", "333000"),
-            );
-
-            ////////// ACTIVISTS
-            List<List<Object>> genesisActivists = Arrays.asList(
-                    //Arrays.asList("7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV", "1000.0"), //
-            );
-
-            // GENESIS FORGERS
-            //ArrayList<String> arrayList = new ArrayList<String>(Arrays.asList(arr));
-            // NEED for .add() ::
-            ArrayList<List<Object>> genesisDebtors = new ArrayList<List<Object>>(Arrays.asList(
-                    //Arrays.asList("7DRH1MjEo3GgtySGsXjzfdqeQYagutXqeP", 2), //
-            ));
-
-            // TRANSFERS
-            //
-
+            Account leftRecipiend = null;
             BigDecimal totalSended = BigDecimal.ZERO;
+            JSONArray holders = (JSONArray) Settings.getInstance().genesisJSON.get(3);
+            for (int i = 0; i < holders.size(); i++) {
+                JSONArray holder = (JSONArray) holders.get(i);
 
-            for (List<Object> item : generalGenesisUsers) {
-
-                recipient = new Account((String) item.get(0));
-
-                bdAmount0 = new BigDecimal((String) item.get(1)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-                transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
-                totalSended = totalSended.add(bdAmount0);
-
-                // buffer for CREDIT sends
-                sends_toUsers.add(new Tuple2<Account, BigDecimal>(recipient, bdAmount0));
-
-                // COMPU
-                if (false) {
-                    bdAmount1 = BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-                    transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
+                // SEND FONDs
+                Account founder = new Account(holder.get(0).toString());
+                if (leftRecipiend == null) {
+                    leftRecipiend = founder;
                 }
 
-            }
+                BigDecimal fondAamount = new BigDecimal(holder.get(1).toString()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                transactions.add(new GenesisTransferAssetTransaction(founder,
+                        AssetCls.ERA_KEY, fondAamount));
 
-            int pickDebt = 27000;
-            BigDecimal limitOwned = new BigDecimal(pickDebt * 6).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                totalSended = totalSended.add(fondAamount);
 
-            // NOT PERSONALIZE INVESTORS - ICO 10%
-            for (List<Object> item : genesisInvestors) {
+                // DEBTORS
+                JSONArray debtors = (JSONArray) holder.get(3);
+                BigDecimal totalCredit = BigDecimal.ZERO;
+                for (int j = 0; j < holders.size(); j++) {
+                    JSONArray debtor = (JSONArray) debtors.get(j);
 
-                //recipient = new Account((String)item.get(0));
-                if (((String) item.get(0)).length() > 36) {
-                    recipient = new PublicKeyAccount((String) item.get(0));
-                } else {
-                    recipient = new Account((String) item.get(0));
+                    BigDecimal creditAmount = new BigDecimal(debtor.get(0).toString());
+                    if (totalCredit.add(creditAmount).compareTo(fondAamount) > 0) {
+                        break;
+                    }
+
+                    transactions.add(new GenesisTransferAssetTransaction(founder,
+                            -AssetCls.ERA_KEY,
+                            creditAmount, new Account(debtor.get(1).toString())));
+                    totalCredit = totalCredit.add(creditAmount);
+                    ;
                 }
-
-                bdAmount0 = new BigDecimal((String) item.get(1)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-                transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
-                totalSended = totalSended.add(bdAmount0);
-
-
-                if (bdAmount0.compareTo(limitOwned) < 1) {
-                    addDebt(recipient.getAddress(), 1, genesisDebtors);
-                } else {
-                    // buffer for CREDIT sends
-                    sends_toUsers.add(new Tuple2<Account, BigDecimal>(recipient, bdAmount0));
-                }
-            }
-
-            // ACTIVITES
-            int nonce = genesisActivists.size() >> 1;
-            for (List<Object> item : genesisActivists) {
-
-                recipient = new Account((String) item.get(0));
-
-                bdAmount0 = new BigDecimal((String) item.get(1)).add(new BigDecimal(nonce--)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-                transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
-                totalSended = totalSended.add(bdAmount0);
-
-                addDebt(recipient.getAddress(), 1, genesisDebtors);
-
             }
 
             // ADJUST end
             transactions.add(new GenesisTransferAssetTransaction(
-                    new Account(grands[0]), AssetCls.ERA_KEY,
+                    leftRecipiend, AssetCls.ERA_KEY,
                     new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
-
-
-            // FOR DEBROTS
-            nonce = genesisDebtors.size() >> 1;
-
-            int i = 0;
-            Account bufferCreditor = sends_toUsers.get(i).a;
-            BigDecimal bufferAmount = sends_toUsers.get(i).b;
-
-            for (List<Object> item : genesisDebtors) {
-
-                if (((String) item.get(0)).length() > 36) {
-                    recipient = new PublicKeyAccount((String) item.get(0));
-                } else {
-                    recipient = new Account((String) item.get(0));
-                }
-
-                bdAmount0 = new BigDecimal((int) item.get(1) * pickDebt + nonce--).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-
-                do {
-                    if (bufferAmount.subtract(bdAmount0).compareTo(limitOwned) < 0) {
-                        // use  MIN BALANCE investor!
-                        BigDecimal diffLimit = bufferAmount.subtract(limitOwned);
-                        bdAmount0 = bdAmount0.subtract(diffLimit);
-
-                        transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERA_KEY,
-                                diffLimit, bufferCreditor));
-                        i++;
-                        limitOwned = limitOwned.subtract(BigDecimal.ONE);
-                        bufferCreditor = sends_toUsers.get(i).a;
-                        bufferAmount = sends_toUsers.get(i).b;
-                        continue;
-                    } else {
-                        transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERA_KEY,
-                                bdAmount0, bufferCreditor));
-                        bufferAmount = bufferAmount.subtract(bdAmount0);
-                        break;
-                    }
-                } while (true);
-            }
 
         } else {
 
@@ -578,7 +427,6 @@ public class GenesisBlock extends Block {
             transactions.add(new GenesisTransferAssetTransaction(
                     new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe"), AssetCls.ERA_KEY,
                     new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
-
 
             // FOR DEBROTS
             nonce = genesisDebtors.size() >> 1;

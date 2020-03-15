@@ -29,6 +29,8 @@ public class Settings {
     public static final long DEFAULT_MAINNET_STAMP = 1487844793333L;
     public static final long DEFAULT_DEMO_NET_STAMP = 1581001700000L; // default for developers test net
 
+    public static String APP_NAME = "";
+
     // FOR TEST by default
     public static long genesisStamp = DEFAULT_MAINNET_STAMP;
 
@@ -111,7 +113,7 @@ public class Settings {
     long timeLoadInternetPeers;
     private JSONObject settingsJSON;
     private JSONObject peersJSON;
-    private JSONObject genesisJSON;
+    public JSONArray genesisJSON;
     private String userPath = "";
     private InetAddress localAddress;
     private String[] defaultPeers = {};
@@ -148,7 +150,8 @@ public class Settings {
                 }
 
                 //CREATE JSON OBJECT
-                this.genesisJSON = (JSONObject) JSONValue.parse(jsonString);
+                this.genesisJSON = (JSONArray) JSONValue.parse(jsonString);
+                APP_NAME = genesisJSON.get(0).toString();
                 NET_MODE = NET_MODE_SIDE;
 
             } catch (Exception e) {
