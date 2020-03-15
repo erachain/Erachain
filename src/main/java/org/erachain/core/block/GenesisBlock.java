@@ -78,7 +78,7 @@ public class GenesisBlock extends Block {
 
             Account leftRecipiend = null;
             BigDecimal totalSended = BigDecimal.ZERO;
-            JSONArray holders = (JSONArray) Settings.getInstance().genesisJSON.get(3);
+            JSONArray holders = (JSONArray) Settings.getInstance().genesisJSON.get(2);
             for (int i = 0; i < holders.size(); i++) {
                 JSONArray holder = (JSONArray) holders.get(i);
 
@@ -94,13 +94,26 @@ public class GenesisBlock extends Block {
 
                 totalSended = totalSended.add(fondAamount);
 
+                if (holder.size() < 3)
+                    continue;
+
+                String COMPUstr = holder.get(2).toString();
+                if (COMPUstr.length() > 0 && !COMPUstr.equals("0")) {
+                    transactions.add(new GenesisTransferAssetTransaction(founder,
+                            AssetCls.FEE_KEY, new BigDecimal(COMPUstr)));
+                }
+
+                if (holder.size() < 4)
+                    continue;
+
                 // DEBTORS
                 JSONArray debtors = (JSONArray) holder.get(3);
                 BigDecimal totalCredit = BigDecimal.ZERO;
-                for (int j = 0; j < holders.size(); j++) {
+                for (int j = 0; j < debtors.size(); j++) {
                     JSONArray debtor = (JSONArray) debtors.get(j);
 
-                    BigDecimal creditAmount = new BigDecimal(debtor.get(0).toString());
+                    BigDecimal creditAmount = new BigDecimal(debtor.get(0).toString()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                    ;
                     if (totalCredit.add(creditAmount).compareTo(fondAamount) > 0) {
                         break;
                     }
@@ -109,7 +122,6 @@ public class GenesisBlock extends Block {
                             -AssetCls.ERA_KEY,
                             creditAmount, new Account(debtor.get(1).toString())));
                     totalCredit = totalCredit.add(creditAmount);
-                    ;
                 }
             }
 
