@@ -101,6 +101,15 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         return this.recipient;
     }
 
+    public String viewActionType() {
+        return TransactionAmount.viewActionType(this.key, this.amount, false);
+    }
+
+    @Override
+    public String viewSubTypeName() {
+        return viewActionType();
+    }
+
     @Override
     public BigDecimal getAmount() {
         return this.amount;
@@ -369,24 +378,5 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
         return assetAmount;
     }
-
-    public String viewActionType() {
-        int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
-
-        if (this.key > 0) {
-            if (amo_sign > 0) {
-                return TransactionAmount.NAME_ACTION_TYPE_PROPERTY;
-            } else {
-                return TransactionAmount.NAME_ACTION_TYPE_HOLD;
-            }
-        } else {
-            if (amo_sign > 0) {
-                return TransactionAmount.NAME_CREDIT;
-            } else {
-                return TransactionAmount.NAME_SPEND;
-            }
-        }
-    }
-
 
 }

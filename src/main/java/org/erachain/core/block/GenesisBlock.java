@@ -118,9 +118,10 @@ public class GenesisBlock extends Block {
                         break;
                     }
 
-                    transactions.add(new GenesisTransferAssetTransaction(founder,
+                    transactions.add(new GenesisTransferAssetTransaction(new Account(debtor.get(1).toString()),
                             -AssetCls.ERA_KEY,
-                            creditAmount, new Account(debtor.get(1).toString())));
+                            creditAmount, founder));
+
                     totalCredit = totalCredit.add(creditAmount);
                 }
             }
