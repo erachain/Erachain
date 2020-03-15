@@ -1,10 +1,24 @@
 [
   // APP NAME
-  "HGHY",
+  "NOVA",
   // TIMESTAMP LONG
   123456789000,
   // forging addresses
   [
+    [
+      "7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz",
+      100000,
+      0,
+      [
+        "78cK2QS34j8cPLWwHDqCBy36ZmikiCzLcg",
+        25000
+      ],
+      [
+        "",
+        0
+      ]
+    ]
   ],
-  ""
+  // ASSETS
+  []
 ]
