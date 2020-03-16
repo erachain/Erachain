@@ -2,20 +2,25 @@
   // APP NAME
   "NOVA",
   // TIMESTAMP LONG
-  123456789000,
+  1584299880000,
   // forging addresses
   [
+    /// recipient, ERA, COMPU, [DEBTORS]
     [
-      "7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz",
-      100000,
+      "74KvWNicSfSTV8aCnKFdwWzBWiTWw1dQoB",
+      10000000,
       0,
+      // debtors
       [
-        "78cK2QS34j8cPLWwHDqCBy36ZmikiCzLcg",
-        25000
-      ],
-      [
-        "",
-        0
+        // ERA, recipient
+        [
+          227272,
+          "79BXYUAA29MKa9LQntiA289rCtCREi3GPu"
+        ],
+        [
+          227272,
+          "79ynTmueP2mXfS2yvtqf5yhkqE2WUS8wYa"
+        ]
       ]
     ]
   ],
