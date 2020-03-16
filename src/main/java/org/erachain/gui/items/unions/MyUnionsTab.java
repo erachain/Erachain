@@ -5,6 +5,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletItemUnionsTableModel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -19,7 +20,7 @@ import java.text.SimpleDateFormat;
 
 public class MyUnionsTab extends SplitPanel {
 
-    private static String iconFile = "images/pageicons/MyUnionsTab.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyUnionsTab.png";
     final WalletItemUnionsTableModel unionsModel;
     private TableColumnModel columnModel;
     private TableColumn favoriteColumn;

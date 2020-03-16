@@ -15,6 +15,7 @@ import org.erachain.gui.items.mails.MailInfo;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.Converter;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
@@ -34,7 +35,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel  {
     private static final long serialVersionUID = 1L;
     private IssueSendPaymentOrder1 issue_Panel;
     private IssueSendPaymentOrder th;
-    private static String iconFile = "images/pageicons/IssueSendPaymentOrder.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssueSendPaymentOrder.png";
 
 
     /*

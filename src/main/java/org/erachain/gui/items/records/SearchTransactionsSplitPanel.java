@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class SearchTransactionsSplitPanel extends SplitPanel {
 
-    private static String iconFile = "images/pageicons/SearchTransactionsSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchTransactionsSplitPanel.png";
     public JPanel info_Panel;
     public VouchLibraryPanel voush_Library_Panel;
     SearchTransactionsTableModel transactionsTableModel;

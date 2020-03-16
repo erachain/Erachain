@@ -8,6 +8,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.mapdb.Fun.Tuple3;
 
 import javax.swing.*;
@@ -23,7 +24,7 @@ import java.io.IOException;
 
 public class SearchLinkedHash extends SplitPanel {
 
-    private static String iconFile = "images/pageicons/SearchLinkedHash.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchLinkedHash.png";
     private TableModelSearchHash tamleModel;
     private JTable Table_Hash;
 

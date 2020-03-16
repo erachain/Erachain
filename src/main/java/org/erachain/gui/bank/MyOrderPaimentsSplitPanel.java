@@ -4,6 +4,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -23,7 +24,7 @@ public class MyOrderPaimentsSplitPanel extends SplitPanel  {
     private PaymentOrdersTableModel payment_Orders_model;
     private MTable payment_Orders_table;
     private TableRowSorter my_Sorter;
-    private static String iconFile = "images/pageicons/MyOrderPaimentsSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyOrderPaimentsSplitPanel.png";
 
 
     public MyOrderPaimentsSplitPanel() {

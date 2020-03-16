@@ -49,7 +49,7 @@ public class TelegramSplitPanel extends SplitPanel {
    /**
     * Creates new form TelegramSplitPanel
     */
-   private static String iconFile = "images/pageicons/TelegramSplitPanel.png";
+   private static String iconFile = Settings.getInstance().getPatnIcons() + "TelegramSplitPanel.png";
     LeftTelegram leftTelegram;
     RightTelegramPanel rightTelegramPanel;
     private static final long serialVersionUID = 1L;

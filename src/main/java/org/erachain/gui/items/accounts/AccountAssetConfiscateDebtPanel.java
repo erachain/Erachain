@@ -10,6 +10,7 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import java.awt.*;
 
@@ -18,7 +19,7 @@ import java.awt.*;
 @SuppressWarnings("serial")
 
 public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls  {
-    private static String iconFile = "images/pageicons/AccountAssetConfiscateDebtPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "AccountAssetConfiscateDebtPanel.png";
 
     public AccountAssetConfiscateDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
         super(true, null, assetIn, null,

@@ -11,6 +11,7 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import java.awt.*;
 
@@ -20,7 +21,7 @@ import java.awt.*;
 public class AccountAssetSpendPanel extends AccountAssetActionPanelCls {
 
     public boolean noRecive;
-    private static String iconFile = "images/pageicons/AccountAssetSpendPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons()+ "AccountAssetSpendPanel.png";
     public AccountAssetSpendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person, String message) {
         super(false, null, assetIn, null, TransactionAmount.ACTION_SPEND, accountFrom, accountTo, message);
 

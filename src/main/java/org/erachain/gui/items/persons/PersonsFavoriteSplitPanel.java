@@ -23,7 +23,7 @@ import java.net.URL;
 public class PersonsFavoriteSplitPanel extends ItemSplitPanel  {
     private static final long serialVersionUID = 2717571093561259483L;
     //private PersonsFavoriteSplitPanel th;
-    private static String iconFile = "images/pageicons/PersonsFavoriteSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "PersonsFavoriteSplitPanel.png";
 
 
     public PersonsFavoriteSplitPanel() {

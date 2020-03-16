@@ -9,6 +9,7 @@ import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.URLViewer;
 import org.json.simple.JSONObject;
@@ -35,7 +36,7 @@ import java.net.URL;
 public class WithdrawExchange extends JPanel {
 
     // private JComboBox<Account> accountLBox;
-    private static String iconFile = "images/pageicons/WithdrawExchange.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons()+ "WithdrawExchange.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(WithdrawExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;

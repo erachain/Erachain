@@ -19,7 +19,7 @@ import java.net.URL;
 
 public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = "images/pageicons/StatusesFavoriteSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "StatusesFavoriteSplitPanel.png";
     //private StatusesFavoriteSplitPanel th;
 
     public StatusesFavoriteSplitPanel() {

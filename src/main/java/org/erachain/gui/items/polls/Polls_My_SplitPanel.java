@@ -21,7 +21,7 @@ import java.net.URL;
 
 public class Polls_My_SplitPanel extends ItemSplitPanel {
 
-    private static String iconFile = "images/pageicons/Polls_My_SplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "Polls_My_SplitPanel.png";
 
     public Polls_My_SplitPanel() {
         super(new WalletItemPollsTableModel(), "Polls_My_SplitPanel");

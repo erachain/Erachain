@@ -25,7 +25,7 @@ import java.net.URL;
 
 public class MyAssetsTab extends SplitPanel {
 
-    private static String iconFile = "images/pageicons/MyAssetsTab.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyAssetsTab.png";
     private static final long serialVersionUID = 1L;
     final MTable table;
     protected int row;

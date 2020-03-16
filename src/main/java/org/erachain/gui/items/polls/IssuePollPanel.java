@@ -13,6 +13,7 @@ import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.CreateOptionsTableModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
@@ -24,7 +25,7 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 public class IssuePollPanel extends JPanel {
 
-    private static String iconFile = "images/pageicons/IssuePollPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssuePollPanel.png";
     private JComboBox<Account> cbxFrom;
     private JComboBox<String> txtFee = new JComboBox<>();
     private JTextField txtName = new JTextField();

@@ -13,6 +13,7 @@ import org.erachain.gui.library.Library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +28,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class IssueImprintPanel extends JPanel {
 
-    private static String iconFile = "images/pageicons/IssueImprintPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons()+ "IssueImprintPanel.png";
 
     private JComboBox<Account> cbxFrom;
     private JComboBox<String> txtFeePow;
