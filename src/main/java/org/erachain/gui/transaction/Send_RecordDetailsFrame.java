@@ -70,10 +70,13 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
 
             AssetCls asset = r_Send.getAsset();
 
-            String sendType = Lang.getInstance().translate(asset.viewAssetTypeAction(r_Send.isBackward(), r_Send.getActionType()));
+            String sendType;
+            if (asset != null) {
+                sendType = Lang.getInstance().translate(asset.viewAssetTypeAction(r_Send.isBackward(), r_Send.getActionType()));
+            } else {
+                sendType = "???";
+            }
             detailGBC.gridy = ++labelGBC.gridy;
-            ;
-            //detailGBC.gridwidth = 2;
 
             JLabel amountLabel = new JLabel(sendType);
             this.add(amountLabel, detailGBC);
@@ -90,9 +93,14 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             //detailGBC.gridy;
             detailGBC.gridx = 3;
             detailGBC.gridwidth = 1;
-            JTextField assetFld = new JTextField(Controller.getInstance().getAsset(r_Send.getAbsKey()).toString());
+            JTextField assetFld = new JTextField();
             assetFld.setEditable(false);
-            MenuPopupUtil.installContextMenu(assetFld);
+            if (asset != null) {
+                assetFld.setText(asset.toString());
+                MenuPopupUtil.installContextMenu(assetFld);
+            } else {
+                assetFld.setText("???");
+            }
             this.add(assetFld, detailGBC);
             detailGBC.gridx = 1;
             detailGBC.gridwidth = 3;

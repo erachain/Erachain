@@ -70,7 +70,7 @@ public class WalletSyncButton extends JButton implements Observer {
                     @Override
                     public void run() {
 
-                        Controller.getInstance().wallet.synchronize();
+                        Controller.getInstance().wallet.synchronizeFull();
                     }
                 }.start();
             }

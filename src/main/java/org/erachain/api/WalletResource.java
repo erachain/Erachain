@@ -73,7 +73,7 @@ public class WalletResource {
 
             // TODO: was
             //Controller.getInstance().synchronizeWallet();
-            Controller.getInstance().wallet.synchronize();
+            Controller.getInstance().wallet.synchronizeFull();
 
             return String.valueOf(true);
         } else {
