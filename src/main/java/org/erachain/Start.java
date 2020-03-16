@@ -57,6 +57,7 @@ public class Start {
                 //CREATE JSON OBJECT
                 Settings.genesisJSON = (JSONArray) JSONValue.parse(jsonString);
                 Settings.APP_NAME = Settings.genesisJSON.get(0).toString();
+                Settings.genesisStamp = new Long(Settings.genesisJSON.get(1).toString());
                 Settings.NET_MODE = Settings.NET_MODE_SIDE;
 
             } catch (Exception e) {
