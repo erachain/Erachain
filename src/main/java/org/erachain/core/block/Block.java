@@ -2045,12 +2045,11 @@ public class Block implements Closeable, ExplorerJsonLine {
             BigDecimal forgerEarn;
             if (BlockChain.SIDE_MODE) {
                 long blockFeeRoyaltyLong = this.blockHead.totalFee / 20; // 5%
-                BigDecimal blockFeeRoyalty = new BigDecimal(blockFeeRoyaltyLong).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE);
                 accountFeeFFF.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
-                        blockFeeRoyalty, false, false);
+                        new BigDecimal(blockFeeRoyaltyLong).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
-                forgerEarn = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE)
-                        .subtract(blockFeeRoyalty).setScale(BlockChain.FEE_SCALE);
+                forgerEarn = new BigDecimal(this.blockHead.totalFee - blockFeeRoyaltyLong).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE)
+                        .setScale(BlockChain.FEE_SCALE);
             } else {
                 forgerEarn = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE);
             }
