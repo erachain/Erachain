@@ -63,7 +63,7 @@ public class GenesisBlock extends Block {
         // ISSUE ITEMS
         this.initItems();
 
-        if (BlockChain.TEST_MODE) {
+        if (BlockChain.TEST_MODE && !BlockChain.DEMO_MODE) {
             this.testnetInfo = "";
 
             //ADD TESTNET GENESIS TRANSACTIONS

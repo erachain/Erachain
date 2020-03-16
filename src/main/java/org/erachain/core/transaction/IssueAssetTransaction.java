@@ -7,7 +7,6 @@ import org.erachain.core.block.Block;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.datachain.DCSet;
-import org.erachain.settings.Settings;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -19,7 +18,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
     private static final String NAME_ID = "Issue Asset";
 
-    public static final long START_KEY = Settings.getInstance().isMainNet() ? 1000L : 1L << 14;
+    public static final long START_KEY = BlockChain.SIDE_MODE || BlockChain.TEST_MODE && !BlockChain.DEMO_MODE ? 1L << 14 : 1000L;
 
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
