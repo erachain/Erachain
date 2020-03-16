@@ -5,7 +5,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.polls.PollFactory;
-import org.erachain.settings.Settings;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -15,7 +14,7 @@ public class IssuePollRecord extends IssueItemRecord {
     private static final String NAME_ID = "Issue Poll";
 
     // TODO: в старой версии с 1 - 2 первый номер будет - надо скинуть в  0 или 1000000L
-    public static final long START_KEY = Settings.getInstance().isMainNet() ? 1000L : 1L << 14;
+    public static final long START_KEY = BlockChain.SIDE_MODE || BlockChain.TEST_MODE && !BlockChain.DEMO_MODE ? 1L << 14 : 1000L;
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, poll, feePow, timestamp, reference);

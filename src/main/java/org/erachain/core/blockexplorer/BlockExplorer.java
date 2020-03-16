@@ -26,6 +26,7 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -533,7 +534,8 @@ public class BlockExplorer {
         // time guery
         output.put("queryTimeMs", stopwatchAll.elapsedTime());
         if (BlockChain.SIDE_MODE || BlockChain.TEST_MODE) {
-            output.put("network", BlockChain.DEMO_MODE ? "DEMO Net" : BlockChain.TEST_MODE ? "Side Net" : "TEST Net");
+            output.put("network", BlockChain.DEMO_MODE ? "DEMO Net"
+                    : BlockChain.SIDE_MODE ? ("SideChain: " + Settings.APP_NAME) : "TEST Net");
         }
         return output;
     }

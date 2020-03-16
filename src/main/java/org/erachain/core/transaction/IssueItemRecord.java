@@ -7,7 +7,6 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
-import org.erachain.settings.Settings;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +66,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     // RETURN START KEY if not GENESIS
     public long getStartKey() {
-        return Settings.getInstance().isMainNet() ? 0L : 1L << 14;
+        return BlockChain.SIDE_MODE || BlockChain.TEST_MODE && !BlockChain.DEMO_MODE ? 1L << 14 : 0L;
     }
 
     @Override

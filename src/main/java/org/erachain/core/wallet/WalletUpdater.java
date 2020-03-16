@@ -201,6 +201,7 @@ public class WalletUpdater extends MonitoredThread {
                             }
                             lastBlock = lastBlocks.get(key);
                             wallet.orphanBlock(dcSet, lastBlock);
+                            lastBlock.close();
                             lastBlocks.remove(key);
                             key--;
                         }
