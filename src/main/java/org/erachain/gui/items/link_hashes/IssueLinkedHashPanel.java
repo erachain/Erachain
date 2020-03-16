@@ -13,6 +13,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 
 import javax.swing.*;
@@ -31,7 +32,7 @@ import java.util.List;
 //import java.awt.GridBagConstraints;
 
 public class IssueLinkedHashPanel extends SplitPanel {
-    private static String iconFile = "images/pageicons/IssueLinkedHashPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssueLinkedHashPanel.png";
 
     TableModelIssueHashes table_Model;
     IssueHashImprint issue_Hash_Imprint;

@@ -3,13 +3,14 @@ package org.erachain.gui.items.imprints;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.gui.items.SearchItemSplitPanel;
+import org.erachain.settings.Settings;
 
 import java.awt.*;
 
 public class ImprintsSearchSplitPanel extends SearchItemSplitPanel  {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = "images/pageicons/ImprintsSearchSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "ImprintsSearchSplitPanel.png";
     private static ImprintsSearchTableModel search_Table_Model = new ImprintsSearchTableModel();
 
     public ImprintsSearchSplitPanel() {

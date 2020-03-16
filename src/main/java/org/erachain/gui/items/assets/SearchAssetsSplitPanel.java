@@ -25,7 +25,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel  {
     private static final long serialVersionUID = 1L;
     //private static ItemAssetsTableModel tableModelItemAssets = ;
     ///private SearchAssetsSplitPanel th;
-    private static String iconFile = "images/pageicons/SearchAssetsSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchAssetsSplitPanel.png";
 
     public SearchAssetsSplitPanel(boolean search_and_exchange) {
         super(new ItemAssetsTableModel(), "SearchAssetsSplitPanel", "SearchAssetsSplitPanel");

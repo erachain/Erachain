@@ -20,7 +20,7 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
     /**
      *
      */
-    private static String iconFile = "images/pageicons/SearchPollsSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchPollsSplitPanel.png";
     private static final long serialVersionUID = 1L;
     private static PollsItemsTableModel tableModelPolls = new PollsItemsTableModel();
 

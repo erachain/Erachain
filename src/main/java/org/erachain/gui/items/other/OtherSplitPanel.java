@@ -30,7 +30,7 @@ import java.util.Observer;
 public class OtherSplitPanel extends SplitPanel implements Observer {
 
     private PeersTableModel peersTableModel = new PeersTableModel();
-    private static String iconFile = "images/pageicons/OtherSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "OtherSplitPanel.png";
     private JPanel jPanel2 = new JPanel();
     private GridBagConstraints gridBagConstraints;
     private JLabel jLabelPeerTitle = new JLabel();

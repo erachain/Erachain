@@ -34,7 +34,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
     private TableModelMails incoming_Mails_Model;
     private MTable inciming_Mail_Table;
     private TableRowSorter my_Sorter;
-    private static String iconFile = "images/pageicons/IncomingMailsSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "IncomingMailsSplitPanel.png";
 
     public IncomingMailsSplitPanel() {
         super("IncomingMailsSplitPanel");

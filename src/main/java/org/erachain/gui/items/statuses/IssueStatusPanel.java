@@ -15,6 +15,7 @@ import org.erachain.gui.library.Library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +25,7 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 public class IssueStatusPanel extends JPanel  {
 
-    private static String iconFile = "images/pageicons/IssueStatusPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssueStatusPanel.png";
     private JComboBox<Account> cbxFrom;
     private JComboBox<String> txtFeePow = new JComboBox<String>();
     private JTextField txtName = new JTextField();

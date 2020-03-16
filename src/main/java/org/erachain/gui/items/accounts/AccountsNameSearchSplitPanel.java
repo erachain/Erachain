@@ -50,7 +50,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
     /**
      *
      */
-    private static String iconFile = "images/pageicons/AccountsNameSearchSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "AccountsNameSearchSplitPanel.png";
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = LoggerFactory.getLogger(AccountsNameSearchSplitPanel.class);
     protected FileChooser chooser;

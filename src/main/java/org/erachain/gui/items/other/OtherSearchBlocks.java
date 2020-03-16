@@ -7,6 +7,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.records.SearchTransactionsSplitPanel;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -21,7 +22,7 @@ import java.io.IOException;
 
 public class OtherSearchBlocks extends SplitPanel {
 
-    private static String iconFile = "images/pageicons/OtherSearchBlocks.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "OtherSearchBlocks.png";
     SearchTransactionsSplitPanel rp = new SearchTransactionsSplitPanel();
     private OtherSeasrchBlocksTableModel tamleModel;
     private JTable Table_Hash;

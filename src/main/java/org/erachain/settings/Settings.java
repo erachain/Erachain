@@ -170,6 +170,7 @@ public class Settings {
         return instance;
     }
 
+
     public synchronized static void freeInstance() {
         instance = null;
     }
@@ -293,6 +294,9 @@ public class Settings {
 		}
     }
 
+    public String getPatnIcons(){
+        return "images" + File.separator + "pageicons" + File.separator;
+    }
 
     public String getDataDir() {
         try {
