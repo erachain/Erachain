@@ -107,7 +107,7 @@ public class BlockChain {
     public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
     public static final int TARGET_COUNT_SHIFT = 10;
     public static final int TARGET_COUNT = 1 << TARGET_COUNT_SHIFT;
-    public static final int BASE_TARGET = 100000;///1 << 15;
+    public static final int BASE_TARGET = 10000;///1 << 15;
     public static final int REPEAT_WIN = DEMO_MODE ? 10 : TEST_MODE ? 5 : ERA_COMPU_ALL_UP ? 15 : 40; // GENESIS START TOP ACCOUNTS
 
     // RIGHTs

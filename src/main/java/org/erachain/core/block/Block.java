@@ -2009,8 +2009,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         validatedForkDB.writeToParent();
     }
 
-    private Account accountFeeFFF = new Account("7S8qgSTdzDiBmyw7j3xgvXbVWdKSJVFyZv");
-    BigDecimal blockFee_TAX_COEFF = new BigDecimal("0.05");
+    private Account accountFeeFFF = new Account("7RYEVPZg7wbu2bmz3tWnzrhPavjpyQ4tnp");
 
     //PROCESS/ORPHAN
     public void feeProcess(DCSet dcSet, boolean asOrphan) {
