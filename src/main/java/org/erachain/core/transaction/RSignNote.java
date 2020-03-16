@@ -68,7 +68,7 @@ public class RSignNote extends Transaction implements Itemable {
                      byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature, long feeLong) {
         this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // asPack
@@ -110,7 +110,7 @@ public class RSignNote extends Transaction implements Itemable {
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as Pack

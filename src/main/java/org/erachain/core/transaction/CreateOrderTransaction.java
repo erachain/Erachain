@@ -86,7 +86,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                                   byte[] signature, long feeLong) {
         this(typeBytes, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
 
     }
 

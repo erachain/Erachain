@@ -745,7 +745,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         BigDecimal fee = new BigDecimal(fee_long).multiply(BlockChain.FEE_RATE).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
 
         if (this.feePow > 0) {
-            this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_UP);
+            this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
         } else {
             this.fee = fee;
         }
@@ -788,7 +788,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public BigDecimal feeToBD(int fee) {
-        return BigDecimal.valueOf(fee, BlockChain.AMOUNT_DEDAULT_SCALE);
+        return BigDecimal.valueOf(fee, BlockChain.FEE_SCALE);
     }
 
     /*

@@ -67,7 +67,7 @@ public class RSetUnionToItem extends Transaction {
         this(typeBytes, creator, feePow, key, itemType, itemKey,
                 beg_date, end_date, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as pack

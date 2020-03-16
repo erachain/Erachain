@@ -51,7 +51,7 @@ public class RVouch extends Transaction {
                   Long reference, byte[] signature, long feeLong) {
         this(typeBytes, creator, feePow, height, seq, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as pack

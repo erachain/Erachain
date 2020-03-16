@@ -1034,7 +1034,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         // TODO calculate AT FEE
         // fee = fee.add(BigDecimal.valueOf(this.atFees, BlockChain.AMOUNT_DEDAULT_SCALE));
 
-        return BigDecimal.valueOf(fee, BlockChain.AMOUNT_DEDAULT_SCALE);
+        return BigDecimal.valueOf(fee, BlockChain.FEE_SCALE);
 
     }
 
@@ -2031,7 +2031,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 Account richAccount = new Account(rich);
                 richAccount.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
-                        new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true, true);
+                        new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), true, true);
             } else {
                 emittedFee = this.blockHead.emittedFee;
             }
@@ -2046,12 +2046,12 @@ public class Block implements Closeable, ExplorerJsonLine {
             if (BlockChain.SIDE_MODE) {
                 long blockFeeRoyaltyLong = this.blockHead.totalFee / 20; // 5%
                 accountFeeFFF.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
-                        new BigDecimal(blockFeeRoyaltyLong).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+                        new BigDecimal(blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE), false, false);
 
-                forgerEarn = new BigDecimal(this.blockHead.totalFee - blockFeeRoyaltyLong).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE)
+                forgerEarn = new BigDecimal(this.blockHead.totalFee - blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE)
                         .setScale(BlockChain.FEE_SCALE);
             } else {
-                forgerEarn = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE);
+                forgerEarn = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.FEE_SCALE);
             }
 
             this.creator.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
@@ -2073,7 +2073,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (emittedFee != 0) {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
-                    new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true, false);
+                    new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), true, false);
         }
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #3");

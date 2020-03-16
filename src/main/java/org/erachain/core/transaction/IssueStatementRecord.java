@@ -57,7 +57,7 @@ public class IssueStatementRecord extends Transaction {
                                 byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature, long feeLong) {
         this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
 
@@ -94,7 +94,7 @@ public class IssueStatementRecord extends Transaction {
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as Pack

@@ -34,7 +34,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow,
                                  long timestamp, Long reference, byte[] signature, long feeLong) {
         super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference, signature);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as pack

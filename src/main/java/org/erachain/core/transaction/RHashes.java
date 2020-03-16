@@ -67,7 +67,7 @@ public class RHashes extends Transaction {
                    long timestamp, Long reference, byte[] signature, long feeLong) {
         this(typeBytes, creator, feePow, url, data, hashes, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // asPack

@@ -108,7 +108,7 @@ public class GenesisBlock extends Block {
 
                 String COMPUstr = holder.get(2).toString();
                 if (COMPUstr.length() > 0 && !COMPUstr.equals("0")) {
-                    BigDecimal compu = new BigDecimal(COMPUstr).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                    BigDecimal compu = new BigDecimal(COMPUstr).setScale(BlockChain.FEE_SCALE);
                     transactions.add(new GenesisTransferAssetTransaction(founder,
                             AssetCls.FEE_KEY, compu));
                     sideSettingString += compu.toString();
@@ -406,7 +406,7 @@ public class GenesisBlock extends Block {
                 // buffer for CREDIT sends
                 sends_toUsers.add(new Tuple2<Account, BigDecimal>(recipient, bdAmount0));
 
-                bdAmount1 = BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                bdAmount1 = BigDecimal.ONE.setScale(BlockChain.FEE_SCALE);
                 transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 
             }

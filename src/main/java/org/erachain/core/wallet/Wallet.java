@@ -1247,7 +1247,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 
         */
 		this.database.getAccountMap().changeBalance(blockGenerator.getAddress(), asOrphan, FEE_KEY,
-				new BigDecimal(blockFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+				new BigDecimal(blockFee).movePointLeft(BlockChain.FEE_SCALE), false);
 
 	}
 
