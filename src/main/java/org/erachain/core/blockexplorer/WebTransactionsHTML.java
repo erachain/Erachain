@@ -216,8 +216,8 @@ public class WebTransactionsHTML {
         String out = "";
         GenesisIssueTemplateRecord templateIssue = (GenesisIssueTemplateRecord) transaction;
         TemplateCls template = (TemplateCls) templateIssue.getItem();
-        out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ": </b>" + template.getName();
-        out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ": </b>" + template.getDescription();
+        out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ": </b>" + template.viewName();
+        out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ": </b>" + template.viewDescription();
         return out;
     }
 

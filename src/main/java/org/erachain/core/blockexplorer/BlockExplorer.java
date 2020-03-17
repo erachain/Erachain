@@ -633,7 +633,7 @@ public class BlockExplorer {
         map.put("key", item.getKey());
         map.put("icon", Base64.encodeBase64String(item.getIcon()));
         map.put("image", Base64.encodeBase64String(item.getImage()));
-        map.put("name", item.getName());
+        map.put("name", item.viewName());
         map.put("description", item.viewDescription());
         map.put("owner", item.getOwner().getAddress());
 
@@ -3010,7 +3010,7 @@ public class BlockExplorer {
                         Long key = new Long(jSON.get("TM") + "");
                         TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, key);
                         if (template != null) {
-                            String description = template.getDescription();
+                            String description = template.viewDescription();
 
                             // Template Params
                             if (jSON.containsKey("PR")) {
@@ -3040,7 +3040,7 @@ public class BlockExplorer {
                         Long key = new Long(jSON.get("Template") + "");
                         TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, key);
                         if (template != null) {
-                            String description = template.getDescription();
+                            String description = template.viewDescription();
 
                             // Template Params
                             if (jSON.containsKey("Statement_Params")) {
@@ -3197,7 +3197,7 @@ public class BlockExplorer {
                     JSONObject data = new JSONObject();
                     TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
                     if (template != null) {
-                        description = template.getDescription();
+                        description = template.viewDescription();
                         data = (JSONObject) JSONValue
                                 .parseWithException(new String(trans.getData(), StandardCharsets.UTF_8));
 
@@ -3246,7 +3246,7 @@ public class BlockExplorer {
 
             TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
             output.put("statement",
-                    template.getName() + "<br>" + Lang.getInstance().translateFromLangObj("Encrypted", langObj));
+                    template.viewName() + "<br>" + Lang.getInstance().translateFromLangObj("Encrypted", langObj));
         }
 
         output.put("creator", trans.getCreator().getAddress());

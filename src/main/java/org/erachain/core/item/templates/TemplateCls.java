@@ -62,6 +62,15 @@ public abstract class TemplateCls extends ItemCls {
         return variables;
     }
 
+    @Override
+    public String viewDescription() {
+        if (this.key > 2 && this.key < 100) {
+            return "<b>EXAMPLE</b> USE #1 and #2 parameters for digits but #3 and #4 parameters for String anr #D for text";
+        }
+
+        return this.description;
+    }
+
     // DB
     public ItemMap getDBMap(DCSet db) {
         return db.getItemTemplateMap();

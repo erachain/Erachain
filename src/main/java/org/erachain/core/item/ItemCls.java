@@ -557,13 +557,13 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
         JSONObject json = new JSONObject();
         json.put("key", this.getKey());
-        json.put("name", this.getName());
+        json.put("name", this.viewName());
 
         if (description != null && !description.isEmpty()) {
-            if (description.length() > 100) {
-                json.put("description", description.substring(0, 100));
+            if (viewDescription().length() > 100) {
+                json.put("description", viewDescription().substring(0, 100));
             } else {
-                json.put("description", description);
+                json.put("description", viewDescription());
             }
         } else {
             json.put("description", "");

@@ -78,7 +78,7 @@ public class StatementInfo extends javax.swing.JPanel {
         TemplateCls template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, statement.getKey());
         // jTextArea_Body.setContentType("text/html");
 
-        String description = template.getDescription();
+        String description = template.viewDescription();
 
         file_Panel.setVisible(false);
 
@@ -323,7 +323,7 @@ public class StatementInfo extends javax.swing.JPanel {
                 TemplateCls template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE,
                         new Long((String) jSON.get("Template")));
                 if (template != null) {
-                    description = template.getDescription();
+                    description = template.viewDescription();
 
                     if (jSON.containsKey("Statement_Params")) {
                         str = jSON.get("Statement_Params").toString();
@@ -344,7 +344,7 @@ public class StatementInfo extends javax.swing.JPanel {
                 TemplateCls template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE,
                         new Long((String) jSON.get("TM")));
                 if (template != null) {
-                    description = template.getDescription();
+                    description = template.viewDescription();
                     jLabel_Title.setText(Lang.getInstance().translate("Title") + ": " + map.b);
 
                     if (jSON.containsKey("PR")) {
