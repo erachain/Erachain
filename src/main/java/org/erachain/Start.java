@@ -85,6 +85,12 @@ public class Start {
                     }
                     Settings.genesisStamp = genesisStamp;
                     break;
+                } else if (arg.startsWith("-testdb=") && arg.length() > 8) {
+                    try {
+                        Settings.TEST_DB_MODE = Integer.parseInt(arg.substring(8));
+                        break;
+                    } catch (Exception e) {
+                    }
                 }
             }
         }

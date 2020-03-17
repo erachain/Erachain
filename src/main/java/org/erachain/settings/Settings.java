@@ -105,7 +105,9 @@ public class Settings {
     public final static int NET_MODE_SIDE = 1;
     public final static int NET_MODE_DEMO = 2;
     public final static int NET_MODE_TEST = 3;
-    public static int NET_MODE = 0;
+    public static int NET_MODE;
+
+    public static int TEST_DB_MODE;
 
     private static Settings instance;
 

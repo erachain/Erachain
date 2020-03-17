@@ -49,5 +49,8 @@ Not store calculated transactions in DB. Make speed up
 -dbschain=rocksdb | mapdb | fast
 Select DataBase for dataChain. rocksdb - RocksDB or mapdb - MapDB or fast - it si complex DB for fast speed (default)
 
+-testdb=[TX_IN_BLOCK]
+Start test for DB system. Make blocks with TX_IN_BLOCK count
+
 example foe Windows:
 	start "erachain" java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1

@@ -3679,6 +3679,10 @@ public class Controller extends Observable {
             // TESTS
             if (BlockChain.TEST_DB > 0) {
                 useGui = false;
+                onlyProtocolIndexing = true;
+                noUseWallet = true;
+                noCalculated = true;
+                HARD_WORK = 6;
                 continue;
             }
 
