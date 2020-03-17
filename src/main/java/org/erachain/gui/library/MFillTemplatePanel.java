@@ -4,7 +4,6 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.templates.ComboBoxModelItemsTemplates;
-import org.erachain.gui.items.templates.ComboBoxModelItemsTemplates_old;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -233,7 +232,7 @@ public class MFillTemplatePanel extends JPanel {
         if (item == null || !add_Tamplate.isSelected())
             return;
         sel_Template = item; //(TemplateCls) jComboBox_Template.getSelectedItem();
-        String ww = sel_Template.getDescription();
+        String ww = sel_Template.viewDescription();
 
         int ee = params_Template_Model.getRowCount() - 1;
         int ccc;

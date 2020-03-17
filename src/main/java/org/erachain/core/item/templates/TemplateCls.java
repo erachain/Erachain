@@ -63,9 +63,18 @@ public abstract class TemplateCls extends ItemCls {
     }
 
     @Override
+    public String viewName() {
+        if (this.key > 2 && this.key < 100) {
+            return "Example. Reserved";
+        }
+
+        return this.name;
+    }
+
+    @Override
     public String viewDescription() {
         if (this.key > 2 && this.key < 100) {
-            return "<b>EXAMPLE</b> USE #1 and #2 parameters for digits but #3 and #4 parameters for String anr #D for text";
+            return "<b>EXAMPLE</b><br>USE {{param.1}} etc. for set values in parameters";
         }
 
         return this.description;
