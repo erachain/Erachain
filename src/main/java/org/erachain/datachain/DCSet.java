@@ -539,7 +539,7 @@ public class DCSet extends DBASet implements Closeable {
                 .asyncWriteFlushDelay(2)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(7)// не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(BlockChain.TEST_DB > 0 ? 3 : 7)// не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
                 ;
@@ -565,6 +565,25 @@ public class DCSet extends DBASet implements Closeable {
                     ///// добавил dcSet.clearCache(); --
                     databaseStruc
                             .cacheSize(32 + 32 << Controller.HARD_WORK)
+                    ;
+
+                } else if (BlockChain.TEST_DB > 0) {
+                    databaseStruc
+
+                            // при норм размере и досточной памяти скорость не хуже чем у остальных
+                            //.cacheLRUEnable() // скорость зависит от памяти и настроек -
+                            //.cacheSize(2048 + 64 << Controller.HARD_WORK)
+
+                            // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                            // у другого типа КЭША происходит утечка памяти
+                            .cacheHardRefEnable() // самый быстрый
+
+                    ///.cacheSoftRefEnable()
+                    ///.cacheSize(32 << Controller.HARD_WORK)
+
+                    // analog new WeakReference() - в случае нехватки ппамяти кеш сам чистится
+                    ///.cacheWeakRefEnable() // new WeakReference()
+                    ///.cacheSize(32 << Controller.HARD_WORK)
                     ;
 
                 } else {

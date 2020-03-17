@@ -1174,6 +1174,9 @@ public class Synchronizer extends Thread {
      */
     public void run() {
 
+        if (ctrl.network == null)
+            return;
+
         long timeTmp;
         long timePoint = 0;
         BlockGenerator blockGenerator;
