@@ -16,6 +16,7 @@ import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
+import org.json.simple.JSONArray;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
@@ -140,7 +141,7 @@ public class BlockChain {
     public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_SIZE_BYTES >> 2;
 
     // переопределим размеры по HARD
-    static private final int MAX_BLOCK_SIZE_GEN_TEMP = MAX_BLOCK_SIZE_BYTES / 100 * (10 * Controller.HARD_WORK + 10) ;
+    static private final int MAX_BLOCK_SIZE_GEN_TEMP = MAX_BLOCK_SIZE_BYTES / 100 * (10 * Controller.HARD_WORK + 10);
     public static final int MAX_BLOCK_SIZE_BYTES_GEN = TEST_DB > 0 ? TEST_DB << 9
             : MAX_BLOCK_SIZE_GEN_TEMP > MAX_BLOCK_SIZE_BYTES ? MAX_BLOCK_SIZE_BYTES : MAX_BLOCK_SIZE_GEN_TEMP;
     public static final int MAX_BLOCK_SIZE_GEN = TEST_DB > 0 ? TEST_DB << 1 : MAX_BLOCK_SIZE_BYTES_GEN >> 8;
@@ -150,13 +151,15 @@ public class BlockChain {
 
     public static final int GENESIS_WIN_VALUE = TEST_MODE ? 3000 : ERA_COMPU_ALL_UP ? 10000 : 22000;
 
-    public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
+    public static final String[] GENESIS_ADMINS = SIDE_MODE ? new String[]{
+            (((JSONArray) ((JSONArray) Settings.genesisJSON.get(2)).get(0)).get(0)).toString()}
+            : new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
     public static final int VERS_4_11 = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 194400;
 
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
-    public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
+    public static final int HOLD_VALID_START = TESTS_VERS > 0 ? 0 : VERS_4_11;
 
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 623904;
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : ALL_BALANCES_OK_TO; //260120;

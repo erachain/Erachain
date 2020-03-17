@@ -1,16 +1,16 @@
 [
   // APP NAME
   "NOVA",
-  // TIMESTAMP LONG
+  // TIMESTAMP in ms [LONG]
   1584299880000,
-  // forging addresses
+  // forging addresses [LIST[]]
   [
     /// recipient, ERA, COMPU, [DEBTORS]
     [
       "74KvWNicSfSTV8aCnKFdwWzBWiTWw1dQoB",
       10000000,
       0,
-      // debtors
+      // debtors [LIST[]]
       [
         // ERA, recipient
         [

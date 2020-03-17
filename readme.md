@@ -44,6 +44,15 @@ ERA\z_bath_examples\readme.txt
 Если после включения в настройках поиска узлов в локальной сети и перезапуска ноды локальные узлы не находятся,
  то нужно их прописать явно в файл peers-test.json (или peer.json или peers-demo.json)
 
+## Test Network (TesNet)
+see readme in /z_bath_examples
+
+## Demo Network (DemoNet)
+see readme in /z_bath_examples
+
+## Sidechain
+see readme in /z_genesis
+
 
 Так же выдает предупреждения:  
 ```
