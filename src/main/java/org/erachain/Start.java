@@ -60,6 +60,8 @@ public class Start {
                 Settings.genesisStamp = new Long(Settings.genesisJSON.get(1).toString());
                 Settings.NET_MODE = Settings.NET_MODE_SIDE;
 
+                //Settings.genesisStamp = -1;
+
             } catch (Exception e) {
                 LOGGER.info("Error while reading " + file.getAbsolutePath());
                 LOGGER.error(e.getMessage(), e);
