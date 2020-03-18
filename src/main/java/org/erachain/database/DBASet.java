@@ -139,16 +139,6 @@ abstract public class DBASet implements IDB {
 
     }
 
-    public void close() {
-        if (this.database != null) {
-            if (!this.database.isClosed()) {
-                this.uses++;
-                this.database.commit();
-                this.database.close();
-                this.uses--;
-
-            }
-        }
-    }
+    abstract public void close();
 
 }
