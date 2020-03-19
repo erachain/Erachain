@@ -8,6 +8,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlocksHeadsMap;
@@ -93,6 +94,8 @@ public class BlockChain {
     public static final boolean ERA_COMPU_ALL_UP = TEST_MODE || TEST_DB > 0;
 
     public static int NETWORK_PORT = TEST_DB > 0 ? 9006 : TEST_MODE ? 9066 : SIDE_MODE ? 9056 : 9046;
+    public static final int TESTNET_PORT = TEST_DB > 0 ? 9906 : DEMO_MODE ? 9966 : 9966; // TESTNET - 95
+    public static final int MAINNET_PORT = TEST_DB > 0 ? 9906 : 9946;
 
     public static final int DEFAULT_WEB_PORT = NETWORK_PORT + 1;
     public static final int DEFAULT_RPC_PORT = NETWORK_PORT + 2;
