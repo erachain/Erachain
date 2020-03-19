@@ -317,10 +317,6 @@ public class RSetUnionStatusToItem extends Transaction {
             return Transaction.ITEM_DOES_NOT_EXIST;
         }
 
-        BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, this.dcSet);
-        if (false && balERA.compareTo(BlockChain.MIN_REGISTRATING_BALANCE_BD) < 0)
-            return Transaction.NOT_ENOUGH_ERA_USE_10;
-
         return Transaction.VALIDATE_OK;
     }
 
