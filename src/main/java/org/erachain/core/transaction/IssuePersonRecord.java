@@ -248,8 +248,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
         if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0l && !BlockChain.ANONIM_SERT_USE
                 && !creatorIsPerson) {
-            long count = dcSet.getItemPersonMap().getLastKey();
-            if (count < 20) {
+            if (height < 10000) {
                 // FIRST Persons only by ME
                 // FIRST Persons only by ADMINS
                 for (String admin : BlockChain.GENESIS_ADMINS) {

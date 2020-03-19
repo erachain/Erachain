@@ -66,7 +66,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     // RETURN START KEY if not GENESIS
     public long getStartKey() {
-        return 0L;
+        return 1L<<14;
     }
 
     @Override
