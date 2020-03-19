@@ -116,10 +116,24 @@ public class BlockChain {
     public static final int GENERAL_ERA_BALANCE = GENESIS_ERA_TOTAL / 100;
     public static final int MAJOR_ERA_BALANCE = 33000;
     public static final int MINOR_ERA_BALANCE = 1000;
+    // SERTIFY
+    // need RIGHTS for non PERSON account
+    public static final BigDecimal MAJOR_ERA_BALANCE_BD = BigDecimal.valueOf(MAJOR_ERA_BALANCE);
+    // need RIGHTS for PERSON account
+    public static final BigDecimal MINOR_ERA_BALANCE_BD = BigDecimal.valueOf(MINOR_ERA_BALANCE);
+
     public static final int MIN_GENERATING_BALANCE = 100;
-    public static final int MIN_REGISTRATING_BALANCE = 10;
     public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
-    public static final BigDecimal MIN_REGISTRATING_BALANCE_BD = new BigDecimal(MIN_REGISTRATING_BALANCE);
+
+    public static final int MIN_REGISTRATING_BALANCE_10 = 10;
+    public static final BigDecimal MIN_REGISTRATING_BALANCE_10_BD = new BigDecimal(MIN_REGISTRATING_BALANCE_10);
+
+    public static final int MIN_REGISTRATING_BALANCE_100 = 100;
+    public static final BigDecimal MIN_REGISTRATING_BALANCE_100_BD = new BigDecimal(MIN_REGISTRATING_BALANCE_100);
+
+    public static final int MIN_REGISTRATING_BALANCE_1000 = 1000;
+    public static final BigDecimal MIN_REGISTRATING_BALANCE_1000_BD = new BigDecimal(MIN_REGISTRATING_BALANCE_1000);
+
     //public static final int GENERATING_RETARGET = 10;
     //public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 120 : 288; // 300 PER DAY
     //public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
@@ -328,12 +342,6 @@ public class BlockChain {
      * Какую долю отдавать на уровень ниже - как степерь двойки. 1 - половину, 2 - четверть, 3 - восьмую часть
      */
     public static final int FEE_INVITED_SHIFT_IN_LEVEL = 1;
-
-    // SERTIFY
-    // need RIGHTS for non PERSON account
-    public static final BigDecimal MAJOR_ERA_BALANCE_BD = BigDecimal.valueOf(MAJOR_ERA_BALANCE);
-    // need RIGHTS for PERSON account
-    public static final BigDecimal MINOR_ERA_BALANCE_BD = BigDecimal.valueOf(MINOR_ERA_BALANCE);
 
     // GIFTS for RSertifyPubKeys
     public static final int GIFTED_COMPU_AMOUNT_4_10 = FEE_PER_BYTE_4_10 << 8;
@@ -711,9 +719,13 @@ public class BlockChain {
 
         if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
             ;
+        } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
+            if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_100_BD) < 0) {
+                return Transaction.NOT_ENOUGH_ERA_OWN_100;
+            }
         } else {
-            if (totalERA.compareTo(BigDecimal.TEN) < 0) {
-                return Transaction.NOT_ENOUGH_ERA_OWN_10;
+            if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_1000_BD) < 0) {
+                return Transaction.NOT_ENOUGH_ERA_OWN_1000;
             }
         }
 
@@ -724,7 +736,7 @@ public class BlockChain {
     public static int VALID_PERSON_CERT_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
 
         if (START_ISSUE_RIGHTS > 0 && height < START_ISSUE_RIGHTS) {
-            if (totalERA.compareTo(new BigDecimal("100")) < 0) {
+            if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_100_BD) < 0) {
                 return Transaction.NOT_ENOUGH_ERA_OWN_100;
             }
             return 0;
@@ -733,12 +745,12 @@ public class BlockChain {
         if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
             ;
         } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
-            if (totalERA.compareTo(BigDecimal.TEN) < 0) {
-                return Transaction.NOT_ENOUGH_ERA_OWN_10;
+            if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_100_BD) < 0) {
+                return Transaction.NOT_ENOUGH_ERA_OWN_100;
             }
         } else {
-            if (totalERA.compareTo(new BigDecimal("100")) < 0) {
-                return Transaction.NOT_ENOUGH_ERA_OWN_100;
+            if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_1000_BD) < 0) {
+                return Transaction.NOT_ENOUGH_ERA_OWN_1000;
             }
         }
 

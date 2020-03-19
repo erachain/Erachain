@@ -90,4 +90,17 @@ public class DGSet extends DBASet {
 
     }
 
+    @Override
+    public void close() {
+
+        if (this.database == null || this.database.isClosed())
+            return;
+
+        this.uses++;
+        this.database.close();
+        this.tables = null;
+        this.uses--;
+
+    }
+
 }

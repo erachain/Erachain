@@ -329,6 +329,13 @@ public class OnDealClick {
                 mess = "Need 100 ERA in OWN or more";
                 break;
             case Transaction.NOT_ENOUGH_ERA_USE_100:
+                mess = "Need 100 ERA in USE or more";
+                break;
+
+            case Transaction.NOT_ENOUGH_ERA_OWN_1000:
+                mess = "Need 1000 ERA in OWN or more";
+                break;
+            case Transaction.NOT_ENOUGH_ERA_USE_1000:
                 mess = "Need 1000 ERA in USE or more";
                 break;
 
