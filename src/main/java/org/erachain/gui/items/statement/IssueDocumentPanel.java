@@ -14,6 +14,7 @@ import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,7 +26,7 @@ import java.awt.event.ActionListener;
  */
 public class IssueDocumentPanel extends javax.swing.JPanel {
 
-    private static String iconFile = "images/pageicons/IssueDocumentPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssueDocumentPanel.png";
     private IssueDocumentPanel th;
     private ExDataPanel exData_Panel;
     private MButton jButton_Work_Cancel;

@@ -26,7 +26,7 @@ import java.net.URL;
 
 public class OutcomingMailsSplitPanel extends SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = "images/pageicons/OutcomingMailsSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "OutcomingMailsSplitPanel.png";
     // для прозрачности
     int alpha = 255;
     int alpha_int;

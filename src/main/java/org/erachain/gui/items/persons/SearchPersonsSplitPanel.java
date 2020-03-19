@@ -23,7 +23,7 @@ import java.net.URL;
 public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = "images/pageicons/SearchPersonsSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchPersonsSplitPanel.png";
 
     public SearchPersonsSplitPanel() {
         super(new ItemsPersonsTableModel(), "SearchPersonsSplitPanel", "SearchPersonsSplitPanel");

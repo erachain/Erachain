@@ -10,6 +10,7 @@ import org.erachain.gui.models.BalanceFromAddressTableModel;
 import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -30,7 +31,7 @@ public class MyBalanceTab extends SplitPanel  {
     /**
      *
      */
-    private static String iconFile = "images/pageicons/MyBalanceTab.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyBalanceTab.png";
     private static final long serialVersionUID = 1L;
     final MTable table;
     protected int row;

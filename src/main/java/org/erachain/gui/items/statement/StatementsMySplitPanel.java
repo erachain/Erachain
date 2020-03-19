@@ -26,7 +26,7 @@ public class StatementsMySplitPanel extends SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
 
 
-    private static String iconFile = "images/pageicons/StatementsMySplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "StatementsMySplitPanel.png";
     // для прозрачности
     int alpha = 255;
     int alpha_int;

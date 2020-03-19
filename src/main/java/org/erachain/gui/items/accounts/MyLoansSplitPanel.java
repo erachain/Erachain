@@ -4,6 +4,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.SplitPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -14,7 +15,7 @@ public class MyLoansSplitPanel extends SplitPanel  {
 
     public AccountsPanel accountPanel;
     public AccountsRightPanel rightPanel;
-    private static String iconFile = "images/pageicons/MyLoansSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyLoansSplitPanel.png";
 
     public MyLoansSplitPanel() {
         super("MyLoansSplitPanel");

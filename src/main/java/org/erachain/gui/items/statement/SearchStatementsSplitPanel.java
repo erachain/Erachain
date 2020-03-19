@@ -29,7 +29,7 @@ import java.util.ArrayList;
 public class SearchStatementsSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = "images/pageicons/SearchStatementsSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchStatementsSplitPanel.png";
     // для прозрачности
     int alpha = 255;
     int alpha_int;

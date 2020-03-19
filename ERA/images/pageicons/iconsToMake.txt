@@ -1,3 +1,6 @@
+иконка root
+    ErachainRootNode.png
+
 иконки для корневых элементов
 
     account_Node.png

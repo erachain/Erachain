@@ -19,6 +19,7 @@ import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 @SuppressWarnings("serial")
 public class IssuePersonPanel extends JPanel  {
     private static final Logger logger = LoggerFactory.getLogger(IssuePersonPanel.class);
-    private static String iconFile = "images/pageicons/IssuePersonPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssuePersonPanel.png";
     protected JLabel titleJLabel = new JLabel();
     protected JComboBox<Account> cbxFrom = new JComboBox<>();
     protected JComboBox<String> txtFeePow = new JComboBox<>();

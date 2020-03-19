@@ -19,7 +19,7 @@ public class SearchStatusesSplitPanel extends SearchItemSplitPanel {
     /**
      *
      */
-    private static String iconFile = "images/pageicons/SearchStatusesSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchStatusesSplitPanel.png";
     private static final long serialVersionUID = 1L;
     private static StatusesItemsTableModel tableModelUnions = new StatusesItemsTableModel();
 

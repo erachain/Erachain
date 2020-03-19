@@ -14,6 +14,7 @@ import org.erachain.gui.library.*;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +27,7 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
  */
 public class IssueAssetPanel extends JPanel  {
 
-    private static String iconFile = "images/pageicons/IssueAssetPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons()+ "IssueAssetPanel.png";
     private JLabel titleJLabel = new JLabel();
     private JLabel accountJLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
     private JLabel descriptionJLabel = new JLabel(Lang.getInstance().translate("Description") + ":");

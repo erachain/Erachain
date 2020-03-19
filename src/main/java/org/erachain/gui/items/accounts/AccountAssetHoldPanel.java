@@ -10,13 +10,14 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import java.awt.*;
 import java.math.BigDecimal;
 
 public class AccountAssetHoldPanel extends AccountAssetActionPanelCls  {
 
-    private static String iconFile = "images/pageicons/AccountAssetHoldPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "AccountAssetHoldPanel.png";
 
     public AccountAssetHoldPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
         super(true, null, assetIn, null, TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
