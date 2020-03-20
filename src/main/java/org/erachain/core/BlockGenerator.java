@@ -1228,6 +1228,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             }
 
                         } else if (ctrl.needUpToDate()) {
+                            // выбрасываем победителя - закроем его
+                            waitWin.close();
+                            waitWin = null;
+
                             try {
                                 Thread.sleep(1000);
                             } catch (InterruptedException e) {
@@ -1235,12 +1239,17 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             }
                             LOGGER.debug("need UPDATE! skip FLUSH BLOCK");
                         } else if (betterPeer != null) {
+                            // выбрасываем победителя - закроем его
+                            waitWin.close();
+                            waitWin = null;
+
                             try {
                                 Thread.sleep(1000);
                             } catch (InterruptedException e) {
                                 return;
                             }
                             LOGGER.debug("found better PEER! skip FLUSH BLOCK " + betterPeer);
+
                         } else {
                             // только если мы не отстали
 
