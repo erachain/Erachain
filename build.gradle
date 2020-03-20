@@ -186,14 +186,15 @@ task CopyResourse {
         into 'build/libs/Erachain/images'
     }
     copy {
-        from 'ERA/z_bath_examples'
-        into 'build/libs/Erachain/z_bath_examples'
+        from 'ERA/z_GENESIS_EXAMPLES'
+        into 'build/libs/Erachain/z_GENESIS_EXAMPLES'
     }
     copy {
-        from 'ERA/z_genesis'
-        into 'build/libs/Erachain/z_genesis'
+        from 'ERA/z_RUN_EXAMPLES'
+        into 'build/libs/Erachain/z_RUN_EXAMPLES'
     }
 }
+
 task CreateZip(type: Zip) {
 
     from 'build/libs/'

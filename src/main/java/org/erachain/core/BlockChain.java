@@ -955,6 +955,8 @@ public class BlockChain {
                 } else {
                     repeatsMin = REPEAT_WIN;
                 }
+            } else if (SIDE_MODE) {
+                ;
             } else {
                 if (height < 40000) {
                     if (repeatsMin > 4)
