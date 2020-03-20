@@ -4,7 +4,6 @@ import com.google.common.collect.Iterators;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import lombok.Getter;
 import org.erachain.at.ATBlock;
 import org.erachain.at.ATController;
 import org.erachain.at.ATException;
@@ -114,7 +113,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     // was validated
     protected boolean wasValidated;
-    @Getter
+
     protected DCSet validatedForkDB;
 
     /////////////////////////////////////// BLOCK HEAD //////////////////////////////
@@ -1954,6 +1953,10 @@ public class Block implements Closeable, ExplorerJsonLine {
             LOGGER.debug("validatedForkDB is closed on SET: " + this.toString());
         }
         this.validatedForkDB = validatedForkDB;
+    }
+
+    public boolean hasValidatedForkDB() {
+        return this.validatedForkDB != null;
     }
 
     private boolean isClosed;

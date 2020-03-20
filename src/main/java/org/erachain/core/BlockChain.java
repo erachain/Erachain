@@ -1061,6 +1061,7 @@ public class BlockChain {
                 LOGGER.error("MY WinBlock is INVALID! ignore...");
             }
 
+            block.close();
             return false;
         }
 
@@ -1069,7 +1070,6 @@ public class BlockChain {
 
         // set and close OLD
         setWaitWinBufferUnchecked(block);
-
 
         LOGGER.info("new winBlock setted!!!" + block.toString());
         return true;
