@@ -86,6 +86,7 @@ public class BlockChain {
     public static final boolean SIDE_MODE = Settings.getInstance().isSideNet();
     public static final boolean DEMO_MODE = Settings.getInstance().isDemoNet();
     public static final boolean TEST_MODE = Settings.getInstance().isTestNet();
+    public static final boolean MAIN_MODE = !TEST_MODE && !SIDE_MODE;
 
     /**
      * set uo all balances ERA to 10000 and COMPU to 100
