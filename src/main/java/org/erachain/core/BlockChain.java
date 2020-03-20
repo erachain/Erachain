@@ -992,30 +992,12 @@ public class BlockChain {
         if (ERA_COMPU_ALL_UP || BlockChain.TEST_MODE)
             return win_value;
 
-        if (false) {
-            if (height < BlockChain.REPEAT_WIN)
-                win_value >>= 4;
-            else if (TEST_MODE)
-                win_value >>= 4;
-            else if (height < BlockChain.TARGET_COUNT)
-                win_value = (win_value >> 4) - (win_value >> 6);
-            else if (height < BlockChain.TARGET_COUNT << 2)
-                win_value >>= 5;
-            else if (height < BlockChain.TARGET_COUNT << 6)
-                win_value = (win_value >> 5) - (win_value >> 7);
-            else if (height < BlockChain.TARGET_COUNT << 10)
-                win_value >>= 6;
-            else
-                win_value = (win_value >> 7) - (win_value >> 9);
-        } else {
-            if (height < BlockChain.REPEAT_WIN)
-                win_value >>= 2;
-            else if (height < (BlockChain.REPEAT_WIN<<2))
-                win_value >>= 5;
-            else
-                win_value >>= 7;
-        }
-
+        if (height < BlockChain.REPEAT_WIN)
+            win_value >>= 2;
+        else if (height < (BlockChain.REPEAT_WIN << 2))
+            win_value >>= 5;
+        else
+            win_value >>= 7;
 
         return win_value;
 
