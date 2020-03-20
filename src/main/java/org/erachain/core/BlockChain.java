@@ -110,7 +110,7 @@ public class BlockChain {
     public static final int TARGET_COUNT_SHIFT = 10;
     public static final int TARGET_COUNT = 1 << TARGET_COUNT_SHIFT;
     public static final int BASE_TARGET = 10000;///1 << 15;
-    public static final int REPEAT_WIN = DEMO_MODE ? 10 : TEST_MODE ? 5 : ERA_COMPU_ALL_UP ? 15 : 40; // GENESIS START TOP ACCOUNTS
+    public static final int REPEAT_WIN = DEMO_MODE ? 10 : TEST_MODE ? 5 : ERA_COMPU_ALL_UP ? 15 : SIDE_MODE ? 15 : 40; // GENESIS START TOP ACCOUNTS
 
     // RIGHTs
     public static final int GENESIS_ERA_TOTAL = 10000000;
@@ -955,9 +955,7 @@ public class BlockChain {
                 } else {
                     repeatsMin = REPEAT_WIN;
                 }
-            } else if (SIDE_MODE) {
-                ;
-            } else {
+            } else if (MAIN_MODE) {
                 if (height < 40000) {
                     if (repeatsMin > 4)
                         repeatsMin = 4;
