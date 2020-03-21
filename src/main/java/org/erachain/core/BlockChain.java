@@ -1030,7 +1030,7 @@ public class BlockChain {
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
         int noValid = 99999;
-        DCSet fork = dcSet.fork(DCSet.makeDBinMemory());
+        DCSet fork = dcSet.fork(DCSet.makeDBinMemory(), "setWaitWinBuffer");
 
         try {
             noValid = block.isValid(fork, true);

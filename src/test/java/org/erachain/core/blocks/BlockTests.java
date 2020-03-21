@@ -530,7 +530,7 @@ public class BlockTests {
                 1000, 1000l, 1000l);
 
         //FORK
-        DCSet fork = db.fork();
+        DCSet fork = db.fork(this.toString());
 
         //GENERATE PAYMENT 1
         Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
@@ -627,7 +627,7 @@ public class BlockTests {
                 1000, 1000l, 1000l);
 
         //FORK
-        DCSet fork = db.fork();
+        DCSet fork = db.fork(this.toString());
 
         //GENERATE PAYMENT 1
         Account recipient1 = new Account("7JU8UTuREAJG2yht5ASn7o1Ur34P1nvTk5");

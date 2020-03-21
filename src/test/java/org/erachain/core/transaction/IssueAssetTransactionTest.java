@@ -109,7 +109,7 @@ public class IssueAssetTransactionTest {
 
             ///////////////// FORK
             ///DB database = DCSet.makeDBinMemory();
-            DCSet forkDC = dcSet.fork(DCSet.getHardBaseForFork());
+            DCSet forkDC = dcSet.fork(DCSet.getHardBaseForFork(), this.toString());
             ItemAssetMap assetMapForked = forkDC.getItemAssetMap();
 
             int key_base = START_KEY + step - (step >> 1) + step;

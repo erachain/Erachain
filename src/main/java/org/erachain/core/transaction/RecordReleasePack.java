@@ -232,7 +232,7 @@ public class RecordReleasePack extends Transaction {
             return INVALID_PAYMENTS_LENGTH;
         }
 
-        try (DCSet fork = this.dcSet.fork()) {
+        try (DCSet fork = this.dcSet.fork(this.toString())) {
 
             int counter = 0;
             int result = 0;

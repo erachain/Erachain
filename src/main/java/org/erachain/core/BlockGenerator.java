@@ -395,7 +395,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         //CREATE FORK OF GIVEN DATABASE
                         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
                         DB database = DCSet.makeDBinMemory();
-                        newBlockDC = dcSet.fork(database);
+                        newBlockDC = dcSet.fork(database, "getUnconfirmedTransactions");
                     }
 
                     transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
@@ -507,7 +507,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public void checkForRemove(long timestamp) {
 
         //CREATE FORK OF GIVEN DATABASE
-        try (DCSet newBlockDC = dcSet.fork(DCSet.makeDBinMemory())) {
+        try (DCSet newBlockDC = dcSet.fork(DCSet.makeDBinMemory(), "checkForRemove")) {
 
             int blockHeight = newBlockDC.getBlockSignsMap().size() + 1;
 

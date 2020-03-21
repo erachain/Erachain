@@ -223,7 +223,7 @@ public class OrderTest {
                 List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet),
                         null);
 
-                DCSet forkDC = dcSet.fork();
+                DCSet forkDC = dcSet.fork(this.toString());
                 // создадим первый ордер который изменит ордера стенки
                 orderCreation = new CreateOrderTransaction(accountB, assetA.getKey(dcSet), assetB.getKey(dcSet),
                         new BigDecimal("10"),

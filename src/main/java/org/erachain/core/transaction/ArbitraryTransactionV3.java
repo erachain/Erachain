@@ -250,7 +250,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
         
         // REMOVE FEE
         Transaction forkTransaction = this.copy();
-        try (DCSet fork = this.dcSet.fork()) {
+        try (DCSet fork = this.dcSet.fork(this.toString())) {
             forkTransaction.setDC(fork, Transaction.FOR_NETWORK, this.height, this.seqNo);
             Block block = fork.getBlockMap().getAndProcess(this.height);
             forkTransaction.process(block, Transaction.FOR_NETWORK);

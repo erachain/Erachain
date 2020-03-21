@@ -375,7 +375,7 @@ public class Synchronizer extends Thread {
 
         // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
         DB database = DCSet.getHardBaseForFork();
-        try (DCSet fork = dcSet.fork(database)) {
+        try (DCSet fork = dcSet.fork(database, "synchronizeNewBlocks")) {
 
             // освободим всю память
             dcSet.clearCache();
@@ -589,7 +589,7 @@ public class Synchronizer extends Thread {
                                 break;
                             }
 
-                            try (DCSet fork = dcSet.fork(DCSet.makeDBinMemory())) {
+                            try (DCSet fork = dcSet.fork(DCSet.makeDBinMemory(), "synchronize")) {
                                 if (blockFromPeer.isValid(fork, false) > 0) {
 
                                     errorMess = "invalid BLOCK";

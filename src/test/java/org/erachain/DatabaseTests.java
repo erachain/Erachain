@@ -118,7 +118,7 @@ public class DatabaseTests {
         //assertEquals(dcSet.getItemPersonMap().keySet().toString(), "");
         //assertEquals(dcSet.getItemPersonMap().getValuesAll().toString(), "");
         //CREATE FORK
-        DCSet fork = dcSet.fork();
+        DCSet fork = dcSet.fork(this.toString());
 
         issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork)[0]);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
@@ -162,7 +162,7 @@ public class DatabaseTests {
         assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get(seed, 1L));
 
         //CREATE SECOND FORK
-        DCSet fork2 = fork.fork();
+        DCSet fork2 = fork.fork(this.toString());
 
         //SET BALANCE IN FORK2
         fork2.getAssetBalanceMap().put(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>

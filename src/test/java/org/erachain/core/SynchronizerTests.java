@@ -116,7 +116,7 @@ public class SynchronizerTests {
         //GENERATE NEXT 5 BLOCK FROM ACCOUNT 2 ON FORK
 
         //FORK
-        DCSet fork = databaseSet.fork();
+        DCSet fork = databaseSet.fork(this.toString());
         lastBlock = fork.getBlockMap().last();
 
         BlockGenerator blockGeneratorFork = new BlockGenerator(fork,blockChain, false);
