@@ -327,7 +327,7 @@ public class BlockChain {
     /**
      * Multi-level Referal Sysytem. Levels for deep
      */
-    public static final int FEE_INVITED_DEEP = TEST_DB > 0 ? 0 : 3;
+    public static final int FEE_INVITED_DEEP = TEST_DB > 0 || MAIN_MODE ? 0 : 3;
     /**
      * Stop referals system on this person Number. Причем рефералка которая должна упать этим персонам
      * (с номером ниже заданного) по сути просто сжигается - то есть идет дефляция.

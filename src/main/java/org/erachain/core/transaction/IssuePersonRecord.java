@@ -246,7 +246,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         // FIRST PERSONS INSERT as ADMIN
         boolean creatorAdmin = false;
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
-        if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0l && !BlockChain.ANONIM_SERT_USE
+        if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
                 && !creatorIsPerson) {
             if (height < 10000) {
                 // FIRST Persons only by ME
