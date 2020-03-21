@@ -42,6 +42,8 @@ import java.util.Random;
 public class DCSet extends DBASet implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
+    public String makedIn = "--";
+
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN
             << (Controller.getInstance().databaseSystem == DBS_MAP_DB ? 1 : 3);
     // если все на Рокс перевели то меньше надо ставить
@@ -1607,13 +1609,15 @@ public class DCSet extends DBASet implements Closeable {
 
     /**
      * создать форк
+     *
      * @return
      */
-    public DCSet fork(DB database) {
+    public DCSet fork(DB database, String maker) {
         this.addUses();
 
         try {
             DCSet fork = new DCSet(this, database);
+            fork.makedIn = maker;
 
             this.outUses();
             return fork;
@@ -1632,10 +1636,11 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * USe inMemory MapDB Database
      *
+     * @param maker
      * @return
      */
-    public DCSet fork() {
-        return fork(makeDBinMemory());
+    public DCSet fork(String maker) {
+        return fork(makeDBinMemory(), maker);
     }
 
     /**

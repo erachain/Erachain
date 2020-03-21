@@ -83,7 +83,7 @@ public class TransactionCreator {
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
         DB database = DCSet.makeDBinMemory();
-        this.fork = DCSet.getInstance().fork(database);
+        this.fork = DCSet.getInstance().fork(database, "updateFork");
 
         //UPDATE LAST BLOCK
         this.lastBlock = Controller.getInstance().getLastBlock();

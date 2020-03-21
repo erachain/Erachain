@@ -597,7 +597,7 @@ public class GeneratorTests {
 
         //ADD 10 UNCONFIRMED VALID TRANSACTIONS
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
-        DCSet snapshot = dcSet.fork();
+        DCSet snapshot = dcSet.fork(this.toString());
         for (int i = 0; i < 10; i++) {
 
             //CREATE VALID PAYMENT
@@ -669,7 +669,7 @@ public class GeneratorTests {
 
         //ADD 10000 UNCONFIRMED VALID TRANSACTIONS
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
-        DCSet snapshot = dcSet.fork();
+        DCSet snapshot = dcSet.fork(this.toString());
         int max_count = 2000;
         for (int i = 0; i < max_count; i++) {
 

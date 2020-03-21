@@ -1951,6 +1951,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             LOGGER.debug("validatedForkDB is closed on SET: " + this.toString());
         }
         this.validatedForkDB = validatedForkDB;
+        validatedForkDB.makedIn = this.toString();
     }
 
     public boolean hasValidatedForkDB() {
@@ -1963,7 +1964,7 @@ public class Block implements Closeable, ExplorerJsonLine {
      * Закрывает базу в котрой производилась проверка блока
      */
 
-    public synchronized void close() {
+    public void close() {
         if (validatedForkDB != null) {
             try {
                 validatedForkDB.close();
@@ -2008,7 +2009,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         super.finalize();
     }
 
-    public synchronized void saveToChainFromvalidatedForkDB() {
+    public void saveToChainFromvalidatedForkDB() {
         validatedForkDB.writeToParent();
     }
 

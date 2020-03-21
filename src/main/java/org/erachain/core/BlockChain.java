@@ -1158,7 +1158,7 @@ public class BlockChain {
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
         int noValid = 99999;
-        DCSet fork = dcSet.fork(DCSet.makeDBinMemory());
+        DCSet fork = dcSet.fork(DCSet.makeDBinMemory(), "setWaitWinBuffer");
 
         try {
             noValid = block.isValid(fork, true);
@@ -1309,15 +1309,14 @@ public class BlockChain {
             transactionValidateTimingCounter++;
             transactionValidateTimingAverage = ((transactionValidateTimingAverage * transactionValidateTimingCounter)
                     + processTiming - transactionValidateTimingAverage) / transactionValidateTimingCounter;
-        } else
-            if (System.currentTimeMillis() - pointValidateAverage > 10000) {
-                pointValidateAverage = System.currentTimeMillis();
-                transactionValidateTimingAverage = ((transactionValidateTimingAverage << 1)
-                        + processTiming - transactionValidateTimingAverage) >> 1;
-            } else {
-                transactionValidateTimingAverage = ((transactionValidateTimingAverage << 5)
-                        + processTiming - transactionValidateTimingAverage) >> 5;
-            }
+        } else if (System.currentTimeMillis() - pointValidateAverage > 10000) {
+            pointValidateAverage = System.currentTimeMillis();
+            transactionValidateTimingAverage = ((transactionValidateTimingAverage << 1)
+                    + processTiming - transactionValidateTimingAverage) >> 1;
+        } else {
+            transactionValidateTimingAverage = ((transactionValidateTimingAverage << 5)
+                    + processTiming - transactionValidateTimingAverage) >> 5;
+        }
     }
 
     private long pointProcessAverage;
@@ -1332,13 +1331,13 @@ public class BlockChain {
                         + processTiming - transactionProcessTimingAverage) / transactionProcessTimingCounter;
             } else if (System.currentTimeMillis() - pointProcessAverage > 10000) {
                 pointProcessAverage = System.currentTimeMillis();
-                    transactionProcessTimingAverage = ((transactionProcessTimingAverage << 1)
-                            + processTiming - transactionProcessTimingAverage) >> 1;
+                transactionProcessTimingAverage = ((transactionProcessTimingAverage << 1)
+                        + processTiming - transactionProcessTimingAverage) >> 1;
 
-                } else {
-                    transactionProcessTimingAverage = ((transactionProcessTimingAverage << 5)
-                            + processTiming - transactionProcessTimingAverage) >> 5;
-                }
+            } else {
+                transactionProcessTimingAverage = ((transactionProcessTimingAverage << 5)
+                        + processTiming - transactionProcessTimingAverage) >> 5;
+            }
         }
     }
 
