@@ -87,6 +87,7 @@ public class BlocksRequest extends MonitoredThread {
         if (newBlock == null) {
             String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
             //Controller.getInstance().banPeerOnError(message.getSender(), mess);
+            return 0;
         }
 
         // CREATE RESPONSE WITH SAME ID
