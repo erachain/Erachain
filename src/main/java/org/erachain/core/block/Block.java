@@ -1954,6 +1954,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
         this.validatedForkDB = validatedForkDB;
         validatedForkDB.makedIn += " setValidatedForkDB: " + this.toString();
+        LOGGER.debug("setValidatedForkDB to: " + validatedForkDB.makedIn);
     }
 
     public boolean hasValidatedForkDB() {
