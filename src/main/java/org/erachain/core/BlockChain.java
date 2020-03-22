@@ -1157,11 +1157,13 @@ public class BlockChain {
 
         byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
         if (!Arrays.equals(lastSignature, block.getReference())) {
+            block.close();
             LOGGER.info("new winBlock from FORK!");
             return false;
         }
 
         if (this.waitWinBuffer != null && block.compareWin(waitWinBuffer) <= 0) {
+            block.close();
             LOGGER.info("new winBlock is POOR!");
             return false;
         }
@@ -1183,9 +1185,6 @@ public class BlockChain {
         // FULL VALIDATE because before was only HEAD validating
         if (noValid > 0) {
 
-            // если невалидная то закроем Форк базы, иначе базу храним для последующего слива
-            fork.close();
-
             if (peer != null) {
                 if (noValid > Block.INVALID_REFERENCE) {
                     peer.ban(10, "invalid block");
@@ -1199,6 +1198,7 @@ public class BlockChain {
                 LOGGER.error("MY WinBlock is INVALID! ignore...");
             }
 
+            block.close();
             return false;
         }
 
@@ -1221,17 +1221,16 @@ public class BlockChain {
      */
     public synchronized void setWaitWinBufferUnchecked(Block block) {
 
-        if (true || // тут же мы без проверки должны вносить любой блок
-                // иначе просто прилетевший блок в момент синхронизации не будет принят
-                this.waitWinBuffer == null || block.compareWin(waitWinBuffer) > 0) {
-            if (this.waitWinBuffer != null) {
-                synchronized (waitWinBuffer) {
-                    waitWinBuffer.close();
-                    this.waitWinBuffer = block;
-                }
-            } else {
+        // тут же мы без проверки должны вносить любой блок
+        // иначе просто прилетевший блок в момент синхронизации не будет принят
+        if (this.waitWinBuffer != null) {
+            synchronized (waitWinBuffer) {
+                waitWinBuffer.close();
+                waitWinBuffer = null; // поможем сборщику мусора явно
                 this.waitWinBuffer = block;
             }
+        } else {
+            this.waitWinBuffer = block;
         }
     }
 
