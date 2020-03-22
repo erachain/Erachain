@@ -1951,7 +1951,8 @@ public class Block implements Closeable, ExplorerJsonLine {
             LOGGER.debug("validatedForkDB is closed on SET: " + this.toString());
         }
         this.validatedForkDB = validatedForkDB;
-        validatedForkDB.makedIn = this.toString();
+        validatedForkDB.makedIn += " setValidatedForkDB: " + this.toString();
+        LOGGER.debug("setValidatedForkDB to: " + validatedForkDB.makedIn);
     }
 
     public boolean hasValidatedForkDB() {
@@ -1964,7 +1965,7 @@ public class Block implements Closeable, ExplorerJsonLine {
      * Закрывает базу в котрой производилась проверка блока
      */
 
-    public void close() {
+    public synchronized void close() {
         if (validatedForkDB != null) {
             try {
                 validatedForkDB.close();
@@ -1973,7 +1974,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                 LOGGER.error(e.getMessage(), e);
             }
             validatedForkDB = null;
-
+        } else {
+            LOGGER.debug("validatedForkDB is closed: NULL");
         }
 
         try {
@@ -1983,6 +1985,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                 transaction.resetDCSet();
             }
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
         }
 
         transactions = null;
