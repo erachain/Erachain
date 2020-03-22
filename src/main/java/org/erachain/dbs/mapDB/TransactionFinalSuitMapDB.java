@@ -184,7 +184,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                         }
 
                         // see https://regexr.com/
-                        String[] tokens = title.toLowerCase().split(DCSet.SPLIT_CHARS);
+                        String[] tokens = title.toLowerCase().split(Transaction.SPLIT_CHARS);
                         String[] keys = new String[tokens.length];
                         for (int i = 0; i < tokens.length; ++i) {
                             if (tokens[i].length() > CUT_NAME_INDEX) {

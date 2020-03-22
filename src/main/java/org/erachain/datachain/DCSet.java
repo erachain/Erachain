@@ -112,11 +112,6 @@ public class DCSet extends DBASet implements Closeable {
     private volatile static DCSet instance;
     private DCSet parent;
 
-    // % и @ и # - пусть они будут служебные и по ним не делать разделения
-    // так чтобы можно было найти @P указатель на персон например
-    // % - это указатель на параметр например иак - %1
-    public static String SPLIT_CHARS = "[!?/_., \\~`+&^№*()<>\\\"\\'|\\[\\]{}=;:\\\\]";
-
     private boolean inMemory = false;
 
     private BlockChain bchain;

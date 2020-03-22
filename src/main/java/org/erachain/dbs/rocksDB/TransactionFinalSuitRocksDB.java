@@ -131,7 +131,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                         return null;
 
                     // see https://regexr.com/
-                    String[] tokens = title.toLowerCase().split(DCSet.SPLIT_CHARS);
+                    String[] tokens = title.toLowerCase().split(Transaction.SPLIT_CHARS);
                     byte[][] keys = new byte[tokens.length][];
                     for (int i = 0; i < tokens.length; ++i) {
                         byte[] key = new byte[TransactionFinalMap.CUT_NAME_INDEX];

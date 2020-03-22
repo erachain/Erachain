@@ -120,6 +120,14 @@ public class RHashes extends Transaction {
         return twins;
     }
 
+    public String[] getTags() {
+        String[] tags = new String[hashes.length];
+        for (int i = 0; i < tags.length; i++) {
+            tags[i] = Base58.encode(hashes[i]);
+        }
+        return tags;
+    }
+
     // releaserReference = null - not a pack
     // releaserReference = reference for releaser account - it is as pack
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
