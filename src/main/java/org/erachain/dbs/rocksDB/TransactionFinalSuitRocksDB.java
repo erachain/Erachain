@@ -126,12 +126,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                     // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
                     transaction.setDC((DCSet) databaseSet);
 
-                    String title = transaction.getTitle();
-                    if (title == null || title.isEmpty() || title.equals(""))
-                        return null;
-
-                    // see https://regexr.com/
-                    String[] tokens = title.toLowerCase().split(Transaction.SPLIT_CHARS);
+                    String[] tokens = transaction.getTags();
                     byte[][] keys = new byte[tokens.length][];
                     for (int i = 0; i < tokens.length; ++i) {
                         byte[] key = new byte[TransactionFinalMap.CUT_NAME_INDEX];

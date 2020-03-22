@@ -639,17 +639,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (txFrom == null) {
             return null;
         }
-        String fromTitle;
-        fromTitle = get(fromSeqNo).getTitle();
-        if (fromTitle != null) {
-            // теперь проверим все слова в Заголовке
-            String[] titleArray = fromTitle.toLowerCase().split(Transaction.SPLIT_CHARS);
-            for (int i = 0; i < titleArray.length; i++) {
-                if (titleArray[i].startsWith(betterFilterWord)) {
-                    return titleArray[i];
-                }
+        // теперь проверим все слова в Заголовке
+        String[] titleArray = get(fromSeqNo).getTags();
+        for (int i = 0; i < titleArray.length; i++) {
+            if (titleArray[i].startsWith(betterFilterWord)) {
+                return titleArray[i];
             }
         }
+
         return null;
     }
 
