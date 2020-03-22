@@ -42,6 +42,10 @@ import java.util.Random;
 public class DCSet extends DBASet implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
+    /**
+     * Используется для отладки - где незакрытый набор таблиц остался.
+     * Делаем дамн КУЧИ в VisualVM и там в параметрах смотрим откуда этот объект был создан
+     */
     public String makedIn = "--";
 
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN
