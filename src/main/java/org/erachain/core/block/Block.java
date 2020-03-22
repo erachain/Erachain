@@ -1978,17 +1978,18 @@ public class Block implements Closeable, ExplorerJsonLine {
             LOGGER.debug("validatedForkDB is closed: NULL");
         }
 
-        try {
-            // ОЧЕНЬ ВАЖНО чтобы Finalizer мог спокойно удалять их и DCSet.fork
-            // иначе Финализер не можеи зацикленные сслки порвать и не очищает HEAP
-            for (Transaction transaction : transactions) {
-                transaction.resetDCSet();
+        if (transactions != null) {
+            try {
+                // ОЧЕНЬ ВАЖНО чтобы Finalizer мог спокойно удалять их и DCSet.fork
+                // иначе Финализер не можеи зацикленные сслки порвать и не очищает HEAP
+                for (Transaction transaction : transactions) {
+                    transaction.resetDCSet();
+                }
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            transactions = null;
         }
-
-        transactions = null;
 
         isClosed = true;
     }
