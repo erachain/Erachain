@@ -1120,7 +1120,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                                 this.setMonitorStatus("local_status " + viewStatus());
 
                                             } else {
-                                                generatedBlock.close();
+                                                // already close in setWaitWinBuffer - generatedBlock.close();
                                                 LOGGER.info("my BLOCK is weak ((...");
                                             }
                                         }
