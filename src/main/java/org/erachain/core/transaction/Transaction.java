@@ -1130,7 +1130,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         int port = BlockChain.NETWORK_PORT;
         data = Bytes.concat(data, Ints.toByteArray(port));
         if (BlockChain.SIDE_MODE) {
-            // чтобы из других сторно не срабатывало
+            // чтобы из других цепочек не срабатывало
             data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
         }
 
@@ -1234,6 +1234,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         int port = BlockChain.NETWORK_PORT;
         data = Bytes.concat(data, Ints.toByteArray(port));
         if (BlockChain.SIDE_MODE) {
+            // чтобы из других цепочек не срабатывало
             data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
         }
 
