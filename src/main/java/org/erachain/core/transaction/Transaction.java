@@ -1129,6 +1129,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         // all other network must be invalid here!
         int port = BlockChain.NETWORK_PORT;
         data = Bytes.concat(data, Ints.toByteArray(port));
+        if (BlockChain.SIDE_MODE) {
+            // чтобы из других сторно не срабатывало
+            data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
+        }
 
         this.signature = Crypto.getInstance().sign(creator, data);
     }
@@ -1229,6 +1233,9 @@ public abstract class Transaction implements ExplorerJsonLine {
         // all other network must be invalid here!
         int port = BlockChain.NETWORK_PORT;
         data = Bytes.concat(data, Ints.toByteArray(port));
+        if (BlockChain.SIDE_MODE) {
+            data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
+        }
 
         if (!Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data)) {
             boolean wrong = true;
