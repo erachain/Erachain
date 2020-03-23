@@ -1593,7 +1593,7 @@ public class Block implements Closeable, ExplorerJsonLine {
     public int isValid(DCSet dcSetPlace, boolean andProcess) {
 
         if (validatedForkDB != null) {
-            LOGGER.error("is Valid validatedForkDB not NULL [" + heightBlock + "]");
+            LOGGER.error("is Valid validatedForkDB " + validatedForkDB + " not NULL [" + heightBlock + "]");
             close();
         }
         wasValidated = false;
@@ -1947,12 +1947,14 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     public synchronized void setValidatedForkDB(DCSet validatedForkDB) {
         if (this.validatedForkDB != null) {
+            LOGGER.debug("CLOSE on SET: " + this.validatedForkDB + " for " + this.toString());
+            validatedForkDB.makedIn += " setValidatedForkDB: " + validatedForkDB + " for " + this.toString();
             this.validatedForkDB.close();
-            LOGGER.debug("validatedForkDB is closed on SET: " + this.toString());
+            this.validatedForkDB = null;
         }
         this.validatedForkDB = validatedForkDB;
-        validatedForkDB.makedIn += " setValidatedForkDB: " + this.toString();
-        LOGGER.debug("setValidatedForkDB to: " + validatedForkDB.makedIn);
+        validatedForkDB.makedIn += " setValidatedForkDB: " + validatedForkDB + " for " + this.toString();
+        LOGGER.debug(validatedForkDB.makedIn);
     }
 
     public boolean hasValidatedForkDB() {

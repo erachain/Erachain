@@ -822,7 +822,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 LOGGER.error(e.getMessage(), e);
                                 ctrl.stopAll(104);
                                 return;
-
                             }
                         }
 
