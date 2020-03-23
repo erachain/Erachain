@@ -1066,8 +1066,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                                     processTiming = System.nanoTime();
 
-                                    try (Block generatedBlock = generateNextBlock(acc_winner, solvingBlock,
-                                            unconfirmedTransactions, winned_forgingValue, winned_winValue, previousTarget)) {
+                                    try {
+
+                                        Block generatedBlock = generateNextBlock(acc_winner, solvingBlock,
+                                                unconfirmedTransactions, winned_forgingValue, winned_winValue, previousTarget);
 
                                         processTiming = System.nanoTime() - processTiming;
 

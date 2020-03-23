@@ -1198,7 +1198,10 @@ public class BlockChain {
                 LOGGER.error("MY WinBlock is INVALID! ignore...");
             }
 
+            // сперва в блоке трнзакции освобождаем и ссылку базу
             block.close();
+            // тепеь сам фор базы закрываем - освободим память и чистильщиков кеша внутренние у MapDB
+            fork.close();
             return false;
         }
 
