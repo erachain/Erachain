@@ -1380,11 +1380,13 @@ public class Controller extends Observable {
         if (this.isStopping)
             return; // MAY BE IT HARD BUSY
 
-        // GET CURRENT WIN BLOCK
-        Block winBlock = this.blockChain.getWaitWinBuffer();
-        if (winBlock != null) {
-            // SEND MESSAGE
-            peer.sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(winBlock));
+        { // ограничим действие переменной winBlock
+            // GET CURRENT WIN BLOCK
+            Block winBlock = this.blockChain.getWaitWinBuffer();
+            if (winBlock != null) {
+                // SEND MESSAGE
+                peer.sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(winBlock));
+            }
         }
 
         if (this.status == STATUS_NO_CONNECTIONS) {
@@ -1878,7 +1880,7 @@ public class Controller extends Observable {
     }
 
     public Block checkNewPeerUpdates(Peer peer) {
-        if (this.blockChain.getWaitWinBuffer() == null) {
+        if (this.blockChain.isEmptyWaitWinBuffer()) {
             // если победный блок не подошел - значит он устарел и там скорее уже цепочка двинулась еще
             byte[] lastSignature = getLastBlockSignature();
             Message mess = MessageFactory.getInstance()
@@ -1906,6 +1908,14 @@ public class Controller extends Observable {
             }
         }
         return null;
+    }
+
+    public void requestLastBlock() {
+        // TODO тут сделать стандартный пустой блок для запроса или новую команду сетевую
+        Block block = getBlockByHeight(2);
+        if (block != null) {
+            broadcastWinBlock(block);
+        }
     }
 
     public Peer update(int shift) {
@@ -2021,18 +2031,13 @@ public class Controller extends Observable {
             // то его вынем и поновой вставим со всеми проверками
             Block winBlockUnchecked = this.blockChain.popWaitWinBuffer();
             if (winBlockUnchecked != null) {
-                this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked,
+                if (!this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked,
                         null // если блок не верный - не баним ПИР может просто он отстал
-                );
+                )) {
+                    // если все же он не подошел или не было победного то вышлем всеим запрос на "Порделитесль последним блоком"
+                    requestLastBlock();
+                }
             }
-            // если все же он не подошел или не было победного то вышлем всеим запрос на "Порделитесль последним блоком"
-            if (this.blockChain.popWaitWinBuffer() == null) {
-                // TODO тут сделать стандартный пустой блок для запроса или новую команду сетевую
-                winBlockUnchecked = getBlockByHeight(2);
-                if (winBlockUnchecked != null)
-                    broadcastWinBlock(winBlockUnchecked);
-            }
-
         }
 
         // send to ALL my HW
@@ -2683,7 +2688,7 @@ public class Controller extends Observable {
             // if last block is changed by core.Synchronizer.process(DLSet, Block)
             // clear this win block
             if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
-                newBlock.close();
+                // see finalliy newBlock.close();
                 return false;
             }
 
@@ -2697,7 +2702,10 @@ public class Controller extends Observable {
                 DCSet forked = dcSet.fork(DCSet.makeDBinMemory(), "flushNewBlockGenerated");
                 // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
                 if (newBlock.isValid(forked, true) > 0) {
-                    // тогда проверим заново полностью
+                    // очищаем занятые транзакциями ресурсы
+                    // see finalliy newBlock.close();
+
+                    // освобождаем память от базы данных - так как мы ее к блоку не привязали
                     forked.close();
                     return false;
                 }
