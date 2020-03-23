@@ -1101,21 +1101,17 @@ public class BlockChain {
 
     }
 
+    public int compareNewWin(DCSet dcSet, Block block) {
+        return this.waitWinBuffer == null ? -1 : this.waitWinBuffer.compareWin(block);
+    }
+
+    public boolean isEmptyWaitWinBuffer() {
+        return this.waitWinBuffer == null;
+    }
+
     // BUFFER of BLOCK for WIN solving
     public Block getWaitWinBuffer() {
         return this.waitWinBuffer;
-    }
-
-	/*
-	public void setCheckPoint(int checkPoint) {
-
-		if (checkPoint > 1)
-			this.checkPoint = checkPoint;
-	}
-	 */
-
-    public int compareNewWin(DCSet dcSet, Block block) {
-        return this.waitWinBuffer == null ? -1 : this.waitWinBuffer.compareWin(block);
     }
 
     public void clearWaitWinBuffer() {
