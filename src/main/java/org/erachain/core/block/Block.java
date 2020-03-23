@@ -4,7 +4,6 @@ import com.google.common.collect.Iterators;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import lombok.Getter;
 import org.erachain.at.ATBlock;
 import org.erachain.at.ATController;
 import org.erachain.at.ATException;
@@ -114,7 +113,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     // was validated
     protected boolean wasValidated;
-    @Getter
+
     protected DCSet validatedForkDB;
 
     /////////////////////////////////////// BLOCK HEAD //////////////////////////////
@@ -1954,6 +1953,12 @@ public class Block implements Closeable, ExplorerJsonLine {
             LOGGER.debug("validatedForkDB is closed on SET: " + this.toString());
         }
         this.validatedForkDB = validatedForkDB;
+        validatedForkDB.makedIn += " setValidatedForkDB: " + this.toString();
+        LOGGER.debug("setValidatedForkDB to: " + validatedForkDB.makedIn);
+    }
+
+    public boolean hasValidatedForkDB() {
+        return this.validatedForkDB != null;
     }
 
     private boolean isClosed;
@@ -1971,19 +1976,22 @@ public class Block implements Closeable, ExplorerJsonLine {
                 LOGGER.error(e.getMessage(), e);
             }
             validatedForkDB = null;
-
+        } else {
+            LOGGER.debug("validatedForkDB is closed: NULL");
         }
 
-        try {
-            // ОЧЕНЬ ВАЖНО чтобы Finalizer мог спокойно удалять их и DCSet.fork
-            // иначе Финализер не можеи зацикленные сслки порвать и не очищает HEAP
-            for (Transaction transaction : transactions) {
-                transaction.resetDCSet();
+        if (transactions != null) {
+            try {
+                // ОЧЕНЬ ВАЖНО чтобы Finalizer мог спокойно удалять их и DCSet.fork
+                // иначе Финализер не можеи зацикленные сслки порвать и не очищает HEAP
+                for (Transaction transaction : transactions) {
+                    transaction.resetDCSet();
+                }
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
-        } catch (Exception e) {
+            transactions = null;
         }
-
-        transactions = null;
 
         isClosed = true;
     }
@@ -2007,7 +2015,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         super.finalize();
     }
 
-    public synchronized void saveToChainFromvalidatedForkDB() {
+    public void saveToChainFromvalidatedForkDB() {
         validatedForkDB.writeToParent();
     }
 

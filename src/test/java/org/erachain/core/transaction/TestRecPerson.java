@@ -984,7 +984,7 @@ public class TestRecPerson {
                 r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
                 r_SertifyPubKeys.sign(registrar, Transaction.FOR_NETWORK);
 
-                DCSet fork = dcSet.fork();
+                DCSet fork = dcSet.fork(this.toString());
 
                 BigDecimal userAccount2ERM = userAccount2.getBalanceUSE(ERM_KEY, fork);
                 BigDecimal userAccount2FEE = userAccount2.getBalanceUSE(FEE_KEY, fork);
@@ -1339,7 +1339,7 @@ public class TestRecPerson {
                 assertEquals(true, userAccount3.isPerson(dcSet, dcSet.getBlockSignsMap().get(dcSet.getBlockMap().getLastBlockSignature())));
 
                 ////////// ORPHAN //////////////////
-                DCSet fork = dcSet.fork();
+                DCSet fork = dcSet.fork(this.toString());
                 r_SertifyPubKeys.setDC(fork);
 
                 r_SertifyPubKeys.orphan(gb, Transaction.FOR_NETWORK);

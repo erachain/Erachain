@@ -3409,7 +3409,7 @@ public class OrderTestsMy {
                 long keyB = assetB.getKey(dcSet);
 
                 // CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
-                DCSet fork1 = dcSet.fork();
+                DCSet fork1 = dcSet.fork(this.toString());
                 CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB,
                         BigDecimal.valueOf(1000), BigDecimal.valueOf(100), (byte) 0, timestamp++,
                         accountA.getLastTimestamp(fork1)[0], new byte[]{5, 6});
@@ -3419,7 +3419,7 @@ public class OrderTestsMy {
                 Long orderID_A = createOrderTransaction.makeOrder().getId();
 
                 // CREATE ORDER TWO (SELLING 1000 A FOR B AT A PRICE FOR 0.20)
-                DCSet fork2 = fork1.fork();
+                DCSet fork2 = fork1.fork(this.toString());
                 createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
                         BigDecimal.valueOf(200), (byte) 0, timestamp++, accountA.getLastTimestamp(fork2)[0], new byte[]{1, 2});
                 createOrderTransaction.sign(accountA, Transaction.FOR_NETWORK);
@@ -3431,7 +3431,7 @@ public class OrderTestsMy {
                 Assert.assertEquals(0, orderB.getInitiatedTrades(fork1).size());
 
                 // CREATE ORDER THREE (SELLING 150 B FOR A AT A PRICE OF 5)
-                DCSet fork3 = fork2.fork();
+                DCSet fork3 = fork2.fork(this.toString());
                 createOrderTransaction = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(150),
                         BigDecimal.valueOf(750), (byte) 0, timestamp++, accountA.getLastTimestamp(fork3)[0], new byte[]{3, 4});
                 createOrderTransaction.sign(accountB, Transaction.FOR_NETWORK);
@@ -3618,7 +3618,7 @@ public class OrderTestsMy {
                 assertEquals(Transaction.INVALID_ORDER_CREATOR, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
                 // CREATE INVALID CANCEL ORDER NO BALANCE
-                DCSet fork = dcSet.fork();
+                DCSet fork = dcSet.fork(this.toString());
                 cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER, timestamp++, 0l);
                 cancelOrderTransaction.setDC(fork, Transaction.FOR_NETWORK, height, ++seqNo);
                 cancelOrderTransaction.sign(accountA, Transaction.FOR_NETWORK);
@@ -3821,7 +3821,7 @@ public class OrderTestsMy {
 
                 ///////////////////  add FORK dcSet
 
-                DCSet fork = dcSet.fork();
+                DCSet fork = dcSet.fork(this.toString());
 
                 orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(100),
                         BigDecimal.valueOf(100), (byte) 0, timestamp++, 0l, new byte[64]);

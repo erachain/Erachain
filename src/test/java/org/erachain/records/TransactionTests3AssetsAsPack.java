@@ -544,7 +544,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(Transaction.INVALID_ORDER_CREATOR, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID CANCEL ORDER NO BALANCE
-        DCSet fork = db.fork();
+        DCSet fork = db.fork(this.toString());
         cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[]{5, 6}, FEE_POWER, System.currentTimeMillis(), 0l, new byte[]{1, 2});
         maker.changeBalance(fork, false, false, FEE_KEY, BigDecimal.ZERO, false, false);
 

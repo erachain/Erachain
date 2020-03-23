@@ -162,7 +162,7 @@ public class TradeMapImplTest {
                         3, 5, index++);
                 tradesMap.put(trade);
 
-                DCSet forked = dcSet.fork();
+                DCSet forked = dcSet.fork(this.toString());
                 TradeMapImpl forkedTradesMap = forked.getTradeMap();
 
                 iterator = forkedTradesMap.getIteratorByInitiator(initiatorID);

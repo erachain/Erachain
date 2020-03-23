@@ -375,7 +375,7 @@ public class Synchronizer extends Thread {
 
         // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
         DB database = DCSet.getHardBaseForFork();
-        try (DCSet fork = dcSet.fork(database)) {
+        try (DCSet fork = dcSet.fork(database, "synchronizeNewBlocks")) {
 
             // освободим всю память
             dcSet.clearCache();
@@ -589,7 +589,7 @@ public class Synchronizer extends Thread {
                                 break;
                             }
 
-                            try (DCSet fork = dcSet.fork(DCSet.makeDBinMemory())) {
+                            try (DCSet fork = dcSet.fork(DCSet.makeDBinMemory(), "synchronize")) {
                                 if (blockFromPeer.isValid(fork, false) > 0) {
 
                                     errorMess = "invalid BLOCK";
@@ -937,234 +937,243 @@ public class Synchronizer extends Thread {
         Exception error = null;
         Throwable thrown = null;
 
-        if (doOrphan) {
+        // нужно закрыть в любом случае блок по выходу так как он уже отыграл
+        // и тем более если там был внутри ФоркБазы - ее надо закрыть
+        // иначе при догонянии цепочки несколькими нодами - частые откаты и т.д. и Форки не закрываются иногда
+        try {
+            if (doOrphan) {
 
-            try {
-                block.orphan(dcSet, notStoreTXs);
-                dcSet.getBlockMap().setProcessing(false);
-                //dcSet.updateTxCounter(-block.getTransactionCount());
-                // FARDFLUSH not use in each case - only after accumulate size
-                dcSet.flush(txCount + 3, false, doOrphan);
+                try {
+                    block.orphan(dcSet, notStoreTXs);
+                    dcSet.getBlockMap().setProcessing(false);
+                    //dcSet.updateTxCounter(-block.getTransactionCount());
+                    // FARDFLUSH not use in each case - only after accumulate size
+                    dcSet.flush(txCount + 3, false, doOrphan);
 
-                if (ctrl.isOnStopping())
-                    return;
+                    if (ctrl.isOnStopping())
+                        return;
 
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
-                error = new Exception(e);
-
-            } catch (Exception e) {
-
-                if (ctrl.isOnStopping()) {
-                    return;
-                } else {
+                } catch (IOException e) {
                     LOGGER.error(e.getMessage(), e);
                     error = new Exception(e);
-                }
-            } catch (Throwable e) {
-                if (ctrl.isOnStopping()) {
-                    return;
-                } else {
-                    thrown = new Throwable(e);
-                }
-            } finally {
 
-                if (ctrl.isOnStopping()) {
-                    // was BREAK - try ROLLBACK
-                    dcSet.rollback();
-                    throw new Exception("on stopping");
-                }
+                } catch (Exception e) {
 
-                if (error != null) {
-                    // was BREAK - try ROLLBACK
-                    try {
+                    if (ctrl.isOnStopping()) {
+                        return;
+                    } else {
+                        LOGGER.error(e.getMessage(), e);
+                        error = new Exception(e);
+                    }
+                } catch (Throwable e) {
+                    if (ctrl.isOnStopping()) {
+                        return;
+                    } else {
+                        thrown = new Throwable(e);
+                    }
+                } finally {
+
+                    if (ctrl.isOnStopping()) {
                         // was BREAK - try ROLLBACK
                         dcSet.rollback();
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(322);
-                        return;
-                    } catch (Throwable e) {
-                        LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(327);
-                        return;
+                        throw new Exception("on stopping");
                     }
 
-                    ctrl.stopAll(323);
-
-                    throw error;
-
-                } else if (thrown != null) {
-
-                    LOGGER.error(thrown.getMessage(), thrown);
-
-                    try {
+                    if (error != null) {
                         // was BREAK - try ROLLBACK
-                        dcSet.rollback();
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(324);
-                        return;
-                    } catch (Throwable e) {
-                        LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(337);
-                        return;
-                    }
-
-                    ctrl.stopAll(335);
-
-                    throw new Exception(thrown);
-
-                }
-
-                if (observOn) {
-
-                    if (countObserv_ADD != null) {
                         try {
-                            dcSet.getTransactionTab().setObservableData(DBTab.NOTIFY_ADD, countObserv_ADD);
+                            // was BREAK - try ROLLBACK
+                            dcSet.rollback();
+                        } catch (Exception e) {
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(322);
+                            return;
+                        } catch (Throwable e) {
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(327);
+                            return;
+                        }
+
+                        ctrl.stopAll(323);
+
+                        throw error;
+
+                    } else if (thrown != null) {
+
+                        LOGGER.error(thrown.getMessage(), thrown);
+
+                        try {
+                            // was BREAK - try ROLLBACK
+                            dcSet.rollback();
+                        } catch (Exception e) {
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(324);
+                            return;
+                        } catch (Throwable e) {
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(337);
+                            return;
+                        }
+
+                        ctrl.stopAll(335);
+
+                        throw new Exception(thrown);
+
+                    }
+
+                    if (observOn) {
+
+                        if (countObserv_ADD != null) {
+                            try {
+                                dcSet.getTransactionTab().setObservableData(DBTab.NOTIFY_ADD, countObserv_ADD);
+                            } catch (Exception e) {
+                                LOGGER.error(e.getMessage(), e);
+                            }
+                        }
+
+                        try {
+                            dcSet.getBlockMap().notifyOrphanChain(block);
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
                         }
                     }
 
-                    try {
-                        dcSet.getBlockMap().notifyOrphanChain(block);
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
+                }
+
+            } else {
+
+                // PROCESS
+                try {
+                    if (block.hasValidatedForkDB()) {
+                        block.saveToChainFromvalidatedForkDB();
+                    } else {
+                        block.process(dcSet);
                     }
-                }
 
-            }
+                    dcSet.getBlockMap().setProcessing(false);
+                    //dcSet.updateTxCounter(block.getTransactionCount());
 
-        } else {
+                    // FLUSH not use in each case - only after accumulate size
+                    dcSet.flush(txCount + 3, false, doOrphan);
 
-            // PROCESS
-            try {
-                if (block.getValidatedForkDB() == null) {
-                    block.process(dcSet);
-                } else {
-                    block.saveToChainFromvalidatedForkDB();
-                }
+                    if (ctrl.isOnStopping())
+                        return;
 
-                dcSet.getBlockMap().setProcessing(false);
-                //dcSet.updateTxCounter(block.getTransactionCount());
+                    if (Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
+                        ctrl.NotifyIncoming(block.getTransactions());
+                    }
 
-                // FLUSH not use in each case - only after accumulate size
-                dcSet.flush(txCount + 3, false, doOrphan);
+                    if (ctrl.isOnStopping())
+                        return;
 
-                if (ctrl.isOnStopping())
-                    return;
-
-                if (Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
-                    ctrl.NotifyIncoming(block.getTransactions());
-                }
-
-                if (ctrl.isOnStopping())
-                    return;
-
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
-                error = new Exception(e);
-
-            } catch (Exception e) {
-
-                if (ctrl.isOnStopping()) {
-                    return;
-                } else {
+                } catch (IOException e) {
                     LOGGER.error(e.getMessage(), e);
                     error = new Exception(e);
-                }
-            } catch (Throwable e) {
-                if (ctrl.isOnStopping()) {
-                    return;
-                } else {
-                    LOGGER.error(e.getMessage(), e);
-                    thrown = new Throwable(e);
-                }
-            } finally {
 
-                if (ctrl.isOnStopping()) {
-                    // was BREAK - try ROLLBACK
-                    dcSet.rollback();
-                    throw new Exception("on stopping");
-                }
+                } catch (Exception e) {
 
-                if (error != null) {
+                    if (ctrl.isOnStopping()) {
+                        return;
+                    } else {
+                        LOGGER.error(e.getMessage(), e);
+                        error = new Exception(e);
+                    }
+                } catch (Throwable e) {
+                    if (ctrl.isOnStopping()) {
+                        return;
+                    } else {
+                        LOGGER.error(e.getMessage(), e);
+                        thrown = new Throwable(e);
+                    }
+                } finally {
 
-                    try {
+                    block.close();
+                    if (ctrl.isOnStopping()) {
                         // was BREAK - try ROLLBACK
                         dcSet.rollback();
-                        ctrl.stopAll(345);
-                        return;
-
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(346);
-                        return;
-                    } catch (Throwable e) {
-                        LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(347);
-                        return;
+                        throw new Exception("on stopping");
                     }
 
-                } else if (thrown != null) {
+                    if (error != null) {
 
-                    try {
-                        // was BREAK - try ROLLBACK
-                        dcSet.rollback();
-                        ctrl.stopAll(351);
-                        return;
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(352);
-                        return;
-                    } catch (Throwable e) {
-                        LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(353);
-                        return;
-                    }
-
-                }
-
-                // NOTIFY to WALLET
-
-                if (observOn) {
-
-                    if (countObserv_REMOVE != null) {
                         try {
-                            dcSet.getTransactionTab().setObservableData(DBTab.NOTIFY_REMOVE, countObserv_REMOVE);
+                            // was BREAK - try ROLLBACK
+                            dcSet.rollback();
+                            ctrl.stopAll(345);
+                            return;
+
+                        } catch (Exception e) {
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(346);
+                            return;
+                        } catch (Throwable e) {
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(347);
+                            return;
+                        }
+
+                    } else if (thrown != null) {
+
+                        try {
+                            // was BREAK - try ROLLBACK
+                            dcSet.rollback();
+                            ctrl.stopAll(351);
+                            return;
+                        } catch (Exception e) {
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(352);
+                            return;
+                        } catch (Throwable e) {
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(353);
+                            return;
+                        }
+
+                    }
+
+                    // NOTIFY to WALLET
+
+                    if (observOn) {
+
+                        if (countObserv_REMOVE != null) {
+                            try {
+                                dcSet.getTransactionTab().setObservableData(DBTab.NOTIFY_REMOVE, countObserv_REMOVE);
+                            } catch (Exception e) {
+                                LOGGER.error(e.getMessage(), e);
+                            }
+                        }
+
+                        try {
+                            dcSet.getBlockMap().notifyProcessChain(block);
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
                         }
-                    }
 
-                    try {
-                        dcSet.getBlockMap().notifyProcessChain(block);
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
                     }
-
                 }
             }
-        }
 
-        if (!dcSet.isFork()) {
-            // только запись в нашу цепочку
+            if (!dcSet.isFork()) {
+                // только запись в нашу цепочку
 
-            if (ctrl.doesWalletExists() && !ctrl.noDataWallet) {
-                ctrl.wallet.walletUpdater.offerMessage(new Pair(doOrphan, block));
+                if (ctrl.doesWalletExists() && !ctrl.noDataWallet) {
+                    ctrl.wallet.walletUpdater.offerMessage(new Pair(doOrphan, block));
+                }
+
+                processTiming = System.nanoTime() - processTiming;
+                if (processTiming < 999999999999L) {
+                    // при переполнении может быть минус
+                    // в миеросекундах подсчет делаем
+                    bchain.updateTXProcessTimingAverage(processTiming, txCount);
+
+                    LOGGER.debug("PROCESS SPEED for: " + txCount + "tx is :" + (txCount + Controller.BLOCK_AS_TX_COUNT) * 1000000000L
+                            / processTiming
+                            + " tx/s");
+                }
             }
 
-            processTiming = System.nanoTime() - processTiming;
-            if (processTiming < 999999999999L) {
-                // при переполнении может быть минус
-                // в миеросекундах подсчет делаем
-                bchain.updateTXProcessTimingAverage(processTiming, txCount);
-
-                LOGGER.debug("PROCESS SPEED for: " + txCount + "tx is :" + (txCount + Controller.BLOCK_AS_TX_COUNT) * 1000000000L
-                        / processTiming
-                        + " tx/s");
-            }
+        } finally {
+            block.close();
         }
 
     }
