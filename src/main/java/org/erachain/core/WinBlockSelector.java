@@ -3,6 +3,7 @@ package org.erachain.core;
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.datachain.DCSet;
+import org.erachain.network.Peer;
 import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
@@ -50,6 +51,15 @@ public class WinBlockSelector extends MonitoredThread {
         return result;
     }
 
+    private void getWinOrLastBlockFromPeer(Peer sender) {
+        Block myWinBlock = blockChain.getWaitWinBuffer();
+        myWinBlock = myWinBlock == null ? blockChain.getLastBlock(dcSet) : myWinBlock;
+        if (myWinBlock != null) {
+            sender.sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
+        }
+
+    }
+
     public void processMessage(Message message) {
 
         if (message == null)
@@ -86,11 +96,7 @@ public class WinBlockSelector extends MonitoredThread {
             if (invalid <= Block.INVALID_REFERENCE) {
                 // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока
                 // а если у нас уже в буфере нет, то пошлем наш последний блок
-                Block myWinBlock = blockChain.getWaitWinBuffer();
-                myWinBlock = myWinBlock == null ? blockChain.getLastBlock(dcSet) : myWinBlock;
-                if (myWinBlock != null) {
-                    message.getSender().sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
-                }
+                getWinOrLastBlockFromPeer(message.getSender());
             }
 
             return;
@@ -116,11 +122,7 @@ public class WinBlockSelector extends MonitoredThread {
         } else {
             // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока
             // а если у нас уже в буфере нет, то пошлем наш последний блок
-            Block myWinBlock = blockChain.getWaitWinBuffer();
-            myWinBlock = myWinBlock == null ? blockChain.getLastBlock(dcSet) : myWinBlock;
-            if (myWinBlock != null) {
-                message.getSender().sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
-            }
+            getWinOrLastBlockFromPeer(message.getSender());
         }
     }
 
