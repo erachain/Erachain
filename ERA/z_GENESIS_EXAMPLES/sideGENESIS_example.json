@@ -1,17 +1,21 @@
-// EXAMPLE
 [
-  // APP NAME
-  "NOVA",
-  // TIMESTAMP in ms [LONG]
-  1584299880000,
-  // forging addresses [LIST[]]
+  // SIDECHAIN SHORT NAME, SIDECHAIN= FULL NAME
+  [
+    "NOVA",
+    "NOVA SIDE CHAIN"
+  ],
+  // TIMESTAMP LONG
+  [
+    1584424800000
+  ],
+  // forging addresses
   [
     /// recipient, ERA, COMPU, [DEBTORS]
     [
       "74KvWNicSfSTV8aCnKFdwWzBWiTWw1dQoB",
       10000000,
       0,
-      // debtors [LIST[]]
+      // debtors
       [
         // ERA, recipient
         [
@@ -20,19 +24,9 @@
         ],
         [
           227272,
-          "74ULDk7gvZGMLMjhNvpNpucDUXTPVcL3ZE"
-        ],
-        [
-          227272,
-          "7PqDCB5YTkEye3sP3WLLP3LiRXr3kxQfVR"
-        ],
-        [
-          227272,
           "79ynTmueP2mXfS2yvtqf5yhkqE2WUS8wYa"
         ]
       ]
     ]
-  ],
-  // ASSETS
-  []
+  ]
 ]

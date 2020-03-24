@@ -39,7 +39,7 @@ public class Start {
 
         //builder.headless(false).run(args);
 
-        File file = new File("genesis.json");
+        File file = new File("sideGENESIS.json");
         if (file.exists()) {
             // START SIDE CHAIN
             try {
