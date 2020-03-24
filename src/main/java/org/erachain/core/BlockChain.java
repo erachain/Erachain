@@ -1,5 +1,7 @@
 package org.erachain.core;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
@@ -8,6 +10,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlocksHeadsMap;
@@ -17,11 +20,14 @@ import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -367,7 +373,7 @@ public class BlockChain {
     public static HashSet<String> ANONYMASERS = new HashSet<String>();
     public static HashSet<String> FOUNDATION_ADDRESSES = new HashSet<String>();
     public static HashMap<String, int[][]> FREEZED_BALANCES = new HashMap<String, int[][]>();
-    public static HashMap<String, Pair<Integer, byte[]>> NOVA_ASSETS = new HashMap<String, Pair<Integer, byte[]>>();
+    public static HashMap<String, Tuple3<Integer, Long, byte[]>> NOVA_ASSETS = new HashMap<String, Tuple3<Integer, Long, byte[]>>();
     public static HashMap<String, String> LOCKED__ADDRESSES = new HashMap<String, String>();
     public static HashMap<String, Tuple3<String, Integer, Integer>> LOCKED__ADDRESSES_PERIOD = new HashMap<String, Tuple3<String, Integer, Integer>>();
     public static HashMap<Long, PublicKeyAccount> ASSET_OWNERS = new HashMap<Long, PublicKeyAccount>();
@@ -405,8 +411,43 @@ public class BlockChain {
         trustedPeers.addAll(Settings.getInstance().getTrustedPeers());
 
 
-        if (TEST_DB > 0 || SIDE_MODE || TEST_MODE && !DEMO_MODE) {
+        if (TEST_DB > 0 || TEST_MODE && !DEMO_MODE) {
             ;
+        } else if (SIDE_MODE) {
+            File file = new File("sidePROTOCOL.json");
+            if (file.exists()) {
+                // START SIDE CHAIN
+                String jsonString = "";
+                try {
+                    List<String> lines = Files.readLines(file, Charsets.UTF_8);
+
+                    for (String line : lines) {
+                        if (line.trim().startsWith("//")) {
+                            // пропускаем //
+                            continue;
+                        }
+                        jsonString += line;
+                    }
+
+                } catch (Exception e) {
+                    LOGGER.info("Error while reading " + file.getAbsolutePath());
+                    LOGGER.error(e.getMessage(), e);
+                    System.exit(3);
+                }
+
+                //CREATE JSON OBJECT
+                JSONObject chainParams = (JSONObject) JSONValue.parse(jsonString);
+
+                if (chainParams.containsKey("assets")) {
+                    JSONArray items = (JSONArray) chainParams.get("assets");
+                    for (Object item : items) {
+                        JSONArray json = (JSONArray) item;
+                        NOVA_ASSETS.put(json.get(0).toString(),
+                                new Tuple3<>((Integer) json.get(1), (Long) json.get(2),
+                                        Crypto.getInstance().getShortBytesFromAddress(json.get(3).toString())));
+                    }
+                }
+            }
         } else if (DEMO_MODE) {
 
             // GENERAL TRUST
@@ -420,9 +461,9 @@ public class BlockChain {
 
             // из p130 счета для прорверки
             NOVA_ASSETS.put("BTC",
-                    new Pair<Integer, byte[]>(12, new Account("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(12, 0L, new Account("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz").getShortAddressBytes()));
             NOVA_ASSETS.put("USD",
-                    new Pair<Integer, byte[]>(95, new Account("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(95, 0L, new Account("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz").getShortAddressBytes()));
 
             LOCKED__ADDRESSES.put("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz", "7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1");
             TRUSTED_ANONYMOUS.add("762eatKnsB3xbyy2t9fwjjqUG1GoxQ8Rhx");
@@ -479,55 +520,55 @@ public class BlockChain {
 
             // TICKER = KEY + CREATOR
             NOVA_ASSETS.put("BTC",
-                    new Pair<Integer, byte[]>(12, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(12, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("ETH",
-                    new Pair<Integer, byte[]>(14, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(14, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
 
             NOVA_ASSETS.put("USD",
-                    new Pair<Integer, byte[]>(95, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(95, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("EUR",
-                    new Pair<Integer, byte[]>(94, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(94, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("CNY",
-                    new Pair<Integer, byte[]>(93, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(93, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("RUB",
-                    new Pair<Integer, byte[]>(92, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(92, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("JPY",
-                    new Pair<Integer, byte[]>(91, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(91, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("GBP",
-                    new Pair<Integer, byte[]>(90, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(90, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("CHF",
-                    new Pair<Integer, byte[]>(89, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(89, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("AUD",
-                    new Pair<Integer, byte[]>(88, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(88, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("SGD",
-                    new Pair<Integer, byte[]>(87, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(87, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("TRY",
-                    new Pair<Integer, byte[]>(86, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(86, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
 
 
             // COMMODITY
             NOVA_ASSETS.put("GOLD",
-                    new Pair<Integer, byte[]>(21, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(21, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("OIL",
-                    new Pair<Integer, byte[]>(22, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(22, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("GAS",
-                    new Pair<Integer, byte[]>(23, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(23, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("BREND",
-                    new Pair<Integer, byte[]>(24, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(24, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
 
 
             /// Права для Кибальникова в Боевой Версии
             NOVA_ASSETS.put("ERG",
-                    new Pair<Integer, byte[]>(20, new Account("7GiE2pKyrULF2iQhAXvdUusXYqiKRQx68m").getShortAddressBytes()));
+                    new Tuple3<Integer, Long, byte[]>(20, 0L, new Account("7GiE2pKyrULF2iQhAXvdUusXYqiKRQx68m").getShortAddressBytes()));
 
             //NOVA_ASSETS.put("@@USD",
-            //		new Pair<Integer, byte[]>(95, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+            //		new Tuple3<Integer, Long, byte[]>(95, 0L, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
             //NOVA_ASSETS.put("¤¤RUB",
-            //		new Pair<Integer, byte[]>(93, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+            //		new Tuple3<Integer, Long, byte[]>(93, 0L, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
             //NOVA_ASSETS.put("ERARUB",
-            //		new Pair<Integer, byte[]>(91, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+            //		new Tuple3<Integer, Long, byte[]>(91, 0L, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
             //NOVA_ASSETS.put("ERAUSD",
-            //		new Pair<Integer, byte[]>(85, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+            //		new Tuple3<Integer, Long, byte[]>(85, 0L, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
 
             // LOCKED -> to TRUSTED for it address
             LOCKED__ADDRESSES.put("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh", "79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
@@ -811,9 +852,9 @@ public class BlockChain {
     }
 
     public static boolean isNovaAsset(Long key) {
-        Iterator<Pair<Integer, byte[]>> iterator = NOVA_ASSETS.values().iterator();
+        Iterator<Tuple3<Integer, Long, byte[]>> iterator = NOVA_ASSETS.values().iterator();
         while (iterator.hasNext()) {
-            if (iterator.next().getA().equals(key))
+            if (iterator.next().a.equals(key))
                 return true;
         }
         return false;

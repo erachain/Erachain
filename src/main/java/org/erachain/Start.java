@@ -90,36 +90,12 @@ public class Start {
 
                 //CREATE JSON OBJECT
                 Settings.genesisJSON = (JSONArray) JSONValue.parse(jsonString);
-                JSONArray appArray = ((JSONArray) Settings.genesisJSON.get(0);
+                JSONArray appArray = (JSONArray) Settings.genesisJSON.get(0);
                 Settings.APP_NAME = appArray.get(0).toString();
                 Settings.APP_FULL_NAME = appArray.get(1).toString();
-                JSONArray timeArray = ((JSONArray) Settings.genesisJSON.get(1);
+                JSONArray timeArray = (JSONArray) Settings.genesisJSON.get(1);
                 Settings.genesisStamp = new Long(timeArray.get(0).toString());
 
-                file = new File("sideGENESIS.json");
-                if (file.exists()) {
-                    // START SIDE CHAIN
-                    try {
-                        lines = Files.readLines(file, Charsets.UTF_8);
-
-                        jsonString = "";
-                        for (String line : lines) {
-                            if (line.trim().startsWith("//")) {
-                                // пропускаем //
-                                continue;
-                            }
-                            jsonString += line;
-                        }
-
-                    } catch (Exception e) {
-                        LOGGER.info("Error while reading " + file.getAbsolutePath());
-                        LOGGER.error(e.getMessage(), e);
-                        System.exit(3);
-                    }
-
-
-                    Settings.NET_MODE = Settings.NET_MODE_SIDE;
-                }
             } catch (Exception e) {
                 LOGGER.info("Error while reading " + file.getAbsolutePath());
                 LOGGER.error(e.getMessage(), e);
