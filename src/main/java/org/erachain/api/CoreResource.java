@@ -31,8 +31,11 @@ public class CoreResource {
     public static JSONObject infoJson() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("version", getVersionJson());
+        jsonObject.put("networkMode", Settings.NET_MODE);
+
         jsonObject.put("status", getStatus());
         jsonObject.put("forgingStatus", getForgingStatusJson());
+
 
         Block last = Controller.getInstance().getLastBlock();
         jsonObject.put("lastBlock", last.blockHead.toJson());
