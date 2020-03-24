@@ -216,7 +216,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
         if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
             Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
-            if (item.b < item.b) {
+            if (item.b < quantity) {
                 return INVALID_QUANTITY;
             }
         }
