@@ -30,6 +30,7 @@ public class Settings {
     public static final long DEFAULT_DEMO_NET_STAMP = 1581001700000L; // default for developers test net
 
     public static String APP_NAME = "";
+    public static String APP_FULL_NAME = "";
 
     // FOR TEST by default
     public static long genesisStamp = DEFAULT_MAINNET_STAMP;

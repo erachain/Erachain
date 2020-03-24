@@ -38,8 +38,42 @@ public class Start {
         //SpringApplicationBuilder builder = new SpringApplicationBuilder(Start.class);
 
         //builder.headless(false).run(args);
+        File file = new File("startARGS.txt");
+        if (file.exists()) {
+            try {
+                List<String> lines = Files.readLines(file, Charsets.UTF_8);
 
-        File file = new File("sideGENESIS.json");
+                String parsString = "";
+                for (String line : lines) {
+                    if (line.trim().startsWith("//")) {
+                        // пропускаем //
+                        continue;
+                    }
+                    parsString += " -" + line.trim(); // add -
+                }
+
+                String[] pars = parsString.trim().split(" ");
+                String[] argsNew = new String[args.length + pars.length];
+                int i = 0;
+                while (i < args.length) {
+                    argsNew[i] = args[i++];
+                }
+                int k = 0;
+                while (k < pars.length) {
+                    argsNew[i + k] = pars[k++];
+                }
+
+                args = pars;
+
+            } catch (Exception e) {
+                LOGGER.info("Error while reading " + file.getAbsolutePath());
+                LOGGER.error(e.getMessage(), e);
+                System.exit(3);
+            }
+        }
+
+
+        file = new File("sideGENESIS.json");
         if (file.exists()) {
             // START SIDE CHAIN
             try {
@@ -56,12 +90,36 @@ public class Start {
 
                 //CREATE JSON OBJECT
                 Settings.genesisJSON = (JSONArray) JSONValue.parse(jsonString);
-                Settings.APP_NAME = Settings.genesisJSON.get(0).toString();
-                Settings.genesisStamp = new Long(Settings.genesisJSON.get(1).toString());
-                Settings.NET_MODE = Settings.NET_MODE_SIDE;
+                JSONArray appArray = ((JSONArray) Settings.genesisJSON.get(0);
+                Settings.APP_NAME = appArray.get(0).toString();
+                Settings.APP_FULL_NAME = appArray.get(1).toString();
+                JSONArray timeArray = ((JSONArray) Settings.genesisJSON.get(1);
+                Settings.genesisStamp = new Long(timeArray.get(0).toString());
 
-                //Settings.genesisStamp = -1;
+                file = new File("sideGENESIS.json");
+                if (file.exists()) {
+                    // START SIDE CHAIN
+                    try {
+                        lines = Files.readLines(file, Charsets.UTF_8);
 
+                        jsonString = "";
+                        for (String line : lines) {
+                            if (line.trim().startsWith("//")) {
+                                // пропускаем //
+                                continue;
+                            }
+                            jsonString += line;
+                        }
+
+                    } catch (Exception e) {
+                        LOGGER.info("Error while reading " + file.getAbsolutePath());
+                        LOGGER.error(e.getMessage(), e);
+                        System.exit(3);
+                    }
+
+
+                    Settings.NET_MODE = Settings.NET_MODE_SIDE;
+                }
             } catch (Exception e) {
                 LOGGER.info("Error while reading " + file.getAbsolutePath());
                 LOGGER.error(e.getMessage(), e);

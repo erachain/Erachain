@@ -15,6 +15,12 @@ For clone code:
 1. Set Task: build
 1. Set Arguments: --exclude-task test
 
+### For use arguments on Mac or by default
+Make in folder file startARGS.txt (see example in z_RUN_EXAMPLES folder) 
+
+## Other
+
+
 Настройка запуска - Приложение и обязательно выбрать нативный Java SDK 1.8, использовать встроенный в IDEA нельзя! Иначе будет ошибка при коммитах базы данных.  
 https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#javasejdk
 
