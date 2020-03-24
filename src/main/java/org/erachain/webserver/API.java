@@ -4,7 +4,6 @@ import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.CoreResource;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -1871,7 +1870,6 @@ public class API {
     public Response getInformation() throws NoSuchFieldException, IllegalAccessException {
         JSONObject jsonObject = CoreResource.infoJson();
 
-
         Object f = Controller.class.getDeclaredField("version");
         ((Field) f).setAccessible(true);
         String version = ((Field) f).get(Controller.getInstance()).toString();
@@ -1880,10 +1878,6 @@ public class API {
 
         int lastBlock = (cntrl.getLastBlock()).getHeight();
         jsonObject.put("lastBlock", lastBlock);
-        BlockGenerator.ForgingStatus forgingStatus = cntrl.getForgingStatus();
-        //jsonObject.put("forgingCodeStatus", forgingStatus.getStatuscode());
-
-        jsonObject.put("forgingStatus", forgingStatus.getName());
 
         Settings setting = Settings.getInstance();
         jsonObject.put("rpcEnable", setting.isRpcEnabled());

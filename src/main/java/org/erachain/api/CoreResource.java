@@ -26,15 +26,20 @@ import javax.ws.rs.core.MediaType;
 public class CoreResource {
     @Context
     HttpServletRequest request;
+    private Controller cnt = Controller.getInstance();
 
     public static JSONObject infoJson() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("version", getVersion());
         jsonObject.put("status", getStatus());
+        jsonObject.put("forgingStatus", getForgingStatus());
+        jsonObject.put("last", Controller.getInstance().getLastBlock().blockHead.toJson());
+
         if (BlockChain.SIDE_MODE) {
             JSONObject jsonSide = new JSONObject();
             ///jsonSide.put("magic", Ints.fromByteArray(Controller.getInstance().getMessageMagic()));
             jsonSide.put("name", Controller.getInstance().APP_NAME);
+            jsonSide.put("timestamp", Controller.getInstance().blockChain.getGenesisBlock().getTimestamp());
             jsonSide.put("sign", Base58.encode(Controller.getInstance().blockChain.getGenesisBlock().getSignature()));
 
             jsonObject.put("side", jsonSide);
@@ -66,24 +71,28 @@ public class CoreResource {
         return String.valueOf(true);
     }
 
-    @SuppressWarnings("unchecked")
-    @GET
-    @Path("/version")
-    public static String getVersion() {
+    public static JSONObject getVersionJson() {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put("version", Controller.getInstance().getVersion(true));
+        jsonObject.put("version", Controller.version);
         jsonObject.put("buildDate", Controller.getInstance().getBuildDateString());
         jsonObject.put("buildTimeStamp", Controller.buildTimestamp);
 
 
-        return jsonObject.toJSONString();
+        return jsonObject;
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("/version")
+    public static String getVersion() {
+        return getVersionJson().toJSONString();
     }
 
     @GET
     @Path("/status/forging")
-    public String getForgingStatus() {
-        return String.valueOf(Controller.getInstance().getForgingStatus().getStatuscode());
+    public static String getForgingStatus() {
+        return Controller.getInstance().getForgingStatus().getName();
     }
 
     @GET
