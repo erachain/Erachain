@@ -152,6 +152,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         String name = this.item.getName();
         // TEST ONLY CHARS
         int nameLen = name.length();
+
         if (nameLen < item.getMinNameLen()
                 //&& !BlockChain.DEVELOP_USE
                 && height > 114000

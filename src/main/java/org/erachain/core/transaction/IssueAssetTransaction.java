@@ -8,6 +8,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -212,6 +213,14 @@ public class IssueAssetTransaction extends IssueItemRecord {
         if (quantity > maxQuantity || quantity < -1) {
             return INVALID_QUANTITY;
         }
+
+        if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
+            Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
+            if (item.b < item.b) {
+                return INVALID_QUANTITY;
+            }
+        }
+
         return Transaction.VALIDATE_OK;
     }
 

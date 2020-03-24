@@ -14,6 +14,7 @@ import org.json.simple.JSONObject;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 
 // 1019 - Movable = true; Divisible = NO; Quantity = 1
@@ -415,10 +416,15 @@ public abstract class AssetCls extends ItemCls {
 
     @Override
     public byte[] getImage() {
-        if (key < 1000 && image.length > 0 )
+        if (key < 1000 && image.length > 0)
             return new byte[0];
 
         return image;
+    }
+
+    @Override
+    public HashMap getNovaItems() {
+        return BlockChain.NOVA_ASSETS;
     }
 
     public boolean isMovable() {

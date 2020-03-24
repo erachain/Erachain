@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 //import java.math.BigDecimal;
 //import com.google.common.primitives.Longs;
@@ -582,17 +583,28 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return json;
     }
 
+    public HashMap getNovaItems() {
+        return new HashMap<String, Fun.Tuple3<Long, Long, byte[]>>();
+    }
+
+    public byte[] getNovaItemCreator(Object item) {
+        return ((Fun.Tuple3<Integer, Long, byte[]>) item).c;
+    }
+
+    public Long getNovaItemKey(Object item) {
+        return ((Fun.Tuple3<Long, Long, byte[]>) item).a;
+    }
+
     /**
-     *
      * @param creator
      * @param dcSet
      * @return key если еще не добавлен, -key если добавлен и 0 - если это не НОВА
      */
     public long isNovaAsset(Account creator, DCSet dcSet) {
-        Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
-        if (pair != null && creator.equals(pair.getB())) {
+        Object item = getNovaItems().get(this.name);
+        if (item != null && creator.equals(getNovaItemCreator(item))) {
             ItemMap dbMap = this.getDBMap(dcSet);
-            long key = (long)pair.getA();
+            Long key = (Long) getNovaItemKey(item);
             if (dbMap.contains(key)) {
                 return -key;
             } else {
@@ -600,7 +612,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
             }
         }
 
-        return 0l;
+        return 0L;
     }
 
     //
