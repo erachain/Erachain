@@ -30,10 +30,17 @@ public class CoreResource {
 
     public static JSONObject infoJson() {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("version", getVersion());
+        jsonObject.put("version", getVersionJson());
         jsonObject.put("status", getStatus());
-        jsonObject.put("forgingStatus", getForgingStatus());
-        jsonObject.put("last", Controller.getInstance().getLastBlock().blockHead.toJson());
+        jsonObject.put("forgingStatus", getForgingStatusJson());
+
+        Block last = Controller.getInstance().getLastBlock();
+        jsonObject.put("lastBlock", last.blockHead.toJson());
+        jsonObject.put("height", last.getHeight());
+
+        Settings setting = Settings.getInstance();
+        jsonObject.put("rpc", setting.isRpcEnabled());
+        jsonObject.put("web", setting.isWebEnabled());
 
         if (BlockChain.SIDE_MODE) {
             JSONObject jsonSide = new JSONObject();
@@ -75,9 +82,8 @@ public class CoreResource {
         JSONObject jsonObject = new JSONObject();
 
         jsonObject.put("version", Controller.version);
-        jsonObject.put("buildDate", Controller.getInstance().getBuildDateString());
+        jsonObject.put("buildDate", Controller.getInstance().getBuildDateTimeString());
         jsonObject.put("buildTimeStamp", Controller.buildTimestamp);
-
 
         return jsonObject;
     }
@@ -89,10 +95,19 @@ public class CoreResource {
         return getVersionJson().toJSONString();
     }
 
+    public static JSONObject getForgingStatusJson() {
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("code", Controller.getInstance().getForgingStatus().getStatuscode());
+        jsonObject.put("name", Controller.getInstance().getForgingStatus().getName());
+
+        return jsonObject;
+    }
+
     @GET
     @Path("/status/forging")
     public static String getForgingStatus() {
-        return Controller.getInstance().getForgingStatus().getName();
+        return getForgingStatusJson().toJSONString();
     }
 
     @GET

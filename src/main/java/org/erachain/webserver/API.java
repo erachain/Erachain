@@ -20,7 +20,6 @@ import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.*;
 import org.erachain.gui.transaction.OnDealClick;
-import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
@@ -1870,18 +1869,13 @@ public class API {
     public Response getInformation() throws NoSuchFieldException, IllegalAccessException {
         JSONObject jsonObject = CoreResource.infoJson();
 
-        Object f = Controller.class.getDeclaredField("version");
-        ((Field) f).setAccessible(true);
-        String version = ((Field) f).get(Controller.getInstance()).toString();
-        ((Field) f).setAccessible(false);
-        jsonObject.put("version2", version);
-
-        int lastBlock = (cntrl.getLastBlock()).getHeight();
-        jsonObject.put("lastBlock", lastBlock);
-
-        Settings setting = Settings.getInstance();
-        jsonObject.put("rpcEnable", setting.isRpcEnabled());
-        jsonObject.put("webEnable", setting.isWebEnabled());
+        if (false) {
+            Object f = Controller.class.getDeclaredField("version");
+            ((Field) f).setAccessible(true);
+            String version = ((Field) f).get(Controller.getInstance()).toString();
+            ((Field) f).setAccessible(false);
+            jsonObject.put("version2", version);
+        }
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
