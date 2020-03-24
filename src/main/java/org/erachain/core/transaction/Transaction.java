@@ -178,6 +178,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int ITEM_DOES_NOT_UNITED = 211;
     public static final int ITEM_DUPLICATE_KEY = 212;
     public static final int ITEM_DUPLICATE = 213;
+    public static final int INVALID_TIMESTAMP_START = 214;
+    public static final int INVALID_TIMESTAMP_END = 215;
 
     public static final int ITEM_PERSON_IS_DEAD = 235;
     public static final int AMOUNT_LENGHT_SO_LONG = 236;

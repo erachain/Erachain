@@ -375,6 +375,12 @@ public class OnDealClick {
             case Transaction.ITEM_DUPLICATE:
                 mess = "Invalid duplicte item";
                 break;
+            case Transaction.INVALID_TIMESTAMP_START:
+                mess = "Invalid start timestamp item";
+                break;
+            case Transaction.INVALID_TIMESTAMP_END:
+                mess = "Invalid end timestamp";
+                break;
             case Transaction.INVALID_CREATOR:
                 mess = "Invalid creator";
                 break;

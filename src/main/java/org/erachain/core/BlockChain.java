@@ -373,7 +373,10 @@ public class BlockChain {
     public static HashSet<String> ANONYMASERS = new HashSet<String>();
     public static HashSet<String> FOUNDATION_ADDRESSES = new HashSet<String>();
     public static HashMap<String, int[][]> FREEZED_BALANCES = new HashMap<String, int[][]>();
+
     public static HashMap<String, Tuple3<Long, Long, byte[]>> NOVA_ASSETS = new HashMap<String, Tuple3<Long, Long, byte[]>>();
+    public static HashMap<String, Tuple3<Long, Long, byte[]>> NOVA_PERSONS = new HashMap<String, Tuple3<Long, Long, byte[]>>();
+
     public static HashMap<String, String> LOCKED__ADDRESSES = new HashMap<String, String>();
     public static HashMap<String, Tuple3<String, Integer, Integer>> LOCKED__ADDRESSES_PERIOD = new HashMap<String, Tuple3<String, Integer, Integer>>();
     public static HashMap<Long, PublicKeyAccount> ASSET_OWNERS = new HashMap<Long, PublicKeyAccount>();
@@ -443,6 +446,16 @@ public class BlockChain {
                     for (Object item : items) {
                         JSONArray json = (JSONArray) item;
                         NOVA_ASSETS.put(json.get(0).toString(),
+                                new Tuple3<>((Long) json.get(1), (Long) json.get(2),
+                                        Crypto.getInstance().getShortBytesFromAddress(json.get(3).toString())));
+                    }
+                }
+
+                if (chainParams.containsKey("persons")) {
+                    JSONArray items = (JSONArray) chainParams.get("persons");
+                    for (Object item : items) {
+                        JSONArray json = (JSONArray) item;
+                        NOVA_PERSONS.put(json.get(0).toString(),
                                 new Tuple3<>((Long) json.get(1), (Long) json.get(2),
                                         Crypto.getInstance().getShortBytesFromAddress(json.get(3).toString())));
                     }
@@ -853,6 +866,15 @@ public class BlockChain {
 
     public static boolean isNovaAsset(Long key) {
         Iterator<Tuple3<Long, Long, byte[]>> iterator = NOVA_ASSETS.values().iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().a.equals(key))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isNovaPerson(Long key) {
+        Iterator<Tuple3<Long, Long, byte[]>> iterator = NOVA_PERSONS.values().iterator();
         while (iterator.hasNext()) {
             if (iterator.next().a.equals(key))
                 return true;

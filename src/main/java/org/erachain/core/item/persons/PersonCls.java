@@ -2,6 +2,7 @@ package org.erachain.core.item.persons;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
@@ -18,6 +19,7 @@ import org.json.simple.JSONObject;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.Set;
 
 //import java.math.BigDecimal;
@@ -183,11 +185,16 @@ public abstract class PersonCls extends ItemCls {
             return true;
 
         if (onThisTime > 0l
-            && this.deathday > onThisTime)
+                && this.deathday > onThisTime)
             return true;
 
         return false;
 
+    }
+
+    @Override
+    public HashMap getNovaItems() {
+        return BlockChain.NOVA_PERSONS;
     }
 
     public Set<String> getPubKeys(DCSet dcSet) {

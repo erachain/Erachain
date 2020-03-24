@@ -82,6 +82,7 @@ public class API {
         help.put("GET Height", "height");
         help.put("GET First Block", "firstblock");
         help.put("GET Last Block", "lastblock");
+        help.put("GET Last Block Head", "lastblockhead");
 
         help.put("*** BLOCK ***", "");
         help.put("GET Block", "block/{signature}");
@@ -170,9 +171,6 @@ public class API {
     @GET
     @Path("firstblock")
     public Response getFirstBlock() {
-        //Map out = new LinkedHashMap();
-
-        //JSONObject out = Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
 
         JSONObject out = dcSet.getBlockMap().get(1).toJson();
 
@@ -187,10 +185,22 @@ public class API {
     @Path("lastblock")
     public Response lastBlock() {
 
-        Map out = new LinkedHashMap();
-
         Block lastBlock = dcSet.getBlockMap().last();
-        out = lastBlock.toJson();
+        Map out = lastBlock.toJson();
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(out))
+                .build();
+    }
+
+    @GET
+    @Path("lastblockhead")
+    public Response lastBlockHead() {
+
+        Block.BlockHead lastBlock = dcSet.getBlocksHeadsMap().last();
+        Map out = lastBlock.toJson();
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")

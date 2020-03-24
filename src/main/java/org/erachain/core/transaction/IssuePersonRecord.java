@@ -239,6 +239,13 @@ public class IssuePersonRecord extends IssueItemRecord {
             }
         }
 
+        if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
+            Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_PERSONS.get(this.item.getName());
+            if (!item.b.equals(((PersonCls) this.item).getBirthday())) {
+                return INVALID_TIMESTAMP_START;
+            }
+        }
+
         // IF BALANCE 0 or more - not check FEE
         boolean checkFeeBalance = creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0;
         int res = super.isValid(asDeal, flags |

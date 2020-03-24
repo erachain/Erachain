@@ -1,6 +1,6 @@
 {
   "assets": [
-    // ASSET KEY, NAME, VOLUME, CREATOR
+    // ASSET KEY, QUALITY, NAME, VOLUME, CREATOR
     [
       12,
       "BTC",
@@ -21,10 +21,11 @@
     ]
   ],
   "persons": [
-    // ASSET KEY, NAME, CREATOR
+    // PERSON KEY, BIRTH TIMESTAMP, NAME, CREATOR
     [
       1001,
       "DMITRII ERMOLAEV",
+      148293470000,
       "7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh"
     ]
   ]
