@@ -3,6 +3,7 @@ package org.erachain.api;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.BlocksHeadsMap;
 import org.erachain.datachain.BlocksMapImpl;
 import org.erachain.datachain.DCSet;
@@ -26,6 +27,28 @@ public class CoreResource {
     @Context
     HttpServletRequest request;
 
+    public static JSONObject infoJson() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("version", getVersion());
+        jsonObject.put("status", getStatus());
+        if (BlockChain.SIDE_MODE) {
+            JSONObject jsonSide = new JSONObject();
+            ///jsonSide.put("magic", Ints.fromByteArray(Controller.getInstance().getMessageMagic()));
+            jsonSide.put("name", Controller.getInstance().APP_NAME);
+            jsonSide.put("sign", Base58.encode(Controller.getInstance().blockChain.getGenesisBlock().getSignature()));
+
+            jsonObject.put("side", jsonSide);
+
+        }
+        return jsonObject;
+    }
+
+    @GET
+    @Path("/status")
+    public static String getStatus() {
+        return String.valueOf(Controller.getInstance().getStatus());
+    }
+
     @GET
     @Path("/stop")
     public String stop() {
@@ -43,10 +66,18 @@ public class CoreResource {
         return String.valueOf(true);
     }
 
+    @SuppressWarnings("unchecked")
     @GET
-    @Path("/status")
-    public String getStatus() {
-        return String.valueOf(Controller.getInstance().getStatus());
+    @Path("/version")
+    public static String getVersion() {
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("version", Controller.getInstance().getVersion(true));
+        jsonObject.put("buildDate", Controller.getInstance().getBuildDateString());
+        jsonObject.put("buildTimeStamp", Controller.buildTimestamp);
+
+
+        return jsonObject.toJSONString();
     }
 
     @GET
@@ -79,18 +110,9 @@ public class CoreResource {
         return "";
     }
 
-    @SuppressWarnings("unchecked")
     @GET
-    @Path("/version")
-    public String getVersion() {
-        JSONObject jsonObject = new JSONObject();
-
-        jsonObject.put("version", Controller.getInstance().getVersion(true));
-        jsonObject.put("buildDate", Controller.getInstance().getBuildDateString());
-        jsonObject.put("buildTimeStamp", Controller.buildTimestamp);
-
-
-        return jsonObject.toJSONString();
+    public String info() {
+        return infoJson().toJSONString();
     }
 
     @GET

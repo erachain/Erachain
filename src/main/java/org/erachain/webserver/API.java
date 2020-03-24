@@ -1,6 +1,7 @@
 package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
+import org.erachain.api.CoreResource;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.BlockGenerator;
@@ -1868,20 +1869,18 @@ public class API {
     @GET
     @Path("info")
     public Response getInformation() throws NoSuchFieldException, IllegalAccessException {
-        JSONObject jsonObject = new JSONObject();
-
-        Controller controller = Controller.getInstance();
+        JSONObject jsonObject = CoreResource.infoJson();
 
 
         Object f = Controller.class.getDeclaredField("version");
         ((Field) f).setAccessible(true);
         String version = ((Field) f).get(Controller.getInstance()).toString();
         ((Field) f).setAccessible(false);
-        jsonObject.put("version", version);
+        jsonObject.put("version2", version);
 
-        int lastBlock = (controller.getLastBlock()).getHeight();
+        int lastBlock = (cntrl.getLastBlock()).getHeight();
         jsonObject.put("lastBlock", lastBlock);
-        BlockGenerator.ForgingStatus forgingStatus = controller.getForgingStatus();
+        BlockGenerator.ForgingStatus forgingStatus = cntrl.getForgingStatus();
         //jsonObject.put("forgingCodeStatus", forgingStatus.getStatuscode());
 
         jsonObject.put("forgingStatus", forgingStatus.getName());
