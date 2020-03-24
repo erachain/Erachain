@@ -96,6 +96,8 @@ public class Start {
                 JSONArray timeArray = (JSONArray) Settings.genesisJSON.get(1);
                 Settings.genesisStamp = new Long(timeArray.get(0).toString());
 
+                Settings.NET_MODE = Settings.NET_MODE_SIDE;
+
             } catch (Exception e) {
                 LOGGER.info("Error while reading " + file.getAbsolutePath());
                 LOGGER.error(e.getMessage(), e);
