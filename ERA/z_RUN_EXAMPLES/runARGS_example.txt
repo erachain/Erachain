@@ -1,3 +1,4 @@
+// coding UTF-8
 // set arguments for start Erachain here
 // This is example
 seed=5:new:1

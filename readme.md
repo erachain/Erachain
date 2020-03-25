@@ -35,6 +35,8 @@ https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#j
 Описание кдючей запуска приложения в файле:  
 ERA\z_bath_examples\readme.txt
 
+Так же можно задавать ключи запуска в файле runARGS.txt - смотри пример в runARGS_example.txt
+
 ## Java
 Для корректной работы MapDB нужна именно Java 1.8 (vers 8) и проект собирается и тестируется именно с этой версией.
  Иначе бедет вызывать ошибка при коммите и закрывании базы:
