@@ -1187,9 +1187,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         continue;
                     }
 
-                    // запросим блок у всех - у нас чето пусто
-                    LOGGER.info("requestLastBlock");
-                    ctrl.requestLastBlock();
+                    if (ctrl.isStatusOK()) {
+                        // запросим блок у всех - у нас чето пусто
+                        LOGGER.info("requestLastBlock");
+                        ctrl.requestLastBlock();
+                    }
 
                     // если нет ничего в буфере то еще немного подождем
                     do {
