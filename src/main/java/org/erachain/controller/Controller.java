@@ -2032,6 +2032,7 @@ public class Controller extends Observable {
                         null // если блок не верный - не баним ПИР может просто он отстал
                 )) {
                     // если все же он не подошел или не было победного то вышлем всеим запрос на "Порделитесль последним блоком"
+                    LOGGER.info("requestLastBlock");
                     requestLastBlock();
                 }
             }
