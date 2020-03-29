@@ -1,5 +1,6 @@
 // coding UTF-8
 // set arguments for start Erachain here
 // This is example
+// make startARGS.txt in Erachain folder
 seed=5:new:1
 dbs=mapdb
