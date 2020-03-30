@@ -1971,7 +1971,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (validatedForkDB != null) {
             try {
                 validatedForkDB.close();
-                LOGGER.debug("validatedForkDB is closed: " + this.toString());
+                // сейчас у нас есть имя базы откуда открыли так что это не важно тут лог писать
+                // LOGGER.debug("validatedForkDB is closed: " + this.toString());
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
