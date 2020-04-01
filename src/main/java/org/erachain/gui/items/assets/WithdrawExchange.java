@@ -150,7 +150,7 @@ public class WithdrawExchange extends JPanel {
             AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn,
                     null, new Account(accountTo), null, message);
 
-            panel.jComboBox_Asset.setEditable(false);
+            panel.jComboBox_Asset.setEnabled(false);
             panel.jTextField_To.setEnabled(false);
             panel.jTextArea_Description.setEnabled(false);
             String rate = jsonObject.get("rate").toString();
