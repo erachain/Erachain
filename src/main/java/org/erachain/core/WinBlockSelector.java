@@ -72,26 +72,24 @@ public class WinBlockSelector extends MonitoredThread {
         // ASK BLOCK FROM BLOCKCHAIN
         Block newBlock = blockWinMessage.getBlock();
 
-        String info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
-                + newBlock.toString();
-
         // если мы синхронизируемся - то берем победный блок а потои
         // его перепроверим при выходе из синхронизации
         if (this.controller.isStatusSynchronizing()) {
-            LOGGER.info("ADD unchecked on Synchronizing - " + info);
+            LOGGER.info("ADD unchecked on Synchronizing - " + newBlock + " from " + blockWinMessage.getSender().getAddress());
             blockChain.setWaitWinBufferUnchecked(newBlock);
             // и разошлем его дальше тоже, так как если мы выпали в оставание то всем свои перешлем все равно
             controller.network.broadcastWinBlock(blockWinMessage, false);
             return;
         }
 
-        LOGGER.info(info);
-
         int invalid = newBlock.isValidHead(dcSet);
+
+        LOGGER.info("received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
+                + newBlock);
+
         if (invalid > 0) {
             // то проверим заголовок
-            info = "Block HEAD is Invalid[" + invalid + "] - ignore " + newBlock.toString();
-            LOGGER.info(info);
+            LOGGER.info("Block HEAD is Invalid[" + invalid + "] - ignore " + newBlock);
 
             if (invalid <= Block.INVALID_REFERENCE) {
                 // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока

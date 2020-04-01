@@ -713,6 +713,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long pointLogWaitFlush = 0;
 
         boolean needRequestWinBlock = false;
+        long blockTimeMS;
         this.initMonitor();
 
         Random random = new Random();
@@ -749,6 +750,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 Peer peer = null;
                 Tuple3<Integer, Long, Peer> maxPeer;
                 SignaturesMessage response;
+                blockTimeMS = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height);
 
                 try {
                     Thread.sleep(WAIT_STEP_MS);
@@ -767,7 +769,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 // на самом деле они сами присылают свое состояние после апдейта
                 if (BlockChain.TEST_DB > 0) {
                     pointPing = 0;
-                } else if (NTP.getTime() - pointPing > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 1) {
+                } else if (NTP.getTime() - pointPing > blockTimeMS >> 1) {
                     // нужно просмотривать пиги для синхронизации так же - если там -ХХ то не будет синхронизации
                     pointPing = NTP.getTime();
                     ctrl.pingAllPeers(false);
@@ -843,7 +845,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
                 }
 
-                timeTmp = bchain.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height);
+                timeTmp = bchain.getTimestamp(dcSet) + blockTimeMS;
                 if (timeTmp > NTP.getTime())
                     continue;
 
@@ -884,7 +886,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     ctrl.checkStatusAndObserve(0);
 
                     if (BlockChain.TEST_DB == 0 && forgingStatus == ForgingStatus.FORGING_WAIT
-                            && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 1) < NTP.getTime()
+                            && (timePoint + (blockTimeMS << 1) < NTP.getTime()
                             || BlockChain.ERA_COMPU_ALL_UP && height < 100
                             || height < 10)) {
 
@@ -1150,10 +1152,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 // сдвиг 0 делаем
                 ctrl.checkStatusAndObserve(bchain.isEmptyWaitWinBuffer() ? 0 : 1);
                 if (betterPeer != null || orphanto > 0 || this.syncTo > 0
-                        || timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) < NTP.getTime()
+                        || timePoint + blockTimeMS < NTP.getTime()
                         && ctrl.needUpToDate()) {
 
-                    if (NTP.getTime() - pointLogWaitFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2) {
+                    if (NTP.getTime() - pointLogWaitFlush > blockTimeMS >> 2) {
                         pointLogWaitFlush = NTP.getTime();
 
                         bchain.clearWaitWinBuffer(); // close winBlock
@@ -1166,7 +1168,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     // FLUSH WINER to DB MAP
                     if (this.solvingReference != null)
-                        if (NTP.getTime() - pointLogWaitFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2) {
+                        if (NTP.getTime() - pointLogWaitFlush > blockTimeMS >> 2) {
                             pointLogWaitFlush = NTP.getTime();
                             LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
                         }
@@ -1196,6 +1198,22 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         ctrl.requestLastBlock();
                     }
 
+                    // если мы догоняем время и быстро генерирум цепочку
+                    if (!bchain.isEmptyWaitWinBuffer()
+                            && NTP.getTime() - timePoint < blockTimeMS << 4) {
+                        // то если уже почти догнали время, то начинаем большие задержки ожидания делать
+                        try {
+                            Thread.sleep(blockTimeMS >> 2);
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+
+                        if (ctrl.isOnStopping()) {
+                            return;
+                        }
+
+                    }
+
                     // если нет ничего в буфере то еще немного подождем
                     do {
 
@@ -1215,7 +1233,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             return;
                         }
                     } while (this.orphanto <= 0 && this.syncTo <= 0
-                            && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) > NTP.getTime()
+                            && timePoint + blockTimeMS > NTP.getTime()
                             // возможно уже надо обновиться - мы отстали
                             && betterPeer == null
                             && !ctrl.needUpToDate());
@@ -1238,7 +1256,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     if (waitWin == null) {
                         if (this.solvingReference != null) {
-                            if (System.currentTimeMillis() - pointLogGoUpdate > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2) {
+                            if (System.currentTimeMillis() - pointLogGoUpdate > blockTimeMS >> 2) {
                                 pointLogGoUpdate = System.currentTimeMillis();
                                 // сбросим и ссылку для генератора
                                 this.solvingReference = null;
@@ -1284,7 +1302,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         LOGGER.info("TRY to FLUSH WINER to DB MAP");
 
                         try {
-                            if (BlockChain.TEST_DB == 0 && flushPoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) < NTP.getTime()) {
+                            if (BlockChain.TEST_DB == 0 && flushPoint + blockTimeMS < NTP.getTime()) {
                                 try {
                                     // если вдруг цепочка встала,, то догоняем не очень быстро чтобы принимать все
                                     // победные блоки не спеша
@@ -1341,7 +1359,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 ////////////////////////// UPDATE ////////////////////
 
                 if (orphanto > 0 || syncTo > 0 || betterPeer == null &&
-                        timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) > NTP.getTime()) {
+                        timePoint + blockTimeMS > NTP.getTime()) {
                     bchain.clearWaitWinBuffer(); // close winBlock
                     continue;
                 }
