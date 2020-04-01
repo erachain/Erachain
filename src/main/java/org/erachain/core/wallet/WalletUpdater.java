@@ -56,6 +56,7 @@ public class WalletUpdater extends MonitoredThread {
     }
 
     public void offerMessage(Pair<Boolean, Block> pair) {
+        //LOGGER.debug(" offer: " + pair.toString());
         blockingQueue.offer(pair);
     }
 
@@ -64,6 +65,7 @@ public class WalletUpdater extends MonitoredThread {
         if (pair == null)
             return;
 
+        //LOGGER.debug(" process: " + pair.toString());
         if (pair.getA()) {
             // ORPHAN
             if (!wallet.checkNeedSyncWallet(pair.getB().getSignature())) {
