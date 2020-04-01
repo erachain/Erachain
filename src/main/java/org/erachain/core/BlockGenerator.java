@@ -712,6 +712,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long pointLogGoUpdate = 0;
         long pointLogWaitFlush = 0;
 
+        boolean needRequestWinBlock = false;
         this.initMonitor();
 
         Random random = new Random();
@@ -850,6 +851,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     timePoint = timeTmp;
                     timePointForValidTX = timePoint - BlockChain.UNCONFIRMED_SORT_WAIT_MS(height);
                     betterPeer = null;
+                    needRequestWinBlock = false;
 
                     Timestamp timestampPoit = new Timestamp(timePoint);
                     LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit + " for UTX time: " + new Timestamp(timePointForValidTX));
@@ -1187,7 +1189,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         continue;
                     }
 
-                    if (ctrl.isStatusOK()) {
+                    if (needRequestWinBlock && bchain.isEmptyWaitWinBuffer() && ctrl.isStatusOK()) {
+                        needRequestWinBlock = false;
                         // запросим блок у всех - у нас чето пусто
                         LOGGER.info("requestLastBlock");
                         ctrl.requestLastBlock();
@@ -1370,6 +1373,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
 
                     setForgingStatus(ForgingStatus.FORGING_WAIT);
+                    needRequestWinBlock = true;
 
                 }
             }

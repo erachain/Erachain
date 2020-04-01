@@ -51,13 +51,13 @@ public class WinBlockSelector extends MonitoredThread {
         return result;
     }
 
-    private void getWinOrLastBlockFromPeer(Peer sender) {
+    private void sendWinOrLastBlockToPeer(Peer peer) {
         Block myWinBlock = blockChain.getWaitWinBuffer();
         myWinBlock = myWinBlock == null ? blockChain.getLastBlock(dcSet) : myWinBlock;
         if (myWinBlock != null) {
-            sender.sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
+            LOGGER.debug("send my last or Win " + myWinBlock + " to " + peer);
+            peer.sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
         }
-
     }
 
     public void processMessage(Message message) {
@@ -90,13 +90,13 @@ public class WinBlockSelector extends MonitoredThread {
         int invalid = newBlock.isValidHead(dcSet);
         if (invalid > 0) {
             // то проверим заголовок
-            info = "Block HEAD is Invalid - ignore " + newBlock.toString();
+            info = "Block HEAD is Invalid[" + invalid + "] - ignore " + newBlock.toString();
             LOGGER.info(info);
 
             if (invalid <= Block.INVALID_REFERENCE) {
                 // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока
                 // а если у нас уже в буфере нет, то пошлем наш последний блок
-                getWinOrLastBlockFromPeer(message.getSender());
+                sendWinOrLastBlockToPeer(message.getSender());
             }
 
             return;
@@ -122,7 +122,7 @@ public class WinBlockSelector extends MonitoredThread {
         } else {
             // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока
             // а если у нас уже в буфере нет, то пошлем наш последний блок
-            getWinOrLastBlockFromPeer(message.getSender());
+            sendWinOrLastBlockToPeer(message.getSender());
         }
     }
 
