@@ -128,20 +128,18 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     @Override
     public Set<T> keySet() {
-        Set<T> u = this.map.keySet();
-
-        u.addAll(this.parent.keySet());
-
-        return u;
+        // тут обработка удаленных еще нужна
+        Long error = null;
+        error++;
+        return null;
     }
 
     @Override
     public Collection<U> values() {
-        Collection<U> u = this.map.values();
-
-        u.addAll(this.parent.values());
-
-        return u;
+        // тут обработка удаленных еще нужна
+        Long error = null;
+        error++;
+        return null;
     }
 
     @Override
@@ -149,14 +147,17 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         try {
 
-            U old = this.map.put(key, value);
+            // сначала проверим - есть ли он тут включая форк
+            boolean exist = this.contains(key);
+
+            this.map.put(key, value);
 
             if (this.deleted != null) {
                 if (this.deleted.remove(key) != null)
                     ++this.shiftSize;
             }
 
-            return old != null;
+            return exist;
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -198,17 +199,17 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             makeDeletedMap(key);
         }
 
+        if (value == null && !this.deleted.containsKey(key)) {
+            // если тут нету то попобуем в Родителе найти
+            value = this.parent.get(key);
+        }
+
         // добавляем в любом случае, так как
         // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
         // и это есть в основной базе, то в воркнутую будет помещена так же запись.
         // Получаем что запись есть и в Родителе и в Форкнутой таблице!
         // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
         this.deleted.put(key, EXIST);
-
-        if (value == null) {
-            // если тут нету то попобуем в Родителе найти
-            value = this.parent.get(key);
-        }
 
         return value;
 
@@ -228,17 +229,17 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             makeDeletedMap(key);
         }
 
+        if (value == null && !this.deleted.containsKey(key)) {
+            // если тут нету то попобуем в Родителе найти
+            value = this.parent.get(key);
+        }
+
         // добавляем в любом случае, так как
         // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
         // и это есть в основной базе, то в воркнутую будет помещена так же запись.
         // Получаем что запись есть и в Родителе и в Форкнутой таблице!
         // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
         this.deleted.put(key, EXIST);
-
-        if (value == null) {
-            // если тут нету то попобуем в Родителе найти
-            value = this.parent.get(key);
-        }
 
         return value;
 

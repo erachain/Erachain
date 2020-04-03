@@ -203,6 +203,10 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         value = this.map.remove(key);
 
         // это форкнутая таблица
+        if (value == null && !this.deleted.containsKey(key)) {
+            // если тут нету то создадим пометку что удалили
+            value = this.parent.get(key);
+        }
 
         // добавляем в любом случае, так как
         // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
@@ -210,11 +214,6 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         // Получаем что запись есть и в Родителе и в Форкнутой таблице!
         // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
         this.deleted.put(key, EXIST);
-
-        if (value == null) {
-            // если тут нету то создадим пометку что удалили
-            value = this.parent.get(key);
-        }
 
         this.outUses();
         return value;
