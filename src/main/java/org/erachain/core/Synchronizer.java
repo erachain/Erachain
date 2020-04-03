@@ -1,5 +1,6 @@
 package org.erachain.core;
 
+import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
@@ -22,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -409,7 +411,83 @@ public class Synchronizer extends Thread {
                 fork.writeToParent();
                 dbsBroken = false;
             } else {
+
                 // вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+
+                // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
+                //// Map<String, byte[]> states = new TreeMap<String, byte[]>();
+
+                // GET LAST BLOCK
+                Block lastBlock = dcSet.getBlockMap().last();
+
+                // ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in MAIN DB
+                // ============ by EQUAL SIGNATURE !!!!!
+                byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
+                int countOrphanedTransactions = 0;
+                while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
+                    if (ctrl.isOnStopping())
+                        throw new Exception("on stopping");
+
+                    // THROWN is new Better Peer
+                    ctrl.checkNewBetterPeer(peer);
+
+                    // ADD ORPHANED TRANSACTIONS
+                    // orphanedTransactions.addAll(lastBlock.getTransactions());
+                    for (Transaction transaction : lastBlock.getTransactions()) {
+                        if (ctrl.isOnStopping())
+                            throw new Exception("on stopping");
+                        if (countOrphanedTransactions < MAX_ORPHAN_TRANSACTIONS_MY) {
+                            countOrphanedTransactions++;
+                            orphanedTransactions.put(Longs.fromByteArray(transaction.getSignature()), transaction);
+                        }
+                    }
+
+                    LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
+                    LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
+
+                    // так как выше мы запоминаем откаченные транзакции то тут их не будем сохранять в базу
+
+                    this.pipeProcessOrOrphan(dcSet, lastBlock, true, false, true);
+
+                    lastBlock = dcSet.getBlockMap().last();
+                }
+
+                LOGGER.debug("*** chain size after orphan " + dcSet.getBlockMap().size());
+
+
+                // PROCESS THE NEW BLOCKS
+                LOGGER.debug("*** synchronize PROCESS NEW blocks.size:" + newBlocks.size());
+                for (Block block : newBlocks) {
+
+                    // THROWN is new Better Peer
+                    ctrl.checkNewBetterPeer(peer);
+
+                    if (ctrl.isOnStopping())
+                        throw new Exception("on stopping");
+
+                    if (dcSet.getBlockSignsMap().contains(block.getSignature())) {
+                        LOGGER.error("*** add CHAIN - DUPLICATE SIGN! [" + block.getHeight() + "] "
+                                + Base58.encode(block.getSignature())
+                                + " from peer: " + peer);
+                        continue;
+                    }
+
+                    // SYNCHRONIZED PROCESSING
+                    LOGGER.debug("*** begin PIPE");
+
+                    this.pipeProcessOrOrphan(dcSet, block, false, false, false);
+
+                    LOGGER.debug("*** begin REMOVE orphanedTransactions");
+                    for (Transaction transaction : block.getTransactions()) {
+                        if (ctrl.isOnStopping())
+                            throw new Exception("on stopping");
+
+                        String key = new BigInteger(1, transaction.getSignature()).toString(16);
+                        if (orphanedTransactions.containsKey(key))
+                            orphanedTransactions.remove(key);
+                    }
+
+                }
 
             }
 
