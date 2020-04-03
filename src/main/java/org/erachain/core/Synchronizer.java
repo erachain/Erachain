@@ -323,8 +323,12 @@ public class Synchronizer extends Thread {
                 }
             }
 
-            // далее тут блок не Процессим так как он в isValid(fork, true) процессится параллельно
-            // и далее будет слив разом без вызова pipe
+            if (ctrl.onlyProtocolIndexing) {
+                // далее тут блок не Процессим так как он в isValid(fork, true) процессится параллельно
+                // и далее будет слив разом без вызова pipe
+            } else {
+                this.pipeProcessOrOrphan(fork, block, false, false, true);
+            }
 
             // проверка силы цепочки на уровне нашего блока и если высота новой цепочки меньше нашей
             if (height - 1 == myHeight && myWeight > block.blockHead.totalWinValue
@@ -393,8 +397,6 @@ public class Synchronizer extends Thread {
                 return;
             }
 
-            LOGGER.debug("*** TRY writeToParent");
-
             // сюда может прити только если проверка прошла успешно
 
             // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
@@ -405,6 +407,7 @@ public class Synchronizer extends Thread {
             // соберем транзакции с блоков которые будут откачены в нашей цепочке
 
             if (ctrl.onlyProtocolIndexing) {
+                LOGGER.debug("*** TRY writeToParent");
                 // теперь сливаем изменения
                 dbsBroken = true; // если останется взведенным значит что-то не залилось правильно
                 fork.writeToParent();
@@ -445,10 +448,11 @@ public class Synchronizer extends Thread {
                     LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
 
                     // так как выше мы запоминаем откаченные транзакции то тут их не будем сохранять в базу
-
                     this.pipeProcessOrOrphan(dcSet, lastBlock, true, false, true);
 
+                    lastBlock.close();
                     lastBlock = dcSet.getBlockMap().last();
+
                 }
 
                 LOGGER.debug("*** chain size after orphan " + dcSet.getBlockMap().size());
