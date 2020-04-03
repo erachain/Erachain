@@ -87,16 +87,18 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     @Override
     public Set<T> keySet() {
-        Set<T> u = map.keySet();
-        u.addAll(parent.keySet());
-        return u;
+        // тут обработка удаленных еще нужна
+        Long error = null;
+        error++;
+        return null;
     }
 
     @Override
     public Collection<U> values() {
-        Collection<U> u = map.values();
-        u.addAll(parent.values());
-        return u;
+        // тут обработка удаленных еще нужна
+        Long error = null;
+        error++;
+        return null;
     }
 
     // TODO тут надо упростить так как внутри иногда берется предыдущее значение

@@ -138,24 +138,18 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     @Override
     public Set<T> keySet() {
-        this.addUses();
-        Set<T> u = this.map.keySet();
-
-        u.addAll(this.parent.keySet());
-
-        this.outUses();
-        return u;
+        // тут обработка удаленных еще нужна
+        Long error = null;
+        error++;
+        return null;
     }
 
     @Override
     public Collection<U> values() {
-        this.addUses();
-        Collection<U> u = this.map.values();
-
-        u.addAll(this.parent.values());
-
-        this.outUses();
-        return u;
+        // тут обработка удаленных еще нужна
+        Long error = null;
+        error++;
+        return null;
     }
 
     @Override
