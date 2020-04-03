@@ -410,6 +410,8 @@ public class Synchronizer extends Thread {
                 dbsBroken = false;
             } else {
 
+                fork.close(); // нам уже ненужна база - освободим память
+
                 // вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
 
                 // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
