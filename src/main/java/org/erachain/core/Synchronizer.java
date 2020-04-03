@@ -323,8 +323,12 @@ public class Synchronizer extends Thread {
                 }
             }
 
-            // далее тут блок не Процессим так как он в isValid(fork, true) процессится параллельно
-            // и далее будет слив разом без вызова pipe
+            if (ctrl.onlyProtocolIndexing) {
+                // далее тут блок не Процессим так как он в isValid(fork, true) процессится параллельно
+                // и далее будет слив разом без вызова pipe
+            } else {
+                this.pipeProcessOrOrphan(fork, block, false, false, true);
+            }
 
             // проверка силы цепочки на уровне нашего блока и если высота новой цепочки меньше нашей
             if (height - 1 == myHeight && myWeight > block.blockHead.totalWinValue
