@@ -311,7 +311,10 @@ public class Synchronizer extends Thread {
                     throw new Exception(mess);
                 }
 
-                if (block.isValid(fork, true) > 0) {
+                if (block.isValid(fork,
+                        // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+                        ctrl.onlyProtocolIndexing
+                ) > 0) {
                     // INVALID BLOCK THROW EXCEPTION
                     String mess = "Dishonest peer by not is Valid block, height: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
@@ -400,10 +403,15 @@ public class Synchronizer extends Thread {
             // Но сначала откаченные транзакции сохраним
             // соберем транзакции с блоков которые будут откачены в нашей цепочке
 
-            // теперь сливаем изменения
-            dbsBroken = true; // если останется взведенным значит что-то не залилось правильно
-            fork.writeToParent();
-            dbsBroken = false;
+            if (ctrl.onlyProtocolIndexing) {
+                // теперь сливаем изменения
+                dbsBroken = true; // если останется взведенным значит что-то не залилось правильно
+                fork.writeToParent();
+                dbsBroken = false;
+            } else {
+                // вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+
+            }
 
             // теперь все транзакции в пул опять закидываем
             for (Transaction transaction : orphanedTransactions.values()) {

@@ -65,10 +65,10 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         } else {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new NativeMapTreeMapFork(parent, databaseSet, null, null); - просто карту нельзя так как тут особые вызовы
+                    //тут будет ошибка
+                    // см issues/1276 map = new NativeMapTreeMapFork(parent, databaseSet, null, null); - просто карту нельзя так как тут особые вызовы
                     //break;
                 default:
-                    ///map = new nativeMapTreeMapFork(parent, databaseSet, null, null); - просто карту нельзя так как тут особые вызовы
                     map = new OrdersSuitMapDBFork((OrderMap) parent, databaseSet);
             }
         }
