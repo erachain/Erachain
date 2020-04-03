@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -482,13 +481,13 @@ public class Synchronizer extends Thread {
                         if (ctrl.isOnStopping())
                             throw new Exception("on stopping");
 
-                        String key = new BigInteger(1, transaction.getSignature()).toString(16);
+                        Long key = transaction.getDBRef();
                         if (orphanedTransactions.containsKey(key))
                             orphanedTransactions.remove(key);
                     }
 
+                    block.close();
                 }
-
             }
 
             // теперь все транзакции в пул опять закидываем
