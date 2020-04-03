@@ -147,7 +147,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         try {
 
-            // сначала проверим - есть ли он тут включая форк
+            // сначала проверим - есть ли он тут включая родителя
             boolean exist = this.contains(key);
 
             this.map.put(key, value);

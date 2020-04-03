@@ -162,7 +162,10 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         try {
 
-            U old = this.map.put(key, value);
+            // сначала проверим - есть ли он тут включая родителя
+            boolean exist = this.contains(key);
+
+            this.map.put(key, value);
 
             if (this.deleted != null) {
                 if (this.deleted.remove(key) != null)
@@ -170,7 +173,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             }
 
             this.outUses();
-            return old != null;
+            return exist;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -181,7 +184,26 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     @Override
     public void put(T key, U value) {
-        set(key, value);
+        if (DCSet.isStoped()) {
+            return;
+        }
+
+        this.addUses();
+
+        try {
+
+            this.map.put(key, value);
+
+            if (this.deleted != null) {
+                if (this.deleted.remove(key) != null)
+                    ++this.shiftSize;
+            }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        this.outUses();
     }
 
     @Override
