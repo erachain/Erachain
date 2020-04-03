@@ -266,19 +266,24 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         boolean updated = false;
 
+        // сперва нужно удалить старые значения
+        // см issues/1276
+        if (deleted != null) {
+            Iterator<T> iteratorDeleted = this.deleted.keySet().iterator();
+            while (iteratorDeleted.hasNext()) {
+                parent.delete(iteratorDeleted.next());
+                updated = true;
+            }
+            deleted = null;
+        }
+
+        // теперь внести новые
+
         Iterator<T> iterator = this.map.keySet().iterator();
         while (iterator.hasNext()) {
             T key = iterator.next();
             parent.put(key, this.map.get(key));
             updated = true;
-        }
-
-        if (deleted != null) {
-            iterator = this.deleted.keySet().iterator();
-            while (iterator.hasNext()) {
-                parent.delete(iterator.next());
-                updated = true;
-            }
         }
 
         return updated;

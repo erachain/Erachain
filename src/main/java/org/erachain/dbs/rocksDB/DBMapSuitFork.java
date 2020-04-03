@@ -256,6 +256,21 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         boolean updated = false;
 
+        // сперва нужно удалить старые значения
+        // см issues/1276
+
+        if (deleted != null) {
+            // тут обычная карта в памяти -- ее не нужно особо закрывать
+            Iterator deletedIterator = this.deleted.keySet().iterator();
+            while (deletedIterator.hasNext()) {
+                parent.getSuit().delete(deletedIterator.next());
+                updated = true;
+            }
+            deleted = null;
+        }
+
+        // теперь внести новые
+
         /// обязательно нужно осовбождать память - см. тут
         /// https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
         try (IteratorCloseable<T> iterator = this.getIterator()) {
@@ -269,15 +284,6 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
-        }
-
-        if (deleted != null) {
-            // тут обычная карта в памяти -- ее не нужно особо закрывать
-            Iterator deletedIterator = this.deleted.keySet().iterator();
-            while (deletedIterator.hasNext()) {
-                parent.getSuit().delete(deletedIterator.next());
-                updated = true;
-            }
         }
 
         return updated;
