@@ -393,8 +393,6 @@ public class Synchronizer extends Thread {
                 return;
             }
 
-            LOGGER.debug("*** TRY writeToParent");
-
             // сюда может прити только если проверка прошла успешно
 
             // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
@@ -405,6 +403,7 @@ public class Synchronizer extends Thread {
             // соберем транзакции с блоков которые будут откачены в нашей цепочке
 
             if (ctrl.onlyProtocolIndexing) {
+                LOGGER.debug("*** TRY writeToParent");
                 // теперь сливаем изменения
                 dbsBroken = true; // если останется взведенным значит что-то не залилось правильно
                 fork.writeToParent();
