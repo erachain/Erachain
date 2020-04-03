@@ -360,6 +360,14 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + REFERENCE_LENGTH;
     protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + FEE_LENGTH;
 
+    /**
+     * Используется для разделения строки поисковых слов для всех трнзакций.<br>
+     * % и @ и # - пусть они будут служебные и по ним не делать разделения
+     * так чтобы можно было найти @P указатель на персон например
+     * % - это указатель на параметр например иак - %1
+     */
+    public static String SPLIT_CHARS = "[!?/_., \\~`+&^№*()<>\\\"\\'|\\[\\]{}=;:\\\\]";
+
     // in pack toByte and Parse - reference not included
     static Logger LOGGER = LoggerFactory.getLogger(Transaction.class.getName());
 
@@ -679,6 +687,10 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public String getTitle() {
         return viewTypeName();
+    }
+
+    public String[] getTags() {
+        return getTitle().toLowerCase().split(SPLIT_CHARS);
     }
 
     /*

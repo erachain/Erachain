@@ -1222,7 +1222,10 @@ public class BlockChain {
         DCSet fork = dcSet.fork(DCSet.makeDBinMemory(), "setWaitWinBuffer");
 
         try {
-            noValid = block.isValid(fork, true);
+            noValid = block.isValid(fork,
+                    // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+                    Controller.getInstance().onlyProtocolIndexing
+            );
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             Controller.getInstance().stopAll(1104);
@@ -1254,8 +1257,13 @@ public class BlockChain {
             return false;
         }
 
-        // иначе запоним форкнутую СУБД чтобы потом быстро слить
-        block.setValidatedForkDB(fork);
+        // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            // иначе запоним форкнутую СУБД чтобы потом быстро слить
+            block.setValidatedForkDB(fork);
+        } else {
+            fork.close();
+        }
 
         // set and close OLD
         setWaitWinBufferUnchecked(block);

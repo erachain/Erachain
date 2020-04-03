@@ -621,26 +621,25 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
         boolean updated = false;
 
+        // сперва нужно удалить старые значения
+        // см issues/1276
+        if (deleted != null) {
+            Iterator<T> iteratorDeleted = this.deleted.keySet().iterator();
+            while (iteratorDeleted.hasNext()) {
+                T key = iteratorDeleted.next();
+                parent.map.remove(key);
+                updated = true;
+            }
+        }
+
+        // и теперь уже сливаем новые
+
         Iterator<T> iterator = this.map.keySet().iterator();
         while (iterator.hasNext()) {
             T key = iterator.next();
             // напрямую в карту сливаем чтобы логику Таблицы не повторить дважды
             parent.map.put(key, this.map.get(key));
             updated = true;
-        }
-
-        // нужно очистить сразу так как общий размер изменится иначе будет ++ больше
-        // да и уже не нужны эти данные
-        // хотя пока можно это не делать this.map.clear();
-
-        if (deleted != null) {
-            iterator = this.deleted.keySet().iterator();
-            while (iterator.hasNext()) {
-                T key = iterator.next();
-                // напрямую в карту сливаем чтобы логику Таблицы не повторить дважды
-                parent.map.remove(key);
-                updated = true;
-            }
         }
 
         return updated;

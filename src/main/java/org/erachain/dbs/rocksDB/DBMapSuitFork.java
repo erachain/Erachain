@@ -87,16 +87,18 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     @Override
     public Set<T> keySet() {
-        Set<T> u = map.keySet();
-        u.addAll(parent.keySet());
-        return u;
+        // тут обработка удаленных еще нужна
+        Long error = null;
+        error++;
+        return null;
     }
 
     @Override
     public Collection<U> values() {
-        Collection<U> u = map.values();
-        u.addAll(parent.values());
-        return u;
+        // тут обработка удаленных еще нужна
+        Long error = null;
+        error++;
+        return null;
     }
 
     // TODO тут надо упростить так как внутри иногда берется предыдущее значение
@@ -104,14 +106,16 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     public boolean set(T key, U value) {
 
         try {
-            boolean old = map.containsKey(key);
+            // сначала проверим - есть ли он тут включая родителя
+            boolean exist = this.contains(key);
+
             map.put(key, value);
             if (deleted != null) {
                 if (deleted.remove(key) != null) {
                     shiftSize++;
                 }
             }
-            return old;
+            return exist;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -145,17 +149,17 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             this.deleted = new TreeMap<T, Boolean>();
         }
 
+        if (value == null && !this.deleted.containsKey(key)) {
+            // если тут нету то попобуем в Родителе найти
+            value = this.parent.get(key);
+        }
+
         // добавляем в любом случае, так как
         // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
         // и это есть в основной базе, то в воркнутую будет помещена так же запись.
         // Получаем что запись есть и в Родителе и в Форкнутой таблице!
         // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
         this.deleted.put(key, EXIST);
-
-        if (value == null) {
-            // если тут нету то попобуем в Родителе найти
-            value = this.parent.get(key);
-        }
 
         return value;
 
@@ -168,9 +172,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         U value = this.map.get(key);
         this.map.deleteValue(key);
 
-        if (this.deleted == null) {
+        if (value == null && !this.deleted.containsKey(key)) {
             //this.deleted = new HashMap<T, U>(1024 , 0.75f);
             this.deleted = new TreeMap<T, Boolean>();
+        }
+
+        if (value == null) {
+            // если тут нету то попобуем в Родителе найти
+            value = this.parent.get(key);
         }
 
         // добавляем в любом случае, так как
@@ -179,11 +188,6 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         // Получаем что запись есть и в Родителе и в Форкнутой таблице!
         // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
         this.deleted.put(key, EXIST);
-
-        if (value == null) {
-            // если тут нету то попобуем в Родителе найти
-            value = this.parent.get(key);
-        }
 
         return value;
 
@@ -256,6 +260,21 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         boolean updated = false;
 
+        // сперва нужно удалить старые значения
+        // см issues/1276
+
+        if (deleted != null) {
+            // тут обычная карта в памяти -- ее не нужно особо закрывать
+            Iterator deletedIterator = this.deleted.keySet().iterator();
+            while (deletedIterator.hasNext()) {
+                parent.getSuit().delete(deletedIterator.next());
+                updated = true;
+            }
+            deleted = null;
+        }
+
+        // теперь внести новые
+
         /// обязательно нужно осовбождать память - см. тут
         /// https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
         try (IteratorCloseable<T> iterator = this.getIterator()) {
@@ -269,15 +288,6 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
-        }
-
-        if (deleted != null) {
-            // тут обычная карта в памяти -- ее не нужно особо закрывать
-            Iterator deletedIterator = this.deleted.keySet().iterator();
-            while (deletedIterator.hasNext()) {
-                parent.getSuit().delete(deletedIterator.next());
-                updated = true;
-            }
         }
 
         return updated;

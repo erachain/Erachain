@@ -62,14 +62,8 @@ public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> i
 
         boolean updated = false;
 
-        Iterator<Long> iterator = this.map.keySet().iterator();
-
-        while (iterator.hasNext()) {
-            Long key = iterator.next();
-            // тут через Очередь сработает - без ошибок от закрытия
-            parent.put(key, this.map.get(key));
-            updated = true;
-        }
+        // сперва нужно удалить старые значения
+        // см issues/1276
 
         if (deleted != null) {
             Iterator<Long> iteratorDeleted = this.deleted.keySet().iterator();
@@ -78,6 +72,18 @@ public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> i
                 parent.delete(iteratorDeleted.next());
                 updated = true;
             }
+            deleted = null;
+        }
+
+        // теперь внести новые
+
+        Iterator<Long> iterator = this.map.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            Long key = iterator.next();
+            // тут через Очередь сработает - без ошибок от закрытия
+            parent.put(key, this.map.get(key));
+            updated = true;
         }
 
         return updated;

@@ -2699,16 +2699,26 @@ public class Controller extends Observable {
                 // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
                 DCSet forked = dcSet.fork(DCSet.makeDBinMemory(), "flushNewBlockGenerated");
                 // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
-                if (newBlock.isValid(forked, true) > 0) {
+
+                if (newBlock.isValid(forked,
+                        onlyProtocolIndexing // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+                ) > 0) {
                     // очищаем занятые транзакциями ресурсы
-                    // see finalliy newBlock.close();
+                    // - see finalliy newBlock.close();
 
                     // освобождаем память от базы данных - так как мы ее к блоку не привязали
                     forked.close();
                     return false;
                 }
-                // запоним что в этой базе проверку сделали с Процессингом чтобы потом быстро слить в основную базу
-                newBlock.setValidatedForkDB(forked);
+
+                // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+                if (onlyProtocolIndexing) {
+                    // запоним что в этой базе проверку сделали с Процессингом чтобы потом быстро слить в основную базу
+                    newBlock.setValidatedForkDB(forked);
+                } else {
+                    // освобождаем память от базы данных - так как мы ее к блоку не привязали
+                    forked.close();
+                }
             }
 
             try {

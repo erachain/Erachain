@@ -7,7 +7,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
-import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -397,7 +396,7 @@ public class RSend extends TransactionAmount {
 
     @Override
     public boolean hasPublicText() {
-        String[] words = head.split(DCSet.SPLIT_CHARS);
+        String[] words = head.split(Transaction.SPLIT_CHARS);
         int length = 0;
         for (String word: words) {
             word = word.trim();

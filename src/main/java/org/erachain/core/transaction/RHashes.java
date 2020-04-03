@@ -3,6 +3,7 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -11,6 +12,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.HashesSignsMap;
+import org.erachain.datachain.TransactionFinalMapSigns;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -408,19 +410,6 @@ public class RHashes extends Transaction {
         int height = this.getBlockHeightByParentOrLast(dcSet);
 
         int transactionIndex = -1;
-		/*
-		int blockIndex = -1;
-		if (block == null) {
-			blockIndex = dcSet.getBlocksHeadMap().last().getHeight(dcSet);
-		} else {
-			blockIndex = block.getHeight(dcSet);
-			if (blockIndex < 1 ) {
-				// if block not is confirmed - get last block + 1
-				blockIndex = dcSet.getBlocksHeadMap().last().getHeight(dcSet) + 1;
-			}			
-			transactionIndex = block.getTransactionSeq(signature);
-		}
-		*/
 
         long personKey;
         Tuple2<Integer, PersonCls> asPerson = this.creator.getPerson(dcSet, height);
@@ -434,6 +423,14 @@ public class RHashes extends Transaction {
         for (byte[] hash : hashes) {
             map.addItem(hash, new Tuple3<Long, Integer, Integer>(personKey, height, transactionIndex));
         }
+
+        if (!Controller.getInstance().onlyProtocolIndexing) {
+            TransactionFinalMapSigns mapSigns = dcSet.getTransactionFinalMapSigns();
+            for (byte[] hash : hashes) {
+                mapSigns.put(hash, dbRef);
+            }
+        }
+
     }
 
     public void orphan(Block block, int asDeal) {
@@ -445,6 +442,14 @@ public class RHashes extends Transaction {
         for (byte[] hash : hashes) {
             map.removeItem(hash);
         }
+
+        if (!Controller.getInstance().onlyProtocolIndexing) {
+            TransactionFinalMapSigns mapSigns = dcSet.getTransactionFinalMapSigns();
+            for (byte[] hash : hashes) {
+                mapSigns.delete(hash);
+            }
+        }
+
     }
 
     @Override

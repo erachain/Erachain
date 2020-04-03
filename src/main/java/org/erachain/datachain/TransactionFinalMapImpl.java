@@ -522,7 +522,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         List<Transaction> result = new ArrayList<>();
 
-        String[] filterArray = filter.toLowerCase().split(DCSet.SPLIT_CHARS);
+        String[] filterArray = filter.toLowerCase().split(Transaction.SPLIT_CHARS);
         Pair<String, Boolean>[] words = stepFilter(filterArray);
 
         // сперва выберем самый короткий набор
@@ -564,7 +564,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     continue;
 
                 // теперь проверим все слова в Заголовке
-                String[] titleArray = transaction.getTitle().toLowerCase().split(DCSet.SPLIT_CHARS);
+                String[] titleArray = transaction.getTags();
 
                 if (titleArray.length < words.length)
                     continue;
@@ -639,17 +639,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (txFrom == null) {
             return null;
         }
-        String fromTitle;
-        fromTitle = get(fromSeqNo).getTitle();
-        if (fromTitle != null) {
-            // теперь проверим все слова в Заголовке
-            String[] titleArray = fromTitle.toLowerCase().split(DCSet.SPLIT_CHARS);
-            for (int i = 0; i < titleArray.length; i++) {
-                if (titleArray[i].startsWith(betterFilterWord)) {
-                    return titleArray[i];
-                }
+        // теперь проверим все слова в Заголовке
+        String[] titleArray = get(fromSeqNo).getTags();
+        for (int i = 0; i < titleArray.length; i++) {
+            if (titleArray[i].startsWith(betterFilterWord)) {
+                return titleArray[i];
             }
         }
+
         return null;
     }
 
@@ -665,7 +662,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         List<Transaction> txs = new ArrayList<>();
 
-        String[] filterArray = filter.toLowerCase().split(DCSet.SPLIT_CHARS);
+        String[] filterArray = filter.toLowerCase().split(Transaction.SPLIT_CHARS);
         Pair<String, Boolean>[] words = stepFilter(filterArray);
 
         // сперва выберем самый короткий набор
