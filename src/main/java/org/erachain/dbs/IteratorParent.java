@@ -6,7 +6,7 @@ import java.util.Map;
 public class IteratorParent<T> implements IteratorCloseable<T> {
     protected PeekingIteratorCloseable<? extends T> iterator;
     private Map deleted;
-    private boolean first = true;
+    private boolean hasNextUsedBefore = false;
 
 
     /**
@@ -22,6 +22,10 @@ public class IteratorParent<T> implements IteratorCloseable<T> {
 
     @Override
     public boolean hasNext() {
+
+        // мы сделали перебор удаленных
+        hasNextUsedBefore = true;
+
         if (deleted == null)
             return iterator.hasNext();
 
@@ -38,13 +42,13 @@ public class IteratorParent<T> implements IteratorCloseable<T> {
 
     @Override
     public T next() {
-        if (first) {
-            // если это самый первый то надо промотать по Делетед иначе
+        if (!hasNextUsedBefore) {
+            // если проверки не было то надо промотать по Делетед иначе
             // возьмет даже удаленный
-            first = false;
             hasNext();
         }
 
+        hasNextUsedBefore = false;
         return iterator.next();
     }
 

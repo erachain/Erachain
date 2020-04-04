@@ -104,4 +104,51 @@ public class IteratorParentTest {
         assertEquals(iterator.hasNext(), false);
 
     }
+
+    /**
+     * проверяем что без вызова hasNext тоже перебор правильно работает
+     */
+    @Test
+    public void nextContinuous() {
+        Set<Long> parent = new TreeSet<Long>() {{
+            add(112L);
+            add(113L);
+            add(21L);
+            add(10L);
+            add(212L);
+        }};
+
+        Map<Long, Boolean> deleted = new TreeMap<Long, Boolean>() {{
+            put(10L, true);
+            put(113L, true);
+            put(212L, true);
+        }};
+
+        List<Long> list = new ArrayList<Long>() {{
+            add(21L);
+            add(112L);
+        }};
+
+        Iterator<Long> parentIterator = parent.iterator();
+        IteratorCloseable iterator = new IteratorParent(parentIterator, deleted);
+
+        assertEquals(Iterators.size(iterator), list.size());
+
+        // refresh
+        parentIterator = parent.iterator();
+        iterator = new IteratorParent(parentIterator, deleted);
+
+        for (Long item : list) {
+            assertEquals(item, iterator.next());
+        }
+
+        // это должен быть уже конец и ошибка должна быть:
+        try {
+            assertEquals(iterator.next(), "must be Exception: java.util.NoSuchElementException");
+        } catch (java.util.NoSuchElementException e) {
+        }
+        assertEquals(iterator.hasNext(), false);
+
+    }
+
 }
