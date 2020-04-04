@@ -1,11 +1,12 @@
 package org.erachain.dbs.nativeMemMap;
 
+import com.google.common.collect.ImmutableList;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
-import org.erachain.dbs.DBTab;
-import org.erachain.dbs.ForkedMap;
+import org.erachain.dbs.*;
 import org.erachain.dbs.mapDB.DBMapSuit;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -138,18 +139,12 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     @Override
     public Set<T> keySet() {
-        // тут обработка удаленных еще нужна
-        Long error = null;
-        error++;
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Collection<U> values() {
-        // тут обработка удаленных еще нужна
-        Long error = null;
-        error++;
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -274,6 +269,54 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         this.outUses();
         return false;
+    }
+
+    @Override
+    public IteratorCloseable<T> getIterator() {
+        this.addUses();
+
+        Iterator<T> parentIterator = parent.getIterator();
+        IteratorCloseable<T> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted), map.keySet().iterator()), Fun.COMPARATOR);
+
+        this.outUses();
+        return iterator;
+
+    }
+
+    // TODO надо рекурсию к Родителю по итератору делать
+    @Override
+    public IteratorCloseable<T> getIterator(int index, boolean descending) {
+        this.addUses();
+
+        Iterator<T> parentIterator = parent.getIterator(index, descending);
+        IteratorCloseable<T> iterator;
+
+        if (index > 0) {
+            // 0 - это главный индекс - он не в списке indexes
+            NavigableSet<Fun.Tuple2<?, T>> indexSet = getIndex(index, descending);
+            if (indexSet != null) {
+                iterator = new org.erachain.datachain.IndexIterator<>(this.indexes.get(index));
+            } else {
+                if (descending) {
+                    iterator = new IteratorCloseableImpl(((NavigableMap<T, U>) this.map).descendingKeySet().iterator());
+                } else {
+                    iterator = new IteratorCloseableImpl(this.map.keySet().iterator());
+                }
+            }
+        } else {
+            if (descending) {
+                iterator = new IteratorCloseableImpl(((NavigableMap<T, U>) this.map).descendingKeySet().iterator());
+            } else {
+                iterator = new IteratorCloseableImpl(this.map.keySet().iterator());
+            }
+        }
+
+        IteratorCloseable iteratorMerged = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted), iterator), Fun.COMPARATOR);
+
+        this.outUses();
+        return iteratorMerged;
     }
 
     @Override
