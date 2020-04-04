@@ -5,7 +5,9 @@ import java.util.Map;
 
 public class IteratorParent<T> implements IteratorCloseable<T> {
     protected PeekingIteratorCloseable<? extends T> iterator;
-    Map deleted;
+    private Map deleted;
+    private boolean first = true;
+
 
     /**
      * С учетом удаленных в форке
@@ -36,11 +38,19 @@ public class IteratorParent<T> implements IteratorCloseable<T> {
 
     @Override
     public T next() {
+        if (first) {
+            // если это самый первый то надо промотать по Делетед иначе
+            // возьмет даже удаленный
+            first = false;
+            hasNext();
+        }
+
         return iterator.next();
     }
 
     @Override
     public void close() {
+        deleted = null;
         iterator.close();
     }
 
