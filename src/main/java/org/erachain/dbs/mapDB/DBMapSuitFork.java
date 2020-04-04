@@ -129,17 +129,12 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     @Override
     public Set<T> keySet() {
         // тут обработка удаленных еще нужна
-        Long error = null;
-        error++;
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Collection<U> values() {
-        // тут обработка удаленных еще нужна
-        Long error = null;
-        error++;
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -313,7 +308,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         Iterator<T> parentIterator = parent.getIterator();
         IteratorCloseable<T> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
-                parentIterator, map.keySet().iterator()), Fun.COMPARATOR, deleted);
+                new IteratorParent(parentIterator, deleted), map.keySet().iterator()), Fun.COMPARATOR);
 
         this.outUses();
         return iterator;
@@ -349,7 +344,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         }
 
         IteratorCloseable iteratorMerged = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
-                parentIterator, iterator), Fun.COMPARATOR, deleted);
+                new IteratorParent(parentIterator, deleted), iterator), Fun.COMPARATOR);
 
         this.outUses();
         return iteratorMerged;
