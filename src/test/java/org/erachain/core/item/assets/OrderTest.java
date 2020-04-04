@@ -191,7 +191,7 @@ public class OrderTest {
                     while (iterator.hasNext()) {
                         Long key = iterator.next();
                         Order value = ordersMap.get(key);
-                        String proce = value.viewPrice();
+                        String price = value.viewPrice();
                         count++;
                     }
                     assertEquals(count, i + 1);
