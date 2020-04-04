@@ -19,11 +19,6 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
     protected boolean isClosed;
     private boolean hasNextUsedBefore = false;
 
-    protected MergedIteratorNoDuplicates() {
-        queue = null;
-        itemComparator = null;
-    }
-
     /**
      * пробегает по итератором сортируя значения и пи этом пропуская дублирующие значения на входе
      * Правда в тестах вылетает ошибка доступа при закрытии - org.erachain.datachain.TradeMapImplTest#getTradesByTimestamp()
@@ -63,21 +58,24 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
         }
 
         // перебор по каждому итератору
-        do {
+        while (!queue.isEmpty()) {
             PeekingIteratorCloseable<T> nextIter = queue.remove();
             if (nextIter.hasNext()) {
 
-                while (itemComparator.compare(nextIter.peek(), lastNext) == 0) {
-                    nextIter.next();
+                try {
+                    if (itemComparator.compare(nextIter.peek(), lastNext) == 0) {
+                        nextIter.next();
+                    } else {
+                        break;
+                    }
+                } finally {
+                    if (nextIter.hasNext()) {
+                        queue.add(nextIter);
+                        break;
+                    }
                 }
-
-                if (nextIter.hasNext()) {
-                    queue.add(nextIter);
-                    break;
-                }
-
             }
-        } while (!queue.isEmpty());
+        }
 
         return !queue.isEmpty();
     }
@@ -96,10 +94,11 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
         hasNextUsedBefore = false;
 
         PeekingIteratorCloseable<T> nextIter = queue.remove();
+        lastNext = nextIter.next();
         if (nextIter.hasNext()) {
             queue.add(nextIter);
         }
-        return (lastNext = nextIter.next());
+        return lastNext;
     }
 
     @Deprecated

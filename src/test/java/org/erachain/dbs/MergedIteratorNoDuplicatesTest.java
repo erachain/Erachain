@@ -76,6 +76,13 @@ public class MergedIteratorNoDuplicatesTest {
         forkIterator = fork.iterator();
         merged = new MergedIteratorNoDuplicates<Long>((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR);
 
+        list = new ArrayList<Long>() {{
+            add(10L);
+            add(21L);
+            add(112L);
+            add(212L);
+        }};
+
         for (Long item : list) {
             assertEquals(item, merged.next());
         }
