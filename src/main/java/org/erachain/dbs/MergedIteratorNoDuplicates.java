@@ -2,10 +2,7 @@ package org.erachain.dbs;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * пробегает по итератором сортируя значения и пи этом пропуская дублирующие значения на входе
@@ -20,11 +17,7 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
     protected T lastNext;
     final Comparator<? super T> itemComparator;
     protected boolean isClosed;
-
-    protected MergedIteratorNoDuplicates() {
-        queue = null;
-        itemComparator = null;
-    }
+    private boolean hasNextUsedBefore = false;
 
     /**
      * пробегает по итератором сортируя значения и пи этом пропуская дублирующие значения на входе
@@ -57,24 +50,54 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
 
     @Override
     public boolean hasNext() {
+
+        hasNextUsedBefore = true;
+
+        if (lastNext == null) {
+            return !queue.isEmpty();
+        }
+
+        // перебор по каждому итератору
+        while (!queue.isEmpty()) {
+            PeekingIteratorCloseable<T> nextIter = queue.remove();
+            if (nextIter.hasNext()) {
+
+                try {
+                    if (itemComparator.compare(nextIter.peek(), lastNext) == 0) {
+                        nextIter.next();
+                    } else {
+                        break;
+                    }
+                } finally {
+                    if (nextIter.hasNext()) {
+                        queue.add(nextIter);
+                        break;
+                    }
+                }
+            }
+        }
+
         return !queue.isEmpty();
     }
 
     @Override
     public T next() {
-        do {
-            PeekingIteratorCloseable<T> nextIter = queue.remove();
-            T next = nextIter.next();
-            if (nextIter.hasNext()) {
-                queue.add(nextIter);
-            }
-            if ((lastNext == null || itemComparator.compare(next, lastNext) != 0)
-            ) {
-                lastNext = next;
-                break;
-            }
-        } while (!queue.isEmpty());
 
+        if (!hasNextUsedBefore) {
+            hasNext();
+        }
+
+        if (queue.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
+        hasNextUsedBefore = false;
+
+        PeekingIteratorCloseable<T> nextIter = queue.remove();
+        lastNext = nextIter.next();
+        if (nextIter.hasNext()) {
+            queue.add(nextIter);
+        }
         return lastNext;
     }
 
