@@ -55,9 +55,9 @@ public class IteratorParentTest {
         parentIterator = parent.iterator();
         iterator = new IteratorParent(parentIterator, deleted);
 
+        // это должен быть уже конец и ошибка должна быть:
         try {
-            assertEquals(iterator.next(), 112L);
-            assertEquals("java.util.NoSuchElementException", false);
+            assertEquals(iterator.next(), "must be Exception: java.util.NoSuchElementException");
         } catch (java.util.NoSuchElementException e) {
         }
         assertEquals(iterator.hasNext(), false);

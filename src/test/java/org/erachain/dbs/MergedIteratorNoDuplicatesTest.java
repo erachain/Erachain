@@ -52,6 +52,13 @@ public class MergedIteratorNoDuplicatesTest {
             assertEquals(item, merged.next());
         }
 
+        // это должен быть уже конец и ошибка должна быть:
+        try {
+            assertEquals(merged.next(), "must be Exception: java.util.NoSuchElementException");
+        } catch (java.util.NoSuchElementException e) {
+        }
+        assertEquals(merged.hasNext(), false);
+
         ///////////////////////
         parentIterator = parent.iterator();
         fork = new TreeSet<Long>() {{
@@ -72,6 +79,13 @@ public class MergedIteratorNoDuplicatesTest {
         for (Long item : list) {
             assertEquals(item, merged.next());
         }
+
+        // это должен быть уже конец и ошибка должна быть:
+        try {
+            assertEquals(merged.next(), "must be Exception: java.util.NoSuchElementException");
+        } catch (java.util.NoSuchElementException e) {
+        }
+        assertEquals(merged.hasNext(), false);
 
     }
 }
