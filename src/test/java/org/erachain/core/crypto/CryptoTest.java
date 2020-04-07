@@ -26,7 +26,7 @@ public class CryptoTest {
         /// java.security.Security.addProvider(new net.i2p.crypto.eddsa.EdDSASecurityProvider());
 
         try {
-            Signature proider = Signature.getInstance("Ed25519");
+            Signature provider = Signature.getInstance("Ed25519");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
