@@ -97,7 +97,7 @@ public class BlockChain {
     /**
      * set uo all balances ERA to 10000 and COMPU to 100
      */
-    public static final boolean ERA_COMPU_ALL_UP = TEST_MODE || TEST_DB > 0;
+    public static final boolean ERA_COMPU_ALL_UP = TEST_MODE || TEST_DB > 0 || Settings.ERA_COMPU_ALL_UP;
 
     public static int NETWORK_PORT = TEST_DB > 0 ? 9006 : TEST_MODE ? 9066 : SIDE_MODE ? 9056 : 9046;
 
@@ -172,7 +172,7 @@ public class BlockChain {
 
     public static final int GENESIS_WIN_VALUE = TEST_MODE ? 3000 : ERA_COMPU_ALL_UP ? 10000 : 22000;
 
-    public static final String[] GENESIS_ADMINS = SIDE_MODE ? new String[]{
+    public static final String[] GENESIS_ADMINS = !ERA_COMPU_ALL_UP && SIDE_MODE ? new String[]{
             (((JSONArray) ((JSONArray) Settings.genesisJSON.get(2)).get(0)).get(0)).toString()}
             : new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
@@ -445,8 +445,8 @@ public class BlockChain {
                     JSONArray items = (JSONArray) chainParams.get("assets");
                     for (Object item : items) {
                         JSONArray json = (JSONArray) item;
-                        NOVA_ASSETS.put(json.get(0).toString(),
-                                new Tuple3<>((Long) json.get(1), (Long) json.get(2),
+                        NOVA_ASSETS.put(json.get(1).toString(),
+                                new Tuple3<>((Long) json.get(0), (Long) json.get(2),
                                         Crypto.getInstance().getShortBytesFromAddress(json.get(3).toString())));
                     }
                 }
@@ -455,8 +455,8 @@ public class BlockChain {
                     JSONArray items = (JSONArray) chainParams.get("persons");
                     for (Object item : items) {
                         JSONArray json = (JSONArray) item;
-                        NOVA_PERSONS.put(json.get(0).toString(),
-                                new Tuple3<>((Long) json.get(1), (Long) json.get(2),
+                        NOVA_PERSONS.put(json.get(1).toString(),
+                                new Tuple3<>((Long) json.get(0), (Long) json.get(2),
                                         Crypto.getInstance().getShortBytesFromAddress(json.get(3).toString())));
                     }
                 }

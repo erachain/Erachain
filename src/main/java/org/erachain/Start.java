@@ -96,6 +96,12 @@ public class Start {
                 JSONArray timeArray = (JSONArray) Settings.genesisJSON.get(1);
                 Settings.genesisStamp = new Long(timeArray.get(0).toString());
 
+                // если там пустой список то включаем "у всех все есть"
+                JSONArray holders = (JSONArray) Settings.genesisJSON.get(2);
+                if (holders.isEmpty()) {
+                    Settings.ERA_COMPU_ALL_UP = true;
+                }
+
                 Settings.NET_MODE = Settings.NET_MODE_SIDE;
 
             } catch (Exception e) {
