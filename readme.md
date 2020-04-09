@@ -15,6 +15,12 @@ For clone code:
 1. Set Task: build
 1. Set Arguments: --exclude-task test
 
+### For use arguments on Mac or by default
+Make in folder file startARGS.txt (see example in z_RUN_EXAMPLES folder) 
+
+## Other
+
+
 Настройка запуска - Приложение и обязательно выбрать нативный Java SDK 1.8, использовать встроенный в IDEA нельзя! Иначе будет ошибка при коммитах базы данных.  
 https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#javasejdk
 
@@ -28,6 +34,8 @@ https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#j
 
 Описание кдючей запуска приложения в файле:  
 ERA\z_bath_examples\readme.txt
+
+Так же можно задавать ключи запуска в файле runARGS.txt - смотри пример в runARGS_example.txt
 
 ## Java
 Для корректной работы MapDB нужна именно Java 1.8 (vers 8) и проект собирается и тестируется именно с этой версией.
@@ -43,6 +51,15 @@ ERA\z_bath_examples\readme.txt
 ## Локальная сеть
 Если после включения в настройках поиска узлов в локальной сети и перезапуска ноды локальные узлы не находятся,
  то нужно их прописать явно в файл peers-test.json (или peer.json или peers-demo.json)
+
+## Test Network (TesNet)
+see readme in /z_bath_examples
+
+## Demo Network (DemoNet)
+see readme in /z_bath_examples
+
+## Sidechain
+see readme in /z_genesis
 
 
 Так же выдает предупреждения:  

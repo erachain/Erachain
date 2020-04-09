@@ -76,4 +76,18 @@ public class DLSet extends DBASet {
         return this.peerMap;
     }
 
+    @Override
+    public void close() {
+
+        if (this.database == null || this.database.isClosed())
+            return;
+
+        this.uses++;
+        this.database.close();
+        // улучшает работу финалайзера
+        this.tables = null;
+        this.uses--;
+
+    }
+
 }

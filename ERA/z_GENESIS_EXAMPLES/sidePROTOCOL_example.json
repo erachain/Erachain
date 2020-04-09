@@ -1,0 +1,32 @@
+{
+  "assets": [
+    // ASSET KEY, NAME, QUALITY, CREATOR
+    [
+      12,
+      "BTC",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      92,
+      "RUB",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      95,
+      "USD",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ]
+  ],
+  "persons": [
+    // PERSON KEY, NAME, BIRTH TIMESTAMP, CREATOR
+    [
+      1001,
+      "DMITRII ERMOLAEV",
+      148293470000,
+      "7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh"
+    ]
+  ]
+}

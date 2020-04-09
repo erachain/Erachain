@@ -37,7 +37,7 @@ public class IssueImprintRecord extends IssueItemRecord {
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow,
                               long timestamp, byte[] signature, long feeLong) {
         super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, null, signature);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // asPack

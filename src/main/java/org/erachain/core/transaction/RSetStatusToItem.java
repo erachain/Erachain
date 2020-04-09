@@ -130,7 +130,7 @@ public class RSetStatusToItem extends Transaction {
                 value_1, value_2, data_1, data_2, ref_to_parent, description,
                 timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as pack

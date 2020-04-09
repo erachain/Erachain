@@ -37,7 +37,7 @@ public class UnconfirmedTransactionsPanel extends JPanel
 
 {
     protected Logger logger;
-    private static String iconFile = "images/pageicons/UnconfirmedTransactionsPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "UnconfirmedTransactionsPanel.png";
     private static UnconfirmedTransactionsPanel instance;
     private UnconfirmedTransactionsTableModel transactionsModel;
     private MTable transactionsTable;

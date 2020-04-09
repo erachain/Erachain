@@ -2,6 +2,7 @@ package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
@@ -161,6 +162,8 @@ public class RCalculated extends TransactionAmount {
 
         transaction.put("asset", this.getAbsKey());
         transaction.put("amount", this.amount.toPlainString());
+
+        transaction.put("timestamp", Controller.getInstance().blockChain.getTimestamp(this.height));
 
         if (message.length() > 0) {
             transaction.put("message", this.message);

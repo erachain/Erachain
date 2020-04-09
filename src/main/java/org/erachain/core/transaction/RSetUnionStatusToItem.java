@@ -71,7 +71,7 @@ public class RSetUnionStatusToItem extends Transaction {
         this(typeBytes, creator, feePow, key, itemType, itemKey,
                 beg_date, end_date, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as pack
@@ -318,7 +318,7 @@ public class RSetUnionStatusToItem extends Transaction {
         }
 
         BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, this.dcSet);
-        if (false && balERA.compareTo(BlockChain.MIN_REGISTRATING_BALANCE_BD) < 0)
+        if (balERA.compareTo(BlockChain.MIN_REGISTRATING_BALANCE_10_BD) < 0)
             return Transaction.NOT_ENOUGH_ERA_USE_10;
 
         return Transaction.VALIDATE_OK;

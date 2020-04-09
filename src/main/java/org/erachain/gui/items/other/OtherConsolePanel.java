@@ -11,7 +11,7 @@ import java.awt.*;
 public class OtherConsolePanel extends JPanel  {
 
     private ConsolePanel debugTabPane;
-    private static String iconFile = "images/pageicons/OtherConsolePanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "OtherConsolePanel.png";
 
     public OtherConsolePanel() {
         //CREATE FRAME

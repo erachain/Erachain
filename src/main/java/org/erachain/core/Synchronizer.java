@@ -716,7 +716,6 @@ public class Synchronizer extends Thread {
 
                             LOGGER.debug("try PROCESS");
                             this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false, false);
-                            blockFromPeer.close();
 
                             LOGGER.debug("synchronize BLOCK END process");
                             blockBuffer.clearBlock(blockFromPeer.getSignature());
@@ -741,6 +740,8 @@ public class Synchronizer extends Thread {
                             LOGGER.error(e.getMessage(), e);
                             ctrl.stopAll(343);
 
+                        } finally {
+                            blockFromPeer.close();
                         }
 
                     }
@@ -1262,7 +1263,8 @@ public class Synchronizer extends Thread {
             }
 
         } finally {
-            block.close();
+            /// наруже уже закрываем
+            ///block.close();
         }
 
     }
@@ -1271,6 +1273,9 @@ public class Synchronizer extends Thread {
      * проверка отставания от сети по силе узлов рядом
      */
     public void run() {
+
+        if (ctrl.network == null)
+            return;
 
         long timeTmp;
         long timePoint = 0;

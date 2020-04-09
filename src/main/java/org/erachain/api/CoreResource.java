@@ -3,6 +3,7 @@ package org.erachain.api;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.BlocksHeadsMap;
 import org.erachain.datachain.BlocksMapImpl;
 import org.erachain.datachain.DCSet;
@@ -25,6 +26,43 @@ import javax.ws.rs.core.MediaType;
 public class CoreResource {
     @Context
     HttpServletRequest request;
+    private Controller cnt = Controller.getInstance();
+
+    public static JSONObject infoJson() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("version", getVersionJson());
+        jsonObject.put("networkMode", Settings.NET_MODE);
+
+        jsonObject.put("status", getStatus());
+        jsonObject.put("forgingStatus", getForgingStatusJson());
+
+
+        Block last = Controller.getInstance().getLastBlock();
+        jsonObject.put("lastBlock", last.blockHead.toJson());
+        jsonObject.put("height", last.getHeight());
+
+        Settings setting = Settings.getInstance();
+        jsonObject.put("rpc", setting.isRpcEnabled());
+        jsonObject.put("web", setting.isWebEnabled());
+
+        if (BlockChain.SIDE_MODE) {
+            JSONObject jsonSide = new JSONObject();
+            ///jsonSide.put("magic", Ints.fromByteArray(Controller.getInstance().getMessageMagic()));
+            jsonSide.put("name", Controller.getInstance().APP_NAME);
+            jsonSide.put("timestamp", Controller.getInstance().blockChain.getGenesisBlock().getTimestamp());
+            jsonSide.put("sign", Base58.encode(Controller.getInstance().blockChain.getGenesisBlock().getSignature()));
+
+            jsonObject.put("side", jsonSide);
+
+        }
+        return jsonObject;
+    }
+
+    @GET
+    @Path("/status")
+    public static String getStatus() {
+        return String.valueOf(Controller.getInstance().getStatus());
+    }
 
     @GET
     @Path("/stop")
@@ -43,16 +81,36 @@ public class CoreResource {
         return String.valueOf(true);
     }
 
+    public static JSONObject getVersionJson() {
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("version", Controller.version);
+        jsonObject.put("buildDate", Controller.getInstance().getBuildDateTimeString());
+        jsonObject.put("buildTimeStamp", Controller.buildTimestamp);
+
+        return jsonObject;
+    }
+
+    @SuppressWarnings("unchecked")
     @GET
-    @Path("/status")
-    public String getStatus() {
-        return String.valueOf(Controller.getInstance().getStatus());
+    @Path("/version")
+    public static String getVersion() {
+        return getVersionJson().toJSONString();
+    }
+
+    public static JSONObject getForgingStatusJson() {
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("code", Controller.getInstance().getForgingStatus().getStatuscode());
+        jsonObject.put("name", Controller.getInstance().getForgingStatus().getName());
+
+        return jsonObject;
     }
 
     @GET
     @Path("/status/forging")
-    public String getForgingStatus() {
-        return String.valueOf(Controller.getInstance().getForgingStatus().getStatuscode());
+    public static String getForgingStatus() {
+        return getForgingStatusJson().toJSONString();
     }
 
     @GET
@@ -79,18 +137,9 @@ public class CoreResource {
         return "";
     }
 
-    @SuppressWarnings("unchecked")
     @GET
-    @Path("/version")
-    public String getVersion() {
-        JSONObject jsonObject = new JSONObject();
-
-        jsonObject.put("version", Controller.getInstance().getVersion(true));
-        jsonObject.put("buildDate", Controller.getInstance().getBuildDateString());
-        jsonObject.put("buildTimeStamp", Controller.buildTimestamp);
-
-
-        return jsonObject.toJSONString();
+    public String info() {
+        return infoJson().toJSONString();
     }
 
     @GET

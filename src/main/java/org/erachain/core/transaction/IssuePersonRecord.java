@@ -36,7 +36,7 @@ public class IssuePersonRecord extends IssueItemRecord {
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp,
                              Long reference, byte[] signature, long feeLong) {
         super(typeBytes, NAME_ID, creator, person, feePow, timestamp, reference, signature);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte[] signature) {
@@ -213,13 +213,13 @@ public class IssuePersonRecord extends IssueItemRecord {
         if (isPersonAlive) {
             // IF PERSON is LIVE
             if (person.getImage().length > person.getMAXimageLenght()) {
-                if (!BlockChain.TEST_MODE && height > 157640) {
+                if (!BlockChain.SIDE_MODE && !BlockChain.TEST_MODE && height > 157640) {
                     // early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
                     return Transaction.INVALID_IMAGE_LENGTH_MAX;
                 }
             } else if (person.getImage().length < person.getMINimageLenght()) {
                 // 2998-1 - транзакция забаненая
-                if (!BlockChain.TEST_MODE && height != 2998) {
+                if (!BlockChain.SIDE_MODE && !BlockChain.TEST_MODE && height != 2998) {
                     return Transaction.INVALID_IMAGE_LENGTH_MIN;
                 }
             }
@@ -239,6 +239,13 @@ public class IssuePersonRecord extends IssueItemRecord {
             }
         }
 
+        if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
+            Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_PERSONS.get(this.item.getName());
+            if (!item.b.equals(((PersonCls) this.item).getBirthday())) {
+                return INVALID_TIMESTAMP_START;
+            }
+        }
+
         // IF BALANCE 0 or more - not check FEE
         boolean checkFeeBalance = creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0;
         int res = super.isValid(asDeal, flags |
@@ -246,10 +253,9 @@ public class IssuePersonRecord extends IssueItemRecord {
         // FIRST PERSONS INSERT as ADMIN
         boolean creatorAdmin = false;
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
-        if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0l && !BlockChain.ANONIM_SERT_USE
+        if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
                 && !creatorIsPerson) {
-            if (height < 10000) {
-                // FIRST Persons only by ME
+            if (height < 20000) {
                 // FIRST Persons only by ADMINS
                 for (String admin : BlockChain.GENESIS_ADMINS) {
                     if (creator.equals(admin)) {

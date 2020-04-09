@@ -33,7 +33,7 @@ ext {
 }
 
 //String versionEra = "4.11.08-${git.head().abbreviatedId}"
-String versionEra = "4.22.04 DEV beta"
+String versionEra = "4.23.01 DEV beta"
 archivesBaseName = 'Erachain'
 group 'org.erachain'
 //version versionEra
@@ -186,10 +186,15 @@ task CopyResourse {
         into 'build/libs/Erachain/images'
     }
     copy {
-        from 'ERA/z_bath_examples'
-        into 'build/libs/Erachain/z_bath_examples'
+        from 'ERA/z_GENESIS_EXAMPLES'
+        into 'build/libs/Erachain/z_GENESIS_EXAMPLES'
+    }
+    copy {
+        from 'ERA/z_RUN_EXAMPLES'
+        into 'build/libs/Erachain/z_RUN_EXAMPLES'
     }
 }
+
 task CreateZip(type: Zip) {
 
     from 'build/libs/'

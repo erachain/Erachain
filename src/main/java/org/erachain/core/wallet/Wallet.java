@@ -96,10 +96,9 @@ public class Wallet extends Observable /*implements Observer*/ {
 				// DCSet.getInstance().getCompletedOrderMap().addObserver(this);
 			}
 
-			walletUpdater = new WalletUpdater(Controller.getInstance(),
-					Controller.getInstance().getBlockChain(), DCSet.getInstance(), this);
+			walletUpdater = new WalletUpdater(Controller.getInstance(), this);
 
-        }
+		}
 
 	}
 
@@ -524,8 +523,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 		// COMMIT
 		this.commit();
 
-		walletUpdater = new WalletUpdater(Controller.getInstance(),
-				Controller.getInstance().getBlockChain(), DCSet.getInstance(), this);
+		walletUpdater = new WalletUpdater(Controller.getInstance(), this);
 
 		// ADD OBSERVER
 		////////// Controller.getInstance().addObserver(this);
@@ -1247,7 +1245,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 
         */
 		this.database.getAccountMap().changeBalance(blockGenerator.getAddress(), asOrphan, FEE_KEY,
-				new BigDecimal(blockFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+				new BigDecimal(blockFee).movePointLeft(BlockChain.FEE_SCALE), false);
 
 	}
 

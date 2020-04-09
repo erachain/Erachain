@@ -29,7 +29,7 @@ import java.util.List;
 public class MyTransactionsSplitPanel extends SplitPanel  {
 
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = "images/pageicons/MyTransactionsSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyTransactionsSplitPanel.png";
     private static MyTransactionsSplitPanel instance;
     public VouchLibraryPanel voush_Library_Panel;
     protected Tuple2<Long, Long> selectedTransactionKey;

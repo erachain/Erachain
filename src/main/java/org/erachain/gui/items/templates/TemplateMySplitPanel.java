@@ -18,7 +18,7 @@ import java.net.URL;
 
 public class TemplateMySplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = "images/pageicons/TemplateMySplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "TemplateMySplitPanel.png";
     //private TemplateMySplitPanel th;
 
     public TemplateMySplitPanel() {

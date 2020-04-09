@@ -900,7 +900,7 @@ public class TestRecSend {
         RSend r_Send = new RSend(maker, FEE_POWER, recipient, era_key, amount, "", null, isText, encrypted, timestamp, 1l);
 
         byte[] data = r_Send.toBytes(Transaction.FOR_NETWORK, true);
-        int port = Controller.getInstance().getNetworkPort();
+        int port = BlockChain.NETWORK_PORT;
         data = Bytes.concat(data, Ints.toByteArray(port));
         byte[] digest = Crypto.getInstance().digest(data);
         digest = Bytes.concat(digest, digest);

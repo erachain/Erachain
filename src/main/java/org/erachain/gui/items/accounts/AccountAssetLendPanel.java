@@ -10,6 +10,7 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import java.awt.*;
 
@@ -19,7 +20,7 @@ import java.awt.*;
 
 public class AccountAssetLendPanel extends AccountAssetActionPanelCls  {
 
-    private static String iconFile = "images/pageicons/AccountAssetLendPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons()+ "AccountAssetLendPanel.png";
     public AccountAssetLendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
         // "If You want to give a loan asset %asset%, fill in this form"
         super(false, null, assetIn,

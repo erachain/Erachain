@@ -28,7 +28,7 @@ public class IssueUnionRecord extends IssueItemRecord {
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp,
                             Long reference, byte[] signature, long feeLong) {
         super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference, signature);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte[] signature) {

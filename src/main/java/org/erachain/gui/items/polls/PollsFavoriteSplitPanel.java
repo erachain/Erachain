@@ -20,7 +20,7 @@ import java.net.URL;
 
 public class PollsFavoriteSplitPanel extends ItemSplitPanel  {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = "images/pageicons/PollsFavoriteSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "PollsFavoriteSplitPanel.png";
 
     public PollsFavoriteSplitPanel() {
         super(new FavoritePollsTableModel(), "PollsFavoriteSplitPanel");

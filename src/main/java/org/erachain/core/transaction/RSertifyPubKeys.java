@@ -3,7 +3,6 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -95,7 +94,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
                 add_day, timestamp, reference);
         this.signature = signature;
         this.sertifiedSignatures = sertifiedSignatures;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
 
@@ -336,7 +335,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
         // all test a not valid for main test
         // all other network must be invalid here!
-        int port = Controller.getInstance().getNetworkPort();
+        int port = BlockChain.NETWORK_PORT;
         data = Bytes.concat(data, Ints.toByteArray(port));
 
         if (this.sertifiedSignatures == null) this.sertifiedSignatures = new ArrayList<byte[]>();
@@ -438,7 +437,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
         // all test a not valid for main test
         // all other network must be invalid here!
-        int port = Controller.getInstance().getNetworkPort();
+        int port = BlockChain.NETWORK_PORT;
         data = Bytes.concat(data, Ints.toByteArray(port));
 
         Crypto crypto = Crypto.getInstance();
@@ -469,8 +468,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
                 && !this.creator.isPerson(dcSet, height)) {
             boolean creator_admin = false;
-            if (height < 10000) {
-                // FIRST Persons only by ME
+            if (height < 20000) {
                 // FIRST Persons only by ADMINS
                 for (String admin : BlockChain.GENESIS_ADMINS) {
                     if (this.creator.equals(admin)) {

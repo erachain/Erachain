@@ -129,6 +129,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int NOT_ENOUGH_ERA_USE_10 = 102;
     public static final int NOT_ENOUGH_ERA_OWN_100 = 103;
     public static final int NOT_ENOUGH_ERA_USE_100 = 104;
+    public static final int NOT_ENOUGH_ERA_OWN_1000 = 105;
+    public static final int NOT_ENOUGH_ERA_USE_1000 = 106;
 
     public static final int INVALID_BACKWARD_ACTION = 117;
     public static final int NOT_SELF_PERSONALIZY = 118;
@@ -176,6 +178,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int ITEM_DOES_NOT_UNITED = 211;
     public static final int ITEM_DUPLICATE_KEY = 212;
     public static final int ITEM_DUPLICATE = 213;
+    public static final int INVALID_TIMESTAMP_START = 214;
+    public static final int INVALID_TIMESTAMP_END = 215;
 
     public static final int ITEM_PERSON_IS_DEAD = 235;
     public static final int AMOUNT_LENGHT_SO_LONG = 236;
@@ -757,7 +761,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         BigDecimal fee = new BigDecimal(fee_long).multiply(BlockChain.FEE_RATE).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
 
         if (this.feePow > 0) {
-            this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_UP);
+            this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
         } else {
             this.fee = fee;
         }
@@ -800,7 +804,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public BigDecimal feeToBD(int fee) {
-        return BigDecimal.valueOf(fee, BlockChain.AMOUNT_DEDAULT_SCALE);
+        return BigDecimal.valueOf(fee, BlockChain.FEE_SCALE);
     }
 
     /*
@@ -1078,12 +1082,13 @@ public abstract class Transaction implements ExplorerJsonLine {
             transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
             transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
             transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
-            if (this.height > 0) {
-                transaction.put("height", this.height);
-                transaction.put("sequence", this.seqNo);
-                if (isWiped()) {
-                    transaction.put("wiped", true);
-                }
+        }
+
+        if (this.height > 0) {
+            transaction.put("height", this.height);
+            transaction.put("sequence", this.seqNo);
+            if (isWiped()) {
+                transaction.put("wiped", true);
             }
         }
 
@@ -1135,10 +1140,14 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (data == null)
             return;
 
-        // all test a not valid for main test
-        // all other network must be invalid here!
-        int port = Controller.getInstance().getNetworkPort();
-        data = Bytes.concat(data, Ints.toByteArray(port));
+        if (BlockChain.SIDE_MODE) {
+            // чтобы из других цепочек не срабатывало
+            data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
+        } else {
+            // чтобы из TestNEt не сработало
+            int port = BlockChain.NETWORK_PORT;
+            data = Bytes.concat(data, Ints.toByteArray(port));
+        }
 
         this.signature = Crypto.getInstance().sign(creator, data);
     }
@@ -1235,10 +1244,14 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
         }
 
-        // all test a not valid for main test
-        // all other network must be invalid here!
-        int port = Controller.getInstance().getNetworkPort();
-        data = Bytes.concat(data, Ints.toByteArray(port));
+        if (BlockChain.SIDE_MODE) {
+            // чтобы из других цепочек не срабатывало
+            data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
+        } else {
+            // чтобы из TestNEt не сработало
+            int port = BlockChain.NETWORK_PORT;
+            data = Bytes.concat(data, Ints.toByteArray(port));
+        }
 
         if (!Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data)) {
             boolean wrong = true;

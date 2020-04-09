@@ -18,7 +18,7 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel {
     /**
      *
      */
-    private static String iconFile = "images/pageicons/SearchUnionSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchUnionSplitPanel.png";
     private static final long serialVersionUID = 1L;
     private static TableModelUnionsItemsTableModel tableModelUnions = new TableModelUnionsItemsTableModel();
     private SearchUnionSplitPanel th;

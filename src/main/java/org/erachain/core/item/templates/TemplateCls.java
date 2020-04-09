@@ -62,6 +62,24 @@ public abstract class TemplateCls extends ItemCls {
         return variables;
     }
 
+    @Override
+    public String viewName() {
+        if (this.key > 2 && this.key < 100) {
+            return "Example. Reserved";
+        }
+
+        return this.name;
+    }
+
+    @Override
+    public String viewDescription() {
+        if (this.key > 2 && this.key < 100) {
+            return "<b>EXAMPLE</b><br>USE {{param.1}} etc. for set values in parameters";
+        }
+
+        return this.description;
+    }
+
     // DB
     public ItemMap getDBMap(DCSet db) {
         return db.getItemTemplateMap();

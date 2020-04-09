@@ -2,6 +2,7 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockBuffer;
+import org.erachain.core.BlockChain;
 import org.erachain.database.DLSet;
 import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
@@ -182,7 +183,7 @@ public class Peer extends MonitoredThread {
                 this.white = false;
                 this.setName("Peer-" + this.getId() + " <<< " + address.getHostAddress());
             } else {
-                this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
+                this.socket = new Socket(address, BlockChain.NETWORK_PORT);
                 this.white = true;
                 this.setName("Peer-" + this.getId() + " >>> " + address.getHostAddress());
 

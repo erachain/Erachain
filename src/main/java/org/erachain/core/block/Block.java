@@ -1024,18 +1024,16 @@ public class Block implements Closeable, ExplorerJsonLine {
     }
 
     private BigDecimal getFeeByProcess(DCSet db) {
-        //BigDecimal fee = BigDecimal.ZERO;
         int fee = 0;
 
         for (Transaction transaction : this.getTransactions()) {
-            //fee = fee.add(transaction.getFee());
             fee += transaction.getForgedFee();
         }
 
         // TODO calculate AT FEE
         // fee = fee.add(BigDecimal.valueOf(this.atFees, BlockChain.AMOUNT_DEDAULT_SCALE));
 
-        return BigDecimal.valueOf(fee, BlockChain.AMOUNT_DEDAULT_SCALE);
+        return BigDecimal.valueOf(fee, BlockChain.FEE_SCALE);
 
     }
 
@@ -1595,7 +1593,7 @@ public class Block implements Closeable, ExplorerJsonLine {
     public int isValid(DCSet dcSetPlace, boolean andProcess) {
 
         if (validatedForkDB != null) {
-            LOGGER.error("is Valid validatedForkDB not NULL [" + heightBlock + "]");
+            LOGGER.error("is Valid validatedForkDB " + validatedForkDB + " not NULL [" + heightBlock + "]");
             close();
         }
         wasValidated = false;
@@ -1738,7 +1736,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     }
 
                     //CHECK TIMESTAMP AND DEADLINE
-                    if ((BlockChain.TEST_MODE || heightBlock > 278989) &&
+                    if ((BlockChain.TEST_MODE || BlockChain.SIDE_MODE || heightBlock > 278989) &&
                             transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
                     ) {
                         LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
@@ -1949,12 +1947,14 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     public synchronized void setValidatedForkDB(DCSet validatedForkDB) {
         if (this.validatedForkDB != null) {
+            LOGGER.debug("CLOSE on SET: " + this.validatedForkDB + " for " + this.toString());
+            validatedForkDB.makedIn += " setValidatedForkDB: " + validatedForkDB + " for " + this.toString();
             this.validatedForkDB.close();
-            LOGGER.debug("validatedForkDB is closed on SET: " + this.toString());
+            this.validatedForkDB = null;
         }
         this.validatedForkDB = validatedForkDB;
-        validatedForkDB.makedIn += " setValidatedForkDB: " + this.toString();
-        LOGGER.debug("setValidatedForkDB to: " + validatedForkDB.makedIn);
+        validatedForkDB.makedIn += " setValidatedForkDB: " + validatedForkDB + " for " + this.toString();
+        LOGGER.debug(validatedForkDB.makedIn);
     }
 
     public boolean hasValidatedForkDB() {
@@ -1971,13 +1971,15 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (validatedForkDB != null) {
             try {
                 validatedForkDB.close();
-                LOGGER.debug("validatedForkDB is closed: " + this.toString());
+                // сейчас у нас есть имя базы откуда открыли так что это не важно тут лог писать
+                // LOGGER.debug("validatedForkDB is closed: " + this.toString());
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
             validatedForkDB = null;
         } else {
-            LOGGER.debug("validatedForkDB is closed NULL: " + this.toString());
+            // пр синхронизации кошелька пользователя слишком много сообщений - так что закроем
+            //LOGGER.debug("validatedForkDB is closed NULL: " + this.toString());
         }
 
         if (transactions != null) {
@@ -2019,6 +2021,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         validatedForkDB.writeToParent();
     }
 
+    private Account accountFeeFFF = new Account("7RYEVPZg7wbu2bmz3tWnzrhPavjpyQ4tnp");
+
     //PROCESS/ORPHAN
     public void feeProcess(DCSet dcSet, boolean asOrphan) {
         //REMOVE FEE
@@ -2027,8 +2031,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (blockHead == null) {
             this.blockHead = new BlockHead(this, this.getTotalFee(dcSet).unscaledValue().longValue(),
                     this.getBonusFee().unscaledValue().longValue());
-        } else {
-
         }
 
         if (BlockChain.ROBINHOOD_USE) {
@@ -2040,7 +2042,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 Account richAccount = new Account(rich);
                 richAccount.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
-                        new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true, true);
+                        new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), true, true);
             } else {
                 emittedFee = this.blockHead.emittedFee;
             }
@@ -2050,13 +2052,24 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
 
         //UPDATE GENERATOR BALANCE WITH FEE
-        if (this.blockHead.totalFee != 0) {
-            BigDecimal totalFee = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE);
+        if (this.blockHead.totalFee > 0) {
+            BigDecimal forgerEarn;
+            if (BlockChain.SIDE_MODE) {
+                long blockFeeRoyaltyLong = this.blockHead.totalFee / 20; // 5%
+                accountFeeFFF.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
+                        new BigDecimal(blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE), false, false);
+
+                forgerEarn = new BigDecimal(this.blockHead.totalFee - blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE)
+                        .setScale(BlockChain.FEE_SCALE);
+            } else {
+                forgerEarn = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.FEE_SCALE);
+            }
+
             this.creator.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
-                    totalFee, true, false);
+                    forgerEarn, true, false);
 
             // учтем что нафоржили
-            this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, totalFee, Transaction.BALANCE_SIDE_FORGED);
+            this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, forgerEarn, Transaction.BALANCE_SIDE_FORGED);
 
             // MAKE CALCULATED TRANSACTIONS
             if (!asOrphan && !Controller.getInstance().noCalculated) {
@@ -2064,14 +2077,14 @@ public class Block implements Closeable, ExplorerJsonLine {
                     this.txCalculated = new ArrayList<RCalculated>();
 
                 this.txCalculated.add(new RCalculated(this.creator, Transaction.FEE_KEY,
-                        totalFee, "forging", Transaction.makeDBRef(this.heightBlock, 0)));
+                        forgerEarn, "forging", Transaction.makeDBRef(this.heightBlock, 0)));
             }
         }
 
         if (emittedFee != 0) {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
-                    new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true, false);
+                    new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), true, false);
         }
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #3");

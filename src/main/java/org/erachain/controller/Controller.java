@@ -93,8 +93,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.22.04 DEV beta";
-    public static String buildTime = "2020-02-20 13:33:33 UTC";
+    public static String version = "4.23.01 DEV";
+    public static String buildTime = "2020-04-02 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -192,7 +192,7 @@ public class Controller extends Observable {
                         put("ru", Transaction.makeDBRef(159727, 1));
                     }
                 };
-        APP_NAME = "Erachain";
+        APP_NAME = "Erachain" + "-" + Settings.getInstance().APP_NAME;
 
     }
 
@@ -217,7 +217,8 @@ public class Controller extends Observable {
 
         if (withTimestamp)
             return version + (BlockChain.DEMO_MODE ? " DEMO Net"
-                    : BlockChain.TEST_MODE ? " Test Net:" + Settings.getInstance().getGenesisStamp() : "")
+                    : BlockChain.TEST_MODE ? " Test Net:" + Settings.getInstance().getGenesisStamp()
+                    : BlockChain.SIDE_MODE ? " Side Net:" + Settings.getInstance().getGenesisStamp() : "")
                     + " (" + dbs + ")";
 
         return version + " (" + dbs + ")";
@@ -226,7 +227,8 @@ public class Controller extends Observable {
 
     public String getApplicationName(boolean withVersion) {
         return APP_NAME + " " + (withVersion ? getVersion(true) :
-                BlockChain.DEMO_MODE ? "DEMO Net" : BlockChain.TEST_MODE ? "Test Net" : "");
+                BlockChain.DEMO_MODE ? "DEMO Net" : BlockChain.TEST_MODE ? "Test Net"
+                        : BlockChain.SIDE_MODE ? "Side Net" : "");
     }
 
     public static String getBuildDateTimeString() {
@@ -311,19 +313,14 @@ public class Controller extends Observable {
         return this.dcSet;
     }
 
-    public int getNetworkPort() {
-        if (BlockChain.TEST_MODE) {
-            return BlockChain.TESTNET_PORT;
-        } else {
-            return BlockChain.MAINNET_PORT;
-        }
-    }
-
     public byte[] getMessageMagic() {
         if (this.messageMagic == null) {
             long longTestNetStamp = Settings.getInstance().getGenesisStamp();
-            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE) {
+            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE || BlockChain.SIDE_MODE) {
                 byte[] seedTestNetStamp = Crypto.getInstance().digest(Longs.toByteArray(longTestNetStamp));
+                this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
+            } else if (BlockChain.SIDE_MODE) {
+                byte[] seedTestNetStamp = blockChain.getGenesisBlock().getSignature();
                 this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
             } else {
                 this.messageMagic = Message.MAINNET_MAGIC;
@@ -575,9 +572,9 @@ public class Controller extends Observable {
         this.random.nextBytes(this.foundMyselfID);
 
         // CHECK NETWORK PORT AVAILABLE
-        if (BlockChain.TEST_DB == 0 && !Network.isPortAvailable(Controller.getInstance().getNetworkPort())) {
+        if (BlockChain.TEST_DB == 0 && !Network.isPortAvailable(BlockChain.NETWORK_PORT)) {
             throw new Exception(Lang.getInstance().translate("Network port %port% already in use!").replace("%port%",
-                    String.valueOf(Controller.getInstance().getNetworkPort())));
+                    String.valueOf(BlockChain.NETWORK_PORT)));
         }
 
         // CHECK RPC PORT AVAILABLE
@@ -639,7 +636,12 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Try Open DataChain")));
             LOGGER.info("Try Open DataChain");
-            this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
+            if (Settings.simpleTestNet) {
+                // -testnet
+                reCreateDC(inMemoryDC);
+            } else {
+                this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
+            }
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataChain OK")));
             LOGGER.info("DataChain OK");
@@ -1366,7 +1368,7 @@ public class Controller extends Observable {
             return;
         }
 
-        if (false && BlockChain.TEST_MODE) {
+        if (false && BlockChain.DEMO_MODE) {
             try {
                 synchronizer.checkBadBlock(peer);
             } catch (Exception e) {
@@ -2035,6 +2037,7 @@ public class Controller extends Observable {
                         null // если блок не верный - не баним ПИР может просто он отстал
                 )) {
                     // если все же он не подошел или не было победного то вышлем всеим запрос на "Порделитесль последним блоком"
+                    LOGGER.info("requestLastBlock");
                     requestLastBlock();
                 }
             }
@@ -3700,6 +3703,10 @@ public class Controller extends Observable {
             // TESTS
             if (BlockChain.TEST_DB > 0) {
                 useGui = false;
+                onlyProtocolIndexing = true;
+                noUseWallet = true;
+                noCalculated = true;
+                HARD_WORK = 6;
                 continue;
             }
 

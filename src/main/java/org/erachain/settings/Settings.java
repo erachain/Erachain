@@ -29,6 +29,10 @@ public class Settings {
     public static final long DEFAULT_MAINNET_STAMP = 1487844793333L;
     public static final long DEFAULT_DEMO_NET_STAMP = 1581001700000L; // default for developers test net
 
+    public static String APP_NAME = "";
+    public static String APP_FULL_NAME = "";
+    public static boolean ERA_COMPU_ALL_UP;
+
     // FOR TEST by default
     public static long genesisStamp = DEFAULT_MAINNET_STAMP;
 
@@ -99,6 +103,13 @@ public class Settings {
     public static final boolean USE_TELEGRAM_STORE = false;
     public static final int TELEGRAM_STORE_PERIOD = 5; // in days
 
+    public final static int NET_MODE_MAIN = 0;
+    public final static int NET_MODE_SIDE = 1;
+    public final static int NET_MODE_DEMO = 2;
+    public final static int NET_MODE_TEST = 3;
+    public static int NET_MODE;
+
+    public static int TEST_DB_MODE;
 
     private static Settings instance;
 
@@ -106,6 +117,8 @@ public class Settings {
     long timeLoadInternetPeers;
     private JSONObject settingsJSON;
     private JSONObject peersJSON;
+    public static JSONArray genesisJSON;
+    public static boolean simpleTestNet;
     private String userPath = "";
     private InetAddress localAddress;
     private String[] defaultPeers = {};
@@ -125,7 +138,6 @@ public class Settings {
     private Settings() {
         this.localAddress = this.getCurrentIp();
         settingsJSON = read_setting_JSON();
-
 
         File file = new File("");
         //TRY READ PEERS.JSON
@@ -163,6 +175,7 @@ public class Settings {
         return instance;
     }
 
+
     public synchronized static void freeInstance() {
         instance = null;
     }
@@ -186,7 +199,8 @@ public class Settings {
     }
 
     public String getPeersPath() {
-        return this.userPath + (isDemoNet() ? "peers-demo.json" : isTestNet() ? "peers-test.json" : "peers.json");
+        return this.userPath + (isDemoNet() ? "peers-demo.json" : isTestNet() ? "peers-test.json" :
+                isSideNet() ? "peers-side.json" : "peers.json");
     }
 
     public String getWalletDir() {
@@ -285,6 +299,9 @@ public class Settings {
 		}
     }
 
+    public String getPatnIcons(){
+        return "images" + File.separator + "pageicons" + File.separator;
+    }
 
     public String getDataDir() {
         try {
@@ -515,12 +532,20 @@ public class Settings {
         }
     }
 
-    public boolean isTestNet() {
-        return this.getGenesisStamp() != DEFAULT_MAINNET_STAMP;
+    public boolean isMainNet() {
+        return NET_MODE == NET_MODE_MAIN;
+    }
+
+    public boolean isSideNet() {
+        return NET_MODE == NET_MODE_SIDE;
     }
 
     public boolean isDemoNet() {
-        return this.getGenesisStamp() == DEFAULT_DEMO_NET_STAMP;
+        return NET_MODE == NET_MODE_DEMO;
+    }
+
+    public boolean isTestNet() {
+        return NET_MODE >= NET_MODE_DEMO;
     }
 
     public long getGenesisStamp() {

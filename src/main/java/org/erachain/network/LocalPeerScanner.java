@@ -1,7 +1,7 @@
 package org.erachain.network;
 
 import org.apache.commons.net.util.SubnetUtils;
-import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +73,7 @@ public class LocalPeerScanner extends Thread {
     @Override
     public void run() {
         try {
-            scanLocalNetForPeers(Controller.getInstance().getNetworkPort());
+            scanLocalNetForPeers(BlockChain.NETWORK_PORT);
         } catch (Exception e) {
             logger.debug(e.getMessage());
         }

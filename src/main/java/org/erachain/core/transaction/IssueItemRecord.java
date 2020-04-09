@@ -66,7 +66,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     // RETURN START KEY if not GENESIS
     public long getStartKey() {
-        return 1L<<14;
+        return BlockChain.SIDE_MODE || BlockChain.TEST_MODE && !BlockChain.DEMO_MODE ? 1L << 14 : 0L;
     }
 
     @Override
@@ -152,6 +152,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         String name = this.item.getName();
         // TEST ONLY CHARS
         int nameLen = name.length();
+
         if (nameLen < item.getMinNameLen()
                 //&& !BlockChain.DEVELOP_USE
                 && height > 114000

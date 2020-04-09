@@ -191,9 +191,14 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         PublicKeyAccount creator = block.getCreator();
         if (BlockChain.ERA_COMPU_ALL_UP && creator.getLastForgingData(dcSet) == null) {
             // так как у нас новые счета сами стартуют без инициализации - надо тут учеть начало
-            creator.setForgingData(dcSet, height - BlockChain.DEVELOP_FORGING_START, block.getForgingValue());
+            int diff = height - BlockChain.DEVELOP_FORGING_START;
+            if (diff <= 0) {
+                diff = height;
+            }
+            creator.setForgingData(dcSet, diff, block.getForgingValue());
+        } else {
+            creator.setForgingData(dcSet, height, block.getForgingValue());
         }
-        creator.setForgingData(dcSet, height, block.getForgingValue());
 
         dcSet.getBlocksHeadsMap().putAndProcess(height, block.blockHead);
         this.setLastBlockSignature(signature);

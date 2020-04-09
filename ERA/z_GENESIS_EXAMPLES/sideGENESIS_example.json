@@ -1,0 +1,32 @@
+[
+  // SIDECHAIN SHORT NAME, SIDECHAIN= FULL NAME
+  [
+    "NOVA",
+    "NOVA SIDE CHAIN"
+  ],
+  // TIMESTAMP LONG
+  [
+    1584424800000
+  ],
+  // forging addresses
+  [
+    /// recipient, ERA, COMPU, [DEBTORS]
+    [
+      "74KvWNicSfSTV8aCnKFdwWzBWiTWw1dQoB",
+      10000000,
+      0,
+      // debtors
+      [
+        // ERA, recipient
+        [
+          227272,
+          "79BXYUAA29MKa9LQntiA289rCtCREi3GPu"
+        ],
+        [
+          227272,
+          "79ynTmueP2mXfS2yvtqf5yhkqE2WUS8wYa"
+        ]
+      ]
+    ]
+  ]
+]

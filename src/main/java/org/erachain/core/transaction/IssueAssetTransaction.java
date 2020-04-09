@@ -8,6 +8,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -18,7 +19,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
     private static final String NAME_ID = "Issue Asset";
 
-    public static final long START_KEY = 1L<<14;
+    public static final long START_KEY = BlockChain.SIDE_MODE || BlockChain.TEST_MODE && !BlockChain.DEMO_MODE ? 1L << 14 : 1000L;
 
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
@@ -34,7 +35,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow,
                                  long timestamp, Long reference, byte[] signature, long feeLong) {
         super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference, signature);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as pack
@@ -212,6 +213,14 @@ public class IssueAssetTransaction extends IssueItemRecord {
         if (quantity > maxQuantity || quantity < -1) {
             return INVALID_QUANTITY;
         }
+
+        if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
+            Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
+            if (item.b < quantity) {
+                return INVALID_QUANTITY;
+            }
+        }
+
         return Transaction.VALIDATE_OK;
     }
 

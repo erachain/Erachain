@@ -26,6 +26,7 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -532,8 +533,9 @@ public class BlockExplorer {
 
         // time guery
         output.put("queryTimeMs", stopwatchAll.elapsedTime());
-        if (BlockChain.TEST_MODE) {
-            output.put("network", BlockChain.DEMO_MODE ? "DEMO Net" : "TEST Net");
+        if (BlockChain.SIDE_MODE || BlockChain.TEST_MODE) {
+            output.put("network", BlockChain.DEMO_MODE ? "DEMO Net"
+                    : BlockChain.SIDE_MODE ? ("SideChain: " + Settings.APP_NAME) : "TEST Net");
         }
         return output;
     }
@@ -631,7 +633,7 @@ public class BlockExplorer {
         map.put("key", item.getKey());
         map.put("icon", Base64.encodeBase64String(item.getIcon()));
         map.put("image", Base64.encodeBase64String(item.getImage()));
-        map.put("name", item.getName());
+        map.put("name", item.viewName());
         map.put("description", item.viewDescription());
         map.put("owner", item.getOwner().getAddress());
 
@@ -2488,11 +2490,14 @@ public class BlockExplorer {
             list.add(new Pair<Long, Long>(1L, 12L));
             list.add(new Pair<Long, Long>(1L, 92L));
             list.add(new Pair<Long, Long>(1L, 95L));
-            list.add(new Pair<Long, Long>(1L, 1010L));
+
+            if (!BlockChain.SIDE_MODE)
+                list.add(new Pair<Long, Long>(1L, 1010L));
+
             list.add(new Pair<Long, Long>(2L, 12L));
             list.add(new Pair<Long, Long>(2L, 92L));
             list.add(new Pair<Long, Long>(2L, 95L));
-            list.add(new Pair<Long, Long>(14L, 12L ));
+            list.add(new Pair<Long, Long>(14L, 12L));
         }
 
         pairsSet.addAll(list);
@@ -3005,7 +3010,7 @@ public class BlockExplorer {
                         Long key = new Long(jSON.get("TM") + "");
                         TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, key);
                         if (template != null) {
-                            String description = template.getDescription();
+                            String description = template.viewDescription();
 
                             // Template Params
                             if (jSON.containsKey("PR")) {
@@ -3035,7 +3040,7 @@ public class BlockExplorer {
                         Long key = new Long(jSON.get("Template") + "");
                         TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, key);
                         if (template != null) {
-                            String description = template.getDescription();
+                            String description = template.viewDescription();
 
                             // Template Params
                             if (jSON.containsKey("Statement_Params")) {
@@ -3192,7 +3197,7 @@ public class BlockExplorer {
                     JSONObject data = new JSONObject();
                     TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
                     if (template != null) {
-                        description = template.getDescription();
+                        description = template.viewDescription();
                         data = (JSONObject) JSONValue
                                 .parseWithException(new String(trans.getData(), StandardCharsets.UTF_8));
 
@@ -3241,7 +3246,7 @@ public class BlockExplorer {
 
             TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
             output.put("statement",
-                    template.getName() + "<br>" + Lang.getInstance().translateFromLangObj("Encrypted", langObj));
+                    template.viewName() + "<br>" + Lang.getInstance().translateFromLangObj("Encrypted", langObj));
         }
 
         output.put("creator", trans.getCreator().getAddress());

@@ -1,9 +1,9 @@
 package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
+import org.erachain.api.CoreResource;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -20,7 +20,6 @@ import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.*;
 import org.erachain.gui.transaction.OnDealClick;
-import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
@@ -83,6 +82,7 @@ public class API {
         help.put("GET Height", "height");
         help.put("GET First Block", "firstblock");
         help.put("GET Last Block", "lastblock");
+        help.put("GET Last Block Head", "lastblockhead");
 
         help.put("*** BLOCK ***", "");
         help.put("GET Block", "block/{signature}");
@@ -171,9 +171,6 @@ public class API {
     @GET
     @Path("firstblock")
     public Response getFirstBlock() {
-        //Map out = new LinkedHashMap();
-
-        //JSONObject out = Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
 
         JSONObject out = dcSet.getBlockMap().get(1).toJson();
 
@@ -188,10 +185,22 @@ public class API {
     @Path("lastblock")
     public Response lastBlock() {
 
-        Map out = new LinkedHashMap();
-
         Block lastBlock = dcSet.getBlockMap().last();
-        out = lastBlock.toJson();
+        Map out = lastBlock.toJson();
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(out))
+                .build();
+    }
+
+    @GET
+    @Path("lastblockhead")
+    public Response lastBlockHead() {
+
+        Block.BlockHead lastBlock = dcSet.getBlocksHeadsMap().last();
+        Map out = lastBlock.toJson();
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -1868,27 +1877,15 @@ public class API {
     @GET
     @Path("info")
     public Response getInformation() throws NoSuchFieldException, IllegalAccessException {
-        JSONObject jsonObject = new JSONObject();
+        JSONObject jsonObject = CoreResource.infoJson();
 
-        Controller controller = Controller.getInstance();
-
-
-        Object f = Controller.class.getDeclaredField("version");
-        ((Field) f).setAccessible(true);
-        String version = ((Field) f).get(Controller.getInstance()).toString();
-        ((Field) f).setAccessible(false);
-        jsonObject.put("version", version);
-
-        int lastBlock = (controller.getLastBlock()).getHeight();
-        jsonObject.put("lastBlock", lastBlock);
-        BlockGenerator.ForgingStatus forgingStatus = controller.getForgingStatus();
-        //jsonObject.put("forgingCodeStatus", forgingStatus.getStatuscode());
-
-        jsonObject.put("forgingStatus", forgingStatus.getName());
-
-        Settings setting = Settings.getInstance();
-        jsonObject.put("rpcEnable", setting.isRpcEnabled());
-        jsonObject.put("webEnable", setting.isWebEnabled());
+        if (false) {
+            Object f = Controller.class.getDeclaredField("version");
+            ((Field) f).setAccessible(true);
+            String version = ((Field) f).get(Controller.getInstance()).toString();
+            ((Field) f).setAccessible(false);
+            jsonObject.put("version2", version);
+        }
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")

@@ -114,8 +114,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         this.jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition)));
 
-        //this.jComboBox_Asset.setEnabled(assetIn != null);
-
         this.jTextField_Recive_Detail.setText("");
         this.jTextField_Mess_Title.setText("");
 
@@ -137,6 +135,8 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         // favorite combo box
         jComboBox_Asset.setModel(new ComboBoxAssetsModel());
         jComboBox_Asset.setEditable(false);
+        //this.jComboBox_Asset.setEnabled(assetIn != null);
+
 
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
             this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
@@ -306,7 +306,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         }
 
         //READ RECIPIENT
-        String recipientAddress = jTextField_To.getText();
+        String recipientAddress = jTextField_To.getText().trim();
 
         //ORDINARY RECIPIENT
         if (Crypto.getInstance().isValidAddress(recipientAddress)) {

@@ -37,7 +37,7 @@ import java.net.URL;
 public class DepositExchange extends JPanel   {
 
     // private JComboBox<Account> accountLBox;
-    private static String iconFile = "images/pageicons/DepositExchange.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "DepositExchange.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(DepositExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;

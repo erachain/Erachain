@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 //import java.math.BigDecimal;
 //import com.google.common.primitives.Longs;
@@ -276,12 +277,10 @@ public abstract class ItemCls implements ExplorerJsonLine {
             if (this.getDBIssueMap(db).contains(this.reference)) {
                 this.key = this.getDBIssueMap(db).get(this.reference);
             } else if (BlockChain.CHECK_BUGS > 0
-                    && !BlockChain.TEST_MODE
+                    && !BlockChain.SIDE_MODE && !BlockChain.TEST_MODE
                     && Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
-                ///|| Base58.encode(this.reference).equals("4VLYXuFEx9hYVwg82921Nh1N1y2ozCyxpvoTs2kXnQk89HLGshF15FJossTBU6dZhXRDAXKUwysvLUD4TFNJfXhW")) // see issue/1149
 
             ) {
-                // zDLLXWRmL8qhrU9DaxTTG4xrLHgb7xLx5fVrC2NXjRaw2vhzB1PArtgqNe2kxp655saohUcWcsSZ8Bo218ByUzH
                 LOGGER.error("Item [" + this.name + "] not found for REFERENCE: " + Base58.encode(this.reference));
                 if (BlockChain.CHECK_BUGS > 3) {
                     Long error = null;
@@ -559,13 +558,13 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
         JSONObject json = new JSONObject();
         json.put("key", this.getKey());
-        json.put("name", this.getName());
+        json.put("name", this.viewName());
 
         if (description != null && !description.isEmpty()) {
-            if (description.length() > 100) {
-                json.put("description", description.substring(0, 100));
+            if (viewDescription().length() > 100) {
+                json.put("description", viewDescription().substring(0, 100));
             } else {
-                json.put("description", description);
+                json.put("description", viewDescription());
             }
         } else {
             json.put("description", "");
@@ -584,17 +583,28 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return json;
     }
 
+    public HashMap getNovaItems() {
+        return new HashMap<String, Fun.Tuple3<Long, Long, byte[]>>();
+    }
+
+    public byte[] getNovaItemCreator(Object item) {
+        return ((Fun.Tuple3<Integer, Long, byte[]>) item).c;
+    }
+
+    public Long getNovaItemKey(Object item) {
+        return ((Fun.Tuple3<Long, Long, byte[]>) item).a;
+    }
+
     /**
-     *
      * @param creator
      * @param dcSet
      * @return key если еще не добавлен, -key если добавлен и 0 - если это не НОВА
      */
     public long isNovaAsset(Account creator, DCSet dcSet) {
-        Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
-        if (pair != null && creator.equals(pair.getB())) {
+        Object item = getNovaItems().get(this.name);
+        if (item != null && creator.equals(getNovaItemCreator(item))) {
             ItemMap dbMap = this.getDBMap(dcSet);
-            long key = (long)pair.getA();
+            Long key = (Long) getNovaItemKey(item);
             if (dbMap.contains(key)) {
                 return -key;
             } else {
@@ -602,7 +612,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
             }
         }
 
-        return 0l;
+        return 0L;
     }
 
     //

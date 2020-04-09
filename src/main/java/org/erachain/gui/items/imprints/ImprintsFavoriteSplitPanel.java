@@ -7,6 +7,7 @@ import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +17,7 @@ import java.awt.event.ActionListener;
 public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
     //private ImprintsFavoriteSplitPanel th;
-    private static String iconFile = "images/pageicons/ImprintsFavoriteSplitPanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons()+ "ImprintsFavoriteSplitPanel.png";
     public ImprintsFavoriteSplitPanel() {
         super(new FavoriteImprintsTableModel(), "PersonsFavoriteSplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Persons"));

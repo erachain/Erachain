@@ -15,7 +15,7 @@ public class ExchangePanel extends JPanel  {
     private static final long serialVersionUID = -7052380905136603354L;
     //public CreateOrderPanel buyOrderPanel;
     //EchangeSellBuyPanel tt;
-    private static String iconFile = "images/pageicons/ExchangePanel.png";
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "ExchangePanel.png";
     String action;
     String account;
     java.awt.GridBagConstraints gridBagConstraints;

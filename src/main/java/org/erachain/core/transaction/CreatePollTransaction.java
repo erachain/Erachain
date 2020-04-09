@@ -45,7 +45,7 @@ public class CreatePollTransaction extends Transaction {
         this(typeBytes, creator, poll, feePow, timestamp, reference);
 
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference, byte[] signature) {

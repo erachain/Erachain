@@ -435,6 +435,7 @@ public class DWSet extends DBASet {
         this.uses++;
         this.database.rollback();
         this.database.close();
+        this.tables = null;
         this.uses--;
 
     }
