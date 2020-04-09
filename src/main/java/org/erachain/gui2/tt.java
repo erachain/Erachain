@@ -58,7 +58,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.TreeMap;
 
 /**
@@ -149,10 +148,9 @@ public class tt extends JPanel { // implements TreeSelectionListener {
 
         root.add(polls_Node);
 
-        if (BlockChain.TEST_MODE)
-            root.add(hashes_Node);
-        if (BlockChain.TEST_MODE)
-            root.add(linked_hashes_Node);
+        root.add(hashes_Node);
+        root.add(linked_hashes_Node);
+
         if (BlockChain.TEST_MODE)
             root.add(telegrams_Tree);
 

@@ -35,10 +35,10 @@ public class WalletUpdater extends MonitoredThread {
 
     public NavigableMap<Integer, Block> lastBlocks = new TreeMap<>();
 
-    public WalletUpdater(Controller controller, BlockChain blockChain, DCSet dcSet, Wallet wallet) {
+    public WalletUpdater(Controller controller, Wallet wallet) {
         this.controller = controller;
-        this.blockChain = blockChain;
-        this.dcSet = dcSet;
+        this.blockChain = controller.blockChain;
+        this.dcSet = controller.getDCSet();
         this.wallet = wallet;
 
         this.setName("WalletUpdater[" + this.getId() + "]");
@@ -235,11 +235,13 @@ public class WalletUpdater extends MonitoredThread {
         byte[] lastWalletBlockSign = wallet.database.getLastBlockSignature();
         if (lastWalletBlockSign != null) {
             // по последнему в этом кошельке смотрим
-            int walletHeight = dcSet.getBlockSignsMap().get(lastWalletBlockSign);
-            for (int i = walletHeight - 100; i <= walletHeight; i++) {
-                Block block = dcSet.getBlockMap().get(i);
-                block.loadHeadMind(dcSet);
-                lastBlocks.put(i, block);
+            Integer walletHeight = dcSet.getBlockSignsMap().get(lastWalletBlockSign);
+            if (walletHeight != null) {
+                for (int i = walletHeight - 100; i <= walletHeight; i++) {
+                    Block block = dcSet.getBlockMap().get(i);
+                    block.loadHeadMind(dcSet);
+                    lastBlocks.put(i, block);
+                }
             }
         }
 

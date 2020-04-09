@@ -636,7 +636,12 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Try Open DataChain")));
             LOGGER.info("Try Open DataChain");
-            this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
+            if (Settings.simpleTestNet) {
+                // -testnet
+                reCreateDC(inMemoryDC);
+            } else {
+                this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
+            }
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataChain OK")));
             LOGGER.info("DataChain OK");

@@ -115,6 +115,7 @@ public class Start {
             for (String arg : args) {
                 if (arg.equals("-testnet")) {
                     genesisStamp = -1;
+                    Settings.simpleTestNet = true;
                     Settings.genesisStamp = genesisStamp;
                     Settings.NET_MODE = Settings.NET_MODE_TEST;
                     break;

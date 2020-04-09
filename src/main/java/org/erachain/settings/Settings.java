@@ -118,6 +118,7 @@ public class Settings {
     private JSONObject settingsJSON;
     private JSONObject peersJSON;
     public static JSONArray genesisJSON;
+    public static boolean simpleTestNet;
     private String userPath = "";
     private InetAddress localAddress;
     private String[] defaultPeers = {};
