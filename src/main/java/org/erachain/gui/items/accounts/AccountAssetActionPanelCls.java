@@ -306,7 +306,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         }
 
         //READ RECIPIENT
-        String recipientAddress = jTextField_To.getText();
+        String recipientAddress = jTextField_To.getText().trim();
 
         //ORDINARY RECIPIENT
         if (Crypto.getInstance().isValidAddress(recipientAddress)) {
