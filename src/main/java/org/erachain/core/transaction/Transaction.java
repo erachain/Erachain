@@ -1082,12 +1082,13 @@ public abstract class Transaction implements ExplorerJsonLine {
             transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
             transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
             transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
-            if (this.height > 0) {
-                transaction.put("height", this.height);
-                transaction.put("sequence", this.seqNo);
-                if (isWiped()) {
-                    transaction.put("wiped", true);
-                }
+        }
+
+        if (this.height > 0) {
+            transaction.put("height", this.height);
+            transaction.put("sequence", this.seqNo);
+            if (isWiped()) {
+                transaction.put("wiped", true);
             }
         }
 
