@@ -755,7 +755,8 @@ public class OrderTestsMy {
                     Trade trade = Trade.get(dcSet, order_BA_1, order_AB_1);
 
                     BigDecimal tradePrice = trade.calcPrice();
-                    assertEquals(true, Order.isPricesClose(order_AB_1.getPrice(), tradePrice, false));
+                    logger.info(order_AB_1.getPrice() + " - " + tradePrice);
+                    assertEquals(false, Order.isPricesClose(order_AB_1.getPrice(), tradePrice, false));
 
                     BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
                     BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
@@ -850,16 +851,17 @@ public class OrderTestsMy {
                     Trade trade = Trade.get(dcSet, order_BA_1, order_AB_1);
 
                     BigDecimal tradePrice = trade.calcPrice();
-                    assertEquals(true, Order.isPricesClose(order_AB_1.getPrice(), tradePrice, false));
+                    logger.info(order_AB_1.getPrice() + " - " + tradePrice);
+                    assertEquals(false, Order.isPricesClose(order_AB_1.getPrice(), tradePrice, false));
 
                     BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
                     BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
 
-                    // доержатель отменяет свой ордер
+                    // держатель отменяет свой ордер
                     assertEquals(false, order_AB_1.isActive(dcSet));
                     assertEquals(false, order_BA_1.isActive(dcSet));
 
-                    // доержатель не исполняет свой ордер
+                    // держатель не исполняет свой ордер
                     assertEquals(true, order_AB_1.isFulfilled());
                     assertEquals(true, order_BA_1.isFulfilled());
 

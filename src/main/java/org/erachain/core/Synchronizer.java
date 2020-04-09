@@ -1,5 +1,6 @@
 package org.erachain.core;
 
+import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
@@ -311,7 +312,10 @@ public class Synchronizer extends Thread {
                     throw new Exception(mess);
                 }
 
-                if (block.isValid(fork, true) > 0) {
+                if (block.isValid(fork,
+                        // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+                        ctrl.onlyProtocolIndexing
+                ) > 0) {
                     // INVALID BLOCK THROW EXCEPTION
                     String mess = "Dishonest peer by not is Valid block, height: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
@@ -319,8 +323,12 @@ public class Synchronizer extends Thread {
                 }
             }
 
-            // далее тут блок не Процессим так как он в isValid(fork, true) процессится параллельно
-            // и далее будет слив разом без вызова pipe
+            if (ctrl.onlyProtocolIndexing) {
+                // далее тут блок не Процессим так как он в isValid(fork, true) процессится параллельно
+                // и далее будет слив разом без вызова pipe
+            } else {
+                this.pipeProcessOrOrphan(fork, block, false, false, true);
+            }
 
             // проверка силы цепочки на уровне нашего блока и если высота новой цепочки меньше нашей
             if (height - 1 == myHeight && myWeight > block.blockHead.totalWinValue
@@ -389,8 +397,6 @@ public class Synchronizer extends Thread {
                 return;
             }
 
-            LOGGER.debug("*** TRY writeToParent");
-
             // сюда может прити только если проверка прошла успешно
 
             // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
@@ -400,10 +406,93 @@ public class Synchronizer extends Thread {
             // Но сначала откаченные транзакции сохраним
             // соберем транзакции с блоков которые будут откачены в нашей цепочке
 
-            // теперь сливаем изменения
-            dbsBroken = true; // если останется взведенным значит что-то не залилось правильно
-            fork.writeToParent();
-            dbsBroken = false;
+            if (ctrl.onlyProtocolIndexing) {
+                LOGGER.debug("*** TRY writeToParent");
+                // теперь сливаем изменения
+                dbsBroken = true; // если останется взведенным значит что-то не залилось правильно
+                fork.writeToParent();
+                dbsBroken = false;
+            } else {
+
+                // вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+
+                // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
+                //// Map<String, byte[]> states = new TreeMap<String, byte[]>();
+
+                // GET LAST BLOCK
+                Block lastBlock = dcSet.getBlockMap().last();
+
+                // ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in MAIN DB
+                // ============ by EQUAL SIGNATURE !!!!!
+                byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
+                int countOrphanedTransactions = 0;
+                while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
+                    if (ctrl.isOnStopping())
+                        throw new Exception("on stopping");
+
+                    // THROWN is new Better Peer
+                    ctrl.checkNewBetterPeer(peer);
+
+                    // ADD ORPHANED TRANSACTIONS
+                    // orphanedTransactions.addAll(lastBlock.getTransactions());
+                    for (Transaction transaction : lastBlock.getTransactions()) {
+                        if (ctrl.isOnStopping())
+                            throw new Exception("on stopping");
+                        if (countOrphanedTransactions < MAX_ORPHAN_TRANSACTIONS_MY) {
+                            countOrphanedTransactions++;
+                            orphanedTransactions.put(Longs.fromByteArray(transaction.getSignature()), transaction);
+                        }
+                    }
+
+                    LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
+                    LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
+
+                    // так как выше мы запоминаем откаченные транзакции то тут их не будем сохранять в базу
+                    this.pipeProcessOrOrphan(dcSet, lastBlock, true, false, true);
+
+                    lastBlock.close();
+                    lastBlock = dcSet.getBlockMap().last();
+
+                }
+
+                LOGGER.debug("*** chain size after orphan " + dcSet.getBlockMap().size());
+
+
+                // PROCESS THE NEW BLOCKS
+                LOGGER.debug("*** synchronize PROCESS NEW blocks.size:" + newBlocks.size());
+                for (Block block : newBlocks) {
+
+                    // THROWN is new Better Peer
+                    ctrl.checkNewBetterPeer(peer);
+
+                    if (ctrl.isOnStopping())
+                        throw new Exception("on stopping");
+
+                    if (dcSet.getBlockSignsMap().contains(block.getSignature())) {
+                        LOGGER.error("*** add CHAIN - DUPLICATE SIGN! [" + block.getHeight() + "] "
+                                + Base58.encode(block.getSignature())
+                                + " from peer: " + peer);
+                        continue;
+                    }
+
+                    // SYNCHRONIZED PROCESSING
+                    LOGGER.debug("*** begin PIPE");
+
+                    this.pipeProcessOrOrphan(dcSet, block, false, false, false);
+
+                    LOGGER.debug("*** begin REMOVE orphanedTransactions");
+                    for (Transaction transaction : block.getTransactions()) {
+                        if (ctrl.isOnStopping())
+                            throw new Exception("on stopping");
+
+                        Long key = transaction.getDBRef();
+                        if (orphanedTransactions.containsKey(key))
+                            orphanedTransactions.remove(key);
+                    }
+
+                    block.close();
+                }
+            }
 
             // теперь все транзакции в пул опять закидываем
             for (Transaction transaction : orphanedTransactions.values()) {

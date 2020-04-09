@@ -17,12 +17,7 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
     protected T lastNext;
     final Comparator<? super T> itemComparator;
     protected boolean isClosed;
-    Map deleted;
-
-    protected MergedIteratorNoDuplicates() {
-        queue = null;
-        itemComparator = null;
-    }
+    private boolean hasNextUsedBefore = false;
 
     /**
      * пробегает по итератором сортируя значения и пи этом пропуская дублирующие значения на входе
@@ -53,34 +48,56 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
         }
     }
 
-    public MergedIteratorNoDuplicates(Iterable<? extends IteratorCloseable<? extends T>> iterators,
-                                      final Comparator<? super T> itemComparator, Map deleted) {
-        this(iterators, itemComparator);
-        this.deleted = deleted;
-    }
-
     @Override
     public boolean hasNext() {
+
+        hasNextUsedBefore = true;
+
+        if (lastNext == null) {
+            return !queue.isEmpty();
+        }
+
+        // перебор по каждому итератору
+        while (!queue.isEmpty()) {
+            PeekingIteratorCloseable<T> nextIter = queue.remove();
+            if (nextIter.hasNext()) {
+
+                try {
+                    if (itemComparator.compare(nextIter.peek(), lastNext) == 0) {
+                        nextIter.next();
+                    } else {
+                        break;
+                    }
+                } finally {
+                    if (nextIter.hasNext()) {
+                        queue.add(nextIter);
+                        break;
+                    }
+                }
+            }
+        }
+
         return !queue.isEmpty();
     }
 
     @Override
     public T next() {
-        do {
-            PeekingIteratorCloseable<T> nextIter = queue.remove();
-            T next = nextIter.next();
-            if (nextIter.hasNext()) {
-                queue.add(nextIter);
-            }
-            if ((lastNext == null || itemComparator.compare(next, lastNext) != 0)
-                    // и если есть таблица удаленных записей то исключим их
-                    && (deleted == null || !deleted.containsKey(next))
-            ) {
-                lastNext = next;
-                break;
-            }
-        } while (!queue.isEmpty());
 
+        if (!hasNextUsedBefore) {
+            hasNext();
+        }
+
+        if (queue.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
+        hasNextUsedBefore = false;
+
+        PeekingIteratorCloseable<T> nextIter = queue.remove();
+        lastNext = nextIter.next();
+        if (nextIter.hasNext()) {
+            queue.add(nextIter);
+        }
         return lastNext;
     }
 
