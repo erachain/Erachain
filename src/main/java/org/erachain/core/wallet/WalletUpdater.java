@@ -231,6 +231,18 @@ public class WalletUpdater extends MonitoredThread {
 
     public void run() {
 
+        // начальная загрузка
+        byte[] lastWalletBlockSign = wallet.database.getLastBlockSignature();
+        if (lastWalletBlockSign != null) {
+            // по последнему в этом кошельке смотрим
+            int walletHeight = dcSet.getBlockSignsMap().get(lastWalletBlockSign);
+            for (int i = walletHeight - 100; i <= walletHeight; i++) {
+                Block block = dcSet.getBlockMap().get(i);
+                block.loadHeadMind(dcSet);
+                lastBlocks.put(i, block);
+            }
+        }
+
         runned = true;
         //Message message;
         while (runned) {
