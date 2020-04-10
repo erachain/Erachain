@@ -143,7 +143,7 @@ public class AssetVenture extends AssetCls {
     }
 
     @Override
-    public Long getQuantity() {
+    public long getQuantity() {
         return this.quantity;
     }
 

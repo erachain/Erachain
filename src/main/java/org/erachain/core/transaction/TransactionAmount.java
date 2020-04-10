@@ -426,15 +426,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return base_len - (this.typeBytes[2] < 0 ? (KEY_LENGTH + AMOUNT_LENGTH) : 0);
     }
 
-    public boolean isUnlimited(long absKey, String owner) {
-        return absKey > AssetCls.REAL_KEY // not
-                // genesis
-                // assets!
-                && asset.getQuantity().equals(0l)
-                && asset.getOwner().getAddress().equals(owner);
-
-    }
-
     //@Override // - fee + balance - calculate here
     private static long pointLogg;
     public int isValid(int asDeal, boolean isPerson, long flags) {
@@ -564,20 +555,19 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                     switch ((int) absKey) {
                         case 111:
-                            return ITEM_ASSET_NOT_EXIST;
                         case 222:
-                            return ITEM_ASSET_NOT_EXIST;
                         case 333:
-                            return ITEM_ASSET_NOT_EXIST;
                         case 444:
+                        case 888:
+                        case 999:
                             return ITEM_ASSET_NOT_EXIST;
                         case 555:
                             if (actionType != ACTION_SEND)
                                 return INVALID_TRANSFER_TYPE;
-                            
+
                             if (amount.compareTo(BigDecimal.ZERO.subtract(BigDecimal.ONE)) < 0)
                                 return NO_BALANCE;
-                            
+
                             break;
                         case 666:
                             if (actionType != ACTION_SEND)
@@ -595,10 +585,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 return NO_BALANCE;
                             
                             break;
-                        case 888:
-                            return ITEM_ASSET_NOT_EXIST;
-                        case 999:
-                            return ITEM_ASSET_NOT_EXIST;
                     }
                     
                 } else {
@@ -624,17 +610,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     return NOT_HOLDABLE_ASSET;
                             }
 
-                            if (height > BlockChain.HOLD_VALID_START) {
-                                if (!backward) {
-                                    // HOLD only must be backward
-                                    return INVALID_HOLD_DIRECTION;
-                                }
-                            } else {
-                                if (backward) {
-                                    return INVALID_HOLD_DIRECTION;
-                                }
-                            }
-                            
+
                             if (true
                                     // для всех активов абсолютно - можно взять на баланс!
                                     // даже деньги и обязателтсва внешние - типа общие деньги разделили по разным рукам???
@@ -643,7 +619,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     /// ащк фдд&& asset.isMovable()
                                     ) {
                                 // if GOODS - HOLD it in STOCK and check BALANCE
-                                boolean unLimited = isUnlimited(absKey, this.recipient.getAddress());
+                                boolean unLimited = asset.isUnlimited(this.recipient);
 
                                 balance = this.recipient.getBalance(dcSet, absKey, actionType).b;
                                 if (unLimited) {
@@ -707,7 +683,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             } else {
                                 // CREDIT - GIVE CREDIT OR RETURN CREDIT
 
-                                if (!isUnlimited(absKey, this.creator.getAddress())) {
+                                if (!asset.isUnlimited(this.creator)) {
 
                                     if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0
                                             && this.creator.getBalanceUSE(absKey, this.dcSet)
@@ -780,7 +756,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                             // if asset is unlimited and me is creator of this
                             // asset
-                            boolean unLimited = isUnlimited(absKey, this.creator.getAddress());
+                            boolean unLimited = asset.isUnlimited(this.creator);
                             // CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
                             if (unLimited) {
                                 // not make RETURN - check validate next

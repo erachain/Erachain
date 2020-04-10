@@ -496,8 +496,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                 ///}
 
                 // if asset is unlimited and me is creator of this asset
-                boolean unLimited = haveAsset.getQuantity().equals(0l)
-                        && haveAsset.getOwner().getAddress().equals(this.creator.getAddress());
+                boolean unLimited = haveAsset.isUnlimited(this.creator);
 
                 if (!unLimited) {
 
