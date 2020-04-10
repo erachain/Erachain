@@ -466,51 +466,66 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) == -1) {
                 return NO_BALANCE;
             }
-        }
-
-        // VALID if want to BY COMPU by ERA
-        else if (wantKey == FEE_KEY && haveKey == RIGHTS_KEY
+            // VALID if want to BY COMPU by ERA
+        } else if (wantKey == FEE_KEY && haveKey == RIGHTS_KEY
                 && amountHave.compareTo(BigDecimal.ONE) >= 0 // минимально меняем 1 ЭРА
                 && (height < 222047 || this.creator.getBalance(this.dcSet, RIGHTS_KEY).a.b.compareTo(amountHave) >= 0) // ЭРА есть на счету
                 && this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.FEE_MIN_1) > 0) { // на балансе компушки не минус
             flags = flags | NOT_VALIDATE_FLAG_FEE;
         } else {
 
-            ///// CHECK IF SENDER HAS ENOUGH FEE BALANCE
-            ///if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.fee) == -1) {
-            ///    return NOT_ENOUGH_FEE;
-            ///}
-
-            // if asset is unlimited and me is creator of this asset
-            boolean unLimited = haveAsset.getQuantity().equals(0l)
-                    && haveAsset.getOwner().getAddress().equals(this.creator.getAddress());
-
-            if (!unLimited) {
-
-                BigDecimal forSale = this.creator.getForSale(this.dcSet, haveKey, height, true);
-
-                if (forSale.compareTo(amountHave) < 0) {
-                    boolean wrong = true;
-                    for (byte[] valid_item : BlockChain.VALID_BAL) {
-                        if (Arrays.equals(this.signature, valid_item)) {
-                            wrong = false;
-                            break;
-                        }
-                    }
-
-                    if (wrong)
+            if (haveAsset.isAccounting()) {
+                switch ((int) haveKey) {
+                    case 111:
+                    case 222:
+                    case 333:
+                    case 444:
+                    case 555:
+                    case 666:
+                    case 777:
+                    case 888:
+                    case 999:
                         return NO_BALANCE;
                 }
+
+            } else {
+
+                ///// CHECK IF SENDER HAS ENOUGH FEE BALANCE
+                ///if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.fee) == -1) {
+                ///    return NOT_ENOUGH_FEE;
+                ///}
+
+                // if asset is unlimited and me is creator of this asset
+                boolean unLimited = haveAsset.getQuantity().equals(0l)
+                        && haveAsset.getOwner().getAddress().equals(this.creator.getAddress());
+
+                if (!unLimited) {
+
+                    BigDecimal forSale = this.creator.getForSale(this.dcSet, haveKey, height, true);
+
+                    if (forSale.compareTo(amountHave) < 0) {
+                        boolean wrong = true;
+                        for (byte[] valid_item : BlockChain.VALID_BAL) {
+                            if (Arrays.equals(this.signature, valid_item)) {
+                                wrong = false;
+                                break;
+                            }
+                        }
+
+                        if (wrong)
+                            return NO_BALANCE;
+                    }
+                }
+
+                if (height > BlockChain.FREEZE_FROM
+                        && BlockChain.LOCKED__ADDRESSES.containsKey(this.creator.getAddress()))
+                    return INVALID_CREATOR;
+
+                Tuple3<String, Integer, Integer> unlockItem = BlockChain.LOCKED__ADDRESSES_PERIOD.get(this.creator.getAddress());
+                if (unlockItem != null && unlockItem.b > height && height < unlockItem.c)
+                    return INVALID_CREATOR;
+
             }
-
-            if (height > BlockChain.FREEZE_FROM
-                    && BlockChain.LOCKED__ADDRESSES.containsKey(this.creator.getAddress()))
-                return INVALID_CREATOR;
-
-            Tuple3<String, Integer, Integer> unlockItem = BlockChain.LOCKED__ADDRESSES_PERIOD.get(this.creator.getAddress());
-            if (unlockItem != null && unlockItem.b > height && height < unlockItem.c)
-                return INVALID_CREATOR;
-
         }
 
         //
