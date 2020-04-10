@@ -165,9 +165,9 @@ public class SplitPanel extends JPanel {
 
         searchTextFieldSearchToolBarLeftPanelDocument.setToolTipText("");
         searchTextFieldSearchToolBarLeftPanelDocument.setAlignmentX(1.0F);
-        searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(200, 20));
+        searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(200, UIManager.getFont("Label.font").getSize()+ UIManager.getFont("Label.font").getSize()/2));
         searchTextFieldSearchToolBarLeftPanelDocument.setName(""); // NOI18N
-        searchTextFieldSearchToolBarLeftPanelDocument.setPreferredSize(new Dimension(200, 20));
+        searchTextFieldSearchToolBarLeftPanelDocument.setPreferredSize(new Dimension(200, UIManager.getFont("Label.font").getSize()+ UIManager.getFont("Label.font").getSize()/2));
         searchToolBar_LeftPanel.add(searchTextFieldSearchToolBarLeftPanelDocument);
 
         gridBagConstraints = new GridBagConstraints();

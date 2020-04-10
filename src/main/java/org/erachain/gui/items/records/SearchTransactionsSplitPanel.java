@@ -6,14 +6,13 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.library.Library;
-import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.VouchLibraryPanel;
+import org.erachain.gui.library.*;
 import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
+import org.erachain.utils.FileHash;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.erachain.utils.URLViewer;
@@ -24,9 +23,13 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -38,6 +41,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
     private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchTransactionsSplitPanel.png";
     public JPanel info_Panel;
     public VouchLibraryPanel voush_Library_Panel;
+    MButton makeHashButton;
     SearchTransactionsTableModel transactionsTableModel;
     JScrollPane jScrollPane4;
     private JTextField searchString;
@@ -50,15 +54,15 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         this.setName(Lang.getInstance().translate("Search Records"));
 
-        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ":");
-        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Set account, signature or title") + ":"));
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ": ");
+        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Set account, signature or title") + ": "));
         searchString = new JTextField();
         searchString.setToolTipText("");
-        searchString.setAlignmentX(1.0F);
-        searchString.setMinimumSize(new java.awt.Dimension(350, 20));
+
+        searchString.setMinimumSize(new java.awt.Dimension(350,  UIManager.getFont("Label.font").getSize()+ UIManager.getFont("Label.font").getSize()/2));
         searchString.setName(""); // NOI18N
-        searchString.setPreferredSize(new java.awt.Dimension(350, 20));
-        searchString.setMaximumSize(new java.awt.Dimension(2000, 20));
+        searchString.setPreferredSize(new java.awt.Dimension(350,  UIManager.getFont("Label.font").getSize()+ UIManager.getFont("Label.font").getSize()/2));
+        searchString.setMaximumSize(new java.awt.Dimension(2000,  UIManager.getFont("Label.font").getSize()+ UIManager.getFont("Label.font").getSize()/2));
 
         MenuPopupUtil.installContextMenu(searchString);
 
@@ -70,6 +74,36 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                 transactionsTableModel.clear();
                 transactionsTableModel.find(searchString.getText(), null);
 
+            }
+
+        });
+        makeHashButton = new MButton();
+        makeHashButton.set_Text_and_Size_From_UIManaget(Lang.getInstance().translate("make Hash"),1.0);
+        this.toolBarLeftPanel.add(makeHashButton);
+        makeHashButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                makeHashButton.setEnabled(false);
+                String ss = searchString.getText();
+                searchString.setText("  " + Lang.getInstance().translate("Waiting..."));
+                // read file
+                FileChooser chooser = new FileChooser();
+                chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
+                chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                chooser.setMultiSelectionEnabled(true);
+                chooser.setMultiSelectionEnabled(false);
+                int returnVal = chooser.showOpenDialog(getParent());
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                      File patch = chooser.getSelectedFile();
+                        /// HASHING
+                        FileHash gf = new FileHash(patch);
+                        String hashes = gf.getHash();
+                        searchString.setText(gf.getHash());
+               }else{
+                    searchString.setText(ss) ;
+                }
+                makeHashButton.setEnabled(true);
             }
 
         });
