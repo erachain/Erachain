@@ -724,10 +724,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         case ACTION_SEND: // SEND ASSET
                             
                             if (absKey == RIGHTS_KEY) {
-                                
-                                if (backward)
-                                    return NO_INCLAIM_BALANCE;
-                                
+
                                 // byte[] ss = this.creator.getAddress();
                                 if (height > BlockChain.FREEZE_FROM
                                         && BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
@@ -759,16 +756,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             boolean unLimited = asset.isUnlimited(this.creator);
                             // CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
                             if (unLimited) {
-                                // not make RETURN - check validate next
-                                //
-                                if (backward)
-                                    return INVALID_BACKWARD_ACTION;
-                                
+                                ;
                             } else if (absKey == FEE_KEY) {
-                                
-                                if (backward)
-                                    return NO_INCLAIM_BALANCE;
-                                
+
                                 if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0
                                         && this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b
                                         .compareTo(this.amount.add(this.fee)) < 0
@@ -794,8 +784,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             } else {
                                 
                                 // ALL OTHER ASSET
-                                
+
                                 // CLAIMs invalid
+                                // TODO сейчас сюда не будет приходить!!!
                                 if (asset.isOutsideType() && backward) {
                                     if (!this.recipient.equals(this.asset.getOwner())) {
                                         // ERROR
