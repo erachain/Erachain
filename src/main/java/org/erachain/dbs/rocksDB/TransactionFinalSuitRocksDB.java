@@ -127,6 +127,9 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                     transaction.setDC((DCSet) databaseSet);
 
                     String[] tokens = transaction.getTags();
+                    if (tokens == null)
+                        return null;
+
                     byte[][] keys = new byte[tokens.length][];
                     for (int i = 0; i < tokens.length; ++i) {
                         byte[] key = new byte[TransactionFinalMap.CUT_NAME_INDEX];

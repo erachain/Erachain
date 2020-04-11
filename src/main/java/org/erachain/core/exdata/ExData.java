@@ -91,6 +91,16 @@ public class ExData {
 
     }
 
+    /**
+     * Title - не может быть равен нулю
+     *
+     * @param version
+     * @param data
+     * @param onlyTitle
+     * @param andFiles
+     * @return
+     * @throws Exception
+     */
     // parse data with File info
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse(

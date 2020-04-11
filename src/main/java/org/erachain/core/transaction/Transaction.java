@@ -692,6 +692,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public String[] getTags() {
+        if (getTitle() == null)
+            return new String[0];
+
         return getTitle().toLowerCase().split(SPLIT_CHARS);
     }
 

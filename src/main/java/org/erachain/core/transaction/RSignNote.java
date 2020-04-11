@@ -326,11 +326,16 @@ public class RSignNote extends Transaction implements Itemable {
         return this.key;
     }
 
+    /**
+     * Titlt не может быть Нуль
+     *
+     * @return
+     */
     @Override
     public String getTitle() {
 
         if (isEncrypted()) {
-            return null;
+            return "";
         }
 
         if (getVersion() == 2) {
@@ -345,7 +350,8 @@ public class RSignNote extends Transaction implements Itemable {
 
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
-                return "error " + e.getMessage();
+                Long error = null;
+                error++;
             }
 
         } else {
@@ -358,13 +364,13 @@ public class RSignNote extends Transaction implements Itemable {
                 if (dataJson.containsKey("Title")) {
                     return dataJson.get("Title").toString();
                 }
-                return null;
 
             } catch (ParseException e) {
                 // version 0
                 return text.split("\n")[0];
             }
         }
+        return "";
     }
 
 
