@@ -83,11 +83,9 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         // make hash item from popup menu
         ASMakeHashMenuItem makeHashButton = new ASMakeHashMenuItem(searchString);
-        JPopupMenu menu = new JPopupMenu();
-        menu.add(makeHashButton);
-        Library.addStandartMenuItems(menu, searchString);
-        searchString.setComponentPopupMenu(menu);
+        this.toolBarLeftPanel.add(makeHashButton);
 
+        MenuPopupUtil.installContextMenu(searchString);
         MenuPopupUtil.installContextMenu(this.searchTextFieldSearchToolBarLeftPanelDocument);
 
         // 	Records_Table_Model records_Model = new Records_Table_Model();

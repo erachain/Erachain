@@ -53,7 +53,7 @@ public class SplitPanel extends JPanel {
     public JTextField searchTextFieldSearchToolBarLeftPanelDocument;
     public JMenuBar  searchToolBar_LeftPanel;
     public JLabel searthLabelSearchToolBarLeftPanel;
-    public JMenuBar toolBarLeftPanel;
+    public JPanel toolBarLeftPanel;
     public JCheckBox searchMyJCheckBoxLeftPanel;
     public JCheckBox searchFavoriteJCheckBoxLeftPanel;
     private JSONObject settingsJSONbuf;
@@ -98,7 +98,7 @@ public class SplitPanel extends JPanel {
         jSplitPanel = new MSplitPane(MSplitPane.VERTICAL_SPLIT, true);
         //      jSplitPanel.M_setDividerSize(20);
         leftPanel = new JPanel();
-        toolBarLeftPanel = new JMenuBar();
+        toolBarLeftPanel = new JPanel();
         button1ToolBarLeftPanel = new JButton();
         button2ToolBarLeftPanel = new JButton();
         searchToolBar_LeftPanel = new JMenuBar ();
@@ -119,7 +119,7 @@ public class SplitPanel extends JPanel {
 
         leftPanel.setLayout(new GridBagLayout());
 
-        toolBarLeftPanel.setBorderPainted(false);
+     //   toolBarLeftPanel.setBorderPainted(false);
        // toolBarLeftPanel.setFloatable(false);
       //  toolBarLeftPanel.setRollover(true);
 

@@ -11,7 +11,7 @@ import java.io.File;
 // user select file
 // calc file hash
 // set text in inputObject
-public class ASMakeHashMenuItem extends JMenuItem {
+public class ASMakeHashMenuItem extends JButton {
     ASMakeHashMenuItem th;
 
     public ASMakeHashMenuItem(JTextField inputObject){
