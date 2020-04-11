@@ -10,15 +10,12 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 //import org.erachain.core.transaction.R_SignStatement_old;
 
@@ -219,7 +216,7 @@ public class WebStatementsTableModelSearch extends AbstractTableModel implements
                 case COLUMN_BODY:
 
                     if (record.getVersion() == 2) {
-                        Tuple3<String, String, JSONObject> a = record.parse_Data_V2_Without_Files();
+                        Fun.Tuple4<String, String, JSONObject, HashMap<String, Fun.Tuple2<Boolean, byte[]>>> a = record.parse_Data_V2_Without_Files();
                         return a.b;
                     }
 

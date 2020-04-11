@@ -344,9 +344,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected static final int SIMPLE_TYPE_LENGTH = 1;
     public static final int TYPE_LENGTH = 4;
     protected static final int HEIGHT_LENGTH = 4;
-    protected static final int DATA_JSON_PART_LENGTH = 4;
-    protected static final int DATA_VERSION_PART_LENGTH = 6;
-    protected static final int DATA_TITLE_PART_LENGTH = 4;
+    public static final int DATA_JSON_PART_LENGTH = 4;
+    public static final int DATA_VERSION_PART_LENGTH = 6;
+    public static final int DATA_TITLE_PART_LENGTH = 4;
     protected static final int DATA_NUM_FILE_LENGTH = 4;
     protected static final int SEQ_LENGTH = 4;
     public static final int DATA_SIZE_LENGTH = 4;

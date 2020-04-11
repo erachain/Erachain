@@ -13,7 +13,6 @@ import org.erachain.settings.Settings;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +100,7 @@ public class LicenseJFrame1 extends JDialog {
                     }
 
                     try {
-                        Tuple3<String, String, JSONObject> a = note.parse_Data_V2_Without_Files();
+                        Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> a = note.parse_Data_V2_Without_Files();
                         message = (String) a.c.get("MS");
                     } catch (Exception e) {
                         message = new String(note.getData(), StandardCharsets.UTF_8);

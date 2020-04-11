@@ -18,7 +18,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
 import java.io.ByteArrayOutputStream;
@@ -790,40 +789,17 @@ public class RSignNote extends Transaction implements Itemable {
         return calcCommonFee();
     }
 
-    public Tuple3<String, String, JSONObject> parse_Data_V2_Without_Files() throws Exception {
+    public Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse_Data_V2_Without_Files() {
         //Version, Title, JSON, Files
-
-        //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < Transaction.DATA_JSON_PART_LENGTH) {
-            throw new Exception("Data does not match block length " + data.length);
+        try {
+            return parse_Data_V2(this.data, false, false);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            Long error = null;
+            error++;
         }
-        int position = 0;
 
-        // read version
-        byte[] version_Byte = Arrays.copyOfRange(data, position, Transaction.DATA_VERSION_PART_LENGTH);
-        position += Transaction.DATA_VERSION_PART_LENGTH;
-        // read title
-        byte[] titleSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_TITLE_PART_LENGTH);
-        int titleSize = Ints.fromByteArray(titleSizeBytes);
-        position += Transaction.DATA_TITLE_PART_LENGTH;
-
-        byte[] titleByte = Arrays.copyOfRange(data, position, position + titleSize);
-
-        position += titleSize;
-        //READ Length JSON PART
-        byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_JSON_PART_LENGTH);
-        int JSONSize = Ints.fromByteArray(dataSizeBytes);
-
-        position += Transaction.DATA_JSON_PART_LENGTH;
-        //READ JSON
-        byte[] arbitraryData = Arrays.copyOfRange(data, position, position + JSONSize);
-        JSONObject json = (JSONObject) JSONValue.parseWithException(new String(arbitraryData, StandardCharsets.UTF_8));
-
-        String title = new String(titleByte, StandardCharsets.UTF_8);
-        String version = new String(version_Byte, StandardCharsets.UTF_8);
-
-
-        return new Tuple3(version, title, json);
+        return null;
     }
 
     public Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse_Data_V2() {
