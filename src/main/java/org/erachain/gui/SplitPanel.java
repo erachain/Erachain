@@ -51,9 +51,9 @@ public class SplitPanel extends JPanel {
     public JPanel leftPanel;
     public JPanel rightPanel1;
     public JTextField searchTextFieldSearchToolBarLeftPanelDocument;
-    public JToolBar searchToolBar_LeftPanel;
+    public JMenuBar  searchToolBar_LeftPanel;
     public JLabel searthLabelSearchToolBarLeftPanel;
-    public JToolBar toolBarLeftPanel;
+    public JMenuBar toolBarLeftPanel;
     public JCheckBox searchMyJCheckBoxLeftPanel;
     public JCheckBox searchFavoriteJCheckBoxLeftPanel;
     private JSONObject settingsJSONbuf;
@@ -98,10 +98,11 @@ public class SplitPanel extends JPanel {
         jSplitPanel = new MSplitPane(MSplitPane.VERTICAL_SPLIT, true);
         //      jSplitPanel.M_setDividerSize(20);
         leftPanel = new JPanel();
-        toolBarLeftPanel = new JToolBar();
+        toolBarLeftPanel = new JMenuBar();
         button1ToolBarLeftPanel = new JButton();
         button2ToolBarLeftPanel = new JButton();
-        searchToolBar_LeftPanel = new JToolBar();
+        searchToolBar_LeftPanel = new JMenuBar ();
+        searchToolBar_LeftPanel.setBorderPainted(false);
         searthLabelSearchToolBarLeftPanel = new JLabel();
         searchTextFieldSearchToolBarLeftPanelDocument = new JTextField();
         jScrollPanelLeftPanel = new JScrollPane();
@@ -118,8 +119,9 @@ public class SplitPanel extends JPanel {
 
         leftPanel.setLayout(new GridBagLayout());
 
-        toolBarLeftPanel.setFloatable(false);
-        toolBarLeftPanel.setRollover(true);
+        toolBarLeftPanel.setBorderPainted(false);
+       // toolBarLeftPanel.setFloatable(false);
+      //  toolBarLeftPanel.setRollover(true);
 
         button1ToolBarLeftPanel.setText("jButton1");
         button1ToolBarLeftPanel.setFocusable(false);
@@ -145,8 +147,8 @@ public class SplitPanel extends JPanel {
         gridBagConstraints.insets = new Insets(5, 8, 0, 0);
         leftPanel.add(toolBarLeftPanel, gridBagConstraints);
 
-        searchToolBar_LeftPanel.setFloatable(false);
-        searchToolBar_LeftPanel.setRollover(true);
+       // searchToolBar_LeftPanel.setFloatable(false);
+       // searchToolBar_LeftPanel.setRollover(true);
         searchToolBar_LeftPanel.setVisible(false);
 
 

@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 import java.io.File;
@@ -625,5 +626,29 @@ public class Library {
         }
         if (jsonString.equals("")) return;
         Library.saveJSONStringToEraFile(parent, jsonString);
+    }
+
+    //добавляем в конец стандартные меню копировать, вырезать
+    //
+    public static void addStandartMenuItems(JPopupMenu menu, JTextField component){
+        JMenuItem item;
+        item = new JMenuItem(new DefaultEditorKit.CopyAction());
+        item.setText(Lang.getInstance().translate("Copy"));
+        item.setEnabled(true);
+ //       item.setEnabled(component.getSelectionStart() != component
+ //               .getSelectionEnd());
+        menu.add(item);
+        item = new JMenuItem(new DefaultEditorKit.CutAction());
+        item.setText(Lang.getInstance().translate("Cut"));
+        item.setEnabled(true);
+   //     item.setEnabled(component.isEditable()
+   //             && component.getSelectionStart() != component
+   //             .getSelectionEnd());
+        menu.add(item);
+        item = new JMenuItem(new DefaultEditorKit.PasteAction());
+        item.setText(Lang.getInstance().translate("Paste"));
+        item.setEnabled(component.isEditable());
+        menu.add(item);
+
     }
 }

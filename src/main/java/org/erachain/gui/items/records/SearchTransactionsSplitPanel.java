@@ -12,7 +12,6 @@ import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.FileHash;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.erachain.utils.URLViewer;
@@ -23,13 +22,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -77,36 +72,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             }
 
         });
-        makeHashButton = new MButton();
-        makeHashButton.set_Text_and_Size_From_UIManaget(Lang.getInstance().translate("make Hash"),1.0);
-        this.toolBarLeftPanel.add(makeHashButton);
-        makeHashButton.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                makeHashButton.setEnabled(false);
-                String ss = searchString.getText();
-                searchString.setText("  " + Lang.getInstance().translate("Waiting..."));
-                // read file
-                FileChooser chooser = new FileChooser();
-                chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
-                chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                chooser.setMultiSelectionEnabled(true);
-                chooser.setMultiSelectionEnabled(false);
-                int returnVal = chooser.showOpenDialog(getParent());
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                      File patch = chooser.getSelectedFile();
-                        /// HASHING
-                        FileHash gf = new FileHash(patch);
-                        String hashes = gf.getHash();
-                        searchString.setText(gf.getHash());
-               }else{
-                    searchString.setText(ss) ;
-                }
-                makeHashButton.setEnabled(true);
-            }
-
-        });
 
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);
@@ -115,11 +81,19 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         this.jButton1_jToolBar_RightPanel.setVisible(false);
         this.jButton2_jToolBar_RightPanel.setVisible(false);
 
+        // make hash item from popup menu
+        ASMakeHashMenuItem makeHashButton = new ASMakeHashMenuItem(searchString);
+        JPopupMenu menu = new JPopupMenu();
+        menu.add(makeHashButton);
+        Library.addStandartMenuItems(menu, searchString);
+        searchString.setComponentPopupMenu(menu);
+
+        MenuPopupUtil.installContextMenu(this.searchTextFieldSearchToolBarLeftPanelDocument);
 
         // 	Records_Table_Model records_Model = new Records_Table_Model();
         // 	this.jTableJScrollPanelLeftPanel = new JTable(records_Model);
 
-        MenuPopupUtil.installContextMenu(this.searchTextFieldSearchToolBarLeftPanelDocument);
+
         this.searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
 
             @Override
