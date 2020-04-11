@@ -1,7 +1,6 @@
 package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
-import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -70,56 +69,45 @@ public class APIDocuments {
     @Path("getFiles")
     public Response getFiles(@QueryParam("block") int block, @QueryParam("seqNo") int seqNo,
                              @QueryParam("txt") int seqNo_old) {
-       JSONObject result = new JSONObject();
+        JSONObject result = new JSONObject();
         try {
             //READ TXT
             if (seqNo == 0 && seqNo_old > 0) {
                 seqNo = seqNo_old;
             }
-           Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
-           if (tx instanceof RSignNote){
-               RSignNote statement = (RSignNote)tx;
-               if (statement.getVersion() == 2) {
-                   byte[] data = statement.getData();
-                   Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
+            Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
+            if (tx instanceof RSignNote) {
+                RSignNote statement = (RSignNote) tx;
+                Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
                 try {
-                    map = ExData.parse_Data_V2(data, false, true);
+                    map = statement.parseData();
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
                 }
 
-                   JSONObject jSON = map.c;
+                HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
+                if (files != null) {
+                    Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
+                    int i = 0;
+                    while (it_Files.hasNext()) {
+                        Entry<String, Tuple2<Boolean, byte[]>> file = it_Files.next();
+                        JSONObject jsonFile = new JSONObject();
+                        jsonFile.put("filename", (String) file.getKey());
+                        jsonFile.put("ZIP", file.getValue().a);
+                        result.put(i++, jsonFile);
+                    }
+                } else {
+                    result.put("code", 4);
+                    result.put("message", "Document not include files");
+                }
 
-                   HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
-                   if (files != null) {
-                       Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
-                       int i = 0;
-                       while (it_Files.hasNext()) {
-                           Entry<String, Tuple2<Boolean, byte[]>> file = it_Files.next();
-                           JSONObject jsonFile = new JSONObject();
-                           jsonFile.put("filename", (String) file.getKey());
-                           jsonFile.put("ZIP", file.getValue().a);
-                           result.put(i++,jsonFile);
-                       }
-                   }else{
-                       result.put("code", 4);
-                       result.put("message", "Document not include files");
-                   }
-                       
-                   
-               }else{
-               // view version 1
-               result.put("code", 3);
-               result.put("message", "Document version 1 (not include files)");
-               }
-               
-           } else{
-               result.put("code", 2);
-               result.put("message", "Transaction is not Document");
-           }
+            } else {
+                result.put("code", 2);
+                result.put("message", "Transaction is not Document");
+            }
 
-           
+
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
@@ -145,90 +133,78 @@ public class APIDocuments {
 
             //READ TXT
            Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
-           if (tx instanceof RSignNote){
-               RSignNote statement = (RSignNote)tx;
-               if (statement.getVersion() == 2) {
-                   byte[] data = statement.getData();
-                   Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
-                   try {
-                       map = ExData.parse_Data_V2(data, false, true);
-                   } catch (Exception e) {
-                       // TODO Auto-generated catch block
-                       throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-                   }
+           if (tx instanceof RSignNote) {
+               RSignNote statement = (RSignNote) tx;
+               Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
+               try {
+                   map = statement.parseData();
+               } catch (Exception e) {
+                   // TODO Auto-generated catch block
+                   throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+               }
 
-                   JSONObject jSON = map.c;
+               HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
+               if (files != null) {
+                   Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
+                   int i = 0;
+                   while (it_Files.hasNext()) {
+                       Entry<String, Tuple2<Boolean, byte[]>> file = it_Files.next();
+                       if (name.equals((String) file.getKey())) {
+                           i++;
 
-                   HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
-                   if (files != null) {
-                       Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
-                       int i = 0;
-                       while (it_Files.hasNext()) {
-                           Entry<String, Tuple2<Boolean, byte[]>> file = it_Files.next();
-                           JSONObject jsonFile = new JSONObject();
-                           if (name.equals((String) file.getKey())) {
-                               i++;
+                           // if ZIP
+                           if (file.getValue().a) {
+                               // надо сделать
 
-                               // if ZIP
-                               if (file.getValue().a) {
-                                   // надо сделать
-
-                                   try {
-                                       resultByte = ZipBytes.decompress(file.getValue().b);
-                                   } catch (DataFormatException e1) {
-                                       // TODO Auto-generated catch block
-                                       e1.printStackTrace();
-                                   } catch (IOException e) {
-                                       // TODO Auto-generated catch block
-                                       e.printStackTrace();
-                                   }
-                               } else {
-                                   resultByte = file.getValue().b;
-                               }
-                               // ifdownloadParam
-
-                               //  mime TYPE
-                               InputStream is = new BufferedInputStream(new ByteArrayInputStream(resultByte));
-                               String mm = null;
                                try {
-                                   mm = URLConnection.guessContentTypeFromStream(is);
+                                   resultByte = ZipBytes.decompress(file.getValue().b);
+                               } catch (DataFormatException e1) {
+                                   // TODO Auto-generated catch block
+                                   e1.printStackTrace();
                                } catch (IOException e) {
                                    // TODO Auto-generated catch block
                                    e.printStackTrace();
                                }
-
-                               //if downloadParam
-                               if (downloadParam != null) {
-
-                                   if (downloadParam.equals("true")) {
-                                       String nameEncode = name.replace(" ", "_");
-                                       try {
-                                           nameEncode = URLEncoder.encode(nameEncode, "UTF-8");
-                                       } catch (Exception e) {
-                                           e.printStackTrace();
-                                       }
-                                       return Response.status(200).header("Content-Type", mm)
-                                               .header("Access-Control-Allow-Origin", "*")
-                                               .header("Content-disposition", "attachment; filename=" + nameEncode)
-                                               .entity(new ByteArrayInputStream(resultByte))
-                                               .build();
-                                   }
-                               }
-
-                               return Response.status(200).header("Content-Type", mm)
-                                       .header("Access-Control-Allow-Origin", "*")
-                                       //    .header("Content-disposition", "attachment; filename=" + new String(outputData).replace(" ", "_"))
-                                       .entity(new ByteArrayInputStream(resultByte))
-                                       .build();
+                           } else {
+                               resultByte = file.getValue().b;
                            }
+                           // ifdownloadParam
+
+                           //  mime TYPE
+                           InputStream is = new BufferedInputStream(new ByteArrayInputStream(resultByte));
+                           String mm = null;
+                           try {
+                               mm = URLConnection.guessContentTypeFromStream(is);
+                           } catch (IOException e) {
+                               // TODO Auto-generated catch block
+                               e.printStackTrace();
+                           }
+
+                           //if downloadParam
+                           if (downloadParam != null) {
+
+                               if (downloadParam.equals("true")) {
+                                   String nameEncode = name.replace(" ", "_");
+                                   try {
+                                       nameEncode = URLEncoder.encode(nameEncode, "UTF-8");
+                                   } catch (Exception e) {
+                                       e.printStackTrace();
+                                   }
+                                   return Response.status(200).header("Content-Type", mm)
+                                           .header("Access-Control-Allow-Origin", "*")
+                                           .header("Content-disposition", "attachment; filename=" + nameEncode)
+                                           .entity(new ByteArrayInputStream(resultByte))
+                                           .build();
+                               }
+                           }
+
+                           return Response.status(200).header("Content-Type", mm)
+                                   .header("Access-Control-Allow-Origin", "*")
+                                   //    .header("Content-disposition", "attachment; filename=" + new String(outputData).replace(" ", "_"))
+                                   .entity(new ByteArrayInputStream(resultByte))
+                                   .build();
                        }
-
-                   } else {
-                       result.put("code", 4);
-                       result.put("message", "Document not include files");
                    }
-
-
                } else {
                    // view version 1
                    result.put("code", 3);

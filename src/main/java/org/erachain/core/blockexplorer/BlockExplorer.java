@@ -2989,7 +2989,7 @@ public class BlockExplorer {
                 Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map_Data;
 
                 try {
-                    map_Data = trans.parse_Data_V2();
+                    map_Data = trans.parseData();
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();

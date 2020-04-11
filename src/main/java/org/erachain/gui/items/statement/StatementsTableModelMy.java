@@ -121,7 +121,7 @@ public class StatementsTableModelMy extends AbstractTableModel implements Observ
                     if (record.getData() == null)
                         return "";
                     if (record.getVersion() == 2) {
-                        Fun.Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> a = record.parse_Data_V2_Without_Files();
+                        Fun.Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> a = record.parseDataV2WithoutFiles();
 
                         return a.b;
                     }

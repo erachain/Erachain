@@ -279,11 +279,6 @@ public class RSignNote extends Transaction implements Itemable {
 
     }
 
-    public static Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse_Data_V2(byte[] data, boolean onlyTitle, boolean andFiles) throws Exception {
-        //Version, Title, JSON, Files
-        return ExData.parse_Data_V2(data, onlyTitle, andFiles);
-    }
-
     //GETTERS/SETTERS
     public void setSidnerSignature(int index, byte[] signature) {
         if (signatures == null)
@@ -345,7 +340,7 @@ public class RSignNote extends Transaction implements Itemable {
 
             try {
                 // парсим только заголовок
-                map_Data = parse_Data_V2(data, true, false);
+                map_Data = parseDataV2WithoutFiles();
                 return map_Data.b;
 
             } catch (Exception e) {
@@ -500,7 +495,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         super.process(block, asDeal);
         try {
-            Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> items = parse_Data_V2();
+            Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> items = parseData();
             Long dbKey = makeDBRef(height, seqNo);
             if (items.c != null) {
                 JSONObject hashes = ExData.getHashes(items.c);
@@ -529,7 +524,7 @@ public class RSignNote extends Transaction implements Itemable {
         super.orphan(block, asDeal);
 
         try {
-            Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> items = parse_Data_V2();
+            Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> items = parseData();
             if (items.c != null) {
                 JSONObject hashes = ExData.getHashes(items.c);
                 if (hashes != null) {
@@ -595,7 +590,7 @@ public class RSignNote extends Transaction implements Itemable {
         if (this.key > 0 && !this.dcSet.getItemTemplateMap().contains(this.key))
             return Transaction.ITEM_DOES_NOT_EXIST;
 
-        Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> items = parse_Data_V2();
+        Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> items = parseData();
         if (items.c != null) {
             JSONObject hashes = ExData.getHashes(items.c);
             if (hashes != null) {
@@ -639,10 +634,10 @@ public class RSignNote extends Transaction implements Itemable {
         return calcCommonFee();
     }
 
-    public Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse_Data_V2_Without_Files() {
+    public Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parseDataV2WithoutFiles() {
         //Version, Title, JSON, Files
         try {
-            return parse_Data_V2(this.data, false, false);
+            return ExData.parse(getVersion(), this.data, false, false);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             Long error = null;
@@ -652,14 +647,36 @@ public class RSignNote extends Transaction implements Itemable {
         return null;
     }
 
-    public Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse_Data_V2() {
+    public Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parseData() {
 
-        try {
-            return parse_Data_V2(this.data, false, true);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            Long error = null;
-            error++;
+        if (getVersion() == 2) {
+
+            // version 2
+            try {
+                return ExData.parse(getVersion(), this.data, false, true);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                Long error = null;
+                error++;
+            }
+
+        } else {
+
+            // version 1
+            String text = new String(getData(), StandardCharsets.UTF_8);
+
+            try {
+                JSONObject data = new JSONObject();
+                data = (JSONObject) JSONValue.parseWithException(text);
+                String title = data.get("Title").toString();
+
+                return new Tuple4("1", title, null, null);
+
+            } catch (ParseException e) {
+                // version 0
+                String[] items = text.split("\n");
+                return new Tuple4("1", items[0], items[1], null);
+            }
         }
 
         return null;

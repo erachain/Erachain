@@ -80,7 +80,7 @@ public class LicenseJFrame1 extends JDialog {
 
                     Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
                     try {
-                         map = ExData.parse_Data_V2(data, false, true);
+                        map = ExData.parse(record.getVersion(), data, false, true);
                     } catch (Exception e) {
                         map = null;
                     }
@@ -100,7 +100,7 @@ public class LicenseJFrame1 extends JDialog {
                     }
 
                     try {
-                        Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> a = note.parse_Data_V2_Without_Files();
+                        Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> a = note.parseDataV2WithoutFiles();
                         message = (String) a.c.get("MS");
                     } catch (Exception e) {
                         message = new String(note.getData(), StandardCharsets.UTF_8);

@@ -1,6 +1,5 @@
 package org.erachain.gui.items.statement;
 
-import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.RSignNote;
@@ -294,12 +293,11 @@ public class StatementInfo extends javax.swing.JPanel {
         JSONObject params;
         Set<String> kS;
         Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map = null;
-        byte[] data = statement.getData();
 
         initComponents();
 
         try {
-            map = ExData.parse_Data_V2(data, false, true);
+            map = statement.parseData();
 
             JSONObject jSON = map.c;
 
