@@ -290,6 +290,12 @@ public class NoWalletFrame extends JFrame {
     }
 
     public void goAfterLicence(int createWallet) {
+        // StartPool
+        StartQuestion ss = new StartQuestion();
+        ss.setVisible(true);
+
+
+        //
         if (createWallet == 1)
             new CreateWalletFrame(this);
         else if (createWallet == 2)
