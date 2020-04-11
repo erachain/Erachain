@@ -9,6 +9,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
@@ -2986,257 +2987,79 @@ public class BlockExplorer {
 
             if (trans.getVersion() == 2) {
                 // version 2
-                Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map_Data;
+                Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> noteData;
 
-                try {
-                    map_Data = trans.parseData();
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    return null;
-                }
+                noteData = trans.parseData();
+                JSONObject dataJson = noteData.c;
+                if (dataJson != null) {
+                    ExData.makeJSONforHTML(dcSet, output, noteData.b, dataJson, block, seqNo, langObj);
 
-                if (map_Data.b != null) {
                     output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
-                    output.put("title", map_Data.b);
-                }
 
-                JSONObject jSON = map_Data.c;
-                // parse JSON
-                if (jSON != null) {
+                    output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
 
-                    if (jSON.containsKey("TM")) {
-                        // V2.1 Template
-                        Long key = new Long(jSON.get("TM") + "");
-                        TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, key);
-                        if (template != null) {
-                            String description = template.viewDescription();
+                    String filesStr;
 
-                            // Template Params
-                            if (jSON.containsKey("PR")) {
-                                String str = jSON.get("PR").toString();
-                                JSONObject params = new JSONObject();
-                                ;
-                                try {
-                                    params = (JSONObject) JSONValue.parseWithException(str);
-                                } catch (ParseException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                                Set<String> kS = params.keySet();
-                                for (String s : kS) {
-                                    description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
-                                }
-
-                            }
-
-                            output.put("body", description);
-
-                        }
-
-                    } else if (jSON.containsKey("Template")) {
-
-                        // V2.0 Template
-                        Long key = new Long(jSON.get("Template") + "");
-                        TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, key);
-                        if (template != null) {
-                            String description = template.viewDescription();
-
-                            // Template Params
-                            if (jSON.containsKey("Statement_Params")) {
-
-                                String str = jSON.get("Statement_Params").toString();
-                                JSONObject params = new JSONObject();
-                                ;
-                                try {
-                                    params = (JSONObject) JSONValue.parseWithException(str);
-                                } catch (ParseException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                                Set<String> kS = params.keySet();
-                                for (String s : kS) {
-                                    description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
-                                }
-
-                            }
-
-                            output.put("body", description);
-
-                        }
-
-                    }
-
-                    if (jSON.containsKey("MS")) {
+                    // parse files
+                    if (dataJson.containsKey("F")) {
                         // v 2.1
-                        output.put("message", jSON.get("MS"));
+                        filesStr = dataJson.get("F").toString();
 
-                    } else if (jSON.containsKey("Message")) {
-                        // Message v2.0
-                        output.put("message", jSON.get("Message"));
-
+                    } else if (dataJson.containsKey("&*&*%$$%_files_#$@%%%")) {
+                        // v2.0
+                        filesStr = dataJson.get("&*&*%$$%_files_#$@%%%").toString();
+                    } else {
+                        filesStr = null;
                     }
 
-                    // Hashes
-                    if (jSON.containsKey("HS")) {
-                        // v2.1
-                        output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
-                        String hashes = "";
-                        String str = jSON.get("HS").toString();
+                    if (filesStr != null && !filesStr.isEmpty()) {
+                        output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
+                        String files = "";
+                        filesStr = dataJson.get("F").toString();
                         JSONObject params = new JSONObject();
                         try {
-                            params = (JSONObject) JSONValue.parseWithException(str);
-                        } catch (ParseException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        Set<String> kS = params.keySet();
-
-                        int i = 1;
-                        for (String s : kS) {
-                            hashes += i + " " + s + " " + params.get(s) + "<br>";
-                        }
-
-                        output.put("hashes", hashes);
-
-                    } else if (jSON.containsKey("Hashes")) {
-                        // v2.0
-                        output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
-                        String hashes = "";
-                        String str = jSON.get("Hashes").toString();
-                        JSONObject params = new JSONObject();
-                        try {
-                            params = (JSONObject) JSONValue.parseWithException(str);
+                            params = (JSONObject) JSONValue.parseWithException(filesStr);
                         } catch (ParseException e) {
                             logger.error(e.getMessage(), e);
                         }
                         Set<String> kS = params.keySet();
 
                         int i = 1;
+                        JSONObject ss = new JSONObject();
                         for (String s : kS) {
-                            hashes += i + " " + s + " " + params.get(s) + "<br>";
-                        }
 
-                        output.put("hashes", hashes);
-                    }
+                            ss = (JSONObject) params.get(s);
 
-                }
-
-                // parse files
-                if (jSON.containsKey("F")) {
-                    // v 2.1
-                    output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
-                    String files = "";
-                    String str = jSON.get("F").toString();
-                    JSONObject params = new JSONObject();
-                    try {
-                        params = (JSONObject) JSONValue.parseWithException(str);
-                    } catch (ParseException e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                    Set<String> kS = params.keySet();
-
-                    int i = 1;
-                    JSONObject ss = new JSONObject();
-                    for (String s : kS) {
-
-                        ss = (JSONObject) params.get(s);
-
-                        files += i + " " + ss.get("FN");
+                            files += i + " " + ss.get("FN");
 //                        files += "<a href ='../apidocuments/getFile?download=false&block="
 //                                + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN") + "'> "
 //                                + Lang.getInstance().translateFromLangObj("View", langObj) + " </a>";
-                        files += "<a href ='../apidocuments/getFile?download=true&block="
-                                + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN") + "'> "
-                                + Lang.getInstance().translateFromLangObj("Download", langObj) + "</a><br>";
+                            files += "<a href ='../apidocuments/getFile?download=true&block="
+                                    + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN") + "'> "
+                                    + Lang.getInstance().translateFromLangObj("Download", langObj) + "</a><br>";
+                        }
+
+                        output.put("files", files);
                     }
-
-                    output.put("files", files);
-
-                } else if (jSON.containsKey("&*&*%$$%_files_#$@%%%")) {
-                    // v2.0
-                    output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
-                    String files = "";
-                    String str = jSON.get("&*&*%$$%_files_#$@%%%").toString();
-                    JSONObject params = new JSONObject();
-                    try {
-                        params = (JSONObject) JSONValue.parseWithException(str);
-                    } catch (ParseException e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                    Set<String> kS = params.keySet();
-
-                    int i = 1;
-                    JSONObject ss = new JSONObject();
-                    for (String s : kS) {
-
-                        ss = (JSONObject) params.get(s);
-
-                        files += i + " " + ss.get("File_Name");
-//                        files += "<a href = '../apidocuments/getFile?download=false&block="
-//                                + block + "&seqNo=" + seqNo + "&name=" + ss.get("File_Name")
-//                                + "'> " + Lang.getInstance().translateFromLangObj("View", langObj) + " </a><br>";
-                        files += "<a href = '../apidocuments/getFile?download=true&block="
-                                + block + "&seqNo=" + seqNo + "&name=" + ss.get("File_Name")
-                                + "'> " + Lang.getInstance().translateFromLangObj("Download", langObj) + " </a><br>";
-                    }
-
-                    output.put("files", files);
-
                 }
 
             } else {
 
+                output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
+                output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
+
                 // version 1
                 try {
-
-                    Set<String> kS;
-                    String description = "";
-                    String str;
-                    JSONObject params = new JSONObject();
-                    JSONObject data = new JSONObject();
-                    TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
-                    if (template != null) {
-                        description = template.viewDescription();
-                        data = (JSONObject) JSONValue
-                                .parseWithException(new String(trans.getData(), StandardCharsets.UTF_8));
-
-                        output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
-                        output.put("title", data.get("Title"));
-
-                        output.put("message", data.get("Message"));
-
-                        str = data.get("Statement_Params").toString();
-                        params = (JSONObject) JSONValue.parseWithException(str);
-                        kS = params.keySet();
-                        for (String s : kS) {
-                            description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
-                        }
-
-                        output.put("body", description);
-
-                    }
-
-                    output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
-
-                    String hashes = "";
-                    str = data.get("Hashes").toString();
-                    params = (JSONObject) JSONValue.parseWithException(str);
-                    kS = params.keySet();
-
-                    int i = 1;
-                    for (String s : kS) {
-                        hashes += i + " " + s + " " + params.get(s) + "<br>";
-                    }
-                    output.put("hashes", hashes);
-
-                } catch (ParseException e) {
-
+                    JSONObject dataJson = (JSONObject) JSONValue
+                            .parseWithException(new String(trans.getData(), StandardCharsets.UTF_8));
+                    ExData.makeJSONforHTML_1(dcSet, output, dataJson, trans.getKey());
+                } catch (Exception e) {
                     output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
                     output.put("title", trans.getTitle());
                     output.put("statement", new String(trans.getData(), StandardCharsets.UTF_8));
 
                 }
+
             }
 
         } else {

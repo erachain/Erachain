@@ -1,10 +1,14 @@
 package org.erachain.core.exdata;
 
 import com.google.common.primitives.Ints;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
@@ -147,60 +151,61 @@ public class ExData {
 
                 position += Transaction.DATA_JSON_PART_LENGTH;
                 //READ JSON
-                byte[] arbitraryData = Arrays.copyOfRange(data, position, position + JSONSize);
-                JSONObject json = (JSONObject) JSONValue.parseWithException(new String(arbitraryData, StandardCharsets.UTF_8));
-
+                byte[] jsonData = Arrays.copyOfRange(data, position, position + JSONSize);
                 position += JSONSize;
-                HashMap<String, Tuple2<Boolean, byte[]>> out_Map = new HashMap<String, Tuple2<Boolean, byte[]>>();
-                JSONObject files;
-                Set files_key_Set;
-                //v2.0
-                if (json.containsKey("&*&*%$$%_files_#$@%%%")) { //return new Tuple4(version,title,json, null);
+                try {
+                    JSONObject json = (JSONObject) JSONValue.parseWithException(new String(jsonData, StandardCharsets.UTF_8));
+
+                    JSONObject files;
+                    Set files_key_Set;
+
+                    if (json.containsKey("F")) {
+                        // v 2.1
+
+                        files = (JSONObject) json.get("F");
+                        HashMap<String, Tuple2<Boolean, byte[]>> filesMap = new HashMap<String, Tuple2<Boolean, byte[]>>();
+
+                        files_key_Set = files.keySet();
+                        for (int i = 0; i < files_key_Set.size(); i++) {
+                            JSONObject file = (JSONObject) files.get(i + "");
 
 
-                    files = (JSONObject) json.get("&*&*%$$%_files_#$@%%%");
+                            String name = (String) file.get("FN"); // File_Name
+                            Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
+                            byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("SZ"))); //Size
+                            position = position + new Integer((String) file.get("SZ")); //Size
+                            filesMap.put(name, new Tuple2(zip, bb));
+
+                        }
+                        return new Tuple4(versiondata, title, json, filesMap);
+
+                    } else if (json.containsKey("&*&*%$$%_files_#$@%%%")) {
+                        //v2.0
+
+                        files = (JSONObject) json.get("&*&*%$$%_files_#$@%%%");
+                        HashMap<String, Tuple2<Boolean, byte[]>> filesMap = new HashMap<String, Tuple2<Boolean, byte[]>>();
+
+                        files_key_Set = files.keySet();
+                        for (int i = 0; i < files_key_Set.size(); i++) {
+                            JSONObject file = (JSONObject) files.get(i + "");
 
 
-                    files_key_Set = files.keySet();
-                    for (int i = 0; i < files_key_Set.size(); i++) {
-                        JSONObject file = (JSONObject) files.get(i + "");
+                            String name = (String) file.get("File_Name"); // File_Name
+                            Boolean zip = new Boolean((String) file.get("ZIP")); // ZIP
+                            byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("Size"))); //Size
+                            position = position + new Integer((String) file.get("Size")); //Size
+                            filesMap.put(name, new Tuple2(zip, bb));
 
-
-                        String name = (String) file.get("File_Name"); // File_Name
-                        Boolean zip = new Boolean((String) file.get("ZIP")); // ZIP
-                        byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("Size"))); //Size
-                        position = position + new Integer((String) file.get("Size")); //Size
-                        out_Map.put(name, new Tuple2(zip, bb));
-
+                        }
+                        return new Tuple4(versiondata, title, json, filesMap);
                     }
-                    return new Tuple4(versiondata, title, json, out_Map);
+
+                    return new Tuple4(versiondata, title, json, null);
+                } catch (Exception e) {
+                    return new Tuple4(versiondata, title, null, null);
                 }
-                // v 2.1
-                if (json.containsKey("F")) { // return new Tuple4(version,title,json, null);
 
-
-                    files = (JSONObject) json.get("F");
-
-
-                    files_key_Set = files.keySet();
-                    for (int i = 0; i < files_key_Set.size(); i++) {
-                        JSONObject file = (JSONObject) files.get(i + "");
-
-
-                        String name = (String) file.get("FN"); // File_Name
-                        Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
-                        byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("SZ"))); //Size
-                        position = position + new Integer((String) file.get("SZ")); //Size
-                        out_Map.put(name, new Tuple2(zip, bb));
-
-                    }
-
-
-                    return new Tuple4(versiondata, title, json, out_Map);
-                }
         }
-
-        return new Tuple4("-1", null, null, null);
     }
 
     public static JSONObject getHashes(JSONObject json) {
@@ -257,4 +262,180 @@ public class ExData {
 
     }
 
+    public static String templateWithValues(String description, JSONObject params) {
+        Set<String> kS = params.keySet();
+        for (String s : kS) {
+            description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
+        }
+
+        return description;
+    }
+
+    /**
+     * Version 2 maker for BlockExplorer
+     */
+    public static void makeJSONforHTML(DCSet dcSet, Map output, Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> noteData,
+                                       int blockNo, int seqNo, JSONObject langObj) {
+
+        if (noteData.b != null) {
+            output.put("title", noteData.b);
+        }
+
+        JSONObject dataJson = noteData.c;
+        // parse JSON
+        if (dataJson != null) {
+
+            if (dataJson.containsKey("MS")) {
+                // v 2.1
+                output.put("message", dataJson.get("MS"));
+
+            } else if (dataJson.containsKey("Message")) {
+                // Message v2.0
+                output.put("message", dataJson.get("Message"));
+
+            }
+
+            Long templateKey = null;
+            String paramsStr = null;
+
+            if (dataJson.containsKey("TM")) {
+                // V2.1 Template
+                templateKey = new Long(dataJson.get("TM").toString());
+
+                // Template Params
+                if (dataJson.containsKey("PR")) {
+                    paramsStr = dataJson.get("PR").toString();
+                }
+            } else if (dataJson.containsKey("Template")) {
+                // V2.0 Template
+                templateKey = new Long(dataJson.get("Template").toString());
+
+                // Template Params
+                if (dataJson.containsKey("Statement_Params")) {
+                    paramsStr = dataJson.get("Statement_Params").toString();
+                }
+            }
+
+            if (templateKey != null) {
+                TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, templateKey);
+                if (template != null) {
+                    String description = template.viewDescription();
+
+                    // Template Params
+                    if (paramsStr != null) {
+                        JSONObject params;
+                        try {
+                            params = (JSONObject) JSONValue.parseWithException(paramsStr);
+                            description = templateWithValues(description, params);
+                        } catch (ParseException e) {
+                        }
+
+                    }
+
+                    output.put("body", description);
+
+                }
+            }
+
+            String hashesStr;
+
+            // Hashes
+            if (dataJson.containsKey("HS")) {
+                // v2.1
+                hashesStr = dataJson.get("HS").toString();
+            } else if (dataJson.containsKey("Hashes")) {
+                // v2.0
+                hashesStr = dataJson.get("HS").toString();
+            } else {
+                hashesStr = null;
+            }
+
+            if (hashesStr != null && !hashesStr.isEmpty()) {
+                try {
+                    String hashes = "";
+                    String str = dataJson.get("HS").toString();
+                    JSONObject params = new JSONObject();
+                    params = (JSONObject) JSONValue.parseWithException(str);
+
+                    Set<String> kS = params.keySet();
+
+                    int i = 1;
+                    for (String s : kS) {
+                        hashes += i + " " + s + " " + params.get(s) + "<br>";
+                    }
+
+                    output.put("hashes", hashes);
+                } catch (ParseException e) {
+                }
+            }
+
+            HashMap<String, Tuple2<Boolean, byte[]>> filesMap = noteData.d;
+
+
+            if (filesMap != null && !filesMap.isEmpty()) {
+                String files = "";
+                Set<String> fileNames = filesMap.keySet();
+
+                int i = 1;
+                for (String fileName : fileNames) {
+
+                    files += i + " " + fileName;
+                    files += "<a href ='../apidocuments/getFile?download=true&block="
+                            + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'> "
+                            + Lang.getInstance().translateFromLangObj("Download", langObj) + "</a><br>";
+
+                    i++;
+                }
+
+                output.put("files", files);
+            }
+
+        }
+
+    }
+
+    /**
+     * Version 1 maker for BlockExplorer
+     */
+    public static void makeJSONforHTML_1(DCSet dcSet, Map output, JSONObject jsonData, Long templateKey) {
+
+        Set<String> kS;
+        String description;
+        String paramsStr;
+        JSONObject params;
+        TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, templateKey);
+        if (template != null) {
+            description = template.viewDescription();
+
+            output.put("title", jsonData.get("Title"));
+
+            output.put("message", jsonData.get("Message"));
+
+            paramsStr = jsonData.get("Statement_Params").toString();
+
+            try {
+                params = (JSONObject) JSONValue.parseWithException(paramsStr);
+                description = templateWithValues(description, params);
+            } catch (Exception e) {
+            }
+
+            output.put("body", description);
+
+        }
+
+        try {
+            String hashes = "";
+            paramsStr = jsonData.get("Hashes").toString();
+            params = (JSONObject) JSONValue.parseWithException(paramsStr);
+            kS = params.keySet();
+
+            int i = 1;
+            for (String s : kS) {
+                hashes += i + " " + s + " " + params.get(s) + "<br>";
+            }
+            output.put("hashes", hashes);
+        } catch (Exception e) {
+        }
+
+    }
 }
