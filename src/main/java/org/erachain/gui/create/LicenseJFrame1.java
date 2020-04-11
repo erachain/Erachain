@@ -81,7 +81,7 @@ public class LicenseJFrame1 extends JDialog {
 
                     Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
                     try {
-                         map = ExData.parse_Data_V2(data);
+                         map = ExData.parse_Data_V2(data, false, true);
                     } catch (Exception e) {
                         map = null;
                     }

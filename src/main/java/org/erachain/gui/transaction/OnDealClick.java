@@ -225,6 +225,10 @@ public class OnDealClick {
             case Transaction.INVALID_DATA:
                 mess = "Invalid data";
                 break;
+            case Transaction.INVALID_DATA_FORMAT:
+                mess = "Invalid data format";
+                break;
+
             case Transaction.INVALID_URL_LENGTH:
                 mess = "Invalid URL length";
                 break;

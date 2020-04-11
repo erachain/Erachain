@@ -299,7 +299,7 @@ public class StatementInfo extends javax.swing.JPanel {
         initComponents();
 
         try {
-            map = ExData.parse_Data_V2(data);
+            map = ExData.parse_Data_V2(data, false, true);
 
             JSONObject jSON = map.c;
 

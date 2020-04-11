@@ -83,7 +83,7 @@ public class APIDocuments {
                    byte[] data = statement.getData();
                    Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
                 try {
-                    map = ExData.parse_Data_V2(data);
+                    map = ExData.parse_Data_V2(data, false, true);
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
@@ -151,7 +151,7 @@ public class APIDocuments {
                    byte[] data = statement.getData();
                    Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
                    try {
-                       map = ExData.parse_Data_V2(data);
+                       map = ExData.parse_Data_V2(data, false, true);
                    } catch (Exception e) {
                        // TODO Auto-generated catch block
                        throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);

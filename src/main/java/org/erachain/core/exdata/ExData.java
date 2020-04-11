@@ -93,7 +93,7 @@ public class ExData {
     // parse data with File info
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse_Data_V2(
-            byte[] data) throws Exception {
+            byte[] data, boolean onlyTitle, boolean andFiles) throws Exception {
         // Version, Title, JSON, Files
 
         // CHECK IF WE MATCH BLOCK LENGTH
@@ -112,6 +112,13 @@ public class ExData {
 
         byte[] titleByte = Arrays.copyOfRange(data, position, position + titleSize);
 
+        String title = new String(titleByte, StandardCharsets.UTF_8);
+        String version = new String(version_Byte, StandardCharsets.UTF_8);
+
+        if (onlyTitle) {
+            return new Tuple4(version, title, null, null);
+        }
+
         position += titleSize;
         // READ Length JSON PART
         byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_JSON_PART_LENGTH);
@@ -123,53 +130,61 @@ public class ExData {
         JSONObject json = (JSONObject) JSONValue
                 .parseWithException(new String(arbitraryData, StandardCharsets.UTF_8));
 
-        String title = new String(titleByte, StandardCharsets.UTF_8);
-        String version = new String(version_Byte, StandardCharsets.UTF_8);
-        position += JSONSize;
-        HashMap<String, Tuple2<Boolean, byte[]>> out_Map = new HashMap<String, Tuple2<Boolean, byte[]>>();
-        JSONObject files;
-        Set files_key_Set;
-        // v2.0
-        if (json.containsKey("&*&*%$$%_files_#$@%%%")) { // return new
-            // Tuple4(version,title,json,
-            // null);
+        if (andFiles) {
+            position += JSONSize;
+            HashMap<String, Tuple2<Boolean, byte[]>> out_Map = new HashMap<String, Tuple2<Boolean, byte[]>>();
+            JSONObject files;
+            Set files_key_Set;
+            // v2.0
+            if (json.containsKey("&*&*%$$%_files_#$@%%%")) { // return new
+                // Tuple4(version,title,json,
+                // null);
 
-            files = (JSONObject) json.get("&*&*%$$%_files_#$@%%%");
+                files = (JSONObject) json.get("&*&*%$$%_files_#$@%%%");
 
-            files_key_Set = files.keySet();
-            for (int i = 0; i < files_key_Set.size(); i++) {
-                JSONObject file = (JSONObject) files.get(i + "");
+                files_key_Set = files.keySet();
+                for (int i = 0; i < files_key_Set.size(); i++) {
+                    JSONObject file = (JSONObject) files.get(i + "");
 
-                String name = (String) file.get("File_Name"); // File_Name
-                Boolean zip = new Boolean((String) file.get("ZIP")); // ZIP
-                byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("Size"))); // Size
-                position = position + new Integer((String) file.get("Size")); // Size
-                out_Map.put(name, new Tuple2(zip, bb));
+                    String name = (String) file.get("File_Name"); // File_Name
+                    Boolean zip = new Boolean((String) file.get("ZIP")); // ZIP
+                    byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("Size"))); // Size
+                    position = position + new Integer((String) file.get("Size")); // Size
+                    out_Map.put(name, new Tuple2(zip, bb));
 
+                }
+                return new Tuple4(version, title, json, out_Map);
             }
-            return new Tuple4(version, title, json, out_Map);
-        }
-        // v 2.1
-        if (json.containsKey("F")) { // return new Tuple4(version,title,json,
-            // null);
+            // v 2.1
+            if (json.containsKey("F")) { // return new Tuple4(version,title,json,
+                // null);
 
-            files = (JSONObject) json.get("F");
+                files = (JSONObject) json.get("F");
 
-            files_key_Set = files.keySet();
-            for (int i = 0; i < files_key_Set.size(); i++) {
-                JSONObject file = (JSONObject) files.get(i + "");
+                files_key_Set = files.keySet();
+                for (int i = 0; i < files_key_Set.size(); i++) {
+                    JSONObject file = (JSONObject) files.get(i + "");
 
-                String name = (String) file.get("FN"); // File_Name
-                Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
-                byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("SZ"))); // Size
-                position = position + new Integer((String) file.get("SZ")); // Size
-                out_Map.put(name, new Tuple2(zip, bb));
+                    String name = (String) file.get("FN"); // File_Name
+                    Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
+                    byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("SZ"))); // Size
+                    position = position + new Integer((String) file.get("SZ")); // Size
+                    out_Map.put(name, new Tuple2(zip, bb));
 
+                }
+
+                return new Tuple4(version, title, json, out_Map);
             }
-
-            return new Tuple4(version, title, json, out_Map);
         }
+
         return new Tuple4(version, title, json, null);
+    }
+
+    public static JSONObject getHashes(JSONObject json) {
+        if (json.containsKey("HS")) {
+            return (JSONObject) json.get("HS");
+        }
+        return null;
     }
 
     // parse data with out files info

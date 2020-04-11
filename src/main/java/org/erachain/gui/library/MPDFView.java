@@ -1,8 +1,22 @@
 package org.erachain.gui.library;
 
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Toolkit;
+import com.sun.pdfview.PDFFile;
+import com.sun.pdfview.PDFPage;
+import org.erachain.controller.Controller;
+import org.erachain.core.exdata.ExData;
+import org.erachain.core.transaction.RSignNote;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
+import org.erachain.settings.Settings;
+import org.erachain.utils.ZipBytes;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
@@ -16,28 +30,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.zip.DataFormatException;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import org.erachain.core.transaction.RSignNote;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple4;
-
-import com.sun.pdfview.PDFFile;
-import com.sun.pdfview.PDFPage;
-
-import org.erachain.controller.Controller;
-import org.erachain.core.exdata.ExData;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
-import org.erachain.settings.Settings;
-import org.erachain.utils.ZipBytes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -237,7 +229,7 @@ public class MPDFView extends javax.swing.JPanel {
 
                     Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
                     try {
-                        map = ExData.parse_Data_V2(data);
+                        map = ExData.parse_Data_V2(data, false, true);
                     } catch (Exception e) {
                         map = null;
                     }

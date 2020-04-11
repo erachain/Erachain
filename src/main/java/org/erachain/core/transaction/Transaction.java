@@ -225,6 +225,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_PARAMS_LENGTH = 390;
     public static final int INVALID_URL_LENGTH = 391;
     public static final int INVALID_HEAD_LENGTH = 392;
+    public static final int INVALID_DATA_FORMAT = 393;
 
     public static final int PRIVATE_KEY_NOT_FOUND = 530;
     public static final int INVALID_UPDATE_VALUE = 540;
