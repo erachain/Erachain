@@ -20,12 +20,11 @@ import org.json.simple.parser.ParseException;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;
 
-import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 
 //import java.math.BigDecimal;
 //import java.math.BigInteger;
@@ -282,157 +281,8 @@ public class RSignNote extends Transaction implements Itemable {
 
     public static Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse_Data_V2(byte[] data, boolean onlyTitle, boolean andFiles) throws Exception {
         //Version, Title, JSON, Files
-
-        if (true) {
-            // TODO надо переделать!! на нее
-            return ExData.parse_Data_V2(data, onlyTitle, andFiles);
-        }
-
-        /// OLD ??
-        // TODO убрать!
-
-        //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < Transaction.DATA_JSON_PART_LENGTH) {
-            throw new Exception("Data does not match block length " + data.length);
-        }
-        int position = 0;
-
-        // read version
-        byte[] version_Byte = Arrays.copyOfRange(data, position, Transaction.DATA_VERSION_PART_LENGTH);
-        position += Transaction.DATA_VERSION_PART_LENGTH;
-        // read title
-        byte[] titleSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_TITLE_PART_LENGTH);
-        int titleSize = Ints.fromByteArray(titleSizeBytes);
-        position += Transaction.DATA_TITLE_PART_LENGTH;
-
-        byte[] titleByte = Arrays.copyOfRange(data, position, position + titleSize);
-
-        String title = new String(titleByte, StandardCharsets.UTF_8);
-        String version = new String(version_Byte, StandardCharsets.UTF_8);
-
-        if (onlyTitle) {
-            return new Tuple4(version, title, null, null);
-        }
-
-        position += titleSize;
-        //READ Length JSON PART
-        byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_JSON_PART_LENGTH);
-        int JSONSize = Ints.fromByteArray(dataSizeBytes);
-
-        position += Transaction.DATA_JSON_PART_LENGTH;
-        //READ JSON
-        byte[] arbitraryData = Arrays.copyOfRange(data, position, position + JSONSize);
-        JSONObject json = (JSONObject) JSONValue.parseWithException(new String(arbitraryData, StandardCharsets.UTF_8));
-
-        position += JSONSize;
-        HashMap<String, Tuple2<Boolean, byte[]>> out_Map = new HashMap<String, Tuple2<Boolean, byte[]>>();
-        JSONObject files;
-        Set files_key_Set;
-        //v2.0
-        if (json.containsKey("&*&*%$$%_files_#$@%%%")) { //return new Tuple4(version,title,json, null);
-
-
-            files = (JSONObject) json.get("&*&*%$$%_files_#$@%%%");
-
-
-            files_key_Set = files.keySet();
-            for (int i = 0; i < files_key_Set.size(); i++) {
-                JSONObject file = (JSONObject) files.get(i + "");
-
-
-                String name = (String) file.get("File_Name"); // File_Name
-                Boolean zip = new Boolean((String) file.get("ZIP")); // ZIP
-                byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("Size"))); //Size
-                position = position + new Integer((String) file.get("Size")); //Size
-                out_Map.put(name, new Tuple2(zip, bb));
-
-            }
-            return new Tuple4(version, title, json, out_Map);
-        }
-        // v 2.1
-        if (json.containsKey("F")) { // return new Tuple4(version,title,json, null);
-
-
-            files = (JSONObject) json.get("F");
-
-
-            files_key_Set = files.keySet();
-            for (int i = 0; i < files_key_Set.size(); i++) {
-                JSONObject file = (JSONObject) files.get(i + "");
-
-
-                String name = (String) file.get("FN"); // File_Name
-                Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
-                byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("SZ"))); //Size
-                position = position + new Integer((String) file.get("SZ")); //Size
-                out_Map.put(name, new Tuple2(zip, bb));
-
-            }
-
-
-            return new Tuple4(version, title, json, out_Map);
-        }
-
-        return new Tuple4(version, title, json, null);
+        return ExData.parse_Data_V2(data, onlyTitle, andFiles);
     }
-
-    public static byte[] Json_Files_to_Byte_V2(String title, JSONObject json, HashMap<String, Tuple2<Boolean, byte[]>> files) throws Exception {
-
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        outStream.write("v 2.00".getBytes(StandardCharsets.UTF_8)); // only 6 simbols!!!
-        byte[] title_Bytes = "".getBytes(StandardCharsets.UTF_8);
-        if (title != null) {
-            title_Bytes = title.getBytes(StandardCharsets.UTF_8);
-        }
-
-
-        byte[] size_Title = ByteBuffer.allocate(Transaction.DATA_TITLE_PART_LENGTH).putInt(title_Bytes.length).array();
-
-        outStream.write(size_Title);
-        outStream.write(title_Bytes);
-
-        if (json == null || json.equals("")) return outStream.toByteArray();
-
-        byte[] JSON_Bytes;
-        byte[] size_Json;
-
-        if (files == null || files.isEmpty()) {
-            JSON_Bytes = json.toString().getBytes(StandardCharsets.UTF_8);
-            // convert int to byte
-            size_Json = ByteBuffer.allocate(Transaction.DATA_JSON_PART_LENGTH).putInt(JSON_Bytes.length).array();
-            outStream.write(size_Json);
-            outStream.write(JSON_Bytes);
-            return outStream.toByteArray();
-        }
-        // if insert Files
-        Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it = files.entrySet().iterator();
-        JSONObject files_Json = new JSONObject();
-        int i = 0;
-        ArrayList<byte[]> out_files = new ArrayList<byte[]>();
-        while (it.hasNext()) {
-            Entry<String, Tuple2<Boolean, byte[]>> file = it.next();
-            JSONObject file_Json = new JSONObject();
-            file_Json.put("FN", file.getKey()); //File_Name
-            file_Json.put("ZP", file.getValue().a.toString()); //ZIP
-            file_Json.put("SZ", file.getValue().b.length + ""); //Size
-            files_Json.put(i + "", file_Json);
-            out_files.add(i, file.getValue().b);
-            i++;
-        }
-        json.put("F", files_Json);
-        JSON_Bytes = json.toString().getBytes(StandardCharsets.UTF_8);
-        // convert int to byte
-        size_Json = ByteBuffer.allocate(Transaction.DATA_JSON_PART_LENGTH).putInt(JSON_Bytes.length).array();
-        outStream.write(size_Json);
-        outStream.write(JSON_Bytes);
-        for (i = 0; i < out_files.size(); i++) {
-            outStream.write(out_files.get(i));
-        }
-        return outStream.toByteArray();
-
-    }
-
-    //public static String getName() { return "Statement"; }
 
     //GETTERS/SETTERS
     public void setSidnerSignature(int index, byte[] signature) {
