@@ -354,13 +354,11 @@ public class RSignNote extends Transaction implements Itemable {
             String text = new String(getData(), StandardCharsets.UTF_8);
 
             try {
-                JSONObject data = new JSONObject();
-                data = (JSONObject) JSONValue.parseWithException(text);
-                String title = data.get("Title").toString();
-                if (title == null || title.equals(""))
-                    return null;
-
-                return title;
+                JSONObject dataJson = (JSONObject) JSONValue.parseWithException(text);
+                if (dataJson.containsKey("Title")) {
+                    return dataJson.get("Title").toString();
+                }
+                return null;
 
             } catch (ParseException e) {
                 // version 0
@@ -666,16 +664,17 @@ public class RSignNote extends Transaction implements Itemable {
             String text = new String(getData(), StandardCharsets.UTF_8);
 
             try {
-                JSONObject data = new JSONObject();
-                data = (JSONObject) JSONValue.parseWithException(text);
-                String title = data.get("Title").toString();
+                JSONObject dataJson = (JSONObject) JSONValue.parseWithException(text);
+                String title = dataJson.get("Title").toString();
 
-                return new Tuple4("1", title, null, null);
+                return new Tuple4("1", title, dataJson, null);
 
             } catch (ParseException e) {
                 // version 0
                 String[] items = text.split("\n");
-                return new Tuple4("1", items[0], items[1], null);
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("Message", text.substring(items[0].length()));
+                return new Tuple4("0", items[0], dataJson, null);
             }
         }
 
