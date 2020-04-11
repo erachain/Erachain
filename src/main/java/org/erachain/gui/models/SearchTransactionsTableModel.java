@@ -80,34 +80,26 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
         if (account != null) {
             // ИЩЕМ по СЧЕТУ
-            list = ((TransactionFinalMap)map).getTransactionsByAddressLimit(account.getShortAddressBytes(), 1000, true);
+            list.addAll(((TransactionFinalMap) map).getTransactionsByAddressLimit(account.getShortAddressBytes(), 1000, true));
 
-        } else {
-
-            try {
-
-                // ИЩЕМ по ПОДПИСИ
-                byte[] signatute = Base58.decode(filter);
-                if (signatute.length > 40) {
-                    Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signatute);
-                    list.add(DCSet.getInstance().getTransactionFinalMap().get(key));
-                }
-            } catch (NumberFormatException e) {
-            }
-
-            if (list.isEmpty()) {
-                // ИЩЕМ по Заголовку
-                DCSet dcSet = DCSet.getInstance();
-
-                String fromWord = null;
-                list = ((FilteredByStringArray) dcSet.getTransactionFinalMap())
-                        .getKeysByFilterAsArray(filter, fromWord, fromID, start, step, false);
-
-            }
         }
 
+        if (Base58.isExtraSymbols(filter)) {
+            byte[] signatute = Base58.decode(filter);
+            Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signatute);
+            list.add(DCSet.getInstance().getTransactionFinalMap().get(key));
+        }
+
+        // ИЩЕМ по Заголовку
+        DCSet dcSet = DCSet.getInstance();
+
+        String fromWord = null;
+        list.addAll(((FilteredByStringArray) dcSet.getTransactionFinalMap())
+                .getKeysByFilterAsArray(filter, fromWord, fromID, start, step, false));
+
         for (Transaction item : list) {
-            if (item instanceof RCalculated) {
+            if (false && // все берем
+                    item instanceof RCalculated) {
                 list.remove(item);
                 continue;
             }
