@@ -32,7 +32,6 @@ import org.erachain.utils.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.ParseException;
 import org.mapdb.Fun;
 import org.mapdb.Fun.*;
 import org.slf4j.Logger;
@@ -2985,68 +2984,18 @@ public class BlockExplorer {
 
         if (!trans.isEncrypted()) {
 
+            output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
+            output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
+
             if (trans.getVersion() == 2) {
                 // version 2
                 Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> noteData;
 
                 noteData = trans.parseData();
-                JSONObject dataJson = noteData.c;
-                if (dataJson != null) {
-                    ExData.makeJSONforHTML(dcSet, output, noteData.b, dataJson, block, seqNo, langObj);
 
-                    output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
-
-                    output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
-
-                    String filesStr;
-
-                    // parse files
-                    if (dataJson.containsKey("F")) {
-                        // v 2.1
-                        filesStr = dataJson.get("F").toString();
-
-                    } else if (dataJson.containsKey("&*&*%$$%_files_#$@%%%")) {
-                        // v2.0
-                        filesStr = dataJson.get("&*&*%$$%_files_#$@%%%").toString();
-                    } else {
-                        filesStr = null;
-                    }
-
-                    if (filesStr != null && !filesStr.isEmpty()) {
-                        output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
-                        String files = "";
-                        filesStr = dataJson.get("F").toString();
-                        JSONObject params = new JSONObject();
-                        try {
-                            params = (JSONObject) JSONValue.parseWithException(filesStr);
-                        } catch (ParseException e) {
-                            logger.error(e.getMessage(), e);
-                        }
-                        Set<String> kS = params.keySet();
-
-                        int i = 1;
-                        JSONObject ss = new JSONObject();
-                        for (String s : kS) {
-
-                            ss = (JSONObject) params.get(s);
-
-                            files += i + " " + ss.get("FN");
-//                        files += "<a href ='../apidocuments/getFile?download=false&block="
-//                                + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN") + "'> "
-//                                + Lang.getInstance().translateFromLangObj("View", langObj) + " </a>";
-                            files += "<a href ='../apidocuments/getFile?download=true&block="
-                                    + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN") + "'> "
-                                    + Lang.getInstance().translateFromLangObj("Download", langObj) + "</a><br>";
-                        }
-
-                        output.put("files", files);
-                    }
-                }
+                ExData.makeJSONforHTML(dcSet, output, noteData, block, seqNo, langObj);
 
             } else {
-
-                output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
-                output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
 
                 // version 1
                 try {
@@ -3054,12 +3003,11 @@ public class BlockExplorer {
                             .parseWithException(new String(trans.getData(), StandardCharsets.UTF_8));
                     ExData.makeJSONforHTML_1(dcSet, output, dataJson, trans.getKey());
                 } catch (Exception e) {
-                    output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
-                    output.put("title", trans.getTitle());
-                    output.put("statement", new String(trans.getData(), StandardCharsets.UTF_8));
-
+                    // версия через новую строку разделение
+                    String title = trans.getTitle();
+                    output.put("title", title);
+                    output.put("statement", new String(trans.getData(), StandardCharsets.UTF_8).substring(title.length()));
                 }
-
             }
 
         } else {
