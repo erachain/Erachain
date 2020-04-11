@@ -7,8 +7,10 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.json.simple.JSONObject;
@@ -559,11 +561,16 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public boolean hasPublicText() {
-        if (data == null || data.length == 0)
-            return false;
-        if (!Arrays.equals(this.encrypted, new byte[1]))
-            return false;
-
+        if (false) {
+            // TODO выделить заголовок и остальное тело
+            String title = null;
+            return hasPublicText(title, data, isText(), isEncrypted());
+        } else {
+            if (data == null || data.length == 0)
+                return false;
+            if (!Arrays.equals(this.encrypted, new byte[1]))
+                return false;
+        }
         return true;
     }
 
@@ -630,26 +637,45 @@ public class RSignNote extends Transaction implements Itemable {
 
     //PROCESS/ORPHAN
 
-	/*
-	public void process(DLSet db, boolean asPack) {
+    @Override
+    public void process(Block block, int asDeal) {
 
-		//UPDATE SENDER
-		super.process(db, asPack);
+        super.process(block, asDeal);
+        try {
+            Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> items = parse_Data_V2();
+            if (items.d != null) {
+                Long dbKey = makeDBRef(height, seqNo);
+                for (Tuple2<Boolean, byte[]> fileItem : items.d.values()) {
+                    dcSet.getTransactionFinalMapSigns().put(Crypto.getInstance().digest(fileItem.b), dbKey);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            Long error = null;
+            error++;
+        }
 
-		// it in any time is unconfirmed! byte[] ref = this.getDBRef(db);
-		db.getAddressStatement_Refs().set(this.creator.getAddress(), this.key, this.signature);
+    }
 
-	}
+    @Override
+    public void orphan(Block block, int asDeal) {
 
-	public void orphan(DLSet db, boolean asPack) {
+        super.orphan(block, asDeal);
 
-		//UPDATE SENDER
-		super.orphan(db, asPack);
+        try {
+            Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> items = parse_Data_V2();
+            if (items.d != null) {
+                for (Tuple2<Boolean, byte[]> fileItem : items.d.values()) {
+                    dcSet.getTransactionFinalMapSigns().delete(Crypto.getInstance().digest(fileItem.b));
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            Long error = null;
+            error++;
+        }
 
-		db.getAddressStatement_Refs().delete(this.creator.getAddress(), this.key);
-
-	}
-	 */
+    }
 
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {

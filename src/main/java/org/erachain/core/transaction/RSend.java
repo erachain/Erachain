@@ -396,27 +396,7 @@ public class RSend extends TransactionAmount {
 
     @Override
     public boolean hasPublicText() {
-        String[] words = head.split(Transaction.SPLIT_CHARS);
-        int length = 0;
-        for (String word: words) {
-            word = word.trim();
-            if (Base58.isExtraSymbols(word)) {
-                // все слова сложим по длинне
-                length += word.length();
-                if (length > (BlockChain.TEST_MODE ? 100 : 100))
-                    return true;
-            }
-        }
-
-        if (data == null || data.length == 0)
-            return false;
-
-        if (this.isText() && !this.isEncrypted()) {
-            String text = new String(this.data, StandardCharsets.UTF_8);
-            if (text.contains(" ") || text.contains("_"))
-                return true;
-        }
-        return false;
+        return hasPublicText(head, data, isText(), isEncrypted());
     }
 
     // PARSE/CONVERT

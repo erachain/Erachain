@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 // import org.slf4j.LoggerFactory;
@@ -719,6 +720,39 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public List<byte[]> getOtherSignatures() {
         return null;
+    }
+
+    /**
+     * Общий для всех проверка на допуск публичного сообщения
+     *
+     * @param title
+     * @param message
+     * @param isText
+     * @param isEncrypted
+     * @return
+     */
+    public static boolean hasPublicText(String title, byte[] message, boolean isText, boolean isEncrypted) {
+        String[] words = title.split(Transaction.SPLIT_CHARS);
+        int length = 0;
+        for (String word : words) {
+            word = word.trim();
+            if (Base58.isExtraSymbols(word)) {
+                // все слова сложим по длинне
+                length += word.length();
+                if (length > (BlockChain.TEST_MODE ? 100 : 100))
+                    return true;
+            }
+        }
+
+        if (message == null || message.length == 0)
+            return false;
+
+        if (isText && !isEncrypted) {
+            String text = new String(message, StandardCharsets.UTF_8);
+            if (text.contains(" ") || text.contains("_"))
+                return true;
+        }
+        return false;
     }
 
     public abstract boolean hasPublicText();
