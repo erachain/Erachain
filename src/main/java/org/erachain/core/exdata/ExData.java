@@ -386,8 +386,6 @@ public class ExData {
                 }
             }
 
-            String hashes = "";
-
             ///////// NATIVE HASHES
             JSONObject hashes = getHashes(noteData);
             int hashesCount = hashes.size();
@@ -410,30 +408,22 @@ public class ExData {
                             + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'> "
                             + Lang.getInstance().translateFromLangObj("Download", langObj) + "</a><br>";
 
-                    hashes.put();
+                    Tuple3<byte[], Boolean, byte[]> fileValue = filesMap.get(fileName);
+                    hashes.put(Base58.encode(fileValue.a), fileName);
                 }
 
                 output.put("files", files);
             }
 
             ///////// HASHES
+            if (!hashes.isEmpty()) {
+                String hashesHTML = "";
 
-            // Hashes
-            if (hashesStr != null && !hashesStr.isEmpty()) {
-                try {
-                    String str = dataJson.get("HS").toString();
-                    JSONObject params = new JSONObject();
-                    params = (JSONObject) JSONValue.parseWithException(str);
-
-                    Set<String> kS = params.keySet();
-
-                    for (String s : kS) {
-                        hashes += hashesCount++ + " " + s + " " + params.get(s) + "<br>";
-                    }
-
-                    output.put("hashes", hashes);
-                } catch (ParseException e) {
+                for (Object hash : hashes.keySet()) {
+                    hashesHTML += hashesCount++ + " " + hash + " " + hashes.get(hash) + "<br>";
                 }
+
+                output.put("hashes", hashesHTML);
             }
 
         }

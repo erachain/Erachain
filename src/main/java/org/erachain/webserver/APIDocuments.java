@@ -7,7 +7,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.ZipBytes;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
 import javax.servlet.http.HttpServletRequest;
@@ -78,7 +78,7 @@ public class APIDocuments {
             Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
             if (tx instanceof RSignNote) {
                 RSignNote statement = (RSignNote) tx;
-                Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
+                Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> map;
                 try {
                     map = statement.parseData();
                 } catch (Exception e) {
@@ -86,15 +86,15 @@ public class APIDocuments {
                     throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
                 }
 
-                HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
+                HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = map.d;
                 if (files != null) {
-                    Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
+                    Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it_Files = files.entrySet().iterator();
                     int i = 0;
                     while (it_Files.hasNext()) {
-                        Entry<String, Tuple2<Boolean, byte[]>> file = it_Files.next();
+                        Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it_Files.next();
                         JSONObject jsonFile = new JSONObject();
                         jsonFile.put("filename", (String) file.getKey());
-                        jsonFile.put("ZIP", file.getValue().a);
+                        jsonFile.put("ZIP", file.getValue().b);
                         result.put(i++, jsonFile);
                     }
                 } else {
@@ -135,7 +135,7 @@ public class APIDocuments {
            Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
            if (tx instanceof RSignNote) {
                RSignNote statement = (RSignNote) tx;
-               Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
+               Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> map;
                try {
                    map = statement.parseData();
                } catch (Exception e) {
@@ -143,21 +143,21 @@ public class APIDocuments {
                    throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
                }
 
-               HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
+               HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = map.d;
                if (files != null) {
-                   Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
+                   Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it_Files = files.entrySet().iterator();
                    int i = 0;
                    while (it_Files.hasNext()) {
-                       Entry<String, Tuple2<Boolean, byte[]>> file = it_Files.next();
+                       Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it_Files.next();
                        if (name.equals((String) file.getKey())) {
                            i++;
 
                            // if ZIP
-                           if (file.getValue().a) {
+                           if (file.getValue().b) {
                                // надо сделать
 
                                try {
-                                   resultByte = ZipBytes.decompress(file.getValue().b);
+                                   resultByte = ZipBytes.decompress(file.getValue().c);
                                } catch (DataFormatException e1) {
                                    // TODO Auto-generated catch block
                                    e1.printStackTrace();
@@ -166,7 +166,7 @@ public class APIDocuments {
                                    e.printStackTrace();
                                }
                            } else {
-                               resultByte = file.getValue().b;
+                               resultByte = file.getValue().c;
                            }
                            // ifdownloadParam
 

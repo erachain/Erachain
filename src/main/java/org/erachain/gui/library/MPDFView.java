@@ -9,7 +9,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ZipBytes;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -223,7 +223,7 @@ public class MPDFView extends javax.swing.JPanel {
             if (record.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
 
                 RSignNote note = (RSignNote) record;
-                Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
+                Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> map;
                 try {
                     map = note.parseData();
                 } catch (Exception e) {
@@ -231,16 +231,16 @@ public class MPDFView extends javax.swing.JPanel {
                 }
 
                 if (map != null) {
-                    HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
+                    HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = map.d;
                     if (files != null) {
-                        Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
+                        Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it_Files = files.entrySet().iterator();
                         while (it_Files.hasNext()) {
-                            Entry<String, Tuple2<Boolean, byte[]>> fileData = it_Files.next();
-                            boolean zip = new Boolean(fileData.getValue().a);
+                            Entry<String, Tuple3<byte[], Boolean, byte[]>> fileData = it_Files.next();
+                            boolean zip = new Boolean(fileData.getValue().b);
                             // String name_File = (String) fileData.getKey();
                             // setTitle(getTitle() + " - " + name_File);
 
-                            byte[] file_byte = (byte[]) fileData.getValue().b;
+                            byte[] file_byte = (byte[]) fileData.getValue().c;
                             if (zip) {
                                 try {
                                     try {
