@@ -1,4 +1,4 @@
-// run argumentse
+// Set here run arguments
 // see in z_RUN_EXAMPLES folder
 
 // If walletKeys not exist make new SEED and 5 account for password "1"
