@@ -29,12 +29,12 @@
             padding-top: 5px;
         }
 
-        .ll-blue-bgc {
-            background-color: #dadada; // #94e7ff;
-            color: #333;
-            margin: 0;
-            margin-top: -6px;
-            cursor: pointer;
+.ll-blue-bgc {
+    background-color: #dadada; // #94e7ff;
+    color: #333;
+    margin: 0;
+    margin-top: -6px;
+    //cursor: pointer;
     border: 3px solid transparent;
     box-sizing: border-box;
     outline: none;
@@ -986,25 +986,11 @@ button.white-bgc[disabled]:focus,
                 output += '</h4>';
             }
 
-            output += '<b>' + data.asset.label_AssetType + ':</b> ' + data.asset.this.assetType;
+            output += ' ' + data.asset.label_AssetType + ': <b>' + data.asset.this.assetType + '</b>';
 
-            output += '<br>';
-
-            output += '<b>' + data.asset.label_Description + ':</b> ' + fformat(data.asset.this.description);
-
-            output += '<br>';
-
-            output += '<b> ' + data.asset.label_Quantity + ':</b> ' + addCommas(data.asset.this.quantity) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
-            output += '<br>';
-            output += '<b>' + data.asset.label_Scale + ':</b> ' + data.asset.this.scale;
-
-            output += '<br>';
-
-            output += '<b> ' + data.asset.label_Released + ':</b> ' + addCommas(data.asset.this.released) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
-
-            output += '</td>';
-            output += '</tr>';
-            output += '</table>';
+            output += ' , ' + data.asset.label_Quantity + ': <b>' + addCommas(data.asset.this.quantity) + '</b>';
+            output += ' , ' + data.asset.label_Scale + ': <b>' + data.asset.this.scale + '</b>';
+            output += ' , ' + data.asset.label_Released + ': <b>' + addCommas(data.asset.this.released) + '</b>';
 
             if (data.asset.this.key != 0) {
                 assetUrl = '&asset=' + data.asset.this.key;
@@ -1012,9 +998,14 @@ button.white-bgc[disabled]:focus,
                 assetUrl = '';
             }
 
-            output += '<b>' + data.asset.label_Holders + ':</b> <a href=?top=all' + assetUrl + get_lang() + '>' + data.asset.label_View + '</a>';
-
+            output += ' , <a href=?top=all' + assetUrl + get_lang() + ' class="button ll-blue-bgc"><b>' + data.asset.label_Holders + '</b></a>';
             output += '<br>';
+
+            output += '<b>' + data.asset.label_Description + ':</b> ' + fformat(data.asset.this.description);
+
+            output += '</td>';
+            output += '</tr>';
+            output += '</table>';
 
             output += '<h3>' + data.asset.label_Available_pairs + '</h3>';
 
