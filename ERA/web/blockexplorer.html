@@ -974,7 +974,8 @@ button.white-bgc[disabled]:focus,
                            + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
 
             if (data.asset.this.hasOwnProperty('seqNo')) {
-                output += data.asset.Label_seqNo + ': ' +'<a href=?tx=' + data.asset.this.seqNo + get_lang() + '><b>' + data.asset.this.seqNo + '</b></a></h4>';
+                output += '<a href=?tx=' + data.asset.this.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.asset.this.seqNo + '</b></a>';
+                output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a></h4>';
 
                 output += '<br>';
 

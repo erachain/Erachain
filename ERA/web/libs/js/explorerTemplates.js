@@ -88,7 +88,9 @@ function template(data) {
 
     output += '<h4> [ <input id="key1" name="template" size="4" type="text" value="' + data.template.key + '" class="" style="font-size: 1em;"'
                    + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
-    output += data.template.Label_seqNo + ': ' +'<a href=?tx=' + data.template.seqNo + get_lang() + '><b>' + data.template.seqNo + '</b></a></h4>';
+    //output += data.template.Label_seqNo + ': ' +'<a href=?tx=' + data.template.seqNo + get_lang() + '><b>' + data.template.seqNo + '</b></a></h4>';
+    output += '<a href=?tx=' + data.template.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.template.seqNo + '</b></a>';
+    output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a></h4>';
 
     output += '<br><br>';
 
