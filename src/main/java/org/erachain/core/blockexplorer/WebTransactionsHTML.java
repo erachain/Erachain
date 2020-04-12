@@ -656,7 +656,7 @@ public class WebTransactionsHTML {
 
     }
 
-    private String get_Lang(JSONObject langObj) {
+    public String get_Lang(JSONObject langObj) {
         if (langObj == null)
             return "&lang=en";
         return "&lang=" + langObj.get("_lang_ISO_");

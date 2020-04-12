@@ -94,6 +94,13 @@ public class BlockExplorer {
         return param;
     }
 
+    public static String get_Lang(JSONObject langObj) {
+        if (langObj == null)
+            return "&lang=en";
+        return "&lang=" + langObj.get("_lang_ISO_");
+
+    }
+
     public void makePage(Class type, int start, int pageSize,
                          Map output, JSONObject langObj) {
 
@@ -2986,6 +2993,7 @@ public class BlockExplorer {
 
             output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
             output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
+            output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
 
             if (trans.getVersion() == 2) {
                 // version 2

@@ -1,6 +1,7 @@
 package org.erachain.core.exdata;
 
 import com.google.common.primitives.Ints;
+import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
@@ -388,7 +389,9 @@ public class ExData {
 
             ///////// NATIVE HASHES
             JSONObject hashes = getHashes(noteData);
-            int hashesCount = hashes.size();
+            if (hashes == null) {
+                hashes = new JSONObject();
+            }
 
             /////////// FILES
             HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap = noteData.d;
@@ -397,19 +400,21 @@ public class ExData {
                 String files = "";
                 Set<String> fileNames = filesMap.keySet();
 
-                if (hashes == null) {
-                    hashes = new JSONObject();
-                }
                 int filesCount = 1;
                 for (String fileName : fileNames) {
 
-                    files += filesCount++ + " " + fileName;
+                    Tuple3<byte[], Boolean, byte[]> fileValue = filesMap.get(fileName);
+                    String hash = Base58.encode(fileValue.a);
+                    hashes.put(hash, fileName);
+
+                    files += filesCount + " " + fileName
+                            + " <a href=?q=" + hash + BlockExplorer.get_Lang(langObj) + "&search=transactions>[" + hash + "]</a> ";
                     files += "<a href ='../apidocuments/getFile?download=true&block="
                             + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'> "
                             + Lang.getInstance().translateFromLangObj("Download", langObj) + "</a><br>";
 
-                    Tuple3<byte[], Boolean, byte[]> fileValue = filesMap.get(fileName);
-                    hashes.put(Base58.encode(fileValue.a), fileName);
+                    filesCount++;
+
                 }
 
                 output.put("files", files);
@@ -418,9 +423,13 @@ public class ExData {
             ///////// HASHES
             if (!hashes.isEmpty()) {
                 String hashesHTML = "";
+                int hashesCount = 1;
 
                 for (Object hash : hashes.keySet()) {
-                    hashesHTML += hashesCount++ + " " + hash + " " + hashes.get(hash) + "<br>";
+                    hashesHTML += hashesCount
+                            + " <a href=?q=" + hash + BlockExplorer.get_Lang(langObj) + "&search=transactions>" + hash + "</a> "
+                            + hashes.get(hash) + "<br>";
+                    hashesCount++;
                 }
 
                 output.put("hashes", hashesHTML);
