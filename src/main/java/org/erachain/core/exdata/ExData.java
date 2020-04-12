@@ -217,7 +217,7 @@ public class ExData {
 
     public static JSONObject getHashes(Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parsedData) {
 
-        if (parsedData == null)
+        if (parsedData == null || parsedData.c == null)
             return null;
 
         if (parsedData.c.containsKey("HS")) {

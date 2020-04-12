@@ -1,4 +1,8 @@
 function tx(data) {
+    if (!data.hasOwnProperty('body')) {
+        return '';
+    }
+
     var output = '<table width="1280" border=0><tr><td align=left>';
     if (data.body.hasOwnProperty('head')) {
         output += data.body.head + '<br>';
