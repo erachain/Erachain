@@ -1,0 +1,8 @@
+// run argumentse
+// see in z_RUN_EXAMPLES folder
+
+// If walletKeys not exist make new SEED and 5 account for password "1"
+////seed=5:new:1
+
+// start forging by that password
+////password=1
