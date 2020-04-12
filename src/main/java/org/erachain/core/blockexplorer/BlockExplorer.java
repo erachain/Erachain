@@ -1808,7 +1808,7 @@ public class BlockExplorer {
                     continue;
 
                 ItemCls item = record.getItem();
-                logger.warn(item.getName());
+                ///logger.warn(item.getName());
 
                 myPersonJSON.put("key", item.getKey(dcSet));
                 myPersonJSON.put("name", item.getName());
