@@ -1,6 +1,8 @@
 package org.erachain.core.exdata;
 
 import com.google.common.primitives.Ints;
+import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
@@ -107,7 +109,7 @@ public class ExData {
      */
     // parse data with File info
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse(
+    public static Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parse(
             int version, byte[] data, boolean onlyTitle, boolean andFiles) throws Exception {
         // Version, Title, JSON, Files
 
@@ -156,48 +158,52 @@ public class ExData {
                 try {
                     JSONObject json = (JSONObject) JSONValue.parseWithException(new String(jsonData, StandardCharsets.UTF_8));
 
-                    JSONObject files;
-                    Set files_key_Set;
+                    if (andFiles) {
+                        JSONObject files;
+                        Set files_key_Set;
 
-                    if (json.containsKey("F")) {
-                        // v 2.1
+                        if (json.containsKey("F")) {
+                            // v 2.1
 
-                        files = (JSONObject) json.get("F");
-                        HashMap<String, Tuple2<Boolean, byte[]>> filesMap = new HashMap<String, Tuple2<Boolean, byte[]>>();
+                            files = (JSONObject) json.get("F");
+                            HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap = new HashMap<String, Tuple3<byte[], Boolean, byte[]>>();
 
-                        files_key_Set = files.keySet();
-                        for (int i = 0; i < files_key_Set.size(); i++) {
-                            JSONObject file = (JSONObject) files.get(i + "");
+                            files_key_Set = files.keySet();
+                            for (int i = 0; i < files_key_Set.size(); i++) {
+                                JSONObject file = (JSONObject) files.get(i + "");
+
+                                String name = (String) file.get("FN"); // File_Name
+                                Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
+                                int size = new Integer((String) file.get("SZ"));
+                                byte[] bb = Arrays.copyOfRange(data, position, position + size);
+                                position = position + size;
+                                filesMap.put(name, new Tuple3(Crypto.getInstance().digest(bb), zip, bb));
+
+                            }
+
+                            return new Tuple4(versiondata, title, json, filesMap);
+
+                        } else if (json.containsKey("&*&*%$$%_files_#$@%%%")) {
+                            //v2.0
+
+                            files = (JSONObject) json.get("&*&*%$$%_files_#$@%%%");
+                            HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap = new HashMap<String, Tuple3<byte[], Boolean, byte[]>>();
+
+                            files_key_Set = files.keySet();
+                            for (int i = 0; i < files_key_Set.size(); i++) {
+                                JSONObject file = (JSONObject) files.get(i + "");
 
 
-                            String name = (String) file.get("FN"); // File_Name
-                            Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
-                            byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("SZ"))); //Size
-                            position = position + new Integer((String) file.get("SZ")); //Size
-                            filesMap.put(name, new Tuple2(zip, bb));
+                                String name = (String) file.get("File_Name"); // File_Name
+                                Boolean zip = new Boolean((String) file.get("ZIP")); // ZIP
+                                int size = new Integer((String) file.get("Size"));
+                                byte[] bb = Arrays.copyOfRange(data, position, position + size);
+                                position = position + size;
+                                filesMap.put(name, new Tuple3(Crypto.getInstance().digest(bb), zip, bb));
 
+                            }
+                            return new Tuple4(versiondata, title, json, filesMap);
                         }
-                        return new Tuple4(versiondata, title, json, filesMap);
-
-                    } else if (json.containsKey("&*&*%$$%_files_#$@%%%")) {
-                        //v2.0
-
-                        files = (JSONObject) json.get("&*&*%$$%_files_#$@%%%");
-                        HashMap<String, Tuple2<Boolean, byte[]>> filesMap = new HashMap<String, Tuple2<Boolean, byte[]>>();
-
-                        files_key_Set = files.keySet();
-                        for (int i = 0; i < files_key_Set.size(); i++) {
-                            JSONObject file = (JSONObject) files.get(i + "");
-
-
-                            String name = (String) file.get("File_Name"); // File_Name
-                            Boolean zip = new Boolean((String) file.get("ZIP")); // ZIP
-                            byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("Size"))); //Size
-                            position = position + new Integer((String) file.get("Size")); //Size
-                            filesMap.put(name, new Tuple2(zip, bb));
-
-                        }
-                        return new Tuple4(versiondata, title, json, filesMap);
                     }
 
                     return new Tuple4(versiondata, title, json, null);
@@ -208,11 +214,50 @@ public class ExData {
         }
     }
 
-    public static JSONObject getHashes(JSONObject json) {
-        if (json.containsKey("HS")) {
-            return (JSONObject) json.get("HS");
+    public static JSONObject getHashes(Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parsedData) {
+
+        if (parsedData.c.containsKey("HS")) {
+            return (JSONObject) parsedData.c.get("HS");
+        }
+        if (parsedData.c.containsKey("Hashes")) {
+            return (JSONObject) parsedData.c.get("Hashes");
         }
         return null;
+    }
+
+    public static byte[][] getAllHashesAsBytes(Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parsedData) {
+
+        JSONObject hashesJson = getHashes(parsedData);
+
+        int count = 0;
+        if (hashesJson != null) {
+            count = hashesJson.size();
+        }
+
+        if (parsedData.d != null && parsedData.d.isEmpty()) {
+            count += parsedData.d.size();
+        }
+
+        if (count == 0)
+            return null;
+
+        byte[][] hashes = new byte[count][];
+
+        count = 0;
+        // ADD native hashes
+        if (hashesJson != null) {
+            for (Object hash : hashesJson.keySet()) {
+                hashes[count++] = Base58.decode(hash.toString());
+            }
+        }
+
+        // ADD hashes of files
+        if (parsedData.d != null && parsedData.d.isEmpty()) {
+            for (Tuple3<byte[], Boolean, byte[]> fileItem : parsedData.d.values()) {
+                hashes[count++] = fileItem.a;
+            }
+        }
+
     }
 
     public static byte[] toByte(String title, TemplateCls template, HashMap<String, String> params_Template,
@@ -337,6 +382,30 @@ public class ExData {
                 }
             }
 
+            String hashes = "";
+            int hashesCount = 1;
+
+            /////////// FILES
+            HashMap<String, Tuple2<Boolean, byte[]>> filesMap = noteData.d;
+
+            if (filesMap != null && !filesMap.isEmpty()) {
+                String files = "";
+                Set<String> fileNames = filesMap.keySet();
+
+                int filesCount = 1;
+                for (String fileName : fileNames) {
+
+                    files += filesCount++ + " " + fileName;
+                    files += "<a href ='../apidocuments/getFile?download=true&block="
+                            + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'> "
+                            + Lang.getInstance().translateFromLangObj("Download", langObj) + "</a><br>";
+
+                }
+
+                output.put("files", files);
+            }
+
+            ///////// HASHES
             String hashesStr;
 
             // Hashes
@@ -352,42 +421,19 @@ public class ExData {
 
             if (hashesStr != null && !hashesStr.isEmpty()) {
                 try {
-                    String hashes = "";
                     String str = dataJson.get("HS").toString();
                     JSONObject params = new JSONObject();
                     params = (JSONObject) JSONValue.parseWithException(str);
 
                     Set<String> kS = params.keySet();
 
-                    int i = 1;
                     for (String s : kS) {
-                        hashes += i + " " + s + " " + params.get(s) + "<br>";
+                        hashes += hashesCount++ + " " + s + " " + params.get(s) + "<br>";
                     }
 
                     output.put("hashes", hashes);
                 } catch (ParseException e) {
                 }
-            }
-
-            HashMap<String, Tuple2<Boolean, byte[]>> filesMap = noteData.d;
-
-
-            if (filesMap != null && !filesMap.isEmpty()) {
-                String files = "";
-                Set<String> fileNames = filesMap.keySet();
-
-                int i = 1;
-                for (String fileName : fileNames) {
-
-                    files += i + " " + fileName;
-                    files += "<a href ='../apidocuments/getFile?download=true&block="
-                            + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'> "
-                            + Lang.getInstance().translateFromLangObj("Download", langObj) + "</a><br>";
-
-                    i++;
-                }
-
-                output.put("files", files);
             }
 
         }

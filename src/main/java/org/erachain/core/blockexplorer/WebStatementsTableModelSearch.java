@@ -216,7 +216,7 @@ public class WebStatementsTableModelSearch extends AbstractTableModel implements
                 case COLUMN_BODY:
 
                     if (record.getVersion() == 2) {
-                        Fun.Tuple4<String, String, JSONObject, HashMap<String, Fun.Tuple2<Boolean, byte[]>>> a = record.parseDataV2WithoutFiles();
+                        Fun.Tuple4<String, String, JSONObject, HashMap<String, Fun.Tuple3<byte[], Boolean, byte[]>>> a = record.parseDataV2WithoutFiles();
                         return a.b;
                     }
 
