@@ -5,4 +5,4 @@
 ////seed=5:new:1
 
 // start forging by that password
-////password=1
+password=1
