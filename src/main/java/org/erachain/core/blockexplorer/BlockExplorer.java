@@ -888,8 +888,6 @@ public class BlockExplorer {
         TradeMapImpl tradesMap = dcSet.getTradeMap();
         List<Trade> trades = tradesMap.getTrades(key);
 
-        AssetCls asset = Controller.getInstance().getAsset(key);
-
         Map assetJSON = itemBase(asset).a;
 
         if (asset.getKey() > 0 && asset.getKey() < 1000) {

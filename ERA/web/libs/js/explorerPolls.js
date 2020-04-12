@@ -1,6 +1,6 @@
 function polls(data){
 
-    var output = '';
+    var output = lastBlock(data.lastBlock);
 
     if(data.hasOwnProperty('error'))
     {
@@ -53,9 +53,12 @@ function polls(data){
 
 function poll(data) {
 
-    var output = "";
+    var output = lastBlock(data.lastBlock);
 
-    output += lastBlock(data.lastBlock);
+    if (!data.hasOwnProperty('poll')) {
+        output += '<h2>Not found</h2>';
+        return output;
+    }
 
     if (data.hasOwnProperty('error')) {
         output += '<br><h5>' + data.error + '</h5>';

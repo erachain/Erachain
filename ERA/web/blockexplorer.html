@@ -943,9 +943,12 @@ button.white-bgc[disabled]:focus,
 
         function asset(data) {
 
-            var output = "";
+            var output = lastBlock(data.lastBlock);
 
-            output += lastBlock(data.lastBlock);
+            if (!data.asset.hasOwnProperty('this')) {
+                output += '<h2>Not found</h2>';
+                return output;
+            }
 
             if (data.hasOwnProperty('error')) {
                 output += '<br><h5>' + data.error + '</h5>';
