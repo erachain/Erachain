@@ -141,7 +141,7 @@ public class RSignNote extends Transaction implements Itemable {
         if (title != null)
             tags += " " + title;
 
-        return tags(tags, this.template == null ? null : this.template.getItemTypeChar());
+        return tags(tags, getItem() == null ? null : this.template.getItemTypeChar());
     }
 
     public static boolean hasTemplate(byte[] typeBytes) {
