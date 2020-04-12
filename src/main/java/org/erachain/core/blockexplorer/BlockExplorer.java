@@ -665,6 +665,11 @@ public class BlockExplorer {
         output.put("type", "poll");
         output.put("search", "polls");
 
+        PollCls poll = (PollCls) dcSet.getItemPollMap().get(pollKey);
+        if (poll == null) {
+            return new HashMap(2);
+        }
+
         Map output = new LinkedHashMap();
         Long assetKey;
 
@@ -681,8 +686,6 @@ public class BlockExplorer {
         }
         output.put("assetKey", assetKey);
         output.put("assetName", asset.getName());
-
-        PollCls poll = (PollCls) dcSet.getItemPollMap().get(pollKey);
 
         Map pollJSON = itemBase(poll).a;
 
@@ -872,6 +875,11 @@ public class BlockExplorer {
 
         output.put("type", "asset");
         output.put("search", "assets");
+
+        AssetCls asset = Controller.getInstance().getAsset(key);
+        if (asset == null) {
+            return new HashMap(2);
+        }
 
         Map output = new LinkedHashMap();
 
@@ -1611,7 +1619,7 @@ public class BlockExplorer {
 
         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(new Long(first));
         if (person == null) {
-            return null;
+            return new HashMap(2);
         }
 
         Tuple2<Map, Transaction> itemBase = itemBase(person);
@@ -2918,9 +2926,12 @@ public class BlockExplorer {
         output.put("type", "template");
         output.put("search", "templates");
 
-        Map output = new LinkedHashMap();
-
         TemplateCls template = (TemplateCls) dcSet.getItemTemplateMap().get(key);
+        if (template == null) {
+            return new HashMap(2);
+        }
+
+        Map output = new LinkedHashMap();
 
         Map templateJSON = itemBase(template).a;
         output.put("template", templateJSON);
@@ -2938,9 +2949,12 @@ public class BlockExplorer {
         output.put("type", "status");
         output.put("search", "statuses");
 
-        Map output = new LinkedHashMap();
-
         StatusCls status = (StatusCls) dcSet.getItemStatusMap().get(key);
+        if (status == null) {
+            return new HashMap(2);
+        }
+
+        Map output = new LinkedHashMap();
 
         Map statusJSON = itemBase(status).a;
 

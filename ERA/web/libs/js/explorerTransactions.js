@@ -1,9 +1,13 @@
 function tx(data) {
+
+    var output = lastBlock(data.lastBlock);
+
     if (!data.hasOwnProperty('body')) {
-        return '';
+        output += '<h2>Not found</h2>';
+        return output;
     }
 
-    var output = '<table width="1280" border=0><tr><td align=left>';
+    output += '<table width="1280" border=0><tr><td align=left>';
     if (data.body.hasOwnProperty('head')) {
         output += data.body.head + '<br>';
         output += '<b>' + data.body.timestampLabel + '</b>: ' + convertTimestamp(data.body.timestamp, true) + ' / ' + data.body.timestamp + '<br>';

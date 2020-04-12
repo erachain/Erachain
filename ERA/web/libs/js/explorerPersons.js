@@ -2,6 +2,11 @@ function person_asset(data) {
 
     var output = lastBlock(data.lastBlock);
 
+    if (!data.hasOwnProperty('person_key')) {
+        output += '<h2>Not found</h2>';
+        return output;
+    }
+
     if (data.error != null) {
         return data.error;
     }
