@@ -503,9 +503,9 @@ public class RSignNote extends Transaction implements Itemable {
             return;
 
         try {
-            Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parsedData = parseData();
-            Long dbKey = makeDBRef(height, seqNo);
+            parseData();
             byte[][] hashes = ExData.getAllHashesAsBytes(parsedData);
+            Long dbKey = makeDBRef(height, seqNo);
             if (hashes != null) {
                 for (byte[] hash : hashes) {
                     dcSet.getTransactionFinalMapSigns().put(hash, dbKey);
@@ -528,11 +528,11 @@ public class RSignNote extends Transaction implements Itemable {
             return;
 
         try {
-            Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> items = parseData();
+            parseData();
             byte[][] hashes = ExData.getAllHashesAsBytes(parsedData);
             if (hashes != null) {
                 for (byte[] hash : hashes) {
-                    dcSet.getTransactionFinalMapSigns().delete(hash));
+                    dcSet.getTransactionFinalMapSigns().delete(hash);
                 }
             }
         } catch (Exception e) {

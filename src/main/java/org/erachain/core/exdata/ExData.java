@@ -216,6 +216,9 @@ public class ExData {
 
     public static JSONObject getHashes(Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parsedData) {
 
+        if (parsedData == null)
+            return null;
+
         if (parsedData.c.containsKey("HS")) {
             return (JSONObject) parsedData.c.get("HS");
         }
@@ -258,6 +261,7 @@ public class ExData {
             }
         }
 
+        return hashes;
     }
 
     public static byte[] toByte(String title, TemplateCls template, HashMap<String, String> params_Template,
@@ -319,7 +323,7 @@ public class ExData {
     /**
      * Version 2 maker for BlockExplorer
      */
-    public static void makeJSONforHTML(DCSet dcSet, Map output, Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> noteData,
+    public static void makeJSONforHTML(DCSet dcSet, Map output, Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> noteData,
                                        int blockNo, int seqNo, JSONObject langObj) {
 
         if (noteData.b != null) {
@@ -383,15 +387,21 @@ public class ExData {
             }
 
             String hashes = "";
-            int hashesCount = 1;
+
+            ///////// NATIVE HASHES
+            JSONObject hashes = getHashes(noteData);
+            int hashesCount = hashes.size();
 
             /////////// FILES
-            HashMap<String, Tuple2<Boolean, byte[]>> filesMap = noteData.d;
+            HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap = noteData.d;
 
             if (filesMap != null && !filesMap.isEmpty()) {
                 String files = "";
                 Set<String> fileNames = filesMap.keySet();
 
+                if (hashes == null) {
+                    hashes = new JSONObject();
+                }
                 int filesCount = 1;
                 for (String fileName : fileNames) {
 
@@ -400,25 +410,15 @@ public class ExData {
                             + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'> "
                             + Lang.getInstance().translateFromLangObj("Download", langObj) + "</a><br>";
 
+                    hashes.put();
                 }
 
                 output.put("files", files);
             }
 
             ///////// HASHES
-            String hashesStr;
 
             // Hashes
-            if (dataJson.containsKey("HS")) {
-                // v2.1
-                hashesStr = dataJson.get("HS").toString();
-            } else if (dataJson.containsKey("Hashes")) {
-                // v2.0
-                hashesStr = dataJson.get("HS").toString();
-            } else {
-                hashesStr = null;
-            }
-
             if (hashesStr != null && !hashesStr.isEmpty()) {
                 try {
                     String str = dataJson.get("HS").toString();

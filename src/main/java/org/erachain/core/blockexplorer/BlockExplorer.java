@@ -2989,7 +2989,7 @@ public class BlockExplorer {
 
             if (trans.getVersion() == 2) {
                 // version 2
-                Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> noteData;
+                Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> noteData;
 
                 noteData = trans.parseData();
 
