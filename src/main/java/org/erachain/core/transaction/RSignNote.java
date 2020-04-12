@@ -632,7 +632,8 @@ public class RSignNote extends Transaction implements Itemable {
     public Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parseDataV2WithoutFiles() {
         //Version, Title, JSON, Files
         try {
-            return (parsedData = ExData.parse(getVersion(), this.data, false, false));
+            // здесь нельзя сохранять в parsedData
+            return ExData.parse(getVersion(), this.data, false, false);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             Long error = null;

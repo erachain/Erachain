@@ -408,10 +408,10 @@ public class ExData {
                     hashes.put(hash, fileName);
 
                     files += filesCount + " " + fileName
-                            + " <a href=?q=" + hash + BlockExplorer.get_Lang(langObj) + "&search=transactions>[" + hash + "]</a> ";
-                    files += "<a href ='../apidocuments/getFile?download=true&block="
-                            + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'> "
-                            + Lang.getInstance().translateFromLangObj("Download", langObj) + "</a><br>";
+                            + " <a href=?q=" + hash + BlockExplorer.get_Lang(langObj) + "&search=transactions>[" + hash + "]</a>";
+                    files += " - <a href ='../apidocuments/getFile?download=true&block="
+                            + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'><b>"
+                            + Lang.getInstance().translateFromLangObj("Download", langObj) + "</b></a><br>";
 
                     filesCount++;
 
@@ -427,7 +427,7 @@ public class ExData {
 
                 for (Object hash : hashes.keySet()) {
                     hashesHTML += hashesCount
-                            + " <a href=?q=" + hash + BlockExplorer.get_Lang(langObj) + "&search=transactions>" + hash + "</a> "
+                            + " <a href=?q=" + hash + BlockExplorer.get_Lang(langObj) + "&search=transactions>" + hash + "</a> - "
                             + hashes.get(hash) + "<br>";
                     hashesCount++;
                 }
