@@ -161,15 +161,29 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public long getKey() {
         return this.key;
     }
-    
+
     @Override
     public long getAssetKey() {
         return this.key;
     }
-    
+
     @Override
     public ItemCls getItem() {
         return this.asset;
+    }
+
+    @Override
+    public String[] getTags() {
+        String tags = viewTypeName();
+        String title = getTitle();
+        if (title != null)
+            tags += " " + title;
+
+        if (getAbsKey() > 0) {
+            tags += " " + ItemCls.getItemTypeChar(ItemCls.ASSET_TYPE, getAbsKey());
+        }
+
+        return tags.toLowerCase().split(SPLIT_CHARS);
     }
 
     @Override

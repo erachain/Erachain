@@ -75,6 +75,11 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     }
 
     @Override
+    public String[] getTags() {
+        return tags(getTitle(), this.item.getItemTypeChar());
+    }
+
+    @Override
     public String viewItemName() {
         return item.toString();
     }

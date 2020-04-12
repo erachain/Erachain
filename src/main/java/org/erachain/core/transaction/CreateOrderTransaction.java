@@ -104,6 +104,11 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         return this.haveAsset;
     }
 
+    public String getTitle() {
+        ///return viewTypeName();
+        return ItemCls.getItemTypeChar(ItemCls.ASSET_TYPE, haveKey) + " " + ItemCls.getItemTypeChar(ItemCls.ASSET_TYPE, wantKey);
+    }
+
     @Override
     public String viewAmount() {
         return this.amountHave.toPlainString();

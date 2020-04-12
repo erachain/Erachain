@@ -688,7 +688,15 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public String getTitle() {
-        return viewTypeName();
+        ///return viewTypeName();
+        return "";
+    }
+
+    public static String[] tags(String tags, String words) {
+        if (words != null)
+            tags += " " + words;
+
+        return tags.toLowerCase().split(SPLIT_CHARS);
     }
 
     public String[] getTags() {
