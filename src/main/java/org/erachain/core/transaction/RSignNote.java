@@ -127,12 +127,21 @@ public class RSignNote extends Transaction implements Itemable {
     //GETTERS/SETTERS
 
     @Override
-    public ItemCls getItem()
-    {
+    public ItemCls getItem() {
         if (template == null) {
             template = (TemplateCls) dcSet.getItemTemplateMap().get(key);
         }
         return this.template;
+    }
+
+    @Override
+    public String[] getTags() {
+        String tags = viewTypeName();
+        String title = getTitle();
+        if (title != null)
+            tags += " " + title;
+
+        return tags(tags, this.template == null ? null : this.template.getItemTypeChar());
     }
 
     public static boolean hasTemplate(byte[] typeBytes) {
