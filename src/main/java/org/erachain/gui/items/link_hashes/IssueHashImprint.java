@@ -8,9 +8,7 @@ package org.erachain.gui.items.link_hashes;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.transaction.RHashes;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -126,13 +124,6 @@ public class IssueHashImprint extends javax.swing.JPanel {
             String description = this.jTextArea_Description.getText();
 
             List<String> hashes = this.table_Model.getValues(0);
-
-            List<String> twins = RHashes.findTwins(DCSet.getInstance(), hashes);
-            if (twins.isEmpty()) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Twin hashes: ") + twins.toString(), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                this.jButton.setEnabled(true);
-                return;
-            }
 
             //CREATE IMPRINT
             PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());

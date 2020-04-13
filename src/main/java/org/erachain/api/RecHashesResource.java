@@ -3,16 +3,13 @@ package org.erachain.api;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.transaction.RHashes;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple3;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -104,16 +101,6 @@ public class RecHashesResource {
                 hashes = hashesStr.split("-");
             } else {
                 hashes = hashesStr.split(" ");
-            }
-            twins = RHashes.findTwins(DCSet.getInstance(), hashes);
-            if (!twins.isEmpty()) {
-                JSONObject json_result = new JSONObject();
-                json_result.put("error", "twin hashes");
-                JSONArray twins_array = new JSONArray();
-                twins_array.addAll(twins);
-                json_result.put("twins", twins_array);
-
-                return json_result.toJSONString();
             }
 
             Pair<Transaction, Integer> result = Controller.getInstance()

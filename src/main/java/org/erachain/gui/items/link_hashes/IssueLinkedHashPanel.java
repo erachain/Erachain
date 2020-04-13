@@ -5,9 +5,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.core.transaction.RHashes;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.FileChooser;
@@ -197,15 +195,6 @@ public class IssueLinkedHashPanel extends SplitPanel {
         }
 
         List<String> hashes = this.table_Model.getValues(0);
-
-        List<String> twins = RHashes.findTwins(DCSet.getInstance(), hashes);
-        if (!twins.isEmpty()) {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate("Twin hashes") + ": " + twins.toString(),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            issue_Hash_Imprint.jButton.setEnabled(true);
-            return;
-        }
 
         // CREATE IMPRINT
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());

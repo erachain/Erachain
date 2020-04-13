@@ -25,6 +25,7 @@ import org.mapdb.Fun;
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -371,13 +372,39 @@ public class WebTransactionsHTML {
     private String hash_Record_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
         String out = "";
-        RHashes r_Hashes = (RHashes) transaction;
-        out += "<b>" + Lang.getInstance().translateFromLangObj("URL", langObj) + ":</b> "
-                + new String(r_Hashes.getURL(), StandardCharsets.UTF_8) + "<br>";
+        RHashes hashesTx = (RHashes) transaction;
+        String url = new String(hashesTx.getURL(), StandardCharsets.UTF_8);
+        URL linkURL;
+        try {
+            linkURL = new URL(url);
+        } catch (Exception e) {
+            linkURL = null;
+            out += "<b>" + Lang.getInstance().translateFromLangObj("Title", langObj) + ":</b> "
+                    + url + "<br>";
+        }
+
+        out += "<b>" + Lang.getInstance().translateFromLangObj("HASHES", langObj) + ":</b> ";
+        int count = 0;
+
+        char ww = '1';
+
+        if (!url.isEmpty()
+                && (url.charAt(url.length()) == '=' ||
+                url.charAt(url.length()) == '/')) {
+
+        }
+
+        for (byte[] hash : hashesTx.getHashes()) {
+            String hash58 = Base58.encode(hash);
+            out += "<br>" + ++count + " <a href=?q=" + hash58 + BlockExplorer.get_Lang(langObj) + "&search=transactions><b>" + hash58 + "</b></a>";
+            if (linkURL != null) {
+                out += " - <a href='" + linkURL.toString() + "' class='button ll-blue-bgc'>" + Lang.getInstance().translateFromLangObj("Open", langObj) + "</a>";
+            }
+        }
+
         out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
-                + new String(r_Hashes.getData(), StandardCharsets.UTF_8) + "<br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("HASHES", langObj) + ":</b> "
-                + String.join("<br />", r_Hashes.getHashesB58()) + "<br>";
+                + new String(hashesTx.getData(), StandardCharsets.UTF_8) + "<br>";
+
         return out;
     }
 
