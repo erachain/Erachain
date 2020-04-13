@@ -74,7 +74,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
         clear();
 
-        if (filter == null || filter.isEmpty()) return;
+        if (filter == null || (filter = filter.trim()).isEmpty()) return;
 
         Tuple2<Account, String> accountResult = Account.tryMakeAccount(filter);
         Account account = accountResult.a;
@@ -85,14 +85,17 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
         }
 
-        if (!Base58.isExtraSymbols(filter)) {
-            byte[] signature = Base58.decode(filter);
-            Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
-            list.add(DCSet.getInstance().getTransactionFinalMap().get(key));
-        }
-
         // ИЩЕМ по Заголовку
         DCSet dcSet = DCSet.getInstance();
+
+        if (!Base58.isExtraSymbols(filter)) {
+            byte[] signature = Base58.decode(filter);
+            Transaction transaction = dcSet.getTransactionFinalMap().get(signature);
+            if (transaction != null) {
+                list.add(transaction);
+            }
+        }
+
 
         String fromWord = null;
         if (false) {
