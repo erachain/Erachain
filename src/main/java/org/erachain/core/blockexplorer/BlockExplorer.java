@@ -3028,6 +3028,7 @@ public class BlockExplorer {
         if (!trans.isEncrypted()) {
 
             output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
+            output.put("Label_mess_hash", Lang.getInstance().translateFromLangObj("Message hash", langObj));
             output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
             output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
 
@@ -3050,7 +3051,11 @@ public class BlockExplorer {
                     // версия через новую строку разделение
                     String title = trans.getTitle();
                     output.put("title", title);
-                    output.put("statement", new String(trans.getData(), StandardCharsets.UTF_8).substring(title.length()));
+                    String message = new String(trans.getData(), StandardCharsets.UTF_8).substring(title.length());
+                    if (!message.isEmpty()) {
+                        output.put("message", message);
+                        output.put("messageHash", Base58.encode(Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8))));
+                    }
                 }
             }
 

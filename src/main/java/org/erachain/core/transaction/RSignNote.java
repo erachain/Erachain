@@ -13,6 +13,7 @@ import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
+import org.erachain.datachain.TransactionFinalMapSigns;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -602,6 +603,17 @@ public class RSignNote extends Transaction implements Itemable {
             for (Object hashObject : hashes.keySet()) {
                 if (Base58.isExtraSymbols(hashObject.toString())) {
                     return INVALID_DATA_FORMAT;
+                }
+            }
+        }
+
+        byte[][] allHashes = ExData.getAllHashesAsBytes(parsed);
+        if (allHashes != null && allHashes.length > 0
+                && BlockChain.VERS_4_23_01 > 0 && height > BlockChain.VERS_4_23_01) {
+            TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
+            for (byte[] hash : allHashes) {
+                if (map.contains(hash)) {
+                    return HASH_ALREDY_EXIST;
                 }
             }
         }

@@ -128,6 +128,8 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public static final int NO_INCLAIM_BALANCE = 49;
 
+    public static final int HASH_ALREDY_EXIST = 51;
+
     public static final int NOT_ENOUGH_ERA_OWN_10 = 101;
     public static final int NOT_ENOUGH_ERA_USE_10 = 102;
     public static final int NOT_ENOUGH_ERA_OWN_100 = 103;

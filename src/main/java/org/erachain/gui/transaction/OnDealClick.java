@@ -173,6 +173,10 @@ public class OnDealClick {
                 mess = "Unknown public key for encrypt";
                 break;
 
+            case Transaction.HASH_ALREDY_EXIST:
+                mess = "Hash already exist";
+                break;
+
             case Transaction.NAME_NOT_LOWER_CASE:
                 mess = "Name not lower case";
                 break;

@@ -270,7 +270,6 @@ public class ExData {
 
         // ADD message first
         if (message != null && !message.isEmpty()) {
-            count++;
             hashes[count++] = Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8));
         }
 

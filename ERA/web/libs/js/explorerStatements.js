@@ -108,9 +108,7 @@ function statement(data) {
 
     output += '<br>' + data.Label_creator + ':&nbsp&nbsp <a href=?address=' + data.creator + get_lang() + '><b>' + data.creator_name + '</b></a>';
 
-    if (data.hasOwnProperty('statement')) {
-        output += '<hr>' + fformat(data.statement);
-    } else if (data.hasOwnProperty('title')) {
+    if (data.hasOwnProperty('title')) {
         output += '<br><b>' + data.Label_title + '</b>:' + escapeHtml(data.title) + "<hr>";
     }
 
@@ -119,7 +117,7 @@ function statement(data) {
     }
 
     if (data.hasOwnProperty('messageHash')) {
-        output += '<a href=?q=' + data.messageHash + get_lang() + '&search=transactions>' + data.messageHash + '</a><br>';
+        output += '<br>' + data.Label_mess_hash + ': <a href=?q=' + data.messageHash + get_lang() + '&search=transactions><b>' + data.messageHash + '</b></a>';
     }
 
     if (data.hasOwnProperty('message')) {
