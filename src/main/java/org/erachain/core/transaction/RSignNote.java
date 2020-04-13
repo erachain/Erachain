@@ -696,7 +696,6 @@ public class RSignNote extends Transaction implements Itemable {
 
         return Controller.getInstance().wallet.database.getDocumentFavoritesSet().contains(this.dbRef);
 
-
     }
 
 }

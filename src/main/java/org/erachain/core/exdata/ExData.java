@@ -229,6 +229,20 @@ public class ExData {
         return null;
     }
 
+    public static String getMessage(Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parsedData) {
+
+        if (parsedData == null || parsedData.c == null)
+            return null;
+
+        if (parsedData.c.containsKey("MS")) {
+            return parsedData.c.get("MS").toString();
+        }
+        if (parsedData.c.containsKey("Message")) {
+            return parsedData.c.get("Message").toString();
+        }
+        return null;
+    }
+
     public static byte[][] getAllHashesAsBytes(Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parsedData) {
 
         JSONObject hashesJson = getHashes(parsedData);
@@ -238,7 +252,12 @@ public class ExData {
             count = hashesJson.size();
         }
 
-        if (parsedData.d != null && parsedData.d.isEmpty()) {
+        String message = getMessage(parsedData);
+        if (message != null && !message.isEmpty()) {
+            count++;
+        }
+
+        if (parsedData.d != null && !parsedData.d.isEmpty()) {
             count += parsedData.d.size();
         }
 
@@ -248,15 +267,22 @@ public class ExData {
         byte[][] hashes = new byte[count][];
 
         count = 0;
+
+        // ADD message first
+        if (message != null && !message.isEmpty()) {
+            count++;
+            hashes[count++] = Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8));
+        }
+
         // ADD native hashes
-        if (hashesJson != null) {
+        if (hashesJson != null && !hashesJson.isEmpty()) {
             for (Object hash : hashesJson.keySet()) {
                 hashes[count++] = Base58.decode(hash.toString());
             }
         }
 
         // ADD hashes of files
-        if (parsedData.d != null && parsedData.d.isEmpty()) {
+        if (parsedData.d != null && !parsedData.d.isEmpty()) {
             for (Tuple3<byte[], Boolean, byte[]> fileItem : parsedData.d.values()) {
                 hashes[count++] = fileItem.a;
             }
@@ -335,14 +361,10 @@ public class ExData {
         // parse JSON
         if (dataJson != null) {
 
-            if (dataJson.containsKey("MS")) {
-                // v 2.1
-                output.put("message", dataJson.get("MS"));
-
-            } else if (dataJson.containsKey("Message")) {
-                // Message v2.0
-                output.put("message", dataJson.get("Message"));
-
+            String message = getMessage(noteData);
+            if (message != null && !message.isEmpty()) {
+                output.put("message", message);
+                output.put("messageHash", Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8)));
             }
 
             Long templateKey = null;
@@ -387,12 +409,6 @@ public class ExData {
                 }
             }
 
-            ///////// NATIVE HASHES
-            JSONObject hashes = getHashes(noteData);
-            if (hashes == null) {
-                hashes = new JSONObject();
-            }
-
             /////////// FILES
             HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap = noteData.d;
 
@@ -405,7 +421,6 @@ public class ExData {
 
                     Tuple3<byte[], Boolean, byte[]> fileValue = filesMap.get(fileName);
                     String hash = Base58.encode(fileValue.a);
-                    hashes.put(hash, fileName);
 
                     files += filesCount + " " + fileName
                             + " <a href=?q=" + hash + BlockExplorer.get_Lang(langObj) + "&search=transactions>[" + hash + "]</a>";
@@ -420,7 +435,12 @@ public class ExData {
                 output.put("files", files);
             }
 
-            ///////// HASHES
+            ///////// NATIVE HASHES
+            JSONObject hashes = getHashes(noteData);
+            if (hashes == null) {
+                hashes = new JSONObject();
+            }
+
             if (!hashes.isEmpty()) {
                 String hashesHTML = "";
                 int hashesCount = 1;
@@ -444,6 +464,15 @@ public class ExData {
      */
     public static void makeJSONforHTML_1(DCSet dcSet, Map output, JSONObject jsonData, Long templateKey) {
 
+        output.put("title", jsonData.get("Title"));
+
+        String message = jsonData.get("Message").toString();
+
+        if (message != null && !message.isEmpty()) {
+            output.put("message", message);
+            output.put("messageHash", Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8)));
+        }
+
         Set<String> kS;
         String description;
         String paramsStr;
@@ -452,9 +481,6 @@ public class ExData {
         if (template != null) {
             description = template.viewDescription();
 
-            output.put("title", jsonData.get("Title"));
-
-            output.put("message", jsonData.get("Message"));
 
             paramsStr = jsonData.get("Statement_Params").toString();
 

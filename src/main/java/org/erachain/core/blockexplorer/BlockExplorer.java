@@ -2622,10 +2622,8 @@ public class BlockExplorer {
 
             if (Base58.isExtraSymbols(filterStr)) {
                 try {
-                    String[] strA = filterStr.split("\\-");
-                    int height = Integer.parseInt(strA[0]);
-                    int seq = Integer.parseInt(strA[1]);
-                    Transaction one = map.get(height, seq);
+                    Long dbRef = Transaction.parseDBRef(filterStr);
+                    Transaction one = map.get(dbRef);
                     if (one != null) {
                         transactions.add(one);
                         needFound = false;
@@ -2644,7 +2642,6 @@ public class BlockExplorer {
                 } catch (Exception e2) {
                 }
             }
-
         }
 
         if (needFound) {
@@ -2663,22 +2660,32 @@ public class BlockExplorer {
                 // это значит нужно скакнуть в самый низ
             }
 
-            if (filterStr == null) {
-                transactions = map.getTransactionsFromID(fromID, intOffest, pageSize, !useForge, true);
+            if (true) {
+                Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filterStr, useForge, pageSize, fromID, intOffest);
+                transactions = result.c;
+                output.put("fromSeqNo", Transaction.viewDBRef(result.a));
+                if (result.b != null) {
+                    output.put("toSeqNo", Transaction.viewDBRef(result.b));
+                }
             } else {
-                transactions = map.getTransactionsByTitleFromID(filterStr, fromID,
-                        intOffest, pageSize, true);
-            }
+                // OLD
+                if (filterStr == null) {
+                    transactions = map.getTransactionsFromID(fromID, intOffest, pageSize, !useForge, true);
+                } else {
+                    transactions = map.getTransactionsByTitleFromID(filterStr, fromID,
+                            intOffest, pageSize, true);
+                }
 
-            if (transactions.isEmpty()) {
-                output.put("fromSeqNo", fromSeqNoStr); // возможно вниз вышли за границу
-            } else {
-                // включим ссылки на листание вверх
-                output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
-                // это не самый конец - включим листание вниз
-                output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
+                if (transactions.isEmpty()) {
+                    // возможно вниз вышли за границу
+                    output.put("fromSeqNo", fromSeqNoStr);
+                } else {
+                    // включим ссылки на листание вверх
+                    output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
+                    // это не самый конец - включим листание вниз
+                    output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
+                }
             }
-
         }
 
         // Transactions view - тут одна страница вся - и пересчет ее внутри делаем

@@ -2,6 +2,7 @@ package org.erachain.gui.library;
 
 import org.erachain.lang.Lang;
 import org.erachain.utils.FileHash;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,11 +15,11 @@ import java.io.File;
 public class ASMakeHashMenuItem extends JButton {
     ASMakeHashMenuItem th;
 
-    public ASMakeHashMenuItem(JTextField inputObject){
+    public ASMakeHashMenuItem(JTextField inputObject) {
         super();
         th = this;
-   //     this.set_Text_and_Size_From_UIManaget(Lang.getInstance().translate("make Hash"),1.0);
-        this.setText(Lang.getInstance().translate("make Hash"));
+        //     this.set_Text_and_Size_From_UIManaget(Lang.getInstance().translate("make Hash"),1.0);
+        this.setText(Lang.getInstance().translate("Hash"));
         this.addActionListener(new ActionListener() {
 
             @Override
@@ -38,18 +39,18 @@ public class ASMakeHashMenuItem extends JButton {
                     new Thread() {
                         @Override
                         public void run() {
-                    File patch = chooser.getSelectedFile();
-                    /// HASHING
-                    FileHash gf = new FileHash(patch);
-                    String hashes = gf.getHash();
-                    inputObject.setText(gf.getHash());
-                    th.setEnabled(true);
-                    inputObject.setEnabled(true);
+                            File patch = chooser.getSelectedFile();
+                            /// HASHING
+                            FileHash gf = new FileHash(patch);
+                            String hashes = gf.getHash();
+                            inputObject.setText(gf.getHash());
+                            th.setEnabled(true);
+                            inputObject.setEnabled(true);
                             inputObject.grabFocus();
                         }
                     }.start();
-                }else{
-                    inputObject.setText(ss) ;
+                } else {
+                    inputObject.setText(ss);
                     th.setEnabled(true);
                     inputObject.setEnabled(true);
                     inputObject.grabFocus();
@@ -58,9 +59,6 @@ public class ASMakeHashMenuItem extends JButton {
             }
 
         });
-
-
-
 
     }
 

@@ -17,11 +17,13 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -735,6 +737,72 @@ public abstract class Transaction implements ExplorerJsonLine {
     public List<byte[]> getOtherSignatures() {
         return null;
     }
+
+    /**
+     * Постраничный поиск по строке поиска
+     *
+     * @param filterStr
+     * @param useForge
+     * @param pageSize
+     * @param fromID
+     * @param offest
+     * @return
+     */
+    public static Tuple3<Long, Long, List<Transaction>> searchTransactions(
+            DCSet dcSet, String filterStr, boolean useForge, int pageSize, Long fromID, int offset) {
+
+        if (filterStr == null || filterStr.isEmpty()) {
+            return null;
+        }
+
+        List<Transaction> transactions = new ArrayList<>();
+
+        TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
+
+        if (Base58.isExtraSymbols(filterStr)) {
+            try {
+                String[] strA = filterStr.split("\\-");
+                int height = Integer.parseInt(strA[0]);
+                int seq = Integer.parseInt(strA[1]);
+                Transaction one = map.get(height, seq);
+                if (one != null) {
+                    transactions.add(one);
+                }
+            } catch (Exception e1) {
+            }
+
+        } else {
+            try {
+                byte[] signature = Base58.decode(filterStr);
+                Transaction one = map.get(signature);
+                if (one != null) {
+                    transactions.add(one);
+                }
+            } catch (Exception e2) {
+            }
+        }
+
+        if (filterStr == null) {
+            transactions = map.getTransactionsFromID(fromID, offset, pageSize, !useForge, true);
+        } else {
+            transactions = map.getTransactionsByTitleFromID(filterStr, fromID,
+                    offset, pageSize, true);
+        }
+
+        if (!transactions.isEmpty()) {
+            // возможно вниз вышли за границу
+            return new Tuple3<>(fromID, null, transactions);
+        } else {
+            return new Tuple3<>(
+                    // включим ссылки на листание вверх
+                    transactions.get(0).dbRef,
+                    // это не самый конец - включим листание вниз
+                    transactions.get(transactions.size() - 1).dbRef,
+                    transactions);
+        }
+
+    }
+
 
     /**
      * Общий для всех проверка на допуск публичного сообщения

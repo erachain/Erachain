@@ -49,15 +49,15 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         this.setName(Lang.getInstance().translate("Search Records"));
 
-        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ": ");
-        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Set account, signature or title") + ": "));
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Height or seqNo") + ": ");
+        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Search") + ": "));
         searchString = new JTextField();
         searchString.setToolTipText("");
 
-        searchString.setMinimumSize(new java.awt.Dimension(350,  UIManager.getFont("Label.font").getSize()+ UIManager.getFont("Label.font").getSize()/2));
+        searchString.setMinimumSize(new java.awt.Dimension(350, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
         searchString.setName(""); // NOI18N
-        searchString.setPreferredSize(new java.awt.Dimension(350,  UIManager.getFont("Label.font").getSize()+ UIManager.getFont("Label.font").getSize()/2));
-        searchString.setMaximumSize(new java.awt.Dimension(2000,  UIManager.getFont("Label.font").getSize()+ UIManager.getFont("Label.font").getSize()/2));
+        searchString.setPreferredSize(new java.awt.Dimension(350, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
+        searchString.setMaximumSize(new java.awt.Dimension(2000, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
 
         MenuPopupUtil.installContextMenu(searchString);
 

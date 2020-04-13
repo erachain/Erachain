@@ -84,9 +84,9 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
         }
 
-        if (Base58.isExtraSymbols(filter)) {
-            byte[] signatute = Base58.decode(filter);
-            Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signatute);
+        if (!Base58.isExtraSymbols(filter)) {
+            byte[] signature = Base58.decode(filter);
+            Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
             list.add(DCSet.getInstance().getTransactionFinalMap().get(key));
         }
 
@@ -94,6 +94,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
         DCSet dcSet = DCSet.getInstance();
 
         String fromWord = null;
+        // TODO сделать поиск по Transaction.searchTransactions
         list.addAll(((FilteredByStringArray) dcSet.getTransactionFinalMap())
                 .getKeysByFilterAsArray(filter, fromWord, fromID, start, step, false));
 
