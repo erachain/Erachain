@@ -45,7 +45,7 @@ public class Start {
 
                 String parsString = "";
                 for (String line : lines) {
-                    if (line.trim().startsWith("//")) {
+                    if ((line = line.trim()).startsWith("//") || line.isEmpty()) {
                         // пропускаем //
                         continue;
                     }
@@ -55,15 +55,14 @@ public class Start {
                 String[] pars = parsString.trim().split(" ");
                 String[] argsNew = new String[args.length + pars.length];
                 int i = 0;
-                while (i < args.length) {
-                    argsNew[i] = args[i++];
+                for (String arg : args) {
+                    argsNew[i++] = arg;
                 }
-                int k = 0;
-                while (k < pars.length) {
-                    argsNew[i + k] = pars[k++];
+                for (String par : pars) {
+                    argsNew[i++] = par;
                 }
 
-                args = pars;
+                args = argsNew;
 
             } catch (Exception e) {
                 LOGGER.info("Error while reading " + file.getAbsolutePath());
