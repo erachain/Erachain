@@ -751,34 +751,30 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static Tuple3<Long, Long, List<Transaction>> searchTransactions(
             DCSet dcSet, String filterStr, boolean useForge, int pageSize, Long fromID, int offset) {
 
-        if (filterStr == null || filterStr.isEmpty()) {
-            return null;
-        }
-
         List<Transaction> transactions = new ArrayList<>();
 
         TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
 
-        if (Base58.isExtraSymbols(filterStr)) {
-            try {
-                String[] strA = filterStr.split("\\-");
-                int height = Integer.parseInt(strA[0]);
-                int seq = Integer.parseInt(strA[1]);
-                Transaction one = map.get(height, seq);
-                if (one != null) {
-                    transactions.add(one);
+        if (filterStr != null && !filterStr.isEmpty()) {
+            if (Base58.isExtraSymbols(filterStr)) {
+                try {
+                    Long dbRef = parseDBRef(filterStr);
+                    Transaction one = map.get(dbRef);
+                    if (one != null) {
+                        transactions.add(one);
+                    }
+                } catch (Exception e1) {
                 }
-            } catch (Exception e1) {
-            }
 
-        } else {
-            try {
-                byte[] signature = Base58.decode(filterStr);
-                Transaction one = map.get(signature);
-                if (one != null) {
-                    transactions.add(one);
+            } else {
+                try {
+                    byte[] signature = Base58.decode(filterStr);
+                    Transaction one = map.get(signature);
+                    if (one != null) {
+                        transactions.add(one);
+                    }
+                } catch (Exception e2) {
                 }
-            } catch (Exception e2) {
             }
         }
 
@@ -789,7 +785,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                     offset, pageSize, true);
         }
 
-        if (!transactions.isEmpty()) {
+        if (transactions.isEmpty()) {
             // возможно вниз вышли за границу
             return new Tuple3<>(fromID, null, transactions);
         } else {

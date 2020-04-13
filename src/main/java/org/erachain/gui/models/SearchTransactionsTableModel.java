@@ -9,6 +9,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.List;
@@ -94,9 +95,13 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
         DCSet dcSet = DCSet.getInstance();
 
         String fromWord = null;
-        // TODO сделать поиск по Transaction.searchTransactions
-        list.addAll(((FilteredByStringArray) dcSet.getTransactionFinalMap())
-                .getKeysByFilterAsArray(filter, fromWord, fromID, start, step, false));
+        if (false) {
+            // TODO сделать поиск по Transaction.searchTransactions
+            Fun.Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filter, false, 10000, fromID, start);
+        } else {
+            list.addAll(((FilteredByStringArray) dcSet.getTransactionFinalMap())
+                    .getKeysByFilterAsArray(filter, fromWord, fromID, start, step, false));
+        }
 
         for (Transaction item : list) {
             if (false && // все берем

@@ -364,7 +364,7 @@ public class ExData {
             String message = getMessage(noteData);
             if (message != null && !message.isEmpty()) {
                 output.put("message", message);
-                output.put("messageHash", Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8)));
+                output.put("messageHash", Base58.encode(Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8))));
             }
 
             Long templateKey = null;
@@ -470,7 +470,7 @@ public class ExData {
 
         if (message != null && !message.isEmpty()) {
             output.put("message", message);
-            output.put("messageHash", Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8)));
+            output.put("messageHash", Base58.encode(Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8))));
         }
 
         Set<String> kS;

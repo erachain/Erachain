@@ -2663,7 +2663,9 @@ public class BlockExplorer {
             if (true) {
                 Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filterStr, useForge, pageSize, fromID, intOffest);
                 transactions = result.c;
-                output.put("fromSeqNo", Transaction.viewDBRef(result.a));
+                if (result.a != null) {
+                    output.put("fromSeqNo", Transaction.viewDBRef(result.a));
+                }
                 if (result.b != null) {
                     output.put("toSeqNo", Transaction.viewDBRef(result.b));
                 }
