@@ -404,7 +404,7 @@ public class WebTransactionsHTML {
             }
         }
 
-        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
+        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b><br>"
                 + new String(hashesTx.getData(), StandardCharsets.UTF_8) + "<br>";
 
         return out;
