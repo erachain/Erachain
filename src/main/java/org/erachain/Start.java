@@ -55,11 +55,13 @@ public class Start {
                 String[] pars = parsString.trim().split(" ");
                 String[] argsNew = new String[args.length + pars.length];
                 int i = 0;
-                for (String arg : args) {
-                    argsNew[i++] = arg;
-                }
+                // PARS has LOW priority
                 for (String par : pars) {
                     argsNew[i++] = par;
+                }
+                // ARGS has HIGH priority и затрут потом в аврсинге значенийц те что были в файле заданы
+                for (String arg : args) {
+                    argsNew[i++] = arg;
                 }
 
                 args = argsNew;
