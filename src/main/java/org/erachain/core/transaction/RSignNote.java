@@ -607,13 +607,15 @@ public class RSignNote extends Transaction implements Itemable {
             }
         }
 
-        byte[][] allHashes = ExData.getAllHashesAsBytes(parsed);
-        if (allHashes != null && allHashes.length > 0
-                && BlockChain.VERS_4_23_01 > 0 && height > BlockChain.VERS_4_23_01) {
-            TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
-            for (byte[] hash : allHashes) {
-                if (map.contains(hash)) {
-                    return HASH_ALREDY_EXIST;
+        if (BlockChain.VERS_4_23_01 > 0 && height > BlockChain.VERS_4_23_01) {
+            // только уникальные - так как иначе каждый новый перезатрет поиск старого
+            byte[][] allHashes = ExData.getAllHashesAsBytes(parsed);
+            if (allHashes != null && allHashes.length > 0) {
+                TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
+                for (byte[] hash : allHashes) {
+                    if (map.contains(hash)) {
+                        return HASH_ALREDY_EXIST;
+                    }
                 }
             }
         }

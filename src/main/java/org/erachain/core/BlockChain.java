@@ -208,7 +208,7 @@ public class BlockChain {
 
     public static final int VERS_4_21_02 = 684000;
 
-    public static final int VERS_4_23_01 = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 3;
+    public static final int VERS_4_23_01 = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 800000;
 
     /**
      * Включает реферальную систему
