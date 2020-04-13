@@ -375,8 +375,18 @@ public class WebTransactionsHTML {
         RHashes hashesTx = (RHashes) transaction;
         String url = new String(hashesTx.getURL(), StandardCharsets.UTF_8);
         URL linkURL;
+        boolean urlForUse = false;
         try {
             linkURL = new URL(url);
+
+            if (!url.isEmpty()
+                    && (url.charAt(url.length() - 1) == '=' ||
+                    url.charAt(url.length() - 1) == '/')) {
+                urlForUse = true;
+            } else {
+                out += "<b>" + Lang.getInstance().translateFromLangObj("URL", langObj) + ":</b> "
+                        + "<a href='" + linkURL.toString() + "'>" + url + "</a><br>";
+            }
         } catch (Exception e) {
             linkURL = null;
             out += "<b>" + Lang.getInstance().translateFromLangObj("Title", langObj) + ":</b> "
@@ -386,23 +396,15 @@ public class WebTransactionsHTML {
         out += "<b>" + Lang.getInstance().translateFromLangObj("HASHES", langObj) + ":</b> ";
         int count = 0;
 
-        char ww = '1';
-
-        if (!url.isEmpty()
-                && (url.charAt(url.length()) == '=' ||
-                url.charAt(url.length()) == '/')) {
-
-        }
-
         for (byte[] hash : hashesTx.getHashes()) {
             String hash58 = Base58.encode(hash);
             out += "<br>" + ++count + " <a href=?q=" + hash58 + BlockExplorer.get_Lang(langObj) + "&search=transactions><b>" + hash58 + "</b></a>";
-            if (linkURL != null) {
-                out += " - <a href='" + linkURL.toString() + "' class='button ll-blue-bgc'>" + Lang.getInstance().translateFromLangObj("Open", langObj) + "</a>";
+            if (urlForUse) {
+                out += " - <a href='" + linkURL.toString() + hash58 + "' class='button ll-blue-bgc'>" + Lang.getInstance().translateFromLangObj("Open", langObj) + "</a>";
             }
         }
 
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
+        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
                 + new String(hashesTx.getData(), StandardCharsets.UTF_8) + "<br>";
 
         return out;

@@ -372,7 +372,6 @@ public class RHashes extends Transaction {
             }
         }
 
-
         return Transaction.VALIDATE_OK;
 
     }
