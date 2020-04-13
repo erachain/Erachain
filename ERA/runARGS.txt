@@ -1,5 +1,5 @@
 // Set here run arguments
-// see in z_RUN_EXAMPLES folder
+// see documentation in readme.txt in z_RUN_EXAMPLES folder
 
 // If walletKeys is not exist make new SEED and 5 accounts by wallet password "1"
 ////seed=5:new:1
