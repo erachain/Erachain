@@ -114,9 +114,12 @@ function statement(data) {
         output += '<br><b>' + data.Label_title + '</b>:' + escapeHtml(data.title) + "<hr>";
     }
 
-
     if (data.hasOwnProperty('body')) {
         output += fformat(data.body);
+    }
+
+    if (data.hasOwnProperty('messageHash')) {
+        output += '<a href=?q=' + data.messageHash + get_lang() + '&search=transactions>' + data.messageHash + '</a><br>';
     }
 
     if (data.hasOwnProperty('message')) {
