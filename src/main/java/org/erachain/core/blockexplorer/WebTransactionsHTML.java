@@ -379,14 +379,15 @@ public class WebTransactionsHTML {
         try {
             linkURL = new URL(url);
 
-            if (!url.isEmpty()
-                    && (url.charAt(url.length() - 1) == '=' || // as query parameter
-                    url.charAt(url.length() - 1) == '/' || // af path parameter
-                    url.charAt(url.length() - 1) == '#')) { // as  anchor
-                urlForUse = true;
-            } else {
-                out += "<b>" + Lang.getInstance().translateFromLangObj("URL", langObj) + ":</b> "
-                        + "<a href='" + linkURL.toString() + "'>" + url + "</a><br>";
+            if (!url.isEmpty()) {
+                if (url.charAt(url.length() - 1) == '=' || // as query parameter
+                        url.charAt(url.length() - 1) == '/' || // af path parameter
+                        url.charAt(url.length() - 1) == '#') { // as  anchor
+                    urlForUse = true;
+                } else {
+                    out += "<b>" + Lang.getInstance().translateFromLangObj("URL", langObj) + ":</b> "
+                            + "<a href='" + linkURL.toString() + "'>" + url + "</a><br>";
+                }
             }
         } catch (Exception e) {
             linkURL = null;
