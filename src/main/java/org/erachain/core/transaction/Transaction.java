@@ -17,16 +17,19 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 // import org.slf4j.LoggerFactory;
@@ -124,6 +127,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_ECXHANGE_PAIR = 48;
 
     public static final int NO_INCLAIM_BALANCE = 49;
+
+    public static final int HASH_ALREDY_EXIST = 51;
 
     public static final int NOT_ENOUGH_ERA_OWN_10 = 101;
     public static final int NOT_ENOUGH_ERA_USE_10 = 102;
@@ -224,6 +229,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_PARAMS_LENGTH = 390;
     public static final int INVALID_URL_LENGTH = 391;
     public static final int INVALID_HEAD_LENGTH = 392;
+    public static final int INVALID_DATA_FORMAT = 393;
 
     public static final int PRIVATE_KEY_NOT_FOUND = 530;
     public static final int INVALID_UPDATE_VALUE = 540;
@@ -342,9 +348,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected static final int SIMPLE_TYPE_LENGTH = 1;
     public static final int TYPE_LENGTH = 4;
     protected static final int HEIGHT_LENGTH = 4;
-    protected static final int DATA_JSON_PART_LENGTH = 4;
-    protected static final int DATA_VERSION_PART_LENGTH = 6;
-    protected static final int DATA_TITLE_PART_LENGTH = 4;
+    public static final int DATA_JSON_PART_LENGTH = 4;
+    public static final int DATA_VERSION_PART_LENGTH = 6;
+    public static final int DATA_TITLE_PART_LENGTH = 4;
     protected static final int DATA_NUM_FILE_LENGTH = 4;
     protected static final int SEQ_LENGTH = 4;
     public static final int DATA_SIZE_LENGTH = 4;
@@ -686,11 +692,24 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public String getTitle() {
-        return viewTypeName();
+        ///return viewTypeName();
+        return "";
+    }
+
+    public static String[] tags(String tags, String words) {
+        if (words != null)
+            tags += " " + words;
+
+        return tags.toLowerCase().split(SPLIT_CHARS);
     }
 
     public String[] getTags() {
-        return getTitle().toLowerCase().split(SPLIT_CHARS);
+        String tags = viewTypeName();
+        String title = getTitle();
+        if (title != null)
+            tags += " " + title;
+
+        return tags.toLowerCase().split(SPLIT_CHARS);
     }
 
     /*
@@ -719,6 +738,101 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public List<byte[]> getOtherSignatures() {
         return null;
+    }
+
+    /**
+     * Постраничный поиск по строке поиска
+     *
+     * @param filterStr
+     * @param useForge
+     * @param pageSize
+     * @param fromID
+     * @param offest
+     * @return
+     */
+    public static Tuple3<Long, Long, List<Transaction>> searchTransactions(
+            DCSet dcSet, String filterStr, boolean useForge, int pageSize, Long fromID, int offset) {
+
+        List<Transaction> transactions = new ArrayList<>();
+
+        TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
+
+        if (filterStr != null && !filterStr.isEmpty()) {
+            if (Base58.isExtraSymbols(filterStr)) {
+                try {
+                    Long dbRef = parseDBRef(filterStr);
+                    Transaction one = map.get(dbRef);
+                    if (one != null) {
+                        transactions.add(one);
+                    }
+                } catch (Exception e1) {
+                }
+
+            } else {
+                try {
+                    byte[] signature = Base58.decode(filterStr);
+                    Transaction one = map.get(signature);
+                    if (one != null) {
+                        transactions.add(one);
+                    }
+                } catch (Exception e2) {
+                }
+            }
+        }
+
+        if (filterStr == null) {
+            transactions = map.getTransactionsFromID(fromID, offset, pageSize, !useForge, true);
+        } else {
+            transactions = map.getTransactionsByTitleFromID(filterStr, fromID,
+                    offset, pageSize, true);
+        }
+
+        if (transactions.isEmpty()) {
+            // возможно вниз вышли за границу
+            return new Tuple3<>(fromID, null, transactions);
+        } else {
+            return new Tuple3<>(
+                    // включим ссылки на листание вверх
+                    transactions.get(0).dbRef,
+                    // это не самый конец - включим листание вниз
+                    transactions.get(transactions.size() - 1).dbRef,
+                    transactions);
+        }
+
+    }
+
+
+    /**
+     * Общий для всех проверка на допуск публичного сообщения
+     *
+     * @param title
+     * @param message
+     * @param isText
+     * @param isEncrypted
+     * @return
+     */
+    public static boolean hasPublicText(String title, byte[] message, boolean isText, boolean isEncrypted) {
+        String[] words = title.split(Transaction.SPLIT_CHARS);
+        int length = 0;
+        for (String word : words) {
+            word = word.trim();
+            if (Base58.isExtraSymbols(word)) {
+                // все слова сложим по длинне
+                length += word.length();
+                if (length > (BlockChain.TEST_MODE ? 100 : 100))
+                    return true;
+            }
+        }
+
+        if (message == null || message.length == 0)
+            return false;
+
+        if (isText && !isEncrypted) {
+            String text = new String(message, StandardCharsets.UTF_8);
+            if (text.contains(" ") || text.contains("_"))
+                return true;
+        }
+        return false;
     }
 
     public abstract boolean hasPublicText();

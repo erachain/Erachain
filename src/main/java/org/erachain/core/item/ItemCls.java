@@ -230,6 +230,14 @@ public abstract class ItemCls implements ExplorerJsonLine {
         }
     }
 
+    public static String getItemTypeChar(int itemType, long itemKey) {
+        return "@" + getItemTypeChar(itemType) + itemKey;
+    }
+
+    public String getItemTypeChar() {
+        return getItemTypeChar(getItemType(), key);
+    }
+
     public static String getItemTypeName(int itemType) {
         switch (itemType) {
             case ItemCls.ASSET_TYPE:
@@ -253,11 +261,6 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
         }
     }
-
-    public static String getItemTypeChar2(int itemType) {
-        return "@" + getItemTypeChar(itemType);
-    }
-
 
     public long getHeight(DCSet db) {
         //INSERT INTO DATABASE

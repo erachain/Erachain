@@ -40,7 +40,7 @@ public class ForgingStatus extends JLabel implements Observer {
         this.forgingIcon = this.createIcon(Color.GREEN);
 
         //TOOLTIP
-        ToolTipManager.sharedInstance().setDismissDelay((int) TimeUnit.SECONDS.toMillis(5));
+        ToolTipManager.sharedInstance().setDismissDelay((int) TimeUnit.SECONDS.toMillis(3));
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent mEvt) {

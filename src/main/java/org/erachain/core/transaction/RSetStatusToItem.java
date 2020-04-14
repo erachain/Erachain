@@ -203,13 +203,12 @@ public class RSetStatusToItem extends Transaction {
 
     @Override
     public String getTitle() {
-        String title = TYPE_NAME + ": " + ItemCls.getItemTypeChar2(ItemCls.STATUS_TYPE) + key + " > ";
-        title += ItemCls.getItemTypeChar2(itemType) + itemKey + " = ";
+        String title = TYPE_NAME + ": " + ItemCls.getItemTypeChar(ItemCls.STATUS_TYPE, key) + " > ";
+        title += ItemCls.getItemTypeChar(itemType, itemKey) + " = ";
         title += getStatus().toStringNoKey(packData());
 
         return title;
     }
-
 
     public String getResultText() {
         return status.toString(dcSet, packData());
