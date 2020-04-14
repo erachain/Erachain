@@ -5,7 +5,9 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.library.ASMakeHashMenuItem;
 import org.erachain.gui.library.FileChooser;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -14,6 +16,7 @@ import org.mapdb.Fun.Tuple3;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,6 +55,15 @@ public class SearchLinkedHash extends SplitPanel {
             }
 
         });
+        // make hash button
+        ASMakeHashMenuItem makeHashButton = new ASMakeHashMenuItem((JTextField) this.searchTextFieldSearchToolBarLeftPanelDocument);
+        //this.searchToolBar_LeftPanel.add(makeHashButton);
+        JPopupMenu menu = new JPopupMenu();
+        menu.add(makeHashButton);
+        Library.addStandartMenuItems(menu, this.searchTextFieldSearchToolBarLeftPanelDocument);
+
+        searchTextFieldSearchToolBarLeftPanelDocument.setComponentPopupMenu(menu);
+
 
         tamleModel = new TableModelSearchHash();
         Table_Hash = new JTable(tamleModel);
