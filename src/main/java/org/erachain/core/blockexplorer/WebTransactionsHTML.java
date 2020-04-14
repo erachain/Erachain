@@ -380,8 +380,9 @@ public class WebTransactionsHTML {
             linkURL = new URL(url);
 
             if (!url.isEmpty()
-                    && (url.charAt(url.length() - 1) == '=' ||
-                    url.charAt(url.length() - 1) == '/')) {
+                    && (url.charAt(url.length() - 1) == '=' || // as query parameter
+                    url.charAt(url.length() - 1) == '/' || // af path parameter
+                    url.charAt(url.length() - 1) == '#')) { // as  anchor
                 urlForUse = true;
             } else {
                 out += "<b>" + Lang.getInstance().translateFromLangObj("URL", langObj) + ":</b> "
