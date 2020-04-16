@@ -183,10 +183,12 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
                         String[] keys = new String[tokens.length];
                         for (int i = 0; i < tokens.length; ++i) {
-                            if (tokens[i].length() > CUT_NAME_INDEX) {
-                                tokens[i] = tokens[i].substring(0, CUT_NAME_INDEX);
+                            String token = tokens[i].trim();
+                            if (token.length() > CUT_NAME_INDEX) {
+                                keys[i] = token.substring(0, CUT_NAME_INDEX);
+                            } else if (token.length() > 0) {
+                                keys[i] = new String(token);
                             }
-                            keys[i] = tokens[i];
                         }
 
                         return keys;

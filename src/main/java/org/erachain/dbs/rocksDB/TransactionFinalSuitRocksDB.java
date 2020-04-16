@@ -137,10 +137,11 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                         int keyLength = bytes.length;
                         if (keyLength >= TransactionFinalMap.CUT_NAME_INDEX) {
                             System.arraycopy(bytes, 0, key, 0, TransactionFinalMap.CUT_NAME_INDEX);
-                        } else {
+                            keys[i] = key;
+                        } else if (keyLength > 0) {
                             System.arraycopy(bytes, 0, key, 0, keyLength);
+                            keys[i] = key;
                         }
-                        keys[i] = key;
                     }
 
                     return keys;
