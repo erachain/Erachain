@@ -534,7 +534,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // PUBLIC TEXT only from PERSONS
         if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
                 && this.hasPublicText() && !isPerson) {
-            if (Base58.encode(this.getSignature()).equals( // TODO: remove on new CHAIN
+            if (BlockChain.MAIN_MODE && Base58.encode(this.getSignature()).equals( // TODO: remove on new CHAIN
                     "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")) {
                 ;
             } else {
