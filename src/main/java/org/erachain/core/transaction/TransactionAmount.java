@@ -7,7 +7,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -534,8 +533,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // PUBLIC TEXT only from PERSONS
         if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
                 && this.hasPublicText() && !isPerson) {
-            if (BlockChain.MAIN_MODE && Base58.encode(this.getSignature()).equals( // TODO: remove on new CHAIN
-                    "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")) {
+            if (BlockChain.MAIN_MODE && height < 800000 // TODO: remove on new CHAIN
+                /// wrong: "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")
+            ) {
                 ;
             } else {
                 return CREATOR_NOT_PERSONALIZED;
