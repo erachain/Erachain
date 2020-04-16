@@ -688,6 +688,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public BigDecimal getFee(String address) {
+
         if (this.creator != null)
             if (this.creator.getAddress().equals(address))
                 return this.fee;

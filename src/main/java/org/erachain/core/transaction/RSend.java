@@ -481,7 +481,7 @@ public class RSend extends TransactionAmount {
             }
         }
 
-        return super.isValid(asDeal, false, flags);
+        return super.isValid(asDeal, flags);
     }
 
 }

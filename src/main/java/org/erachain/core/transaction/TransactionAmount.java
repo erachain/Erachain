@@ -457,7 +457,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     //@Override // - fee + balance - calculate here
     private static long pointLogg;
-    public int isValid(int asDeal, boolean isPerson, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         if (false) {
             for (byte[] valid_item : VALID_REC) {
@@ -529,7 +529,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
         }
 
-        isPerson = this.creator.isPerson(dcSet, height, creatorPersonDuration);
+        boolean isPerson = this.creator.isPerson(dcSet, height, creatorPersonDuration);
 
         // PUBLIC TEXT only from PERSONS
         if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
