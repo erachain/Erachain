@@ -174,17 +174,22 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     @Override
-    public String[] getTags() {
-        String tags = viewTypeName();
-        String title = getTitle();
-        if (title != null)
-            tags += " " + title;
-
-        if (getAbsKey() > 0) {
-            tags += " " + ItemCls.getItemTypeChar(ItemCls.ASSET_TYPE, getAbsKey());
+    public void makeItemsKeys() {
+        // запомним что тут две сущности
+        if (creatorPersonDuration != null && amount != null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
+                    new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+            };
+        } else if (creatorPersonDuration != null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a}
+            };
+        } else if (amount != null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+            };
         }
-
-        return tags.toLowerCase().split(SPLIT_CHARS);
     }
 
     @Override
@@ -1003,25 +1008,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
 
         return VALIDATE_OK;
-    }
-
-    @Override
-    public void makeItemsKeys() {
-        // запомним что тут две сущности
-        if (creatorPersonDuration != null && amount != null) {
-            itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
-                    new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
-            };
-        } else if (creatorPersonDuration != null) {
-            itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a}
-            };
-        } else if (amount != null) {
-            itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
-            };
-        }
     }
 
     @Override

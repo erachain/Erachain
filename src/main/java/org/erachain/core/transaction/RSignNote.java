@@ -136,13 +136,21 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     @Override
-    public String[] getTags() {
-        String tags = viewTypeName();
-        String title = getTitle();
-        if (title != null)
-            tags += " " + title;
-
-        return tags(tags, getItem() == null ? null : this.template.getItemTypeChar(), itemsKeys);
+    public void makeItemsKeys() {
+        if (creatorPersonDuration != null && key != 0) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
+                    new Object[]{ItemCls.TEMPLATE_TYPE, key}
+            };
+        } else if (creatorPersonDuration != null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a}
+            };
+        } else if (key != 0) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.TEMPLATE_TYPE, key}
+            };
+        }
     }
 
     public static boolean hasTemplate(byte[] typeBytes) {
