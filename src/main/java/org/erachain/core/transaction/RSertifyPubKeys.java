@@ -532,6 +532,11 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             }
         }
 
+        itemsKeys = new Object[][]{
+                new Object[]{ItemCls.PERSON_TYPE, key},
+                new Object[]{ItemCls.PERSON_TYPE, creatorPersonInfo.b.getKey(dcSet)}
+        };
+
         return Transaction.VALIDATE_OK;
     }
 

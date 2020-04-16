@@ -481,19 +481,7 @@ public class RSend extends TransactionAmount {
             }
         }
 
-        boolean isPerson = this.creator.isPerson(dcSet, height);
-        // PUBLIC TEXT only from PERSONS
-        if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
-                && this.hasPublicText() && !isPerson) {
-            if (Base58.encode(this.getSignature()).equals( // TODO: remove on new CHAIN
-                    "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")) {
-                ;
-            } else {
-                return CREATOR_NOT_PERSONALIZED;
-            }
-        }
-
-        return super.isValid(asDeal, isPerson, flags);
+        return super.isValid(asDeal, false, flags);
     }
 
 }

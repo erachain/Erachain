@@ -396,6 +396,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected long timestamp;
     protected PublicKeyAccount creator;
 
+    protected Object[][] itemsKeys;
+
     /**
      * если да то значит взята из Пула трнзакций и на двойную трату проверялась
      */
@@ -647,6 +649,10 @@ public abstract class Transaction implements ExplorerJsonLine {
      */
     public long getKey() {
         return 0l;
+    }
+
+    public Object[][] getItemsKeys() {
+        return itemsKeys;
     }
 
     public long getAbsKey() {

@@ -7,6 +7,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -14,6 +15,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,6 +112,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     protected BigDecimal amount;
     protected long key; //  = Transaction.FEE_KEY;
     protected AssetCls asset;
+    protected Fun.Tuple4<Long, Integer, Integer, Integer> personDuration;
     
     // need for calculate fee by feePow into GUI
     protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient,
@@ -514,8 +517,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             pointLogg = System.currentTimeMillis();
                             if (BlockChain.CHECK_BUGS > 1)
                                 LOGGER.debug("INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
-                                    + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
-                                    + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
+                                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                                        + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
                         }
                     }
                     return INVALID_TIMESTAMP;
@@ -523,14 +526,28 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
         }
 
+        personDuration = this.creator.getPersonDuration(dcSet);
+        isPerson = this.creator.isPerson(dcSet, height, personDuration);
+
+        // PUBLIC TEXT only from PERSONS
+        if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
+                && this.hasPublicText() && !isPerson) {
+            if (Base58.encode(this.getSignature()).equals( // TODO: remove on new CHAIN
+                    "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")) {
+                ;
+            } else {
+                return CREATOR_NOT_PERSONALIZED;
+            }
+        }
+
         // CHECK IF AMOUNT AND ASSET
         if ((flags & NOT_VALIDATE_FLAG_BALANCE) == 0l
                 && this.amount != null) {
-            
+
             int amount_sign = this.amount.signum();
             if (amount_sign != 0
                     && height > BlockChain.ALL_BALANCES_OK_TO) {
-                
+
                 long absKey = this.key;
                 if (absKey < 0)
                     absKey = -absKey;
@@ -982,6 +999,22 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0 && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
             // потому что мы ключ урезали до 12 байт - могут быть коллизии
             return KEY_COLLISION;
+        }
+
+        // запомним что тут две сущности
+        if (personDuration != null && amount != null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, personDuration.a},
+                    new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+            };
+        } else if (personDuration != null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, personDuration.a}
+            };
+        } else if (amount != null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+            };
         }
 
         return VALIDATE_OK;

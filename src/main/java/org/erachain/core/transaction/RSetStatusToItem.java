@@ -786,6 +786,11 @@ public class RSetStatusToItem extends Transaction {
                 return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
 
+        itemsKeys = new Object[][]{
+                new Object[]{ItemCls.STATUS_TYPE, key},
+                new Object[]{item.getItemType(), itemKey}
+        };
+
         return Transaction.VALIDATE_OK;
     }
 

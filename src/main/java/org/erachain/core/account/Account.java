@@ -1213,10 +1213,9 @@ public class Account {
 
     }
 
-    public boolean isPerson(DCSet dcSet, int forHeight) {
+    public boolean isPerson(DCSet dcSet, int forHeight, Tuple4<Long, Integer, Integer, Integer> addressDuration) {
 
         // IF DURATION ADDRESS to PERSON IS ENDED
-        Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(dcSet);
         if (addressDuration == null)
             return false;
 
@@ -1243,6 +1242,17 @@ public class Account {
 
         return true;
 
+    }
+
+    public boolean isPerson(DCSet dcSet, int forHeight) {
+
+        // IF DURATION ADDRESS to PERSON IS ENDED
+        Tuple4<Long, Integer, Integer, Integer> addressDuration =
+                this.getPersonDuration(dcSet);
+        if (addressDuration == null)
+            return false;
+
+        return isPerson(dcSet, forHeight, addressDuration);
     }
 
     public boolean isPerson() {
