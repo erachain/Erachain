@@ -178,7 +178,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     @Override
                     public String[] run(Long key, Transaction transaction) {
                         String[] tokens = transaction.getTags();
-                        if (tokens == null)
+                        if (tokens == null || tokens.length == 0)
                             return null;
 
                         String[] keys = new String[tokens.length];

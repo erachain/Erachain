@@ -15,7 +15,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,8 +111,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     protected BigDecimal amount;
     protected long key; //  = Transaction.FEE_KEY;
     protected AssetCls asset;
-    protected Fun.Tuple4<Long, Integer, Integer, Integer> personDuration;
-    
+
     // need for calculate fee by feePow into GUI
     protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient,
             BigDecimal amount, long key, long timestamp, Long reference) {
@@ -526,8 +524,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
         }
 
-        personDuration = this.creator.getPersonDuration(dcSet);
-        isPerson = this.creator.isPerson(dcSet, height, personDuration);
+        isPerson = this.creator.isPerson(dcSet, height, creatorPersonDuration);
 
         // PUBLIC TEXT only from PERSONS
         if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
@@ -1001,25 +998,32 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return KEY_COLLISION;
         }
 
+        if (creatorPerson != null && !creatorPerson.isAlive(this.timestamp)) {
+            return ITEM_PERSON_IS_DEAD;
+        }
+
+        return VALIDATE_OK;
+    }
+
+    @Override
+    public void makeItemsKeys() {
         // запомним что тут две сущности
-        if (personDuration != null && amount != null) {
+        if (creatorPersonDuration != null && amount != null) {
             itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, personDuration.a},
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
                     new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
             };
-        } else if (personDuration != null) {
+        } else if (creatorPersonDuration != null) {
             itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, personDuration.a}
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a}
             };
         } else if (amount != null) {
             itemsKeys = new Object[][]{
                     new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
             };
         }
-
-        return VALIDATE_OK;
     }
-    
+
     @Override
     public void process(Block block, int asDeal) {
 

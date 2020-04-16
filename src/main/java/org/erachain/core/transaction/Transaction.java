@@ -395,6 +395,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected byte[] signature;
     protected long timestamp;
     protected PublicKeyAccount creator;
+    protected Fun.Tuple4<Long, Integer, Integer, Integer> creatorPersonDuration;
+    protected PersonCls creatorPerson;
 
     protected Object[][] itemsKeys;
 
@@ -569,6 +571,13 @@ public abstract class Transaction implements ExplorerJsonLine {
     // see org.mapdb.Bind.secondaryKeys
     public void setDC(DCSet dcSet) {
         this.dcSet = dcSet;
+
+        if (BlockChain.TEST_DB == 0 && creator != null) {
+            creatorPersonDuration = creator.getPersonDuration(dcSet);
+            if (creatorPersonDuration != null) {
+                creatorPerson = (PersonCls) dcSet.getItemPersonMap().get(creatorPersonDuration.a);
+            }
+        }
     }
 
     public void setDC_HeightSeq(DCSet dcSet) {
@@ -702,20 +711,35 @@ public abstract class Transaction implements ExplorerJsonLine {
         return "";
     }
 
-    public static String[] tags(String tags, String words) {
+    public void makeItemsKeys() {
+        if (creatorPersonDuration != null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a}
+            };
+        }
+    }
+
+    public static String[] tags(String tags, String words, Object[][] itemsKeys) {
         if (words != null)
             tags += " " + words;
 
-        return tags.toLowerCase().split(SPLIT_CHARS);
+        String[] tagsWords = tags.toLowerCase().split(SPLIT_CHARS);
+
+        if (itemsKeys == null || itemsKeys.length == 0)
+            return tagsWords;
+
+        String[] tagsArray = new String[tagsWords.length + itemsKeys.length];
+
+        System.arraycopy(tagsWords, 0, tagsArray, 0, tagsWords.length);
+        for (int i = tagsWords.length; i < tagsArray.length; i++) {
+            Object[] itemKey = itemsKeys[i - tagsWords.length];
+            tagsArray[i] = ItemCls.getItemTypeChar((int) itemKey[0], (Long) itemKey[1]);
+        }
+        return tagsArray;
     }
 
     public String[] getTags() {
-        String tags = viewTypeName();
-        String title = getTitle();
-        if (title != null)
-            tags += " " + title;
-
-        return tags.toLowerCase().split(SPLIT_CHARS);
+        return tags(viewTypeName(), getTitle(), itemsKeys);
     }
 
     /*
@@ -1473,6 +1497,10 @@ public abstract class Transaction implements ExplorerJsonLine {
             return KEY_COLLISION;
         }
 
+        if (creatorPerson != null && !creatorPerson.isAlive(this.timestamp)) {
+            return ITEM_PERSON_IS_DEAD;
+        }
+
         return VALIDATE_OK;
 
     }
@@ -1596,12 +1624,14 @@ public abstract class Transaction implements ExplorerJsonLine {
     public void process(Block block, int asDeal) {
 
         if (false
-                //this.signature != null && Base58.encode(this.signature)
-                //.equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
-                ) {
+            //this.signature != null && Base58.encode(this.signature)
+            //.equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
+        ) {
             int error = 0;
             error++;
         }
+
+        makeItemsKeys();
 
         if (asDeal > Transaction.FOR_PACK) {
             // this.calcFee();
@@ -1730,6 +1760,7 @@ public abstract class Transaction implements ExplorerJsonLine {
      */
     public void resetDCSet() {
         dcSet = null;
+        itemsKeys = null;
     }
 
     // ПРОЫЕРЯЛОСЬ! действует в совокупк с Финализе в Блоке

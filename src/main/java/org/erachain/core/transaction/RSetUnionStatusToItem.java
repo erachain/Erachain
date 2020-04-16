@@ -101,7 +101,7 @@ public class RSetUnionStatusToItem extends Transaction {
 
     @Override
     public String getTitle() {
-        String title = TYPE_NAME + ": " + ItemCls.getItemTypeChar(ItemCls.STATUS_TYPE, key) + " > ";
+        String title = ItemCls.getItemTypeChar(ItemCls.STATUS_TYPE, key) + " > ";
         title += ItemCls.getItemTypeChar(itemType, itemKey) + " = ";
         // TODO tags
         ///title += ite().toStringNoKey(packData());

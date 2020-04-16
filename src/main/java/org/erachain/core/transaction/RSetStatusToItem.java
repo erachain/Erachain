@@ -203,7 +203,7 @@ public class RSetStatusToItem extends Transaction {
 
     @Override
     public String getTitle() {
-        String title = TYPE_NAME + ": " + ItemCls.getItemTypeChar(ItemCls.STATUS_TYPE, key) + " > ";
+        String title = ItemCls.getItemTypeChar(ItemCls.STATUS_TYPE, key) + " > ";
         title += ItemCls.getItemTypeChar(itemType, itemKey) + " = ";
         title += getStatus().toStringNoKey(packData());
 
@@ -786,12 +786,15 @@ public class RSetStatusToItem extends Transaction {
                 return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
 
+        return Transaction.VALIDATE_OK;
+    }
+
+    @Override
+    public void makeItemsKeys() {
         itemsKeys = new Object[][]{
                 new Object[]{ItemCls.STATUS_TYPE, key},
-                new Object[]{item.getItemType(), itemKey}
+                new Object[]{this.itemType, this.itemKey}
         };
-
-        return Transaction.VALIDATE_OK;
     }
 
     //PROCESS/ORPHAN

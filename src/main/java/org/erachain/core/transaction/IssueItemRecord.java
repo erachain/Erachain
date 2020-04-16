@@ -71,12 +71,23 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     @Override
     public String getTitle() {
-        return TYPE_NAME + ": " + this.item.getName();
+        return this.item.getName();
+    }
+
+    @Override
+    public void makeItemsKeys() {
+        // запомним что тут две сущности
+        if (creatorPersonDuration != null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
+                    new Object[]{item.getItemType(), key}
+            };
+        }
     }
 
     @Override
     public String[] getTags() {
-        return tags(getTitle(), this.item.getItemTypeChar());
+        return tags(viewTypeName(), getTitle(), itemsKeys);
     }
 
     @Override
