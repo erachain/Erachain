@@ -1030,15 +1030,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         int actionType = Account.balancePosition(key, amount, backward);
         boolean incomeReverse = actionType == ACTION_HOLD;
 
-        // ASSET ACTIONS PROCESS - 18165-1
-        if (this.asset.isOutsideType()) {
-            if (actionType == ACTION_SEND && backward) {
+        // ASSET ACTIONS PROCESS
+        if (false && this.asset.isOutsideType()) {
+            // пока это не работает так как пересмотрел actionType = balancePosition
+            if (actionType == ACTION_PLEDGE) {
                 // UPDATE SENDER
                 this.creator.changeBalance(db, true, backward, key, this.amount, true, false);
-                
+
                 // UPDATE RECIPIENT
                 this.recipient.changeBalance(db, false, backward, key, this.amount, true, false);
-                
+
                 // CLOSE IN CLAIN - back amount to claim ISSUER
                 this.creator.changeBalance(db, false, backward, -absKey, this.amount, true, false);
                 this.recipient.changeBalance(db, true, backward, -absKey, this.amount, true, false);
@@ -1073,7 +1074,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 
             } else {
                 // UPDATE SENDER
-                if (absKey == 666l) {
+                if (absKey == 666L) {
                     this.creator.changeBalance(db, backward, backward, key, this.amount, !incomeReverse, false);
                 } else {
                     this.creator.changeBalance(db, !backward, backward, key, this.amount, !incomeReverse, false);
@@ -1142,14 +1143,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         String creatorStr = this.creator.getAddress();
         // ASSET TYPE ORPHAN
-        if (this.asset.isOutsideType()) {
+        if (false && this.asset.isOutsideType()) {
             if (actionType == ACTION_SEND && backward) {
                 // UPDATE SENDER
                 this.creator.changeBalance(db, false, backward, key, this.amount, true, false);
-                
+
                 // UPDATE RECIPIENT
                 this.recipient.changeBalance(db, true, backward, key, this.amount, true, false);
-                
+
                 this.creator.changeBalance(db, true, backward, -absKey, this.amount, true, false);
                 this.recipient.changeBalance(db, false, backward, -absKey, this.amount, true, false);
                 
@@ -1184,7 +1185,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             } else {
                 
                 // UPDATE SENDER
-                if (absKey == 666l) {
+                if (absKey == 666L) {
                     this.creator.changeBalance(db, !backward, backward, key, this.amount, !incomeReverse, false);
                 } else {
                     this.creator.changeBalance(db, backward, backward, key, this.amount, !incomeReverse, false);
