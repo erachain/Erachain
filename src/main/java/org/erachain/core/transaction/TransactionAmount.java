@@ -147,7 +147,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         super.setDC(dcSet);
         if (BlockChain.TEST_DB == 0 && recipient != null) {
             recipientPersonDuration = recipient.getPersonDuration(dcSet);
-            if (creatorPersonDuration != null) {
+            if (recipientPersonDuration != null) {
                 recipientPerson = (PersonCls) dcSet.getItemPersonMap().get(recipientPersonDuration.a);
             }
         }
