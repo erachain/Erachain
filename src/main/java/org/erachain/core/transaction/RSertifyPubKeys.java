@@ -131,9 +131,16 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
     //GETTERS/SETTERS
 
+    public void setDC(DCSet dcSet) {
+        super.setDC(dcSet);
+
+        if (dcSet != null) {
+            this.person = (PersonCls) this.dcSet.getItemPersonMap().get(this.key);
+        }
+    }
+
     @Override
-    public ItemCls getItem()
-    {
+    public ItemCls getItem() {
         if (person == null) {
             person = (PersonCls) dcSet.getItemPersonMap().get(key);
         }
@@ -465,8 +472,9 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         if (result != VALIDATE_OK)
             return result;
 
+        ///// CREATOR
         if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
-                && !this.creator.isPerson(dcSet, height)) {
+                && !this.creator.isPerson(dcSet, height, creatorPersonDuration)) {
             boolean creator_admin = false;
             if (height < 20000) {
                 // FIRST Persons only by ADMINS
@@ -482,20 +490,28 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
                 return CREATOR_NOT_PERSONALIZED;
         }
 
-        // MY SELF PERSON INFO
-        Fun.Tuple2<Integer, PersonCls> creatorPersonInfo = this.creator.getPerson(dcSet, height);
+        //////// PERSON
+        if (!dcSet.getItemPersonMap().contains(this.key)) {
+            return Transaction.ITEM_PERSON_NOT_EXIST;
+        }
 
+        if (!person.isAlive(this.timestamp))
+            return Transaction.ITEM_PERSON_IS_DEAD;
+
+        ///////// PUBLIC KEYS
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
             //CHECK IF PERSON PUBLIC KEY IS VALID
             if (!publicAccount.isValid()) {
                 return INVALID_PUBLIC_KEY;
             }
-            Fun.Tuple2<Integer, PersonCls> sertifyInfo = publicAccount.getPerson(dcSet, height);
-            if (sertifyInfo != null) {
+
+            Tuple4<Long, Integer, Integer, Integer> personDuration = publicAccount.getPersonDuration(dcSet);
+
+            if (personDuration != null) {
                 // если этот ключ уже удостоврен то его изменять может только сам владелец
                 // снять удостоврение ключа может только сам владелец
                 // или продлить только сам владелец может
-                if (creatorPersonInfo.b.getKey() != this.key) {
+                if (!personDuration.a.equals(this.key)) {
                     return NOT_SELF_PERSONALIZY;
                 }
             } else {
@@ -505,13 +521,6 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
                 }
             }
         }
-
-        if (!dcSet.getItemPersonMap().contains(this.key)) {
-            return Transaction.ITEM_PERSON_NOT_EXIST;
-        }
-
-        if (creatorPersonInfo != null && !creatorPersonInfo.b.isAlive(this.timestamp))
-            return Transaction.ITEM_PERSON_IS_DEAD;
 
         if (height > BlockChain.START_ISSUE_RIGHTS) {
             Fun.Tuple4<Long, Integer, Integer, Integer> creatorPerson = creator.getPersonDuration(dcSet);
@@ -533,6 +542,21 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         }
 
         return Transaction.VALIDATE_OK;
+    }
+
+    @Override
+    public void makeItemsKeys() {
+        if (creatorPersonDuration == null) {
+            // Creator is ADMIN
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, key}
+            };
+        } else {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, key},
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a}
+            };
+        }
     }
 
     //PROCESS/ORPHAN

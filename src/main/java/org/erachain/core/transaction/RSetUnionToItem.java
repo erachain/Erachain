@@ -97,12 +97,7 @@ public class RSetUnionToItem extends Transaction {
 
     @Override
     public String getTitle() {
-        String title = TYPE_NAME + ": " + ItemCls.getItemTypeChar(ItemCls.UNION_TYPE, key) + " > ";
-        title += ItemCls.getItemTypeChar(itemType, itemKey) + " = ";
-        // TODO tags
-        ///title += getI().toStringNoKey(packData());
-
-        return title;
+        return "";
     }
 
     // releaserReference = null - not a pack

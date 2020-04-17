@@ -1213,10 +1213,9 @@ public class Account {
 
     }
 
-    public boolean isPerson(DCSet dcSet, int forHeight) {
+    public boolean isPerson(DCSet dcSet, int forHeight, Tuple4<Long, Integer, Integer, Integer> addressDuration) {
 
         // IF DURATION ADDRESS to PERSON IS ENDED
-        Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(dcSet);
         if (addressDuration == null)
             return false;
 
@@ -1245,6 +1244,17 @@ public class Account {
 
     }
 
+    public boolean isPerson(DCSet dcSet, int forHeight) {
+
+        // IF DURATION ADDRESS to PERSON IS ENDED
+        Tuple4<Long, Integer, Integer, Integer> addressDuration =
+                this.getPersonDuration(dcSet);
+        if (addressDuration == null)
+            return false;
+
+        return isPerson(dcSet, forHeight, addressDuration);
+    }
+
     public boolean isPerson() {
         return isPerson(DCSet.getInstance(), Controller.getInstance().getMyHeight());
     }
@@ -1252,14 +1262,14 @@ public class Account {
 
     /**
      * Обновляет данные о персоне даже если они уже были записаны
+     *
      * @param dcSet
      * @param forHeight
      * @return
      */
-    public Tuple2<Integer, PersonCls> getPerson(DCSet dcSet, int forHeight) {
+    public Tuple2<Integer, PersonCls> getPerson(DCSet dcSet, int forHeight, Tuple4<Long, Integer, Integer, Integer> addressDuration) {
 
         // IF DURATION ADDRESS to PERSON IS ENDED
-        Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(dcSet);
         if (addressDuration == null)
             return null;
 
@@ -1293,8 +1303,19 @@ public class Account {
 
     }
 
+    public Tuple2<Integer, PersonCls> getPerson(DCSet dcSet, int forHeight) {
+
+        // IF DURATION ADDRESS to PERSON IS ENDED
+        Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(dcSet);
+        if (addressDuration == null)
+            return null;
+
+        return getPerson(dcSet, forHeight, addressDuration);
+    }
+
     /**
      * берет данные из переменной локальной если там что-то было
+     *
      * @return
      */
     public Tuple2<Integer, PersonCls> getPerson() {
