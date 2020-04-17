@@ -157,7 +157,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
 
-        if (BlockChain.CHECK_BUGS > 3 && viewDBRef(dbRef).equals("18165-1")) {
+        if (BlockChain.CHECK_BUGS > 3// && viewDBRef(dbRef).equals("18165-1")
+        ) {
             boolean debug;
             debug = true;
         }
