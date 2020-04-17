@@ -1,31 +1,16 @@
 package org.erachain.gui.create;
 
-import java.awt.Cursor;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JRadioButton;
-import javax.swing.border.EmptyBorder;
-
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.gui.Gui;
 import org.erachain.lang.Lang;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public class NoWalletFrame extends JFrame {
@@ -246,8 +231,6 @@ public class NoWalletFrame extends JFrame {
         });
 
 
-        
-        
         //BUTTON NEXT
         buttonGBC.gridy = 5;
         buttonGBC.gridx = 1;
@@ -291,9 +274,11 @@ public class NoWalletFrame extends JFrame {
 
     public void goAfterLicence(int createWallet) {
         // StartPool
-        StartQuestion ss = new StartQuestion();
-        ss.setVisible(true);
 
+        if (BlockChain.DEMO_MODE) {
+            StartQuestion ss = new StartQuestion();
+            ss.setVisible(true);
+        }
 
         //
         if (createWallet == 1)
@@ -329,13 +314,13 @@ public class NoWalletFrame extends JFrame {
         if (createButton.isSelected()) {
             //OPEN CREATE WALLET FRAME
             this.setVisible(false);
-           // new LicenseJFrame(template, true, this, true);
+            // new LicenseJFrame(template, true, this, true);
         }
 
         if (recoverButton.isSelected()) {
             //OPEN RECOVER WALLET FRAME
             this.setVisible(false);
-          //  new LicenseJFrame(template, true, this, false);
+            //  new LicenseJFrame(template, true, this, false);
         }
     }
 
