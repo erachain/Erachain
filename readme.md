@@ -5,18 +5,18 @@ For clone code:
 1. After load project - import Gradle project
 1. Install Lombok (Settings - Plugins)
 
-### For Run Appllication
+### For Start Application
 1. select Application, set org.erachain.Start
 1. Set Working Directory for new Application to \ERA
 1. select ERA_main module
 
-### For Build Appllication
+### For Build Application
 1. Select Gradle build
 1. Set Task: build
 1. Set Arguments: --exclude-task test
 
-### For use arguments on Mac or by default
-Make in folder file startARGS.txt (see example in z_RUN_EXAMPLES folder) 
+### For use start arguments on Mac or by default
+Make in folder file startARGS.txt (see example in z_START_EXAMPLES folder) 
 
 ## Other
 
@@ -35,7 +35,7 @@ https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#j
 Описание кдючей запуска приложения в файле:  
 ERA\z_bath_examples\readme.txt
 
-Так же можно задавать ключи запуска в файле runARGS.txt - смотри пример в runARGS_example.txt
+Так же можно задавать ключи запуска в файле startARGS.txt - смотри пример в startARGS_example.txt
 
 ## Java
 Для корректной работы MapDB нужна именно Java 1.8 (vers 8) и проект собирается и тестируется именно с этой версией.

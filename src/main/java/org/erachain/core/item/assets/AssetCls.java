@@ -1027,13 +1027,13 @@ public abstract class AssetCls extends ItemCls {
 
         switch (actionType) {
             case TransactionAmount.ACTION_SEND:
-                return "Recipient";
-            case TransactionAmount.ACTION_DEBT:
-                return "Debitor";
-            case TransactionAmount.ACTION_REPAY_DEBT:
-                return "Lender Account";
-            case TransactionAmount.ACTION_HOLD:
                 return "Giver";
+            case TransactionAmount.ACTION_DEBT:
+                return "Creditor";
+            case TransactionAmount.ACTION_REPAY_DEBT:
+                return "Debtor";
+            case TransactionAmount.ACTION_HOLD:
+                return "Taker";
             case TransactionAmount.ACTION_SPEND:
                 return "Spender";
         }
@@ -1093,11 +1093,11 @@ public abstract class AssetCls extends ItemCls {
             case TransactionAmount.ACTION_SEND:
                 return "Recipient";
             case TransactionAmount.ACTION_DEBT:
-                return "Vendor";
+                return "Debtor";
             case TransactionAmount.ACTION_REPAY_DEBT:
-                return "Lender";
+                return "Creditor";
             case TransactionAmount.ACTION_HOLD:
-                return "Giver";
+                return "Supplier";
             case TransactionAmount.ACTION_SPEND:
                 return "Spender";
         }

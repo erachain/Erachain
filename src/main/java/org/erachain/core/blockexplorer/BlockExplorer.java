@@ -9,6 +9,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
@@ -31,7 +32,6 @@ import org.erachain.utils.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.ParseException;
 import org.mapdb.Fun;
 import org.mapdb.Fun.*;
 import org.slf4j.Logger;
@@ -92,6 +92,13 @@ public class BlockExplorer {
             }
         }
         return param;
+    }
+
+    public static String get_Lang(JSONObject langObj) {
+        if (langObj == null)
+            return "&lang=en";
+        return "&lang=" + langObj.get("_lang_ISO_");
+
     }
 
     public void makePage(Class type, int start, int pageSize,
@@ -658,6 +665,14 @@ public class BlockExplorer {
         output.put("type", "poll");
         output.put("search", "polls");
 
+        PollCls poll = (PollCls) dcSet.getItemPollMap().get(pollKey);
+        if (poll == null) {
+            return new HashMap(2);
+        }
+
+        output.put("charKey", poll.getItemTypeChar());
+        output.put("label_Actions", Lang.getInstance().translateFromLangObj("Actions", langObj));
+
         Map output = new LinkedHashMap();
         Long assetKey;
 
@@ -674,8 +689,6 @@ public class BlockExplorer {
         }
         output.put("assetKey", assetKey);
         output.put("assetName", asset.getName());
-
-        PollCls poll = (PollCls) dcSet.getItemPollMap().get(pollKey);
 
         Map pollJSON = itemBase(poll).a;
 
@@ -866,14 +879,20 @@ public class BlockExplorer {
         output.put("type", "asset");
         output.put("search", "assets");
 
+        AssetCls asset = Controller.getInstance().getAsset(key);
+        if (asset == null) {
+            return new HashMap(2);
+        }
+
+        output.put("charKey", asset.getItemTypeChar());
+        output.put("label_Actions", Lang.getInstance().translateFromLangObj("Actions", langObj));
+
         Map output = new LinkedHashMap();
 
         List<Order> orders = dcSet.getOrderMap().getOrders(key);
 
         TradeMapImpl tradesMap = dcSet.getTradeMap();
         List<Trade> trades = tradesMap.getTrades(key);
-
-        AssetCls asset = Controller.getInstance().getAsset(key);
 
         Map assetJSON = itemBase(asset).a;
 
@@ -1604,8 +1623,11 @@ public class BlockExplorer {
 
         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(new Long(first));
         if (person == null) {
-            return null;
+            return new HashMap(2);
         }
+
+        output.put("charKey", person.getItemTypeChar());
+        output.put("label_Actions", Lang.getInstance().translateFromLangObj("Actions", langObj));
 
         Tuple2<Map, Transaction> itemBase = itemBase(person);
         Map output = itemBase.a;
@@ -1801,7 +1823,7 @@ public class BlockExplorer {
                     continue;
 
                 ItemCls item = record.getItem();
-                logger.warn(item.getName());
+                ///logger.warn(item.getName());
 
                 myPersonJSON.put("key", item.getKey(dcSet));
                 myPersonJSON.put("name", item.getName());
@@ -2600,10 +2622,8 @@ public class BlockExplorer {
 
             if (Base58.isExtraSymbols(filterStr)) {
                 try {
-                    String[] strA = filterStr.split("\\-");
-                    int height = Integer.parseInt(strA[0]);
-                    int seq = Integer.parseInt(strA[1]);
-                    Transaction one = map.get(height, seq);
+                    Long dbRef = Transaction.parseDBRef(filterStr);
+                    Transaction one = map.get(dbRef);
                     if (one != null) {
                         transactions.add(one);
                         needFound = false;
@@ -2622,7 +2642,6 @@ public class BlockExplorer {
                 } catch (Exception e2) {
                 }
             }
-
         }
 
         if (needFound) {
@@ -2641,22 +2660,34 @@ public class BlockExplorer {
                 // это значит нужно скакнуть в самый низ
             }
 
-            if (filterStr == null) {
-                transactions = map.getTransactionsFromID(fromID, intOffest, pageSize, !useForge, true);
+            if (true) {
+                Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filterStr, useForge, pageSize, fromID, intOffest);
+                transactions = result.c;
+                if (result.a != null) {
+                    output.put("fromSeqNo", Transaction.viewDBRef(result.a));
+                }
+                if (result.b != null) {
+                    output.put("toSeqNo", Transaction.viewDBRef(result.b));
+                }
             } else {
-                transactions = map.getTransactionsByTitleFromID(filterStr, fromID,
-                        intOffest, pageSize, true);
-            }
+                // OLD
+                if (filterStr == null) {
+                    transactions = map.getTransactionsFromID(fromID, intOffest, pageSize, !useForge, true);
+                } else {
+                    transactions = map.getTransactionsByTitleFromID(filterStr, fromID,
+                            intOffest, pageSize, true);
+                }
 
-            if (transactions.isEmpty()) {
-                output.put("fromSeqNo", fromSeqNoStr); // возможно вниз вышли за границу
-            } else {
-                // включим ссылки на листание вверх
-                output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
-                // это не самый конец - включим листание вниз
-                output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
+                if (transactions.isEmpty()) {
+                    // возможно вниз вышли за границу
+                    output.put("fromSeqNo", fromSeqNoStr);
+                } else {
+                    // включим ссылки на листание вверх
+                    output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
+                    // это не самый конец - включим листание вниз
+                    output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
+                }
             }
-
         }
 
         // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
@@ -2911,9 +2942,15 @@ public class BlockExplorer {
         output.put("type", "template");
         output.put("search", "templates");
 
-        Map output = new LinkedHashMap();
-
         TemplateCls template = (TemplateCls) dcSet.getItemTemplateMap().get(key);
+        if (template == null) {
+            return new HashMap(2);
+        }
+
+        output.put("charKey", template.getItemTypeChar());
+        output.put("label_Actions", Lang.getInstance().translateFromLangObj("Actions", langObj));
+
+        Map output = new LinkedHashMap();
 
         Map templateJSON = itemBase(template).a;
         output.put("template", templateJSON);
@@ -2931,9 +2968,15 @@ public class BlockExplorer {
         output.put("type", "status");
         output.put("search", "statuses");
 
-        Map output = new LinkedHashMap();
-
         StatusCls status = (StatusCls) dcSet.getItemStatusMap().get(key);
+        if (status == null) {
+            return new HashMap(2);
+        }
+
+        output.put("charKey", status.getItemTypeChar());
+        output.put("label_Actions", Lang.getInstance().translateFromLangObj("Actions", langObj));
+
+        Map output = new LinkedHashMap();
 
         Map statusJSON = itemBase(status).a;
 
@@ -2984,258 +3027,35 @@ public class BlockExplorer {
 
         if (!trans.isEncrypted()) {
 
+            output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
+            output.put("Label_mess_hash", Lang.getInstance().translateFromLangObj("Message hash", langObj));
+            output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
+            output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
+
             if (trans.getVersion() == 2) {
                 // version 2
-                Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map_Data;
+                Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> noteData;
 
-                try {
-                    map_Data = trans.parse_Data_V2();
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    return null;
-                }
+                noteData = trans.parseData();
 
-                if (map_Data.b != null) {
-                    output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
-                    output.put("title", map_Data.b);
-                }
-
-                JSONObject jSON = map_Data.c;
-                // parse JSON
-                if (jSON != null) {
-
-                    if (jSON.containsKey("TM")) {
-                        // V2.1 Template
-                        Long key = new Long(jSON.get("TM") + "");
-                        TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, key);
-                        if (template != null) {
-                            String description = template.viewDescription();
-
-                            // Template Params
-                            if (jSON.containsKey("PR")) {
-                                String str = jSON.get("PR").toString();
-                                JSONObject params = new JSONObject();
-                                ;
-                                try {
-                                    params = (JSONObject) JSONValue.parseWithException(str);
-                                } catch (ParseException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                                Set<String> kS = params.keySet();
-                                for (String s : kS) {
-                                    description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
-                                }
-
-                            }
-
-                            output.put("body", description);
-
-                        }
-
-                    } else if (jSON.containsKey("Template")) {
-
-                        // V2.0 Template
-                        Long key = new Long(jSON.get("Template") + "");
-                        TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, key);
-                        if (template != null) {
-                            String description = template.viewDescription();
-
-                            // Template Params
-                            if (jSON.containsKey("Statement_Params")) {
-
-                                String str = jSON.get("Statement_Params").toString();
-                                JSONObject params = new JSONObject();
-                                ;
-                                try {
-                                    params = (JSONObject) JSONValue.parseWithException(str);
-                                } catch (ParseException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                                Set<String> kS = params.keySet();
-                                for (String s : kS) {
-                                    description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
-                                }
-
-                            }
-
-                            output.put("body", description);
-
-                        }
-
-                    }
-
-                    if (jSON.containsKey("MS")) {
-                        // v 2.1
-                        output.put("message", jSON.get("MS"));
-
-                    } else if (jSON.containsKey("Message")) {
-                        // Message v2.0
-                        output.put("message", jSON.get("Message"));
-
-                    }
-
-                    // Hashes
-                    if (jSON.containsKey("HS")) {
-                        // v2.1
-                        output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
-                        String hashes = "";
-                        String str = jSON.get("HS").toString();
-                        JSONObject params = new JSONObject();
-                        try {
-                            params = (JSONObject) JSONValue.parseWithException(str);
-                        } catch (ParseException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        Set<String> kS = params.keySet();
-
-                        int i = 1;
-                        for (String s : kS) {
-                            hashes += i + " " + s + " " + params.get(s) + "<br>";
-                        }
-
-                        output.put("hashes", hashes);
-
-                    } else if (jSON.containsKey("Hashes")) {
-                        // v2.0
-                        output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
-                        String hashes = "";
-                        String str = jSON.get("Hashes").toString();
-                        JSONObject params = new JSONObject();
-                        try {
-                            params = (JSONObject) JSONValue.parseWithException(str);
-                        } catch (ParseException e) {
-                            logger.error(e.getMessage(), e);
-                        }
-                        Set<String> kS = params.keySet();
-
-                        int i = 1;
-                        for (String s : kS) {
-                            hashes += i + " " + s + " " + params.get(s) + "<br>";
-                        }
-
-                        output.put("hashes", hashes);
-                    }
-
-                }
-
-                // parse files
-                if (jSON.containsKey("F")) {
-                    // v 2.1
-                    output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
-                    String files = "";
-                    String str = jSON.get("F").toString();
-                    JSONObject params = new JSONObject();
-                    try {
-                        params = (JSONObject) JSONValue.parseWithException(str);
-                    } catch (ParseException e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                    Set<String> kS = params.keySet();
-
-                    int i = 1;
-                    JSONObject ss = new JSONObject();
-                    for (String s : kS) {
-
-                        ss = (JSONObject) params.get(s);
-
-                        files += i + " " + ss.get("FN");
-//                        files += "<a href ='../apidocuments/getFile?download=false&block="
-//                                + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN") + "'> "
-//                                + Lang.getInstance().translateFromLangObj("View", langObj) + " </a>";
-                        files += "<a href ='../apidocuments/getFile?download=true&block="
-                                + block + "&seqNo=" + seqNo + "&name=" + ss.get("FN") + "'> "
-                                + Lang.getInstance().translateFromLangObj("Download", langObj) + "</a><br>";
-                    }
-
-                    output.put("files", files);
-
-                } else if (jSON.containsKey("&*&*%$$%_files_#$@%%%")) {
-                    // v2.0
-                    output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
-                    String files = "";
-                    String str = jSON.get("&*&*%$$%_files_#$@%%%").toString();
-                    JSONObject params = new JSONObject();
-                    try {
-                        params = (JSONObject) JSONValue.parseWithException(str);
-                    } catch (ParseException e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                    Set<String> kS = params.keySet();
-
-                    int i = 1;
-                    JSONObject ss = new JSONObject();
-                    for (String s : kS) {
-
-                        ss = (JSONObject) params.get(s);
-
-                        files += i + " " + ss.get("File_Name");
-//                        files += "<a href = '../apidocuments/getFile?download=false&block="
-//                                + block + "&seqNo=" + seqNo + "&name=" + ss.get("File_Name")
-//                                + "'> " + Lang.getInstance().translateFromLangObj("View", langObj) + " </a><br>";
-                        files += "<a href = '../apidocuments/getFile?download=true&block="
-                                + block + "&seqNo=" + seqNo + "&name=" + ss.get("File_Name")
-                                + "'> " + Lang.getInstance().translateFromLangObj("Download", langObj) + " </a><br>";
-                    }
-
-                    output.put("files", files);
-
-                }
+                ExData.makeJSONforHTML(dcSet, output, noteData, block, seqNo, langObj);
 
             } else {
 
                 // version 1
                 try {
-
-                    Set<String> kS;
-                    String description = "";
-                    String str;
-                    JSONObject params = new JSONObject();
-                    JSONObject data = new JSONObject();
-                    TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
-                    if (template != null) {
-                        description = template.viewDescription();
-                        data = (JSONObject) JSONValue
-                                .parseWithException(new String(trans.getData(), StandardCharsets.UTF_8));
-
-                        output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
-                        output.put("title", data.get("Title"));
-
-                        output.put("message", data.get("Message"));
-
-                        str = data.get("Statement_Params").toString();
-                        params = (JSONObject) JSONValue.parseWithException(str);
-                        kS = params.keySet();
-                        for (String s : kS) {
-                            description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
-                        }
-
-                        output.put("body", description);
-
+                    JSONObject dataJson = (JSONObject) JSONValue
+                            .parseWithException(new String(trans.getData(), StandardCharsets.UTF_8));
+                    ExData.makeJSONforHTML_1(dcSet, output, dataJson, trans.getKey());
+                } catch (Exception e) {
+                    // версия через новую строку разделение
+                    String title = trans.getTitle();
+                    output.put("title", title);
+                    String message = new String(trans.getData(), StandardCharsets.UTF_8).substring(title.length());
+                    if (!message.isEmpty()) {
+                        output.put("message", message);
+                        output.put("messageHash", Base58.encode(Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8))));
                     }
-
-                    output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
-
-                    String hashes = "";
-                    str = data.get("Hashes").toString();
-                    params = (JSONObject) JSONValue.parseWithException(str);
-                    kS = params.keySet();
-
-                    int i = 1;
-                    for (String s : kS) {
-                        hashes += i + " " + s + " " + params.get(s) + "<br>";
-                    }
-                    output.put("hashes", hashes);
-
-                } catch (ParseException e) {
-
-                    output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
-                    output.put("title", trans.getTitle());
-                    output.put("statement", new String(trans.getData(), StandardCharsets.UTF_8));
-
                 }
             }
 

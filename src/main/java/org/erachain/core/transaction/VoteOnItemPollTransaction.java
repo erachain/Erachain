@@ -94,8 +94,9 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         return this.option;
     }
 
+    @Override
     public String getTitle() {
-        return "Vote #" + option + " @V" + key;
+        return "##" + option + " > " + ItemCls.getItemTypeChar(ItemCls.POLL_TYPE, key);
     }
 
     @Override
