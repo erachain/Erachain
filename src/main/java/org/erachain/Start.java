@@ -38,7 +38,7 @@ public class Start {
         //SpringApplicationBuilder builder = new SpringApplicationBuilder(Start.class);
 
         //builder.headless(false).run(args);
-        File file = new File("runARGS.txt");
+        File file = new File("startARGS.txt");
         if (file.exists()) {
             try {
                 List<String> lines = Files.readLines(file, Charsets.UTF_8);
