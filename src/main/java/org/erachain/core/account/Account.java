@@ -433,6 +433,7 @@ public class Account {
             case TransactionAmount.ACTION_SEND:
                 return this.getBalance(dcSet, key).a;
             case TransactionAmount.ACTION_DEBT:
+            case TransactionAmount.ACTION_REPAY_DEBT:
                 return this.getBalance(dcSet, key).b;
             case TransactionAmount.ACTION_HOLD:
                 return this.getBalance(dcSet, key).c;
