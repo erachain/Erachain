@@ -513,8 +513,14 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType == AS_ACCOUNTING;
     }
 
+    /**
+     * Без ограничений - только если это счетная единица или сам владелец без огрничений
+     *
+     * @param address
+     * @return
+     */
     public boolean isUnlimited(Account address) {
-        return getQuantity() < 0L || isAccounting() || getQuantity() == 0L && owner.equals(address);
+        return isAccounting() || getQuantity() == 0L && owner.equals(address);
     }
 
     public BigDecimal defaultAmountAssetType() {

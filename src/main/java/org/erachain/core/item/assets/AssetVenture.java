@@ -23,6 +23,10 @@ public class AssetVenture extends AssetCls {
 
     private static final int TYPE_ID = VENTURE;
 
+    /**
+     * 0 - unlimited for owner.
+     * If < 0 - all but not owner may sold it on exchange for owner - as Auction
+     */
     protected long quantity;
 
     public AssetVenture(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
@@ -142,6 +146,10 @@ public class AssetVenture extends AssetCls {
         return "venture";
     }
 
+    /**
+     * 0 - unlimited for owner.
+     * If < 0 - all but not owner may sold it on exchange for owner - as Auction.
+     */
     @Override
     public long getQuantity() {
         return this.quantity;
