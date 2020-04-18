@@ -52,7 +52,7 @@ public class RSendResource {
         Map<String, String> help = new LinkedHashMap<String, String>();
         help.put("GET r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&encoding={encoding}&encrypt=true&password={password}",
                 "make and broadcast SEND asset amount and mail");
-        help.put("POST r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&encoding={encoding}&encrypt=true&password={password} (message)",
+        help.put("POST r_send/{creator}/{recipient} {feePowfeePow}&assetKey={assetKey}&amount={amount}&title={title}&encoding={encoding}&encrypt=true&password={password} (message)",
                 "make and broadcast SEND asset amount and mail in body");
         help.put("GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&encoding={encoding}&encrypt=true&password={password}",
                 "make RAW for SEND asset amount and mail");

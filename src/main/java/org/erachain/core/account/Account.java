@@ -418,6 +418,7 @@ public class Account {
     public Tuple2<BigDecimal, BigDecimal> getBalanceInSettedPosition(long key) {
         return getBalanceInPosition(DCSet.getInstance(), key, this.viewBalancePosition);
     }
+
     /**
      * в заданной позиции баланс взять
      * @param key
