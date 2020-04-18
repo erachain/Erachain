@@ -514,7 +514,7 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public boolean isUnlimited(Account address) {
-        return getQuantity() < 0L || getQuantity() == 0L && owner.equals(address);
+        return getQuantity() < 0L || isAccounting() || getQuantity() == 0L && owner.equals(address);
     }
 
     public BigDecimal defaultAmountAssetType() {
