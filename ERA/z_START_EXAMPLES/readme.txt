@@ -52,8 +52,8 @@ Select DataBase for dataChain. rocksdb - RocksDB or mapdb - MapDB or fast - it s
 -testdb=[TX_IN_BLOCK]
 Start test for DB system. Make blocks with TX_IN_BLOCK count
 
-example foe Windows:
+example for Windows:
 	start "erachain" java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1
 
 
-USE runARGS.txt for ser arguments for start application. For example for Mac OS
+USE startARGS.txt for ser arguments for start application. For example for Mac OS
