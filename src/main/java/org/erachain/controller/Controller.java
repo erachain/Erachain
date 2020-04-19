@@ -93,8 +93,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.23.01 DEV";
-    public static String buildTime = "2020-04-02 13:33:33 UTC";
+    public static String version = "4.23.01";
+    public static String buildTime = "2020-04-20 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -111,7 +111,7 @@ public class Controller extends Observable {
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
     // code!
     // for reset DB if DB PROTOCOL is CHANGED
-    public static final String releaseVersion = "3.02.01";
+    public static final String releaseVersion = "3.02.02";
     // TODO ENUM would be better here
     public static final int STATUS_NO_CONNECTIONS = 0;
     public static final int STATUS_SYNCHRONIZING = 1;

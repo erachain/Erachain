@@ -12,7 +12,7 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.slf4j.Logger;
@@ -79,29 +79,29 @@ public class LicenseJFrame1 extends JDialog {
                 if (record.getVersion() == 2) {
                     byte[] data = note.getData();
 
-                    Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
+                    Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> map;
                     try {
-                         map = ExData.parse_Data_V2(data);
+                        map = ExData.parse(record.getVersion(), data, false, true);
                     } catch (Exception e) {
                         map = null;
                     }
                         
                     if (map != null) {
-                        HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
+                        HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = map.d;
                         if (files != null) {
-                            Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
+                            Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it_Files = files.entrySet().iterator();
                             while (it_Files.hasNext()) {
-                                Entry<String, Tuple2<Boolean, byte[]>> file = it_Files.next();
-                                boolean zip = new Boolean(file.getValue().a);
+                                Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it_Files.next();
+                                boolean zip = new Boolean(file.getValue().b);
                                 String name_File = (String) file.getKey();
-                                byte[] file_byte = (byte[]) file.getValue().b;
+                                byte[] file_byte = (byte[]) file.getValue().c;
                                 return name_File;
                             }
                         }
                     }
 
                     try {
-                        Tuple3<String, String, JSONObject> a = note.parse_Data_V2_Without_Files();
+                        Tuple4<String, String, JSONObject, HashMap<String, Fun.Tuple3<byte[], Boolean, byte[]>>> a = note.parseDataV2WithoutFiles();
                         message = (String) a.c.get("MS");
                     } catch (Exception e) {
                         message = new String(note.getData(), StandardCharsets.UTF_8);

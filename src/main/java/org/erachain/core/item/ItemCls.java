@@ -206,6 +206,12 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return this.key;
     }
 
+    /**
+     * При поиске будет в нижний регистр перевернуто. Поэтому тут нельзя использовать маленькие буквы
+     *
+     * @param itemType
+     * @return
+     */
     public static String getItemTypeChar(int itemType) {
         switch (itemType) {
             case ItemCls.ASSET_TYPE:
@@ -219,15 +225,23 @@ public abstract class ItemCls implements ExplorerJsonLine {
             case ItemCls.UNION_TYPE:
                 return "U";
             case ItemCls.STATEMENT_TYPE:
-                return "T"; // TeXT
+                return "N"; // NOTE
             case ItemCls.STATUS_TYPE:
                 return "S";
             case ItemCls.TEMPLATE_TYPE:
-                return "E"; // exDATA
+                return "T"; // TEMPLATE
             default:
                 return "x";
 
         }
+    }
+
+    public static String getItemTypeChar(int itemType, long itemKey) {
+        return "@" + getItemTypeChar(itemType) + itemKey;
+    }
+
+    public String getItemTypeChar() {
+        return getItemTypeChar(getItemType(), key);
     }
 
     public static String getItemTypeName(int itemType) {
@@ -253,11 +267,6 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
         }
     }
-
-    public static String getItemTypeChar2(int itemType) {
-        return "@" + getItemTypeChar(itemType);
-    }
-
 
     public long getHeight(DCSet db) {
         //INSERT INTO DATABASE

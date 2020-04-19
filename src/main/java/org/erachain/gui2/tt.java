@@ -13,7 +13,6 @@ import org.erachain.gui.items.imprints.ImprintsSearchSplitPanel;
 import org.erachain.gui.items.imprints.IssueImprintPanel;
 import org.erachain.gui.items.imprints.MyImprintsTab;
 import org.erachain.gui.items.link_hashes.IssueLinkedHashPanel;
-import org.erachain.gui.items.link_hashes.SearchLinkedHash;
 import org.erachain.gui.items.mails.IncomingMailsSplitPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.items.mails.OutcomingMailsSplitPanel;
@@ -231,7 +230,8 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         hashes_Node.add(new ASMutableTreeNode("IssueImprintPanel", Lang.getInstance().translate("Issue Unique Hash"), IssueImprintPanel.getIcon()));
 
         linked_hashes_Node.add(new ASMutableTreeNode("IssueLinkedHashPanel", Lang.getInstance().translate("Issue Linked Hash"), IssueLinkedHashPanel.getIcon()));
-        linked_hashes_Node.add(new ASMutableTreeNode("SearchLinkedHash", Lang.getInstance().translate("Search Linked Hash"), SearchLinkedHash.getIcon()));
+        //linked_hashes_Node.add(new ASMutableTreeNode("SearchLinkedHash", Lang.getInstance().translate("Search Linked Hash"), SearchLinkedHash.getIcon()));
+        linked_hashes_Node.add(new ASMutableTreeNode("SearchTransactionsSplitPanel", Lang.getInstance().translate("Search Linked Hash"), SearchTransactionsSplitPanel.getIcon()));
 
         //telegram
         telegrams_Tree.add(new ASMutableTreeNode("TelegramSplitPanel", Lang.getInstance().translate("Telegrams Panel"), TelegramSplitPanel.getIcon()));

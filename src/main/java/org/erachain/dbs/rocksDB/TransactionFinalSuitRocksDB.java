@@ -127,20 +127,28 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                     transaction.setDC((DCSet) databaseSet);
 
                     String[] tokens = transaction.getTags();
+                    if (tokens == null || tokens.length == 0)
+                        return null;
+
                     byte[][] keys = new byte[tokens.length][];
-                    for (int i = 0; i < tokens.length; ++i) {
+                    int count = 0;
+                    for (String token : tokens) {
                         byte[] key = new byte[TransactionFinalMap.CUT_NAME_INDEX];
-                        byte[] bytes = tokens[i].getBytes(StandardCharsets.UTF_8);
+                        byte[] bytes = token.getBytes(StandardCharsets.UTF_8);
                         int keyLength = bytes.length;
                         if (keyLength >= TransactionFinalMap.CUT_NAME_INDEX) {
                             System.arraycopy(bytes, 0, key, 0, TransactionFinalMap.CUT_NAME_INDEX);
-                        } else {
+                            keys[count++] = key;
+                        } else if (keyLength > 0) {
                             System.arraycopy(bytes, 0, key, 0, keyLength);
+                            keys[count++] = key;
                         }
-                        keys[i] = key;
                     }
 
-                    return keys;
+                    byte[][] keys2 = new byte[count][];
+                    System.arraycopy(keys, 0, keys2, 0, keys2.length);
+                    return keys2;
+
                 }, (result) -> result);
 
         addressBiDirectionTxs = new ListIndexDB<>("addressBiDirectionTXIndex",

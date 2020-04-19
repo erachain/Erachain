@@ -38,14 +38,14 @@ public class Start {
         //SpringApplicationBuilder builder = new SpringApplicationBuilder(Start.class);
 
         //builder.headless(false).run(args);
-        File file = new File("runARGS.txt");
+        File file = new File("startARGS.txt");
         if (file.exists()) {
             try {
                 List<String> lines = Files.readLines(file, Charsets.UTF_8);
 
                 String parsString = "";
                 for (String line : lines) {
-                    if (line.trim().startsWith("//")) {
+                    if ((line = line.trim()).startsWith("//") || line.isEmpty()) {
                         // пропускаем //
                         continue;
                     }
@@ -55,15 +55,16 @@ public class Start {
                 String[] pars = parsString.trim().split(" ");
                 String[] argsNew = new String[args.length + pars.length];
                 int i = 0;
-                while (i < args.length) {
-                    argsNew[i] = args[i++];
+                // PARS has LOW priority
+                for (String par : pars) {
+                    argsNew[i++] = par;
                 }
-                int k = 0;
-                while (k < pars.length) {
-                    argsNew[i + k] = pars[k++];
+                // ARGS has HIGH priority и затрут потом в аврсинге значенийц те что были в файле заданы
+                for (String arg : args) {
+                    argsNew[i++] = arg;
                 }
 
-                args = pars;
+                args = argsNew;
 
             } catch (Exception e) {
                 LOGGER.info("Error while reading " + file.getAbsolutePath());

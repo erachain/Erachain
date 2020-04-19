@@ -95,6 +95,11 @@ public class RSetUnionToItem extends Transaction {
 
     //public static String getName() { return "Send"; }
 
+    @Override
+    public String getTitle() {
+        return "";
+    }
+
     // releaserReference = null - not a pack
     // releaserReference = reference for releaser account - it is as pack
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {

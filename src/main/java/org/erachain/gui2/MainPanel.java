@@ -13,7 +13,6 @@ import org.erachain.gui.items.imprints.ImprintsSearchSplitPanel;
 import org.erachain.gui.items.imprints.IssueImprintPanel;
 import org.erachain.gui.items.imprints.MyImprintsTab;
 import org.erachain.gui.items.link_hashes.IssueLinkedHashPanel;
-import org.erachain.gui.items.link_hashes.SearchLinkedHash;
 import org.erachain.gui.items.mails.IncomingMailsSplitPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.items.mails.OutcomingMailsSplitPanel;
@@ -550,11 +549,11 @@ public class MainPanel extends javax.swing.JPanel {
                 return;
             }
 
-            if (str.equals(Lang.getInstance().translate("Search Linked Hash")) || str.equals("SearchLinkedHash")) {
-                insertTab(Lang.getInstance().translate("Search Linked Hash"), new SearchLinkedHash(), SearchLinkedHash.getIcon());
-
+            if (str.equals(Lang.getInstance().translate("Search Linked Hash")) || str.equals("SearchTransactionsSplitPanel")) {
+                insertTab(Lang.getInstance().translate("Search Linked Hash"), new SearchTransactionsSplitPanel(), SearchTransactionsSplitPanel.getIcon());
                 return;
             }
+
 
             if (BlockChain.TEST_MODE) {
                 if (str.equals(Lang.getInstance().translate("Wallets Manager"))
