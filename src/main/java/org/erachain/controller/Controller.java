@@ -86,8 +86,6 @@ import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-// 04/01 +-
-
 /**
  * main class for connection all modules
  */
