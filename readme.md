@@ -18,22 +18,8 @@ For clone code:
 ### For use start arguments on Mac or by default
 Make in folder file startARGS.txt (see example in z_START_EXAMPLES folder) 
 
-## Other
-
-
-Настройка запуска - Приложение и обязательно выбрать нативный Java SDK 1.8, использовать встроенный в IDEA нельзя! Иначе будет ошибка при коммитах базы данных.  
-https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#javasejdk
-
-
-Используйте Java 64 SDK
-
-Для тестирования так же использовать  
-
-Для сборки JAR файла без прогона тестов используем ключи:  
--x test
-
 Описание кдючей запуска приложения в файле:  
-ERA\z_bath_examples\readme.txt
+ERA\z_START_EXAMPLES\readme.txt
 
 Так же можно задавать ключи запуска в файле startARGS.txt - смотри пример в startARGS_example.txt
 
@@ -46,21 +32,32 @@ ERA\z_bath_examples\readme.txt
 ### Запуск ноды
 Если ваша нода будет только форжить то запускайте ее с ключами:
 -nodatawallet -pass=[PASSWORD]  
-Описание ключей запуска в z_bath_examples\readme.txt
+Описание ключей запуска в z_START_EXAMPLES\readme.txt
 
 ## Локальная сеть
 Если после включения в настройках поиска узлов в локальной сети и перезапуска ноды локальные узлы не находятся,
  то нужно их прописать явно в файл peers-test.json (или peer.json или peers-demo.json)
 
 ## Test Network (TesNet)
-see readme in /z_bath_examples
+see readme in /z_START_EXAMPLES
 
 ## Demo Network (DemoNet)
-see readme in /z_bath_examples
+see readme in /z_START_EXAMPLES
 
-## Sidechain
-see readme in /z_genesis
+## Sidechains (для тестеров)
+see readme in /z_GENESIS_EXAMPLES
 
+## Other
+
+Настройка запуска - Приложение и обязательно выбрать нативный Java SDK 1.8, использовать встроенный в IDEA нельзя! Иначе будет ошибка при коммитах базы данных.  
+https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#javasejdk
+
+Используйте Java 64 SDK
+
+Для тестирования так же использовать  
+
+Для сборки JAR файла без прогона тестов используем ключи:  
+-x test
 
 Так же выдает предупреждения:  
 ```
