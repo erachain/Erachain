@@ -313,8 +313,7 @@ public class Synchronizer extends Thread {
                 }
 
                 if (block.isValid(fork,
-                        // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
-                        ctrl.onlyProtocolIndexing
+                        true /// это же проверка в ФОРКЕ - тут нужно! Тем более что там внутри процессинг уже идет
                 ) > 0) {
                     // INVALID BLOCK THROW EXCEPTION
                     String mess = "Dishonest peer by not is Valid block, height: " + height;
@@ -323,12 +322,7 @@ public class Synchronizer extends Thread {
                 }
             }
 
-            if (ctrl.onlyProtocolIndexing) {
-                // далее тут блок не Процессим так как он в isValid(fork, true) процессится параллельно
-                // и далее будет слив разом без вызова pipe
-            } else {
-                this.pipeProcessOrOrphan(fork, block, false, false, true);
-            }
+            /// откатывать уже не нужно - он в isValid выше просчитался
 
             // проверка силы цепочки на уровне нашего блока и если высота новой цепочки меньше нашей
             if (height - 1 == myHeight && myWeight > block.blockHead.totalWinValue
@@ -407,6 +401,7 @@ public class Synchronizer extends Thread {
             // соберем транзакции с блоков которые будут откачены в нашей цепочке
 
             if (ctrl.onlyProtocolIndexing) {
+                // вторичные индексы НЕ нужны - можно быстрый слив из ФОРКА
                 LOGGER.debug("*** TRY writeToParent");
                 // теперь сливаем изменения
                 dbsBroken = true; // если останется взведенным значит что-то не залилось правильно
