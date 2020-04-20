@@ -410,6 +410,7 @@ public class Synchronizer extends Thread {
             } else {
 
                 // вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+                fork.close(); // закроем чтобы память освободить
 
                 // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
                 //// Map<String, byte[]> states = new TreeMap<String, byte[]>();
