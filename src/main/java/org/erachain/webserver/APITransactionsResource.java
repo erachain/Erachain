@@ -51,7 +51,7 @@ public class APITransactionsResource {
                 Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
 
         help.put("apirecords/unconfirmed?address={address}&type={type}&from={from}&count={count}&descending=true",
-                Lang.getInstance().translate("Get all unconfirmed Records for Address from Start at Count filtered by Type"));
+                Lang.getInstance().translate("Get all incoming unconfirmed transaction by address, type transaction, timestamp limited by count"));
 
         help.put("apirecords/unconfirmedincomes/{address}?type={type}&from={from}&count={count}&descending=true",
                 Lang.getInstance().translate("Get all unconfirmed Records for Address from Start at Count filtered by Type"));
@@ -401,7 +401,7 @@ public class APITransactionsResource {
     }
 
     /**
-     * Get all incoming unconfirmed transaction by timestamp and type transaction
+     * Get all incoming unconfirmed transaction by address, type transaction, timestamp limited by count
      *
      * @param address    address
      * @param count      limit
