@@ -36,9 +36,9 @@ ERA\z_START_EXAMPLES\readme.txt
 
 ## Локальная сеть
 Если после включения в настройках поиска узлов в локальной сети и перезапуска ноды локальные узлы не находятся,
- то нужно их прописать явно в файл peers-test.json (или peer.json или peers-demo.json)
+ то нужно их прописать явно в файл peers.json (или peer-test.json или peers-demo.json или peers-side.json)
 
-## Test Network (TesNet)
+## Test Network (TestNet)
 see readme in /z_START_EXAMPLES
 
 ## Demo Network (DemoNet)
