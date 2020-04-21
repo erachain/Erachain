@@ -50,6 +50,9 @@ public class APITransactionsResource {
         help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",
                 Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
 
+        help.put("apirecords/unconfirmed?address={address}&type={type}&from={from}&count={count}&descending=true",
+                Lang.getInstance().translate("Get all unconfirmed Records for Address from Start at Count filtered by Type"));
+
         help.put("apirecords/unconfirmedincomes/{address}?type={type}&from={from}&count={count}&descending=true",
                 Lang.getInstance().translate("Get all unconfirmed Records for Address from Start at Count filtered by Type"));
 
@@ -395,6 +398,40 @@ public class APITransactionsResource {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(new JSONObject(k_Map.subMap(start, end)).toJSONString()).build();
 
+    }
+
+    /**
+     * Get all incoming unconfirmed transaction by timestamp and type transaction
+     *
+     * @param address    address
+     * @param count      limit
+     * @param type       type incoming transaction
+     * @param descending order
+     * @param timestamp  current timestamp
+     * @return JSON list of transaction
+     *
+     * <h2>Example request</h2>
+     * http://127.0.0.1:9067/apirecords/unconfirmed?address=7R5m1NKAL3c2p3B7jMQXMsdqNaqCktS4h9?from=23&count=13&descending=true&timestamp=1535966134229&type=36
+     */
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("/unconfirmedincomes")
+
+    public String getNetworkTransactions(@QueryParam("address") String address,
+                                         @QueryParam("count") int count,
+                                         @QueryParam("type") int type, @QueryParam("descending") boolean descending,
+                                         @QueryParam("timestamp") long timestamp) {
+        JSONArray array = new JSONArray();
+        DCSet dcSet = DCSet.getInstance();
+
+        List<Transaction> transaction = dcSet.getTransactionTab().getTransactions(address, type,
+                timestamp, count, descending);
+
+        for (Transaction record : transaction) {
+            array.add(record.toJson());
+        }
+
+        return array.toJSONString();
     }
 
     /**
