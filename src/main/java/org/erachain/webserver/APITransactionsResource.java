@@ -415,7 +415,7 @@ public class APITransactionsResource {
      */
     @SuppressWarnings("unchecked")
     @GET
-    @Path("/unconfirmedincomes")
+    @Path("/unconfirmed")
 
     public String getNetworkTransactions(@QueryParam("address") String address,
                                          @QueryParam("count") int count,
