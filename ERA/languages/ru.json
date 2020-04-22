@@ -29,7 +29,7 @@
   "Account debtor": "Счет Должника",
   "Account not found!": "Счет не определён!",
   "Account to Deposit": "Пополняемый счет",
-  "Accounting (bookkeeping) units. They do not have a generally accepted value and can only be exchanged among themselves. Actions with them are possible only for accounting purposes: transfer, take for storage (on balance), lend, take back the debt, etc.": "Счетные (бухгалтерские) единицы. Не имеют общепринятой стоимости и могут обмениваться только между собой. Действия с ними возможны только в целях учета: передать, принять на хранение (на баланс), выдать в долг, забрать долг и т.д.",
+  "Accounting units #DESC": "Счетные (бухгалтерские) единицы. Могут выпускаться любым счетом безгранично, поэтому не являются обязательствами. Могут обмениваться только между другими счетными единицами. Используются только в целях внутреннего учета.",
   "Account Verifier": "Заверитель счета",
   "ACCT": "",
   "Accuracy": "Точность",
