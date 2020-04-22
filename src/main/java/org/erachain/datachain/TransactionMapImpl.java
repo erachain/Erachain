@@ -581,6 +581,43 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         return values;
     }
 
+    /**
+     * @param address    may be Null for ALL
+     * @param type
+     * @param timestamp
+     * @param count
+     * @param descending
+     * @return
+     */
+    public List<Transaction> getTransactions(String address, int type, long timestamp, int count, boolean descending) {
+
+        ArrayList<Transaction> values = new ArrayList<>();
+        try (IteratorCloseable<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
+            Account account = address == null ? null : new Account(address);
+
+            int i = 0;
+            Transaction transaction;
+            while (iterator.hasNext()) {
+                transaction = map.get(iterator.next());
+                if (type != 0 && type != transaction.getType()
+                        || transaction.getTimestamp() < timestamp)
+                    continue;
+
+                transaction.setDC((DCSet) databaseSet);
+
+                if ((account == null || transaction.isInvolved(account))) {
+                    values.add(transaction);
+                    i++;
+                    if (count > 0 && i > count)
+                        break;
+                }
+            }
+        } catch (IOException e) {
+        }
+
+        return values;
+    }
+
     public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<>();
