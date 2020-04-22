@@ -667,7 +667,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_OTHER_CLAIM:
                 return lang.translate("Other digital rights, requirements and obligations. These assets (as well as other digital assets) can be given in debt and seized by the lender.");
             case AS_ACCOUNTING:
-                return lang.translate("Accounting (bookkeeping) units. They do not have a generally accepted value and can only be exchanged among themselves. Actions with them are possible only for accounting purposes: transfer, take for storage (on balance), lend, take back the debt, etc.");
+                return lang.translate("Accounting units #DESC");
         }
         return "";
     }
