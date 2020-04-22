@@ -683,6 +683,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         case ACTION_HOLD:
 
                             if (absKey == FEE_KEY
+                                    || absKey == AssetCls.ERA_KEY
                                     || assetType == AssetCls.AS_INDEX
                                     || assetType == AssetCls.AS_INSIDE_ACCESS
                                     || assetType == AssetCls.AS_INSIDE_BONUS
@@ -724,8 +725,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         
                         case ACTION_DEBT: // DEBT, CREDIT and BORROW
 
-                            if (absKey == FEE_KEY
-                                    || assetType == AssetCls.AS_INDEX
+                            if (assetType == AssetCls.AS_INDEX
                                     || assetType == AssetCls.AS_INSIDE_BONUS
                             ) {
                                 if (height > BlockChain.HOLD_VALID_START + 20000)
@@ -947,11 +947,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                         case ACTION_SPEND: // PRODUCE - SPEND
 
-                            if (backward && !asset.getOwner().equals(creator))
-                                return INVALID_BACKWARD_ACTION;
-
-
                             if (absKey == FEE_KEY
+                                    || assetType == AssetCls.ERA_KEY
                                     || assetType == AssetCls.AS_INDEX
                                     || assetType == AssetCls.AS_INSIDE_ACCESS
                                     || assetType == AssetCls.AS_INSIDE_BONUS
@@ -960,19 +957,39 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     return NOT_SPENDABLE_ASSET;
                             }
 
+                            if (backward && !asset.getOwner().equals(creator))
+                                return INVALID_BACKWARD_ACTION;
 
                             // TRY FEE
-                            if (this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b.compareTo(this.fee) < 0) {
+                            if (this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b.compareTo(this.fee) < 0) {
                                 return NOT_ENOUGH_FEE;
                             }
-                            
+
                             balance = this.creator.getBalance(dcSet, absKey, actionType).b;
                             if (amount.compareTo(balance) > 0) {
                                 return NO_BALANCE;
                             }
-                            
+
                             break;
-                        
+
+                        case ACTION_PLEDGE: // Учеть передачу в залог и возврат из залога
+
+                            // пока отключим
+                            if (!BlockChain.TEST_MODE && height > BlockChain.HOLD_VALID_START) {
+                                // вначавле были трнзакции взять на руки без Обратного флага - и она сюда прийдет
+                                return INVALID_TRANSFER_TYPE;
+                            }
+
+                            if (backward) {
+                                if (!asset.getOwner().equals(recipient))
+                                    return INVALID_BACKWARD_ACTION;
+                            } else {
+                                if (!asset.getOwner().equals(creator))
+                                    return CREATOR_NOT_OWNER;
+                            }
+
+                            break;
+
                         default:
                             return INVALID_TRANSFER_TYPE;
                     }
