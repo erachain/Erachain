@@ -29,34 +29,31 @@ public class PersonListAddPopupMenuItem {
             }
         });
 
-      //  menu.add(vsend_Coins_Item);
-        
-        
         JMenuItem send_Mail_Item = new JMenuItem(Lang.getInstance().translate("Send Mail"));
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, null, (PersonCls) person), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, (PersonCls) person), MailSendPanel.getIcon());
             }
         });
 
-     //   menu.add(send_Mail_Item);
+        //   menu.add(send_Mail_Item);
         JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status to Person"));
-       
+
         set_Status_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
                 @SuppressWarnings("unused")
                 PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) person);
-                
+
             }
         });
         menu.add(set_Status_Item);
 
         JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Attest Public Key for Person"));
-       
+
         attestPubKey_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -64,7 +61,7 @@ public class PersonListAddPopupMenuItem {
 
                 @SuppressWarnings("unused")
                 PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) person, person.getOwner());
-               
+
             }
         });
         menu.add(attestPubKey_Item);
@@ -80,13 +77,10 @@ public class PersonListAddPopupMenuItem {
                 int blockNo = transaction.getBlockHeight();
                 int recNo = transaction.getSeqNo();
                 new VouchRecordDialog(blockNo, recNo);
-               
+
             }
         });
         menu.add(vouchPerson_Item);
-
-
-      
 
     }
 }

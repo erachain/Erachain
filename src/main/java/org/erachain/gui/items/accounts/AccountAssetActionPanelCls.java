@@ -74,7 +74,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
     private AccountsComboBoxModel accountsModel;
 
-    public AccountAssetActionPanelCls(boolean backward, String panelName, AssetCls assetIn, String title,
+    public AccountAssetActionPanelCls(boolean backward, String panelName, AssetCls assetIn, String titleIn,
                                       int balancePosition,
                                       Account accountFrom, Account accountTo, String message) {
 
@@ -83,10 +83,10 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         else
             this.asset = assetIn;
 
-        if (title == null) {
+        if (titleIn == null) {
             this.title = asset.viewAssetTypeActionTitle(backward, balancePosition);
         } else {
-            this.title = title;
+            this.title = titleIn;
         }
 
         if (panelName == null) {
