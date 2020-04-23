@@ -83,6 +83,8 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         else
             this.asset = assetIn;
 
+        // необходимо входящий параметр отделить так как ниже он по событию изменения актива будет как НУЛь вызваться
+        // поэтому тут только приватную переменную юзаем дальше
         if (titleIn == null) {
             this.title = asset.viewAssetTypeActionTitle(backward, balancePosition);
         } else {
