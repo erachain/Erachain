@@ -957,16 +957,21 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     return NOT_SPENDABLE_ASSET;
                             }
 
-                            if (backward && !asset.getOwner().equals(creator))
+                            if (backward
+                                // && !asset.getOwner().equals(creator)
+                            ) {
                                 return INVALID_BACKWARD_ACTION;
+                            }
 
                             // TRY FEE
                             if (this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b.compareTo(this.fee) < 0) {
                                 return NOT_ENOUGH_FEE;
                             }
 
-                            balance = this.creator.getBalance(dcSet, absKey, actionType).b;
-                            if (amount.compareTo(balance) > 0) {
+                            BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height,
+                                    false);
+
+                            if (amount.compareTo(forSale) > 0) {
                                 return NO_BALANCE;
                             }
 
@@ -1103,7 +1108,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     // UPDATE DEBTOR
                     this.recipient.changeBalance(db, backward, backward, key, this.amount, false, false);
                 }
-                
+            } else if (actionType == ACTION_SPEND) {
+                // UPDATE SENDER - OWNABLE
+                this.creator.changeBalance(db, true, backward, absKey, this.amount.abs(), !incomeReverse, false);
+                // UPDATE RECIPIENT - SPENDABLE
+                this.recipient.changeBalance(db, false, backward, key, this.amount, incomeReverse, false);
             } else {
                 // UPDATE SENDER
                 if (absKey == 666L) {
@@ -1213,9 +1222,15 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     // UPDATE DEBTOR
                     this.recipient.changeBalance(db, !backward, backward, key, this.amount, false, false);
                 }
-                
+
+            } else if (actionType == ACTION_SPEND) {
+                // UPDATE SENDER - OWNABLE
+                this.creator.changeBalance(db, false, backward, absKey, this.amount.abs(), !incomeReverse, false);
+                // UPDATE RECIPIENT - SPENDABLE
+                this.recipient.changeBalance(db, true, backward, key, this.amount, incomeReverse, false);
+
             } else {
-                
+
                 // UPDATE SENDER
                 if (absKey == 666L) {
                     this.creator.changeBalance(db, !backward, backward, key, this.amount, !incomeReverse, false);
