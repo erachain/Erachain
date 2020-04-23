@@ -191,9 +191,11 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                         jComboBox_Account.repaint();
                     }
 
-                    jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
+                    String titleLocal = Lang.getInstance().translate(title);
+                    jLabel_Title.setText((titleLocal == null ? title : titleLocal).replace("%asset%", asset.viewName()));
+
                     if (panelName == null) {
-                        setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition) + " ]" + asset.getKey() + " ]"));
+                        setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition)) + " ]" + asset.getKey() + " ]");
                     } else {
                         setName(Lang.getInstance().translate(panelName));
                     }

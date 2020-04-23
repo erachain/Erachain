@@ -219,8 +219,8 @@ public class MyBalanceTab extends SplitPanel  {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = balancesModel.getAsset(row);
                 String account = balancesModel.getAccount(row);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"), new ExchangePanel(asset, null, "To sell", account), ExchangePanel.getIcon());
-
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                        new ExchangePanel(asset, null, "To sell", account), ExchangePanel.getIcon());
 
 
             }
@@ -231,7 +231,8 @@ public class MyBalanceTab extends SplitPanel  {
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = balancesModel.getAsset(row);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"), new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                        new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
 
             }
         });
@@ -242,7 +243,8 @@ public class MyBalanceTab extends SplitPanel  {
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = balancesModel.getAsset(row);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"), new ExchangePanel(asset, null, "Buy", ""), ExchangePanel.getIcon());
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                        new ExchangePanel(asset, null, "Buy", ""), ExchangePanel.getIcon());
 
             }
         });
@@ -445,7 +447,8 @@ if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
         String action = null;
         ExchangePanel panel = new ExchangePanel(asset, compu, action, "");
         panel.setName(asset.getTickerName() + "/" + compu.getTickerName());
-        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"), panel, ExchangePanel.getIcon());
+        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                panel, ExchangePanel.getIcon());
     }
 
     public static Image getIcon() {

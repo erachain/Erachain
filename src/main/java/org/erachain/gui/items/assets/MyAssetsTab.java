@@ -238,7 +238,8 @@ public class MyAssetsTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = assetsModel.getItem(row).b;
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel(asset, null, "To sell", ""), ExchangePanel.getIcon());
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                        new ExchangePanel(asset, null, "To sell", ""), ExchangePanel.getIcon());
 
             }
 
@@ -250,7 +251,8 @@ public class MyAssetsTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = assetsModel.getItem(row).b;
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                        new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
             }
         });
         assetsMenu.add(excahge);
@@ -260,7 +262,8 @@ public class MyAssetsTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = assetsModel.getItem(row).b;
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel(asset, null, "Buy", ""), ExchangePanel.getIcon());
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                        new ExchangePanel(asset, null, "Buy", ""), ExchangePanel.getIcon());
 
             }
         });
@@ -390,7 +393,8 @@ public class MyAssetsTab extends SplitPanel {
                 if (e.getClickCount() == 2) {
                     row = table.convertRowIndexToModel(row);
                     AssetCls asset = assetsModel.getItem(row).b;
-                    MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
+                    MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                            new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
 
                     //		new AssetFrame(asset);
                 }
@@ -486,7 +490,8 @@ public class MyAssetsTab extends SplitPanel {
         String action = null;
         ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");
         panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
-        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),panel, ExchangePanel.getIcon());
+        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                panel, ExchangePanel.getIcon());
     }
 
 

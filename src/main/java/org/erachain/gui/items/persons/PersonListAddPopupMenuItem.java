@@ -23,7 +23,7 @@ public class PersonListAddPopupMenuItem {
             public void actionPerformed(ActionEvent e) {
 
                 //new AccountSendDialog(null, null, null, person);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"),new AccountAssetSendPanel(null,
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
                         null, null, person, null), AccountAssetSendPanel.getIcon());
 
             }

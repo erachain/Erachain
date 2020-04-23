@@ -596,6 +596,16 @@ public class MainPanel extends javax.swing.JPanel {
 
     }
 
+    public void insertNewTab(String str, JPanel pp, Image im) {
+        int index = jTabbedPane1.indexOfTab(str);
+        if (index >= 0) {
+            jTabbedPane1.remove(index);
+        }
+        jTabbedPane1.addTabWithCloseButton(str, im, (JPanel) pp);
+        index = jTabbedPane1.indexOfTab(str);
+        jTabbedPane1.setSelectedIndex(index);
+
+    }
 
 
     // insert tab in tabbedpane
