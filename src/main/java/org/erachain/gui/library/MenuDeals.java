@@ -23,7 +23,8 @@ public class MenuDeals extends JMenu {
         dealsMenuMail.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send mail"),new MailSendPanel(null, null, null), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send mail"),
+                        new MailSendPanel(null, null, null), MailSendPanel.getIcon());
 
             }
         });
@@ -37,8 +38,9 @@ public class MenuDeals extends JMenu {
         dealsMenuSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send"),new AccountAssetSendPanel(null,
-                        null, null, null, null), AccountAssetSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send"),
+                        new AccountAssetSendPanel(null,
+                                null, null, null, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -53,7 +55,8 @@ public class MenuDeals extends JMenu {
         dealsMenu_Take_On_Hold.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Take on Hold"),new AccountAssetHoldPanel(null, null, null, null), AccountAssetHoldPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Take on Hold"),
+                        new AccountAssetHoldPanel(null, null, null, null), AccountAssetHoldPanel.getIcon());
             }
         });
         add(dealsMenu_Take_On_Hold);
@@ -67,7 +70,8 @@ public class MenuDeals extends JMenu {
         dealsMenuLend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Lend"),new AccountAssetLendPanel(null, null, null, null),AccountAssetLendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Lend"),
+                        new AccountAssetLendPanel(null, null, null, null), AccountAssetLendPanel.getIcon());
 
             }
         });
@@ -80,7 +84,8 @@ public class MenuDeals extends JMenu {
         dealsMenu_Confiscate_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Confiscate Debt"),new AccountAssetConfiscateDebtPanel(null, null, null, null), AccountAssetConfiscateDebtPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Confiscate Debt"),
+                        new AccountAssetConfiscateDebtPanel(null, null, null, null), AccountAssetConfiscateDebtPanel.getIcon());
 
             }
         });
@@ -93,7 +98,8 @@ public class MenuDeals extends JMenu {
         dealsMenu_Repay_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Repay Debt"),new AccountAssetRepayDebtPanel(null, null, null, null), AccountAssetRepayDebtPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Repay Debt"),
+                        new AccountAssetRepayDebtPanel(null, null, null, null), AccountAssetRepayDebtPanel.getIcon());
 
             }
         });
@@ -108,8 +114,9 @@ public class MenuDeals extends JMenu {
         dealsMenu_Spend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Spend"),new AccountAssetSpendPanel(null,
-                        null, null, null, null), AccountAssetSpendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Spend"),
+                        new AccountAssetSpendPanel(null,
+                                null, null, null, null), AccountAssetSpendPanel.getIcon());
 
             }
         });

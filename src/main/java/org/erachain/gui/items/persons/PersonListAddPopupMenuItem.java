@@ -34,7 +34,7 @@ public class PersonListAddPopupMenuItem {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, (PersonCls) person), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, (PersonCls) person), MailSendPanel.getIcon());
             }
         });
 
