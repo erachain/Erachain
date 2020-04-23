@@ -126,7 +126,7 @@ public class AssetUnique extends AssetCls {
     }
 
     @Override
-    public Long getQuantity() {
+    public long getQuantity() {
         return 1L;
     }
 

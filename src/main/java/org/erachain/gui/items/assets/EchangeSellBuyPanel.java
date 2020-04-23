@@ -302,6 +302,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                     if (row < sellOrdersTableModel.getRowCount()) {
                         ///buyOrderPanel.calculateWant(order.getAmountHaveLeft(), order.calcLeftPrice(), true);
                         buyOrderPanel.setFields(order.getAmountHaveLeft(), order.calcLeftPrice(), order.getAmountWantLeft());
+                        sellOrderPanel.setFields(order.getAmountHaveLeft(), order.calcLeftPrice(), order.getAmountWantLeft());
                     }
                 }
             }
@@ -343,6 +344,8 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 if (e.getClickCount() == 2) {
                     ///sellOrderPanel.calculateWant(order.getAmountWantLeft(), order.calcLeftPriceReverse(), false);
                     sellOrderPanel.setFields(order.getAmountWantLeft(), order.calcLeftPriceReverse(), order.getAmountHaveLeft());
+                    //buyOrderPanel.calculateWant(trade.getAmountWant(), price, type);
+                    buyOrderPanel.setFields(order.getAmountWantLeft(), order.calcLeftPriceReverse(), order.getAmountHaveLeft());
                 }
             }
         });

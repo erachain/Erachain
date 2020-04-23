@@ -321,15 +321,13 @@ public class DealsPopupMenu extends JPopupMenu {
                 balance = pubKey.getBalance(asset.getKey());
 
         if (balance.a.b.signum() == 0
-                && (asset.getQuantity() > 0
-                || !pubKey.equals(asset.getOwner()))) {
+                && !asset.isUnlimited(pubKey)) {
             this.sendAsset.setEnabled(false);
             this.debtAsset.setEnabled(false);
         }
 
         if (balance.b.b.signum() == 0
-                && (asset.getQuantity() > 0
-                || !pubKey.equals(asset.getOwner()))) {
+                && !asset.isUnlimited(pubKey)) {
             this.debtAssetReturn.setEnabled(false);
         }
 
