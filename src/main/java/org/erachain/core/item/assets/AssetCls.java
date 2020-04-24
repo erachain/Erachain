@@ -292,6 +292,54 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType;
     }
 
+    public String charAssetType() {
+
+        if (this.key < 100) {
+            return "";
+        }
+
+        switch (this.assetType) {
+            case AS_OUTSIDE_GOODS:
+                return "▲";
+            case AS_OUTSIDE_IMMOVABLE:
+                return "▼";
+            case AS_ACCOUNTING:
+                if (this.key == 555l || this.key == 666l || this.key == 777l)
+                    return this.name;
+
+                return "±";
+            case AS_INDEX:
+                return "⤴";
+            case AS_INSIDE_VOTE:
+                return "✋";
+            case AS_OUTSIDE_BILL:
+                return "⬖"; // ⬒
+            case AS_OUTSIDE_SERVICE:
+                return "⬔";
+            case AS_INSIDE_BONUS:
+                return "⮌";
+            case AS_INSIDE_ACCESS:
+                return "⛨";
+            case AS_INSIDE_SHARE:
+                return "◔";
+
+
+        }
+
+        if (this.assetType >= AS_OUTSIDE_CURRENCY
+                && this.assetType <= AS_OUTSIDE_OTHER_CLAIM)
+            return "◄";
+
+        if (this.assetType == AS_INSIDE_ASSETS
+                || this.assetType >= AS_INSIDE_CURRENCY
+                && this.assetType <= AS_INSIDE_OTHER_CLAIM)
+            return "►";
+
+        // ● ⚫ ◆ █ ▇ ■ ◢ ◤ ◔ ◑ ◕ ⬛ ⬜ ⬤ ⛃
+        return "⚫";
+
+    }
+
     @Override
     public String getName() {
 		/*
@@ -310,35 +358,13 @@ public abstract class AssetCls extends ItemCls {
     @Override
     public String viewName() {
 
-        if (this.key < 5) {
-            return "" + this.name; // ®
+        if (this.key < 100) {
+            return this.name;
         }
 
-        switch (this.assetType) {
-            case AS_OUTSIDE_GOODS:
-                return "▲" + this.name;
-            case AS_OUTSIDE_IMMOVABLE:
-                return "▼" + this.name;
-            case AS_ACCOUNTING:
-                if (this.key == 555l || this.key == 666l || this.key == 777l)
-                    return this.name;
-
-                return "±" + this.name;
-        }
-
-        if (this.assetType >= AS_OUTSIDE_CURRENCY
-                && this.assetType <= AS_OUTSIDE_OTHER_CLAIM)
-            return "◄" + this.name;
-
-        if (this.assetType == AS_INSIDE_ASSETS
-                || this.assetType >= AS_INSIDE_CURRENCY
-                && this.assetType <= AS_INSIDE_OTHER_CLAIM)
-            return "►" + this.name;
-
-        return "?" + this.name;
+        return charAssetType() + this.name;
 
     }
-
 
     public PublicKeyAccount getOwner() {
         if (this.key > 10 && this.key < 100 && BlockChain.ASSET_OWNERS.containsKey(this.key)) {
