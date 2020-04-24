@@ -20,7 +20,6 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
-import org.erachain.core.voting.Poll;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.datachain.*;
 import org.erachain.dbs.DBTab;
@@ -688,7 +687,7 @@ public class BlockExplorer {
             asset = (AssetCls) dcSet.getItemAssetMap().get(assetKey);
         }
         output.put("assetKey", assetKey);
-        output.put("assetName", asset.getName());
+        output.put("assetName", asset.viewName());
 
         Map pollJSON = itemBase(poll).a;
 
@@ -951,7 +950,7 @@ public class BlockExplorer {
             pairJSON.put("tradesPriceVolume", pair.getValue().e.toPlainString());
             pairJSON.put("tradeAmountVolume", pair.getValue().f.toPlainString());
             pairJSON.put("asset", pair.getKey());
-            pairJSON.put("assetName", assetWant.getName());
+            pairJSON.put("assetName", assetWant.viewName());
             if (assetWant.getKey() > 0 && assetWant.getKey() < 1000) {
                 pairJSON.put("description", Lang.getInstance().translateFromLangObj(assetWant.viewDescription(), langObj));
             } else {
@@ -1043,9 +1042,9 @@ public class BlockExplorer {
         output.put("assetWantOwner", assetWant.getOwner().getAddress());
 
         output.put("assetHaveKey", assetHave.getKey());
-        output.put("assetHaveName", assetHave.getName());
+        output.put("assetHaveName", assetHave.viewName());
         output.put("assetWantKey", assetWant.getKey());
-        output.put("assetWantName", assetWant.getName());
+        output.put("assetWantName", assetWant.viewName());
 
         Map tradesJSON = new LinkedHashMap();
 
@@ -1150,10 +1149,10 @@ public class BlockExplorer {
         }
 
         tradeJSON.put("assetHaveKey", pairAssetHave.getKey());
-        tradeJSON.put("assetHaveName", pairAssetHave.getName());
+        tradeJSON.put("assetHaveName", pairAssetHave.viewName());
 
         tradeJSON.put("assetWantKey", pairAssetWant.getKey());
-        tradeJSON.put("assetWantName", pairAssetWant.getName());
+        tradeJSON.put("assetWantName", pairAssetWant.viewName());
 
         tradeJSON.put("assetHaveOwner", pairAssetHave.getOwner().getAddress());
         tradeJSON.put("assetWantOwner", pairAssetWant.getOwner().getAddress());
@@ -1223,9 +1222,9 @@ public class BlockExplorer {
         output.put("assetWantOwner", assetWant.getOwner().getAddress());
 
         output.put("assetHave", assetHave.getKey());
-        output.put("assetHaveName", assetHave.getName());
+        output.put("assetHaveName", assetHave.viewName());
         output.put("assetWant", assetWant.getKey());
-        output.put("assetWantName", assetWant.getName());
+        output.put("assetWantName", assetWant.viewName());
 
         Map sellsJSON = new LinkedHashMap();
         Map buysJSON = new LinkedHashMap();
@@ -1400,10 +1399,10 @@ public class BlockExplorer {
 
         output.put("person_img", a);
         output.put("person_key", person.getKey());
-        output.put("person_name", person.getName());
+        output.put("person_name", person.viewName());
 
         output.put("asset_key", asset.getKey());
-        output.put("asset_name", asset.getName());
+        output.put("asset_name", asset.viewName());
 
         output.put("Label_asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
         output.put("Label_person", Lang.getInstance().translateFromLangObj("Person", langObj));
@@ -1486,10 +1485,10 @@ public class BlockExplorer {
 
         output.put("person_img", a);
         output.put("person_key", person.getKey());
-        output.put("person_name", person.getName());
+        output.put("person_name", person.viewName());
 
         output.put("status_key", status.getKey());
-        output.put("status_name", status.getName());
+        output.put("status_name", status.viewName());
 
         output.put("Label_status", Lang.getInstance().translateFromLangObj("Status", langObj));
         output.put("Label_person", Lang.getInstance().translateFromLangObj("Person", langObj));
@@ -1595,7 +1594,7 @@ public class BlockExplorer {
         Map assetJSON = new LinkedHashMap();
 
         assetJSON.put("key", asset.getKey());
-        assetJSON.put("name", asset.getName());
+        assetJSON.put("name", asset.viewName());
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
             assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
         } else {
@@ -1645,7 +1644,7 @@ public class BlockExplorer {
         output.put("creator", person.getOwner().getAddress());
         if (person.getOwner().getPerson() != null) {
             output.put("creator_key", person.getOwner().getPerson().b.getKey());
-            output.put("creator_name", person.getOwner().getPerson().b.getName());
+            output.put("creator_name", person.getOwner().getPerson().b.viewName());
         } else {
             output.put("creator_key", "");
             output.put("creator_name", "");
@@ -1656,7 +1655,7 @@ public class BlockExplorer {
         output.put("registrar", transaction.getCreator().getAddress());
         if (transaction.getCreator().getPerson() != null) {
             output.put("registrar_key", transaction.getCreator().getPerson().b.getKey());
-            output.put("registrar_name", transaction.getCreator().getPerson().b.getName());
+            output.put("registrar_name", transaction.getCreator().getPerson().b.viewName());
         } else {
             output.put("registrar_key", "");
             output.put("registrar_name", "");
@@ -1707,7 +1706,7 @@ public class BlockExplorer {
                 if (creator != null) {
                     statusJSON.put("status_creator", creator.getAddress());
                     if (creator.isPerson()) {
-                        statusJSON.put("status_creator_name", creator.getPerson().b.getName());
+                        statusJSON.put("status_creator_name", creator.getPerson().b.viewName());
                     } else {
                         statusJSON.put("status_creator_name", "");
                     }
@@ -1764,7 +1763,7 @@ public class BlockExplorer {
                 accountJSON.put("verifier", transactionIssue.getCreator().getAddress());
                 if (transactionIssue.getCreator().getPerson() != null) {
                     accountJSON.put("verifier_key", transactionIssue.getCreator().getPerson().b.getKey());
-                    accountJSON.put("verifier_name", transactionIssue.getCreator().getPerson().b.getName());
+                    accountJSON.put("verifier_name", transactionIssue.getCreator().getPerson().b.viewName());
                 } else {
                     accountJSON.put("verifier_key", "");
                     accountJSON.put("verifier_name", "");
@@ -1823,10 +1822,10 @@ public class BlockExplorer {
                     continue;
 
                 ItemCls item = record.getItem();
-                ///logger.warn(item.getName());
+                ///logger.warn(item.viewName());
 
                 myPersonJSON.put("key", item.getKey(dcSet));
-                myPersonJSON.put("name", item.getName());
+                myPersonJSON.put("name", item.viewName());
 
                 myPersonJSON.put("seqNo", myIssuePerson.viewHeightSeq());
                 myPersonJSON.put("timestamp", myIssuePerson.getTimestamp());
@@ -1930,7 +1929,7 @@ public class BlockExplorer {
 
             Tuple2<Integer, PersonCls> person = account.getPerson();
             if (person != null) {
-                balance.put("person", person.b.getName());
+                balance.put("person", person.b.viewName());
                 balance.put("person_key", person.b.getKey());
             }
 
@@ -1961,15 +1960,15 @@ public class BlockExplorer {
                 output.put("total", asset.getReleased(dcSet).toPlainString());
             }
             output.put("released", asset.getReleased(dcSet).toPlainString());
-            output.put("assetName", asset.getName());
+            output.put("assetName", asset.viewName());
             output.put("Label_Title", (Lang.getInstance().translateFromLangObj("Top %limit% %assetName% Richest", langObj)
-                    .replace("%limit%", String.valueOf(limit > 0 ? limit : ""))).replace("%assetName%", asset.getName()));
+                    .replace("%limit%", String.valueOf(limit > 0 ? limit : ""))).replace("%assetName%", asset.viewName()));
             output.put("Label_All_non",
                     (Lang.getInstance().translateFromLangObj("All non-empty %assetName% accounts (%count%)", langObj)
-                            .replace("%assetName%", asset.getName())).replace("%count%", String.valueOf(couter)));
+                            .replace("%assetName%", asset.viewName())).replace("%count%", String.valueOf(couter)));
             output.put("Label_All_accounts",
                     (Lang.getInstance().translateFromLangObj("All %assetName% accounts (%count%)", langObj)
-                            .replace("%assetName%", asset.getName())).replace("%count%", String.valueOf(couter)));
+                            .replace("%assetName%", asset.viewName())).replace("%count%", String.valueOf(couter)));
         }
         output.put("Label_Table_Account", Lang.getInstance().translateFromLangObj("Account", langObj));
         output.put("Label_Table_Balance", Lang.getInstance().translateFromLangObj("Balance", langObj));
@@ -2107,8 +2106,8 @@ public class BlockExplorer {
                 transactionDataJSON.put("haveKey", haveAsset.getKey());
                 transactionDataJSON.put("wantKey", wantAsset.getKey());
 
-                transactionDataJSON.put("haveName", haveAsset.getName());
-                transactionDataJSON.put("wantName", wantAsset.getName());
+                transactionDataJSON.put("haveName", haveAsset.viewName());
+                transactionDataJSON.put("wantName", wantAsset.viewName());
 
                 transactionDataJSON.put("initiatorTxSeqNo", Transaction.viewDBRef(trade.getInitiator()));
                 transactionDataJSON.put("targetTxSeqNo", Transaction.viewDBRef(trade.getTarget()));
@@ -2275,7 +2274,7 @@ public class BlockExplorer {
                     // IS CONFIRMED
                     long assetkey = ((IssueAssetTransaction) transaction).getItem().getKey();
                     transactionDataJSON.put("asset", assetkey);
-                    transactionDataJSON.put("assetName", ((IssueAssetTransaction) transaction).getItem().getName());
+                    transactionDataJSON.put("assetName", ((IssueAssetTransaction) transaction).getItem().viewName());
                 }
                 */
             } else if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
@@ -2347,13 +2346,16 @@ public class BlockExplorer {
 
                 transactionDataJSON.put("amounts", amountOfAssetsJSON);
 
+                /*
             } else if (transaction.getType() == Transaction.VOTE_ON_POLL_TRANSACTION) {
                 Poll poll = Controller.getInstance().getPoll(((VoteOnPollTransaction) transaction).getPoll());
                 if (poll != null) {
                     transactionDataJSON.put("optionString",
                             Controller.getInstance().getPoll(((VoteOnPollTransaction) transaction).getPoll()).getOptions()
-                                    .get(((VoteOnPollTransaction) transaction).getOption()).getName());
+                                    .get(((VoteOnPollTransaction) transaction).getOption()).viewName());
                 }
+
+                 */
 
             } else if (transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
                 /*
@@ -2468,7 +2470,7 @@ public class BlockExplorer {
         for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
             Map assetBalance = new LinkedHashMap();
 
-            assetBalance.put("assetName", Controller.getInstance().getAsset(map.getAssetKeyFromKey(assetsBalance.getA())).getName());
+            assetBalance.put("assetName", Controller.getInstance().getAsset(map.getAssetKeyFromKey(assetsBalance.getA())).viewName());
             assetBalance.put("amount", assetsBalance.getB().toString());
 
             output.put(map.getAssetKeyFromKey(assetsBalance.getA()), assetBalance);
@@ -2762,7 +2764,7 @@ public class BlockExplorer {
         if (person != null) {
             output.put("label_person_name", Lang.getInstance().translateFromLangObj("Name", langObj));
             output.put("person_Img", Base64.encodeBase64String(person.b.getImage()));
-            output.put("person", person.b.getName());
+            output.put("person", person.b.viewName());
             output.put("person_key", person.b.getKey());
 
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balabce_LIA = account.getBalance(AssetCls.LIA_KEY);

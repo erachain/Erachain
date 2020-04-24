@@ -309,8 +309,8 @@ public abstract class AssetCls extends ItemCls {
     @Override
     public String viewName() {
 
-        if (this.key < 5) {
-            return "" + this.name; // ®
+        if (this.key < 100) {
+            return this.name;
         }
 
         switch (this.assetType) {
@@ -323,6 +323,22 @@ public abstract class AssetCls extends ItemCls {
                     return this.name;
 
                 return "±" + this.name;
+            case AS_INDEX:
+                return "⤴" + this.name;
+            case AS_INSIDE_VOTE:
+                return "✋" + this.name;
+            case AS_OUTSIDE_BILL:
+                return "⬖" + this.name; // ⬒
+            case AS_OUTSIDE_SERVICE:
+                return "⬔" + this.name;
+            case AS_INSIDE_BONUS:
+                return "⮌" + this.name;
+            case AS_INSIDE_ACCESS:
+                return "⛨" + this.name;
+            case AS_INSIDE_SHARE:
+                return "◔" + this.name;
+
+
         }
 
         if (this.assetType >= AS_OUTSIDE_CURRENCY
@@ -334,7 +350,8 @@ public abstract class AssetCls extends ItemCls {
                 && this.assetType <= AS_INSIDE_OTHER_CLAIM)
             return "►" + this.name;
 
-        return "?" + this.name;
+        // ● ⚫ ◆ █ ▇ ■ ◢ ◤ ◔ ◑ ◕ ⬛ ⬜ ⬤ ⛃
+        return "⚫" + this.name;
 
     }
 
