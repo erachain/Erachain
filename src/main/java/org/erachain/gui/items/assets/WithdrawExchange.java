@@ -178,7 +178,7 @@ public class WithdrawExchange extends JPanel {
             panel.setName(Lang.getInstance().translate("Withdraw"));
 
             MainPanel.getInstance().removeTab(panel.getName());
-            MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"), panel, AccountAssetSendPanel.getIcon());
+            MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), panel, AccountAssetSendPanel.getIcon());
 
         }
 

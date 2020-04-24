@@ -581,7 +581,14 @@ public class MainPanel extends javax.swing.JPanel {
 
     }
 
-    // insert tab in tabbedpane
+    /**
+     * If already opened - show it
+     *
+     * @param str
+     * @param pp
+     * @param im
+     * @return
+     */
     public boolean insertTab(String str, JPanel pp, Image im) {
         int index = jTabbedPane1.indexOfTab(str);
         boolean inserted = false;
@@ -596,6 +603,23 @@ public class MainPanel extends javax.swing.JPanel {
 
     }
 
+    /**
+     * If already opened - close first it and open anew
+     *
+     * @param str
+     * @param pp
+     * @param im
+     */
+    public void insertNewTab(String str, JPanel pp, Image im) {
+        int index = jTabbedPane1.indexOfTab(str);
+        if (index >= 0) {
+            jTabbedPane1.remove(index);
+        }
+        jTabbedPane1.addTabWithCloseButton(str, im, (JPanel) pp);
+        index = jTabbedPane1.indexOfTab(str);
+        jTabbedPane1.setSelectedIndex(index);
+
+    }
 
 
     // insert tab in tabbedpane
