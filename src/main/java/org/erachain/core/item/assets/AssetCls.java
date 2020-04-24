@@ -292,17 +292,17 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType;
     }
 
-    public String charAssetType() {
+     public String charAssetType() {
 
-        if (this.key < 100) {
-            return "";
-        }
+         if (this.key < 100) {
+             return "";
+         }
 
-        switch (this.assetType) {
-            case AS_OUTSIDE_GOODS:
-                return "▲";
-            case AS_OUTSIDE_IMMOVABLE:
-                return "▼";
+         switch (this.assetType) {
+             case AS_OUTSIDE_GOODS:
+                 return "▲";
+             case AS_OUTSIDE_IMMOVABLE:
+                 return "▼";
             case AS_ACCOUNTING:
                 if (this.key == 555l || this.key == 666l || this.key == 777l)
                     return this.name;
