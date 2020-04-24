@@ -236,7 +236,7 @@ public class WebTransactionsHTML {
             out += asset.viewDescription();
         }
 
-        out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Quantity", langObj) + ": </b>" + asset.getQuantity().toString();
+        out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Quantity", langObj) + ": </b>" + asset.getQuantity();
         out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Scale", langObj) + ": </b>" + Lang.getInstance().translateFromLangObj(asset.getScale() + "", langObj);
         out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Asset Type", langObj) + ": </b>" + Lang.getInstance().translateFromLangObj(asset.viewAssetType() + "", langObj);
         return out;
@@ -619,7 +619,7 @@ public class WebTransactionsHTML {
                 + ":</b> <a href=?asset=" + asset.getKey()
                 + get_Lang(langObj) + ">" + asset.viewName() + "</a><br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Quantity", langObj) + ":</b> "
-                + asset.getQuantity().toString() + "<br>";
+                + asset.getQuantity() + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Scale", langObj) + ":</b> "
                 + Lang.getInstance().translateFromLangObj(asset.getScale() + "", langObj)
                 + "<br>";

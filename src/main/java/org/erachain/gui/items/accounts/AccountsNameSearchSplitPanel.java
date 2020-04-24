@@ -227,7 +227,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
                 Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
                 Account account = new Account(account1.getA());
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, account, null), MailSendPanel.getIcon());
             }
         });
         menu.add(Send_Mail_item_Menu);
@@ -239,7 +239,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
             public void actionPerformed(ActionEvent e) {
                 Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
                 Account accountTo = new Account(account1.getA());
-                MainPanel.getInstance().insertTab( Lang.getInstance().translate("Send"),new AccountAssetSendPanel(null,
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send"), new AccountAssetSendPanel(null,
                         null, accountTo, null, null), AccountAssetSendPanel.getIcon());
 
             }

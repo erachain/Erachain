@@ -74,7 +74,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
     private AccountsComboBoxModel accountsModel;
 
-    public AccountAssetActionPanelCls(boolean backward, String panelName, AssetCls assetIn, String title,
+    public AccountAssetActionPanelCls(boolean backward, String panelName, AssetCls assetIn, String titleIn,
                                       int balancePosition,
                                       Account accountFrom, Account accountTo, String message) {
 
@@ -83,10 +83,12 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         else
             this.asset = assetIn;
 
-        if (title == null) {
+        // необходимо входящий параметр отделить так как ниже он по событию изменения актива будет как НУЛь вызваться
+        // поэтому тут только приватную переменную юзаем дальше
+        if (titleIn == null) {
             this.title = asset.viewAssetTypeActionTitle(backward, balancePosition);
         } else {
-            this.title = title;
+            this.title = titleIn;
         }
 
         if (panelName == null) {
@@ -191,9 +193,11 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                         jComboBox_Account.repaint();
                     }
 
-                    jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
+                    String titleLocal = Lang.getInstance().translate(title);
+                    jLabel_Title.setText((titleLocal == null ? title : titleLocal).replace("%asset%", asset.viewName()));
+
                     if (panelName == null) {
-                        setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition) + " ]" + asset.getKey() + " ]"));
+                        setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition)) + " ]" + asset.getKey() + " ]");
                     } else {
                         setName(Lang.getInstance().translate(panelName));
                     }

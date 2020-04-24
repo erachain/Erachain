@@ -136,7 +136,11 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     }
 
     @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
+    /**
+     * убираем synchronized - так как теперь все размеренно по таймеру вызывается. Иначе блокировка при нажатии
+     * на Синхронизировать кошелек очень часто бывает
+     */
+    public /*synchronized*/ void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
         if (message.getType() == ADD_EVENT

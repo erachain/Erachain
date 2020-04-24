@@ -118,7 +118,8 @@ public class CreditsPanel extends JPanel // implements ItemListener
                 //Menu.selectOrAdd( new AccountSendDialog(asset, account), null);
 
                 //new AccountSendDialog(asset, account, null, null);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send"),new AccountAssetSendPanel(asset, account, null, null, null), AccountAssetSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send") + ":" + asset.getKey(),
+                        new AccountAssetSendPanel(asset, account, null, null, null), AccountAssetSendPanel.getIcon());
 
 
             }
@@ -143,7 +144,8 @@ public class CreditsPanel extends JPanel // implements ItemListener
                 AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
                 Account account = tableModel.getAccount(row);
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate(hold_check_label), new AccountAssetHoldPanel(asset, account, null, null),AccountAssetHoldPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate(hold_check_label) + ":" + asset.getKey(),
+                        new AccountAssetHoldPanel(asset, account, null, null), AccountAssetHoldPanel.getIcon());
 
 
             }
@@ -161,7 +163,8 @@ public class CreditsPanel extends JPanel // implements ItemListener
                 AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
                 Account account = tableModel.getAccount(row);
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate(asset.isOutsideType()? "Предявить требование к погашению" : "Lend"),new AccountAssetLendPanel(asset, account, null, null), AccountAssetLendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate(asset.isOutsideType() ? "Предявить требование к погашению" : "Lend") + ":" + asset.getKey(),
+                        new AccountAssetLendPanel(asset, account, null, null), AccountAssetLendPanel.getIcon());
 
             }
         });
@@ -173,10 +176,11 @@ public class CreditsPanel extends JPanel // implements ItemListener
                 public void actionPerformed(ActionEvent e) {
                     int row = table.getSelectedRow();
                     row = table.convertRowIndexToModel(row);
-    
+
                     AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
                     Account account = tableModel.getAccount(row);
-                    MainPanel.getInstance().insertTab(Lang.getInstance().translate("Repay Debt"), new AccountAssetRepayDebtPanel(asset, account, null, null), AccountAssetRepayDebtPanel.getIcon());
+                    MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Repay Debt") + ":" + asset.getKey(),
+                            new AccountAssetRepayDebtPanel(asset, account, null, null), AccountAssetRepayDebtPanel.getIcon());
 
                 }
             });
@@ -191,7 +195,8 @@ public class CreditsPanel extends JPanel // implements ItemListener
 
                 AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
                 Account account = tableModel.getAccount(row);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate(asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"),new AccountAssetConfiscateDebtPanel(asset, account, null, null), AccountAssetConfiscateDebtPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate(asset.isOutsideType() ? "Подтвердить погашение требования" : "Confiscate Debt") + ":" + asset.getKey(),
+                        new AccountAssetConfiscateDebtPanel(asset, account, null, null), AccountAssetConfiscateDebtPanel.getIcon());
 
             }
         });

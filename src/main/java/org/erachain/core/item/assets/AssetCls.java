@@ -2,6 +2,7 @@ package org.erachain.core.item.assets;
 
 
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.TransactionAmount;
@@ -260,7 +261,7 @@ public abstract class AssetCls extends ItemCls {
         return db.getIssueAssetMap();
     }
 
-    public abstract Long getQuantity();
+    public abstract long getQuantity();
 
     public abstract BigDecimal getReleased();
     public abstract BigDecimal getReleased(DCSet dc);
@@ -510,6 +511,16 @@ public abstract class AssetCls extends ItemCls {
 
     public boolean isAccounting() {
         return this.assetType == AS_ACCOUNTING;
+    }
+
+    /**
+     * Без ограничений - только если это счетная единица или сам владелец без огрничений
+     *
+     * @param address
+     * @return
+     */
+    public boolean isUnlimited(Account address) {
+        return isAccounting() || getQuantity() == 0L && owner.equals(address);
     }
 
     public BigDecimal defaultAmountAssetType() {
