@@ -639,7 +639,7 @@ public class BlockExplorer {
         map.put("key", item.getKey());
         map.put("icon", Base64.encodeBase64String(item.getIcon()));
         map.put("image", Base64.encodeBase64String(item.getImage()));
-        map.put("name", item.viewName());
+        map.put("name", item.getName());
         map.put("description", item.viewDescription());
         map.put("owner", item.getOwner().getAddress());
 
@@ -908,6 +908,7 @@ public class BlockExplorer {
         assetJSON.put("operations", orders.size() + trades.size());
 
         assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
+        assetJSON.put("assetTypeChar", asset.charAssetType());
 
         assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
 
@@ -2354,8 +2355,6 @@ public class BlockExplorer {
                             Controller.getInstance().getPoll(((VoteOnPollTransaction) transaction).getPoll()).getOptions()
                                     .get(((VoteOnPollTransaction) transaction).getOption()).viewName());
                 }
-
-                 */
 
             } else if (transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
                 /*
