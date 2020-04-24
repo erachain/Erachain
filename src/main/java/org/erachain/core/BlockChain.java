@@ -724,6 +724,9 @@ public class BlockChain {
             return 288; // old MainNet
         }
 
+        if (TEST_MODE && !DEMO_MODE)
+            return 5;
+
         return 30;
     }
 
