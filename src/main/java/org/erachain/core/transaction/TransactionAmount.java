@@ -694,17 +694,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         // asset - for RECIPIENT !
                         unLimited = asset.isUnlimited(this.recipient);
 
-                        balance = this.recipient.getBalance(dcSet, absKey, actionType).b;
-                        if (unLimited) {
+                        if (!unLimited) {
+                            balance = this.recipient.getBalance(dcSet, absKey, actionType).b;
                             BigDecimal amountOWN = this.recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
                             // amontOWN, balance and amount - is
                             // negative
                             if (balance.add(this.amount).compareTo(amountOWN) < 0) {
-                                return NO_HOLD_BALANCE;
-                            }
-                        } else {
-                            // amount - is negative
-                            if (this.amount.abs().compareTo(balance) > 0) {
                                 return NO_HOLD_BALANCE;
                             }
                         }
