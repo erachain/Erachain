@@ -1132,9 +1132,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 }
             } else if (actionType == ACTION_SPEND) {
                 // UPDATE SENDER - OWNABLE
-                this.creator.changeBalance(db, true, backward, absKey, this.amount.abs(), !incomeReverse, false);
+                this.creator.changeBalance(db, true, backward, absKey, this.amount.abs(), true, false);
                 // UPDATE RECIPIENT - SPENDABLE
-                this.recipient.changeBalance(db, false, backward, key, this.amount, incomeReverse, false);
+                this.recipient.changeBalance(db, false, backward, key, this.amount, false, false);
             } else {
                 // UPDATE SENDER
                 if (absKey == 666L) {
@@ -1247,9 +1247,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
             } else if (actionType == ACTION_SPEND) {
                 // UPDATE SENDER - OWNABLE
-                this.creator.changeBalance(db, false, backward, absKey, this.amount.abs(), !incomeReverse, false);
+                this.creator.changeBalance(db, false, backward, absKey, this.amount.abs(), true, false);
                 // UPDATE RECIPIENT - SPENDABLE
-                this.recipient.changeBalance(db, true, backward, key, this.amount, incomeReverse, false);
+                this.recipient.changeBalance(db, true, backward, key, this.amount, false, false);
 
             } else {
 
