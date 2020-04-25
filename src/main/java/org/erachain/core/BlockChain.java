@@ -463,6 +463,20 @@ public class BlockChain {
                     }
                 }
 
+                if (chainParams.containsKey("peersURL")) {
+                    Settings.peersURL = chainParams.get("peersURL").toString();
+                }
+
+                if (chainParams.containsKey("license")) {
+                    Settings.sideLicense = chainParams.get("license").toString();
+                }
+
+                if (chainParams.containsKey("startKey")) {
+                    JSONObject startKeys = (JSONObject) chainParams.get("startKey");
+                    // TODO  do start KEYS
+                }
+
+
                 if (chainParams.containsKey("explorer")) {
                     Settings.getInstance().explorerURL = chainParams.get("explorer").toString();
                 }
