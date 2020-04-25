@@ -4,7 +4,10 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.library.*;
+import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.SetIntervalPanel;
+import org.erachain.gui.library.VouchLibraryPanel;
 import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -197,8 +200,8 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
                 }
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?tx=" + selectedTransaction.viewHeightSeq()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);

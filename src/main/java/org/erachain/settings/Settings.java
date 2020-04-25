@@ -707,12 +707,18 @@ public class Settings {
         return BlockChain.DEFAULT_WEB_PORT;
     }
 
+    public String explorerURL;
     public String getBlockexplorerURL() {
-        if (this.settingsJSON.containsKey("explorerURL")) {
-            return this.settingsJSON.get("explorerURL").toString();
+        if (explorerURL == null) {
+            if (this.settingsJSON.containsKey("explorerURL")) {
+                return (explorerURL = this.settingsJSON.get("explorerURL").toString());
+            } else {
+                return (explorerURL = BlockChain.DEFAULT_EXPLORER);
+            }
         }
 
-        return BlockChain.DEFAULT_EXPLORER;
+        return explorerURL;
+
     }
 
     public boolean isGuiConsoleEnabled() {

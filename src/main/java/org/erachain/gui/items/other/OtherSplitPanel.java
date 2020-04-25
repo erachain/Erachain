@@ -169,8 +169,8 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
                 }
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?block=" + blockHead.heightBlock));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
@@ -234,8 +234,8 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
                 }
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?block=" + blockHead.heightBlock));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);

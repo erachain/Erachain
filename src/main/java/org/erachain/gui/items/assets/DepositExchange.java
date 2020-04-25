@@ -673,8 +673,8 @@ public class DepositExchange extends JPanel   {
                                 JSONObject pay_out = (JSONObject) json.get("pay_out");
 
                                 if (isWithdraw) {
-                                    txURLin = "http://" + Settings.getInstance().getBlockexplorerURL()
-                                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                                    txURLin = Settings.getInstance().getBlockexplorerURL()
+                                            + "/index/blockexplorer.html"
                                             + "?tx=";
 
                                     if (curr_out.get("abbrev").equals("BTC")) {
@@ -694,8 +694,8 @@ public class DepositExchange extends JPanel   {
                                         txURLin = "";
                                     }
 
-                                    txURLout = "http://" + Settings.getInstance().getBlockexplorerURL()
-                                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                                    txURLout = Settings.getInstance().getBlockexplorerURL()
+                                            + "/index/blockexplorer.html"
                                             + "?tx=";
 
                                 }
@@ -725,8 +725,8 @@ public class DepositExchange extends JPanel   {
                                  */
 
                                 String txURL;
-                                txURL = "http://" + Settings.getInstance().getBlockexplorerURL()
-                                        + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                                txURL = Settings.getInstance().getBlockexplorerURL()
+                                        + "/index/blockexplorer.html"
                                         + "?tx=";
 
                                 resultText += json.get("created") + " - " + json.get("amount_in") + " " + curr_in.get("abbrev")
