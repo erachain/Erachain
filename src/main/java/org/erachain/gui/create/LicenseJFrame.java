@@ -5,6 +5,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.gui.library.MPDFView;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -184,9 +186,14 @@ public class LicenseJFrame extends JDialog {
                 setVisible(false);
 
                 if (parent != null) {
-                    if (BlockChain.SIDE_MODE) {
-                        th.setVisible(false);
-                        new LicenseDataJFrame(true, parent, goCreateWallet);
+                    if (BlockChain.SIDE_MODE && Settings.sideLicense != null) {
+                        File sideLicense = new File(Settings.sideLicense);
+                        if (sideLicense.isFile()) {
+                            th.setVisible(false);
+                            new LicenseDataJFrame(true, parent, goCreateWallet);
+                        } else {
+                            ((NoWalletFrame) parent).goAfterLicence(goCreateWallet);
+                        }
                     } else {
                         ((NoWalletFrame) parent).goAfterLicence(goCreateWallet);
                     }
