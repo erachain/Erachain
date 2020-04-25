@@ -2,6 +2,7 @@ package org.erachain.core.item.assets;
 
 
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.TransactionAmount;
@@ -260,7 +261,7 @@ public abstract class AssetCls extends ItemCls {
         return db.getIssueAssetMap();
     }
 
-    public abstract Long getQuantity();
+    public abstract long getQuantity();
 
     public abstract BigDecimal getReleased();
     public abstract BigDecimal getReleased(DCSet dc);
@@ -291,6 +292,54 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType;
     }
 
+    public String charAssetType() {
+
+        if (this.key < 100) {
+            return "";
+        }
+
+        switch (this.assetType) {
+            case AS_OUTSIDE_GOODS:
+                return "▲";
+            case AS_OUTSIDE_IMMOVABLE:
+                return "▼";
+            case AS_ACCOUNTING:
+                if (this.key == 555l || this.key == 666l || this.key == 777l)
+                    return this.name;
+
+                return "±";
+            case AS_INDEX:
+                return "⤴";
+            case AS_INSIDE_VOTE:
+                return "✋";
+            case AS_OUTSIDE_BILL:
+                return "⬖"; // ⬒
+            case AS_OUTSIDE_SERVICE:
+                return "⬔";
+            case AS_INSIDE_BONUS:
+                return "⮌";
+            case AS_INSIDE_ACCESS:
+                return "⛨";
+            case AS_INSIDE_SHARE:
+                return "◔";
+
+
+        }
+
+        if (this.assetType >= AS_OUTSIDE_CURRENCY
+                && this.assetType <= AS_OUTSIDE_OTHER_CLAIM)
+            return "◄";
+
+        if (this.assetType == AS_INSIDE_ASSETS
+                || this.assetType >= AS_INSIDE_CURRENCY
+                && this.assetType <= AS_INSIDE_OTHER_CLAIM)
+            return "►";
+
+        // ● ⚫ ◆ █ ▇ ■ ◢ ◤ ◔ ◑ ◕ ⬛ ⬜ ⬤ ⛃
+        return "⚫";
+
+    }
+
     @Override
     public String getName() {
 		/*
@@ -309,35 +358,13 @@ public abstract class AssetCls extends ItemCls {
     @Override
     public String viewName() {
 
-        if (this.key < 5) {
-            return "" + this.name; // ®
+        if (this.key < 100) {
+            return this.name;
         }
 
-        switch (this.assetType) {
-            case AS_OUTSIDE_GOODS:
-                return "▲" + this.name;
-            case AS_OUTSIDE_IMMOVABLE:
-                return "▼" + this.name;
-            case AS_ACCOUNTING:
-                if (this.key == 555l || this.key == 666l || this.key == 777l)
-                    return this.name;
-
-                return "±" + this.name;
-        }
-
-        if (this.assetType >= AS_OUTSIDE_CURRENCY
-                && this.assetType <= AS_OUTSIDE_OTHER_CLAIM)
-            return "◄" + this.name;
-
-        if (this.assetType == AS_INSIDE_ASSETS
-                || this.assetType >= AS_INSIDE_CURRENCY
-                && this.assetType <= AS_INSIDE_OTHER_CLAIM)
-            return "►" + this.name;
-
-        return "?" + this.name;
+        return charAssetType() + this.name;
 
     }
-
 
     public PublicKeyAccount getOwner() {
         if (this.key > 10 && this.key < 100 && BlockChain.ASSET_OWNERS.containsKey(this.key)) {
@@ -512,6 +539,16 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType == AS_ACCOUNTING;
     }
 
+    /**
+     * Без ограничений - только если это счетная единица или сам владелец без огрничений
+     *
+     * @param address
+     * @return
+     */
+    public boolean isUnlimited(Account address) {
+        return isAccounting() || getQuantity() == 0L && owner.equals(address);
+    }
+
     public BigDecimal defaultAmountAssetType() {
         switch (assetType) {
             case AS_BANK_GUARANTEE:
@@ -667,7 +704,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_OTHER_CLAIM:
                 return lang.translate("Other digital rights, requirements and obligations. These assets (as well as other digital assets) can be given in debt and seized by the lender.");
             case AS_ACCOUNTING:
-                return lang.translate("Accounting (bookkeeping) units. They do not have a generally accepted value and can only be exchanged among themselves. Actions with them are possible only for accounting purposes: transfer, take for storage (on balance), lend, take back the debt, etc.");
+                return lang.translate("Accounting units #DESC");
         }
         return "";
     }
@@ -1016,13 +1053,13 @@ public abstract class AssetCls extends ItemCls {
 
         switch (actionType) {
             case TransactionAmount.ACTION_SEND:
-                return "Recipient";
-            case TransactionAmount.ACTION_DEBT:
-                return "Debitor";
-            case TransactionAmount.ACTION_REPAY_DEBT:
-                return "Lender Account";
-            case TransactionAmount.ACTION_HOLD:
                 return "Giver";
+            case TransactionAmount.ACTION_DEBT:
+                return "Creditor";
+            case TransactionAmount.ACTION_REPAY_DEBT:
+                return "Debtor";
+            case TransactionAmount.ACTION_HOLD:
+                return "Taker";
             case TransactionAmount.ACTION_SPEND:
                 return "Spender";
         }
@@ -1082,11 +1119,11 @@ public abstract class AssetCls extends ItemCls {
             case TransactionAmount.ACTION_SEND:
                 return "Recipient";
             case TransactionAmount.ACTION_DEBT:
-                return "Vendor";
+                return "Debtor";
             case TransactionAmount.ACTION_REPAY_DEBT:
-                return "Lender";
+                return "Creditor";
             case TransactionAmount.ACTION_HOLD:
-                return "Giver";
+                return "Supplier";
             case TransactionAmount.ACTION_SPEND:
                 return "Spender";
         }

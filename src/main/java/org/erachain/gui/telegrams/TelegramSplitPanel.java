@@ -343,8 +343,9 @@ public class TelegramSplitPanel extends SplitPanel {
         public void actionPerformed(ActionEvent e) {
             Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
-            MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send asset"),new AccountAssetSendPanel(null,
-                    null, account, null, null), AccountAssetSendPanel.getIcon());
+            MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"),
+                    new AccountAssetSendPanel(null,
+                            null, account, null, null), AccountAssetSendPanel.getIcon());
 
 
         }
@@ -356,7 +357,8 @@ public class TelegramSplitPanel extends SplitPanel {
         public void actionPerformed(ActionEvent e) {
             Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
-            MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail"),new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+            MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"),
+                    new MailSendPanel(null, account, null), MailSendPanel.getIcon());
 
         }
     });

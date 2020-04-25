@@ -33,7 +33,7 @@ ext {
 }
 
 //String versionEra = "4.11.08-${git.head().abbreviatedId}"
-String versionEra = "4.23.01 DEV beta"
+String versionEra = "5.01.01"
 archivesBaseName = 'Erachain'
 group 'org.erachain'
 //version versionEra
@@ -158,7 +158,7 @@ task CopyResourse {
         into 'build/libs/Erachain'
         include 'Erachain Licence*'
         include 'peers*'
-        include 'run*'
+        include 'start*'
     }
 
     copy {
@@ -190,8 +190,8 @@ task CopyResourse {
         into 'build/libs/Erachain/z_GENESIS_EXAMPLES'
     }
     copy {
-        from 'ERA/z_RUN_EXAMPLES'
-        into 'build/libs/Erachain/z_RUN_EXAMPLES'
+        from 'ERA/z_START_EXAMPLES'
+        into 'build/libs/Erachain/z_START_EXAMPLES'
     }
 }
 

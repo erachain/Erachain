@@ -1,6 +1,5 @@
 package org.erachain.gui.items.statement;
 
-import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.RSignNote;
@@ -14,6 +13,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
 import javax.swing.*;
@@ -293,24 +293,23 @@ public class StatementInfo extends javax.swing.JPanel {
         String str = "";
         JSONObject params;
         Set<String> kS;
-        Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map = null;
-        byte[] data = statement.getData();
+        Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> map = null;
 
         initComponents();
 
         try {
-            map = ExData.parse_Data_V2(data);
+            map = statement.parseData();
 
             JSONObject jSON = map.c;
 
-            HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
+            HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = map.d;
             if (files != null) {
-                Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
+                Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it_Files = files.entrySet().iterator();
                 while (it_Files.hasNext()) {
-                    Entry<String, Tuple2<Boolean, byte[]>> file = it_Files.next();
-                    boolean zip = new Boolean(file.getValue().a);
+                    Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it_Files.next();
+                    boolean zip = new Boolean(file.getValue().b);
                     String name_File = (String) file.getKey();
-                    byte[] file_byte = (byte[]) file.getValue().b;
+                    byte[] file_byte = (byte[]) file.getValue().c;
                     file_Panel.insert_Row(name_File, zip, file_byte);
                 }
             }

@@ -2,7 +2,7 @@
   // peers from external source
   "peersURL": "https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json",
   "assets": [
-    // ASSET KEY, QUALITY, NAME, VOLUME, CREATOR
+    // ASSET KEY, NAME, QUALITY, CREATOR
     [
       12,
       "BTC",
@@ -23,7 +23,7 @@
     ]
   ],
   "persons": [
-    // PERSON KEY, BIRTH TIMESTAMP, NAME, CREATOR
+    // PERSON KEY, NAME, BIRTH TIMESTAMP, CREATOR
     [
       1001,
       "DMITRII ERMOLAEV",

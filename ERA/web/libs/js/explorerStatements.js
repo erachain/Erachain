@@ -55,13 +55,17 @@ function statements(data) {
 }
 
 function statements2(data) {
-    var output = '';
+
+    var output = lastBlock(data.lastBlock);
+
+    if (!data.hasOwnProperty('person_key')) {
+        output += '<h2>Not found</h2>';
+        return output;
+    }
 
     if (data.hasOwnProperty('error')) {
         return '<h2>' + data.error + '</h2>';
     }
-
-    output += lastBlock(data.lastBlock);
 
     output += '<div class="navbar-form">';
     output += '<label>' + data.Label_Statement + '</label>&nbsp;&nbsp;';
@@ -84,13 +88,16 @@ function openStatement() {
 
 function statement(data) {
 
-    var output = '';
+    var output = lastBlock(data.lastBlock);
+
+    if (!data.hasOwnProperty('type')) {
+        output += '<h2>Not found</h2>';
+        return output;
+    }
 
     if (data.hasOwnProperty('error')) {
         return '<h2>' + data.error + '</h2>';
     }
-
-    //output += lastBlock(data.lastBlock);
 
     output += '<table><tr><td>';
     output += '<div style="word-wrap: break-word;  width: 1000px;">';
@@ -101,15 +108,16 @@ function statement(data) {
 
     output += '<br>' + data.Label_creator + ':&nbsp&nbsp <a href=?address=' + data.creator + get_lang() + '><b>' + data.creator_name + '</b></a>';
 
-    if (data.hasOwnProperty('statement')) {
-        output += '<hr>' + fformat(data.statement);
-    } else if (data.hasOwnProperty('title')) {
+    if (data.hasOwnProperty('title')) {
         output += '<br><b>' + data.Label_title + '</b>:' + escapeHtml(data.title) + "<hr>";
     }
 
-
     if (data.hasOwnProperty('body')) {
         output += fformat(data.body);
+    }
+
+    if (data.hasOwnProperty('messageHash')) {
+        output += '<br>' + data.Label_mess_hash + ': <a href=?q=' + data.messageHash + get_lang() + '&search=transactions><b>' + data.messageHash + '</b></a>';
     }
 
     if (data.hasOwnProperty('message')) {

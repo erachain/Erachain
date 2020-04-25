@@ -186,7 +186,7 @@ public class PersonVouchedPanel extends JPanel {
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account accountTo = (Account) model.getPublicKey(row);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Asset to Person"),new AccountAssetSendPanel(null,
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Asset to Person"), new AccountAssetSendPanel(null,
                         null, accountTo, person, null), AccountAssetSendPanel.getIcon());
 
                 ;
@@ -200,7 +200,7 @@ public class PersonVouchedPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Account account = (Account) model.getPublicKey(row);
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Mail to Person"),new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail to Person"), new MailSendPanel(null, account, null), MailSendPanel.getIcon());
 
             }
         });

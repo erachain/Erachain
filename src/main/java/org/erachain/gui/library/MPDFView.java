@@ -1,8 +1,21 @@
 package org.erachain.gui.library;
 
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Toolkit;
+import com.sun.pdfview.PDFFile;
+import com.sun.pdfview.PDFPage;
+import org.erachain.controller.Controller;
+import org.erachain.core.transaction.RSignNote;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
+import org.erachain.settings.Settings;
+import org.erachain.utils.ZipBytes;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
@@ -16,28 +29,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.zip.DataFormatException;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import org.erachain.core.transaction.RSignNote;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple4;
-
-import com.sun.pdfview.PDFFile;
-import com.sun.pdfview.PDFPage;
-
-import org.erachain.controller.Controller;
-import org.erachain.core.exdata.ExData;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
-import org.erachain.settings.Settings;
-import org.erachain.utils.ZipBytes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -232,41 +223,37 @@ public class MPDFView extends javax.swing.JPanel {
             if (record.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
 
                 RSignNote note = (RSignNote) record;
-                if (record.getVersion() == 2) {
-                    byte[] data = note.getData();
+                Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> map;
+                try {
+                    map = note.parseData();
+                } catch (Exception e) {
+                    map = null;
+                }
 
-                    Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
-                    try {
-                        map = ExData.parse_Data_V2(data);
-                    } catch (Exception e) {
-                        map = null;
-                    }
+                if (map != null) {
+                    HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = map.d;
+                    if (files != null) {
+                        Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it_Files = files.entrySet().iterator();
+                        while (it_Files.hasNext()) {
+                            Entry<String, Tuple3<byte[], Boolean, byte[]>> fileData = it_Files.next();
+                            boolean zip = new Boolean(fileData.getValue().b);
+                            // String name_File = (String) fileData.getKey();
+                            // setTitle(getTitle() + " - " + name_File);
 
-                    if (map != null) {
-                        HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
-                        if (files != null) {
-                            Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
-                            while (it_Files.hasNext()) {
-                                Entry<String, Tuple2<Boolean, byte[]>> fileData = it_Files.next();
-                                boolean zip = new Boolean(fileData.getValue().a);
-                                // String name_File = (String) fileData.getKey();
-                                // setTitle(getTitle() + " - " + name_File);
-
-                                byte[] file_byte = (byte[]) fileData.getValue().b;
-                                if (zip) {
+                            byte[] file_byte = (byte[]) fileData.getValue().c;
+                            if (zip) {
+                                try {
                                     try {
-                                        try {
-                                            file_byte = ZipBytes.decompress(file_byte);
-                                        } catch (IOException e) {
-                                            logger.error(e.getMessage(), e);
-                                        }
-                                    } catch (DataFormatException e1) {
-                                        logger.error(e1.getMessage(), e1);
+                                        file_byte = ZipBytes.decompress(file_byte);
+                                    } catch (IOException e) {
+                                        logger.error(e.getMessage(), e);
                                     }
+                                } catch (DataFormatException e1) {
+                                    logger.error(e1.getMessage(), e1);
                                 }
-
-                                buf = ByteBuffer.wrap(file_byte);
                             }
+
+                            buf = ByteBuffer.wrap(file_byte);
                         }
                     }
                 }

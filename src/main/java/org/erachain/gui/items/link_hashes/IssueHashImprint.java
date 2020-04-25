@@ -8,16 +8,17 @@ package org.erachain.gui.items.link_hashes;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.transaction.RHashes;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.library.AuxiliaryToolTip;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Pair;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 /*
@@ -30,6 +31,9 @@ import java.util.List;
  * @author Саша
  */
 public class IssueHashImprint extends javax.swing.JPanel {
+
+    private AuxiliaryToolTip auxiliaryToolTip;
+    private boolean wasChanged = false;
 
     /**
      *
@@ -64,8 +68,13 @@ public class IssueHashImprint extends javax.swing.JPanel {
         this.jTable_Hash.setModel(table_Model);
         this.jLabel_Account.setText(Lang.getInstance().translate("Account") + ":");
         this.jComboBox_Account.setModel(new AccountsComboBoxModel());
+        String tipURL = Lang.getInstance().translate("Задайте внешнюю ссылку ввиде URL. \n Причем если ссвлка будет закачиваться на:\n / или = или № - то значение хеша будет добавлено к ссылке");
         this.jLabel_URL.setText(Lang.getInstance().translate("URL") + ":");
+        this.jLabel_URL.setToolTipText(tipURL);
         this.jTextField_URL.setText("");
+        this.jTextField_URL.setToolTipText(tipURL);
+
+
         this.jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");
         this.jButton.setText(Lang.getInstance().translate("Write & Sign"));
 
@@ -126,13 +135,6 @@ public class IssueHashImprint extends javax.swing.JPanel {
             String description = this.jTextArea_Description.getText();
 
             List<String> hashes = this.table_Model.getValues(0);
-
-            List<String> twins = RHashes.findTwins(DCSet.getInstance(), hashes);
-            if (twins.isEmpty()) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Twin hashes: ") + twins.toString(), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                this.jButton.setEnabled(true);
-                return;
-            }
 
             //CREATE IMPRINT
             PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
@@ -322,14 +324,73 @@ public class IssueHashImprint extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
-       
+
         txtFeePow = new JComboBox<String>();
-        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFeePow.setSelectedIndex(0);
-       
-        
+
+
         this.add(this.txtFeePow, gridBagConstraints);
 
     }// </editor-fold>
     // End of variables declaration                   
+
+    @Override
+    public String getToolTipText() {
+        String res = super.getToolTipText();
+        return AuxiliaryToolTip.IGNORE_TOOLTIP.equals(res) ? null : res;
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        if (auxiliaryToolTip == null) {
+            auxiliaryToolTip = new AuxiliaryToolTip();
+            auxiliaryToolTip.setComponent(this);
+        }
+        auxiliaryToolTip.setKey(null);
+        auxiliaryToolTip.setStoredLocation(null);
+
+        Point p = event.getPoint();
+        Component component = event.getComponent();
+
+        String rendererTip = null;
+        if (component instanceof JComponent) {
+            // Convert the event to the renderer's coordinate system
+            MouseEvent newEvent = new MouseEvent(component, event.getID(),
+                    event.getWhen(), event.getModifiers(),
+                    p.x, p.y,
+                    event.getXOnScreen(),
+                    event.getYOnScreen(),
+                    event.getClickCount(),
+                    event.isPopupTrigger(),
+                    MouseEvent.NOBUTTON);
+
+            rendererTip = ((JComponent) component).getToolTipText(newEvent);
+        }
+
+        if (rendererTip != null) {
+            return AuxiliaryToolTip.IGNORE_TOOLTIP.equals(rendererTip) ? null : rendererTip;
+        }
+
+        return auxiliaryToolTip.getKey() == null ? getToolTipText() : auxiliaryToolTip.getKey();
+    }
+
+    @Override
+    public Point getToolTipLocation(MouseEvent event) {
+        if ((auxiliaryToolTip == null) || (auxiliaryToolTip.getKey() == null)) {
+            return null;
+        } else {
+            return auxiliaryToolTip.getStoredLocation();
+        }
+    }
+
+    @Override
+    public JToolTip createToolTip() {
+        if ((auxiliaryToolTip == null) || (auxiliaryToolTip.getKey() == null)) {
+            return super.createToolTip();
+        } else {
+            return auxiliaryToolTip;
+        }
+    }
+
 }

@@ -213,7 +213,8 @@ public class MenuFiles extends JMenu {
                     String amount = (String) js.get("amount");
                     AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey),
                             ct.getAccountByAddress(creator), ct.getAccountByAddress(recipient), null, null);
-                    MainPanel.getInstance().insertTab(Lang.getInstance().translate("Read Transaction"),panel, AccountAssetSendPanel.getIcon() );
+                    MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Read Transaction"),
+                            panel, AccountAssetSendPanel.getIcon());
 
                     AssetCls asset = ct.getAsset(assetKey);
                     panel.jTextField_To.setText(recipient);
@@ -242,8 +243,9 @@ public class MenuFiles extends JMenu {
                 //  new SettingsFrame();
                 // no receive
                 //AccountSendDialog dd = new AccountSendDialog(null, null, null, null, false);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Write Transaction"),new AccountAssetSendPanel(null,
-                        null, null, null, null), AccountAssetSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Write Transaction"),
+                        new AccountAssetSendPanel(null,
+                                null, null, null, null), AccountAssetSendPanel.getIcon());
 
 
             }

@@ -86,15 +86,13 @@ import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-// 04/01 +-
-
 /**
  * main class for connection all modules
  */
 public class Controller extends Observable {
 
-    public static String version = "4.23.01 DEV";
-    public static String buildTime = "2020-04-02 13:33:33 UTC";
+    public static String version = "5.01.01";
+    public static String buildTime = "2020-04-25 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -111,7 +109,7 @@ public class Controller extends Observable {
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
     // code!
     // for reset DB if DB PROTOCOL is CHANGED
-    public static final String releaseVersion = "3.02.01";
+    public static final String releaseVersion = "3.02.02";
     // TODO ENUM would be better here
     public static final int STATUS_NO_CONNECTIONS = 0;
     public static final int STATUS_SYNCHRONIZING = 1;
@@ -636,7 +634,12 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Try Open DataChain")));
             LOGGER.info("Try Open DataChain");
-            this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
+            if (Settings.simpleTestNet) {
+                // -testnet
+                reCreateDC(inMemoryDC);
+            } else {
+                this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
+            }
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataChain OK")));
             LOGGER.info("DataChain OK");

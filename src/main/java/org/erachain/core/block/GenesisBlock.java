@@ -85,65 +85,67 @@ public class GenesisBlock extends Block {
             Account leftRecipiend = null;
             BigDecimal totalSended = BigDecimal.ZERO;
             JSONArray holders = (JSONArray) Settings.genesisJSON.get(2);
-            for (int i = 0; i < holders.size(); i++) {
-                JSONArray holder = (JSONArray) holders.get(i);
+            if (!Settings.ERA_COMPU_ALL_UP) {
+                for (int i = 0; i < holders.size(); i++) {
+                    JSONArray holder = (JSONArray) holders.get(i);
 
-                sideSettingString += holder.get(0).toString();
-                sideSettingString += holder.get(1).toString();
+                    sideSettingString += holder.get(0).toString();
+                    sideSettingString += holder.get(1).toString();
 
-                // SEND FONDs
-                Account founder = new Account(holder.get(0).toString());
-                if (leftRecipiend == null) {
-                    leftRecipiend = founder;
-                }
-
-                BigDecimal fondAamount = new BigDecimal(holder.get(1).toString()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-                transactions.add(new GenesisTransferAssetTransaction(founder,
-                        AssetCls.ERA_KEY, fondAamount));
-
-                totalSended = totalSended.add(fondAamount);
-
-                if (holder.size() < 3)
-                    continue;
-
-                String COMPUstr = holder.get(2).toString();
-                if (COMPUstr.length() > 0 && !COMPUstr.equals("0")) {
-                    BigDecimal compu = new BigDecimal(COMPUstr).setScale(BlockChain.FEE_SCALE);
-                    transactions.add(new GenesisTransferAssetTransaction(founder,
-                            AssetCls.FEE_KEY, compu));
-                    sideSettingString += compu.toString();
-                }
-
-                if (holder.size() < 4)
-                    continue;
-
-                // DEBTORS
-                JSONArray debtors = (JSONArray) holder.get(3);
-                BigDecimal totalCredit = BigDecimal.ZERO;
-                for (int j = 0; j < debtors.size(); j++) {
-                    JSONArray debtor = (JSONArray) debtors.get(j);
-
-                    BigDecimal creditAmount = new BigDecimal(debtor.get(0).toString()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-                    if (totalCredit.add(creditAmount).compareTo(fondAamount) > 0) {
-                        break;
+                    // SEND FONDs
+                    Account founder = new Account(holder.get(0).toString());
+                    if (leftRecipiend == null) {
+                        leftRecipiend = founder;
                     }
 
-                    sideSettingString += creditAmount.toString();
-                    sideSettingString += debtor.get(1).toString();
+                    BigDecimal fondAamount = new BigDecimal(holder.get(1).toString()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                    transactions.add(new GenesisTransferAssetTransaction(founder,
+                            AssetCls.ERA_KEY, fondAamount));
 
-                    transactions.add(new GenesisTransferAssetTransaction(new Account(debtor.get(1).toString()),
-                            -AssetCls.ERA_KEY,
-                            creditAmount, founder));
+                    totalSended = totalSended.add(fondAamount);
 
-                    totalCredit = totalCredit.add(creditAmount);
+                    if (holder.size() < 3)
+                        continue;
+
+                    String COMPUstr = holder.get(2).toString();
+                    if (COMPUstr.length() > 0 && !COMPUstr.equals("0")) {
+                        BigDecimal compu = new BigDecimal(COMPUstr).setScale(BlockChain.FEE_SCALE);
+                        transactions.add(new GenesisTransferAssetTransaction(founder,
+                                AssetCls.FEE_KEY, compu));
+                        sideSettingString += compu.toString();
+                    }
+
+                    if (holder.size() < 4)
+                        continue;
+
+                    // DEBTORS
+                    JSONArray debtors = (JSONArray) holder.get(3);
+                    BigDecimal totalCredit = BigDecimal.ZERO;
+                    for (int j = 0; j < debtors.size(); j++) {
+                        JSONArray debtor = (JSONArray) debtors.get(j);
+
+                        BigDecimal creditAmount = new BigDecimal(debtor.get(0).toString()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                        if (totalCredit.add(creditAmount).compareTo(fondAamount) > 0) {
+                            break;
+                        }
+
+                        sideSettingString += creditAmount.toString();
+                        sideSettingString += debtor.get(1).toString();
+
+                        transactions.add(new GenesisTransferAssetTransaction(new Account(debtor.get(1).toString()),
+                                -AssetCls.ERA_KEY,
+                                creditAmount, founder));
+
+                        totalCredit = totalCredit.add(creditAmount);
+                    }
                 }
-            }
 
-            if (totalSended.compareTo(new BigDecimal(BlockChain.GENESIS_ERA_TOTAL)) < 0) {
-                // ADJUST end
-                transactions.add(new GenesisTransferAssetTransaction(
-                        leftRecipiend, AssetCls.ERA_KEY,
-                        new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+                if (totalSended.compareTo(new BigDecimal(BlockChain.GENESIS_ERA_TOTAL)) < 0) {
+                    // ADJUST end
+                    transactions.add(new GenesisTransferAssetTransaction(
+                            leftRecipiend, AssetCls.ERA_KEY,
+                            new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+                }
             }
 
         } else {

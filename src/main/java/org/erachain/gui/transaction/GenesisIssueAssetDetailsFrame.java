@@ -52,7 +52,7 @@ public class GenesisIssueAssetDetailsFrame extends RecGenesis_DetailsFrame {
 
         //QUANTITY
         ++detailGBC.gridy;
-        JTextField quantity = new JTextField(asset.getQuantity().toString());
+        JTextField quantity = new JTextField("" + asset.getQuantity());
         quantity.setEditable(false);
         MenuPopupUtil.installContextMenu(quantity);
         this.add(quantity, detailGBC);

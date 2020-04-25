@@ -31,6 +31,7 @@ public class Settings {
 
     public static String APP_NAME = "";
     public static String APP_FULL_NAME = "";
+    public static boolean ERA_COMPU_ALL_UP;
 
     // FOR TEST by default
     public static long genesisStamp = DEFAULT_MAINNET_STAMP;
@@ -120,6 +121,7 @@ public class Settings {
     private JSONObject settingsJSON;
     private JSONObject peersJSON;
     public static JSONArray genesisJSON;
+    public static boolean simpleTestNet;
     private String userPath = "";
     private InetAddress localAddress;
     private String[] defaultPeers = {};

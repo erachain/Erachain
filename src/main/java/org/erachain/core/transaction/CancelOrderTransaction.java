@@ -83,7 +83,6 @@ public class CancelOrderTransaction extends Transaction {
 
     }
 
-
     public byte[] getorderSignature() {
         return this.orderSignature;
     }

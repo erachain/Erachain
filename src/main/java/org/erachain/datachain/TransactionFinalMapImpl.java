@@ -566,7 +566,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 // теперь проверим все слова в Заголовке
                 String[] titleArray = transaction.getTags();
 
-                if (titleArray.length < words.length)
+                if (titleArray == null || titleArray.length < words.length)
                     continue;
 
                 Pair<String, Boolean>[] txWords = stepFilter(titleArray);
@@ -641,6 +641,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
         // теперь проверим все слова в Заголовке
         String[] titleArray = get(fromSeqNo).getTags();
+        if (titleArray == null)
+            return null;
+
         for (int i = 0; i < titleArray.length; i++) {
             if (titleArray[i].startsWith(betterFilterWord)) {
                 return titleArray[i];

@@ -152,8 +152,9 @@ public class StatusesLibraryPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Account account = statusModel.getCreator(row);
                 //new AccountSendDialog(null, null, account, null);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send Asset to Creator"),new AccountAssetSendPanel(null,
-                        null, null, person, null), AccountAssetSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Asset to Creator"),
+                        new AccountAssetSendPanel(null,
+                                null, null, person, null), AccountAssetSendPanel.getIcon());
 
 
             }
@@ -164,7 +165,8 @@ public class StatusesLibraryPanel extends JPanel {
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account account = statusModel.getCreator(row);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Send mail to creator"),new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send mail to creator"),
+                        new MailSendPanel(null, account, null), MailSendPanel.getIcon());
                 //new MailSendDialog(null, null, account, null);
 
             }
