@@ -462,6 +462,20 @@ public class BlockChain {
                                         Crypto.getInstance().getShortBytesFromAddress(json.get(3).toString())));
                     }
                 }
+
+                if (chainParams.containsKey("peersURL")) {
+                    Settings.peersURL = chainParams.get("peersURL").toString();
+                }
+
+                if (chainParams.containsKey("license")) {
+                    Settings.sideLicense = chainParams.get("license").toString();
+                }
+
+                if (chainParams.containsKey("startKey")) {
+                    JSONObject startKeys = (JSONObject) chainParams.get("startKey");
+                    // TODO  do start KEYS
+                }
+
             }
         } else if (DEMO_MODE) {
 

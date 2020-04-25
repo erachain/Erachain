@@ -1,4 +1,6 @@
 {
+  // peers from external source
+  "peersURL": "https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json",
   "assets": [
     // ASSET KEY, NAME, QUALITY, CREATOR
     [
@@ -28,5 +30,12 @@
       148293470000,
       "7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh"
     ]
-  ]
+  ],
+  // start number of items from START_NO
+  // for items: assets, imprints, persons, polls, statements, statuses, templates, unouns
+  // default is 2^14
+  "startKey": {
+    "assets": 100000,
+    "persons": 1000000
+  }
 }
