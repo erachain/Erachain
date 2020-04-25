@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.*;
+import org.erachain.gui.create.LicenseDataJFrame;
 import org.erachain.gui.create.LicenseJFrame;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.settings.SettingsFrame;
@@ -296,25 +297,37 @@ public class MenuFiles extends JMenu {
         aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
         aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                    AboutFrame.getInstance().setCursor(new Cursor(Cursor.HAND_CURSOR));
-                    AboutFrame.getInstance().set_console_Text("");
-                    AboutFrame.getInstance().setUserClose(true);
-                    AboutFrame.getInstance().setModal(true);
-                    AboutFrame.getInstance().setVisible(true);
-                }
+                AboutFrame.getInstance().setCursor(new Cursor(Cursor.HAND_CURSOR));
+                AboutFrame.getInstance().set_console_Text("");
+                AboutFrame.getInstance().setUserClose(true);
+                AboutFrame.getInstance().setModal(true);
+                AboutFrame.getInstance().setVisible(true);
+            }
         });
         add(aboutItem);
 
-        //ABOUT
-        JMenuItem licisceItem = new JMenuItem(Lang.getInstance().translate("License"));
-        //    licisceItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
-        //    licisceItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
-        licisceItem.addActionListener(new ActionListener() {
+        // ERACHAIN LICENSE
+        JMenuItem licenseItem = new JMenuItem(Lang.getInstance().translate("License"));
+        //    licenseItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
+        //    licenseItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
+        licenseItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new LicenseJFrame();
             }
         });
-        add(licisceItem);
+        add(licenseItem);
+
+        // SIDECHAIN LICENSE
+        //ABOUT
+        JMenuItem dataLicenseItem = new JMenuItem(Lang.getInstance().translate("Data License of Sidechain"));
+        //    licenseItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
+        //    licenseItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
+        dataLicenseItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new LicenseDataJFrame();
+            }
+        });
+        add(dataLicenseItem);
 
 
         //SEPARATOR
