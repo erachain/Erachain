@@ -36,6 +36,9 @@ public class Settings {
     // FOR TEST by default
     public static long genesisStamp = DEFAULT_MAINNET_STAMP;
 
+    public static String peersURL = "https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json";
+    public static String sideLicense = "sideLicense.txt";
+
     //private static final String[] DEFAULT_PEERS = { };
     public static final String DEFAULT_THEME = "System";
     public static final int DEFAULT_ACCOUNTS = 1;
@@ -457,7 +460,7 @@ public class Settings {
 
             if (this.cacheInternetPeers.isEmpty() || NTP.getTime() - this.timeLoadInternetPeers > 24 * 60 * 60 * 1000) {
                 this.timeLoadInternetPeers = NTP.getTime();
-                URL u = new URL("https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json");
+                URL u = new URL(peersURL);
                 InputStream in = u.openStream();
                 String stringInternetSettings = IOUtils.toString(in);
                 JSONObject internetSettingsJSON = (JSONObject) JSONValue.parse(stringInternetSettings);
@@ -707,12 +710,18 @@ public class Settings {
         return BlockChain.DEFAULT_WEB_PORT;
     }
 
+    public String explorerURL;
     public String getBlockexplorerURL() {
-        if (this.settingsJSON.containsKey("explorerURL")) {
-            return this.settingsJSON.get("explorerURL").toString();
+        if (explorerURL == null) {
+            if (this.settingsJSON.containsKey("explorerURL")) {
+                return (explorerURL = this.settingsJSON.get("explorerURL").toString());
+            } else {
+                return (explorerURL = BlockChain.DEFAULT_EXPLORER);
+            }
         }
 
-        return BlockChain.DEFAULT_EXPLORER;
+        return explorerURL;
+
     }
 
     public boolean isGuiConsoleEnabled() {

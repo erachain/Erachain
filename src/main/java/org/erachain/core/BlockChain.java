@@ -104,7 +104,7 @@ public class BlockChain {
     public static final int DEFAULT_WEB_PORT = NETWORK_PORT + 1;
     public static final int DEFAULT_RPC_PORT = NETWORK_PORT + 2;
 
-    public static final String DEFAULT_EXPLORER = "explorer.erachain.org";
+    public static final String DEFAULT_EXPLORER = "http://explorer.erachain.org:" + DEFAULT_WEB_PORT;
 
     //public static final String TIME_ZONE = "GMT+3";
     //
@@ -462,6 +462,26 @@ public class BlockChain {
                                         Crypto.getInstance().getShortBytesFromAddress(json.get(3).toString())));
                     }
                 }
+
+                if (chainParams.containsKey("peersURL")) {
+                    Settings.peersURL = chainParams.get("peersURL").toString();
+                }
+
+                if (chainParams.containsKey("license")) {
+                    Settings.sideLicense = chainParams.get("license").toString();
+                }
+
+                if (chainParams.containsKey("startKey")) {
+                    JSONObject startKeys = (JSONObject) chainParams.get("startKey");
+                    // TODO  do start KEYS
+                }
+
+
+                if (chainParams.containsKey("explorer")) {
+                    Settings.getInstance().explorerURL = chainParams.get("explorer").toString();
+                }
+
+
             }
         } else if (DEMO_MODE) {
 
