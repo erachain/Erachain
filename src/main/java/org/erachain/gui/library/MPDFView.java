@@ -306,8 +306,8 @@ public class MPDFView extends javax.swing.JPanel {
             FileChannel channel = raf.getChannel();
             return channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(e.getMessage() + " - " + fileName, e);
+            Controller.getInstance().stopAll(3);
         }
 
         return null;

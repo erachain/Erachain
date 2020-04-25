@@ -37,7 +37,7 @@ public class Settings {
     public static long genesisStamp = DEFAULT_MAINNET_STAMP;
 
     public static String peersURL = "https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json";
-    public static String sideLicense = "sideLicense.txt";
+    public static String sideLicense; // see sidePROTOCOL_example.json
 
     //private static final String[] DEFAULT_PEERS = { };
     public static final String DEFAULT_THEME = "System";
