@@ -147,7 +147,8 @@ public class LicenseDataJFrame extends JDialog {
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new Insets(0, 8, 0, 8);
         //    mainPanel.add(scrollPaneDescription, gridBagConstraints);
-        MPDFView pp = new MPDFView();
+
+        MPDFView pp = new MPDFView("readPDFFile");
 
         mainPanel.add(pp, gridBagConstraints);
         pp.show();
