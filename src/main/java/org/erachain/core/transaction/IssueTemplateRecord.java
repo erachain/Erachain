@@ -16,8 +16,6 @@ public class IssueTemplateRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_TEMPLATE_TRANSACTION;
     private static final String NAME_ID = "Issue Template";
 
-    public static final long START_KEY = BlockChain.SIDE_MODE || BlockChain.TEST_MODE && !BlockChain.DEMO_MODE ? 1L << 14 : 1000L;
-
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, template, feePow, timestamp, reference);
     }
@@ -52,11 +50,6 @@ public class IssueTemplateRecord extends IssueItemRecord {
     }
 
     //GETTERS/SETTERS
-
-    @Override
-    public long getStartKey() {
-        return START_KEY;
-    }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 

@@ -1,5 +1,6 @@
 package org.erachain.core.item.statements;
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
@@ -7,6 +8,8 @@ import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 
 public abstract class StatementCls extends ItemCls {
+
+    public static final long START_KEY = BlockChain.SIDE_MODE ? 1L << 14 : 1000L;
 
     public static final int NOTE = 1;
 
@@ -25,6 +28,13 @@ public abstract class StatementCls extends ItemCls {
     //GETTERS/SETTERS
     public int getItemType() {
         return ItemCls.STATEMENT_TYPE;
+    }
+
+    @Override
+    public long getStartKey() {
+        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.STATEMENT_TYPE] < START_KEY)
+            return START_KEY;
+        return BlockChain.startKeys[ItemCls.STATEMENT_TYPE];
     }
 
     public String getItemTypeName() {

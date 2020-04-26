@@ -19,8 +19,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
     private static final String NAME_ID = "Issue Asset";
 
-    public static final long START_KEY = BlockChain.SIDE_MODE || BlockChain.TEST_MODE && !BlockChain.DEMO_MODE ? 1L << 14 : 1000L;
-
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
     //private AssetCls asset;
@@ -58,11 +56,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Asset"; }
-
-    @Override
-    public long getStartKey() {
-        return START_KEY;
-    }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
         //boolean asPack = releaserReference != null;

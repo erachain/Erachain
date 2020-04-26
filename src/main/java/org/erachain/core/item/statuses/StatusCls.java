@@ -1,5 +1,6 @@
 package org.erachain.core.item.statuses;
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
@@ -13,6 +14,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public abstract class StatusCls extends ItemCls {
+
+    public static final long START_KEY = BlockChain.SIDE_MODE ? 1L << 14 : 0L;
 
     public static final Long RIGHTS_KEY = 1l;
     public static final Long MEMBER_KEY = 2l;
@@ -36,6 +39,13 @@ public abstract class StatusCls extends ItemCls {
     //GETTERS/SETTERS
     public int getItemType() {
         return ItemCls.STATUS_TYPE;
+    }
+
+    @Override
+    public long getStartKey() {
+        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.STATUS_TYPE] < START_KEY)
+            return START_KEY;
+        return BlockChain.startKeys[ItemCls.STATUS_TYPE];
     }
 
     public String getItemTypeName() {

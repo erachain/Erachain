@@ -38,6 +38,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
     public static final int UNION_TYPE = 6;
     public static final int STATEMENT_TYPE = 7;
     public static final int POLL_TYPE = 8;
+
     public static final int MAX_ICON_LENGTH = 11000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
     public static final int MAX_IMAGE_LENGTH = 1100000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
     protected static final int TYPE_LENGTH = 2;
@@ -123,6 +124,9 @@ public abstract class ItemCls implements ExplorerJsonLine {
         //return Controller.getInstance().getItem(db, type, key);
         return db.getItem_Map(type).get(key);
     }
+
+    // RETURN START KEY in not GENESIS
+    public abstract long getStartKey();
 
     public abstract int getMinNameLen();
 
@@ -268,6 +272,31 @@ public abstract class ItemCls implements ExplorerJsonLine {
         }
     }
 
+    public static int getItemTypeByName(String itemTypeName) {
+        String type = itemTypeName.toLowerCase();
+
+        if (type.equals("asset")) {
+            return ItemCls.ASSET_TYPE;
+        } else if (type.equals("imprint")) {
+            return ItemCls.IMPRINT_TYPE;
+        } else if (type.equals("person")) {
+            return ItemCls.PERSON_TYPE;
+        } else if (type.equals("poll")) {
+            return ItemCls.POLL_TYPE;
+        } else if (type.equals("statement")) {
+            return ItemCls.STATEMENT_TYPE;
+        } else if (type.equals("status")) {
+            return ItemCls.STATUS_TYPE;
+        } else if (type.equals("template")) {
+            return ItemCls.TEMPLATE_TYPE;
+        } else if (type.equals("union")) {
+            return ItemCls.UNION_TYPE;
+        }
+
+        return -1;
+
+    }
+
     public long getHeight(DCSet db) {
         //INSERT INTO DATABASE
         ItemMap dbMap = this.getDBMap(db);
@@ -317,8 +346,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return this.description;
     }
 
-
-        public byte[] getReference() {
+    public byte[] getReference() {
         return this.reference;
     }
 
