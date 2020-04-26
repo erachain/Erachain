@@ -249,7 +249,7 @@ public abstract class AssetCls extends ItemCls {
 
     @Override
     public long getStartKey() {
-        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.ASSET_TYPE] == 0)
+        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.ASSET_TYPE] < START_KEY)
             return START_KEY;
         return BlockChain.startKeys[ItemCls.ASSET_TYPE];
     }

@@ -48,7 +48,7 @@ public abstract class UnionCls extends ItemCls {
 
     @Override
     public long getStartKey() {
-        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.UNION_TYPE] == 0)
+        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.UNION_TYPE] < START_KEY)
             return START_KEY;
         return BlockChain.startKeys[ItemCls.UNION_TYPE];
     }

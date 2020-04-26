@@ -32,7 +32,7 @@ public abstract class StatementCls extends ItemCls {
 
     @Override
     public long getStartKey() {
-        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.STATEMENT_TYPE] == 0)
+        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.STATEMENT_TYPE] < START_KEY)
             return START_KEY;
         return BlockChain.startKeys[ItemCls.STATEMENT_TYPE];
     }

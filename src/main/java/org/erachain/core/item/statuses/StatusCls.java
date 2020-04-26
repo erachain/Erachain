@@ -43,7 +43,7 @@ public abstract class StatusCls extends ItemCls {
 
     @Override
     public long getStartKey() {
-        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.STATUS_TYPE] == 0)
+        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.STATUS_TYPE] < START_KEY)
             return START_KEY;
         return BlockChain.startKeys[ItemCls.STATUS_TYPE];
     }
