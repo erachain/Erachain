@@ -3,6 +3,13 @@
   "peersURL": "",
   "sideLicense": "Sidechain Licence Agreement.pdf",
   "explorer": "http://18.219.143.155:9057",
+  // START KEYS
+  "startKey": {
+    "assets": 10000,
+    "persons": 10000,
+    "polls": 100,
+    "statuses": 100
+  },
   "assets": [
     // ASSET KEY, NAME, VOLUME, CREATOR
     [
