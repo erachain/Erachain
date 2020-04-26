@@ -3,6 +3,7 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -340,10 +341,14 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         data = this.toBytes(FOR_NETWORK, false);
         if (data == null) return;
 
-        // all test a not valid for main test
-        // all other network must be invalid here!
-        int port = BlockChain.NETWORK_PORT;
-        data = Bytes.concat(data, Ints.toByteArray(port));
+        if (BlockChain.SIDE_MODE) {
+            // чтобы из других цепочек не срабатывало
+            data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
+        } else {
+            // чтобы из TestNEt не сработало
+            int port = BlockChain.NETWORK_PORT;
+            data = Bytes.concat(data, Ints.toByteArray(port));
+        }
 
         if (this.sertifiedSignatures == null) this.sertifiedSignatures = new ArrayList<byte[]>();
 
@@ -442,10 +447,14 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         byte[] data = this.toBytes(Transaction.FOR_NETWORK, false);
         if (data == null) return false;
 
-        // all test a not valid for main test
-        // all other network must be invalid here!
-        int port = BlockChain.NETWORK_PORT;
-        data = Bytes.concat(data, Ints.toByteArray(port));
+        if (BlockChain.SIDE_MODE) {
+            // чтобы из других цепочек не срабатывало
+            data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
+        } else {
+            // чтобы из TestNEt не сработало
+            int port = BlockChain.NETWORK_PORT;
+            data = Bytes.concat(data, Ints.toByteArray(port));
+        }
 
         Crypto crypto = Crypto.getInstance();
         if (!crypto.verify(creator.getPublicKey(), signature, data))
