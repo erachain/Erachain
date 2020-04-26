@@ -75,7 +75,7 @@ public class Start {
 
         ///////////////////  SIDECHAINS ///////////
         file = new File("sideGENESIS.json");
-        if (false && file.exists()) {
+        if (true && file.exists()) {
             // START SIDE CHAIN
             try {
                 List<String> lines = Files.readLines(file, Charsets.UTF_8);
