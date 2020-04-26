@@ -473,6 +473,9 @@ public class BlockChain {
 
                 if (chainParams.containsKey("blockPeriod")) {
                     BLOCKS_PERIOD = Integer.parseInt(chainParams.get("blockPeriod").toString());
+                    if (BLOCKS_PERIOD < 3) {
+                        BLOCKS_PERIOD = 3;
+                    }
                 }
 
                 if (chainParams.containsKey("peersURL")) {
