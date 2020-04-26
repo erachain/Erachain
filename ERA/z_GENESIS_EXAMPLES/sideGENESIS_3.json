@@ -1,0 +1,104 @@
+[
+  // SIDECHAIN SHORT NAME, SIDECHAIN= FULL NAME
+  [
+    "Литовкин",
+    "Литовкин Василий Анатольевич"
+  ],
+  // TIMESTAMP LONG
+  [
+    1587915462000
+  ],
+  // forging addresses
+  [
+    /// recipient, ERA, COMPU, [DEBTORS]
+    [
+      "7GTVsqf2rNycHL5JRj2rh8eQUsjTa1gQso",
+      10000000,
+      0,
+      // debtors
+      [
+        // ERA, recipient
+        [
+          600000,
+          "7F1KmVWiV7pX5hupuLe5tMXxqpNzsNnF1E"
+        ],
+        [
+          600000,
+          "7487AFh2Ejek79JPXZSzDddegMxJp1vyNZ"
+        ],
+        [
+          600000,
+          "7MLaMYZqXwx16KmQmVc6CKZQekVnASDPj7"
+        ],
+        [
+          600000,
+          "7BZLBbhNCBcX67Uvn9VH3ASVaV6VdAiXcY"
+        ],
+        [
+          400000,
+          "7DHs2R8UygYgpFVEyxrZ5bHB1EwPjcafeP"
+        ],
+        [
+          400000,
+          "7GoTmX87qmeciz6WCvw5mhP3Skvv9jJpE4"
+        ],
+        [
+          400000,
+          "7KqsQijPTPFpVqZabRZZXJp74MPUM5B3rT"
+        ],
+        [
+          400000,
+          "7KrZt6UYC1EhSiFTzVpxStCJQQMTSGsHKv"
+        ],
+        [
+          400000,
+          "77SMErmzHSSugGQdbXH8bYwcGYT8Yy2ybF"
+        ],
+        [
+          400000,
+          "7FBxdSmAi7Afw1hPpLQZMyD68y1SPQsfvk"
+        ],
+        [
+          400000,
+          "7MwEXsUm4utHaCwNq1FFuzppmwfV9CwjJc"
+        ],
+        [
+          400000,
+          "7QuNPj4YPAty6djcMqHkHQynz2H8M7YYSr"
+        ],
+        [
+          400000,
+          "7EBY2Znt22SE35X56dNbvBB19iWCkDzxHk"
+        ],
+        [
+          400000,
+          "7E88CiLGoF48NvkGQp95Q2kWKpKCYKAdS4"
+        ],
+        [
+          400000,
+          "7LpCeofG9FZSX8AqrgUjJrNFmE9sE7z5xM"
+        ],
+        [
+          400000,
+          "77DafzF629hCvF78FWhXSyVzg9jV2KxreQ"
+        ],
+        [
+          400000,
+          "7J6jPBge9pNBbsgvpWnQvijEHqmHDu5DuZ"
+        ],
+        [
+          400000,
+          "7P9g3kFmLzUUJtxbzaBnZGxX39kAj2sTtQ"
+        ],
+        [
+          400000,
+          "7LUf994TdbHST7mKjHKDFmQNprHPkJU1pC"
+        ],
+        [
+          400000,
+          "7Ekmc6ao7ccSaBVG7v1d5j14E4EahA7s7y"
+        ]
+      ]
+    ]
+  ]
+]
