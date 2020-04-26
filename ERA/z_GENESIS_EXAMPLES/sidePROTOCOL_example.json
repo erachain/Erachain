@@ -38,6 +38,8 @@
   // default is 2^14
   "startKey": {
     "assets": 100000,
-    "persons": 1000000
+    "persons": 1000000,
+    "polls": 1000,
+    "statuses": 1000
   }
 }

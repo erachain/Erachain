@@ -11,6 +11,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlocksHeadsMap;
@@ -387,6 +388,8 @@ public class BlockChain {
     private long genesisTimestamp;
     private Block waitWinBuffer;
 
+    public static long[] startKeys = new long[10];
+
     //private int target = 0;
     //private byte[] lastBlockSignature;
     //private Tuple2<Integer, Long> HWeight;
@@ -472,8 +475,10 @@ public class BlockChain {
                 }
 
                 if (chainParams.containsKey("startKey")) {
-                    JSONObject startKeys = (JSONObject) chainParams.get("startKey");
-                    // TODO  do start KEYS
+                    JSONObject startKeysJson = (JSONObject) chainParams.get("startKey");
+                    for (Object key : startKeysJson.keySet()) {
+                        startKeys[ItemCls.getItemTypeByName((String) key)] = (long) startKeysJson.get(key);
+                    }
                 }
 
 

@@ -111,6 +111,13 @@ public abstract class PersonCls extends ItemCls {
         return ItemCls.PERSON_TYPE;
     }
 
+    @Override
+    public long getStartKey() {
+        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.PERSON_TYPE] == 0)
+            return 0L;
+        return BlockChain.startKeys[ItemCls.PERSON_TYPE];
+    }
+
     public String getItemTypeName() {
         return "person";
     }
