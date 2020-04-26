@@ -472,7 +472,7 @@ public class BlockChain {
                 }
 
                 if (chainParams.containsKey("blockPeriod")) {
-                    BLOCKS_PERIOD = (int) chainParams.get("blockPeriod");
+                    BLOCKS_PERIOD = Integer.parseInt(chainParams.get("blockPeriod").toString());
                 }
 
                 if (chainParams.containsKey("peersURL")) {
