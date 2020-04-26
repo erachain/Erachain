@@ -31,9 +31,12 @@ public abstract class ImprintCls extends ItemCls {
 
     @Override
     public long getStartKey() {
-        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.IMPRINT_TYPE] < START_KEY)
-            return 0L;
-        return BlockChain.startKeys[ItemCls.IMPRINT_TYPE];
+        long startKey = BlockChain.startKeys[ItemCls.IMPRINT_TYPE];
+
+        if (BlockChain.MAIN_MODE || startKey > 0 && startKey < START_KEY)
+            return START_KEY;
+
+        return startKey;
     }
 
     public String getItemTypeName() {
