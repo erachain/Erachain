@@ -64,11 +64,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         return key;
     }
 
-    // RETURN START KEY if not GENESIS
-    public long getStartKey() {
-        return BlockChain.SIDE_MODE || BlockChain.TEST_MODE && !BlockChain.DEMO_MODE ? 1L << 14 : 0L;
-    }
-
     @Override
     public String getTitle() {
         return this.item.getName();
@@ -219,7 +214,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
             this.item.setReference(this.signature);
 
         //INSERT INTO DATABASE
-        key = this.item.insertToMap(this.dcSet, this.getStartKey());
+        key = this.item.insertToMap(this.dcSet, this.item.getStartKey());
 
     }
 
@@ -231,7 +226,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
         //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 1");
         //DELETE FROM DATABASE
-        long key = this.item.deleteFromMap(this.dcSet, getStartKey());
+        long key = this.item.deleteFromMap(this.dcSet, item.getStartKey());
         //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 2");
     }
 
