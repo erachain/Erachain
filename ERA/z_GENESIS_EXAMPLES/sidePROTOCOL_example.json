@@ -3,6 +3,7 @@
   "peersURL": "https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json",
   // external Block Explorer
   "explorer": "http://my-sidechain.dom:9057",
+  "sideLicense": "Sidechain Licence Agreement.pdf",
   "assets": [
     // ASSET KEY, NAME, QUALITY, CREATOR
     [

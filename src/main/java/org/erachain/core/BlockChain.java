@@ -467,8 +467,8 @@ public class BlockChain {
                     Settings.peersURL = chainParams.get("peersURL").toString();
                 }
 
-                if (chainParams.containsKey("license")) {
-                    Settings.sideLicense = chainParams.get("license").toString();
+                if (chainParams.containsKey("sideLicense")) {
+                    Settings.sideLicense = chainParams.get("sideLicense").toString();
                 }
 
                 if (chainParams.containsKey("startKey")) {
