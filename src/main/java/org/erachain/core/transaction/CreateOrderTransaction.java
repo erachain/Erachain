@@ -479,63 +479,60 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             flags = flags | NOT_VALIDATE_FLAG_FEE;
         } else {
 
-            if (haveAsset.isAccounting()) {
-                switch ((int) haveKey) {
-                    case 111:
-                    case 222:
-                    case 333:
-                    case 444:
-                    case 555:
-                    case 666:
-                    case 777:
-                    case 888:
-                    case 999:
+            switch ((int) haveKey) {
+                case 111:
+                case 222:
+                case 333:
+                case 444:
+                case 555:
+                case 666:
+                case 777:
+                case 888:
+                case 999:
+                    return NO_BALANCE;
+            }
+
+
+            ///// CHECK IF SENDER HAS ENOUGH FEE BALANCE
+            ///if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.fee) == -1) {
+            ///    return NOT_ENOUGH_FEE;
+            ///}
+
+            // if asset is unlimited and me is creator of this asset
+            boolean unLimited = haveAsset.isUnlimited(this.creator);
+
+            if (!unLimited) {
+
+                BigDecimal forSale = this.creator.getForSale(this.dcSet, haveKey, height, true);
+
+                if (forSale.compareTo(amountHave) < 0) {
+                    boolean wrong = true;
+                    for (byte[] valid_item : BlockChain.VALID_BAL) {
+                        if (Arrays.equals(this.signature, valid_item)) {
+                            wrong = false;
+                            break;
+                        }
+                    }
+
+                    if (wrong)
                         return NO_BALANCE;
                 }
-
-            } else {
-
-                ///// CHECK IF SENDER HAS ENOUGH FEE BALANCE
-                ///if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.fee) == -1) {
-                ///    return NOT_ENOUGH_FEE;
-                ///}
-
-                // if asset is unlimited and me is creator of this asset
-                boolean unLimited = haveAsset.isUnlimited(this.creator);
-
-                if (!unLimited) {
-
-                    BigDecimal forSale = this.creator.getForSale(this.dcSet, haveKey, height, true);
-
-                    if (forSale.compareTo(amountHave) < 0) {
-                        boolean wrong = true;
-                        for (byte[] valid_item : BlockChain.VALID_BAL) {
-                            if (Arrays.equals(this.signature, valid_item)) {
-                                wrong = false;
-                                break;
-                            }
-                        }
-
-                        if (wrong)
-                            return NO_BALANCE;
-                    }
-                }
-
-                if (height > BlockChain.FREEZE_FROM
-                        && BlockChain.LOCKED__ADDRESSES.containsKey(this.creator.getAddress()))
-                    return INVALID_CREATOR;
-
-                Tuple3<String, Integer, Integer> unlockItem = BlockChain.LOCKED__ADDRESSES_PERIOD.get(this.creator.getAddress());
-                if (unlockItem != null && unlockItem.b > height && height < unlockItem.c)
-                    return INVALID_CREATOR;
-
             }
-        }
 
-        //
-        Long maxWant = wantAsset.getQuantity();
-        if (maxWant > 0 && new BigDecimal(maxWant).compareTo(amountWant) < 0)
-            return INVALID_QUANTITY;
+            if (height > BlockChain.FREEZE_FROM
+                    && BlockChain.LOCKED__ADDRESSES.containsKey(this.creator.getAddress()))
+                return INVALID_CREATOR;
+
+            Tuple3<String, Integer, Integer> unlockItem = BlockChain.LOCKED__ADDRESSES_PERIOD.get(this.creator.getAddress());
+            if (unlockItem != null && unlockItem.b > height && height < unlockItem.c)
+                return INVALID_CREATOR;
+
+            //
+            Long maxWant = wantAsset.getQuantity();
+            if (maxWant > 0 && new BigDecimal(maxWant).compareTo(amountWant) < 0)
+                return INVALID_QUANTITY;
+
+        }
 
         // for PARSE and toBYTES need only AMOUNT_LENGTH bytes
         // and SCALE
