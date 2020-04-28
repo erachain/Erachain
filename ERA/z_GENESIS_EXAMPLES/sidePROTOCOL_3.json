@@ -1,0 +1,43 @@
+{
+  "blockPeriod": 5,
+  "peersURL": "",
+  "sideLicense": "Sidechain Licence Agreement.pdf",
+  "explorer": "http://18.219.143.155:9057",
+  // START KEYS
+  "startKey": {
+    "assets": 10000,
+    "persons": 10000,
+    "polls": 100,
+    "statuses": 100
+  },
+  "assets": [
+    // ASSET KEY, NAME, VOLUME, CREATOR
+    [
+      12,
+      "BTC",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      92,
+      "RUB",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      95,
+      "USD",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ]
+  ],
+  "persons": [
+    // NAME. PERSON KEY, CREATOR
+    [
+      1010,
+      "DMITRII ERMOLAEV",
+      148293470000,
+      "7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh"
+    ]
+  ]
+}

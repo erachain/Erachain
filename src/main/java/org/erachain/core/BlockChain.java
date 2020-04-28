@@ -96,6 +96,11 @@ public class BlockChain {
     public static final boolean MAIN_MODE = !TEST_MODE && !SIDE_MODE;
 
     /**
+     * default = 30 sec
+     */
+    private static int BLOCKS_PERIOD = 30; // [sec]
+
+    /**
      * set uo all balances ERA to 10000 and COMPU to 100
      */
     public static final boolean ERA_COMPU_ALL_UP = TEST_MODE || TEST_DB > 0 || Settings.ERA_COMPU_ALL_UP;
@@ -466,6 +471,13 @@ public class BlockChain {
                     }
                 }
 
+                if (chainParams.containsKey("blockPeriod")) {
+                    BLOCKS_PERIOD = Integer.parseInt(chainParams.get("blockPeriod").toString());
+                    if (BLOCKS_PERIOD < 3) {
+                        BLOCKS_PERIOD = 3;
+                    }
+                }
+
                 if (chainParams.containsKey("peersURL")) {
                     Settings.peersURL = chainParams.get("peersURL").toString();
                 }
@@ -480,7 +492,6 @@ public class BlockChain {
                         startKeys[ItemCls.getItemTypeByName((String) key)] = (long) startKeysJson.get(key);
                     }
                 }
-
 
                 if (chainParams.containsKey("explorer")) {
                     Settings.getInstance().explorerURL = chainParams.get("explorer").toString();
@@ -744,6 +755,9 @@ public class BlockChain {
     }
 
     public static int GENERATING_MIN_BLOCK_TIME(int height) {
+
+        if (SIDE_MODE)
+            return BLOCKS_PERIOD;
 
         if (VERS_30SEC > 0 && height <= VERS_30SEC) {
             return 288; // old MainNet

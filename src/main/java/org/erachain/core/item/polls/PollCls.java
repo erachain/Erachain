@@ -49,9 +49,12 @@ public abstract class PollCls extends ItemCls {
 
     @Override
     public long getStartKey() {
-        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.POLL_TYPE] < START_KEY)
+        long startKey = BlockChain.startKeys[ItemCls.POLL_TYPE];
+
+        if (BlockChain.MAIN_MODE || startKey > 0 && startKey < START_KEY)
             return START_KEY;
-        return BlockChain.startKeys[ItemCls.POLL_TYPE];
+
+        return startKey;
     }
 
     public String getItemTypeName() {

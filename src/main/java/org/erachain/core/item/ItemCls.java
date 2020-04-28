@@ -275,21 +275,21 @@ public abstract class ItemCls implements ExplorerJsonLine {
     public static int getItemTypeByName(String itemTypeName) {
         String type = itemTypeName.toLowerCase();
 
-        if (type.equals("asset")) {
+        if (type.startsWith("asset")) {
             return ItemCls.ASSET_TYPE;
-        } else if (type.equals("imprint")) {
+        } else if (type.startsWith("imprint")) {
             return ItemCls.IMPRINT_TYPE;
-        } else if (type.equals("person")) {
+        } else if (type.startsWith("person")) {
             return ItemCls.PERSON_TYPE;
-        } else if (type.equals("poll")) {
+        } else if (type.startsWith("poll")) {
             return ItemCls.POLL_TYPE;
-        } else if (type.equals("statement")) {
+        } else if (type.startsWith("statement")) {
             return ItemCls.STATEMENT_TYPE;
-        } else if (type.equals("status")) {
+        } else if (type.startsWith("status")) {
             return ItemCls.STATUS_TYPE;
-        } else if (type.equals("template")) {
+        } else if (type.startsWith("template")) {
             return ItemCls.TEMPLATE_TYPE;
-        } else if (type.equals("union")) {
+        } else if (type.startsWith("union")) {
             return ItemCls.UNION_TYPE;
         }
 

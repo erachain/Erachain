@@ -49,9 +49,12 @@ public abstract class TemplateCls extends ItemCls {
 
     @Override
     public long getStartKey() {
-        if (BlockChain.MAIN_MODE || BlockChain.startKeys[ItemCls.TEMPLATE_TYPE] < START_KEY)
+        long startKey = BlockChain.startKeys[ItemCls.TEMPLATE_TYPE];
+
+        if (BlockChain.MAIN_MODE || startKey > 0 && startKey < START_KEY)
             return START_KEY;
-        return BlockChain.startKeys[ItemCls.TEMPLATE_TYPE];
+
+        return startKey;
     }
 
     public String getItemTypeName() {
