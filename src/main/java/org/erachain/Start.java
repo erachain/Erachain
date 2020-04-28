@@ -73,7 +73,7 @@ public class Start {
             }
         }
 
-
+        ///////////////////  SIDECHAINS ///////////
         file = new File("sideGENESIS.json");
         if (true && file.exists()) {
             // START SIDE CHAIN

@@ -16,8 +16,6 @@ public class IssueUnionRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_UNION_TRANSACTION;
     private static final String NAME_ID = "Issue Union";
 
-    public static final long START_KEY = 1L << 20;
-
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference);
     }
@@ -53,11 +51,6 @@ public class IssueUnionRecord extends IssueItemRecord {
 
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Union"; }
-
-    // RETURN START KEY in not GENESIS
-    public long getStartKey(int height) {
-        return START_KEY;
-    }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 

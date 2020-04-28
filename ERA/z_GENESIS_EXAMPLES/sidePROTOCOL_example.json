@@ -1,8 +1,20 @@
 {
   // peers from external source
   "peersURL": "https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json",
+  // Blocks period [sec], minumum: 3, default: 30
+  "blockPeriod": 5,
   // external Block Explorer
   "explorer": "http://my-sidechain.dom:9057",
+  "sideLicense": "Sidechain Licence Agreement.pdf",
+  // start number of items from START_NO
+  // for items: assets, imprints, persons, polls, statements, statuses, templates, unouns
+  // default is 2^14
+  "startKey": {
+    "assets": 100000,
+    "persons": 1000000,
+    "polls": 1000,
+    "statuses": 1000
+  },
   "assets": [
     // ASSET KEY, NAME, QUALITY, CREATOR
     [
@@ -24,6 +36,7 @@
       "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
     ]
   ],
+
   "persons": [
     // PERSON KEY, NAME, BIRTH TIMESTAMP, CREATOR
     [
@@ -32,12 +45,5 @@
       148293470000,
       "7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh"
     ]
-  ],
-  // start number of items from START_NO
-  // for items: assets, imprints, persons, polls, statements, statuses, templates, unouns
-  // default is 2^14
-  "startKey": {
-    "assets": 100000,
-    "persons": 1000000
-  }
+  ]
 }

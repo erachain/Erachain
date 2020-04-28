@@ -21,6 +21,8 @@ import java.util.HashMap;
 // 1019 - Movable = true; Divisible = NO; Quantity = 1
 public abstract class AssetCls extends ItemCls {
 
+    public static final long START_KEY = 1000L;
+
     // CORE KEY
     public static final long ERA_KEY = 1l;
     public static final String ERA_ABBREV = "ERA"; // ERA (main rights units)
@@ -243,6 +245,16 @@ public abstract class AssetCls extends ItemCls {
     @Override
     public int getItemType() {
         return ItemCls.ASSET_TYPE;
+    }
+
+    @Override
+    public long getStartKey() {
+        long startKey = BlockChain.startKeys[ItemCls.ASSET_TYPE];
+
+        if (BlockChain.MAIN_MODE || startKey > 0 && startKey < START_KEY)
+            return START_KEY;
+
+        return startKey;
     }
 
     @Override

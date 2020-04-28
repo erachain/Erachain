@@ -1,6 +1,7 @@
 package org.erachain.core.item.imprints;
 
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
@@ -9,6 +10,7 @@ import org.erachain.datachain.ItemMap;
 
 public abstract class ImprintCls extends ItemCls {
 
+    public static final long START_KEY = BlockChain.SIDE_MODE ? 1L << 14 : 1000L;
     protected static final int IMPRINT = 1;
 
     public ImprintCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
@@ -25,6 +27,16 @@ public abstract class ImprintCls extends ItemCls {
 
     public int getItemType() {
         return ItemCls.IMPRINT_TYPE;
+    }
+
+    @Override
+    public long getStartKey() {
+        long startKey = BlockChain.startKeys[ItemCls.IMPRINT_TYPE];
+
+        if (BlockChain.MAIN_MODE || startKey > 0 && startKey < START_KEY)
+            return START_KEY;
+
+        return startKey;
     }
 
     public String getItemTypeName() {

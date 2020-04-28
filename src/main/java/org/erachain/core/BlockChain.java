@@ -11,6 +11,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlocksHeadsMap;
@@ -93,6 +94,11 @@ public class BlockChain {
     public static final boolean DEMO_MODE = Settings.getInstance().isDemoNet();
     public static final boolean TEST_MODE = Settings.getInstance().isTestNet();
     public static final boolean MAIN_MODE = !TEST_MODE && !SIDE_MODE;
+
+    /**
+     * default = 30 sec
+     */
+    private static int BLOCKS_PERIOD = 30; // [sec]
 
     /**
      * set uo all balances ERA to 10000 and COMPU to 100
@@ -387,6 +393,8 @@ public class BlockChain {
     private long genesisTimestamp;
     private Block waitWinBuffer;
 
+    public static long[] startKeys = new long[10];
+
     //private int target = 0;
     //private byte[] lastBlockSignature;
     //private Tuple2<Integer, Long> HWeight;
@@ -463,19 +471,27 @@ public class BlockChain {
                     }
                 }
 
+                if (chainParams.containsKey("blockPeriod")) {
+                    BLOCKS_PERIOD = Integer.parseInt(chainParams.get("blockPeriod").toString());
+                    if (BLOCKS_PERIOD < 3) {
+                        BLOCKS_PERIOD = 3;
+                    }
+                }
+
                 if (chainParams.containsKey("peersURL")) {
                     Settings.peersURL = chainParams.get("peersURL").toString();
                 }
 
-                if (chainParams.containsKey("license")) {
-                    Settings.sideLicense = chainParams.get("license").toString();
+                if (chainParams.containsKey("sideLicense")) {
+                    Settings.sideLicense = chainParams.get("sideLicense").toString();
                 }
 
                 if (chainParams.containsKey("startKey")) {
-                    JSONObject startKeys = (JSONObject) chainParams.get("startKey");
-                    // TODO  do start KEYS
+                    JSONObject startKeysJson = (JSONObject) chainParams.get("startKey");
+                    for (Object key : startKeysJson.keySet()) {
+                        startKeys[ItemCls.getItemTypeByName((String) key)] = (long) startKeysJson.get(key);
+                    }
                 }
-
 
                 if (chainParams.containsKey("explorer")) {
                     Settings.getInstance().explorerURL = chainParams.get("explorer").toString();
@@ -739,6 +755,9 @@ public class BlockChain {
     }
 
     public static int GENERATING_MIN_BLOCK_TIME(int height) {
+
+        if (SIDE_MODE)
+            return BLOCKS_PERIOD;
 
         if (VERS_30SEC > 0 && height <= VERS_30SEC) {
             return 288; // old MainNet

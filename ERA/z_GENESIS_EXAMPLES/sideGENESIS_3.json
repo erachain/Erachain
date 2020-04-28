@@ -1,18 +1,18 @@
 [
   // SIDECHAIN SHORT NAME, SIDECHAIN= FULL NAME
   [
-    "Project 1",
-    "Project One"
+    "Литовкин",
+    "Литовкин Василий Анатольевич"
   ],
   // TIMESTAMP LONG
   [
-    1587480548000
+    1587923185000
   ],
   // forging addresses
   [
     /// recipient, ERA, COMPU, [DEBTORS]
     [
-      "7Gbdt3MpsdX991S2ZH6DbA9tHNx3EjEXoo",
+      "7GTVsqf2rNycHL5JRj2rh8eQUsjTa1gQso",
       10000000,
       0,
       // debtors
@@ -20,55 +20,55 @@
         // ERA, recipient
         [
           600000,
-          "78eMJysdFE2pLY5mGPi3hytoTT7qpX5vQ2"
+          "7F1KmVWiV7pX5hupuLe5tMXxqpNzsNnF1E"
         ],
         [
           600000,
-          "7AbsxsaYBMHA6afnaqZs2i3KpAeMyBysLw"
+          "7487AFh2Ejek79JPXZSzDddegMxJp1vyNZ"
         ],
         [
           600000,
-          "7HHz2DqZBgHaNX6KmhyWWqkF2hRqJoXGJh"
+          "7MLaMYZqXwx16KmQmVc6CKZQekVnASDPj7"
         ],
         [
           600000,
-          "7PxHbHJpCFWHvkmMzq5HemQJzytYShGt3S"
+          "7BZLBbhNCBcX67Uvn9VH3ASVaV6VdAiXcY"
         ],
         [
           400000,
-          "75X5EEzjFHi6XuoayZocJqSWudDDjXkuQV"
+          "7DHs2R8UygYgpFVEyxrZ5bHB1EwPjcafeP"
         ],
         [
           400000,
-          "7N7ZJ5QfwGRKhkhVuA5yehNwtm4xHyZh9q"
+          "7GoTmX87qmeciz6WCvw5mhP3Skvv9jJpE4"
         ],
         [
           400000,
-          "7HWfY9DswGxgxnEumzNQWzm5kDATn8jahk"
+          "7KqsQijPTPFpVqZabRZZXJp74MPUM5B3rT"
         ],
         [
           400000,
-          "7QsFTGhaRM1dRniKtzzB6mbsxpBGXjdphq"
+          "7KrZt6UYC1EhSiFTzVpxStCJQQMTSGsHKv"
         ],
         [
           400000,
-          "7A31guYWzcQxAmj6g6p3w9cpidytWy2Ua8"
+          "77SMErmzHSSugGQdbXH8bYwcGYT8Yy2ybF"
         ],
         [
           400000,
-          "79czuwKmVJ7UNpfoh5sEVT7Ra9Z3GP8qgh"
+          "7FBxdSmAi7Afw1hPpLQZMyD68y1SPQsfvk"
         ],
         [
           400000,
-          "7D4wBtpaVnoKCkMw2jMhktWTrDwTvceEgV"
+          "7MwEXsUm4utHaCwNq1FFuzppmwfV9CwjJc"
         ],
         [
           400000,
-          "76deeUdpHrsrB33nPVWmkutrQ55Aep1NED"
+          "7QuNPj4YPAty6djcMqHkHQynz2H8M7YYSr"
         ],
         [
           400000,
-          "75mEAvYxoKWMoGiZQq5jq2wA8AFJ2PXS2i"
+          "7EBY2Znt22SE35X56dNbvBB19iWCkDzxHk"
         ],
         [
           400000,
@@ -76,27 +76,27 @@
         ],
         [
           400000,
-          "7Q2YnD19Sec6cgDQKmPzaerhQNwA1AeZdH"
+          "7LpCeofG9FZSX8AqrgUjJrNFmE9sE7z5xM"
         ],
         [
           400000,
-          "7LnBxam1EpVSAnnKWcGccSemNXiFeru5TE"
+          "77DafzF629hCvF78FWhXSyVzg9jV2KxreQ"
         ],
         [
           400000,
-          "744XqTHbrkBC7mckjaQ5ZirV3zfM2Y5Hkf"
+          "7J6jPBge9pNBbsgvpWnQvijEHqmHDu5DuZ"
         ],
         [
           400000,
-          "74FA5e9xGUnQHBGMfkn7RdyCEU8BAQ9RL6"
+          "7P9g3kFmLzUUJtxbzaBnZGxX39kAj2sTtQ"
         ],
         [
           400000,
-          "79jzM1K3vAZUNfVcTWS1zHXXZa9ocPge9V"
+          "7LUf994TdbHST7mKjHKDFmQNprHPkJU1pC"
         ],
         [
           400000,
-          "78iErMhKwc4kEuUassmJUX4kL4TSEbNPvN"
+          "7Ekmc6ao7ccSaBVG7v1d5j14E4EahA7s7y"
         ]
       ]
     ]

@@ -4,17 +4,20 @@ package org.erachain.core.item.unions;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
-import org.json.simple.JSONObject;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
+import org.json.simple.JSONObject;
 
 public abstract class UnionCls extends ItemCls {
+
+    public static final long START_KEY = BlockChain.SIDE_MODE ? 1L << 14 : 1000L;
 
     public static final int UNION = 1;
 
@@ -41,6 +44,16 @@ public abstract class UnionCls extends ItemCls {
     //GETTERS/SETTERS
     public int getItemType() {
         return ItemCls.UNION_TYPE;
+    }
+
+    @Override
+    public long getStartKey() {
+        long startKey = BlockChain.startKeys[ItemCls.UNION_TYPE];
+
+        if (BlockChain.MAIN_MODE || startKey > 0 && startKey < START_KEY)
+            return START_KEY;
+
+        return startKey;
     }
 
     public String getItemTypeName() {

@@ -1,6 +1,7 @@
 package org.erachain.core.item.templates;
 
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
@@ -13,6 +14,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class TemplateCls extends ItemCls {
+
+    public static final long START_KEY = BlockChain.SIDE_MODE ? 1L << 14 : 1000L;
 
     // PERS KEY
     public static final long EMPTY_KEY = 1l;
@@ -44,12 +47,22 @@ public abstract class TemplateCls extends ItemCls {
         return ItemCls.TEMPLATE_TYPE;
     }
 
+    @Override
+    public long getStartKey() {
+        long startKey = BlockChain.startKeys[ItemCls.TEMPLATE_TYPE];
+
+        if (BlockChain.MAIN_MODE || startKey > 0 && startKey < START_KEY)
+            return START_KEY;
+
+        return startKey;
+    }
+
     public String getItemTypeName() {
         return "template";
     }
 
     public List<String> getVarNames() {
-        if (variables != null)  {
+        if (variables != null) {
             return variables;
         }
 

@@ -61,7 +61,7 @@ public class MPDFView extends javax.swing.JPanel {
     private int height1;
     int pageNum = 0;
 
-    public MPDFView() {
+    public MPDFView(String fileName) {
         super();
 
         logger = LoggerFactory.getLogger(getClass());
@@ -77,7 +77,7 @@ public class MPDFView extends javax.swing.JPanel {
         initComponents();
 
         try {
-            pdffile = new PDFFile(readPDFFile());
+            pdffile = new PDFFile(readPDFFile(fileName));
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -291,6 +291,27 @@ public class MPDFView extends javax.swing.JPanel {
 
         }
         return buf;
+    }
+
+    public ByteBuffer readPDFFile(String fileName) {
+
+        if (fileName == null)
+            return readPDFFile();
+
+        File file;
+        file = new File(fileName);
+
+        try {
+            RandomAccessFile raf = new RandomAccessFile(file, "r");
+            FileChannel channel = raf.getChannel();
+            return channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+        } catch (IOException e) {
+            logger.error(e.getMessage() + " - " + fileName, e);
+            Controller.getInstance().stopAll(3);
+        }
+
+        return null;
+
     }
 
     class PDFPageViewSmall extends JButton {
