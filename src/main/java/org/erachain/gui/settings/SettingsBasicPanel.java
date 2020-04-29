@@ -239,7 +239,7 @@ public class SettingsBasicPanel extends JPanel {
         add(lblWelletDir, gbc_lblWelletDir);
 
         textWallet = new JTextField();
-        textWallet.setText(Settings.getInstance().getWalletDir());
+        textWallet.setText(Settings.getInstance().getWalletKeysDir());
         textWallet.setHorizontalAlignment(SwingConstants.LEFT);
         textWallet.setColumns(10);
         textWallet.setEditable(false);

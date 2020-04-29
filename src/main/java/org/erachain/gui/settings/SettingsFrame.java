@@ -299,7 +299,7 @@ public class SettingsFrame extends JDialog {
         }
 
 
-        if (!Settings.getInstance().getWalletDir().equals(settingsTabPane.settingsBasicPanel.textWallet.getText())) {
+        if (!Settings.getInstance().getWalletKeysDir().equals(settingsTabPane.settingsBasicPanel.textWallet.getText())) {
             settingsJSONbuf.put("walletdir", settingsTabPane.settingsBasicPanel.textWallet.getText());
             changeWallet = true;
         }

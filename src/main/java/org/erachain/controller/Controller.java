@@ -786,7 +786,7 @@ public class Controller extends Observable {
                     if (this.seedCommand.length > 3) {
                         path = this.seedCommand[3];
                     } else {
-                        path = Settings.getInstance().getWalletDir();
+                        path = Settings.getInstance().getWalletKeysDir();
                     }
 
                     boolean res = recoverWallet(seed,
@@ -3693,6 +3693,16 @@ public class Controller extends Observable {
                         databaseSystem = DCSet.DBS_FAST;
                     }
 
+                } catch (Exception e) {
+                }
+                continue;
+            }
+
+            if (arg.startsWith("-datachainpath=")) {
+                try {
+                    String datachainPath = arg.substring(15);
+                    Settings.getInstance().setDataChainPath(datachainPath);
+                    LOGGER.info("-datachain path = " + datachainPath);
                 } catch (Exception e) {
                 }
                 continue;
