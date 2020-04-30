@@ -195,14 +195,6 @@ public class Settings {
         this.defaultPeers = peers;
     }
 
-    public String getSettingsPath() {
-        return this.userPath + "settings.json";
-    }
-
-    public String getGuiSettingPath() {
-        return this.userPath + "gui_settings.json";
-    }
-
     public boolean getTelegramStoreUse() {
         return USE_TELEGRAM_STORE;
     }
@@ -258,7 +250,7 @@ public class Settings {
                 path = this.userPath + DEFAULT_TEMP_DIR;
             } else path = this.tempPath;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            // TODO Auto-generated catch blockx
             path = this.userPath + DEFAULT_TEMP_DIR;
         }
         // if temp dir not exist make dir
@@ -279,7 +271,9 @@ public class Settings {
     public String getDataWalletPath() {
         if (this.dataWalletPath.isEmpty())
             return this.userPath + DEFAULT_DATA_WALLET_DIR;
-        return this.walletKeysPath;
+        if (this.dataWalletPath.endsWith(DEFAULT_DATA_WALLET_DIR))
+            return this.dataWalletPath;
+        return this.dataWalletPath + DEFAULT_DATA_WALLET_DIR;
     }
 
     public void setDataWalletPath(String path) {
@@ -299,7 +293,9 @@ public class Settings {
     public String getWalletKeysPath() {
         if (this.walletKeysPath.isEmpty())
             return this.userPath + DEFAULT_WALLET_KEYS_DIR;
-        return this.walletKeysPath;
+        if (this.walletKeysPath.endsWith(DEFAULT_WALLET_KEYS_DIR))
+            return this.walletKeysPath;
+        return this.walletKeysPath + DEFAULT_WALLET_KEYS_DIR;
     }
 
     public void setWalletKeysPath(String path) {
@@ -319,7 +315,9 @@ public class Settings {
     public String getTelegramDir() {
         if (this.dataTelePath.isEmpty())
             return this.userPath + DEFAULT_TELEGRAM_DIR;
-        return this.dataTelePath;
+        if (this.dataTelePath.endsWith(DEFAULT_TELEGRAM_DIR))
+            return this.dataTelePath;
+        return this.dataTelePath + DEFAULT_TELEGRAM_DIR;
     }
 
     public void setDataTelePath(String path) {
@@ -338,29 +336,11 @@ public class Settings {
 
     }
 
-    public String getBackUpPath() {
-        if (this.backUpPath.isEmpty())
-            return this.userPath + DEFAULT_BACKUP_DIR;
-        return this.backUpPath;
-    }
-
-    public void setBackUpPath(String path) {
-        if (path == null) {
-            path = "";
-        } else if (!path.isEmpty()) {
-            // correcting single backslash bug
-            path.replace("\\", File.separator);
-            if (!path.endsWith(File.separator)) {
-                path += File.separator;
-            }
-        }
-
-        this.backUpPath = path;
-    }
-
+    /// Так как в папке все может быть удалено - делаем встроенную папку, иначе по несотарожности все может быть удалено ((
     public String getDataChainPath() {
         if (this.dataChainPath.isEmpty()) return this.userPath + DEFAULT_DATA_CHAIN_DIR;
-        return this.dataChainPath;
+        if (this.dataChainPath.endsWith(DEFAULT_DATA_CHAIN_DIR)) return this.dataChainPath;
+        return this.dataChainPath + DEFAULT_DATA_CHAIN_DIR;
     }
 
     public void setDataChainPath(String path) {
@@ -378,6 +358,28 @@ public class Settings {
 
     }
 
+    public String getBackUpPath() {
+        if (this.backUpPath.isEmpty())
+            return this.userPath + DEFAULT_BACKUP_DIR;
+        if (this.backUpPath.endsWith(DEFAULT_BACKUP_DIR))
+            return this.backUpPath;
+        return this.backUpPath + DEFAULT_BACKUP_DIR;
+    }
+
+    public void setBackUpPath(String path) {
+        if (path == null) {
+            path = "";
+        } else if (!path.isEmpty()) {
+            // correcting single backslash bug
+            path.replace("\\", File.separator);
+            if (!path.endsWith(File.separator)) {
+                path += File.separator;
+            }
+        }
+
+        this.backUpPath = path;
+    }
+
     public String getPatnIcons() {
         return this.getUserPath() + "images" + File.separator + "pageicons" + File.separator;
     }
@@ -387,11 +389,25 @@ public class Settings {
     }
 
     public String getDataTempDir() {
-        return this.getUserPath() + DEFAULT_DATA_TEMP_DIR;
+        String path = this.getUserPath() + DEFAULT_DATA_TEMP_DIR;
+        File tempDir = new File(path);
+        if (!tempDir.exists()) {
+            tempDir.mkdir();
+        }
+
+        return path;
     }
 
     public String getLangDir() {
         return this.getUserPath() + "languages";
+    }
+
+    public String getSettingsPath() {
+        return getUserPath() + "settings.json";
+    }
+
+    public String getGuiSettingPath() {
+        return getUserPath() + "gui_settings.json";
     }
 
     ////////////////

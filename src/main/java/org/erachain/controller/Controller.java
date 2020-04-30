@@ -1053,8 +1053,11 @@ public class Controller extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Delete files from TEMP dir")));
         LOGGER.info("Delete files from TEMP dir");
-        for (File file : new File(Settings.getInstance().getDataTempDir()).listFiles())
-            if (file.isFile()) file.delete();
+        try {
+            File tempDir = new File(Settings.getInstance().getDataTempDir());
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Exception e) {
+        }
 
         // STOP TRANSACTIONS POOL
         this.setChanged();
@@ -1133,14 +1136,6 @@ public class Controller extends Observable {
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing telegram")));
             LOGGER.info("Closing telegram");
             this.telegramStore.close();
-        }
-
-        try {
-            // удалим все в папке Temp
-            File tempDir = new File(Settings.getInstance().getDataTempDir());
-            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-        } catch (Throwable e) {
-            //LOGGER.error(e.getMessage(), e);
         }
 
         LOGGER.info("Closed.");
