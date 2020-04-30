@@ -36,7 +36,7 @@ public class BackUPSettingPanel extends JPanel {
 
         jCheckBox_Enable_BackUp.setSelected(Settings.getInstance().getbacUpEnabled());
         jCheckBox_Ask_To_Start.setSelected(Settings.getInstance().getbacUpAskToStart());
-        jTextField_BuckUp_Dir.setText(Settings.getInstance().getBackUpDir());
+        jTextField_BuckUp_Dir.setText(Settings.getInstance().getBackUpPath());
 
         MenuPopupUtil.installContextMenu(jTextField_BuckUp_Dir);
 

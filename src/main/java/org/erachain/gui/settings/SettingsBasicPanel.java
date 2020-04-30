@@ -190,7 +190,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_lblAnExplanatoryText_3.gridy = 7;
         add(lblKeyCachingExplanatoryText, gbc_lblAnExplanatoryText_3);
 
-        JLabel lblDataDir = new JLabel(Lang.getInstance().translate("Data dir") + ":");
+        JLabel lblDataDir = new JLabel(Lang.getInstance().translate("DataChain dir") + ":");
         GridBagConstraints gbc_lblDataDir = new GridBagConstraints();
         gbc_lblDataDir.anchor = GridBagConstraints.WEST;
         gbc_lblDataDir.insets = new Insets(0, 0, 5, 5);
@@ -199,7 +199,7 @@ public class SettingsBasicPanel extends JPanel {
         add(lblDataDir, gbc_lblDataDir);
 
         textDataFolder = new JTextField();
-        textDataFolder.setText(Settings.getInstance().getDataDir());
+        textDataFolder.setText(Settings.getInstance().getDataChainPath());
         textDataFolder.setHorizontalAlignment(SwingConstants.LEFT);
         textDataFolder.setColumns(10);
         textDataFolder.setEditable(false);
@@ -222,7 +222,7 @@ public class SettingsBasicPanel extends JPanel {
                 FileChooser fileopen = new FileChooser();
                 fileopen.setFileSelectionMode(FileChooser.DIRECTORIES_ONLY);
                 fileopen.setCurrentDirectory(new File(textDataFolder.getText()));
-                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set data dir"));
+                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set datachain dir"));
                 if (ret == FileChooser.APPROVE_OPTION) {
                     textDataFolder.setText(fileopen.getSelectedFile().toString());
                 }
@@ -230,7 +230,7 @@ public class SettingsBasicPanel extends JPanel {
         });
         add(btnBrowseDataFolder, gbc_btnBrowseDataFolder);
 
-        JLabel lblWelletDir = new JLabel(Lang.getInstance().translate("Wallet dir") + ":");
+        JLabel lblWelletDir = new JLabel(Lang.getInstance().translate("WalletKeys dir") + ":");
         GridBagConstraints gbc_lblWelletDir = new GridBagConstraints();
         gbc_lblWelletDir.anchor = GridBagConstraints.WEST;
         gbc_lblWelletDir.insets = new Insets(0, 0, 5, 5);
@@ -239,7 +239,7 @@ public class SettingsBasicPanel extends JPanel {
         add(lblWelletDir, gbc_lblWelletDir);
 
         textWallet = new JTextField();
-        textWallet.setText(Settings.getInstance().getWalletKeysDir());
+        textWallet.setText(Settings.getInstance().getWalletKeysPath());
         textWallet.setHorizontalAlignment(SwingConstants.LEFT);
         textWallet.setColumns(10);
         textWallet.setEditable(false);
@@ -263,7 +263,7 @@ public class SettingsBasicPanel extends JPanel {
                 JFileChooser fileopen = new JFileChooser();
                 fileopen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 fileopen.setCurrentDirectory(new File(textWallet.getText()));
-                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set wallet dir"));
+                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set walletKeys dir"));
                 if (ret == JFileChooser.APPROVE_OPTION) {
                     textWallet.setText(fileopen.getSelectedFile().toString());
                 }

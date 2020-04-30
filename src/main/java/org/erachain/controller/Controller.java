@@ -786,7 +786,7 @@ public class Controller extends Observable {
                     if (this.seedCommand.length > 3) {
                         path = this.seedCommand[3];
                     } else {
-                        path = Settings.getInstance().getWalletKeysDir();
+                        path = Settings.getInstance().getWalletKeysPath();
                     }
 
                     boolean res = recoverWallet(seed,
@@ -872,9 +872,9 @@ public class Controller extends Observable {
         if (inMemory) {
             DCSet.reCreateDBinMEmory(this.dcSetWithObserver, this.dynamicGUI);
         } else {
-            File dataChain = new File(Settings.getInstance().getDataDir());
-            File dataChainBackUp = new File(Settings.getInstance().getBackUpDir() + File.separator
-                    + Settings.getInstance().getDataDir() + File.separator);
+            File dataChain = new File(Settings.getInstance().getDataChainPath());
+            File dataChainBackUp = new File(Settings.getInstance().getBackUpPath()
+                    + Settings.getInstance().getDataChainPath() + File.separator);
             // del datachain
             if (dataChain.exists()) {
                 try {
@@ -926,10 +926,10 @@ public class Controller extends Observable {
             // && Settings.getInstance().isCheckpointingEnabled()) {
             // this.dcSet.close();
 
-            File dataDir = new File(Settings.getInstance().getDataDir());
+            File dataDir = new File(Settings.getInstance().getDataChainPath());
 
-            File dataBakDC = new File(Settings.getInstance().getBackUpDir() + File.separator
-                    + Settings.getInstance().getDataDir() + File.separator);
+            File dataBakDC = new File(Settings.getInstance().getBackUpPath()
+                    + Settings.getInstance().getDataChainPath() + File.separator);
             // copy Data dir to Back
             if (dataDir.exists()) {
                 if (dataBakDC.exists()) {
@@ -960,7 +960,7 @@ public class Controller extends Observable {
         String dataVersion = this.dcSet.getLocalDataMap().get(LocalDataMap.LOCAL_DATA_VERSION_KEY);
 
         if (dataVersion == null || !dataVersion.equals(releaseVersion)) {
-            File dataDir = new File(Settings.getInstance().getDataDir());
+            File dataDir = new File(Settings.getInstance().getDataChainPath());
             File dataBak = getDataBakDir(dataDir);
             this.dcSet.close();
 
@@ -982,7 +982,7 @@ public class Controller extends Observable {
     }
 
     private File getDataBakDir(File dataDir) {
-        return new File(dataDir.getParent(), Settings.getInstance().getDataDir() + "Bak");
+        return new File(dataDir.getParent(), Settings.getInstance().getDataChainPath() + "Bak");
     }
 
     public ApiService getRPCService() {
@@ -1053,7 +1053,7 @@ public class Controller extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Delete files from TEMP dir")));
         LOGGER.info("Delete files from TEMP dir");
-        for (File file : new File(Settings.getInstance().getTemDir()).listFiles())
+        for (File file : new File(Settings.getInstance().getDataTempDir()).listFiles())
             if (file.isFile()) file.delete();
 
         // STOP TRANSACTIONS POOL

@@ -158,7 +158,7 @@ public class SettingsFrame extends JDialog {
         settingsJSONbuf.put("backupenabled", settingsTabPane.backUp_Setting_Panel.jCheckBox_Enable_BackUp.isSelected());
         settingsJSONbuf.put("backupasktostart", settingsTabPane.backUp_Setting_Panel.jCheckBox_Ask_To_Start.isSelected());
 
-        if (!Settings.getInstance().getBackUpDir().equals(settingsTabPane.backUp_Setting_Panel.jTextField_BuckUp_Dir.getText())) {
+        if (!Settings.getInstance().getBackUpPath().equals(settingsTabPane.backUp_Setting_Panel.jTextField_BuckUp_Dir.getText())) {
             settingsJSONbuf.put("backuppath", settingsTabPane.backUp_Setting_Panel.jTextField_BuckUp_Dir.getText());
             changeWallet = true;
         }
@@ -299,13 +299,13 @@ public class SettingsFrame extends JDialog {
         }
 
 
-        if (!Settings.getInstance().getWalletKeysDir().equals(settingsTabPane.settingsBasicPanel.textWallet.getText())) {
-            settingsJSONbuf.put("walletdir", settingsTabPane.settingsBasicPanel.textWallet.getText());
+        if (!Settings.getInstance().getWalletKeysPath().equals(settingsTabPane.settingsBasicPanel.textWallet.getText())) {
+            settingsJSONbuf.put("walletKeysPath", settingsTabPane.settingsBasicPanel.textWallet.getText());
             changeWallet = true;
         }
 
-        if (!Settings.getInstance().getDataDir().equals(settingsTabPane.settingsBasicPanel.textDataFolder.getText())) {
-            settingsJSONbuf.put("datadir", settingsTabPane.settingsBasicPanel.textDataFolder.getText());
+        if (!Settings.getInstance().getDataChainPath().equals(settingsTabPane.settingsBasicPanel.textDataFolder.getText())) {
+            settingsJSONbuf.put("dataChainPath", settingsTabPane.settingsBasicPanel.textDataFolder.getText());
             changeDataDir = true;
         }
 

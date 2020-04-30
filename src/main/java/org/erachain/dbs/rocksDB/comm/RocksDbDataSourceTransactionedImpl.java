@@ -42,7 +42,7 @@ public abstract class RocksDbDataSourceTransactionedImpl extends RocksDbDataSour
     }
 
     public RocksDbDataSourceTransactionedImpl(String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
-        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings, enableSize);
+        this(Settings.getInstance().getDataChainPath() + ROCKS_DB_FOLDER, name, indexes, settings, enableSize);
     }
 
     @Override

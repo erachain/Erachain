@@ -664,7 +664,7 @@ public class DCSet extends DBASet implements Closeable {
     public static void reCreateDB(boolean withObserver, boolean dynamicGUI) throws Exception {
 
         //OPEN DB
-        File dbFile = new File(Settings.getInstance().getDataDir(), "chain.dat");
+        File dbFile = new File(Settings.getInstance().getDataChainPath(), "chain.dat");
         dbFile.getParentFile().mkdirs();
 
         DB database = makeFileDB(dbFile);

@@ -81,7 +81,7 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         this.enableSize = enableSize;
         this.root = (dbaSet == null // in TESTs
                 || dbaSet.getFile() == null ? // in Memory or in TESTs
-                Settings.getInstance().getDataDir()
+                Settings.getInstance().getDataChainPath()
                 : dbaSet.getFile().getParent()) + ROCKS_DB_FOLDER;
         // Чтобы не было NullPointerException
         //if (indexes == null) {
