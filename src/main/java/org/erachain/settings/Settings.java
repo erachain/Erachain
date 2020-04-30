@@ -271,7 +271,7 @@ public class Settings {
     public String getDataWalletPath() {
         if (this.dataWalletPath.isEmpty())
             return this.userPath + DEFAULT_DATA_WALLET_DIR;
-        if (this.dataWalletPath.endsWith(DEFAULT_DATA_WALLET_DIR))
+        if (this.dataWalletPath.endsWith(DEFAULT_DATA_WALLET_DIR + File.separator))
             return this.dataWalletPath;
         return this.dataWalletPath + DEFAULT_DATA_WALLET_DIR;
     }
@@ -293,7 +293,7 @@ public class Settings {
     public String getWalletKeysPath() {
         if (this.walletKeysPath.isEmpty())
             return this.userPath + DEFAULT_WALLET_KEYS_DIR;
-        if (this.walletKeysPath.endsWith(DEFAULT_WALLET_KEYS_DIR))
+        if (this.walletKeysPath.endsWith(DEFAULT_WALLET_KEYS_DIR + File.separator))
             return this.walletKeysPath;
         return this.walletKeysPath + DEFAULT_WALLET_KEYS_DIR;
     }
@@ -315,7 +315,7 @@ public class Settings {
     public String getTelegramDir() {
         if (this.dataTelePath.isEmpty())
             return this.userPath + DEFAULT_TELEGRAM_DIR;
-        if (this.dataTelePath.endsWith(DEFAULT_TELEGRAM_DIR))
+        if (this.dataTelePath.endsWith(DEFAULT_TELEGRAM_DIR + File.separator))
             return this.dataTelePath;
         return this.dataTelePath + DEFAULT_TELEGRAM_DIR;
     }
@@ -339,7 +339,7 @@ public class Settings {
     /// Так как в папке все может быть удалено - делаем встроенную папку, иначе по несотарожности все может быть удалено ((
     public String getDataChainPath() {
         if (this.dataChainPath.isEmpty()) return this.userPath + DEFAULT_DATA_CHAIN_DIR;
-        if (this.dataChainPath.endsWith(DEFAULT_DATA_CHAIN_DIR)) return this.dataChainPath;
+        if (this.dataChainPath.endsWith(DEFAULT_DATA_CHAIN_DIR + File.separator)) return this.dataChainPath;
         return this.dataChainPath + DEFAULT_DATA_CHAIN_DIR;
     }
 
@@ -361,7 +361,7 @@ public class Settings {
     public String getBackUpPath() {
         if (this.backUpPath.isEmpty())
             return this.userPath + DEFAULT_BACKUP_DIR;
-        if (this.backUpPath.endsWith(DEFAULT_BACKUP_DIR))
+        if (this.backUpPath.endsWith(DEFAULT_BACKUP_DIR + File.separator))
             return this.backUpPath;
         return this.backUpPath + DEFAULT_BACKUP_DIR;
     }
