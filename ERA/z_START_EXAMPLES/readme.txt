@@ -58,7 +58,9 @@ Exapmle 1:  -datachainpath=rrr - make and use folder 'rrr' in folder of applicat
 Exapmle 2:  -datachainpath=\rrr - make and use folder 'rrr' in root folder of disk
 
 example for Windows:
-	start "erachain" java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1
+	>start "erachain" java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1
+example for other OS:
+	>java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1
 
 
 USE startARGS.txt for ser arguments for start application. For example for Mac OS
