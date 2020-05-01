@@ -55,7 +55,7 @@ public class SettingsFrame extends JDialog {
         //SETTINGS TABPANE
         this.settingsTabPane = new SettingsTabPane();
         GridBagConstraints gbc_tabPane = new GridBagConstraints();
-        gbc_tabPane.gridwidth = 4;
+        gbc_tabPane.gridwidth = 5;
         gbc_tabPane.fill = GridBagConstraints.BOTH;
         gbc_tabPane.anchor = GridBagConstraints.NORTHWEST;
         gbc_tabPane.insets = new Insets(0, 0, 0, 0);
@@ -104,7 +104,7 @@ public class SettingsFrame extends JDialog {
         gbc_btnCancel.insets = new Insets(5, 5, 5, 5);
         gbc_btnCancel.gridx = 3;
         gbc_btnCancel.gridy = 1;
-        gbc_btnCancel.weightx = 2;
+  //      gbc_btnCancel.weightx = 2;
 
         btnCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -119,6 +119,27 @@ public class SettingsFrame extends JDialog {
         //    btnCancel.setPreferredSize(new Dimension(100, 25));
 
         this.add(btnCancel, gbc_btnCancel);
+        //AS
+        JButton btnDefaultSettings = new JButton(Lang.getInstance().translate("Default settings"));
+        GridBagConstraints gbc_btnDefaultSettings = new GridBagConstraints();
+        gbc_btnDefaultSettings.fill = GridBagConstraints.NONE;
+        gbc_btnDefaultSettings.anchor = GridBagConstraints.WEST;
+        gbc_btnDefaultSettings.insets = new Insets(5, 5, 5, 5);
+        gbc_btnDefaultSettings.gridx = 4;
+        gbc_btnDefaultSettings.gridy = 1;
+        gbc_btnDefaultSettings.weightx = 2;
+
+        btnDefaultSettings.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // insert code ...
+            }
+        });
+        //AS
+        //    btnCancel.setPreferredSize(new Dimension(100, 25));
+
+        this.add(btnDefaultSettings, gbc_btnDefaultSettings);
+
+
 
         //ON CLOSE
         this.addWindowListener(new WindowAdapter() {
