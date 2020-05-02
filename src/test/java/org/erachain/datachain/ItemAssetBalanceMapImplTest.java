@@ -56,7 +56,7 @@ public class ItemAssetBalanceMapImplTest {
 
         try {
             // NEED DELETE RocksDB file !!!
-            File tempDir = new File(Settings.getInstance().getDataDir() + ConstantsRocksDB.ROCKS_DB_FOLDER);
+            File tempDir = new File(Settings.getInstance().getDataChainPath() + ConstantsRocksDB.ROCKS_DB_FOLDER);
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
         } catch (Throwable e) {
         }

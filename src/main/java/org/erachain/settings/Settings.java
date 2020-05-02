@@ -43,14 +43,14 @@ public class Settings {
     public static final String DEFAULT_THEME = "System";
     public static final int DEFAULT_ACCOUNTS = 1;
     //DATA
-    public static final String DEFAULT_DATA_DIR = "datachain";
-    public static final String DEFAULT_LOCAL_DIR = "datalocal";
-    public static final String DEFAULT_DATATEMP_DIR = "datatemp";
-    public static final String DEFAULT_WALLET_DIR = "walletKeys";
-    private static final String DEFAULT_DATAWALET_DIR = "dataWallet";
-    public static final String DEFAULT_BACKUP_DIR = "backup";
-    public static final String DEFAULT_TEMP_DIR = "temp";
-    public static final String DEFAULT_TELEGRAM_DIR = "datatele";
+    private static final String DEFAULT_DATA_CHAIN_DIR = "datachain";
+    private static final String DEFAULT_DATA_LOCAL_DIR = "datalocal";
+    private static final String DEFAULT_DATA_TEMP_DIR = "datatemp";
+    private static final String DEFAULT_DATA_WALLET_DIR = "dataWallet";
+    private static final String DEFAULT_WALLET_KEYS_DIR = "walletKeys";
+    private static final String DEFAULT_BACKUP_DIR = "backup";
+    private static final String DEFAULT_TEMP_DIR = "temp";
+    private static final String DEFAULT_TELEGRAM_DIR = "datatele";
     private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
     //NETWORK
     private static final int DEFAULT_MIN_CONNECTIONS = 10; // for OWN connections
@@ -122,21 +122,25 @@ public class Settings {
     private JSONObject peersJSON;
     public static JSONArray genesisJSON;
     public static boolean simpleTestNet;
-    private String userPath = "";
     private InetAddress localAddress;
     private String[] defaultPeers = {};
 
-    private String tmpPath;
-    private String getBackUpPath;
-    private String getWalletPath;
-    private String getDataWalletPath;
-    private String dataPath;
+
+    private String userPath = "";
+
+    /**
+     * Если задан то включает и конечную папку длля файлов
+     */
+    private String dataChainPath = "";
+    private String walletKeysPath = "";
+    private String dataWalletPath = "";
+    private String dataTelePath = "";
+    private String backUpPath = "";
+    private String tempPath;
+
     private String telegramDefaultSender;
     private String telegramDefaultReciever;
     private String telegramRatioReciever = null;
-    private String getTelegramPath;
-
-    private String telegramtPath;
 
     private Settings() {
         this.localAddress = this.getCurrentIp();
@@ -191,62 +195,6 @@ public class Settings {
         this.defaultPeers = peers;
     }
 
-    public String getSettingsPath() {
-        return this.userPath + "settings.json";
-    }
-
-    public String getGuiSettingPath() {
-
-        return this.userPath + "gui_settings.json";
-
-    }
-
-    public String getPeersPath() {
-        return this.userPath + (isDemoNet() ? "peers-demo.json" : isTestNet() ? "peers-test.json" :
-                isSideNet() ? "peers-side.json" : "peers.json");
-    }
-
-    public String getWalletDir() {
-        try {
-            if (this.getWalletPath.equals(""))
-                return this.userPath + DEFAULT_WALLET_DIR;
-            return this.getWalletPath;
-        } catch (Exception e) {
-			return this.userPath + DEFAULT_WALLET_DIR;
-		}
-    }
-
-    public String getDataWalletDir() {
-        try {
-            if (this.getDataWalletPath.equals("")) return this.userPath + DEFAULT_DATAWALET_DIR;
-            return this.getWalletPath;
-        } catch (Exception e) {
-            return this.userPath + DEFAULT_DATAWALET_DIR;
-        }
-    }
-
-    public void setWalletDir(String dir) {
-       
-			this.getWalletPath = dir;
-		
-    }
-    
-    public String getTelegramDir() {
-        try {
-            if (this.telegramtPath.equals("")) this.telegramtPath =  this.userPath + DEFAULT_TELEGRAM_DIR;
-            return this.telegramtPath;
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            return this.userPath + DEFAULT_TELEGRAM_DIR;
-        }
-    }
-    
-    public void setTelegramDir(String dir) {
-       
-            this.telegramtPath = dir;
-        
-    }
-
     public boolean getTelegramStoreUse() {
         return USE_TELEGRAM_STORE;
     }
@@ -256,82 +204,213 @@ public class Settings {
     }
 
 
-    public String getTelegramDefaultSender(){
+    public String getTelegramDefaultSender() {
         return telegramDefaultSender;
     }
-    
-    public void setTelegramDefaultSender(String str){
+
+    public void setTelegramDefaultSender(String str) {
         telegramDefaultSender = str;
     }
-    
-   public String getTelegramDefaultReciever(){
-       return telegramDefaultReciever;
-   }
-   public void setTelegramDefaultReciever(String str){
-        this.telegramDefaultReciever=str;
-    }
-    
- public String getTemDir(){
-     String path = "";
-     try {
-         
-         if (this.tmpPath.equals("")) {
-             path= this.userPath + DEFAULT_TEMP_DIR;
-         }
-         else path =  this.tmpPath;
-     } catch (Exception e) {
-         // TODO Auto-generated catch block
-         path = this.userPath + DEFAULT_TEMP_DIR;
-     }
-     // if temp dir not exist make dir
-     File tempDir = new File(path);
-     if (!tempDir.exists()) {
-             tempDir.mkdir();
-     }
-        
-     return path;
+
+    public String getTelegramDefaultReciever() {
+        return telegramDefaultReciever;
     }
 
-    public String getBackUpDir() {
+    public void setTelegramDefaultReciever(String str) {
+        this.telegramDefaultReciever = str;
+    }
+
+    /////// DIR
+
+    public String getUserPath() {
+        return this.userPath;
+    }
+
+    public void setUserPath(String path) {
+        if (path == null) {
+            path = "";
+        } else if (!path.isEmpty()) {
+            // correcting single backslash bug
+            path.replace("\\", File.separator);
+            if (!path.endsWith(File.separator)) {
+                path += File.separator;
+            }
+        }
+
+        this.userPath = path;
+
+    }
+
+    /*
+    public String getTempDir() {
+        String path = "";
         try {
-			if (this.getBackUpPath.equals("")) return this.userPath + DEFAULT_BACKUP_DIR;
-			return this.getBackUpPath;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			return this.userPath + DEFAULT_BACKUP_DIR;
-		}
+
+            if (this.tempPath.isEmpty()) {
+                path = this.userPath + DEFAULT_TEMP_DIR;
+            } else path = this.tempPath;
+        } catch (Exception e) {
+            // TODO Auto-generated catch blockx
+            path = this.userPath + DEFAULT_TEMP_DIR;
+        }
+        // if temp dir not exist make dir
+        File tempDir = new File(path);
+        if (!tempDir.exists()) {
+            tempDir.mkdir();
+        }
+
+        return path;
+    }
+     */
+
+    public String getPeersPath() {
+        return this.userPath + (isDemoNet() ? "peers-demo.json" : isTestNet() ? "peers-test.json" :
+                isSideNet() ? "peers-side.json" : "peers.json");
     }
 
-    public String getPatnIcons(){
-        return "images" + File.separator + "pageicons" + File.separator;
+    public String getDataWalletPath() {
+        if (this.dataWalletPath.isEmpty())
+            return this.userPath + DEFAULT_DATA_WALLET_DIR;
+        if (this.dataWalletPath.endsWith(DEFAULT_DATA_WALLET_DIR + File.separator))
+            return this.dataWalletPath;
+        return this.dataWalletPath + DEFAULT_DATA_WALLET_DIR;
     }
 
-    public String getDataDir() {
-        try {
-			if (this.dataPath.equals(""))
-			    return this.getUserPath() + DEFAULT_DATA_DIR;
-			return this.dataPath;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			return this.getUserPath() + DEFAULT_DATA_DIR;
-		}
+    public void setDataWalletPath(String path) {
+        if (path == null) {
+            path = "";
+        } else if (!path.isEmpty()) {
+            // correcting single backslash bug
+            path.replace("\\", File.separator);
+            if (!path.endsWith(File.separator)) {
+                path += File.separator;
+            }
+        }
+
+        this.dataWalletPath = path;
+    }
+
+    public String getWalletKeysPath() {
+        if (this.walletKeysPath.isEmpty())
+            return this.userPath + DEFAULT_WALLET_KEYS_DIR;
+        if (this.walletKeysPath.endsWith(DEFAULT_WALLET_KEYS_DIR + File.separator))
+            return this.walletKeysPath;
+        return this.walletKeysPath + DEFAULT_WALLET_KEYS_DIR;
+    }
+
+    public void setWalletKeysPath(String path) {
+        if (path == null) {
+            path = "";
+        } else if (!path.isEmpty()) {
+            // correcting single backslash bug
+            path.replace("\\", File.separator);
+            if (!path.endsWith(File.separator)) {
+                path += File.separator;
+            }
+        }
+
+        this.walletKeysPath = path;
+    }
+
+    public String getTelegramDir() {
+        if (this.dataTelePath.isEmpty())
+            return this.userPath + DEFAULT_TELEGRAM_DIR;
+        if (this.dataTelePath.endsWith(DEFAULT_TELEGRAM_DIR + File.separator))
+            return this.dataTelePath;
+        return this.dataTelePath + DEFAULT_TELEGRAM_DIR;
+    }
+
+    public void setDataTelePath(String path) {
+
+        if (path == null) {
+            path = "";
+        } else if (!path.isEmpty()) {
+            // correcting single backslash bug
+            path.replace("\\", File.separator);
+            if (!path.endsWith(File.separator)) {
+                path += File.separator;
+            }
+        }
+
+        this.dataTelePath = path;
+
+    }
+
+    /// Так как в папке все может быть удалено - делаем встроенную папку, иначе по несотарожности все может быть удалено ((
+    public String getDataChainPath() {
+        if (this.dataChainPath.isEmpty()) return this.userPath + DEFAULT_DATA_CHAIN_DIR;
+        if (this.dataChainPath.endsWith(DEFAULT_DATA_CHAIN_DIR + File.separator)) return this.dataChainPath;
+        return this.dataChainPath + DEFAULT_DATA_CHAIN_DIR;
+    }
+
+    public void setDataChainPath(String path) {
+        if (path == null) {
+            path = "";
+        } else if (!path.isEmpty()) {
+            // correcting single backslash bug
+            path.replace("\\", File.separator);
+            if (!path.endsWith(File.separator)) {
+                path += File.separator;
+            }
+        }
+
+        this.dataChainPath = path;
+
+    }
+
+    public String getBackUpPath() {
+        if (this.backUpPath.isEmpty())
+            return this.userPath + DEFAULT_BACKUP_DIR;
+        if (this.backUpPath.endsWith(DEFAULT_BACKUP_DIR + File.separator))
+            return this.backUpPath;
+        return this.backUpPath + DEFAULT_BACKUP_DIR;
+    }
+
+    public void setBackUpPath(String path) {
+        if (path == null) {
+            path = "";
+        } else if (!path.isEmpty()) {
+            // correcting single backslash bug
+            path.replace("\\", File.separator);
+            if (!path.endsWith(File.separator)) {
+                path += File.separator;
+            }
+        }
+
+        this.backUpPath = path;
+    }
+
+    public String getPatnIcons() {
+        return this.getUserPath() + "images" + File.separator + "pageicons" + File.separator;
     }
 
     public String getLocalDir() {
-        return this.getUserPath() + DEFAULT_LOCAL_DIR;
+        return this.getUserPath() + DEFAULT_DATA_LOCAL_DIR;
     }
 
     public String getDataTempDir() {
-        return this.getUserPath() + DEFAULT_DATATEMP_DIR;
+        String path = this.getUserPath() + DEFAULT_DATA_TEMP_DIR;
+        File tempDir = new File(path);
+        if (!tempDir.exists()) {
+            tempDir.mkdir();
+        }
+
+        return path;
     }
 
     public String getLangDir() {
         return this.getUserPath() + "languages";
     }
 
-    public String getUserPath() {
-        return this.userPath;
+    public String getSettingsPath() {
+        return getUserPath() + "settings.json";
     }
+
+    public String getGuiSettingPath() {
+        return getUserPath() + "gui_settings.json";
+    }
+
+    ////////////////
 
     // http://127.0.0.1:8000/ipay3_free/tools/block_proc/ERA
     public String getNotifyIncomingURL() {
@@ -669,7 +748,7 @@ public class Settings {
 
     public long getCompuRateAsset() {
         if (this.settingsJSON.containsKey("compuRateAsset")) {
-            return  Long.valueOf(this.settingsJSON.get("compuRateAsset").toString());
+            return Long.valueOf(this.settingsJSON.get("compuRateAsset").toString());
         }
 
         return 95L;
@@ -677,7 +756,7 @@ public class Settings {
 
     public long getDefaultPairAssetKey() {
         if (this.settingsJSON.containsKey("defaultPairAsset")) {
-            return  Long.valueOf(this.settingsJSON.get("defaultPairAsset").toString());
+            return Long.valueOf(this.settingsJSON.get("defaultPairAsset").toString());
         }
 
         return 2L;
@@ -711,6 +790,7 @@ public class Settings {
     }
 
     public String explorerURL;
+
     public String getBlockexplorerURL() {
         if (explorerURL == null) {
             if (this.settingsJSON.containsKey("explorerURL")) {
@@ -946,12 +1026,12 @@ public class Settings {
 
     public String getLang() {
         if (this.settingsJSON.containsKey("lang")) {
-            String langStr = (String)this.settingsJSON.get("lang");
-            
+            String langStr = (String) this.settingsJSON.get("lang");
+
             // delete .json
             String[] tokens = langStr.split("\\.");
             if (tokens.length > 1)
-        	return tokens[0];
+                return tokens[0];
             return langStr;
         }
 
@@ -959,7 +1039,7 @@ public class Settings {
     }
 
     public String getLangFileName() {
-	return getLang() + ".json";
+        return getLang() + ".json";
     }
 
     public String get_Font() {
@@ -1054,6 +1134,7 @@ public class Settings {
             }
         }
         try {
+            // тут можно здать путь и чтение 2-й раз будет с того пути использовано как новый Settings по тому пути
             while (alreadyPassed < 2) {
                 //OPEN FILE
                 //READ SETTINS JSON FILE
@@ -1061,12 +1142,6 @@ public class Settings {
 
                 String jsonString = "";
                 for (String line : lines) {
-
-                    //correcting single backslash bug
-                    if (line.contains("userpath")) {
-                        line = line.replace("\\", File.separator);
-                    }
-
                     jsonString += line;
                 }
 
@@ -1074,66 +1149,47 @@ public class Settings {
                 this.settingsJSON = (JSONObject) JSONValue.parse(jsonString);
                 settingsJSON = settingsJSON == null ? new JSONObject() : settingsJSON;
 
-
                 alreadyPassed++;
 
-                if (this.settingsJSON.containsKey("userpath")) {
-                    this.userPath = (String) this.settingsJSON.get("userpath");
+                if (this.settingsJSON.containsKey("userPath")) {
+                    setUserPath(this.settingsJSON.get("userPath").toString());
                 } else {
                     alreadyPassed++;
                 }
                 // read Telegrams parameters
-                if (this.settingsJSON.containsKey("Telegram_Sender")){ 
-                    telegramDefaultSender =(String)this.settingsJSON.get("Telegram_Sender");
-                }   
-                
-                if (this.settingsJSON.containsKey("Telegram_Reciever")){
-                    telegramDefaultReciever = (String)this.settingsJSON.get("Telegram_Reciever");
+                if (this.settingsJSON.containsKey("Telegram_Sender")) {
+                    telegramDefaultSender = (String) this.settingsJSON.get("Telegram_Sender");
                 }
-                
-                if (this.settingsJSON.containsKey("Telegram_Ratio_Reciever")){
-                    telegramRatioReciever = (String)this.settingsJSON.get("Telegram_Ratio_Reciever");
+
+                if (this.settingsJSON.containsKey("Telegram_Reciever")) {
+                    telegramDefaultReciever = (String) this.settingsJSON.get("Telegram_Reciever");
                 }
+
+                if (this.settingsJSON.containsKey("Telegram_Ratio_Reciever")) {
+                    telegramRatioReciever = (String) this.settingsJSON.get("Telegram_Ratio_Reciever");
+                }
+
                 // read BackUb Path
-                if (this.settingsJSON.containsKey("backuppath")) {
-                    this.getBackUpPath = (String) this.settingsJSON.get("backuppath");
-
-
-                    try {
-                        if ( false && !(this.getBackUpPath.endsWith("\\") || this.getBackUpPath.endsWith("/") || this.getBackUpPath.endsWith(File.separator))) {
-                            this.getBackUpPath += File.separator;
-                        }
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        this.getBackUpPath = "";
-                    }
-
-                } else {
-                    this.getBackUpPath = "";
-
+                if (this.settingsJSON.containsKey("backUpPath")) {
+                    setBackUpPath((String) this.settingsJSON.get("backUpPath"));
                 }
 
-                if (this.settingsJSON.containsKey("walletdir")) {
-                    this.getWalletPath = (String) this.settingsJSON.get("walletdir");
-
-                } else {
-                    this.getWalletPath = "";
+                if (this.settingsJSON.containsKey("dataWalletPath")) {
+                    setDataWalletPath((String) this.settingsJSON.get("dataWalletPath"));
                 }
 
                 // set data dir getDataPath
-                if (this.settingsJSON.containsKey("datadir")) {
-                    this.dataPath = (String) this.settingsJSON.get("datadir");
+                if (this.settingsJSON.containsKey("dataChainPath")) {
+                    setDataChainPath((String) this.settingsJSON.get("dataChainPath"));
+                }
 
-                    try {
-                        if ( false && !(this.dataPath.endsWith("\\") || this.dataPath.endsWith("/") || this.dataPath.endsWith(File.separator))) {
-                            this.dataPath += File.separator;
-                        }
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        this.dataPath = "";
-                    }
-                } else {
-                    this.dataPath = "";
+                // set data dir getDataPath
+                if (this.settingsJSON.containsKey("dataTelePath")) {
+                    setDataTelePath((String) this.settingsJSON.get("dataTelePath"));
+                }
+
+                if (this.settingsJSON.containsKey("walletKeysPath")) {
+                    setWalletKeysPath((String) this.settingsJSON.get("walletKeysPath"));
                 }
 
                 //CREATE FILE IF IT DOESNT EXIST
@@ -1151,8 +1207,8 @@ public class Settings {
         return settingsJSON;
 
     }
-    
-    public JSONObject getJSONObject(){
+
+    public JSONObject getJSONObject() {
         return this.settingsJSON;
     }
 
@@ -1160,7 +1216,7 @@ public class Settings {
         // TODO Auto-generated method stub
         return this.telegramRatioReciever;
     }
-    
+
     public void setTelegramRatioReciever(String str) {
         // TODO Auto-generated method stub
         this.telegramRatioReciever = str;
