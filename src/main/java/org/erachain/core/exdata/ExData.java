@@ -9,24 +9,30 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
+import org.erachain.utils.ZipBytes;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.zip.DataFormatException;
 
 public class ExData {
 
     private static final int DATA_TITLE_PART_LENGTH = Transaction.DATA_TITLE_PART_LENGTH; // size title message
     private static final int DATA_JSON_PART_LENGTH = Transaction.DATA_JSON_PART_LENGTH; // size JSON part
     private static final int DATA_VERSION_PART_LENGTH = Transaction.DATA_VERSION_PART_LENGTH; // size version part
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExData.class);
 
     /*
      * StandardCharsets.UTF_8 JSON "TM" - template key "PR" - template params
@@ -176,9 +182,19 @@ public class ExData {
                                 String name = (String) file.get("FN"); // File_Name
                                 Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
                                 int size = new Integer((String) file.get("SZ"));
-                                byte[] bb = Arrays.copyOfRange(data, position, position + size);
+                                byte[] fileBytes = Arrays.copyOfRange(data, position, position + size);
                                 position = position + size;
-                                filesMap.put(name, new Tuple3(Crypto.getInstance().digest(bb), zip, bb));
+                                byte[] fileBytesOrig = null;
+                                if (zip) {
+                                    try {
+                                        fileBytesOrig = ZipBytes.decompress(fileBytes);
+                                    } catch (DataFormatException e1) {
+                                        LOGGER.error(e1.getMessage(), e1);
+                                    }
+                                } else {
+                                    fileBytesOrig = fileBytes;
+                                }
+                                filesMap.put(name, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
 
                             }
 
@@ -198,9 +214,20 @@ public class ExData {
                                 String name = (String) file.get("File_Name"); // File_Name
                                 Boolean zip = new Boolean((String) file.get("ZIP")); // ZIP
                                 int size = new Integer((String) file.get("Size"));
-                                byte[] bb = Arrays.copyOfRange(data, position, position + size);
+                                byte[] fileBytes = Arrays.copyOfRange(data, position, position + size);
                                 position = position + size;
-                                filesMap.put(name, new Tuple3(Crypto.getInstance().digest(bb), zip, bb));
+
+                                byte[] fileBytesOrig = null;
+                                if (zip) {
+                                    try {
+                                        fileBytesOrig = ZipBytes.decompress(fileBytes);
+                                    } catch (DataFormatException e1) {
+                                        LOGGER.error(e1.getMessage(), e1);
+                                    }
+                                } else {
+                                    fileBytesOrig = fileBytes;
+                                }
+                                filesMap.put(name, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
 
                             }
                             return new Tuple4(versiondata, title, json, filesMap);
