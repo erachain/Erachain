@@ -229,6 +229,24 @@ public class SettingsBasicPanel extends JPanel {
             }
         });
         add(btnBrowseDataFolder, gbc_btnBrowseDataFolder);
+        // AS
+        JButton resetDataDirButton = new JButton(Lang.getInstance().translate("Reset"));
+        GridBagConstraints gbc_resetDataDirButton = new GridBagConstraints();
+        gbc_resetDataDirButton.anchor = GridBagConstraints.WEST;
+        gbc_resetDataDirButton.insets = new Insets(0, 0, 5, 5);
+        gbc_resetDataDirButton.gridx = 5;
+        gbc_resetDataDirButton.gridy = 8;
+        resetDataDirButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                textDataFolder.setText(Settings.DEFAULT_DATA_CHAIN_DIR);
+            }
+        });
+        add(resetDataDirButton, gbc_resetDataDirButton);
+
+        //AS
+
+
+
 
         JLabel lblWelletDir = new JLabel(Lang.getInstance().translate("WalletKeys dir") + ":");
         GridBagConstraints gbc_lblWelletDir = new GridBagConstraints();
@@ -271,6 +289,23 @@ public class SettingsBasicPanel extends JPanel {
         });
 
         add(btnBrowseWallet, gbc_BrowseWalletbutton);
+
+        // AS
+        JButton resetWaletDirButton = new JButton(Lang.getInstance().translate("Reset"));
+        GridBagConstraints gbc_resetWaletDirButton = new GridBagConstraints();
+        gbc_resetWaletDirButton.anchor = GridBagConstraints.WEST;
+        gbc_resetWaletDirButton.insets = new Insets(0, 0, 5, 5);
+        gbc_resetWaletDirButton.gridx = 5;
+        gbc_resetWaletDirButton.gridy = 9;
+        resetWaletDirButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                textWallet.setText(Settings.DEFAULT_WALLET_KEYS_DIR);
+            }
+        });
+        add(resetWaletDirButton, gbc_resetWaletDirButton);
+
+        //AS
+
 
         JLabel lblAnExplanatoryText_4 = new JLabel(Lang.getInstance().translate("The data folder contains blockchain data. The wallet dir contains user specific data."));
         lblAnExplanatoryText_4.setVerticalAlignment(SwingConstants.TOP);
