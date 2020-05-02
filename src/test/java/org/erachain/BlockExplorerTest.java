@@ -38,7 +38,7 @@ public class BlockExplorerTest {
 
     public static DCSet createRealEmptyDatabaseSet() {
         //OPEN DB
-        File dbFile = new File(Settings.getInstance().getDataDir(), "data2.dat");
+        File dbFile = new File(Settings.getInstance().getDataChainPath(), "data2.dat");
         dbFile.getParentFile().mkdirs();
 
         //CREATE DATABASE

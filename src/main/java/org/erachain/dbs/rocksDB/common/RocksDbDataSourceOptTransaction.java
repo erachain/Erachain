@@ -39,7 +39,7 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
 
     public RocksDbDataSourceOptTransaction(String name, List<IndexDB> indexes,
                                            OptimisticTransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles, boolean enableSize) {
-        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, dbCore, columnFamilyHandles,
+        this(Settings.getInstance().getDataChainPath() + ROCKS_DB_FOLDER, name, indexes, dbCore, columnFamilyHandles,
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions(), enableSize);
     }

@@ -113,21 +113,18 @@ public class MAttachedFilesPanel extends JPanel {
                 if (table.getSelectedRow() < 0) return;
                 int row = table.convertRowIndexToModel(table.getSelectedRow());
                 String str = (String) model.getValueAt(row, 0);
-               
 
-               
+                String pp = Settings.getInstance().getUserPath() + str;
 
-                    String pp = Settings.getInstance().getTemDir()+ File.separator + str;// "era_default_file" ;
+                File ff = new File(pp);
+                // if file
+                if (ff.exists() && ff.isFile()) {
+                    ff.delete();
 
-                    File ff = new File( pp);
-                    // if file
-                    if (ff.exists() && ff.isFile()) {
-                        ff.delete();
-
-                    }
+                }
 
 
-                    try (FileOutputStream fos = new FileOutputStream(pp)) {
+                try (FileOutputStream fos = new FileOutputStream(pp)) {
                         byte[] buffer = (byte[]) model.getValueAt(row, 2);
                         // if ZIP
                         if ((boolean) model.getValueAt(row, 1)) {

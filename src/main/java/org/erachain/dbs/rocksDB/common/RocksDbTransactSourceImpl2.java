@@ -95,7 +95,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     }
 
     public RocksDbTransactSourceImpl2(String name, List<IndexDB> indexes, RocksDbSettings settings) {
-        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings);
+        this(Settings.getInstance().getDataChainPath() + ROCKS_DB_FOLDER, name, indexes, settings);
     }
 
     @Override

@@ -155,7 +155,7 @@ public class RecoverWalletFrame extends JFrame {
         panGBC.gridy =0;
       //path text
       //  labelGBC.gridy = labelGBC.gridy+1;
-        jTextFieldDataDir = new JTextField(Settings.getInstance().getWalletDir());
+        jTextFieldDataDir = new JTextField(Settings.getInstance().getWalletKeysPath());
         jTextFieldDataDir.setEditable(false);
         pan.add(jTextFieldDataDir, panGBC);
        // this.add(jTextFieldDataDir, labelGBC);

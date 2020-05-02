@@ -3,7 +3,7 @@
 set app=erachain
 set task=erachain-test
 
-set pars=-testnet=1586455622000
+set pars=-testnet
 
 set jpars=
 

@@ -39,7 +39,7 @@ public class BlockChainTest {
         try {
 
             if (true) {
-                File dbFile = new File("ERA/" + Settings.getInstance().getDataDir(), "chain.dat");
+                File dbFile = new File("ERA/" + Settings.getInstance().getDataChainPath(), "chain.dat");
                 DB database = DCSet.makeFileDB(dbFile);
                 //CREATE INSTANCE
                 dcSet = new DCSet(dbFile, database, false, false, false, 0);

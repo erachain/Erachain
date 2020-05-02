@@ -27,7 +27,7 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
         super(parentName, name, indexes, settings, enableSize);
     }
     public RocksDbTransactSourceImpl(String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
-        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings, enableSize);
+        this(Settings.getInstance().getDataChainPath() + ROCKS_DB_FOLDER, name, indexes, settings, enableSize);
     }
 
     @Override

@@ -40,7 +40,7 @@ public class RocksDBTransactions {
 
         // DELETE перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
-        File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
+        File tempDir = new File(Settings.getInstance().getDataChainPath() + ROCKS_DB_FOLDER);
         try {
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
         } catch (Throwable e) {

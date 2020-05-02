@@ -31,7 +31,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
             database = DCSet.makeDBinMemory();
         } else {
 
-            File dbFile = new File(Settings.getInstance().getDataDir(), "txPool.dat");
+            File dbFile = new File(Settings.getInstance().getDataChainPath(), "txPool.dat");
             dbFile.getParentFile().mkdirs();
 
             /// https://jankotek.gitbooks.io/mapdb/performance/
