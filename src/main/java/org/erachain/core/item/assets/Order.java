@@ -11,9 +11,11 @@ import org.erachain.datachain.CompletedOrderMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TradeMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -634,7 +636,7 @@ public class Order implements Comparable<Order> {
         // REVERT not completed AMOUNT
         BigDecimal left = this.getAmountHaveLeft();
         this.creator.changeBalance(this.dcSet, false,
-                this.haveAssetKey, left, false, false);
+                false, this.haveAssetKey, left, false, false);
         transaction.addCalculated(block, this.creator, this.haveAssetKey, left,
                 "Outprice " + (forTarget ? "close" : "ended") + " Order @" + transaction.viewDBRef(this.id));
 
@@ -686,7 +688,7 @@ public class Order implements Comparable<Order> {
 
         //REMOVE HAVE
         //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
-        this.creator.changeBalance(this.dcSet, true, this.haveAssetKey, this.amountHave, true, false);
+        this.creator.changeBalance(this.dcSet, true, false, this.haveAssetKey, this.amountHave, true, false);
 
         BigDecimal thisPriceReverse = calcPriceReverse();
 
@@ -982,7 +984,7 @@ public class Order implements Comparable<Order> {
                 }
 
                 //TRANSFER FUNDS
-                order.getCreator().changeBalance(this.dcSet, false, order.wantAssetKey, tradeAmountForWant, false, false);
+                order.getCreator().changeBalance(this.dcSet, false, false, order.wantAssetKey, tradeAmountForWant, false, false);
                 transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
                         "Trade Order @" + Transaction.viewDBRef(order.id));
 
@@ -1041,7 +1043,7 @@ public class Order implements Comparable<Order> {
 
         //TRANSFER FUNDS
         if (processedAmountFulfilledWant.signum() > 0) {
-            this.creator.changeBalance(this.dcSet, false, this.wantAssetKey, processedAmountFulfilledWant, false, false);
+            this.creator.changeBalance(this.dcSet, false, false, this.wantAssetKey, processedAmountFulfilledWant, false, false);
             transaction.addCalculated(block, this.creator, this.wantAssetKey, processedAmountFulfilledWant,
                     "Resolve Order @" + Transaction.viewDBRef(this.id));
         }
@@ -1068,46 +1070,52 @@ public class Order implements Comparable<Order> {
         BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
 
         //ORPHAN TRADES
-        for (Trade trade : this.getInitiatedTrades(this.dcSet)) {
-            Order target = trade.getTargetOrder(this.dcSet);
+        Trade trade;
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(this.id)) {
+            while (iterator.hasNext()) {
 
-            //REVERSE FUNDS
-            BigDecimal tradeAmountHave = trade.getAmountHave();
-            BigDecimal tradeAmountWant = trade.getAmountWant();
+                trade = tradesMap.get(iterator.next());
+                Order target = trade.getTargetOrder(this.dcSet);
 
-            //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
-            // - на всякий случай удалим его в любом случае
-            completedMap.delete(target);
+                //REVERSE FUNDS
+                BigDecimal tradeAmountHave = trade.getAmountHave();
+                BigDecimal tradeAmountWant = trade.getAmountWant();
 
-            //// Пока не изменились Остатки и цена по Остаткм не съехала, удалим из таблицы ордеров
-            /// иначе вторичный ключ останется так как он не будет найден из-за измененой "цены по остаткам"
-            ordersMap.delete(target);
+                //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
+                // - на всякий случай удалим его в любом случае
+                completedMap.delete(target);
 
-            //REVERSE FULFILLED
-            target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
-            thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
+                //// Пока не изменились Остатки и цена по Остаткм не съехала, удалим из таблицы ордеров
+                /// иначе вторичный ключ останется так как он не будет найден из-за измененой "цены по остаткам"
+                ordersMap.delete(target);
 
-            target.getCreator().changeBalance(this.dcSet, true, target.wantAssetKey, tradeAmountWant, false, false);
+                //REVERSE FULFILLED
+                target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
+                thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
-            // Учтем что у стороны ордера обновилась форжинговая информация
-            if (target.wantAssetKey == Transaction.RIGHTS_KEY && block != null) {
-                block.addForgingInfoUpdate(target.getCreator());
-            }
+                target.getCreator().changeBalance(this.dcSet, true, false, target.wantAssetKey, tradeAmountWant, false, false);
 
-            //UPDATE ORDERS
-            ordersMap.put(target);
-
-            //REMOVE TRADE FROM DATABASE
-            tradesMap.delete(trade);
-
-            if (BlockChain.CHECK_BUGS > 3) {
-                if (tradesMap.contains(new Fun.Tuple2<>(trade.getInitiator(), trade.getTarget()))) {
-                    Long err = null;
-                    err++;
+                // Учтем что у стороны ордера обновилась форжинговая информация
+                if (target.wantAssetKey == Transaction.RIGHTS_KEY && block != null) {
+                    block.addForgingInfoUpdate(target.getCreator());
                 }
+
+                //UPDATE ORDERS
+                ordersMap.put(target);
+
+                //REMOVE TRADE FROM DATABASE
+                tradesMap.delete(trade);
+
+                if (BlockChain.CHECK_BUGS > 3) {
+                    if (tradesMap.contains(new Fun.Tuple2<>(trade.getInitiator(), trade.getTarget()))) {
+                        Long err = null;
+                        err++;
+                    }
+                }
+
+
             }
-
-
+        } catch (IOException e) {
         }
 
         //// тут нужно получить остатки все из текущего состояния иначе индексы по измененой цене с остатков не удалятся
@@ -1121,9 +1129,9 @@ public class Order implements Comparable<Order> {
         //REMOVE HAVE
         // GET HAVE LEFT - if it CANCELWED by INCREMENT close
         //   - если обработка остановлена по достижению порога Инкремента
-        this.creator.changeBalance(this.dcSet, false, this.haveAssetKey, this.getAmountHaveLeft(), true, false);
+        this.creator.changeBalance(this.dcSet, false, false, this.haveAssetKey, this.getAmountHaveLeft(), true, false);
         //REVERT WANT
-        this.creator.changeBalance(this.dcSet, true, this.wantAssetKey, thisAmountFulfilledWant, false, false);
+        this.creator.changeBalance(this.dcSet, true, false, this.wantAssetKey, thisAmountFulfilledWant, false, false);
     }
 
     @Override

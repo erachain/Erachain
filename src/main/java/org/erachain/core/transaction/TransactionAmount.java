@@ -10,10 +10,12 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,15 +78,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public static final int minSCALE = BlockChain.AMOUNT_DEDAULT_SCALE - TransactionAmount.SCALE_MASK_HALF;
 
     public static final byte BACKWARD_MASK = 64;
-    
+
     // BALANCES types and ACTION with IT
     // 0 - not used
     public static final int ACTION_SEND = 1;
     public static final int ACTION_DEBT = 2;
+    public static final int ACTION_REPAY_DEBT = -2; // чисто для другого отображения а так = ACTION_DEBT
     public static final int ACTION_HOLD = 3;
     public static final int ACTION_SPEND = 4;
     public static final int ACTION_PLEDGE = 5;
-    
+
     /*
      * public static final String NAME_ACTION_TYPE_BACKWARD_PROPERTY =
      * "backward PROPERTY"; public static final String
@@ -106,42 +109,56 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
     protected Account recipient;
+    protected Fun.Tuple4<Long, Integer, Integer, Integer> recipientPersonDuration;
+    protected PersonCls recipientPerson;
+
     protected BigDecimal amount;
     protected long key; //  = Transaction.FEE_KEY;
     protected AssetCls asset;
-    
+
     // need for calculate fee by feePow into GUI
     protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient,
-            BigDecimal amount, long key, long timestamp, Long reference) {
+                                BigDecimal amount, long key, long timestamp, Long reference) {
         super(typeBytes, name, creator, feePow, timestamp, reference);
         this.recipient = recipient;
-        
+
         if (amount == null || amount.equals(BigDecimal.ZERO)) {
             // set version to 1
             typeBytes[2] = (byte) (typeBytes[2] | (byte) -128);
         } else {
             // RESET 0 bit
             typeBytes[2] = (byte) (typeBytes[2] & (byte) 127);
-            
+
             this.amount = amount;
             this.key = key;
         }
     }
-    
+
     // need for calculate fee
     protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient,
-            BigDecimal amount, long key, long timestamp, Long reference, byte[] signature) {
+                                BigDecimal amount, long key, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, name, creator, feePow, recipient, amount, key, timestamp, reference);
         this.signature = signature;
     }
-    
+
     // GETTERS/SETTERS
 
+    public void setDC(DCSet dcSet) {
+        super.setDC(dcSet);
+        if (BlockChain.TEST_DB == 0 && recipient != null) {
+            recipientPersonDuration = recipient.getPersonDuration(dcSet);
+            if (recipientPersonDuration != null) {
+                recipientPerson = (PersonCls) dcSet.getItemPersonMap().get(recipientPersonDuration.a);
+            }
+        }
+
+    }
 
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
 
-        if (BlockChain.CHECK_BUGS > 3 && viewDBRef(dbRef).equals("18165-1")) {
+        if (BlockChain.CHECK_BUGS > 3// && viewDBRef(dbRef).equals("18165-1")
+        ) {
             boolean debug;
             debug = true;
         }
@@ -160,15 +177,66 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public long getKey() {
         return this.key;
     }
-    
+
     @Override
     public long getAssetKey() {
         return this.key;
     }
-    
+
     @Override
     public ItemCls getItem() {
         return this.asset;
+    }
+
+    @Override
+    public void makeItemsKeys() {
+        // запомним что тут две сущности
+        if (amount != null) {
+            if (creatorPersonDuration != null) {
+                if (recipientPersonDuration != null) {
+                    itemsKeys = new Object[][]{
+                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
+                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a},
+                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+                    };
+                } else {
+                    itemsKeys = new Object[][]{
+                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
+                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+                    };
+                }
+            } else {
+                if (recipientPersonDuration != null) {
+                    itemsKeys = new Object[][]{
+                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a},
+                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+                    };
+                } else {
+                    itemsKeys = new Object[][]{
+                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+                    };
+                }
+            }
+        } else {
+            if (creatorPersonDuration != null) {
+                if (recipientPersonDuration != null) {
+                    itemsKeys = new Object[][]{
+                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
+                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a},
+                    };
+                } else {
+                    itemsKeys = new Object[][]{
+                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
+                    };
+                }
+            } else {
+                if (recipientPersonDuration != null) {
+                    itemsKeys = new Object[][]{
+                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a},
+                    };
+                }
+            }
+        }
     }
 
     @Override
@@ -230,8 +298,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     public static int getActionType(long assetKey, BigDecimal amount, boolean isBackward) {
-        int type = Account.actionType(assetKey, amount);
-        return type * (isBackward ? -1 : 1);
+        return Account.balancePosition(assetKey, amount, isBackward);
     }
     public int getActionType() {
         return getActionType(this.key, this.amount, this.isBackward());
@@ -294,8 +361,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         
         if (amount == null || amount.signum() == 0)
             return "";
-        
-        int actionType = Account.actionType(assetKey, amount);
+
+        int actionType = Account.balancePosition(assetKey, amount, isBackward);
         
         switch (actionType) {
             case ACTION_SEND:
@@ -368,9 +435,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             transaction.put("asset", this.getAbsKey());
             transaction.put("assetKey", this.getAbsKey());
             transaction.put("amount", this.amount.toPlainString());
-            ///transaction.put("action_key", this.getActionType());
             transaction.put("actionKey", this.getActionType());
-            //transaction.put("action_name", this.viewActionType());
             transaction.put("actionName", this.viewActionType());
             if (this.isBackward())
                 transaction.put("backward", this.isBackward());
@@ -428,18 +493,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return base_len - (this.typeBytes[2] < 0 ? (KEY_LENGTH + AMOUNT_LENGTH) : 0);
     }
 
-    public boolean isUnlimited(long absKey, String owner) {
-        return absKey > AssetCls.REAL_KEY // not
-                // genesis
-                // assets!
-                && asset.getQuantity().equals(0l)
-                && asset.getOwner().getAddress().equals(owner);
-
-    }
-
     //@Override // - fee + balance - calculate here
     private static long pointLogg;
-    public int isValid(int asDeal, boolean isPerson, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         if (false) {
             for (byte[] valid_item : VALID_REC) {
@@ -491,8 +547,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 long[] reference = this.creator.getLastTimestamp(dcSet);
                 if (reference != null && reference[0] >= this.timestamp
                         // при откатах для нового счета который первый раз сделал транзакцию
-                        // из нулевого баланса - Референс будеть ошибочный
-                        // поэтому отключим эту проверку тут
+                    // из нулевого баланса - Референс будет ошибочный
+                    // поэтому отключим эту проверку тут
                     /////   && !(BlockChain.DEVELOP_USE && height < 897144)
                 ) {
 
@@ -502,8 +558,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             pointLogg = System.currentTimeMillis();
                             if (BlockChain.CHECK_BUGS > 1)
                                 LOGGER.debug("INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
-                                    + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
-                                    + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
+                                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                                        + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
                         }
                     }
                     return INVALID_TIMESTAMP;
@@ -511,14 +567,28 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
         }
 
+        boolean isPerson = this.creator.isPerson(dcSet, height, creatorPersonDuration);
+
+        // PUBLIC TEXT only from PERSONS
+        if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
+                && this.hasPublicText() && !isPerson) {
+            if (BlockChain.MAIN_MODE && height < 800000 // TODO: remove on new CHAIN
+                /// wrong: "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")
+            ) {
+                ;
+            } else {
+                return CREATOR_NOT_PERSONALIZED;
+            }
+        }
+
         // CHECK IF AMOUNT AND ASSET
         if ((flags & NOT_VALIDATE_FLAG_BALANCE) == 0l
                 && this.amount != null) {
-            
+
             int amount_sign = this.amount.signum();
             if (amount_sign != 0
                     && height > BlockChain.ALL_BALANCES_OK_TO) {
-                
+
                 long absKey = this.key;
                 if (absKey < 0)
                     absKey = -absKey;
@@ -555,398 +625,404 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     }
                 }
 
-                int actionType = Account.actionType(this.key, this.amount);
+                // BACKWARD - CONFISCATE
+                boolean backward = isBackward();
+
+                int actionType = Account.balancePosition(this.key, this.amount, backward);
                 int assetType = this.asset.getAssetType();
                 BigDecimal balance;
-                
-                // BACKWARD - CONFISCATE
-                boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
-                if (asset.isAccounting()) {
+                // условия для особых счетных единиц
+                switch ((int) absKey) {
+                    case 111:
+                    case 222:
+                    case 333:
+                    case 444:
+                    case 888:
+                    case 999:
+                        return ITEM_ASSET_NOT_EXIST;
+                    case 555:
+                        if (actionType != ACTION_SEND)
+                            return INVALID_TRANSFER_TYPE;
 
-                    switch ((int) absKey) {
-                        case ACTION_SEND:
-                            if (backward)
-                                return INVALID_BACKWARD_ACTION;
-                        case ACTION_DEBT:
-                            ;
-                        case ACTION_HOLD:
-                            if (!backward)
-                                return INVALID_HOLD_DIRECTION;
-                        case ACTION_SPEND:
-                            ;
-                    }
+                        if (amount.compareTo(BigDecimal.ZERO.subtract(BigDecimal.ONE)) < 0)
+                            return NO_BALANCE;
 
-                    switch ((int) absKey) {
-                        case 111:
-                            return ITEM_ASSET_NOT_EXIST;
-                        case 222:
-                            return ITEM_ASSET_NOT_EXIST;
-                        case 333:
-                            return ITEM_ASSET_NOT_EXIST;
-                        case 444:
-                            return ITEM_ASSET_NOT_EXIST;
-                        case 555:
-                            if (actionType != ACTION_SEND)
-                                return INVALID_TRANSFER_TYPE;
-                            
-                            if (amount.compareTo(BigDecimal.ZERO.subtract(BigDecimal.ONE)) < 0)
-                                return NO_BALANCE;
-                            
-                            break;
-                        case 666:
-                            if (actionType != ACTION_SEND)
-                                return INVALID_TRANSFER_TYPE;
-                            
-                            if (amount.compareTo(BigDecimal.ZERO.subtract(BigDecimal.ONE)) < 0)
-                                return NO_BALANCE;
-                            
-                            break;
-                        case 777:
-                            if (actionType != ACTION_SEND)
-                                return INVALID_TRANSFER_TYPE;
-                            
-                            if (amount.compareTo(BigDecimal.ZERO.subtract(BigDecimal.ONE)) < 0)
-                                return NO_BALANCE;
-                            
-                            break;
-                        case 888:
-                            return ITEM_ASSET_NOT_EXIST;
-                        case 999:
-                            return ITEM_ASSET_NOT_EXIST;
-                    }
-                    
-                } else {
-                    
-                    // VALIDATE by ASSET
-                    switch (assetType) {
-                        // HOLD GOODS, CHECK myself DEBT for CLAIMS
-                        case AssetCls.AS_INSIDE_OTHER_CLAIM:
-                            break;
-                    }
-                    
-                    // VALIDATE by ACTION
-                    switch (actionType) {
-                        // HOLD GOODS, CHECK myself DEBT for CLAIMS
-                        case ACTION_HOLD:
+                        break;
+                    case 666:
+                        if (actionType != ACTION_SEND)
+                            return INVALID_TRANSFER_TYPE;
 
-                            if (absKey == FEE_KEY
-                                    || assetType == AssetCls.AS_INDEX
-                                    || assetType == AssetCls.AS_INSIDE_ACCESS
-                                    || assetType == AssetCls.AS_INSIDE_BONUS
-                            ) {
-                                if (height > BlockChain.VERS_4_12)
-                                    return NOT_HOLDABLE_ASSET;
+                        if (amount.compareTo(BigDecimal.ZERO.subtract(BigDecimal.ONE)) < 0)
+                            return NO_BALANCE;
+
+                        break;
+                    case 777:
+                        if (actionType != ACTION_SEND)
+                            return INVALID_TRANSFER_TYPE;
+
+                        if (amount.compareTo(BigDecimal.ZERO.subtract(BigDecimal.ONE)) < 0)
+                            return NO_BALANCE;
+
+                        break;
+                }
+
+                // VALIDATE by ASSET
+                switch (assetType) {
+                    // HOLD GOODS, CHECK myself DEBT for CLAIMS
+                    case AssetCls.AS_INSIDE_OTHER_CLAIM:
+                        break;
+                }
+
+                boolean unLimited;
+                // VALIDATE by ACTION
+                switch (actionType) {
+                    // HOLD GOODS, CHECK myself DEBT for CLAIMS
+                    case ACTION_HOLD:
+
+                        if (absKey == FEE_KEY
+                                || absKey == AssetCls.ERA_KEY
+                                || assetType == AssetCls.AS_INDEX
+                                || assetType == AssetCls.AS_INSIDE_ACCESS
+                                || assetType == AssetCls.AS_INSIDE_BONUS
+                        ) {
+                            if (height > BlockChain.VERS_4_12)
+                                return NOT_HOLDABLE_ASSET;
+                        }
+
+                        // if asset is unlimited and me is creator of this
+                        // asset - for RECIPIENT !
+                        unLimited = asset.isUnlimited(this.recipient);
+
+                        if (!unLimited) {
+                            balance = this.recipient.getBalance(dcSet, absKey, actionType).b;
+                            BigDecimal amountOWN = this.recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
+                            // amontOWN, balance and amount - is
+                            // negative
+                            if (balance.add(this.amount).compareTo(amountOWN) < 0) {
+                                return NO_HOLD_BALANCE;
+                            }
+                        }
+
+                        if (height > BlockChain.ALL_BALANCES_OK_TO
+                                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
+                            return NOT_ENOUGH_FEE;
+                        }
+
+                        break;
+
+                    case ACTION_DEBT: // DEBT, CREDIT and BORROW
+
+                        if (assetType == AssetCls.AS_INDEX
+                                || assetType == AssetCls.AS_INSIDE_BONUS
+                        ) {
+                            if (height > BlockChain.HOLD_VALID_START + 20000)
+                                return NOT_DEBTABLE_ASSET;
+                        }
+
+                        // CLAIMs DEBT - only for OWNER
+                        if (asset.isOutsideType()) {
+                            if (!this.recipient.equals(this.asset.getOwner())) {
+                                // ERROR
+                                return Transaction.INVALID_CLAIM_DEBT_RECIPIENT;
+                            }
+                        }
+
+                        if (backward) {
+
+                            // BACKWARD - BORROW - CONFISCATE CREDIT
+                            Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+                                    this.creator.getAddress(), absKey, this.recipient.getAddress());
+                            BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
+                            if (creditAmount.compareTo(amount) < 0) {
+                                // NOT ENOUGHT DEBT from recipient to
+                                // creator
+                                return NO_DEBT_BALANCE;
                             }
 
-                            if (height > BlockChain.HOLD_VALID_START) {
-                                if (!backward) {
-                                    // HOLD only must be backward
-                                    return INVALID_HOLD_DIRECTION;
+                            /*
+                             * BigDecimal balance1 =
+                             * this.creator.getBalanceUSE(absKey, db); if
+                             * (balance1.compareTo(amount) < 0) { // OWN +
+                             * (-CREDIT)) = max amount that can be used for
+                             * new credit return NO_BALANCE; }
+                             */
+                        } else {
+                            // CREDIT - GIVE CREDIT OR RETURN CREDIT
+
+                            if (!asset.isUnlimited(this.creator)) {
+
+                                if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0
+                                        && this.creator.getBalanceUSE(absKey, this.dcSet)
+                                        .compareTo(this.amount) < 0) {
+
+                                    if (height > BlockChain.ALL_BALANCES_OK_TO // в боевой
+                                    )
+                                        return NO_BALANCE;
                                 }
-                            } else {
-                                if (backward) {
-                                    return INVALID_HOLD_DIRECTION;
+
+                                Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+                                        this.recipient.getAddress(), absKey, this.creator.getAddress());
+                                // TRY RETURN
+                                BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
+                                if (creditAmount.compareTo(amount) < 0) {
+
+                                    // TODO: найти ошибку когда возвращаем больше чем на счету
+                                    // и идет переворот выдачи займа в dcSet.getCredit_AddressesMap().get(creditKey);
+                                    if (false)
+                                        return NO_BALANCE;
+
+                                    BigDecimal leftAmount = amount.subtract(creditAmount);
+                                    BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, ACTION_SEND).b; // OWN
+                                    // balance
+                                    // NOT ENOUGHT DEBT from recipient to
+                                    // creator
+                                    // TRY CREDITN OWN
+                                    if (balanceOwn.compareTo(leftAmount) < 0) {
+                                        // NOT ENOUGHT DEBT from recipient to
+                                        // creator
+                                        return NO_BALANCE;
+                                    }
                                 }
                             }
-                            
-                            if (true
-                                    // для всех активов абсолютно - можно взять на баланс!
-                                    // даже деньги и обязателтсва внешние - типа общие деньги разделили по разным рукам???
-                                    // взятие на руки подтверждает что ты в реальном мире их взял
-                                    ///|| height > BlockChain.HOLD_VALID_START
-                                    /// ащк фдд&& asset.isMovable()
+                        }
+
+                        if (height > BlockChain.ALL_BALANCES_OK_TO
+                                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
+                            return NOT_ENOUGH_FEE;
+                        }
+
+                        break;
+
+                    case ACTION_SEND: // SEND ASSET
+
+                        if (absKey == RIGHTS_KEY) {
+
+                            // byte[] ss = this.creator.getAddress();
+                            if (height > BlockChain.FREEZE_FROM
+                                    && BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
+                                // LOCK PAYMENTS
+                                wrong = true;
+                                for (String address : BlockChain.TRUE_ADDRESSES) {
+                                    if (this.recipient.equals(address)
+                                        // || this.creator.equals(address)
                                     ) {
-                                // if GOODS - HOLD it in STOCK and check BALANCE
-                                boolean unLimited = isUnlimited(absKey, this.recipient.getAddress());
-
-                                balance = this.recipient.getBalance(dcSet, absKey, actionType).b;
-                                if (unLimited) {
-                                    BigDecimal amountOWN = this.recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
-                                    // amontOWN, balance and amount - is
-                                    // negative
-                                    if (balance.add(this.amount).compareTo(amountOWN) < 0) {
-                                        return NO_HOLD_BALANCE;
-                                    }
-                                } else {
-                                    // amount - is negative
-                                    if (this.amount.abs().compareTo(balance) > 0) {
-                                        return NO_HOLD_BALANCE;
+                                        wrong = false;
+                                        break;
                                     }
                                 }
-                                // } else if (asset.isAsset()) {
-                                // return NOT_MOVABLE_ASSET;
-                            }
-                            
-                            break;
-                        
-                        case ACTION_DEBT: // DEBT, CREDIT and BORROW
 
-                            if (absKey == FEE_KEY
-                                    || assetType == AssetCls.AS_INDEX
-                                    || assetType == AssetCls.AS_INSIDE_BONUS
-                            ) {
-                                if (height > BlockChain.HOLD_VALID_START + 20000)
-                                    return NOT_DEBTABLE_ASSET;
+                                if (wrong) {
+                                    // int balance =
+                                    // this.creator.getBalance(dcSet,
+                                    // absKey, 1).b.intValue();
+                                    // if (balance > 3000)
+                                    return INVALID_CREATOR;
+                                }
+
                             }
-                            
-                            // CLAIMs DEBT - only for OWNER
-                            if (asset.isOutsideType()) {
+
+                        }
+
+                        // if asset is unlimited and me is creator of this
+                        // asset
+                        unLimited = asset.isUnlimited(this.creator);
+                        // CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
+                        if (unLimited) {
+                            ;
+                        } else if (absKey == FEE_KEY) {
+
+                            if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0
+                                    && this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b
+                                    .compareTo(this.amount.add(this.fee)) < 0
+                                    && !BlockChain.ERA_COMPU_ALL_UP
+                            ) {
+
+                                /// если это девелоп то не проверяем ниже особые счета
+                                if (BlockChain.SIDE_MODE || BlockChain.TEST_MODE)
+                                    return NO_BALANCE;
+
+                                wrong = true;
+                                for (byte[] valid_item : BlockChain.VALID_BAL) {
+                                    if (Arrays.equals(this.signature, valid_item)) {
+                                        wrong = false;
+                                        break;
+                                    }
+                                }
+
+                                if (wrong)
+                                    return NO_BALANCE;
+                            }
+
+                        } else {
+
+                            // ALL OTHER ASSET
+
+                            // CLAIMs invalid
+                            // TODO сейчас сюда не будет приходить!!!
+                            if (asset.isOutsideType() && backward) {
                                 if (!this.recipient.equals(this.asset.getOwner())) {
                                     // ERROR
-                                    return Transaction.INVALID_CLAIM_DEBT_RECIPIENT;
+                                    return Transaction.INVALID_CLAIM_RECIPIENT;
                                 }
-                            }
-                            
-                            // 75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12 ->
-                            // 7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7
-                            if (backward) {
 
-                                // BACKWARD - BORROW - CONFISCATE CREDIT
+                                // BACKWARD CLAIM
                                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
                                         this.creator.getAddress(), absKey, this.recipient.getAddress());
                                 BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
                                 if (creditAmount.compareTo(amount) < 0) {
-                                    // NOT ENOUGHT DEBT from recipient to
+                                    // NOT ENOUGHT INCLAIM from recipient to
                                     // creator
-                                    return NO_DEBT_BALANCE;
-                                }
-                                
-                                /*
-                                 * BigDecimal balance1 =
-                                 * this.creator.getBalanceUSE(absKey, db); if
-                                 * (balance1.compareTo(amount) < 0) { // OWN +
-                                 * (-CREDIT)) = max amount that can be used for
-                                 * new credit return NO_BALANCE; }
-                                 */
-                            } else {
-                                // CREDIT - GIVE CREDIT OR RETURN CREDIT
-
-                                if (!isUnlimited(absKey, this.creator.getAddress())) {
-
-                                    if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0
-                                            && this.creator.getBalanceUSE(absKey, this.dcSet)
-                                            .compareTo(this.amount) < 0) {
-
-                                        if (height > BlockChain.ALL_BALANCES_OK_TO // в боевой
-                                        )
-                                            return NO_BALANCE;
-                                    }
-
-                                    Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-                                            this.recipient.getAddress(), absKey, this.creator.getAddress());
-                                    // TRY RETURN
-                                    BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
-                                    if (creditAmount.compareTo(amount) < 0) {
-
-                                        // TODO: найти ошибку когда возвращаем больше чем на счету
-                                        // и идет переворот выдачи займа в dcSet.getCredit_AddressesMap().get(creditKey);
-                                        if (false)
-                                            return NO_BALANCE;
-
-                                        BigDecimal leftAmount = amount.subtract(creditAmount);
-                                        BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey,  ACTION_SEND).b; // OWN
-                                        // balance
-                                        // NOT ENOUGHT DEBT from recipient to
-                                        // creator
-                                        // TRY CREDITN OWN
-                                        if (balanceOwn.compareTo(leftAmount) < 0) {
-                                            // NOT ENOUGHT DEBT from recipient to
-                                            // creator
-                                            return NO_BALANCE;
-                                        }
-                                    }
-                                }
-                            }
-                            break;
-                        
-                        case ACTION_SEND: // SEND ASSET
-                            
-                            if (absKey == RIGHTS_KEY) {
-                                
-                                if (backward)
                                     return NO_INCLAIM_BALANCE;
-                                
-                                // byte[] ss = this.creator.getAddress();
-                                if (height > BlockChain.FREEZE_FROM
-                                        && BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
-                                    // LOCK PAYMENTS
-                                    wrong = true;
-                                    for (String address : BlockChain.TRUE_ADDRESSES) {
-                                        if (this.recipient.equals(address)
-                                        // || this.creator.equals(address)
-                                        ) {
-                                            wrong = false;
-                                            break;
-                                        }
-                                    }
-                                    
-                                    if (wrong) {
-                                        // int balance =
-                                        // this.creator.getBalance(dcSet,
-                                        // absKey, 1).b.intValue();
-                                        // if (balance > 3000)
-                                        return INVALID_CREATOR;
-                                    }
-                                    
                                 }
-                                
-                            }
-
-                            // if asset is unlimited and me is creator of this
-                            // asset
-                            boolean unLimited = isUnlimited(absKey, this.creator.getAddress());
-                            // CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
-                            if (unLimited) {
-                                // not make RETURN - check validate next
-                                //
-                                if (backward)
-                                    return INVALID_BACKWARD_ACTION;
-                                
-                            } else if (absKey == FEE_KEY) {
-                                
-                                if (backward)
-                                    return NO_INCLAIM_BALANCE;
-                                
-                                if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0
-                                        && this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b
-                                        .compareTo(this.amount.add(this.fee)) < 0
-                                        && !BlockChain.ERA_COMPU_ALL_UP
-                                ) {
-
-                                    /// если это девелоп то не проверяем ниже особые счета
-                                    if (BlockChain.TEST_MODE)
-                                        return NO_BALANCE;
-                                    
-                                    wrong = true;
-                                    for (byte[] valid_item : BlockChain.VALID_BAL) {
-                                        if (Arrays.equals(this.signature, valid_item)) {
-                                            wrong = false;
-                                            break;
-                                        }
-                                    }
-                                    
-                                    if (wrong)
-                                        return NO_BALANCE;
-                                }
-                                
-                            } else {
-                                
-                                // ALL OTHER ASSET
-                                
-                                // CLAIMs invalid
-                                if (asset.isOutsideType() && backward) {
-                                    if (!this.recipient.equals(this.asset.getOwner())) {
-                                        // ERROR
-                                        return Transaction.INVALID_CLAIM_RECIPIENT;
-                                    }
-                                    
-                                    // BACKWARD CLAIM
-                                    Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-                                            this.creator.getAddress(), absKey, this.recipient.getAddress());
-                                    BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
-                                    if (creditAmount.compareTo(amount) < 0) {
-                                        // NOT ENOUGHT INCLAIM from recipient to
-                                        // creator
-                                        return NO_INCLAIM_BALANCE;
-                                    }
-                                    
-                                }
-
-                                // проверим баланс по КОМПУ
-                                if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
-                                        && this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b.compareTo(this.fee) < 0
-                                        && !BlockChain.ERA_COMPU_ALL_UP) {
-                                    if (BlockChain.TEST_MODE)
-                                        return NOT_ENOUGH_FEE;
-                                        
-                                    // TODO: delete wrong check in new CHAIN
-                                    // SOME PAYMENTs is WRONG
-                                    wrong = true;
-                                    for (byte[] valid_item : BlockChain.VALID_BAL) {
-                                        if (Arrays.equals(this.signature, valid_item)) {
-                                            wrong = false;
-                                            break;
-                                        }
-                                    }
-                                    
-                                    if (wrong)
-                                        return NOT_ENOUGH_FEE;
-                                }
-                                
-                                BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height,
-                                        !(asset.isOutsideType() && backward));
-                                
-                                if (amount.compareTo(forSale) > 0) {
-                                    if (BlockChain.TEST_MODE)
-                                        return NO_BALANCE;
-                                        
-                                    // TODO: delete wrong check in new CHAIN
-                                    // SOME PAYMENTs is WRONG
-                                    wrong = true;
-                                    for (byte[] valid_item : BlockChain.VALID_BAL) {
-                                        if (Arrays.equals(this.signature, valid_item)) {
-                                            wrong = false;
-                                            break;
-                                        }
-                                    }
-                                    
-                                    if (wrong)
-                                        return NO_BALANCE;
-                                }
-                                
-                            }
-
-                            if (height > BlockChain.FREEZE_FROM) {
-                                String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
-                                if (unlock != null && !this.recipient.equals(unlock))
-                                    return INVALID_CREATOR;
-
-                                Tuple3<String, Integer, Integer> unlockItem = BlockChain.LOCKED__ADDRESSES_PERIOD
-                                        .get(this.creator.getAddress());
-                                if (unlockItem != null && unlockItem.b > height && height < unlockItem.c
-                                        && !this.recipient.equals(unlockItem.a))
-                                    return INVALID_CREATOR;
 
                             }
 
-                            break;
-                        
-                        case ACTION_SPEND: // PRODUCE - SPEND
+                            // проверим баланс по КОМПУ
+                            if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
+                                    && this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b.compareTo(this.fee) < 0
+                                    && !BlockChain.ERA_COMPU_ALL_UP) {
+                                if (BlockChain.SIDE_MODE || BlockChain.TEST_MODE)
+                                    return NOT_ENOUGH_FEE;
 
-                            if (absKey == FEE_KEY
-                                    || assetType == AssetCls.AS_INDEX
-                                    || assetType == AssetCls.AS_INSIDE_ACCESS
-                                    || assetType == AssetCls.AS_INSIDE_BONUS
-                            ) {
-                                if (height > BlockChain.HOLD_VALID_START)
-                                    return NOT_SPENDABLE_ASSET;
+                                // TODO: delete wrong check in new CHAIN
+                                // SOME PAYMENTs is WRONG
+                                wrong = true;
+                                for (byte[] valid_item : BlockChain.VALID_BAL) {
+                                    if (Arrays.equals(this.signature, valid_item)) {
+                                        wrong = false;
+                                        break;
+                                    }
+                                }
+
+                                if (wrong)
+                                    return NOT_ENOUGH_FEE;
                             }
 
+                            BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height,
+                                    !(asset.isOutsideType() && backward));
 
-                            // TRY FEE
-                            if (this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b.compareTo(this.fee) < 0) {
-                                return NOT_ENOUGH_FEE;
+                            if (amount.compareTo(forSale) > 0) {
+                                if (BlockChain.SIDE_MODE || BlockChain.TEST_MODE)
+                                    return NO_BALANCE;
+
+                                // TODO: delete wrong check in new CHAIN
+                                // SOME PAYMENTs is WRONG
+                                wrong = true;
+                                for (byte[] valid_item : BlockChain.VALID_BAL) {
+                                    if (Arrays.equals(this.signature, valid_item)) {
+                                        wrong = false;
+                                        break;
+                                    }
+                                }
+
+                                if (wrong)
+                                    return NO_BALANCE;
                             }
-                            
-                            balance = this.creator.getBalance(dcSet, absKey, actionType).b;
-                            if (amount.compareTo(balance) > 0) {
+
+                        }
+
+                        if (height > BlockChain.FREEZE_FROM) {
+                            String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
+                            if (unlock != null && !this.recipient.equals(unlock))
+                                return INVALID_CREATOR;
+
+                            Tuple3<String, Integer, Integer> unlockItem = BlockChain.LOCKED__ADDRESSES_PERIOD
+                                    .get(this.creator.getAddress());
+                            if (unlockItem != null && unlockItem.b > height && height < unlockItem.c
+                                    && !this.recipient.equals(unlockItem.a))
+                                return INVALID_CREATOR;
+
+                        }
+
+                        break;
+
+                    case ACTION_SPEND: // PRODUCE - SPEND
+
+                        if (absKey == FEE_KEY
+                                || assetType == AssetCls.ERA_KEY
+                                || assetType == AssetCls.AS_INDEX
+                                || assetType == AssetCls.AS_INSIDE_ACCESS
+                                || assetType == AssetCls.AS_INSIDE_BONUS
+                        ) {
+                            if (height > BlockChain.HOLD_VALID_START)
+                                return NOT_SPENDABLE_ASSET;
+                        }
+
+                        if (backward
+                            // && !asset.getOwner().equals(creator)
+                        ) {
+                            return INVALID_BACKWARD_ACTION;
+                        }
+
+                        // if asset is unlimited and me is creator of this
+                        // asset
+                        unLimited = asset.isUnlimited(this.creator);
+
+                        if (!unLimited) {
+
+                            BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height,
+                                    false);
+
+                            if (amount.abs().compareTo(forSale) > 0) {
                                 return NO_BALANCE;
                             }
-                            
-                            break;
-                        
-                        default:
-                            return INVALID_TRANSFER_TYPE;
-                    }
+                        }
 
+                        // TRY FEE
+                        if (this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b.compareTo(this.fee) < 0) {
+                            return NOT_ENOUGH_FEE;
+                        }
+
+                        break;
+
+                    case ACTION_PLEDGE: // Учеть передачу в залог и возврат из залога
+
+                        // пока отключим
+                        if (!BlockChain.TEST_MODE && height > BlockChain.HOLD_VALID_START) {
+                            // вначавле были трнзакции взять на руки без Обратного флага - и она сюда прийдет
+                            return INVALID_TRANSFER_TYPE;
+                        }
+
+                        if (backward) {
+                            if (!asset.getOwner().equals(recipient))
+                                return INVALID_BACKWARD_ACTION;
+                        } else {
+                            if (!asset.getOwner().equals(creator))
+                                return CREATOR_NOT_OWNER;
+                        }
+
+                        // if asset is unlimited and me is creator of this
+                        // asset
+                        unLimited = asset.isUnlimited(this.creator);
+
+                        if (!unLimited) {
+
+                            BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height,
+                                    false);
+
+                            if (amount.abs().compareTo(forSale) > 0) {
+                                return NO_BALANCE;
+                            }
+                        }
+
+                        // TRY FEE
+                        if (height > BlockChain.ALL_BALANCES_OK_TO
+                                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
+                            return NOT_ENOUGH_FEE;
+                        }
+
+                        break;
+
+                    default:
+                        return INVALID_TRANSFER_TYPE;
                 }
 
                 // IF send from PERSON to ANONYMOUS
                 // TODO: PERSON RULE 1
                 if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
                         && actionType != ACTION_DEBT && actionType != ACTION_HOLD
-                        && (absKey < 10 || absKey > IssueAssetTransaction.START_KEY) // GATE Assets
+                        && (absKey < 10 || absKey > asset.getStartKey()) // GATE Assets
                         && assetType != AssetCls.AS_ACCOUNTING
                         && assetType != AssetCls.AS_INSIDE_BONUS
                         && assetType != AssetCls.AS_INSIDE_VOTE
@@ -981,12 +1057,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return KEY_COLLISION;
         }
 
+        if (creatorPerson != null && !creatorPerson.isAlive(this.timestamp)) {
+            return ITEM_PERSON_IS_DEAD;
+        }
+
         return VALIDATE_OK;
     }
-    
+
     @Override
     public void process(Block block, int asDeal) {
-        
+
         super.process(block, asDeal);
 
         if (this.amount == null)
@@ -997,26 +1077,26 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
         if (amount_sign == 0)
             return;
-        
-        long absKey = getAbsKey();
-        int actionType = Account.actionType(key, amount);
-        boolean incomeReverse = actionType == ACTION_HOLD;
-        
-        // BACKWARD - CONFISCATE
-        boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
-        // ASSET ACTIONS PROCESS - 18165-1
-        if (this.asset.isOutsideType()) {
-            if (actionType == ACTION_SEND && backward) {
+        // BACKWARD - CONFISCATE
+        boolean backward = isBackward();
+        long absKey = getAbsKey();
+        int actionType = Account.balancePosition(key, amount, backward);
+        boolean incomeReverse = actionType == ACTION_HOLD;
+
+        // ASSET ACTIONS PROCESS
+        if (false && this.asset.isOutsideType()) {
+            // пока это не работает так как пересмотрел actionType = balancePosition
+            if (actionType == ACTION_PLEDGE) {
                 // UPDATE SENDER
-                this.creator.changeBalance(db, true, key, this.amount, true, false);
-                
+                this.creator.changeBalance(db, true, backward, key, this.amount, true, false);
+
                 // UPDATE RECIPIENT
-                this.recipient.changeBalance(db, false, key, this.amount, true, false);
-                
+                this.recipient.changeBalance(db, false, backward, key, this.amount, true, false);
+
                 // CLOSE IN CLAIN - back amount to claim ISSUER
-                this.creator.changeBalance(db, false, -absKey, this.amount, true, false);
-                this.recipient.changeBalance(db, true, -absKey, this.amount, true, false);
+                this.creator.changeBalance(db, false, backward, -absKey, this.amount, true, false);
+                this.recipient.changeBalance(db, true, backward, -absKey, this.amount, true, false);
                 
                 // CLOSE IN CLAIM table balance
                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.creator.getAddress(),
@@ -1024,10 +1104,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 db.getCredit_AddressesMap().sub(creditKey, this.amount);
             } else {
                 // UPDATE SENDER
-                this.creator.changeBalance(db, !backward, key, this.amount, false, false);
+                this.creator.changeBalance(db, !backward, backward, key, this.amount, false, false);
                 
                 // UPDATE RECIPIENT
-                this.recipient.changeBalance(db, backward, key, this.amount, false, false);
+                this.recipient.changeBalance(db, backward, backward, key, this.amount, false, false);
                 
             }
             
@@ -1036,25 +1116,29 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             if (false && actionType == ACTION_DEBT) {
                 if (backward) {
                     // UPDATE CREDITOR
-                    this.creator.changeBalance(db, !backward, key, this.amount, true, false);
+                    this.creator.changeBalance(db, !backward, backward, key, this.amount, true, false);
                     // UPDATE DEBTOR
-                    this.recipient.changeBalance(db, backward, key, this.amount, false, false);
+                    this.recipient.changeBalance(db, backward, backward, key, this.amount, false, false);
                 } else {
                     // UPDATE CREDITOR
-                    this.creator.changeBalance(db, !backward, key, this.amount, true, false);
+                    this.creator.changeBalance(db, !backward, backward, key, this.amount, true, false);
                     // UPDATE DEBTOR
-                    this.recipient.changeBalance(db, backward, key, this.amount, false, false);
+                    this.recipient.changeBalance(db, backward, backward, key, this.amount, false, false);
                 }
-                
+            } else if (actionType == ACTION_SPEND) {
+                // UPDATE SENDER - OWNABLE
+                this.creator.changeBalance(db, true, backward, absKey, this.amount.abs(), true, false);
+                // UPDATE RECIPIENT - SPENDABLE
+                this.recipient.changeBalance(db, false, backward, key, this.amount, false, false);
             } else {
                 // UPDATE SENDER
-                if (absKey == 666l) {
-                    this.creator.changeBalance(db, backward, key, this.amount, !incomeReverse, false);
+                if (absKey == 666L) {
+                    this.creator.changeBalance(db, backward, backward, key, this.amount, !incomeReverse, false);
                 } else {
-                    this.creator.changeBalance(db, !backward, key, this.amount, !incomeReverse, false);
+                    this.creator.changeBalance(db, !backward, backward, key, this.amount, !incomeReverse, false);
                 }
                 // UPDATE RECIPIENT
-                this.recipient.changeBalance(db, backward, key, this.amount, incomeReverse, false);
+                this.recipient.changeBalance(db, backward, backward, key, this.amount, incomeReverse, false);
             }
         }
         
@@ -1099,45 +1183,44 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public void orphan(Block block, int asDeal) {
 
         super.orphan(block, asDeal);
-        
+
         if (this.amount == null)
             return;
 
         DCSet db = this.dcSet;
-        
+
         int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
         if (amount_sign == 0)
             return;
-        
-        long absKey = getAbsKey();
-        int actionType = Account.actionType(key, amount);
-        boolean incomeReverse = actionType == ACTION_HOLD;
-        
+
         // BACKWARD - CONFISCATE
-        boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+        boolean backward = isBackward();
+        long absKey = getAbsKey();
+        int actionType = Account.balancePosition(key, amount, backward);
+        boolean incomeReverse = actionType == ACTION_HOLD;
 
         String creatorStr = this.creator.getAddress();
         // ASSET TYPE ORPHAN
-        if (this.asset.isOutsideType()) {
+        if (false && this.asset.isOutsideType()) {
             if (actionType == ACTION_SEND && backward) {
                 // UPDATE SENDER
-                this.creator.changeBalance(db, false, key, this.amount, true, false);
-                
+                this.creator.changeBalance(db, false, backward, key, this.amount, true, false);
+
                 // UPDATE RECIPIENT
-                this.recipient.changeBalance(db, true, key, this.amount, true, false);
-                
-                this.creator.changeBalance(db, true, -absKey, this.amount, true, false);
-                this.recipient.changeBalance(db, false, -absKey, this.amount, true, false);
+                this.recipient.changeBalance(db, true, backward, key, this.amount, true, false);
+
+                this.creator.changeBalance(db, true, backward, -absKey, this.amount, true, false);
+                this.recipient.changeBalance(db, false, backward, -absKey, this.amount, true, false);
                 
                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(creatorStr,
                         absKey, this.recipient.getAddress());
                 db.getCredit_AddressesMap().add(creditKey, this.amount);
             } else {
                 // UPDATE SENDER
-                this.creator.changeBalance(db, backward, key, this.amount, false, false);
+                this.creator.changeBalance(db, backward, backward, key, this.amount, false, false);
                 
                 // UPDATE RECIPIENT
-                this.recipient.changeBalance(db, !backward, key, this.amount, false, false);
+                this.recipient.changeBalance(db, !backward, backward, key, this.amount, false, false);
                 
             }
             
@@ -1147,26 +1230,32 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             if (false && actionType == ACTION_DEBT) {
                 if (backward) {
                     // UPDATE CREDITOR
-                    this.creator.changeBalance(db, backward, key, this.amount, true, false);
+                    this.creator.changeBalance(db, backward, backward, key, this.amount, true, false);
                     // UPDATE DEBTOR
-                    this.recipient.changeBalance(db, !backward, key, this.amount, false, false);
+                    this.recipient.changeBalance(db, !backward, backward, key, this.amount, false, false);
                 } else {
                     // UPDATE CREDITOR
-                    this.creator.changeBalance(db, backward, key, this.amount, true, false);
+                    this.creator.changeBalance(db, backward, backward, key, this.amount, true, false);
                     // UPDATE DEBTOR
-                    this.recipient.changeBalance(db, !backward, key, this.amount, false, false);
+                    this.recipient.changeBalance(db, !backward, backward, key, this.amount, false, false);
                 }
-                
+
+            } else if (actionType == ACTION_SPEND) {
+                // UPDATE SENDER - OWNABLE
+                this.creator.changeBalance(db, false, backward, absKey, this.amount.abs(), true, false);
+                // UPDATE RECIPIENT - SPENDABLE
+                this.recipient.changeBalance(db, true, backward, key, this.amount, false, false);
+
             } else {
-                
+
                 // UPDATE SENDER
-                if (absKey == 666l) {
-                    this.creator.changeBalance(db, !backward, key, this.amount, !incomeReverse, false);
+                if (absKey == 666L) {
+                    this.creator.changeBalance(db, !backward, backward, key, this.amount, !incomeReverse, false);
                 } else {
-                    this.creator.changeBalance(db, backward, key, this.amount, !incomeReverse, false);
+                    this.creator.changeBalance(db, backward, backward, key, this.amount, !incomeReverse, false);
                 }
                 // UPDATE RECIPIENT
-                this.recipient.changeBalance(db, !backward, key, this.amount, incomeReverse, false);
+                this.recipient.changeBalance(db, !backward, backward, key, this.amount, incomeReverse, false);
                 
             }
         }

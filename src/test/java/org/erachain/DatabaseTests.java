@@ -86,8 +86,8 @@ public class DatabaseTests {
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
         maker.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
-        maker.changeBalance(dcSet, true, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
-        maker.changeBalance(dcSet, true, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(dcSet, true, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(dcSet, true, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         person = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
@@ -118,7 +118,7 @@ public class DatabaseTests {
         //assertEquals(dcSet.getItemPersonMap().keySet().toString(), "");
         //assertEquals(dcSet.getItemPersonMap().getValuesAll().toString(), "");
         //CREATE FORK
-        DCSet fork = dcSet.fork();
+        DCSet fork = dcSet.fork(this.toString());
 
         issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork)[0]);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
@@ -162,7 +162,7 @@ public class DatabaseTests {
         assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get(seed, 1L));
 
         //CREATE SECOND FORK
-        DCSet fork2 = fork.fork();
+        DCSet fork2 = fork.fork(this.toString());
 
         //SET BALANCE IN FORK2
         fork2.getAssetBalanceMap().put(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>

@@ -1,15 +1,5 @@
 package org.erachain.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-
-import org.json.simple.JSONArray;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
@@ -21,6 +11,14 @@ import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
+import org.json.simple.JSONArray;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
+import java.util.List;
 
 @Path("blocks")
 @Produces(MediaType.APPLICATION_JSON)
@@ -53,6 +51,12 @@ public class BlocksResource {
     @Path("/last")
     public static String getLastBlock() {
         return Controller.getInstance().getLastBlock().toJson().toJSONString();
+    }
+
+    @GET
+    @Path("/lasthead")
+    public static String getLastBlockHead() {
+        return Controller.getInstance().getDCSet().getBlocksHeadsMap().last().toJson().toJSONString();
     }
 
     @GET

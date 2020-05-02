@@ -46,7 +46,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
                                      long timestamp, Long reference, byte[] signature, long feeLong) {
         this(typeBytes, creator, pollKey, option, feePow, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as pack
@@ -94,8 +94,9 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         return this.option;
     }
 
+    @Override
     public String getTitle() {
-        return "Vote #" + option + " @V" + key;
+        return "##" + option + " > " + ItemCls.getItemTypeChar(ItemCls.POLL_TYPE, key);
     }
 
     @Override

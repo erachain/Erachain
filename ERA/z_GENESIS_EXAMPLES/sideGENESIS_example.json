@@ -1,0 +1,104 @@
+[
+  // SIDECHAIN SHORT NAME, SIDECHAIN= FULL NAME
+  [
+    "Project 1",
+    "Project One"
+  ],
+  // TIMESTAMP LONG
+  [
+    1587480548000
+  ],
+  // forging addresses
+  [
+    /// recipient, ERA, COMPU, [DEBTORS]
+    [
+      "7Gbdt3MpsdX991S2ZH6DbA9tHNx3EjEXoo",
+      10000000,
+      0,
+      // debtors
+      [
+        // ERA, recipient
+        [
+          600000,
+          "78eMJysdFE2pLY5mGPi3hytoTT7qpX5vQ2"
+        ],
+        [
+          600000,
+          "7AbsxsaYBMHA6afnaqZs2i3KpAeMyBysLw"
+        ],
+        [
+          600000,
+          "7HHz2DqZBgHaNX6KmhyWWqkF2hRqJoXGJh"
+        ],
+        [
+          600000,
+          "7PxHbHJpCFWHvkmMzq5HemQJzytYShGt3S"
+        ],
+        [
+          400000,
+          "75X5EEzjFHi6XuoayZocJqSWudDDjXkuQV"
+        ],
+        [
+          400000,
+          "7N7ZJ5QfwGRKhkhVuA5yehNwtm4xHyZh9q"
+        ],
+        [
+          400000,
+          "7HWfY9DswGxgxnEumzNQWzm5kDATn8jahk"
+        ],
+        [
+          400000,
+          "7QsFTGhaRM1dRniKtzzB6mbsxpBGXjdphq"
+        ],
+        [
+          400000,
+          "7A31guYWzcQxAmj6g6p3w9cpidytWy2Ua8"
+        ],
+        [
+          400000,
+          "79czuwKmVJ7UNpfoh5sEVT7Ra9Z3GP8qgh"
+        ],
+        [
+          400000,
+          "7D4wBtpaVnoKCkMw2jMhktWTrDwTvceEgV"
+        ],
+        [
+          400000,
+          "76deeUdpHrsrB33nPVWmkutrQ55Aep1NED"
+        ],
+        [
+          400000,
+          "75mEAvYxoKWMoGiZQq5jq2wA8AFJ2PXS2i"
+        ],
+        [
+          400000,
+          "7E88CiLGoF48NvkGQp95Q2kWKpKCYKAdS4"
+        ],
+        [
+          400000,
+          "7Q2YnD19Sec6cgDQKmPzaerhQNwA1AeZdH"
+        ],
+        [
+          400000,
+          "7LnBxam1EpVSAnnKWcGccSemNXiFeru5TE"
+        ],
+        [
+          400000,
+          "744XqTHbrkBC7mckjaQ5ZirV3zfM2Y5Hkf"
+        ],
+        [
+          400000,
+          "74FA5e9xGUnQHBGMfkn7RdyCEU8BAQ9RL6"
+        ],
+        [
+          400000,
+          "79jzM1K3vAZUNfVcTWS1zHXXZa9ocPge9V"
+        ],
+        [
+          400000,
+          "78iErMhKwc4kEuUassmJUX4kL4TSEbNPvN"
+        ]
+      ]
+    ]
+  ]
+]

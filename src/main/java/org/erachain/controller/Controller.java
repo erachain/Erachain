@@ -56,7 +56,6 @@ import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -87,15 +86,13 @@ import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-// 04/01 +-
-
 /**
  * main class for connection all modules
  */
 public class Controller extends Observable {
 
-    public static String version = "4.22.03 hf beta";
-    public static String buildTime = "2020-02-20 13:33:33 UTC";
+    public static String version = "5.01.01";
+    public static String buildTime = "2020-04-25 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -106,13 +103,13 @@ public class Controller extends Observable {
     public static TreeMap<String, Tuple2<BigDecimal, String>> COMPU_RATES = new TreeMap();
 
     public final String APP_NAME;
-    public final static long MIN_MEMORY_TAIL = 1 << 23;
+    public final static long MIN_MEMORY_TAIL = 64 * (1 << 20); // Машина Явы вылетает если меньше 50 МБ
 
     public static final Integer MUTE_PEER_COUNT = 6;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
     // code!
     // for reset DB if DB PROTOCOL is CHANGED
-    public static final String releaseVersion = "3.02.01";
+    public static final String releaseVersion = "3.02.02";
     // TODO ENUM would be better here
     public static final int STATUS_NO_CONNECTIONS = 0;
     public static final int STATUS_SYNCHRONIZING = 1;
@@ -129,7 +126,6 @@ public class Controller extends Observable {
     private static Controller instance;
     public Wallet wallet;
     public TelegramStore telegramStore;
-    private boolean processingWalletSynchronize = false;
     private int status;
     private boolean dcSetWithObserver = false;
     private boolean dynamicGUI = false;
@@ -143,7 +139,6 @@ public class Controller extends Observable {
     private BlockGenerator blockGenerator;
     public Synchronizer synchronizer;
     private TransactionCreator transactionCreator;
-    private boolean needSyncWallet = false;
     private Timer connectTimer;
     private Random random = new SecureRandom();
     private byte[] foundMyselfID = new byte[128];
@@ -195,7 +190,7 @@ public class Controller extends Observable {
                         put("ru", Transaction.makeDBRef(159727, 1));
                     }
                 };
-        APP_NAME = "Erachain";
+        APP_NAME = "Erachain" + "-" + Settings.getInstance().APP_NAME;
 
     }
 
@@ -204,23 +199,24 @@ public class Controller extends Observable {
         String dbs;
         switch (getInstance().databaseSystem) {
             case DCSet.DBS_ROCK_DB:
-                dbs = "RocksDB";
+                dbs = "R";
                 break;
             case DCSet.DBS_MAP_DB:
-                dbs = "MapDB";
+                dbs = "M";
                 break;
             case DCSet.DBS_FAST:
-                dbs = "fast";
+                dbs = "f";
                 break;
             default:
-                dbs = "MapDB";
+                dbs = "M";
 
         }
 
 
         if (withTimestamp)
             return version + (BlockChain.DEMO_MODE ? " DEMO Net"
-                    : BlockChain.TEST_MODE ? " Test Net:" + Settings.getInstance().getGenesisStamp() : "")
+                    : BlockChain.TEST_MODE ? " Test Net:" + Settings.getInstance().getGenesisStamp()
+                    : BlockChain.SIDE_MODE ? " Side Net:" + Settings.getInstance().getGenesisStamp() : "")
                     + " (" + dbs + ")";
 
         return version + " (" + dbs + ")";
@@ -229,7 +225,8 @@ public class Controller extends Observable {
 
     public String getApplicationName(boolean withVersion) {
         return APP_NAME + " " + (withVersion ? getVersion(true) :
-                BlockChain.DEMO_MODE ? "DEMO Net" : BlockChain.TEST_MODE ? "Test Net" : "");
+                BlockChain.DEMO_MODE ? "DEMO Net" : BlockChain.TEST_MODE ? "Test Net"
+                        : BlockChain.SIDE_MODE ? "Side Net" : "");
     }
 
     public static String getBuildDateTimeString() {
@@ -281,7 +278,7 @@ public class Controller extends Observable {
         return buildTimestamp;
     }
 
-    public static Controller getInstance() {
+    public synchronized static Controller getInstance() {
         if (instance == null) {
             instance = new Controller();
             instance.setDCSetWithObserver(Settings.getInstance().isGuiEnabled());
@@ -289,14 +286,6 @@ public class Controller extends Observable {
         }
 
         return instance;
-    }
-
-    public boolean isProcessingWalletSynchronize() {
-        return processingWalletSynchronize;
-    }
-
-    public void setProcessingWalletSynchronize(boolean isPocessing) {
-        this.processingWalletSynchronize = isPocessing;
     }
 
     public void setDCSetWithObserver(boolean dcSetWithObserver) {
@@ -322,19 +311,14 @@ public class Controller extends Observable {
         return this.dcSet;
     }
 
-    public int getNetworkPort() {
-        if (BlockChain.TEST_MODE) {
-            return BlockChain.TESTNET_PORT;
-        } else {
-            return BlockChain.MAINNET_PORT;
-        }
-    }
-
     public byte[] getMessageMagic() {
         if (this.messageMagic == null) {
             long longTestNetStamp = Settings.getInstance().getGenesisStamp();
-            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE) {
+            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE || BlockChain.SIDE_MODE) {
                 byte[] seedTestNetStamp = Crypto.getInstance().digest(Longs.toByteArray(longTestNetStamp));
+                this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
+            } else if (BlockChain.SIDE_MODE) {
+                byte[] seedTestNetStamp = blockChain.getGenesisBlock().getSignature();
                 this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
             } else {
                 this.messageMagic = Message.MAINNET_MAGIC;
@@ -502,27 +486,6 @@ public class Controller extends Observable {
         return this.status == STATUS_SYNCHRONIZING;
     }
 
-    public void checkNeedSyncWallet() {
-        if (this.wallet == null || this.wallet.database == null)
-            return;
-
-        // CHECK IF WE NEED TO RESYNC
-        byte[] lastBlockSignature = this.wallet.database.getLastBlockSignature();
-        if (lastBlockSignature == null
-                ///// || !findLastBlockOff(lastBlockSignature, block)
-                || !Arrays.equals(lastBlockSignature, this.getBlockChain().getLastBlockSignature(dcSet))) {
-            this.needSyncWallet = true;
-        }
-    }
-
-    public boolean isNeedSyncWallet() {
-        return this.needSyncWallet;
-    }
-
-    public void setNeedSyncWallet(boolean needSync) {
-        this.needSyncWallet = needSync;
-    }
-
     private void openDataBaseFile(String name, String path, org.erachain.database.IDB dbSet) {
 
         boolean error = false;
@@ -607,9 +570,9 @@ public class Controller extends Observable {
         this.random.nextBytes(this.foundMyselfID);
 
         // CHECK NETWORK PORT AVAILABLE
-        if (BlockChain.TEST_DB == 0 && !Network.isPortAvailable(Controller.getInstance().getNetworkPort())) {
+        if (BlockChain.TEST_DB == 0 && !Network.isPortAvailable(BlockChain.NETWORK_PORT)) {
             throw new Exception(Lang.getInstance().translate("Network port %port% already in use!").replace("%port%",
-                    String.valueOf(Controller.getInstance().getNetworkPort())));
+                    String.valueOf(BlockChain.NETWORK_PORT)));
         }
 
         // CHECK RPC PORT AVAILABLE
@@ -671,7 +634,12 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Try Open DataChain")));
             LOGGER.info("Try Open DataChain");
-            this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
+            if (Settings.simpleTestNet) {
+                // -testnet
+                reCreateDC(inMemoryDC);
+            } else {
+                this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
+            }
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataChain OK")));
             LOGGER.info("DataChain OK");
@@ -719,7 +687,7 @@ public class Controller extends Observable {
                 reCreateDC(inMemoryDC);
             } catch (Throwable e) {
                 LOGGER.error(e.getMessage(), e);
-                stopAll(5);
+                stopAll(6);
             }
         }
 
@@ -818,7 +786,7 @@ public class Controller extends Observable {
                     if (this.seedCommand.length > 3) {
                         path = this.seedCommand[3];
                     } else {
-                        path = Settings.getInstance().getWalletDir();
+                        path = Settings.getInstance().getWalletKeysPath();
                     }
 
                     boolean res = recoverWallet(seed,
@@ -839,10 +807,6 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Wallet OK")));
 
-            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE && this.wallet.isWalletDatabaseExisting()
-                    && !this.wallet.getAccounts().isEmpty()) {
-                this.wallet.synchronize(true);
-            }
             // create telegtam
 
             this.setChanged();
@@ -908,9 +872,9 @@ public class Controller extends Observable {
         if (inMemory) {
             DCSet.reCreateDBinMEmory(this.dcSetWithObserver, this.dynamicGUI);
         } else {
-            File dataChain = new File(Settings.getInstance().getDataDir());
-            File dataChainBackUp = new File(Settings.getInstance().getBackUpDir() + File.separator
-                    + Settings.getInstance().getDataDir() + File.separator);
+            File dataChain = new File(Settings.getInstance().getDataChainPath());
+            File dataChainBackUp = new File(Settings.getInstance().getBackUpPath()
+                    + Settings.getInstance().getDataChainPath() + File.separator);
             // del datachain
             if (dataChain.exists()) {
                 try {
@@ -962,10 +926,10 @@ public class Controller extends Observable {
             // && Settings.getInstance().isCheckpointingEnabled()) {
             // this.dcSet.close();
 
-            File dataDir = new File(Settings.getInstance().getDataDir());
+            File dataDir = new File(Settings.getInstance().getDataChainPath());
 
-            File dataBakDC = new File(Settings.getInstance().getBackUpDir() + File.separator
-                    + Settings.getInstance().getDataDir() + File.separator);
+            File dataBakDC = new File(Settings.getInstance().getBackUpPath()
+                    + Settings.getInstance().getDataChainPath() + File.separator);
             // copy Data dir to Back
             if (dataDir.exists()) {
                 if (dataBakDC.exists()) {
@@ -996,7 +960,7 @@ public class Controller extends Observable {
         String dataVersion = this.dcSet.getLocalDataMap().get(LocalDataMap.LOCAL_DATA_VERSION_KEY);
 
         if (dataVersion == null || !dataVersion.equals(releaseVersion)) {
-            File dataDir = new File(Settings.getInstance().getDataDir());
+            File dataDir = new File(Settings.getInstance().getDataChainPath());
             File dataBak = getDataBakDir(dataDir);
             this.dcSet.close();
 
@@ -1018,7 +982,7 @@ public class Controller extends Observable {
     }
 
     private File getDataBakDir(File dataDir) {
-        return new File(dataDir.getParent(), Settings.getInstance().getDataDir() + "Bak");
+        return new File(dataDir.getParent(), Settings.getInstance().getDataChainPath() + "Bak");
     }
 
     public ApiService getRPCService() {
@@ -1054,7 +1018,7 @@ public class Controller extends Observable {
         return this.isStopping;
     }
 
-    public void stopAll(Integer par) {
+    public void stopAll(int par) {
         // PREVENT MULTIPLE CALLS
         if (this.isStopping)
             return;
@@ -1089,8 +1053,11 @@ public class Controller extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Delete files from TEMP dir")));
         LOGGER.info("Delete files from TEMP dir");
-        for (File file : new File(Settings.getInstance().getTemDir()).listFiles())
-            if (file.isFile()) file.delete();
+        try {
+            File tempDir = new File(Settings.getInstance().getDataTempDir());
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Exception e) {
+        }
 
         // STOP TRANSACTIONS POOL
         this.setChanged();
@@ -1169,14 +1136,6 @@ public class Controller extends Observable {
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing telegram")));
             LOGGER.info("Closing telegram");
             this.telegramStore.close();
-        }
-
-        try {
-            // удалим все в папке Temp
-            File tempDir = new File(Settings.getInstance().getDataTempDir());
-            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-        } catch (Throwable e) {
-            //LOGGER.error(e.getMessage(), e);
         }
 
         LOGGER.info("Closed.");
@@ -1402,7 +1361,7 @@ public class Controller extends Observable {
             return;
         }
 
-        if (false && BlockChain.TEST_MODE) {
+        if (false && BlockChain.DEMO_MODE) {
             try {
                 synchronizer.checkBadBlock(peer);
             } catch (Exception e) {
@@ -1416,11 +1375,13 @@ public class Controller extends Observable {
         if (this.isStopping)
             return; // MAY BE IT HARD BUSY
 
-        // GET CURRENT WIN BLOCK
-        Block winBlock = this.blockChain.getWaitWinBuffer();
-        if (winBlock != null) {
-            // SEND MESSAGE
-            peer.sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(winBlock));
+        { // ограничим действие переменной winBlock
+            // GET CURRENT WIN BLOCK
+            Block winBlock = this.blockChain.getWaitWinBuffer();
+            if (winBlock != null) {
+                // SEND MESSAGE
+                peer.sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(winBlock));
+            }
         }
 
         if (this.status == STATUS_NO_CONNECTIONS) {
@@ -1431,6 +1392,7 @@ public class Controller extends Observable {
                     < NTP.getTime()) {
                 // мы не во воремени - надо синхронизироваться
                 this.status = STATUS_SYNCHRONIZING;
+                LOGGER.debug("status = STATUS_SYNCHRONIZING by " + peer);
             } else {
                 // время не ушло вперед - можно не синронизироваться
                 this.status = STATUS_OK;
@@ -1756,6 +1718,7 @@ public class Controller extends Observable {
 
         if (maxHW.a > thisHW.a + shift) {
             this.status = STATUS_SYNCHRONIZING;
+            LOGGER.debug("status = STATUS_SYNCHRONIZING by check maxHW: " + maxHW.a + " - shift: " + shift);
             return false;
             // } else if (maxHW.a < thisHW.a) {
         } else {
@@ -1912,7 +1875,7 @@ public class Controller extends Observable {
     }
 
     public Block checkNewPeerUpdates(Peer peer) {
-        if (this.blockChain.getWaitWinBuffer() == null) {
+        if (this.blockChain.isEmptyWaitWinBuffer()) {
             // если победный блок не подошел - значит он устарел и там скорее уже цепочка двинулась еще
             byte[] lastSignature = getLastBlockSignature();
             Message mess = MessageFactory.getInstance()
@@ -1940,6 +1903,14 @@ public class Controller extends Observable {
             }
         }
         return null;
+    }
+
+    public void requestLastBlock() {
+        // TODO тут сделать стандартный пустой блок для запроса или новую команду сетевую
+        Block block = getBlockByHeight(2);
+        if (block != null) {
+            broadcastWinBlock(block);
+        }
     }
 
     public Peer update(int shift) {
@@ -2055,11 +2026,14 @@ public class Controller extends Observable {
             // то его вынем и поновой вставим со всеми проверками
             Block winBlockUnchecked = this.blockChain.popWaitWinBuffer();
             if (winBlockUnchecked != null) {
-                this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked,
+                if (!this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked,
                         null // если блок не верный - не баним ПИР может просто он отстал
-                );
+                )) {
+                    // если все же он не подошел или не было победного то вышлем всеим запрос на "Порделитесль последним блоком"
+                    LOGGER.info("requestLastBlock");
+                    requestLastBlock();
+                }
             }
-
         }
 
         // send to ALL my HW
@@ -2165,11 +2139,11 @@ public class Controller extends Observable {
 
     public boolean doesWalletExists() {
         // CHECK IF WALLET EXISTS
-        return this.wallet != null && this.wallet.exists();
+        return !noUseWallet && this.wallet != null && this.wallet.exists();
     }
 
     public boolean doesWalletDatabaseExists() {
-        return wallet != null && this.wallet.isWalletDatabaseExisting();
+        return !noUseWallet && wallet != null && this.wallet.isWalletDatabaseExisting();
     }
 
     // use license KEY
@@ -2194,9 +2168,6 @@ public class Controller extends Observable {
 
         if (this.wallet.create(seed, password, amount, false, path,
                 this.dcSetWithObserver, this.dynamicGUI)) {
-
-            LOGGER.info("Wallet needs to synchronize!");
-            this.setNeedSyncWallet(true);
 
             return true;
         } else
@@ -2252,9 +2223,9 @@ public class Controller extends Observable {
     }
 
     public String generateNewAccountWithSynch() {
-        String ss = this.wallet.generateNewAccount();
-        this.wallet.synchronize(true);
-        return ss;
+        String account = this.wallet.generateNewAccount();
+        this.wallet.synchronizeFull();
+        return account;
     }
 
     public PrivateKeyAccount getPrivateKeyAccountByAddress(String address) {
@@ -2341,10 +2312,6 @@ public class Controller extends Observable {
 
     public boolean deleteAccount(PrivateKeyAccount account) {
         return this.wallet.deleteAccount(account);
-    }
-
-    public void synchronizeWallet() {
-        this.wallet.synchronize(false);
     }
 
     /**
@@ -2717,6 +2684,7 @@ public class Controller extends Observable {
             // if last block is changed by core.Synchronizer.process(DLSet, Block)
             // clear this win block
             if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
+                // see finalliy newBlock.close();
                 return false;
             }
 
@@ -2727,11 +2695,27 @@ public class Controller extends Observable {
                 // или при добавлении моего сгнерированного блока т.к. он не проверился?
 
                 // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-                DB database = DCSet.makeDBinMemory();
+                DCSet forked = dcSet.fork(DCSet.makeDBinMemory(), "flushNewBlockGenerated");
                 // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
-                if (!newBlock.isValid(dcSet.fork(database), true)) {
-                    // тогда проверим заново полностью
+
+                if (newBlock.isValid(forked,
+                        onlyProtocolIndexing // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+                ) > 0) {
+                    // очищаем занятые транзакциями ресурсы
+                    // - see finalliy newBlock.close();
+
+                    // освобождаем память от базы данных - так как мы ее к блоку не привязали
+                    forked.close();
                     return false;
+                }
+
+                // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+                if (onlyProtocolIndexing) {
+                    // запоним что в этой базе проверку сделали с Процессингом чтобы потом быстро слить в основную базу
+                    newBlock.setValidatedForkDB(forked);
+                } else {
+                    // освобождаем память от базы данных - так как мы ее к блоку не привязали
+                    forked.close();
                 }
             }
 
@@ -3709,9 +3693,23 @@ public class Controller extends Observable {
                 continue;
             }
 
+            if (arg.startsWith("-datachainpath=")) {
+                try {
+                    String datachainPath = arg.substring(15);
+                    Settings.getInstance().setDataChainPath(datachainPath);
+                    LOGGER.info("-datachain path = " + datachainPath);
+                } catch (Exception e) {
+                }
+                continue;
+            }
+
             // TESTS
             if (BlockChain.TEST_DB > 0) {
                 useGui = false;
+                onlyProtocolIndexing = true;
+                noUseWallet = true;
+                noCalculated = true;
+                HARD_WORK = 6;
                 continue;
             }
 

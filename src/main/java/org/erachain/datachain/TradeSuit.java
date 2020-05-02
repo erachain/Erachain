@@ -1,12 +1,11 @@
 package org.erachain.datachain;
 
-import org.erachain.core.item.assets.Order;
 import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.Fun;
 
 public interface TradeSuit {
 
-    IteratorCloseable<Fun.Tuple2<Long, Long>> getIterator(Order order);
+    IteratorCloseable<Fun.Tuple2<Long, Long>> getIteratorByInitiator(Long orderID);
 
     IteratorCloseable<Fun.Tuple2<Long, Long>> getIteratorByKeys(Long orderID);
 

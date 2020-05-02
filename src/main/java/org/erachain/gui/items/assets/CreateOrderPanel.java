@@ -409,9 +409,9 @@ public class CreateOrderPanel extends JPanel {
 
         try {
 
-            BigDecimal amount;
+            BigDecimal amount = null;
             BigDecimal price;
-            BigDecimal total;
+            BigDecimal total = null;
 
             if (recurse && notQueved(txtAmountWant)
                     || !recurse && queve[1].equals(txtAmountWant)) {
@@ -445,6 +445,10 @@ public class CreateOrderPanel extends JPanel {
                     amount = total.divide(price, have.getScale(), RoundingMode.HALF_DOWN);
                 }
                 txtAmountHave.setText(amount.toPlainString());
+            }
+
+            if (amount.signum() == 0 || total.signum() == 0) {
+                sellButton.setEnabled(false);
             }
 
         } catch (Exception e) {
@@ -676,13 +680,14 @@ public class CreateOrderPanel extends JPanel {
                 //this.txtPrice.setText("0");
 
             } else {
+                // ENABLE
+                this.sellButton.setEnabled(true);
+
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.getInstance().translate(OnDealClick.resultMess(result)),
                         Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             }
         }
-        // ENABLE
-        this.sellButton.setEnabled(true);
     }
 
     // confirm asset & return scale

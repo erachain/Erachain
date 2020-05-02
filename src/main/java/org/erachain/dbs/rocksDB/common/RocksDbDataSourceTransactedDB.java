@@ -33,7 +33,7 @@ public class RocksDbDataSourceTransactedDB extends RocksDbDataSourceImpl {
     }
 
     public RocksDbDataSourceTransactedDB(String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
-        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings,
+        this(Settings.getInstance().getDataChainPath() + ROCKS_DB_FOLDER, name, indexes, settings,
                 new TransactionDBOptions(),
                 new WriteOptions().setSync(true).setDisableWAL(false), enableSize);
     }

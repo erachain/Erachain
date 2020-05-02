@@ -3,6 +3,7 @@ package org.erachain.core;
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.datachain.DCSet;
+import org.erachain.network.Peer;
 import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
@@ -50,6 +51,15 @@ public class WinBlockSelector extends MonitoredThread {
         return result;
     }
 
+    private void sendWinOrLastBlockToPeer(Peer peer) {
+        Block myWinBlock = blockChain.getWaitWinBuffer();
+        myWinBlock = myWinBlock == null ? blockChain.getLastBlock(dcSet) : myWinBlock;
+        if (myWinBlock != null) {
+            LOGGER.debug("send my last or Win " + myWinBlock + " to " + peer);
+            peer.sendWinBlock((BlockWinMessage) MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
+        }
+    }
+
     public void processMessage(Message message) {
 
         if (message == null)
@@ -65,17 +75,28 @@ public class WinBlockSelector extends MonitoredThread {
         // если мы синхронизируемся - то берем победный блок а потои
         // его перепроверим при выходе из синхронизации
         if (this.controller.isStatusSynchronizing()) {
+            LOGGER.info("ADD unchecked on Synchronizing - " + newBlock + " from " + blockWinMessage.getSender().getAddress());
             blockChain.setWaitWinBufferUnchecked(newBlock);
+            // и разошлем его дальше тоже, так как если мы выпали в оставание то всем свои перешлем все равно
+            controller.network.broadcastWinBlock(blockWinMessage, false);
             return;
         }
-        String info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
-                + newBlock.toString();
-        LOGGER.info(info);
 
-        if (!newBlock.isValidHead(dcSet)) {
+        int invalid = newBlock.isValidHead(dcSet);
+
+        LOGGER.info("received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
+                + newBlock);
+
+        if (invalid > 0) {
             // то проверим заголовок
-            info = "Block HEAD is Invalid - ignore " + newBlock.toString();
-            LOGGER.info(info);
+            LOGGER.info("Block HEAD is Invalid[" + invalid + "] - ignore " + newBlock);
+
+            if (invalid <= Block.INVALID_REFERENCE) {
+                // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока
+                // а если у нас уже в буфере нет, то пошлем наш последний блок
+                sendWinOrLastBlockToPeer(message.getSender());
+            }
+
             return;
         }
 
@@ -87,7 +108,7 @@ public class WinBlockSelector extends MonitoredThread {
             // BROADCAST
             //List<Peer> excludes = new ArrayList<Peer>();
             //excludes.add(message.getSender());
-            message.getSender().network.broadcastWinBlock(blockWinMessage, false);
+            controller.network.broadcastWinBlock(blockWinMessage, false);
 
             onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
             if (onMessageProcessTiming < 999999999999l) {
@@ -97,11 +118,9 @@ public class WinBlockSelector extends MonitoredThread {
             }
 
         } else {
-            // SEND my BLOCK
-            Block myWinBlock = blockChain.getWaitWinBuffer();
-            if (myWinBlock != null) {
-                message.getSender().sendWinBlock((BlockWinMessage)MessageFactory.getInstance().createWinBlockMessage(myWinBlock));
-            }
+            // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока
+            // а если у нас уже в буфере нет, то пошлем наш последний блок
+            sendWinOrLastBlockToPeer(message.getSender());
         }
     }
 
@@ -115,11 +134,11 @@ public class WinBlockSelector extends MonitoredThread {
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
                 blockingQueue = null;
-                Controller.getInstance().stopAll(66);
+                Controller.getInstance().stopAll(566);
                 break;
             } catch (java.lang.IllegalMonitorStateException e) {
                 blockingQueue = null;
-                Controller.getInstance().stopAll(67);
+                Controller.getInstance().stopAll(567);
                 break;
             } catch (java.lang.InterruptedException e) {
                 blockingQueue = null;

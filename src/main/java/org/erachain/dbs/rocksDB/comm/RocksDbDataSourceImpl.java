@@ -94,7 +94,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     public RocksDbDataSourceImpl(String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
-        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings, enableSize);
+        this(Settings.getInstance().getDataChainPath() + ROCKS_DB_FOLDER, name, indexes, settings, enableSize);
     }
 
     abstract protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException;

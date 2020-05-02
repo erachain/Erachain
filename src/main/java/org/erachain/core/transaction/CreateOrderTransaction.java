@@ -86,7 +86,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                                   byte[] signature, long feeLong) {
         this(typeBytes, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
 
     }
 
@@ -102,6 +102,11 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     @Override
     public ItemCls getItem() {
         return this.haveAsset;
+    }
+
+    public String getTitle() {
+        ///return viewTypeName();
+        return ItemCls.getItemTypeChar(ItemCls.ASSET_TYPE, haveKey) + " " + ItemCls.getItemTypeChar(ItemCls.ASSET_TYPE, wantKey);
     }
 
     @Override
@@ -434,7 +439,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             return HAVE_EQUALS_WANT;
         }
 
-        if (haveKey == RIGHTS_KEY && !BlockChain.TEST_MODE
+        if (haveKey == RIGHTS_KEY && BlockChain.FREEZE_FROM > 0
                 && height > BlockChain.FREEZE_FROM
                 && BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
             // LOCK ERA sell
@@ -466,15 +471,27 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) == -1) {
                 return NO_BALANCE;
             }
-        }
-
-        // VALID if want to BY COMPU by ERA
-        else if (wantKey == FEE_KEY && haveKey == RIGHTS_KEY
+            // VALID if want to BY COMPU by ERA
+        } else if (wantKey == FEE_KEY && haveKey == RIGHTS_KEY
                 && amountHave.compareTo(BigDecimal.ONE) >= 0 // минимально меняем 1 ЭРА
                 && (height < 222047 || this.creator.getBalance(this.dcSet, RIGHTS_KEY).a.b.compareTo(amountHave) >= 0) // ЭРА есть на счету
                 && this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.FEE_MIN_1) > 0) { // на балансе компушки не минус
             flags = flags | NOT_VALIDATE_FLAG_FEE;
         } else {
+
+            switch ((int) haveKey) {
+                case 111:
+                case 222:
+                case 333:
+                case 444:
+                case 555:
+                case 666:
+                case 777:
+                case 888:
+                case 999:
+                    return NO_BALANCE;
+            }
+
 
             ///// CHECK IF SENDER HAS ENOUGH FEE BALANCE
             ///if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.fee) == -1) {
@@ -482,8 +499,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             ///}
 
             // if asset is unlimited and me is creator of this asset
-            boolean unLimited = haveAsset.getQuantity().equals(0l)
-                    && haveAsset.getOwner().getAddress().equals(this.creator.getAddress());
+            boolean unLimited = haveAsset.isUnlimited(this.creator);
 
             if (!unLimited) {
 
@@ -511,12 +527,12 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             if (unlockItem != null && unlockItem.b > height && height < unlockItem.c)
                 return INVALID_CREATOR;
 
-        }
+            //
+            Long maxWant = wantAsset.getQuantity();
+            if (maxWant > 0 && new BigDecimal(maxWant).compareTo(amountWant) < 0)
+                return INVALID_QUANTITY;
 
-        //
-        Long maxWant = wantAsset.getQuantity();
-        if (maxWant > 0 && new BigDecimal(maxWant).compareTo(amountWant) < 0)
-            return INVALID_QUANTITY;
+        }
 
         // for PARSE and toBYTES need only AMOUNT_LENGTH bytes
         // and SCALE

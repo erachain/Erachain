@@ -27,7 +27,7 @@ public class IssueStatusRecord extends IssueItemRecord {
     public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp,
                              Long reference, byte[] signature, long feeLong) {
         super(typeBytes, NAME_ID, creator, status, feePow, timestamp, reference, signature);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte[] signature) {
@@ -51,17 +51,6 @@ public class IssueStatusRecord extends IssueItemRecord {
     }
 
     //GETTERS/SETTERS
-
-    // RETURN START KEY in tot GEMESIS
-    public long getStartKey(int height) {
-
-        if (height < BlockChain.VERS_4_11) {
-            return 0l;
-        }
-
-        return START_KEY;
-
-    }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 

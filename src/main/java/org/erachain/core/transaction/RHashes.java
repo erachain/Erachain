@@ -3,14 +3,15 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.datachain.DCSet;
 import org.erachain.datachain.HashesSignsMap;
+import org.erachain.datachain.TransactionFinalMapSigns;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -18,7 +19,8 @@ import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
 
 //import java.math.BigDecimal;
 //import java.math.BigInteger;
@@ -67,7 +69,7 @@ public class RHashes extends Transaction {
                    long timestamp, Long reference, byte[] signature, long feeLong) {
         this(typeBytes, creator, feePow, url, data, hashes, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // asPack
@@ -93,32 +95,7 @@ public class RHashes extends Transaction {
         return Ints.fromBytes((byte) 0, (byte) 0, typeBytes[2], typeBytes[3]);
     }
 
-    public static Stack<Tuple3<Long, Integer, Integer>> findRecord(DCSet db, byte[] hash) {
-        return db.getHashesSignsMap().get(hash);
-    }
-
     //public static String getName() { return "Statement"; }
-
-    // find twins before insert a record
-    public static List<String> findTwins(DCSet db, List<String> hashes58) {
-        List<String> twins = new ArrayList<String>();
-        for (String hash58 : hashes58) {
-            if (db.getHashesSignsMap().contains(Base58.decode(hash58))) {
-                twins.add(hash58);
-            }
-        }
-        return twins;
-    }
-
-    public static List<String> findTwins(DCSet db, String[] hashes58) {
-        List<String> twins = new ArrayList<String>();
-        for (String hash58 : hashes58) {
-            if (db.getHashesSignsMap().contains(Base58.decode(hash58))) {
-                twins.add(hash58);
-            }
-        }
-        return twins;
-    }
 
     // releaserReference = null - not a pack
     // releaserReference = reference for releaser account - it is as pack
@@ -295,7 +272,6 @@ public class RHashes extends Transaction {
             //transaction.put("data", Base58.encode(this.data));
         }
 
-
         JSONArray hashesArray = new JSONArray();
         for (byte[] hash : this.hashes) {
             hashesArray.add(Base58.encode(hash));
@@ -384,15 +360,17 @@ public class RHashes extends Transaction {
         int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
-        /** double singns is available
-         HashesMap map = db.getHashesMap();
-         for (byte[] hash: hashes) {
-         if (map.contains(hash)) {
-         return Transaction.ITEM_DUPLICATE_KEY;
-         }
-         }
-         */
-
+        if (BlockChain.VERS_4_23_01 > 0 && height > BlockChain.VERS_4_23_01) {
+            // только уникальные - так как иначе каждый новый перезатрет поиск старого
+            if (hashes != null && hashes.length > 0) {
+                TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
+                for (byte[] hash : hashes) {
+                    if (map.contains(hash)) {
+                        return HASH_ALREDY_EXIST;
+                    }
+                }
+            }
+        }
 
         return Transaction.VALIDATE_OK;
 
@@ -408,19 +386,6 @@ public class RHashes extends Transaction {
         int height = this.getBlockHeightByParentOrLast(dcSet);
 
         int transactionIndex = -1;
-		/*
-		int blockIndex = -1;
-		if (block == null) {
-			blockIndex = dcSet.getBlocksHeadMap().last().getHeight(dcSet);
-		} else {
-			blockIndex = block.getHeight(dcSet);
-			if (blockIndex < 1 ) {
-				// if block not is confirmed - get last block + 1
-				blockIndex = dcSet.getBlocksHeadMap().last().getHeight(dcSet) + 1;
-			}			
-			transactionIndex = block.getTransactionSeq(signature);
-		}
-		*/
 
         long personKey;
         Tuple2<Integer, PersonCls> asPerson = this.creator.getPerson(dcSet, height);
@@ -434,6 +399,14 @@ public class RHashes extends Transaction {
         for (byte[] hash : hashes) {
             map.addItem(hash, new Tuple3<Long, Integer, Integer>(personKey, height, transactionIndex));
         }
+
+        if (!Controller.getInstance().onlyProtocolIndexing) {
+            TransactionFinalMapSigns mapSigns = dcSet.getTransactionFinalMapSigns();
+            for (byte[] hash : hashes) {
+                mapSigns.put(hash, dbRef);
+            }
+        }
+
     }
 
     public void orphan(Block block, int asDeal) {
@@ -445,6 +418,14 @@ public class RHashes extends Transaction {
         for (byte[] hash : hashes) {
             map.removeItem(hash);
         }
+
+        if (!Controller.getInstance().onlyProtocolIndexing) {
+            TransactionFinalMapSigns mapSigns = dcSet.getTransactionFinalMapSigns();
+            for (byte[] hash : hashes) {
+                mapSigns.delete(hash);
+            }
+        }
+
     }
 
     @Override

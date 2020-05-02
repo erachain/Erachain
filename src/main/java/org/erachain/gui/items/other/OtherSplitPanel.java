@@ -30,7 +30,7 @@ import java.util.Observer;
 public class OtherSplitPanel extends SplitPanel implements Observer {
 
     private PeersTableModel peersTableModel = new PeersTableModel();
-
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "OtherSplitPanel.png";
     private JPanel jPanel2 = new JPanel();
     private GridBagConstraints gridBagConstraints;
     private JLabel jLabelPeerTitle = new JLabel();
@@ -169,8 +169,8 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
                 }
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?block=" + blockHead.heightBlock));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
@@ -234,8 +234,8 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
                 }
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?block=" + blockHead.heightBlock));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
@@ -284,5 +284,16 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
         if (jLabelAllBlocksSum != null)
             jLabelAllBlocksSum.setText(String.valueOf(Controller.getInstance().getBlockChain().
                  getFullWeight(DCSet.getInstance())));
+    }
+
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

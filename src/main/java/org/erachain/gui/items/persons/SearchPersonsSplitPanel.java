@@ -3,7 +3,6 @@ package org.erachain.gui.items.persons;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemSplitPanel;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
@@ -24,6 +23,7 @@ import java.net.URL;
 public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchPersonsSplitPanel.png";
 
     public SearchPersonsSplitPanel() {
         super(new ItemsPersonsTableModel(), "SearchPersonsSplitPanel", "SearchPersonsSplitPanel");
@@ -34,8 +34,8 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
-                        null, null, (PersonCls) itemTableSelected, null));
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
+                        null, null, (PersonCls) itemTableSelected, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -48,7 +48,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) itemTableSelected));
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, (PersonCls) itemTableSelected), MailSendPanel.getIcon());
             }
         });
 
@@ -108,8 +108,8 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?person=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
@@ -127,5 +127,16 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
         return new PersonInfo002((PersonCls) item, true);
 
+    }
+
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

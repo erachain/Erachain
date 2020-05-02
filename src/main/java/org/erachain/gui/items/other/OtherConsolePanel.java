@@ -5,11 +5,13 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 
 import javax.swing.*;
+import java.awt.*;
 
 @SuppressWarnings("serial")
-public class OtherConsolePanel extends JPanel {
+public class OtherConsolePanel extends JPanel  {
 
     private ConsolePanel debugTabPane;
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "OtherConsolePanel.png";
 
     public OtherConsolePanel() {
         //CREATE FRAME
@@ -47,5 +49,16 @@ public class OtherConsolePanel extends JPanel {
 
         this.setVisible(true);
 
+    }
+
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

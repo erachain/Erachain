@@ -16,8 +16,6 @@ public class IssueUnionRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_UNION_TRANSACTION;
     private static final String NAME_ID = "Issue Union";
 
-    public static final long START_KEY = 1l << 20;
-
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference);
     }
@@ -28,7 +26,7 @@ public class IssueUnionRecord extends IssueItemRecord {
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp,
                             Long reference, byte[] signature, long feeLong) {
         super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference, signature);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte[] signature) {
@@ -53,17 +51,6 @@ public class IssueUnionRecord extends IssueItemRecord {
 
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Union"; }
-
-    // RETURN START KEY in tot GEMESIS
-    public long getStartKey(int height) {
-
-        if (height < BlockChain.VERS_4_11) {
-            return 0l;
-        }
-
-        return START_KEY;
-
-    }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 

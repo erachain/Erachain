@@ -101,6 +101,15 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         return this.recipient;
     }
 
+    public String viewActionType() {
+        return TransactionAmount.viewActionType(this.key, this.amount, false);
+    }
+
+    @Override
+    public String viewSubTypeName() {
+        return viewActionType();
+    }
+
     @Override
     public BigDecimal getAmount() {
         return this.amount;
@@ -264,7 +273,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         }
 
         //UPDATE RECIPIENT OWN or RENT
-        this.recipient.changeBalance(this.dcSet, false, key, this.amount, false, false);
+        this.recipient.changeBalance(this.dcSet, false, false, key, this.amount, false, false);
 
         //UPDATE REFERENCE OF RECIPIENT
         this.recipient.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
@@ -280,7 +289,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         if (key < 0) {
             // THIS is CREDIT
             //this.owner.setBalance(key, this.owner.getBalance(db, key).subtract(this.amount), db);
-            this.creator.changeBalance(this.dcSet, true, key, this.amount, false, false);
+            this.creator.changeBalance(this.dcSet, true, false, key, this.amount, false, false);
             this.dcSet.getCredit_AddressesMap().add(
                     new Tuple3<String, Long, String>(
                             this.creator.getAddress(), -key,
@@ -290,7 +299,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
         } else {
             // CREATOR update
-            GenesisBlock.CREATOR.changeBalance(this.dcSet, true, key, this.amount, false, false);
+            GenesisBlock.CREATOR.changeBalance(this.dcSet, true, false, key, this.amount, false, false);
         }
     }
 
@@ -369,24 +378,5 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
         return assetAmount;
     }
-
-    public String viewActionType() {
-        int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
-
-        if (this.key > 0) {
-            if (amo_sign > 0) {
-                return TransactionAmount.NAME_ACTION_TYPE_PROPERTY;
-            } else {
-                return TransactionAmount.NAME_ACTION_TYPE_HOLD;
-            }
-        } else {
-            if (amo_sign > 0) {
-                return TransactionAmount.NAME_CREDIT;
-            } else {
-                return TransactionAmount.NAME_SPEND;
-            }
-        }
-    }
-
 
 }

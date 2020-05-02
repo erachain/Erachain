@@ -15,6 +15,7 @@ import org.erachain.gui.library.MButton;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 public class InsertPersonPanel extends IssuePersonPanel {
     private static final Logger logger = LoggerFactory.getLogger(InsertPersonPanel.class);
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "InsertPersonPanel.png";
     private static final long serialVersionUID = 1L;
 
     private JTextField txtSign = new JTextField();
@@ -336,6 +338,16 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtGenderTxt.setText("");
         iconLabel.setIcon(null);
 
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 }

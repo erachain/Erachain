@@ -4,11 +4,13 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -22,6 +24,7 @@ public class ALLTelegramPanel extends javax.swing.JPanel {
     * Creates new form rightTelegramPanel
     */
     JPopupMenu menu;
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "ALLTelegramPanel.png";
     
     public TelegramsTableModel walletTelegramsFilterTableModel;
 protected int row;
@@ -216,6 +219,16 @@ public ALLTelegramPanel() {
 
     
    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
    // Variables declaration - do not modify                     
    public javax.swing.JButton jButtonSendTelegram;
    public javax.swing.JLabel jLabelCenter;

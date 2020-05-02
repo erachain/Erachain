@@ -136,7 +136,7 @@ public class Account {
     }
 
     // make TYPE of transactionAmount by signs of KEY and AMOUNT
-    public static int actionType(long key, BigDecimal amount) {
+    public static int balancePosition(long key, BigDecimal amount, boolean isBackward) {
         if (key == 0l || amount == null || amount.signum() == 0)
             return 0;
 
@@ -144,11 +144,11 @@ public class Account {
         int amount_sign = amount.signum();
         if (key > 0) {
             if (amount_sign > 0) {
-                // SEND
-                type = TransactionAmount.ACTION_SEND;
+                // OWN SEND or PLEDGE
+                type = isBackward ? TransactionAmount.ACTION_PLEDGE : TransactionAmount.ACTION_SEND;
             } else {
-                // HOLD in STOCK
-                type = TransactionAmount.ACTION_HOLD;
+                // HOLD in STOCK or PLEDGE
+                type = isBackward ? TransactionAmount.ACTION_HOLD : TransactionAmount.ACTION_PLEDGE;
             }
         } else {
             if (amount_sign > 0) {
@@ -418,6 +418,7 @@ public class Account {
     public Tuple2<BigDecimal, BigDecimal> getBalanceInSettedPosition(long key) {
         return getBalanceInPosition(DCSet.getInstance(), key, this.viewBalancePosition);
     }
+
     /**
      * в заданной позиции баланс взять
      * @param key
@@ -433,6 +434,7 @@ public class Account {
             case TransactionAmount.ACTION_SEND:
                 return this.getBalance(dcSet, key).a;
             case TransactionAmount.ACTION_DEBT:
+            case TransactionAmount.ACTION_REPAY_DEBT:
                 return this.getBalance(dcSet, key).b;
             case TransactionAmount.ACTION_HOLD:
                 return this.getBalance(dcSet, key).c;
@@ -739,10 +741,10 @@ public class Account {
      */
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
-    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, long key,
+    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, boolean isBackward, long key,
                                                                     BigDecimal amount_in, boolean notUpdateIncomed, boolean spendUpdate) {
 
-        int actionType = actionType(key, amount_in);
+        int actionType = balancePosition(key, amount_in, isBackward);
 
         ItemAssetBalanceMap map = db.getAssetBalanceMap();
 
@@ -1213,10 +1215,9 @@ public class Account {
 
     }
 
-    public boolean isPerson(DCSet dcSet, int forHeight) {
+    public boolean isPerson(DCSet dcSet, int forHeight, Tuple4<Long, Integer, Integer, Integer> addressDuration) {
 
         // IF DURATION ADDRESS to PERSON IS ENDED
-        Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(dcSet);
         if (addressDuration == null)
             return false;
 
@@ -1245,6 +1246,17 @@ public class Account {
 
     }
 
+    public boolean isPerson(DCSet dcSet, int forHeight) {
+
+        // IF DURATION ADDRESS to PERSON IS ENDED
+        Tuple4<Long, Integer, Integer, Integer> addressDuration =
+                this.getPersonDuration(dcSet);
+        if (addressDuration == null)
+            return false;
+
+        return isPerson(dcSet, forHeight, addressDuration);
+    }
+
     public boolean isPerson() {
         return isPerson(DCSet.getInstance(), Controller.getInstance().getMyHeight());
     }
@@ -1252,14 +1264,14 @@ public class Account {
 
     /**
      * Обновляет данные о персоне даже если они уже были записаны
+     *
      * @param dcSet
      * @param forHeight
      * @return
      */
-    public Tuple2<Integer, PersonCls> getPerson(DCSet dcSet, int forHeight) {
+    public Tuple2<Integer, PersonCls> getPerson(DCSet dcSet, int forHeight, Tuple4<Long, Integer, Integer, Integer> addressDuration) {
 
         // IF DURATION ADDRESS to PERSON IS ENDED
-        Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(dcSet);
         if (addressDuration == null)
             return null;
 
@@ -1293,8 +1305,19 @@ public class Account {
 
     }
 
+    public Tuple2<Integer, PersonCls> getPerson(DCSet dcSet, int forHeight) {
+
+        // IF DURATION ADDRESS to PERSON IS ENDED
+        Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(dcSet);
+        if (addressDuration == null)
+            return null;
+
+        return getPerson(dcSet, forHeight, addressDuration);
+    }
+
     /**
      * берет данные из переменной локальной если там что-то было
+     *
      * @return
      */
     public Tuple2<Integer, PersonCls> getPerson() {

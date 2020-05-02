@@ -29,6 +29,7 @@ import java.util.ArrayList;
 public class SearchStatementsSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchStatementsSplitPanel.png";
     // для прозрачности
     int alpha = 255;
     int alpha_int;
@@ -220,8 +221,8 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 }
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?tx=" + transaction.viewHeightSeq()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
@@ -316,13 +317,23 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             int infoPanelHeight = jScrollPaneJPanelRightPanel.getSize().height;
 
             info_panel.setPreferredSize(new Dimension(infoPanelWidth, infoPanelHeight));
-            info_panel.setMinimumSize(new Dimension(infoPanelWidth, infoPanelHeight));
-            info_panel.setMaximumSize(new Dimension(infoPanelWidth, infoPanelHeight));
+            //info_panel.setMinimumSize(new Dimension(infoPanelWidth, infoPanelHeight));
+            //info_panel.setMaximumSize(new Dimension(infoPanelWidth, infoPanelHeight));
 
             jScrollPaneJPanelRightPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPaneJPanelRightPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             // jSplitPanel.setRightComponent(info_panel);
+        }
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
         }
     }
 }

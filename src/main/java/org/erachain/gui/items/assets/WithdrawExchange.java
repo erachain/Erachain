@@ -4,12 +4,12 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.URLViewer;
 import org.json.simple.JSONObject;
@@ -36,7 +36,7 @@ import java.net.URL;
 public class WithdrawExchange extends JPanel {
 
     // private JComboBox<Account> accountLBox;
-
+    private static String iconFile = Settings.getInstance().getPatnIcons()+ "WithdrawExchange.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(WithdrawExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
@@ -45,7 +45,7 @@ public class WithdrawExchange extends JPanel {
     private JComboBox<Account> jComboBox_YourAddress;
     public JComboBox<AssetCls> cbxAssets;
     private JLabel jLabel_Address;
-    private JLabel jLabel_Adress_Check;
+    private JLabel jLabelAdressCheck;
     private JLabel jLabel_Asset;
     private JLabel jLabel_Details;
     private JLabel jLabel_YourAddress;
@@ -130,7 +130,7 @@ public class WithdrawExchange extends JPanel {
             jsonObject = (JSONObject) JSONValue.parse(inputText);
 
             if (BlockChain.TEST_MODE) {
-                jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
+                jLabelAdressCheck.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
             LOGGER.debug(StrJSonFine.convert(jsonObject));
@@ -140,16 +140,19 @@ public class WithdrawExchange extends JPanel {
         } catch (Exception e) {
             jsonObject = null;
             accountTo = null;
-            jLabel_Adress_Check.setText(inputText);
+            jLabelAdressCheck.setText(inputText);
             inputText = "";
         }
 
         if (assetIn != null && accountTo != null) {
 
             message += ":" + jTextField_Address.getText();
-            AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn, TransactionAmount.ACTION_SEND,
+            AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn,
                     null, new Account(accountTo), null, message);
 
+            panel.jComboBox_Asset.setEnabled(false);
+            panel.jTextField_To.setEnabled(false);
+            panel.jTextArea_Description.setEnabled(false);
             String rate = jsonObject.get("rate").toString();
             String bal = jsonObject.get("bal").toString();
 
@@ -173,8 +176,9 @@ public class WithdrawExchange extends JPanel {
 
             panel.jLabel_Title.setText("<html><h2>" + formTitle + "</h2></html>");
             panel.setName(Lang.getInstance().translate("Withdraw"));
+
             MainPanel.getInstance().removeTab(panel.getName());
-            MainPanel.getInstance().insertTab(panel);
+            MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), panel, AccountAssetSendPanel.getIcon());
 
         }
 
@@ -198,7 +202,7 @@ public class WithdrawExchange extends JPanel {
         jLabel_Address = new JLabel();
         jLabel_Asset = new JLabel();
 
-        jLabel_Adress_Check = new JLabel();
+        jLabelAdressCheck = new JLabel();
         jLabel_Details = new JLabel();
 
         GridBagLayout layout = new GridBagLayout();
@@ -295,7 +299,7 @@ public class WithdrawExchange extends JPanel {
         add(jLabel_Address, gridBagConstraints);
 
         if (account == null) {
-            jLabel_Adress_Check.setText(Lang.getInstance().translate("Insert Withdraw Address"));
+            jLabelAdressCheck.setText(Lang.getInstance().translate("Insert Withdraw Address"));
         } else {
             jTextField_Address.setText(account.getAddress());
         }
@@ -334,8 +338,8 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        jLabel_Adress_Check.setText("");
-        add(jLabel_Adress_Check, gridBagConstraints);
+        jLabelAdressCheck.setText("");
+        add(jLabelAdressCheck, gridBagConstraints);
 
         //////////////////////////
         JEditorPane jText_History = new JEditorPane();
@@ -351,7 +355,7 @@ public class WithdrawExchange extends JPanel {
         jButton_ShowForm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jText_History.setText(DepositExchange.showHistory(null,
-                        jTextField_Address.getText(), jLabel_Adress_Check));
+                        jTextField_Address.getText(), jLabelAdressCheck));
             }
         });
 
@@ -392,6 +396,16 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_History, gridBagConstraints);
 
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 }

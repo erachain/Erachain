@@ -144,8 +144,8 @@ public class GeneratorTests {
             assertEquals(true, newBlock.isSignatureValid());
 
             //CHECK IF BLOCK IS VALID
-            if (!newBlock.isValid(dcSet, false))
-                assertEquals(true, newBlock.isValid(dcSet, false));
+            if (newBlock.isValid(dcSet, false) > 0)
+                assertEquals(0, newBlock.isValid(dcSet, false));
 
             height = Controller.getInstance().getMyHeight();
             assertEquals(height, i + 1);
@@ -414,8 +414,8 @@ public class GeneratorTests {
 
             long weight_old = newBlock.calcWinValueTargeted();
             //CHECK IF BLOCK IS VALID
-            if (!newBlock.isValid(dcSet, false))
-                assertEquals(false, newBlock.isValid(dcSet, false));
+            if (newBlock.isValid(dcSet, false) > 0)
+                assertEquals(0, newBlock.isValid(dcSet, false));
 
             Tuple2<Integer, Long> hWeight_old = cntrlr.getBlockChain().getHWeightFull(dcSet);
 
@@ -580,8 +580,8 @@ public class GeneratorTests {
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000), NTP.getTime());
         //transaction.process(databaseSet, false);
         generator.setLastTimestamp(new long[]{genesisBlock.getTimestamp(), 0}, dcSet);
-        generator.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(10000), false, false);
-        generator.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(10000), false, false);
+        generator.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(10000), false, false);
+        generator.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10000), false, false);
 
         //GENERATE NEXT BLOCK
         BlockGenerator blockGenerator = new BlockGenerator(dcSet, null, false);
@@ -597,7 +597,7 @@ public class GeneratorTests {
 
         //ADD 10 UNCONFIRMED VALID TRANSACTIONS
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
-        DCSet snapshot = dcSet.fork();
+        DCSet snapshot = dcSet.fork(this.toString());
         for (int i = 0; i < 10; i++) {
 
             //CREATE VALID PAYMENT
@@ -652,8 +652,8 @@ public class GeneratorTests {
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000), NTP.getTime());
         //transaction.process(databaseSet, false);
         generator.setLastTimestamp(new long[]{genesisBlock.getTimestamp(), 0}, dcSet);
-        generator.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(10000), false, false);
-        generator.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(100000), false, false);
+        generator.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(10000), false, false);
+        generator.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(100000), false, false);
 
 
         //GENERATE NEXT BLOCK
@@ -669,7 +669,7 @@ public class GeneratorTests {
 
         //ADD 10000 UNCONFIRMED VALID TRANSACTIONS
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
-        DCSet snapshot = dcSet.fork();
+        DCSet snapshot = dcSet.fork(this.toString());
         int max_count = 2000;
         for (int i = 0; i < max_count; i++) {
 

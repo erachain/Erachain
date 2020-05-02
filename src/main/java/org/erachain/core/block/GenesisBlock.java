@@ -20,11 +20,12 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
-import org.erachain.utils.Pair;
+import org.json.simple.JSONArray;
 import org.mapdb.Fun.Tuple2;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,6 +45,7 @@ public class GenesisBlock extends Block {
     private static byte[] image = new byte[0];
     private String testnetInfo;
     private long genesisTimestamp;
+    private String sideSettingString;
 
     public GenesisBlock() {
 
@@ -61,7 +63,7 @@ public class GenesisBlock extends Block {
         // ISSUE ITEMS
         this.initItems();
 
-        if (false && genesisTimestamp != Settings.DEFAULT_MAINNET_STAMP) {
+        if (BlockChain.TEST_MODE && !BlockChain.DEMO_MODE) {
             this.testnetInfo = "";
 
             //ADD TESTNET GENESIS TRANSACTIONS
@@ -71,42 +73,80 @@ public class GenesisBlock extends Block {
 
             this.testnetInfo += "\ngenesisSeed: " + Base58.encode(seed);
 
-            bdAmount0 = new BigDecimal(BlockChain.GENESIS_ERA_TOTAL >> 2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-            bdAmount1 = new BigDecimal(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-            for (int nonce = 0; nonce < 3; nonce++) {
-                byte[] accountSeed = generateAccountSeed(seed, nonce);
+            this.testnetInfo += "\nStart the other nodes with command" + ":";
+            this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar erachain.jar -testnet=" + genesisTimestamp;
 
-                Pair<byte[], byte[]> keyPair = Crypto.getInstance().createKeyPair(accountSeed);
-                byte[] publicKey = keyPair.getB();
-                //String address = Crypto.getInstance().getAddress(publicKey);
-                recipient = new PublicKeyAccount(publicKey);
-                String address = recipient.getAddress();
+        } else if (BlockChain.SIDE_MODE) {
 
-				/*
-				user = new PersonHuman(recipient,
-						"UNKNOWN", "1966-08-21 0:10:10.0", null, (byte)1, "-", (float)0.0, (float)0.0,
-						"-", "-", "-", (int) 188, icon, image, "-", null);
-				 */
+            sideSettingString = "";
+            sideSettingString += Settings.genesisJSON.get(0).toString();
+            sideSettingString += Settings.genesisJSON.get(1).toString();
 
+            Account leftRecipiend = null;
+            BigDecimal totalSended = BigDecimal.ZERO;
+            JSONArray holders = (JSONArray) Settings.genesisJSON.get(2);
+            if (!Settings.ERA_COMPU_ALL_UP) {
+                for (int i = 0; i < holders.size(); i++) {
+                    JSONArray holder = (JSONArray) holders.get(i);
 
-                if (false) {
-                    //CREATE ISSUE PERSON TRANSACTION
-                    ////this.addTransaction(new GenesisIssuePersonRecord(user));
+                    sideSettingString += holder.get(0).toString();
+                    sideSettingString += holder.get(1).toString();
 
-                    // CERTIFY PERSON
-                    // TODO: тут ошибка сериализации транзакции - поидее нужно проверить и чтобы она работала
-                    // а лучше разрешить создание персон и так
-                    transactions.add(new GenesisCertifyPersonRecord(recipient, nonce++));
+                    // SEND FONDs
+                    Account founder = new Account(holder.get(0).toString());
+                    if (leftRecipiend == null) {
+                        leftRecipiend = founder;
+                    }
 
-                    this.testnetInfo += "\ngenesisAccount(" + String.valueOf(nonce) + "): " + address + " / POST addresses " + Base58.encode(accountSeed);
+                    BigDecimal fondAamount = new BigDecimal(holder.get(1).toString()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                    transactions.add(new GenesisTransferAssetTransaction(founder,
+                            AssetCls.ERA_KEY, fondAamount));
+
+                    totalSended = totalSended.add(fondAamount);
+
+                    if (holder.size() < 3)
+                        continue;
+
+                    String COMPUstr = holder.get(2).toString();
+                    if (COMPUstr.length() > 0 && !COMPUstr.equals("0")) {
+                        BigDecimal compu = new BigDecimal(COMPUstr).setScale(BlockChain.FEE_SCALE);
+                        transactions.add(new GenesisTransferAssetTransaction(founder,
+                                AssetCls.FEE_KEY, compu));
+                        sideSettingString += compu.toString();
+                    }
+
+                    if (holder.size() < 4)
+                        continue;
+
+                    // DEBTORS
+                    JSONArray debtors = (JSONArray) holder.get(3);
+                    BigDecimal totalCredit = BigDecimal.ZERO;
+                    for (int j = 0; j < debtors.size(); j++) {
+                        JSONArray debtor = (JSONArray) debtors.get(j);
+
+                        BigDecimal creditAmount = new BigDecimal(debtor.get(0).toString()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                        if (totalCredit.add(creditAmount).compareTo(fondAamount) > 0) {
+                            break;
+                        }
+
+                        sideSettingString += creditAmount.toString();
+                        sideSettingString += debtor.get(1).toString();
+
+                        transactions.add(new GenesisTransferAssetTransaction(new Account(debtor.get(1).toString()),
+                                -AssetCls.ERA_KEY,
+                                creditAmount, founder));
+
+                        totalCredit = totalCredit.add(creditAmount);
+                    }
                 }
 
-                // SEND GENESIS ASSETS
-                transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
-                transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
+                if (totalSended.compareTo(new BigDecimal(BlockChain.GENESIS_ERA_TOTAL)) < 0) {
+                    // ADJUST end
+                    transactions.add(new GenesisTransferAssetTransaction(
+                            leftRecipiend, AssetCls.ERA_KEY,
+                            new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+                }
             }
-            this.testnetInfo += "\nStart the other nodes with command" + ":";
-            this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar ERA.jar -testnet=" + genesisTimestamp;
 
         } else {
 
@@ -368,7 +408,7 @@ public class GenesisBlock extends Block {
                 // buffer for CREDIT sends
                 sends_toUsers.add(new Tuple2<Account, BigDecimal>(recipient, bdAmount0));
 
-                bdAmount1 = BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                bdAmount1 = BigDecimal.ONE.setScale(BlockChain.FEE_SCALE);
                 transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 
             }
@@ -417,7 +457,6 @@ public class GenesisBlock extends Block {
             transactions.add(new GenesisTransferAssetTransaction(
                     new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe"), AssetCls.ERA_KEY,
                     new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
-
 
             // FOR DEBROTS
             nonce = genesisDebtors.size() >> 1;
@@ -513,7 +552,7 @@ public class GenesisBlock extends Block {
         switch (key) {
             case (int) TemplateCls.LICENSE_KEY:
                 String license = "";
-                if (!(BlockChain.TESTS_VERS != 0 && BlockChain.TEST_MODE)) {
+                if (!(BlockChain.TESTS_VERS != 0 && (BlockChain.SIDE_MODE || BlockChain.TEST_MODE))) {
                     try {
                         //File file = new File("License Erachain.txt");
                         File file = new File("Erachain Licence Agreement (genesis).txt");
@@ -669,11 +708,16 @@ public class GenesisBlock extends Block {
         byte[] referenceBytes = Bytes.ensureCapacity(genesisReference, Crypto.SIGNATURE_LENGTH, 0);
         data = Bytes.concat(data, referenceBytes);
 
-
         //WRITE TIMESTAMP
         byte[] genesisTimestampBytes = Longs.toByteArray(this.genesisTimestamp);
         genesisTimestampBytes = Bytes.ensureCapacity(genesisTimestampBytes, 8, 0);
         data = Bytes.concat(data, genesisTimestampBytes);
+
+        if (BlockChain.SIDE_MODE) {
+            //WRITE SIDE SETTINGS
+            byte[] genesisSideBytes = this.sideSettingString.getBytes(StandardCharsets.UTF_8);
+            data = Bytes.concat(data, genesisSideBytes);
+        }
 
 		/*
 		//WRITE GENERATING BALANCE
@@ -711,10 +755,10 @@ public class GenesisBlock extends Block {
     }
 
     @Override
-    public boolean isValid(DCSet db, boolean andProcess) {
+    public int isValid(DCSet db, boolean andProcess) {
         //CHECK IF NO OTHER BLOCK IN DB
         if (db.getBlockMap().last() != null) {
-            return false;
+            return INVALID_BLOCK_VERSION;
         }
 
         //VALIDATE TRANSACTIONS
@@ -722,7 +766,7 @@ public class GenesisBlock extends Block {
         for (Transaction transaction : this.getTransactions()) {
             transaction.setDC(db);
             if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
-                return false;
+                return INVALID_BLOCK_VERSION;
             }
             transactionsSignatures = Bytes.concat(transactionsSignatures, transaction.getSignature());
 
@@ -730,10 +774,10 @@ public class GenesisBlock extends Block {
         transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
         if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
             LOGGER.error("*** GenesisBlock.digest(transactionsSignatures) invalid");
-            return false;
+            return INVALID_BLOCK_VERSION;
         }
 
-        return true;
+        return INVALID_NONE;
     }
 
     public void process(DCSet dcSet) throws Exception {

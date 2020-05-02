@@ -4,9 +4,9 @@ package org.erachain.gui.create;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.lang.Lang;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.settings.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -155,7 +155,7 @@ public class RecoverWalletFrame extends JFrame {
         panGBC.gridy =0;
       //path text
       //  labelGBC.gridy = labelGBC.gridy+1;
-        jTextFieldDataDir = new JTextField(Settings.getInstance().getWalletDir());
+        jTextFieldDataDir = new JTextField(Settings.getInstance().getWalletKeysPath());
         jTextFieldDataDir.setEditable(false);
         pan.add(jTextFieldDataDir, panGBC);
        // this.add(jTextFieldDataDir, labelGBC);
@@ -231,7 +231,7 @@ public class RecoverWalletFrame extends JFrame {
         //CHECK IF SEEDS MATCH
         byte[] seed = null;
         try {
-            seed = Base58.decode(this.seedTxt.getText());
+            seed = Base58.decode(this.seedTxt.getText().trim());
         } catch (Exception e) {
             seed = null;
         }

@@ -20,7 +20,7 @@ public class SecureWalletDatabase {
 
     public SecureWalletDatabase(String password) {
         //OPEN WALLET
-    	SECURE_WALLET_FILE = new File(Settings.getInstance().getWalletDir(), "wallet.s.dat");
+        SECURE_WALLET_FILE = new File(Settings.getInstance().getWalletKeysPath(), "wallet.s.dat");
         SECURE_WALLET_FILE.getParentFile().mkdirs();
 
         //DELETE TRANSACTIONS
@@ -31,7 +31,7 @@ public class SecureWalletDatabase {
         this.database = DBMaker.newFileDB(SECURE_WALLET_FILE)
                 .encryptionEnable(password)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
-                .cacheSize(2048)
+                .cacheSize(1 << 11)
                 .checksumEnable()
                 .mmapFileEnableIfSupported()
                 .make();

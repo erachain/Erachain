@@ -74,35 +74,55 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
     private AccountsComboBoxModel accountsModel;
 
-    public AccountAssetActionPanelCls(String panelName, AssetCls assetIn, String title, int balancePosition,
+    public AccountAssetActionPanelCls(boolean backward, String panelName, AssetCls assetIn, String titleIn,
+                                      int balancePosition,
                                       Account accountFrom, Account accountTo, String message) {
 
-        setName(Lang.getInstance().translate(panelName));
         if (assetIn == null)
             this.asset = Controller.getInstance().getAsset(2);
         else
             this.asset = assetIn;
 
-        this.title = title;
+        // необходимо входящий параметр отделить так как ниже он по событию изменения актива будет как НУЛь вызваться
+        // поэтому тут только приватную переменную юзаем дальше
+        if (titleIn == null) {
+            this.title = asset.viewAssetTypeActionTitle(backward, balancePosition);
+        } else {
+            this.title = titleIn;
+        }
+
+        if (panelName == null) {
+            setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition) + " [" + asset.getKey() + " ]"));
+        } else {
+            setName(Lang.getInstance().translate(panelName));
+        }
 
         this.account = accountFrom;
         recipient = accountTo;
         this.balancePosition = balancePosition;
 
+
         initComponents(message);
 
-        if (title != null) {
-            if (asset == null)
-                this.jLabel_Title.setText(Lang.getInstance().translate(title));
-            else
-                this.jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
-        }
+        this.jLabel_Title.setText(Lang.getInstance().translate(this.title).replace("%asset%", asset.viewName()));
 
-        //this.jComboBox_Asset.setEnabled(assetIn != null);
+        // icon.setIcon(null);
+        this.jLabel_Account.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, balancePosition)) + ":");
+
+        this.jLabel_To.setText(Lang.getInstance().translate(
+                asset.viewAssetTypeTarget(backward, balancePosition) + " " + "Account") + ":");
+        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate(
+                asset.viewAssetTypeTarget(backward, balancePosition) + " " + "Details") + ":");
+
+        this.jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition)));
 
         this.jTextField_Recive_Detail.setText("");
         this.jTextField_Mess_Title.setText("");
-        this.jTextField_Amount.setText("0");
+
+        if (this.asset.defaultAmountAssetType() == null)
+            this.jTextField_Amount.setText("0");
+        else
+            this.jTextField_Amount.setText(this.asset.defaultAmountAssetType().toPlainString());
 
         // account ComboBox
         this.accountsModel = new AccountsComboBoxModel(balancePosition);
@@ -116,6 +136,9 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         // favorite combo box
         jComboBox_Asset.setModel(new ComboBoxAssetsModel());
+        jComboBox_Asset.setEditable(false);
+        //this.jComboBox_Asset.setEnabled(assetIn != null);
+
 
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
             this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
@@ -170,8 +193,13 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                         jComboBox_Account.repaint();
                     }
 
-                    if (title != null) {
-                        jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
+                    String titleLocal = Lang.getInstance().translate(title);
+                    jLabel_Title.setText((titleLocal == null ? title : titleLocal).replace("%asset%", asset.viewName()));
+
+                    if (panelName == null) {
+                        setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition)) + " ]" + asset.getKey() + " ]");
+                    } else {
+                        setName(Lang.getInstance().translate(panelName));
                     }
 
                     // set scale
@@ -217,7 +245,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         if (recipient != null) {
             if (recipient instanceof PublicKeyAccount) {
-                jTextField_To.setText(((PublicKeyAccount)recipient).getBase58());
+                jTextField_To.setText(((PublicKeyAccount) recipient).getBase58());
             } else {
                 jTextField_To.setText(recipient.getAddress());
             }
@@ -225,15 +253,11 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         }
 
-        ///this.jLabel_Title.setText(Lang.getInstance().translate("Title"));
-        this.jLabel_Account.setText(Lang.getInstance().translate("Select account") + ":");
-        this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)"));
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
         this.jLabel_Mess_Title.setText(Lang.getInstance().translate("Title") + ":");
         this.jLabel_Mess.setText(Lang.getInstance().translate("Message") + ":");
         this.jCheckBox_Enscript.setText(Lang.getInstance().translate("Encrypt message") + ":");
         this.jCheckBox_Enscript.setSelected(true);
-        this.jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
+        this.jLabel_Asset.setText(Lang.getInstance().translate(asset.viewAssetType()) + ":");
         this.jLabel_Amount.setText(Lang.getInstance().translate("Amount") + ":");
 
         if (account != null && asset != null) {
@@ -242,8 +266,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         }
 
         this.jLabel_Fee.setText(Lang.getInstance().translate("Fee level") + ":");
-
-        this.jButton_ok.setText(Lang.getInstance().translate("Send"));
 
         // CONTEXT MENU
         MenuPopupUtil.installContextMenu(this.jTextField_To);
@@ -288,7 +310,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         }
 
         //READ RECIPIENT
-        String recipientAddress = jTextField_To.getText();
+        String recipientAddress = jTextField_To.getText().trim();
 
         //ORDINARY RECIPIENT
         if (Crypto.getInstance().isValidAddress(recipientAddress)) {
@@ -628,7 +650,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
         add(jComboBox_Asset, gridBagConstraints);
 
-        jTextField_Amount.setText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 18;
@@ -645,7 +666,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
         add(jLabel_AmountHave, gridBagConstraints);
 
-        jTextField_Amount.setText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 18;

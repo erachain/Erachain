@@ -7,7 +7,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
-import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,7 +107,7 @@ public class RSend extends TransactionAmount {
                  Long reference, byte[] signature, long feeLong) {
         this(typeBytes, creator, feePow, recipient, key, amount, head, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
 
@@ -397,27 +396,7 @@ public class RSend extends TransactionAmount {
 
     @Override
     public boolean hasPublicText() {
-        String[] words = head.split(DCSet.SPLIT_CHARS);
-        int length = 0;
-        for (String word: words) {
-            word = word.trim();
-            if (Base58.isExtraSymbols(word)) {
-                // все слова сложим по длинне
-                length += word.length();
-                if (length > (BlockChain.TEST_MODE ? 100 : 100))
-                    return true;
-            }
-        }
-
-        if (data == null || data.length == 0)
-            return false;
-
-        if (this.isText() && !this.isEncrypted()) {
-            String text = new String(this.data, StandardCharsets.UTF_8);
-            if (text.contains(" ") || text.contains("_"))
-                return true;
-        }
-        return false;
+        return hasPublicText(head, data, isText(), isEncrypted());
     }
 
     // PARSE/CONVERT
@@ -430,7 +409,6 @@ public class RSend extends TransactionAmount {
 
         if (head.length() > 0) {
             transaction.put("title", this.head);
-            //transaction.put("head", this.head);
         }
 
         if (data != null && data.length > 0) {
@@ -438,10 +416,8 @@ public class RSend extends TransactionAmount {
             // ADD CREATOR/SERVICE/DATA
             if (this.isText() && !this.isEncrypted()) {
                 transaction.put("message", new String(this.data, StandardCharsets.UTF_8));
-                //transaction.put("data", new String(this.data, StandardCharsets.UTF_8));
             } else {
                 transaction.put("message", Base58.encode(this.data));
-                // transaction.put("data", Base58.encode(this.data));
             }
             transaction.put("encrypted", this.isEncrypted());
             transaction.put("isText", this.isText());
@@ -505,19 +481,7 @@ public class RSend extends TransactionAmount {
             }
         }
 
-        boolean isPerson = this.creator.isPerson(dcSet, height);
-        // PUBLIC TEXT only from PERSONS
-        if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
-                && this.hasPublicText() && !isPerson) {
-            if (Base58.encode(this.getSignature()).equals( // TODO: remove on new CHAIN
-                    "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")) {
-                ;
-            } else {
-                return CREATOR_NOT_PERSONALIZED;
-            }
-        }
-
-        return super.isValid(asDeal, isPerson, flags);
+        return super.isValid(asDeal, flags);
     }
 
 }

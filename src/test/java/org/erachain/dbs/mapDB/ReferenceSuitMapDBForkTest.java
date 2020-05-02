@@ -49,7 +49,7 @@ public class ReferenceSuitMapDBForkTest {
         account.setLastTimestamp(point2, dcSet);
         assertEquals(point2, account.getLastTimestamp(dcSet));
 
-        DCSet forkDCSet = dcSet.fork();
+        DCSet forkDCSet = dcSet.fork(this.toString());
         account.removeLastTimestamp(forkDCSet, point2[0]);
         long[] pointStartCopy = new long[]{2345L, 123L};
         assertEquals(2345L, account.getLastTimestamp(forkDCSet)[0]);

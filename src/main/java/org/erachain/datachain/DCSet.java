@@ -42,6 +42,12 @@ import java.util.Random;
 public class DCSet extends DBASet implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
+    /**
+     * Используется для отладки - где незакрытый набор таблиц остался.
+     * Делаем дамн КУЧИ в VisualVM и там в параметрах смотрим откуда этот объект был создан
+     */
+    public String makedIn = "--";
+
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN
             << (Controller.getInstance().databaseSystem == DBS_MAP_DB ? 1 : 3);
     // если все на Рокс перевели то меньше надо ставить
@@ -105,11 +111,6 @@ public class DCSet extends DBASet implements Closeable {
     private static boolean isStoped = false;
     private volatile static DCSet instance;
     private DCSet parent;
-
-    // % и @ и # - пусть они будут служебные и по ним не делать разделения
-    // так чтобы можно было найти @P указатель на персон например
-    // % - это указатель на параметр например иак - %1
-    public static String SPLIT_CHARS = "[!?/_., \\~`+&^№*()<>\\\"\\'|\\[\\]{}=;:\\\\]";
 
     private boolean inMemory = false;
 
@@ -346,7 +347,7 @@ public class DCSet extends DBASet implements Closeable {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
             if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
-                        + (Controller.MIN_MEMORY_TAIL << 1)) {
+                    + (Controller.MIN_MEMORY_TAIL)) {
                 // у родителя чистим - у себя нет, так как только создали
                 parent.clearCache();
                 System.gc();
@@ -362,7 +363,6 @@ public class DCSet extends DBASet implements Closeable {
         this.addUses();
 
         this.database = idDatabase;
-
         this.parent = parent;
         ///this.database = parent.database.snapshot();
         this.bchain = parent.bchain;
@@ -540,7 +540,7 @@ public class DCSet extends DBASet implements Closeable {
                 .asyncWriteFlushDelay(2)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(7)// не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(BlockChain.TEST_DB > 0 ? 3 : 7)// не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
                 ;
@@ -568,6 +568,25 @@ public class DCSet extends DBASet implements Closeable {
                             .cacheSize(32 + 32 << Controller.HARD_WORK)
                     ;
 
+                } else if (BlockChain.TEST_DB > 0) {
+                    databaseStruc
+
+                            // при норм размере и досточной памяти скорость не хуже чем у остальных
+                            //.cacheLRUEnable() // скорость зависит от памяти и настроек -
+                            //.cacheSize(2048 + 64 << Controller.HARD_WORK)
+
+                            // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                            // у другого типа КЭША происходит утечка памяти
+                            .cacheHardRefEnable() // самый быстрый
+
+                    ///.cacheSoftRefEnable()
+                    ///.cacheSize(32 << Controller.HARD_WORK)
+
+                    // analog new WeakReference() - в случае нехватки ппамяти кеш сам чистится
+                    ///.cacheWeakRefEnable() // new WeakReference()
+                    ///.cacheSize(32 << Controller.HARD_WORK)
+                    ;
+
                 } else {
                     databaseStruc
 
@@ -577,12 +596,13 @@ public class DCSet extends DBASet implements Closeable {
 
                             // это чистит сама память если соталось 25% от кучи - так что она безопасная
                             // у другого типа КЭША происходит утечка памяти
-                            .cacheHardRefEnable()
+                            ///.cacheHardRefEnable()
 
-                    ///.cacheSoftRefEnable()
-                    ///.cacheSize(32 << Controller.HARD_WORK)
+                            ///.cacheSoftRefEnable()
+                            ///.cacheSize(32 << Controller.HARD_WORK)
 
-                    ///.cacheWeakRefEnable()
+                            // analog new WeakReference() - в случае нехватки ппамяти кеш сам чистится
+                            .cacheWeakRefEnable() // new WeakReference()
                     ///.cacheSize(32 << Controller.HARD_WORK)
                     ;
 
@@ -604,7 +624,8 @@ public class DCSet extends DBASet implements Closeable {
     public static boolean needResetUTXPoolMap = false;
     public static DB makeDBinMemory() {
 
-        int freeSpaceReclaimQ = 3;
+        // лучше для памяти ставить наилучшее сжатие чтобы память не кушать лишний раз
+        int freeSpaceReclaimQ = 10;
         needResetUTXPoolMap = freeSpaceReclaimQ < 3;
         return DBMaker
                 .newMemoryDB()
@@ -617,7 +638,9 @@ public class DCSet extends DBASet implements Closeable {
                 .asyncWriteFlushDelay(2)
                 // тут не влияет .commitFileSyncDisable()
 
-                .cacheHardRefEnable()
+                //.cacheHardRefEnable()
+                //.cacheLRUEnable()
+                .cacheWeakRefEnable() // new WeakReference()
                 //.cacheDisable()
 
 
@@ -641,7 +664,7 @@ public class DCSet extends DBASet implements Closeable {
     public static void reCreateDB(boolean withObserver, boolean dynamicGUI) throws Exception {
 
         //OPEN DB
-        File dbFile = new File(Settings.getInstance().getDataDir(), "chain.dat");
+        File dbFile = new File(Settings.getInstance().getDataChainPath(), "chain.dat");
         dbFile.getParentFile().mkdirs();
 
         DB database = makeFileDB(dbFile);
@@ -1585,13 +1608,15 @@ public class DCSet extends DBASet implements Closeable {
 
     /**
      * создать форк
+     *
      * @return
      */
-    public DCSet fork(DB database) {
+    public DCSet fork(DB database, String maker) {
         this.addUses();
 
         try {
             DCSet fork = new DCSet(this, database);
+            fork.makedIn = maker;
 
             this.outUses();
             return fork;
@@ -1601,7 +1626,7 @@ public class DCSet extends DBASet implements Closeable {
 
             this.outUses();
 
-            Controller.getInstance().stopAll(13);
+            Controller.getInstance().stopAll(1113);
             return null;
         }
 
@@ -1610,10 +1635,11 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * USe inMemory MapDB Database
      *
+     * @param maker
      * @return
      */
-    public DCSet fork() {
-        return fork(makeDBinMemory());
+    public DCSet fork(String maker) {
+        return fork(makeDBinMemory(), maker);
     }
 
     /**
@@ -1622,14 +1648,46 @@ public class DCSet extends DBASet implements Closeable {
     @Override
     public synchronized void writeToParent() {
 
-        // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
-        // иначе размер больше будет в форке и не то значение
-        ((BlockMap) blockMap.getParent()).setLastBlockSignature(blockMap.getLastBlockSignature());
-
-        for (DBTab table : tables) {
-            table.writeToParent();
+        // проверим сначала тут память чтобы посередине не вылететь
+        if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+            // System.out.println("########################### Free Memory:"
+            // + Runtime.getRuntime().freeMemory());
+            if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                    + (Controller.MIN_MEMORY_TAIL)) {
+                // у родителя чистим - у себя нет, так как только создали
+                parent.clearCache();
+                System.gc();
+                if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1)) {
+                    logger.error("Heap Memory Overflow before commit");
+                    Controller.getInstance().stopAll(9618);
+                    return;
+                }
+            }
         }
-        // теперь нужно все общие переменные переопределить
+
+        try {
+            // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
+            // иначе размер больше будет в форке и не то значение
+            ((BlockMap) blockMap.getParent()).setLastBlockSignature(blockMap.getLastBlockSignature());
+
+            for (DBTab table : tables) {
+                table.writeToParent();
+            }
+            // теперь нужно все общие переменные переопределить
+        } catch (Exception e) {
+
+            LOGGER.error(e.getMessage(), e);
+
+            // база битая полуяается !? хотя rollback должен сработать
+            Controller.getInstance().stopAll(9613);
+            return;
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
+
+            // база битая полуяается !? хотя rollback должен сработать
+            Controller.getInstance().stopAll(9615);
+        }
 
     }
 
@@ -1684,11 +1742,15 @@ public class DCSet extends DBASet implements Closeable {
                         LOGGER.error(e.getMessage(), e);
                     }
                 }
+                // улучшает работу финализера
+                tables = null;
                 try {
                     this.database.close();
                 } catch (IOError e) {
                     LOGGER.error(e.getMessage(), e);
                 }
+                // улучшает работу финализера
+                this.database = null;
 
                 this.uses = 0;
             }
@@ -1696,6 +1758,15 @@ public class DCSet extends DBASet implements Closeable {
             logger.info("closed " + (parent == null ? "Main" : "parent " + toString()));
         }
 
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        close();
+        if (BlockChain.CHECK_BUGS > 5) {
+            LOGGER.debug("DCSet is FINALIZED: " + this.toString());
+        }
+        super.finalize();
     }
 
     @Override

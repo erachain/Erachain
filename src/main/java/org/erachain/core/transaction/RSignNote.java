@@ -7,23 +7,24 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
+import org.erachain.datachain.TransactionFinalMapSigns;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
-import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
-import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 
 //import java.math.BigDecimal;
 //import java.math.BigInteger;
@@ -50,6 +51,8 @@ public class RSignNote extends Transaction implements Itemable {
     protected PublicKeyAccount[] signers; // for all it need ecnrypt
     protected byte[][] signatures; // - multi sign
 
+    Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parsedData;
+
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 
         super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
@@ -68,7 +71,7 @@ public class RSignNote extends Transaction implements Itemable {
                      byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature, long feeLong) {
         this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // asPack
@@ -110,7 +113,7 @@ public class RSignNote extends Transaction implements Itemable {
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as Pack
@@ -125,12 +128,29 @@ public class RSignNote extends Transaction implements Itemable {
     //GETTERS/SETTERS
 
     @Override
-    public ItemCls getItem()
-    {
+    public ItemCls getItem() {
         if (template == null) {
             template = (TemplateCls) dcSet.getItemTemplateMap().get(key);
         }
         return this.template;
+    }
+
+    @Override
+    public void makeItemsKeys() {
+        if (creatorPersonDuration != null && key != 0) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
+                    new Object[]{ItemCls.TEMPLATE_TYPE, key}
+            };
+        } else if (creatorPersonDuration != null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a}
+            };
+        } else if (key != 0) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.TEMPLATE_TYPE, key}
+            };
+        }
     }
 
     public static boolean hasTemplate(byte[] typeBytes) {
@@ -278,152 +298,6 @@ public class RSignNote extends Transaction implements Itemable {
 
     }
 
-    public static Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse_Data_V2(byte[] data, boolean onlyTitle) throws Exception {
-        //Version, Title, JSON, Files
-
-        //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < Transaction.DATA_JSON_PART_LENGTH) {
-            throw new Exception("Data does not match block length " + data.length);
-        }
-        int position = 0;
-
-        // read version
-        byte[] version_Byte = Arrays.copyOfRange(data, position, Transaction.DATA_VERSION_PART_LENGTH);
-        position += Transaction.DATA_VERSION_PART_LENGTH;
-        // read title
-        byte[] titleSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_TITLE_PART_LENGTH);
-        int titleSize = Ints.fromByteArray(titleSizeBytes);
-        position += Transaction.DATA_TITLE_PART_LENGTH;
-
-        byte[] titleByte = Arrays.copyOfRange(data, position, position + titleSize);
-
-        String title = new String(titleByte, StandardCharsets.UTF_8);
-        String version = new String(version_Byte, StandardCharsets.UTF_8);
-
-        if (onlyTitle) {
-            return new Tuple4(version, title, null, null);
-        }
-
-        position += titleSize;
-        //READ Length JSON PART
-        byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_JSON_PART_LENGTH);
-        int JSONSize = Ints.fromByteArray(dataSizeBytes);
-
-        position += Transaction.DATA_JSON_PART_LENGTH;
-        //READ JSON
-        byte[] arbitraryData = Arrays.copyOfRange(data, position, position + JSONSize);
-        JSONObject json = (JSONObject) JSONValue.parseWithException(new String(arbitraryData, StandardCharsets.UTF_8));
-
-        position += JSONSize;
-        HashMap<String, Tuple2<Boolean, byte[]>> out_Map = new HashMap<String, Tuple2<Boolean, byte[]>>();
-        JSONObject files;
-        Set files_key_Set;
-        //v2.0
-        if (json.containsKey("&*&*%$$%_files_#$@%%%")) { //return new Tuple4(version,title,json, null);
-
-
-            files = (JSONObject) json.get("&*&*%$$%_files_#$@%%%");
-
-
-            files_key_Set = files.keySet();
-            for (int i = 0; i < files_key_Set.size(); i++) {
-                JSONObject file = (JSONObject) files.get(i + "");
-
-
-                String name = (String) file.get("File_Name"); // File_Name
-                Boolean zip = new Boolean((String) file.get("ZIP")); // ZIP
-                byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("Size"))); //Size
-                position = position + new Integer((String) file.get("Size")); //Size
-                out_Map.put(name, new Tuple2(zip, bb));
-
-            }
-            return new Tuple4(version, title, json, out_Map);
-        }
-        // v 2.1
-        if (json.containsKey("F")) { // return new Tuple4(version,title,json, null);
-
-
-            files = (JSONObject) json.get("F");
-
-
-            files_key_Set = files.keySet();
-            for (int i = 0; i < files_key_Set.size(); i++) {
-                JSONObject file = (JSONObject) files.get(i + "");
-
-
-                String name = (String) file.get("FN"); // File_Name
-                Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
-                byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("SZ"))); //Size
-                position = position + new Integer((String) file.get("SZ")); //Size
-                out_Map.put(name, new Tuple2(zip, bb));
-
-            }
-
-
-            return new Tuple4(version, title, json, out_Map);
-        }
-
-        return new Tuple4(version, title, json, null);
-    }
-
-    public static byte[] Json_Files_to_Byte_V2(String title, JSONObject json, HashMap<String, Tuple2<Boolean, byte[]>> files) throws Exception {
-
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        outStream.write("v 2.00".getBytes(StandardCharsets.UTF_8)); // only 6 simbols!!!
-        byte[] title_Bytes = "".getBytes(StandardCharsets.UTF_8);
-        if (title != null) {
-            title_Bytes = title.getBytes(StandardCharsets.UTF_8);
-        }
-
-
-        byte[] size_Title = ByteBuffer.allocate(Transaction.DATA_TITLE_PART_LENGTH).putInt(title_Bytes.length).array();
-
-        outStream.write(size_Title);
-        outStream.write(title_Bytes);
-
-        if (json == null || json.equals("")) return outStream.toByteArray();
-
-        byte[] JSON_Bytes;
-        byte[] size_Json;
-
-        if (files == null || files.isEmpty()) {
-            JSON_Bytes = json.toString().getBytes(StandardCharsets.UTF_8);
-            // convert int to byte
-            size_Json = ByteBuffer.allocate(Transaction.DATA_JSON_PART_LENGTH).putInt(JSON_Bytes.length).array();
-            outStream.write(size_Json);
-            outStream.write(JSON_Bytes);
-            return outStream.toByteArray();
-        }
-        // if insert Files
-        Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it = files.entrySet().iterator();
-        JSONObject files_Json = new JSONObject();
-        int i = 0;
-        ArrayList<byte[]> out_files = new ArrayList<byte[]>();
-        while (it.hasNext()) {
-            Entry<String, Tuple2<Boolean, byte[]>> file = it.next();
-            JSONObject file_Json = new JSONObject();
-            file_Json.put("FN", file.getKey()); //File_Name
-            file_Json.put("ZP", file.getValue().a.toString()); //ZIP
-            file_Json.put("SZ", file.getValue().b.length + ""); //Size
-            files_Json.put(i + "", file_Json);
-            out_files.add(i, file.getValue().b);
-            i++;
-        }
-        json.put("F", files_Json);
-        JSON_Bytes = json.toString().getBytes(StandardCharsets.UTF_8);
-        // convert int to byte
-        size_Json = ByteBuffer.allocate(Transaction.DATA_JSON_PART_LENGTH).putInt(JSON_Bytes.length).array();
-        outStream.write(size_Json);
-        outStream.write(JSON_Bytes);
-        for (i = 0; i < out_files.size(); i++) {
-            outStream.write(out_files.get(i));
-        }
-        return outStream.toByteArray();
-
-    }
-
-    //public static String getName() { return "Statement"; }
-
     //GETTERS/SETTERS
     public void setSidnerSignature(int index, byte[] signature) {
         if (signatures == null)
@@ -471,26 +345,32 @@ public class RSignNote extends Transaction implements Itemable {
         return this.key;
     }
 
+    /**
+     * Titlt не может быть Нуль
+     *
+     * @return
+     */
     @Override
     public String getTitle() {
 
         if (isEncrypted()) {
-            return null;
+            return "";
         }
 
         if (getVersion() == 2) {
 
             // version 2
-            Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map_Data;
+            Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> map_Data;
 
             try {
                 // парсим только заголовок
-                map_Data = parse_Data_V2(data, true);
+                map_Data = parseDataV2WithoutFiles();
                 return map_Data.b;
 
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
-                return "error " + e.getMessage();
+                Long error = null;
+                error++;
             }
 
         } else {
@@ -499,19 +379,17 @@ public class RSignNote extends Transaction implements Itemable {
             String text = new String(getData(), StandardCharsets.UTF_8);
 
             try {
-                JSONObject data = new JSONObject();
-                data = (JSONObject) JSONValue.parseWithException(text);
-                String title = data.get("Title").toString();
-                if (title == null || title.equals(""))
-                    return null;
-
-                return title;
+                JSONObject dataJson = (JSONObject) JSONValue.parseWithException(text);
+                if (dataJson.containsKey("Title")) {
+                    return dataJson.get("Title").toString();
+                }
 
             } catch (ParseException e) {
                 // version 0
                 return text.split("\n")[0];
             }
         }
+        return "";
     }
 
 
@@ -559,11 +437,16 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public boolean hasPublicText() {
-        if (data == null || data.length == 0)
-            return false;
-        if (!Arrays.equals(this.encrypted, new byte[1]))
-            return false;
-
+        if (false) {
+            // TODO выделить заголовок и остальное тело
+            String title = null;
+            return hasPublicText(title, data, isText(), isEncrypted());
+        } else {
+            if (data == null || data.length == 0)
+                return false;
+            if (!Arrays.equals(this.encrypted, new byte[1]))
+                return false;
+        }
         return true;
     }
 
@@ -630,26 +513,53 @@ public class RSignNote extends Transaction implements Itemable {
 
     //PROCESS/ORPHAN
 
-	/*
-	public void process(DLSet db, boolean asPack) {
+    @Override
+    public void process(Block block, int asDeal) {
 
-		//UPDATE SENDER
-		super.process(db, asPack);
+        super.process(block, asDeal);
+        if (Controller.getInstance().onlyProtocolIndexing)
+            return;
 
-		// it in any time is unconfirmed! byte[] ref = this.getDBRef(db);
-		db.getAddressStatement_Refs().set(this.creator.getAddress(), this.key, this.signature);
+        try {
+            parseData();
+            byte[][] hashes = ExData.getAllHashesAsBytes(parsedData);
+            Long dbKey = makeDBRef(height, seqNo);
+            if (hashes != null) {
+                for (byte[] hash : hashes) {
+                    dcSet.getTransactionFinalMapSigns().put(hash, dbKey);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            Long error = null;
+            error++;
+        }
 
-	}
+    }
 
-	public void orphan(DLSet db, boolean asPack) {
+    @Override
+    public void orphan(Block block, int asDeal) {
 
-		//UPDATE SENDER
-		super.orphan(db, asPack);
+        super.orphan(block, asDeal);
 
-		db.getAddressStatement_Refs().delete(this.creator.getAddress(), this.key);
+        if (Controller.getInstance().onlyProtocolIndexing)
+            return;
 
-	}
-	 */
+        try {
+            parseData();
+            byte[][] hashes = ExData.getAllHashesAsBytes(parsedData);
+            if (hashes != null) {
+                for (byte[] hash : hashes) {
+                    dcSet.getTransactionFinalMapSigns().delete(hash);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            Long error = null;
+            error++;
+        }
+
+    }
 
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
@@ -688,13 +598,35 @@ public class RSignNote extends Transaction implements Itemable {
             return INVALID_DATA_LENGTH;
         }
 
-
         int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         // ITEM EXIST? - for assets transfer not need - amount expect instead
         if (this.key > 0 && !this.dcSet.getItemTemplateMap().contains(this.key))
             return Transaction.ITEM_DOES_NOT_EXIST;
+
+        Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parsed = parseDataV2WithoutFiles();
+        JSONObject hashes = ExData.getHashes(parsed);
+        if (hashes != null) {
+            for (Object hashObject : hashes.keySet()) {
+                if (Base58.isExtraSymbols(hashObject.toString())) {
+                    return INVALID_DATA_FORMAT;
+                }
+            }
+        }
+
+        if (BlockChain.VERS_4_23_01 > 0 && height > BlockChain.VERS_4_23_01) {
+            // только уникальные - так как иначе каждый новый перезатрет поиск старого
+            byte[][] allHashes = ExData.getAllHashesAsBytes(parsed);
+            if (allHashes != null && allHashes.length > 0) {
+                TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
+                for (byte[] hash : allHashes) {
+                    if (map.contains(hash)) {
+                        return HASH_ALREDY_EXIST;
+                    }
+                }
+            }
+        }
 
         return Transaction.VALIDATE_OK;
 
@@ -728,52 +660,63 @@ public class RSignNote extends Transaction implements Itemable {
         return calcCommonFee();
     }
 
-    public Tuple3<String, String, JSONObject> parse_Data_V2_Without_Files() throws Exception {
+    public Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parseDataV2WithoutFiles() {
         //Version, Title, JSON, Files
-
-        //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < Transaction.DATA_JSON_PART_LENGTH) {
-            throw new Exception("Data does not match block length " + data.length);
+        try {
+            // здесь нельзя сохранять в parsedData
+            return ExData.parse(getVersion(), this.data, false, false);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            Long error = null;
+            error++;
         }
-        int position = 0;
 
-        // read version
-        byte[] version_Byte = Arrays.copyOfRange(data, position, Transaction.DATA_VERSION_PART_LENGTH);
-        position += Transaction.DATA_VERSION_PART_LENGTH;
-        // read title
-        byte[] titleSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_TITLE_PART_LENGTH);
-        int titleSize = Ints.fromByteArray(titleSizeBytes);
-        position += Transaction.DATA_TITLE_PART_LENGTH;
-
-        byte[] titleByte = Arrays.copyOfRange(data, position, position + titleSize);
-
-        position += titleSize;
-        //READ Length JSON PART
-        byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_JSON_PART_LENGTH);
-        int JSONSize = Ints.fromByteArray(dataSizeBytes);
-
-        position += Transaction.DATA_JSON_PART_LENGTH;
-        //READ JSON
-        byte[] arbitraryData = Arrays.copyOfRange(data, position, position + JSONSize);
-        JSONObject json = (JSONObject) JSONValue.parseWithException(new String(arbitraryData, StandardCharsets.UTF_8));
-
-        String title = new String(titleByte, StandardCharsets.UTF_8);
-        String version = new String(version_Byte, StandardCharsets.UTF_8);
-
-
-        return new Tuple3(version, title, json);
+        return null;
     }
 
-    public Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> parse_Data_V2() throws Exception {
+    public Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parseData() {
 
-        return parse_Data_V2(this.data, false);
+        if (parsedData == null) {
+
+            if (getVersion() == 2) {
+
+                // version 2
+                try {
+                    parsedData = ExData.parse(getVersion(), this.data, false, true);
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                    Long error = null;
+                    error++;
+                }
+
+            } else {
+
+                // version 1
+                String text = new String(getData(), StandardCharsets.UTF_8);
+
+                try {
+                    JSONObject dataJson = (JSONObject) JSONValue.parseWithException(text);
+                    String title = dataJson.get("Title").toString();
+
+                    parsedData = new Tuple4("1", title, dataJson, null);
+
+                } catch (ParseException e) {
+                    // version 0
+                    String[] items = text.split("\n");
+                    JSONObject dataJson = new JSONObject();
+                    dataJson.put("Message", text.substring(items[0].length()));
+                    parsedData = new Tuple4("0", items[0], dataJson, null);
+                }
+            }
+        }
+
+        return parsedData;
 
     }
 
     public boolean isFavorite() {
 
         return Controller.getInstance().wallet.database.getDocumentFavoritesSet().contains(this.dbRef);
-
 
     }
 

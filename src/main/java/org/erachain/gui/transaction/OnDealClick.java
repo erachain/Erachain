@@ -173,6 +173,10 @@ public class OnDealClick {
                 mess = "Unknown public key for encrypt";
                 break;
 
+            case Transaction.HASH_ALREDY_EXIST:
+                mess = "Hash already exist";
+                break;
+
             case Transaction.NAME_NOT_LOWER_CASE:
                 mess = "Name not lower case";
                 break;
@@ -225,6 +229,10 @@ public class OnDealClick {
             case Transaction.INVALID_DATA:
                 mess = "Invalid data";
                 break;
+            case Transaction.INVALID_DATA_FORMAT:
+                mess = "Invalid data format";
+                break;
+
             case Transaction.INVALID_URL_LENGTH:
                 mess = "Invalid URL length";
                 break;
@@ -329,6 +337,13 @@ public class OnDealClick {
                 mess = "Need 100 ERA in OWN or more";
                 break;
             case Transaction.NOT_ENOUGH_ERA_USE_100:
+                mess = "Need 100 ERA in USE or more";
+                break;
+
+            case Transaction.NOT_ENOUGH_ERA_OWN_1000:
+                mess = "Need 1000 ERA in OWN or more";
+                break;
+            case Transaction.NOT_ENOUGH_ERA_USE_1000:
                 mess = "Need 1000 ERA in USE or more";
                 break;
 
@@ -367,6 +382,12 @@ public class OnDealClick {
                 break;
             case Transaction.ITEM_DUPLICATE:
                 mess = "Invalid duplicte item";
+                break;
+            case Transaction.INVALID_TIMESTAMP_START:
+                mess = "Invalid start timestamp item";
+                break;
+            case Transaction.INVALID_TIMESTAMP_END:
+                mess = "Invalid end timestamp";
                 break;
             case Transaction.INVALID_CREATOR:
                 mess = "Invalid creator";

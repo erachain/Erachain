@@ -55,7 +55,7 @@ public class SettingsFrame extends JDialog {
         //SETTINGS TABPANE
         this.settingsTabPane = new SettingsTabPane();
         GridBagConstraints gbc_tabPane = new GridBagConstraints();
-        gbc_tabPane.gridwidth = 4;
+        gbc_tabPane.gridwidth = 5;
         gbc_tabPane.fill = GridBagConstraints.BOTH;
         gbc_tabPane.anchor = GridBagConstraints.NORTHWEST;
         gbc_tabPane.insets = new Insets(0, 0, 0, 0);
@@ -104,7 +104,7 @@ public class SettingsFrame extends JDialog {
         gbc_btnCancel.insets = new Insets(5, 5, 5, 5);
         gbc_btnCancel.gridx = 3;
         gbc_btnCancel.gridy = 1;
-        gbc_btnCancel.weightx = 2;
+  //      gbc_btnCancel.weightx = 2;
 
         btnCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -119,6 +119,51 @@ public class SettingsFrame extends JDialog {
         //    btnCancel.setPreferredSize(new Dimension(100, 25));
 
         this.add(btnCancel, gbc_btnCancel);
+        //AS
+        JButton btnDefaultSettings = new JButton(Lang.getInstance().translate("Default settings"));
+        GridBagConstraints gbc_btnDefaultSettings = new GridBagConstraints();
+        gbc_btnDefaultSettings.fill = GridBagConstraints.NONE;
+        gbc_btnDefaultSettings.anchor = GridBagConstraints.WEST;
+        gbc_btnDefaultSettings.insets = new Insets(5, 5, 5, 5);
+        gbc_btnDefaultSettings.gridx = 4;
+        gbc_btnDefaultSettings.gridy = 1;
+        gbc_btnDefaultSettings.weightx = 2;
+
+        btnDefaultSettings.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), new JSONObject());
+                } catch (IOException e1) {
+                    LOGGER.error(e1.getMessage(), e1);
+                    JOptionPane.showMessageDialog(
+                            new JFrame(), "Error writing to the file: " + Settings.getInstance().getSettingsPath()
+                                    + "\nProbably there is no access.",
+                            "Error!",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+
+                Settings.freeInstance();
+
+                JOptionPane.showMessageDialog(
+                        new JFrame(), Lang.getInstance().translate("You need to restart the application for the changes to take effect."),
+                        Lang.getInstance().translate("Attention!"),
+                        JOptionPane.WARNING_MESSAGE);
+
+                settingsTabPane.close();
+                //DISPOSE
+                setVisible(false);
+                dispose();
+
+            }
+        });
+
+        //AS
+        //    btnCancel.setPreferredSize(new Dimension(100, 25));
+
+        this.add(btnDefaultSettings, gbc_btnDefaultSettings);
+
 
         //ON CLOSE
         this.addWindowListener(new WindowAdapter() {
@@ -158,7 +203,7 @@ public class SettingsFrame extends JDialog {
         settingsJSONbuf.put("backupenabled", settingsTabPane.backUp_Setting_Panel.jCheckBox_Enable_BackUp.isSelected());
         settingsJSONbuf.put("backupasktostart", settingsTabPane.backUp_Setting_Panel.jCheckBox_Ask_To_Start.isSelected());
 
-        if (!Settings.getInstance().getBackUpDir().equals(settingsTabPane.backUp_Setting_Panel.jTextField_BuckUp_Dir.getText())) {
+        if (!Settings.getInstance().getBackUpPath().equals(settingsTabPane.backUp_Setting_Panel.jTextField_BuckUp_Dir.getText())) {
             settingsJSONbuf.put("backuppath", settingsTabPane.backUp_Setting_Panel.jTextField_BuckUp_Dir.getText());
             changeWallet = true;
         }
@@ -299,13 +344,13 @@ public class SettingsFrame extends JDialog {
         }
 
 
-        if (!Settings.getInstance().getWalletDir().equals(settingsTabPane.settingsBasicPanel.textWallet.getText())) {
-            settingsJSONbuf.put("walletdir", settingsTabPane.settingsBasicPanel.textWallet.getText());
+        if (!Settings.getInstance().getWalletKeysPath().equals(settingsTabPane.settingsBasicPanel.textWallet.getText())) {
+            settingsJSONbuf.put("walletKeysPath", settingsTabPane.settingsBasicPanel.textWallet.getText());
             changeWallet = true;
         }
 
-        if (!Settings.getInstance().getDataDir().equals(settingsTabPane.settingsBasicPanel.textDataFolder.getText())) {
-            settingsJSONbuf.put("datadir", settingsTabPane.settingsBasicPanel.textDataFolder.getText());
+        if (!Settings.getInstance().getDataChainPath().equals(settingsTabPane.settingsBasicPanel.textDataFolder.getText())) {
+            settingsJSONbuf.put("dataChainPath", settingsTabPane.settingsBasicPanel.textDataFolder.getText());
             changeDataDir = true;
         }
 

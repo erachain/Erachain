@@ -1,24 +1,5 @@
 package org.erachain.gui.items.records;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
@@ -35,13 +16,25 @@ import org.erachain.utils.URLViewer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+
 
 @SuppressWarnings("serial")
-public class UnconfirmedTransactionsPanel extends JPanel
-
-{
+public class UnconfirmedTransactionsPanel extends JPanel {
     protected Logger logger;
-
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "UnconfirmedTransactionsPanel.png";
     private static UnconfirmedTransactionsPanel instance;
     private UnconfirmedTransactionsTableModel transactionsModel;
     private MTable transactionsTable;
@@ -246,8 +239,8 @@ public class UnconfirmedTransactionsPanel extends JPanel
                 Transaction trans = transactionsModel.getItem(row);
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?tx=" + trans.viewSignature()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
@@ -284,4 +277,13 @@ public class UnconfirmedTransactionsPanel extends JPanel
 
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

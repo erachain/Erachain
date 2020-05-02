@@ -8,6 +8,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -18,15 +19,12 @@ public class IssueAssetTransaction extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
     private static final String NAME_ID = "Issue Asset";
 
-    public static final long START_KEY = 1000l; // << 20;
-
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
     //private AssetCls asset;
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference);
-        //this.asset = asset;
     }
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -35,7 +33,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow,
                                  long timestamp, Long reference, byte[] signature, long feeLong) {
         super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference, signature);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as pack
@@ -58,15 +56,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Asset"; }
-
-    // RETURN START KEY in tot GEMESIS
-    public long getStartKey(int height) {
-        if (height < BlockChain.VERS_4_11) {
-            return 1000L;
-        }
-        return START_KEY;
-
-    }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
         //boolean asPack = releaserReference != null;
@@ -217,6 +206,14 @@ public class IssueAssetTransaction extends IssueItemRecord {
         if (quantity > maxQuantity || quantity < -1) {
             return INVALID_QUANTITY;
         }
+
+        if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
+            Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
+            if (item.b < quantity) {
+                return INVALID_QUANTITY;
+            }
+        }
+
         return Transaction.VALIDATE_OK;
     }
 
@@ -258,17 +255,17 @@ public class IssueAssetTransaction extends IssueItemRecord {
         AssetCls asset = (AssetCls) this.getItem();
         long quantity = asset.getQuantity();
         if (quantity > 0) {
-            creator.changeBalance(dcSet, false, asset.getKey(dcSet),
+            creator.changeBalance(dcSet, false, false, asset.getKey(dcSet),
                     new BigDecimal(quantity).setScale(0), false, false);
 
             // make HOLD balance
-            creator.changeBalance(dcSet, false, asset.getKey(dcSet),
+            creator.changeBalance(dcSet, false, true, asset.getKey(dcSet),
                     new BigDecimal(-quantity).setScale(0), false, false);
 
         } else if (quantity == 0) {
             // безразмерные - нужно баланс в таблицу нулевой записать чтобы в блокэксплорере он отображался у счета
             // см. https://lab.erachain.org/erachain/Erachain/issues/1103
-            this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
+            this.creator.changeBalance(this.dcSet, false, false, asset.getKey(this.dcSet),
                     BigDecimal.ZERO.setScale(0), false, false);
 
         }
@@ -284,11 +281,11 @@ public class IssueAssetTransaction extends IssueItemRecord {
         AssetCls asset = (AssetCls) this.getItem();
         long quantity = asset.getQuantity();
         if (quantity > 0) {
-            this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
+            this.creator.changeBalance(this.dcSet, true, true, asset.getKey(this.dcSet),
                     new BigDecimal(quantity).setScale(0), false, false);
 
             // на балансе На Руках - добавляем тоже
-            creator.changeBalance(dcSet, true, asset.getKey(dcSet),
+            creator.changeBalance(dcSet, true, false, asset.getKey(dcSet),
                     new BigDecimal(-quantity).setScale(0), false, false);
         }
     }

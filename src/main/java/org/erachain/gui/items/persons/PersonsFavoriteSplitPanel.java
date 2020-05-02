@@ -3,7 +3,6 @@ package org.erachain.gui.items.persons;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
@@ -21,9 +20,11 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
+public class PersonsFavoriteSplitPanel extends ItemSplitPanel  {
     private static final long serialVersionUID = 2717571093561259483L;
     //private PersonsFavoriteSplitPanel th;
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "PersonsFavoriteSplitPanel.png";
+
 
     public PersonsFavoriteSplitPanel() {
         super(new FavoritePersonsTableModel(), "PersonsFavoriteSplitPanel");
@@ -34,8 +35,8 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
         vsend_Coins_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
-                        null, null, (PersonCls) itemTableSelected, null));
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
+                        null, null, (PersonCls) itemTableSelected, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -45,7 +46,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) itemTableSelected));
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, (PersonCls) itemTableSelected), MailSendPanel.getIcon());
             }
         });
 
@@ -104,8 +105,8 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?person=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
@@ -123,4 +124,14 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
         return new PersonInfo002((PersonCls) item, true);
     }
 
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

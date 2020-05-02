@@ -5,6 +5,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletItemUnionsTableModel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -19,6 +20,7 @@ import java.text.SimpleDateFormat;
 
 public class MyUnionsTab extends SplitPanel {
 
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyUnionsTab.png";
     final WalletItemUnionsTableModel unionsModel;
     private TableColumnModel columnModel;
     private TableColumn favoriteColumn;
@@ -123,5 +125,15 @@ public class MyUnionsTab extends SplitPanel {
         // if PersonInfo 002 delay on close
         //  if (c1 instanceof StatementInfo) ( (StatementInfo)c1).delay_on_Close();
 
+    }
+
+    public static  Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

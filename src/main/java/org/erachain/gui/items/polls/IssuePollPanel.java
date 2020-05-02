@@ -8,14 +8,12 @@ import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
-import org.erachain.gui.library.AddImageLabel;
-import org.erachain.gui.library.IssueConfirmDialog;
-import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.Library;
+import org.erachain.gui.library.*;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.CreateOptionsTableModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
@@ -26,6 +24,8 @@ import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 public class IssuePollPanel extends JPanel {
+
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssuePollPanel.png";
     private JComboBox<Account> cbxFrom;
     private JComboBox<String> txtFee = new JComboBox<>();
     private JTextField txtName = new JTextField();
@@ -298,6 +298,16 @@ public class IssuePollPanel extends JPanel {
             int selRow = table.getSelectedRow();
             if (selRow != -1) {
                 optionsTableModel.removeRow(selRow);
+            }
+        }
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
             }
         }
     }

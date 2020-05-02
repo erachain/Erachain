@@ -3,11 +3,54 @@
 For clone code:  
 1. Use InteliJ IDEA - New > Project from Version Control...
 1. After load project - import Gradle project
-1. For RUN - select Application
+1. Install Lombok (Settings - Plugins)
+
+### For Start Application
+1. select Application, set org.erachain.Start
+1. Set Working Directory for new Application to \ERA
+1. select ERA_main module
+
+### For Build Application
+1. Select Gradle build
+1. Set Task: build
+1. Set Arguments: --exclude-task test
+
+### For use start arguments on Mac or by default
+Make in folder file startARGS.txt (see example in z_START_EXAMPLES folder) 
+
+Описание кдючей запуска приложения в файле:  
+ERA\z_START_EXAMPLES\readme.txt
+
+Так же можно задавать ключи запуска в файле startARGS.txt - смотри пример в startARGS_example.txt
+
+## Java
+Для корректной работы MapDB нужна именно Java 1.8 (vers 8) и проект собирается и тестируется именно с этой версией.
+ Иначе бедет вызывать ошибка при коммите и закрывании базы:
+
+> DCSet.close:1674 - java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
+
+### Запуск ноды
+Если ваша нода будет только форжить то запускайте ее с ключами:
+-nodatawallet -pass=[PASSWORD]  
+Описание ключей запуска в z_START_EXAMPLES\readme.txt
+
+## Локальная сеть
+Если после включения в настройках поиска узлов в локальной сети и перезапуска ноды локальные узлы не находятся,
+ то нужно их прописать явно в файл peers.json (или peer-test.json или peers-demo.json или peers-side.json)
+
+## Test Network (TestNet)
+see readme in /z_START_EXAMPLES
+
+## Demo Network (DemoNet)
+see readme in /z_START_EXAMPLES
+
+## Sidechains (для тестеров)
+see readme in /z_GENESIS_EXAMPLES
+
+## Other
 
 Настройка запуска - Приложение и обязательно выбрать нативный Java SDK 1.8, использовать встроенный в IDEA нельзя! Иначе будет ошибка при коммитах базы данных.  
 https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#javasejdk
-
 
 Используйте Java 64 SDK
 
@@ -15,15 +58,6 @@ https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#j
 
 Для сборки JAR файла без прогона тестов используем ключи:  
 -x test
-
-Описание кдючей запуска приложения в файле:  
-ERA\z_bath_examples\readme.txt
-
-## Java
-Для корректной работы MapDB нужна именно Java 1.8 (vers 8) и проект собирается и тестируется именно с этой версией.
- Иначе бедет вызывать ошибка при коммите и закрывании базы:
-
-> DCSet.close:1674 - java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
 
 Так же выдает предупреждения:  
 ```

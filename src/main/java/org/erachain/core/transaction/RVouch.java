@@ -51,7 +51,7 @@ public class RVouch extends Transaction {
                   Long reference, byte[] signature, long feeLong) {
         this(typeBytes, creator, feePow, height, seq, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as pack
@@ -323,13 +323,20 @@ public class RVouch extends Transaction {
     public HashSet<Account> getRecipientAccounts() {
 
         HashSet<Account> accounts = new HashSet<Account>(2, 1);
-
-        Transaction record = dcSet.getTransactionFinalMap().get(vouchHeight, vouchSeqNo);
-        if (record == null) {
-            LOGGER.debug("org.erachain.core.transaction.RVouch.getRecipientAccounts() not found record: " + vouchHeight + "-" + vouchSeqNo);
+        if (isWiped())
             return accounts;
+
+        // НЕЛЬЗЯ ссылаться на новую запись см. issue #1241 - иначе при откате ссылается на уже удаленную запись
+        if (false) {
+            Transaction record = dcSet.getTransactionFinalMap().get(vouchHeight, vouchSeqNo);
+            if (record == null) {
+                ///throw new Exception(this.toString() + " - not found record: " + vouchHeight + "-" + vouchSeqNo);
+            } else {
+                accounts.addAll(record.getInvolvedAccounts());
+            }
+
         }
-        accounts.addAll(record.getInvolvedAccounts());
+
 
         return accounts;
     }

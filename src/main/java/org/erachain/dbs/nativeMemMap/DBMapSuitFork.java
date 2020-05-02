@@ -1,11 +1,12 @@
 package org.erachain.dbs.nativeMemMap;
 
+import com.google.common.collect.ImmutableList;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
-import org.erachain.dbs.DBTab;
-import org.erachain.dbs.ForkedMap;
+import org.erachain.dbs.*;
 import org.erachain.dbs.mapDB.DBMapSuit;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -45,11 +46,13 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
-            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+            if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                    + (Controller.MIN_MEMORY_TAIL)) {
                 databaseSet.clearCache();
                 System.gc();
-                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL)
-                    Controller.getInstance().stopAll(1391);
+                if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1))
+                    Controller.getInstance().stopAll(1021);
             }
         }
 
@@ -136,24 +139,12 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     @Override
     public Set<T> keySet() {
-        this.addUses();
-        Set<T> u = this.map.keySet();
-
-        u.addAll(this.parent.keySet());
-
-        this.outUses();
-        return u;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Collection<U> values() {
-        this.addUses();
-        Collection<U> u = this.map.values();
-
-        u.addAll(this.parent.values());
-
-        this.outUses();
-        return u;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -166,7 +157,10 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         try {
 
-            U old = this.map.put(key, value);
+            // сначала проверим - есть ли он тут включая родителя
+            boolean exist = this.contains(key);
+
+            this.map.put(key, value);
 
             if (this.deleted != null) {
                 if (this.deleted.remove(key) != null)
@@ -174,7 +168,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             }
 
             this.outUses();
-            return old != null;
+            return exist;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -185,7 +179,26 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     @Override
     public void put(T key, U value) {
-        set(key, value);
+        if (DCSet.isStoped()) {
+            return;
+        }
+
+        this.addUses();
+
+        try {
+
+            this.map.put(key, value);
+
+            if (this.deleted != null) {
+                if (this.deleted.remove(key) != null)
+                    ++this.shiftSize;
+            }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        this.outUses();
     }
 
     @Override
@@ -201,6 +214,10 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         value = this.map.remove(key);
 
         // это форкнутая таблица
+        if (value == null && !this.deleted.containsKey(key)) {
+            // если тут нету то создадим пометку что удалили
+            value = this.parent.get(key);
+        }
 
         // добавляем в любом случае, так как
         // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
@@ -208,11 +225,6 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         // Получаем что запись есть и в Родителе и в Форкнутой таблице!
         // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
         this.deleted.put(key, EXIST);
-
-        if (value == null) {
-            // если тут нету то создадим пометку что удалили
-            value = this.parent.get(key);
-        }
 
         this.outUses();
         return value;
@@ -260,9 +272,70 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     }
 
     @Override
+    public IteratorCloseable<T> getIterator() {
+        this.addUses();
+
+        Iterator<T> parentIterator = parent.getIterator();
+        IteratorCloseable<T> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted), map.keySet().iterator()), Fun.COMPARATOR);
+
+        this.outUses();
+        return iterator;
+
+    }
+
+    // TODO надо рекурсию к Родителю по итератору делать
+    @Override
+    public IteratorCloseable<T> getIterator(int index, boolean descending) {
+        this.addUses();
+
+        Iterator<T> parentIterator = parent.getIterator(index, descending);
+        IteratorCloseable<T> iterator;
+
+        if (index > 0) {
+            // 0 - это главный индекс - он не в списке indexes
+            NavigableSet<Fun.Tuple2<?, T>> indexSet = getIndex(index, descending);
+            if (indexSet != null) {
+                iterator = new org.erachain.datachain.IndexIterator<>(this.indexes.get(index));
+            } else {
+                if (descending) {
+                    iterator = new IteratorCloseableImpl(((NavigableMap<T, U>) this.map).descendingKeySet().iterator());
+                } else {
+                    iterator = new IteratorCloseableImpl(this.map.keySet().iterator());
+                }
+            }
+        } else {
+            if (descending) {
+                iterator = new IteratorCloseableImpl(((NavigableMap<T, U>) this.map).descendingKeySet().iterator());
+            } else {
+                iterator = new IteratorCloseableImpl(this.map.keySet().iterator());
+            }
+        }
+
+        IteratorCloseable iteratorMerged = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted), iterator), Fun.COMPARATOR);
+
+        this.outUses();
+        return iteratorMerged;
+    }
+
+    @Override
     public boolean writeToParent() {
 
         boolean updated = false;
+
+        // сперва нужно удалить старые значения
+        // см issues/1276
+        if (deleted != null) {
+            Iterator<T> iteratorDeleted = this.deleted.keySet().iterator();
+            while (iteratorDeleted.hasNext()) {
+                parent.delete(iteratorDeleted.next());
+                updated = true;
+            }
+            deleted = null;
+        }
+
+        // теперь внести новые
 
         Iterator<T> iterator = this.map.keySet().iterator();
         while (iterator.hasNext()) {
@@ -271,16 +344,15 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             updated = true;
         }
 
-        if (deleted != null) {
-            iterator = this.deleted.keySet().iterator();
-            while (iterator.hasNext()) {
-                parent.delete(iterator.next());
-                updated = true;
-            }
-        }
-
         return updated;
 
+    }
+
+    @Override
+    public void close() {
+        parent = null;
+        deleted = null;
+        super.close();
     }
 
     @Override

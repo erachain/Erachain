@@ -5,14 +5,13 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.core.transaction.RHashes;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 
 import javax.swing.*;
@@ -31,6 +30,8 @@ import java.util.List;
 //import java.awt.GridBagConstraints;
 
 public class IssueLinkedHashPanel extends SplitPanel {
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssueLinkedHashPanel.png";
+
     TableModelIssueHashes table_Model;
     IssueHashImprint issue_Hash_Imprint;
     private JTable Table_Hash;
@@ -195,15 +196,6 @@ public class IssueLinkedHashPanel extends SplitPanel {
 
         List<String> hashes = this.table_Model.getValues(0);
 
-        List<String> twins = RHashes.findTwins(DCSet.getInstance(), hashes);
-        if (!twins.isEmpty()) {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate("Twin hashes") + ": " + twins.toString(),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            issue_Hash_Imprint.jButton.setEnabled(true);
-            return;
-        }
-
         // CREATE IMPRINT
         PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
         if (creator == null) {
@@ -342,6 +334,16 @@ public class IssueLinkedHashPanel extends SplitPanel {
             table_Model.addRow(new Object[]{"", ""});
             table_Model.fireTableDataChanged();
             Table_Hash.setRowSelectionInterval(table_Model.getRowCount() - 1, table_Model.getRowCount() - 1);
+        }
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
         }
     }
 }

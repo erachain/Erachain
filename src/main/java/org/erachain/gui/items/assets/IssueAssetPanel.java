@@ -17,6 +17,7 @@ import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,8 +28,9 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 /**
  * @author Саша
  */
-public class IssueAssetPanel extends JPanel {
+public class IssueAssetPanel extends JPanel  {
 
+    private static String iconFile = Settings.getInstance().getPatnIcons()+ "IssueAssetPanel.png";
     private JLabel titleJLabel = new JLabel();
     private JLabel accountJLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
     private JLabel descriptionJLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
@@ -319,7 +321,7 @@ public class IssueAssetPanel extends JPanel {
                     + Lang.getInstance().translate("Issue Asset") + "<br><br><br>"
                     + Lang.getInstance().translate("Creator") + ":&nbsp;" + issueAssetTransaction.getCreator() + "<br>"
                     + "[" + asset.getKey() + "]" + Lang.getInstance().translate("Name") + ":&nbsp;" + asset.viewName() + "<br>"
-                    + Lang.getInstance().translate("Quantity") + ":&nbsp;" + asset.getQuantity().toString() + "<br>"
+                    + Lang.getInstance().translate("Quantity") + ":&nbsp;" + asset.getQuantity() + "<br>"
                     + Lang.getInstance().translate("Asset Type") + ":&nbsp;"
                     + Lang.getInstance().translate(asset.viewAssetTypeFull() + "") + "<br>"
                     + Lang.getInstance().translate("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
@@ -432,5 +434,14 @@ public class IssueAssetPanel extends JPanel {
         issueJButton.setEnabled(true);
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 
 }

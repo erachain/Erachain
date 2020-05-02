@@ -177,23 +177,23 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                 new Function2<String[], Long, Transaction>() {
                     @Override
                     public String[] run(Long key, Transaction transaction) {
-                        String title = transaction.getTitle();
-                        if (title == null || title.isEmpty() || title.equals("")) {
-                            // нужно возвращать не null что бы сработал Компаратор нормально
-                            return new String[0];
-                        }
+                        String[] tokens = transaction.getTags();
+                        if (tokens == null || tokens.length == 0)
+                            return null;
 
-                        // see https://regexr.com/
-                        String[] tokens = title.toLowerCase().split(DCSet.SPLIT_CHARS);
                         String[] keys = new String[tokens.length];
-                        for (int i = 0; i < tokens.length; ++i) {
-                            if (tokens[i].length() > CUT_NAME_INDEX) {
-                                tokens[i] = tokens[i].substring(0, CUT_NAME_INDEX);
+                        int count = 0;
+                        for (String token : tokens) {
+                            if (token.length() > CUT_NAME_INDEX) {
+                                keys[count++] = token.substring(0, CUT_NAME_INDEX);
+                            } else if (token.length() > 0) {
+                                keys[count++] = token;
                             }
-                            keys[i] = tokens[i];
                         }
 
-                        return keys;
+                        String[] keys2 = new String[count];
+                        System.arraycopy(keys, 0, keys2, 0, keys2.length);
+                        return keys2;
                     }
                 });
 

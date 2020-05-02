@@ -21,6 +21,7 @@ import java.net.URL;
 
 public class PersonsMySplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "PersonsMySplitPanel.png";
 
     public PersonsMySplitPanel() {
         super(new WalletItemPersonsTableModel(), "PersonsMySplitPanel");
@@ -80,8 +81,8 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?person=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
@@ -99,4 +100,14 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
         return new PersonInfo002((PersonCls) item, true);
     }
 
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

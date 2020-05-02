@@ -34,6 +34,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
     private TableModelMails incoming_Mails_Model;
     private MTable inciming_Mail_Table;
     private TableRowSorter my_Sorter;
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "IncomingMailsSplitPanel.png";
 
     public IncomingMailsSplitPanel() {
         super("IncomingMailsSplitPanel");
@@ -95,7 +96,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
                 row = inciming_Mail_Table.convertRowIndexToModel(row);
                 Account account = incoming_Mails_Model.getTransaction(row).getCreator();
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, account, null), MailSendPanel.getIcon());
 
             }
         });
@@ -134,8 +135,8 @@ public class IncomingMailsSplitPanel extends SplitPanel {
                 }
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?tx=" + transaction.viewHeightSeq()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
@@ -247,5 +248,14 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         }
     }
 
+    public static  Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 
 }

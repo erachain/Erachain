@@ -1,6 +1,6 @@
 function polls(data){
 
-    var output = '';
+    var output = lastBlock(data.lastBlock);
 
     if(data.hasOwnProperty('error'))
     {
@@ -53,9 +53,12 @@ function polls(data){
 
 function poll(data) {
 
-    var output = "";
+    var output = lastBlock(data.lastBlock);
 
-    output += lastBlock(data.lastBlock);
+    if (!data.hasOwnProperty('poll')) {
+        output += '<h2>Not found</h2>';
+        return output;
+    }
 
     if (data.hasOwnProperty('error')) {
         output += '<br><h5>' + data.error + '</h5>';
@@ -65,7 +68,7 @@ function poll(data) {
 
     output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
     output += '<tr><td align=left>';
-    output += '<table><tr>';
+    output += '<table><tr style="vertical-align:top">';
 
     if (data.poll.image.length > 0) {
         output += '<td><img src="data:image/gif;base64,' + data.poll.image + '" width = "350" /></td><td style ="padding-left:20px">';
@@ -87,7 +90,8 @@ function poll(data) {
     output += ' [ <input id="key1" name="poll" size="4" type="text" value="' + data.poll.key + '" class="" style="font-size: 1em;"'
                    + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
 
-    output += data.poll.Label_seqNo + ': ' +'<a href=?tx=' + data.poll.seqNo + get_lang() + '><b>' + data.poll.seqNo + '</b></a><br>';
+    output += '<a href=?tx=' + data.poll.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.poll.seqNo + '</b></a>';
+    output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a></h4>';
 
     output += '<h4 style="display:inline;"><b>' + data.label_Asset + ':</b>';
     output += ' [ <input id="key2" name="asset" size="4" type="text" value="' + data.assetKey + '" class="" style="font-size: 1em;"'

@@ -190,7 +190,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_lblAnExplanatoryText_3.gridy = 7;
         add(lblKeyCachingExplanatoryText, gbc_lblAnExplanatoryText_3);
 
-        JLabel lblDataDir = new JLabel(Lang.getInstance().translate("Data dir") + ":");
+        JLabel lblDataDir = new JLabel(Lang.getInstance().translate("DataChain dir") + ":");
         GridBagConstraints gbc_lblDataDir = new GridBagConstraints();
         gbc_lblDataDir.anchor = GridBagConstraints.WEST;
         gbc_lblDataDir.insets = new Insets(0, 0, 5, 5);
@@ -199,7 +199,7 @@ public class SettingsBasicPanel extends JPanel {
         add(lblDataDir, gbc_lblDataDir);
 
         textDataFolder = new JTextField();
-        textDataFolder.setText(Settings.getInstance().getDataDir());
+        textDataFolder.setText(Settings.getInstance().getDataChainPath());
         textDataFolder.setHorizontalAlignment(SwingConstants.LEFT);
         textDataFolder.setColumns(10);
         textDataFolder.setEditable(false);
@@ -222,15 +222,33 @@ public class SettingsBasicPanel extends JPanel {
                 FileChooser fileopen = new FileChooser();
                 fileopen.setFileSelectionMode(FileChooser.DIRECTORIES_ONLY);
                 fileopen.setCurrentDirectory(new File(textDataFolder.getText()));
-                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set data dir"));
+                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set datachain dir"));
                 if (ret == FileChooser.APPROVE_OPTION) {
                     textDataFolder.setText(fileopen.getSelectedFile().toString());
                 }
             }
         });
         add(btnBrowseDataFolder, gbc_btnBrowseDataFolder);
+        // AS
+        JButton resetDataDirButton = new JButton(Lang.getInstance().translate("Reset"));
+        GridBagConstraints gbc_resetDataDirButton = new GridBagConstraints();
+        gbc_resetDataDirButton.anchor = GridBagConstraints.WEST;
+        gbc_resetDataDirButton.insets = new Insets(0, 0, 5, 5);
+        gbc_resetDataDirButton.gridx = 5;
+        gbc_resetDataDirButton.gridy = 8;
+        resetDataDirButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                textDataFolder.setText(Settings.DEFAULT_DATA_CHAIN_DIR);
+            }
+        });
+        add(resetDataDirButton, gbc_resetDataDirButton);
 
-        JLabel lblWelletDir = new JLabel(Lang.getInstance().translate("Wallet dir") + ":");
+        //AS
+
+
+
+
+        JLabel lblWelletDir = new JLabel(Lang.getInstance().translate("WalletKeys dir") + ":");
         GridBagConstraints gbc_lblWelletDir = new GridBagConstraints();
         gbc_lblWelletDir.anchor = GridBagConstraints.WEST;
         gbc_lblWelletDir.insets = new Insets(0, 0, 5, 5);
@@ -239,7 +257,7 @@ public class SettingsBasicPanel extends JPanel {
         add(lblWelletDir, gbc_lblWelletDir);
 
         textWallet = new JTextField();
-        textWallet.setText(Settings.getInstance().getWalletDir());
+        textWallet.setText(Settings.getInstance().getWalletKeysPath());
         textWallet.setHorizontalAlignment(SwingConstants.LEFT);
         textWallet.setColumns(10);
         textWallet.setEditable(false);
@@ -263,7 +281,7 @@ public class SettingsBasicPanel extends JPanel {
                 JFileChooser fileopen = new JFileChooser();
                 fileopen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 fileopen.setCurrentDirectory(new File(textWallet.getText()));
-                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set wallet dir"));
+                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set walletKeys dir"));
                 if (ret == JFileChooser.APPROVE_OPTION) {
                     textWallet.setText(fileopen.getSelectedFile().toString());
                 }
@@ -271,6 +289,23 @@ public class SettingsBasicPanel extends JPanel {
         });
 
         add(btnBrowseWallet, gbc_BrowseWalletbutton);
+
+        // AS
+        JButton resetWaletDirButton = new JButton(Lang.getInstance().translate("Reset"));
+        GridBagConstraints gbc_resetWaletDirButton = new GridBagConstraints();
+        gbc_resetWaletDirButton.anchor = GridBagConstraints.WEST;
+        gbc_resetWaletDirButton.insets = new Insets(0, 0, 5, 5);
+        gbc_resetWaletDirButton.gridx = 5;
+        gbc_resetWaletDirButton.gridy = 9;
+        resetWaletDirButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                textWallet.setText(Settings.DEFAULT_WALLET_KEYS_DIR);
+            }
+        });
+        add(resetWaletDirButton, gbc_resetWaletDirButton);
+
+        //AS
+
 
         JLabel lblAnExplanatoryText_4 = new JLabel(Lang.getInstance().translate("The data folder contains blockchain data. The wallet dir contains user specific data."));
         lblAnExplanatoryText_4.setVerticalAlignment(SwingConstants.TOP);

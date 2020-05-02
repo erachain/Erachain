@@ -41,7 +41,7 @@ public class DGSet extends DBASet {
                 ///.cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(1000)
+                .cacheSize(1 << 10)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported()
@@ -86,6 +86,19 @@ public class DGSet extends DBASet {
     public void delete(PublicKeyAccount account) {
         this.uses++;
         this.telegramsMap.deleteFromAccount(account);
+        this.uses--;
+
+    }
+
+    @Override
+    public void close() {
+
+        if (this.database == null || this.database.isClosed())
+            return;
+
+        this.uses++;
+        this.database.close();
+        this.tables = null;
         this.uses--;
 
     }

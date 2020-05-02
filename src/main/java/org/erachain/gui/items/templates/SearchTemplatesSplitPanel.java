@@ -21,7 +21,7 @@ import java.net.URL;
 public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
     private static TemplatesItemsTableModel tableModelTemplates = new TemplatesItemsTableModel();
     private SearchTemplatesSplitPanel th;
-
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchTemplatesSplitPanel.png";
 
     public SearchTemplatesSplitPanel() {
         super(tableModelTemplates, "SearchTemplatesSplitPanel", "SearchTemplatesSplitPanel");
@@ -52,8 +52,8 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?template=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
@@ -72,5 +72,13 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
 
     }
 
-
+    public static  Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

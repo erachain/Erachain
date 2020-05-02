@@ -212,7 +212,7 @@ public class PollsDialog extends JDialog {
         });
         this.add(voteButton, detailGBC);
 
-        setPreferredSize(new java.awt.Dimension(800, 650));
+        setPreferredSize(new java.awt.Dimension(800, 600));
         setMinimumSize(new java.awt.Dimension(650, 23));
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setModal(true);

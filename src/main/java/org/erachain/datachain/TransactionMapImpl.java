@@ -7,6 +7,7 @@ import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.TransactionsPool;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.*;
@@ -43,8 +44,9 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  */
 @Slf4j
 public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
-        implements TransactionMap
-{
+        implements TransactionMap {
+
+    TransactionsPool pool;
 
     //public int TIMESTAMP_INDEX = 1;
 
@@ -86,8 +88,8 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
             switch (dbsUsed) {
                 //case DBS_MAP_DB:
                 case DBS_MAP_DB_IN_MEM:
-                    map = new TransactionSuitMapDBFork((TransactionMap) parent, databaseSet);
-                    break;
+                    //map = new TransactionSuitMapDBFork((TransactionMap) parent, databaseSet);
+                    //break;
                 case DBS_ROCK_DB:
                     //map = new TransactionSuitRocksDBFork((TransactionMap) parent, ((TransactionSuitRocksDB) parent).map, databaseSet);
                     //break;
@@ -98,12 +100,22 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         }
     }
 
-    public void setTotalDeleted(int value) { totalDeleted = value; }
-    public int getTotalDeleted() { return totalDeleted; }
+    public void setPool(TransactionsPool pool) {
+        this.pool = pool;
+    }
+
+    public int getTotalDeleted() {
+        return totalDeleted;
+    }
+
+    public void setTotalDeleted(int value) {
+        totalDeleted = value;
+    }
 
     //private static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
 
     private boolean clearProcessed = false;
+
     private synchronized boolean isClearProcessedAndSet() {
 
         if (clearProcessed)
@@ -174,13 +186,15 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                                 || size - deletions >
                                 (cutMaximum ? BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 3
                                         : BlockChain.MAX_UNCONFIGMED_MAP_SIZE)) {
-                            this.delete(key);
+                            // обязательно прямая чиста из таблицы иначе опять сюда в очередь прилетит и не сработает
+                            this.deleteDirect(key);
                             deletions++;
                         } else {
                             break;
                         }
                     }
                 } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
                 }
 
                 long ticker = System.currentTimeMillis() - realTime;
@@ -226,6 +240,21 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         this.put(Longs.fromByteArray(transaction.getSignature()), transaction);
     }
 
+    /**
+     * Нужно вносить через очередь так как там может быть очистка таблицы с закрыванием запущена, см issue #1246
+     * Так же чтобы при закрытии в dbs.mapDB.DBMapSuitFork.writeToParent(DBMapSuitFork.java:371) не вылетала ошибка что таблица закрыта
+     *
+     * @param key
+     * @param transaction
+     */
+    @Override
+    public void put(Long key, Transaction transaction) {
+        if (pool == null)
+            return;
+
+        pool.offerMessage(transaction);
+    }
+
     @Override
     public void delete(Transaction transaction) {
         this.delete(Longs.fromByteArray(transaction.getSignature()));
@@ -236,38 +265,64 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         this.delete(Longs.fromByteArray(signature));
     }
 
+    public void deleteDirect(byte[] signature) {
+        super.delete(Longs.fromByteArray(signature));
+    }
+
+    public void putDirect(Transaction transaction) {
+        super.put(Longs.fromByteArray(transaction.getSignature()), transaction);
+    }
+
+    public void deleteDirect(Long key) {
+        super.delete(key);
+    }
+
 
     /**
-     * synchronized - потому что почемуто вызывало ошибку в unconfirmedMap.delete(transactionSignature) в процессе блока.
-     * Head Zero - data corrupted
+     * Нужно удалять через очередь так как там может быть очистка таблицы с закрыванием запущена, см issue #1246
+     * Так же чтобы при закрытии в dbs.mapDB.DBMapSuitFork.writeToParent(DBMapSuitFork.java:371) не вылетала ошибка что таблица закрыта
+     * <hr>
+     * ////// synchronized - потому что почемуто вызывало ошибку в unconfirmedMap.delete(transactionSignature) в процессе блока.
+     * ////// Head Zero - data corrupted
+     *
      * @param key
      * @return
      */
     @Override
     public Transaction remove(Long key) {
+        if (pool == null)
+            return null;
+
         try {
-            Transaction transaction = super.remove(key);
-            if (transaction != null) {
-                // DELETE only if DELETED
+
+            Transaction transactionOld = null;
+            if (contains(key)) {
                 totalDeleted++;
+                transactionOld = get(key);
             }
+            pool.offerMessage(key);
 
-            return transaction;
+            return transactionOld;
         } catch (Exception e) {
-
         }
 
         return null;
 
     }
 
+    /**
+     * Нужно удалять через очередь так как там может быть очистка таблицы с закрыванием запущена, см issue #1246
+     * Так же чтобы при закрытии в dbs.mapDB.DBMapSuitFork.writeToParent(DBMapSuitFork.java:371) не вылетала ошибка что таблица закрыта
+     *
+     * @param key
+     */
+    @Override
     public void delete(Long key) {
-        try {
-            super.delete(key);
-            totalDeleted++;
-        } catch (Exception e) {
+        if (pool == null)
+            return;
 
-        }
+        pool.offerMessage(key);
+        totalDeleted++;
     }
 
     public boolean contains(Long key) {
@@ -519,6 +574,43 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                 transaction = this.get(iterator.next());
                 transaction.setDC((DCSet) databaseSet);
                 values.add(transaction);
+            }
+        } catch (IOException e) {
+        }
+
+        return values;
+    }
+
+    /**
+     * @param address    may be Null for ALL
+     * @param type
+     * @param timestamp
+     * @param count
+     * @param descending
+     * @return
+     */
+    public List<Transaction> getTransactions(String address, int type, long timestamp, int count, boolean descending) {
+
+        ArrayList<Transaction> values = new ArrayList<>();
+        try (IteratorCloseable<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
+            Account account = address == null ? null : new Account(address);
+
+            int i = 0;
+            Transaction transaction;
+            while (iterator.hasNext()) {
+                transaction = map.get(iterator.next());
+                if (type != 0 && type != transaction.getType()
+                        || transaction.getTimestamp() < timestamp)
+                    continue;
+
+                transaction.setDC((DCSet) databaseSet);
+
+                if ((account == null || transaction.isInvolved(account))) {
+                    values.add(transaction);
+                    i++;
+                    if (count > 0 && i > count)
+                        break;
+                }
             }
         } catch (IOException e) {
         }

@@ -93,7 +93,7 @@ public class TestChain {
         Tuple3<Integer, Integer, Integer> forging = creator.getForgingData(dcSet, height);
         Tuple3<Integer, Integer, Integer> lastForging = creator.getLastForgingData(dcSet);
 
-        DCSet fork = dcSet.fork();
+        DCSet fork = dcSet.fork(this.toString());
 
         try {
             block.orphan(fork);

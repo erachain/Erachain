@@ -1,6 +1,7 @@
 package org.erachain.network;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.database.PeerMap;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
@@ -51,12 +52,12 @@ public class ConnectionAcceptor extends MonitoredThread {
 
                 if (socket == null) {
                     //START LISTENING
-                    socket = new ServerSocket(Controller.getInstance().getNetworkPort());
+                    socket = new ServerSocket(BlockChain.NETWORK_PORT);
                 }
 
                 //REOPEN SOCKET
                 if (socket.isClosed()) {
-                    socket = new ServerSocket(Controller.getInstance().getNetworkPort());
+                    socket = new ServerSocket(BlockChain.NETWORK_PORT);
                 }
 
                 //ACCEPT CONNECTION
@@ -76,7 +77,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                 }
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(90);
+                Controller.getInstance().stopAll(222);
                 break;
             } catch (java.net.SocketException e) {
 
@@ -110,6 +111,7 @@ public class ConnectionAcceptor extends MonitoredThread {
 
             // проверим - может уже есть такое соединение в котром мы мнмцматор
             Peer peer = this.network.getKnownWhitePeer(connectionSocket.getInetAddress().getAddress());
+
             if (peer != null && (peer.isOnUsed() || peer.isUsed())) {
                 try {
                     // сообщим об закрытии на тот конец
@@ -159,7 +161,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                 }
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(89);
+                Controller.getInstance().stopAll(225);
                 break;
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);

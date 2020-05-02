@@ -2,6 +2,7 @@ package org.erachain.core.item.persons;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
@@ -18,6 +19,7 @@ import org.json.simple.JSONObject;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.Set;
 
 //import java.math.BigDecimal;
@@ -27,6 +29,8 @@ import java.util.Set;
 
 //birthLatitude -90..90; birthLongitude -180..180
 public abstract class PersonCls extends ItemCls {
+
+    public static final long START_KEY = 0L;
 
     public static int MAX_IMAGE_LENGTH = 28000;
     public static int MIN_IMAGE_LENGTH = 10240;
@@ -109,6 +113,16 @@ public abstract class PersonCls extends ItemCls {
         return ItemCls.PERSON_TYPE;
     }
 
+    @Override
+    public long getStartKey() {
+        long startKey = BlockChain.startKeys[ItemCls.PERSON_TYPE];
+
+        if (BlockChain.MAIN_MODE || startKey > 0 && startKey < START_KEY)
+            return START_KEY;
+
+        return startKey;
+    }
+
     public String getItemTypeName() {
         return "person";
     }
@@ -183,11 +197,16 @@ public abstract class PersonCls extends ItemCls {
             return true;
 
         if (onThisTime > 0l
-            && this.deathday > onThisTime)
+                && this.deathday > onThisTime)
             return true;
 
         return false;
 
+    }
+
+    @Override
+    public HashMap getNovaItems() {
+        return BlockChain.NOVA_PERSONS;
     }
 
     public Set<String> getPubKeys(DCSet dcSet) {

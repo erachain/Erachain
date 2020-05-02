@@ -5,6 +5,7 @@ import org.erachain.gui.items.accounts.AccountsPanel;
 import org.erachain.gui.items.accounts.AccountsRightPanel;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -15,6 +16,7 @@ import java.io.File;
 
 public class WalletsManagerSplitPanel extends SplitPanel {
 
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "WalletsManagerSplitPanel.png";
     public AccountsPanel accountPanel;
     public AccountsRightPanel rightPanel;
     private int spt = 1;
@@ -76,5 +78,14 @@ public class WalletsManagerSplitPanel extends SplitPanel {
 
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 
 }

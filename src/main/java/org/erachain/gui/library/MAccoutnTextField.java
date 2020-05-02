@@ -4,7 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.GenesisBlock;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui2.MainPanel;
@@ -85,8 +84,8 @@ public class MAccoutnTextField extends JTextField {
         JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_Crator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
-                        null, account, null, null));
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
+                        null, account, null, null), AccountAssetSendPanel.getIcon());
 
             }
         });
@@ -96,7 +95,7 @@ public class MAccoutnTextField extends JTextField {
         Send_Mail_Creator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, account, null));
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, account, null), MailSendPanel.getIcon());
             }
         });
         creator_Meny.add(Send_Mail_Creator);

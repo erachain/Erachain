@@ -95,7 +95,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
                 add_day, timestamp, reference);
         this.signature = signature;
         this.sertifiedSignatures = sertifiedSignatures;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
 
@@ -132,9 +132,16 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
     //GETTERS/SETTERS
 
+    public void setDC(DCSet dcSet) {
+        super.setDC(dcSet);
+
+        if (dcSet != null) {
+            this.person = (PersonCls) this.dcSet.getItemPersonMap().get(this.key);
+        }
+    }
+
     @Override
-    public ItemCls getItem()
-    {
+    public ItemCls getItem() {
         if (person == null) {
             person = (PersonCls) dcSet.getItemPersonMap().get(key);
         }
@@ -334,10 +341,14 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         data = this.toBytes(FOR_NETWORK, false);
         if (data == null) return;
 
-        // all test a not valid for main test
-        // all other network must be invalid here!
-        int port = Controller.getInstance().getNetworkPort();
-        data = Bytes.concat(data, Ints.toByteArray(port));
+        if (BlockChain.SIDE_MODE) {
+            // чтобы из других цепочек не срабатывало
+            data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
+        } else {
+            // чтобы из TestNEt не сработало
+            int port = BlockChain.NETWORK_PORT;
+            data = Bytes.concat(data, Ints.toByteArray(port));
+        }
 
         if (this.sertifiedSignatures == null) this.sertifiedSignatures = new ArrayList<byte[]>();
 
@@ -436,10 +447,14 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         byte[] data = this.toBytes(Transaction.FOR_NETWORK, false);
         if (data == null) return false;
 
-        // all test a not valid for main test
-        // all other network must be invalid here!
-        int port = Controller.getInstance().getNetworkPort();
-        data = Bytes.concat(data, Ints.toByteArray(port));
+        if (BlockChain.SIDE_MODE) {
+            // чтобы из других цепочек не срабатывало
+            data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
+        } else {
+            // чтобы из TestNEt не сработало
+            int port = BlockChain.NETWORK_PORT;
+            data = Bytes.concat(data, Ints.toByteArray(port));
+        }
 
         Crypto crypto = Crypto.getInstance();
         if (!crypto.verify(creator.getPublicKey(), signature, data))
@@ -466,12 +481,11 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         if (result != VALIDATE_OK)
             return result;
 
+        ///// CREATOR
         if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
-                && !this.creator.isPerson(dcSet, height)) {
+                && !this.creator.isPerson(dcSet, height, creatorPersonDuration)) {
             boolean creator_admin = false;
-            long personsCount = dcSet.getItemPersonMap().getLastKey();
-            if (personsCount < 20) {
-                // FIRST Persons only by ME
+            if (height < 20000) {
                 // FIRST Persons only by ADMINS
                 for (String admin : BlockChain.GENESIS_ADMINS) {
                     if (this.creator.equals(admin)) {
@@ -485,20 +499,28 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
                 return CREATOR_NOT_PERSONALIZED;
         }
 
-        // MY SELF PERSON INFO
-        Fun.Tuple2<Integer, PersonCls> creatorPersonInfo = this.creator.getPerson(dcSet, height);
+        //////// PERSON
+        if (!dcSet.getItemPersonMap().contains(this.key)) {
+            return Transaction.ITEM_PERSON_NOT_EXIST;
+        }
 
+        if (!person.isAlive(this.timestamp))
+            return Transaction.ITEM_PERSON_IS_DEAD;
+
+        ///////// PUBLIC KEYS
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
             //CHECK IF PERSON PUBLIC KEY IS VALID
             if (!publicAccount.isValid()) {
                 return INVALID_PUBLIC_KEY;
             }
-            Fun.Tuple2<Integer, PersonCls> sertifyInfo = publicAccount.getPerson(dcSet, height);
-            if (sertifyInfo != null) {
+
+            Tuple4<Long, Integer, Integer, Integer> personDuration = publicAccount.getPersonDuration(dcSet);
+
+            if (personDuration != null) {
                 // если этот ключ уже удостоврен то его изменять может только сам владелец
                 // снять удостоврение ключа может только сам владелец
                 // или продлить только сам владелец может
-                if (creatorPersonInfo.b.getKey() != this.key) {
+                if (!personDuration.a.equals(this.key)) {
                     return NOT_SELF_PERSONALIZY;
                 }
             } else {
@@ -508,13 +530,6 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
                 }
             }
         }
-
-        if (!dcSet.getItemPersonMap().contains(this.key)) {
-            return Transaction.ITEM_PERSON_NOT_EXIST;
-        }
-
-        if (creatorPersonInfo != null && !creatorPersonInfo.b.isAlive(this.timestamp))
-            return Transaction.ITEM_PERSON_IS_DEAD;
 
         if (height > BlockChain.START_ISSUE_RIGHTS) {
             Fun.Tuple4<Long, Integer, Integer, Integer> creatorPerson = creator.getPersonDuration(dcSet);
@@ -536,6 +551,21 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         }
 
         return Transaction.VALIDATE_OK;
+    }
+
+    @Override
+    public void makeItemsKeys() {
+        if (creatorPersonDuration == null) {
+            // Creator is ADMIN
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, key}
+            };
+        } else {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, key},
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a}
+            };
+        }
     }
 
     //PROCESS/ORPHAN
@@ -586,14 +616,14 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             Account issuer = transPersonIssue.getCreator();
 
             // EMITTE LIA
-            issuer.changeBalance(this.dcSet, false, AssetCls.LIA_KEY, BigDecimal.ONE, false, false);
+            issuer.changeBalance(this.dcSet, false, false, AssetCls.LIA_KEY, BigDecimal.ONE, false, false);
             // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
+            GenesisBlock.CREATOR.changeBalance(dcSet, true, false, AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
 
             // EMITTE LIA
-            this.creator.changeBalance(this.dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false, false);
+            this.creator.changeBalance(this.dcSet, false, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false, false);
             // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
+            GenesisBlock.CREATOR.changeBalance(dcSet, true, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
 
 
             boolean makeCalculates = false;
@@ -603,7 +633,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
             // GIVE GIFT for this PUB_KEY - to PERSON
             BigDecimal personBonus = BlockChain.BONUS_FOR_PERSON(height);
-            pkAccount.changeBalance(dcSet, false, FEE_KEY, personBonus, false, true);
+            pkAccount.changeBalance(dcSet, false, false, FEE_KEY, personBonus, false, true);
             pkAccount.changeCOMPUBonusBalances(dcSet, false, personBonus, Transaction.BALANCE_SIDE_DEBIT);
             if (makeCalculates) {
                 block.txCalculated.add(new RCalculated(pkAccount, FEE_KEY, personBonus,
@@ -612,7 +642,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             BigDecimal issued_FEE_BD_total = personBonus;
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
-            issuer.changeBalance(dcSet, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
+            issuer.changeBalance(dcSet, false, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
                     false, true);
             issuer.changeCOMPUBonusBalances(dcSet, false, issued_FEE_BD, Transaction.BALANCE_SIDE_DEBIT);
             if (makeCalculates) {
@@ -622,7 +652,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 
             // TO EMITTE FEE (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, true, FEE_KEY, issued_FEE_BD_total, true, false);
+            GenesisBlock.CREATOR.changeBalance(dcSet, true, false, FEE_KEY, issued_FEE_BD_total, true, false);
 
         }
 
@@ -714,31 +744,31 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             Account issuer = transPersonIssue.getCreator();
 
             // EMITTE LIA
-            issuer.changeBalance(this.dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, false, false);
+            issuer.changeBalance(this.dcSet, true, false, AssetCls.LIA_KEY, BigDecimal.ONE, false, false);
             // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, false, AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
+            GenesisBlock.CREATOR.changeBalance(dcSet, false, false, AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
 
             // EMITTE LIA
-            this.creator.changeBalance(this.dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, false, false);
+            this.creator.changeBalance(this.dcSet, true, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false, false);
             // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
+            GenesisBlock.CREATOR.changeBalance(dcSet, false, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
 
             // BONUSES
 
             // GIVE GIFT for this PUB_KEY - to PERSON
             BigDecimal personBonus = BlockChain.BONUS_FOR_PERSON(height);
-            pkAccount.changeBalance(dcSet, true, FEE_KEY, personBonus, false, true);
+            pkAccount.changeBalance(dcSet, true, false, FEE_KEY, personBonus, false, true);
             pkAccount.changeCOMPUBonusBalances(dcSet, true, personBonus, Transaction.BALANCE_SIDE_DEBIT);
             BigDecimal issued_FEE_BD_total = personBonus;
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
-            issuer.changeBalance(dcSet, true, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRAR_4_11,
+            issuer.changeBalance(dcSet, true, false, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRAR_4_11,
                     false, true);
             issuer.changeCOMPUBonusBalances(dcSet, true, issued_FEE_BD, Transaction.BALANCE_SIDE_DEBIT);
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 
             // ADD to EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, false, FEE_KEY, issued_FEE_BD_total, true, false);
+            GenesisBlock.CREATOR.changeBalance(dcSet, false, false, FEE_KEY, issued_FEE_BD_total, true, false);
 
         }
 

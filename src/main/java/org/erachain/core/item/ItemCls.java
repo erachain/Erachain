@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 //import java.math.BigDecimal;
 //import com.google.common.primitives.Longs;
@@ -37,6 +38,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
     public static final int UNION_TYPE = 6;
     public static final int STATEMENT_TYPE = 7;
     public static final int POLL_TYPE = 8;
+
     public static final int MAX_ICON_LENGTH = 11000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
     public static final int MAX_IMAGE_LENGTH = 1100000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
     protected static final int TYPE_LENGTH = 2;
@@ -123,6 +125,9 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return db.getItem_Map(type).get(key);
     }
 
+    // RETURN START KEY in not GENESIS
+    public abstract long getStartKey();
+
     public abstract int getMinNameLen();
 
     public abstract int getItemType();
@@ -205,6 +210,12 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return this.key;
     }
 
+    /**
+     * При поиске будет в нижний регистр перевернуто. Поэтому тут нельзя использовать маленькие буквы
+     *
+     * @param itemType
+     * @return
+     */
     public static String getItemTypeChar(int itemType) {
         switch (itemType) {
             case ItemCls.ASSET_TYPE:
@@ -214,19 +225,27 @@ public abstract class ItemCls implements ExplorerJsonLine {
             case ItemCls.PERSON_TYPE:
                 return "P";
             case ItemCls.POLL_TYPE:
-                return "O"; // Opinion
+                return "V"; // Vote
             case ItemCls.UNION_TYPE:
                 return "U";
             case ItemCls.STATEMENT_TYPE:
-                return "T"; // TeXT
+                return "N"; // NOTE
             case ItemCls.STATUS_TYPE:
                 return "S";
             case ItemCls.TEMPLATE_TYPE:
-                return "E"; // exDATA
+                return "T"; // TEMPLATE
             default:
                 return "x";
 
         }
+    }
+
+    public static String getItemTypeChar(int itemType, long itemKey) {
+        return "@" + getItemTypeChar(itemType) + itemKey;
+    }
+
+    public String getItemTypeChar() {
+        return getItemTypeChar(getItemType(), key);
     }
 
     public static String getItemTypeName(int itemType) {
@@ -253,10 +272,30 @@ public abstract class ItemCls implements ExplorerJsonLine {
         }
     }
 
-    public static String getItemTypeChar2(int itemType) {
-        return "@" + getItemTypeChar(itemType);
-    }
+    public static int getItemTypeByName(String itemTypeName) {
+        String type = itemTypeName.toLowerCase();
 
+        if (type.startsWith("asset")) {
+            return ItemCls.ASSET_TYPE;
+        } else if (type.startsWith("imprint")) {
+            return ItemCls.IMPRINT_TYPE;
+        } else if (type.startsWith("person")) {
+            return ItemCls.PERSON_TYPE;
+        } else if (type.startsWith("poll")) {
+            return ItemCls.POLL_TYPE;
+        } else if (type.startsWith("statement")) {
+            return ItemCls.STATEMENT_TYPE;
+        } else if (type.startsWith("status")) {
+            return ItemCls.STATUS_TYPE;
+        } else if (type.startsWith("template")) {
+            return ItemCls.TEMPLATE_TYPE;
+        } else if (type.startsWith("union")) {
+            return ItemCls.UNION_TYPE;
+        }
+
+        return -1;
+
+    }
 
     public long getHeight(DCSet db) {
         //INSERT INTO DATABASE
@@ -276,12 +315,10 @@ public abstract class ItemCls implements ExplorerJsonLine {
             if (this.getDBIssueMap(db).contains(this.reference)) {
                 this.key = this.getDBIssueMap(db).get(this.reference);
             } else if (BlockChain.CHECK_BUGS > 0
-                    && !BlockChain.TEST_MODE
+                    && !BlockChain.SIDE_MODE && !BlockChain.TEST_MODE
                     && Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
-                ///|| Base58.encode(this.reference).equals("4VLYXuFEx9hYVwg82921Nh1N1y2ozCyxpvoTs2kXnQk89HLGshF15FJossTBU6dZhXRDAXKUwysvLUD4TFNJfXhW")) // see issue/1149
 
             ) {
-                // zDLLXWRmL8qhrU9DaxTTG4xrLHgb7xLx5fVrC2NXjRaw2vhzB1PArtgqNe2kxp655saohUcWcsSZ8Bo218ByUzH
                 LOGGER.error("Item [" + this.name + "] not found for REFERENCE: " + Base58.encode(this.reference));
                 if (BlockChain.CHECK_BUGS > 3) {
                     Long error = null;
@@ -309,8 +346,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return this.description;
     }
 
-
-        public byte[] getReference() {
+    public byte[] getReference() {
         return this.reference;
     }
 
@@ -559,13 +595,13 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
         JSONObject json = new JSONObject();
         json.put("key", this.getKey());
-        json.put("name", this.getName());
+        json.put("name", this.viewName());
 
         if (description != null && !description.isEmpty()) {
-            if (description.length() > 100) {
-                json.put("description", description.substring(0, 100));
+            if (viewDescription().length() > 100) {
+                json.put("description", viewDescription().substring(0, 100));
             } else {
-                json.put("description", description);
+                json.put("description", viewDescription());
             }
         } else {
             json.put("description", "");
@@ -584,17 +620,28 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return json;
     }
 
+    public HashMap getNovaItems() {
+        return new HashMap<String, Fun.Tuple3<Long, Long, byte[]>>();
+    }
+
+    public byte[] getNovaItemCreator(Object item) {
+        return ((Fun.Tuple3<Integer, Long, byte[]>) item).c;
+    }
+
+    public Long getNovaItemKey(Object item) {
+        return ((Fun.Tuple3<Long, Long, byte[]>) item).a;
+    }
+
     /**
-     *
      * @param creator
      * @param dcSet
      * @return key если еще не добавлен, -key если добавлен и 0 - если это не НОВА
      */
     public long isNovaAsset(Account creator, DCSet dcSet) {
-        Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
-        if (pair != null && creator.equals(pair.getB())) {
+        Object item = getNovaItems().get(this.name);
+        if (item != null && creator.equals(getNovaItemCreator(item))) {
             ItemMap dbMap = this.getDBMap(dcSet);
-            long key = (long)pair.getA();
+            Long key = (Long) getNovaItemKey(item);
             if (dbMap.contains(key)) {
                 return -key;
             } else {
@@ -602,7 +649,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
             }
         }
 
-        return 0l;
+        return 0L;
     }
 
     //
@@ -647,7 +694,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
             map.decrementDelete(thisKey);
 
             if (BlockChain.CHECK_BUGS > 1
-                    && map.getLastKey() != thisKey - 1) {
+                    && map.getLastKey() != thisKey - 1 && !BlockChain.isNovaAsset(thisKey)) {
                 LOGGER.error("After delete KEY: " + key + " != map.value.key - 1: " + map.getLastKey());
                 Long error = null;
                 error++;

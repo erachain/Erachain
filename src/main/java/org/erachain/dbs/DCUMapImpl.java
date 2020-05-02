@@ -63,13 +63,15 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
-            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+            if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                    + (Controller.MIN_MEMORY_TAIL)) {
                 // у родителя чистим - у себя нет, так как только создали
-                ((DBASet)parent.getDBSet()).clearCache();
+                ((DBASet) parent.getDBSet()).clearCache();
                 System.gc();
-                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1)) {
                     LOGGER.error("Heap Memory Overflow");
-                    Controller.getInstance().stopAll(1191);
+                    Controller.getInstance().stopAll(1192);
                 }
             }
         }
@@ -619,26 +621,25 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
         boolean updated = false;
 
+        // сперва нужно удалить старые значения
+        // см issues/1276
+        if (deleted != null) {
+            Iterator<T> iteratorDeleted = this.deleted.keySet().iterator();
+            while (iteratorDeleted.hasNext()) {
+                T key = iteratorDeleted.next();
+                parent.map.remove(key);
+                updated = true;
+            }
+        }
+
+        // и теперь уже сливаем новые
+
         Iterator<T> iterator = this.map.keySet().iterator();
         while (iterator.hasNext()) {
             T key = iterator.next();
             // напрямую в карту сливаем чтобы логику Таблицы не повторить дважды
             parent.map.put(key, this.map.get(key));
             updated = true;
-        }
-
-        // нужно очистить сразу так как общий размер изменится иначе будет ++ больше
-        // да и уже не нужны эти данные
-        // хотя пока можно это не делать this.map.clear();
-
-        if (deleted != null) {
-            iterator = this.deleted.keySet().iterator();
-            while (iterator.hasNext()) {
-                T key = iterator.next();
-                // напрямую в карту сливаем чтобы логику Таблицы не повторить дважды
-                parent.map.remove(key);
-                updated = true;
-            }
         }
 
         return updated;
@@ -654,7 +655,12 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     public void clearCache() {}
 
     @Override
-    public void close() {}
+    public void close() {
+        map = null;
+        parent = null;
+        deleted = null;
+        super.close();
+    }
 
     @Override
     public boolean isClosed() {

@@ -78,8 +78,8 @@ public class BlockTests {
         gbTransactions = gb.getTransactions();
 
         generator.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000), false, false);
-        generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000), false, false); // need for payments
+        generator.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(1000), false, false);
+        generator.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1000), false, false); // need for payments
     }
 
     private void initTrans(List<Transaction> transactions, long timestamp) {
@@ -520,8 +520,8 @@ public class BlockTests {
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000), NTP.getTime());
         //transaction.process(databaseSet, false);
         generator.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000), false, false);
-        generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000), false, false);
+        generator.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(1000), false, false);
+        generator.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1000), false, false);
 
 
         //GENERATE NEXT BLOCK
@@ -530,7 +530,7 @@ public class BlockTests {
                 1000, 1000l, 1000l);
 
         //FORK
-        DCSet fork = db.fork();
+        DCSet fork = db.fork(this.toString());
 
         //GENERATE PAYMENT 1
         Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
@@ -618,8 +618,8 @@ public class BlockTests {
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000), NTP.getTime());
         //transaction.process(databaseSet, false);
         generator.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100000), false, false);
-        generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000), false, false);
+        generator.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(100000), false, false);
+        generator.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1000), false, false);
 
         //GENERATE NEXT BLOCK
         Block block = blockGenerator.generateNextBlock(generator, gb,
@@ -627,7 +627,7 @@ public class BlockTests {
                 1000, 1000l, 1000l);
 
         //FORK
-        DCSet fork = db.fork();
+        DCSet fork = db.fork(this.toString());
 
         //GENERATE PAYMENT 1
         Account recipient1 = new Account("7JU8UTuREAJG2yht5ASn7o1Ur34P1nvTk5");

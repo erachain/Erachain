@@ -44,7 +44,7 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
     }
 
     public RocksDbDataSourceDBCommitAsBathDelPuts(String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
-        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings,
+        this(Settings.getInstance().getDataChainPath() + ROCKS_DB_FOLDER, name, indexes, settings,
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions(), enableSize);
     }

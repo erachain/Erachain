@@ -7,6 +7,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.statuses.StatusCls;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple5;
 
@@ -29,6 +30,7 @@ public class RSetUnionStatusToItem extends Transaction {
 
     protected Long key; // UNION KEY
     protected Long statusKey; // STATUS KEY
+    protected StatusCls status; // STATUS
     protected int itemType; // ITEM TYPE (CAnnot read ITEMS on start DB - need reset ITEM after
     protected Long itemKey; // ITEM KEY
     protected long beg_date;
@@ -71,7 +73,7 @@ public class RSetUnionStatusToItem extends Transaction {
         this(typeBytes, creator, feePow, key, itemType, itemKey,
                 beg_date, end_date, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as pack
@@ -98,6 +100,18 @@ public class RSetUnionStatusToItem extends Transaction {
     //GETTERS/SETTERS
 
     //public static String getName() { return "Send"; }
+
+    public StatusCls getStatus() {
+        if (statusKey == null) {
+            status = (StatusCls) ItemCls.getItem(dcSet, ItemCls.STATUS_TYPE, this.key);
+        }
+        return status;
+    }
+
+    @Override
+    public String getTitle() {
+        return getStatus().getName();
+    }
 
     // releaserReference = null - not a pack
     // releaserReference = reference for releaser account - it is as pack
@@ -318,7 +332,7 @@ public class RSetUnionStatusToItem extends Transaction {
         }
 
         BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, this.dcSet);
-        if (false && balERA.compareTo(BlockChain.MIN_REGISTRATING_BALANCE_BD) < 0)
+        if (balERA.compareTo(BlockChain.MIN_REGISTRATING_BALANCE_10_BD) < 0)
             return Transaction.NOT_ENOUGH_ERA_USE_10;
 
         return Transaction.VALIDATE_OK;

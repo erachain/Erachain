@@ -13,9 +13,6 @@ public class IssuePollRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_POLL_TRANSACTION;
     private static final String NAME_ID = "Issue Poll";
 
-    // TODO: в старой версии с 1 - 2 первый номер будет - надо скинуть в  0 или 1000000L
-    public static final long START_KEY = 1000L;
-
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, poll, feePow, timestamp, reference);
     }
@@ -27,7 +24,7 @@ public class IssuePollRecord extends IssueItemRecord {
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp,
                            Long reference, byte[] signature, long feeLong) {
         super(typeBytes, NAME_ID, creator, poll, feePow, timestamp, reference, signature);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte[] signature) {
@@ -53,16 +50,6 @@ public class IssuePollRecord extends IssueItemRecord {
     //GETTERS/SETTERS
 
     // RETURN START KEY in tot GEMESIS
-
-    public long getStartKey(int height) {
-
-        if (height < BlockChain.VERS_4_11) {
-            return 0l;
-        }
-
-        return START_KEY;
-
-    }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 

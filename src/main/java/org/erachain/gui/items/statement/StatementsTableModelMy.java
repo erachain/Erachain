@@ -12,8 +12,8 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
@@ -121,8 +121,7 @@ public class StatementsTableModelMy extends AbstractTableModel implements Observ
                     if (record.getData() == null)
                         return "";
                     if (record.getVersion() == 2) {
-                        Tuple3<String, String, JSONObject> a = record.parse_Data_V2_Without_Files();
-
+                        Fun.Tuple4<String, String, JSONObject, HashMap<String, Fun.Tuple3<byte[], Boolean, byte[]>>> a = record.parseDataV2WithoutFiles();
 
                         return a.b;
                     }

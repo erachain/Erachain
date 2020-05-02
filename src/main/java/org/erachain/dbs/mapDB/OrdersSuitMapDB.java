@@ -81,6 +81,9 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
                                 // и потом при поиске по итераторы находятся эти неудалившиеся ключи!
                                 key > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPrice() : order.getPrice(),
                                 //// теперь можно - в Обработке ордера сделал решение этой проблемы value.getPrice(),
+                                // но нужно помнить что сначала полностью удаляем ордер а потом добавляем его вместо простого Обновить
+                                // тоже самое и при сливе из ФОРКнутой базы при просчете валидности и догонянии цепочки - надо учесть
+                                // что сначала из ДЕЛЕТ удалить а потом добавить новое значение
 
                                 order.getId());
                     }
@@ -226,7 +229,7 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
 
     @Override
     public void delete(Long key) {
-        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(key).equals("176395-2")) {
+        if (BlockChain.CHECK_BUGS > 33 && Transaction.viewDBRef(key).equals("176395-2")) {
             boolean debug = true;
         }
         super.delete(key);
@@ -234,7 +237,7 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
 
     @Override
     public Order remove(Long key) {
-        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(key).equals("176395-2")) {
+        if (BlockChain.CHECK_BUGS > 33 && Transaction.viewDBRef(key).equals("176395-2")) {
             boolean debug = true;
         }
         return super.remove(key);

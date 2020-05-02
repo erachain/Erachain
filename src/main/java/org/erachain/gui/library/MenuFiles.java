@@ -3,8 +3,8 @@ package org.erachain.gui.library;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.*;
+import org.erachain.gui.create.LicenseDataJFrame;
 import org.erachain.gui.create.LicenseJFrame;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.settings.SettingsFrame;
@@ -212,9 +212,10 @@ public class MenuFiles extends JMenu {
                     String head = (String) js.get("head");
                     if (!js.containsKey("amount")) return;
                     String amount = (String) js.get("amount");
-                    AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey), TransactionAmount.ACTION_SEND,
+                    AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey),
                             ct.getAccountByAddress(creator), ct.getAccountByAddress(recipient), null, null);
-                    MainPanel.getInstance().insertTab(panel);
+                    MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Read Transaction"),
+                            panel, AccountAssetSendPanel.getIcon());
 
                     AssetCls asset = ct.getAsset(assetKey);
                     panel.jTextField_To.setText(recipient);
@@ -243,8 +244,9 @@ public class MenuFiles extends JMenu {
                 //  new SettingsFrame();
                 // no receive
                 //AccountSendDialog dd = new AccountSendDialog(null, null, null, null, false);
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
-                        null, null, null, null));
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Write Transaction"),
+                        new AccountAssetSendPanel(null,
+                                null, null, null, null), AccountAssetSendPanel.getIcon());
 
 
             }
@@ -295,25 +297,37 @@ public class MenuFiles extends JMenu {
         aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
         aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                    AboutFrame.getInstance().setCursor(new Cursor(Cursor.HAND_CURSOR));
-                    AboutFrame.getInstance().set_console_Text("");
-                    AboutFrame.getInstance().setUserClose(true);
-                    AboutFrame.getInstance().setModal(true);
-                    AboutFrame.getInstance().setVisible(true);
-                }
+                AboutFrame.getInstance().setCursor(new Cursor(Cursor.HAND_CURSOR));
+                AboutFrame.getInstance().set_console_Text("");
+                AboutFrame.getInstance().setUserClose(true);
+                AboutFrame.getInstance().setModal(true);
+                AboutFrame.getInstance().setVisible(true);
+            }
         });
         add(aboutItem);
 
-        //ABOUT
-        JMenuItem licisceItem = new JMenuItem(Lang.getInstance().translate("License"));
-        //    licisceItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
-        //    licisceItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
-        licisceItem.addActionListener(new ActionListener() {
+        // ERACHAIN LICENSE
+        JMenuItem licenseItem = new JMenuItem(Lang.getInstance().translate("License"));
+        //    licenseItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
+        //    licenseItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
+        licenseItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new LicenseJFrame();
             }
         });
-        add(licisceItem);
+        add(licenseItem);
+
+        // SIDECHAIN LICENSE
+        //ABOUT
+        JMenuItem dataLicenseItem = new JMenuItem(Lang.getInstance().translate("Data License of Sidechain"));
+        //    licenseItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
+        //    licenseItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
+        dataLicenseItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new LicenseDataJFrame();
+            }
+        });
+        add(dataLicenseItem);
 
 
         //SEPARATOR

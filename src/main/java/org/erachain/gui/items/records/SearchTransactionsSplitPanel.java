@@ -6,9 +6,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.library.Library;
-import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.VouchLibraryPanel;
+import org.erachain.gui.library.*;
 import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -35,8 +33,10 @@ import java.util.List;
  */
 public class SearchTransactionsSplitPanel extends SplitPanel {
 
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchTransactionsSplitPanel.png";
     public JPanel info_Panel;
     public VouchLibraryPanel voush_Library_Panel;
+    MButton makeHashButton;
     SearchTransactionsTableModel transactionsTableModel;
     JScrollPane jScrollPane4;
     private JTextField searchString;
@@ -49,15 +49,15 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         this.setName(Lang.getInstance().translate("Search Records"));
 
-        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ":");
-        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Set account, signature or title") + ":"));
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Height or seqNo") + ": ");
+        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Search") + ": "));
         searchString = new JTextField();
         searchString.setToolTipText("");
-        searchString.setAlignmentX(1.0F);
-        searchString.setMinimumSize(new java.awt.Dimension(350, 20));
+
+        searchString.setMinimumSize(new java.awt.Dimension(350, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
         searchString.setName(""); // NOI18N
-        searchString.setPreferredSize(new java.awt.Dimension(350, 20));
-        searchString.setMaximumSize(new java.awt.Dimension(2000, 20));
+        searchString.setPreferredSize(new java.awt.Dimension(350, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
+        searchString.setMaximumSize(new java.awt.Dimension(2000, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
 
         MenuPopupUtil.installContextMenu(searchString);
 
@@ -73,6 +73,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         });
 
+
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);
         this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
@@ -80,11 +81,17 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         this.jButton1_jToolBar_RightPanel.setVisible(false);
         this.jButton2_jToolBar_RightPanel.setVisible(false);
 
+        // make hash item from popup menu
+        ASMakeHashMenuItem makeHashButton = new ASMakeHashMenuItem(searchString);
+        this.toolBarLeftPanel.add(makeHashButton);
+
+        MenuPopupUtil.installContextMenu(searchString);
+        MenuPopupUtil.installContextMenu(this.searchTextFieldSearchToolBarLeftPanelDocument);
 
         // 	Records_Table_Model records_Model = new Records_Table_Model();
         // 	this.jTableJScrollPanelLeftPanel = new JTable(records_Model);
 
-        MenuPopupUtil.installContextMenu(this.searchTextFieldSearchToolBarLeftPanelDocument);
+
         this.searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
 
             @Override
@@ -153,8 +160,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                 Transaction trans = transactionsTableModel.getItem(row);
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?tx=" + trans.viewHeightSeq()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
@@ -321,4 +328,13 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 }

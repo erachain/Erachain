@@ -31,13 +31,13 @@ public class RocksDbDataSourceOptTransactedDB extends RocksDbDataSourceTransacti
     }
 
     public RocksDbDataSourceOptTransactedDB(String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
-        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings,
+        this(Settings.getInstance().getDataChainPath() + ROCKS_DB_FOLDER, name, indexes, settings,
                 new TransactionDBOptions(),
                 new WriteOptions().setSync(true).setDisableWAL(false), enableSize);
     }
 
     public RocksDbDataSourceOptTransactedDB(String name, boolean enableSize) {
-        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, new ArrayList<>(),
+        this(Settings.getInstance().getDataChainPath() + ROCKS_DB_FOLDER, name, new ArrayList<>(),
                 new RocksDbSettings(),
                 new TransactionDBOptions(),
                 new WriteOptions().setSync(true).setDisableWAL(false), enableSize);

@@ -148,4 +148,60 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
         return null;
     }
 
+    @Override
+    public boolean set(Long key, Order value) {
+
+        try {
+
+            // сначала проверим - есть ли он тут включая форк
+            boolean exist = this.contains(key);
+
+            this.map.put(key, value);
+
+            if (false) {
+                // так как тут особый случай по замене записи - нужно ставить в ДЕЛЕТЕД значения
+                // см issues/1276
+                if (this.deleted != null) {
+                    if (this.deleted.remove(key) != null)
+                        ++this.shiftSize;
+                }
+            }
+
+            return exist;
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        return false;
+    }
+
+    @Override
+    public void put(Long key, Order value) {
+
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.set, так как
+        /// если в подклассе будет из SET вызов PUT то он придет сюда и при перевузове THIS.SET отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> set(key, value);
+        ///
+
+        try {
+
+            this.map.put(key, value);
+
+            if (false) {
+                // так как тут особый случай по замене записи - нужно ставить в ДЕЛЕТЕД значения
+                // см issues/1276
+                if (this.deleted != null) {
+                    if (this.deleted.remove(key) != null)
+                        ++this.shiftSize;
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+    }
+
 }

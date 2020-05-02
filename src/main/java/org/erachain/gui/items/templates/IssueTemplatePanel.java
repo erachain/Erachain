@@ -16,6 +16,7 @@ import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssueTemplateDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +26,8 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
 public class IssueTemplatePanel extends JPanel {
+
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssueTemplatePanel.png";
     private JComboBox<Account> jComboBoxAccountCreator = new JComboBox<>(new AccountsComboBoxModel());
     private JButton jButtonCreate = new JButton();
     private JLabel jLabelAccountCreator = new JLabel();
@@ -287,5 +290,15 @@ public class IssueTemplatePanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new Insets(0, 0, 5, 15);
         add(jButtonCreate, gridBagConstraints);
+    }
+
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

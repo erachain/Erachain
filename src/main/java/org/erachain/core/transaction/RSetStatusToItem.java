@@ -130,7 +130,7 @@ public class RSetStatusToItem extends Transaction {
                 value_1, value_2, data_1, data_2, ref_to_parent, description,
                 timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as pack
@@ -203,13 +203,8 @@ public class RSetStatusToItem extends Transaction {
 
     @Override
     public String getTitle() {
-        String title = TYPE_NAME + ": " + ItemCls.getItemTypeChar2(ItemCls.STATUS_TYPE) + key + " > ";
-        title += ItemCls.getItemTypeChar2(itemType) + itemKey + " = ";
-        title += getStatus().toStringNoKey(packData());
-
-        return title;
+        return getStatus().toStringNoKey(packData());
     }
-
 
     public String getResultText() {
         return status.toString(dcSet, packData());
@@ -788,6 +783,14 @@ public class RSetStatusToItem extends Transaction {
         }
 
         return Transaction.VALIDATE_OK;
+    }
+
+    @Override
+    public void makeItemsKeys() {
+        itemsKeys = new Object[][]{
+                new Object[]{ItemCls.STATUS_TYPE, key},
+                new Object[]{this.itemType, this.itemKey}
+        };
     }
 
     //PROCESS/ORPHAN

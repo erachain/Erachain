@@ -15,7 +15,7 @@ import java.util.concurrent.BlockingQueue;
 public class TransactionsPool extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.TEST_MODE ? true : false;
+    private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.TEST_MODE;
     private boolean runned;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionsPool.class.getSimpleName());
@@ -41,6 +41,9 @@ public class TransactionsPool extends MonitoredThread {
         this.setName("Transactions Pool[" + this.getId() + "]");
 
         this.start();
+
+        dcSet.getTransactionTab().setPool(this);
+
     }
 
     /**
@@ -81,14 +84,16 @@ public class TransactionsPool extends MonitoredThread {
                     clearCount++;
                 }
             } else {
-                utxMap.put((Transaction) item);
+                utxMap.putDirect((Transaction) item);
                 clearCount++;
             }
+        } else if (item instanceof Long) {
+            utxMap.deleteDirect((Long) item);
 
         } else if (item instanceof TransactionMessage) {
 
-            long timeCheck = System.nanoTime();
-            long onMessageProcessTiming = timeCheck;
+            long timeCheck = System.currentTimeMillis();
+            long onMessageProcessTiming = System.nanoTime();
 
             TransactionMessage transactionMessage = (TransactionMessage) item;
 
@@ -117,13 +122,11 @@ public class TransactionsPool extends MonitoredThread {
                 if (timeCheck > 10) {
                     LOGGER.debug("TRANSACTION_TYPE proccess 1 period: " + timeCheck);
                 }
+                timeCheck = System.currentTimeMillis();
             }
 
             // ALREADY EXIST
             byte[] signature = transaction.getSignature();
-
-            if (LOG_UNCONFIRMED_PROCESS)
-                timeCheck = System.currentTimeMillis();
 
             // проверка на двойной ключ в таблице ожидания транзакций
             if (utxMap.contains(signature)) {
@@ -141,10 +144,8 @@ public class TransactionsPool extends MonitoredThread {
                 if (timeCheck > 20) {
                     LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
                 }
-            }
-
-            if (LOG_UNCONFIRMED_PROCESS)
                 timeCheck = System.currentTimeMillis();
+            }
 
             // проверка на двойной ключ в основной таблице транзакций
             if (this.controller.isOnStopping()
@@ -157,8 +158,9 @@ public class TransactionsPool extends MonitoredThread {
             if (LOG_UNCONFIRMED_PROCESS) {
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 30) {
-                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in FINAL period: " + timeCheck);
+                    LOGGER.debug("TRANSACTION_TYPE process CONTAINS in FINAL period: " + timeCheck);
                 }
+                timeCheck = System.currentTimeMillis();
             }
 
             // ADD TO UNCONFIRMED TRANSACTIONS
@@ -171,7 +173,7 @@ public class TransactionsPool extends MonitoredThread {
                     clearCount++;
                 }
             } else {
-                utxMap.put(transaction);
+                utxMap.putDirect(transaction);
                 clearCount++;
             }
 
@@ -301,7 +303,7 @@ public class TransactionsPool extends MonitoredThread {
                     }
                 } catch (OutOfMemoryError e) {
                     LOGGER.error(e.getMessage(), e);
-                    Controller.getInstance().stopAll(56);
+                    Controller.getInstance().stopAll(456);
                     return;
                 } catch (IllegalMonitorStateException e) {
                     break;
@@ -319,11 +321,11 @@ public class TransactionsPool extends MonitoredThread {
             } catch (OutOfMemoryError e) {
                 blockingQueue = null;
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(56);
+                Controller.getInstance().stopAll(457);
                 return;
             } catch (IllegalMonitorStateException e) {
                 blockingQueue = null;
-                Controller.getInstance().stopAll(57);
+                Controller.getInstance().stopAll(458);
                 break;
             } catch (InterruptedException e) {
                 blockingQueue = null;

@@ -26,6 +26,7 @@ import java.net.URL;
 
 public class OutcomingMailsSplitPanel extends SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
+    private static String iconFile = Settings.getInstance().getPatnIcons() + "OutcomingMailsSplitPanel.png";
     // для прозрачности
     int alpha = 255;
     int alpha_int;
@@ -123,8 +124,8 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
                 }
 
                 try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
                             + "?tx=" + transaction.viewHeightSeq()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
@@ -220,6 +221,15 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         }
     }
 
+    public static Image getIcon() {
+        {
+            try {
+                return Toolkit.getDefaultToolkit().getImage(iconFile);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
 
 }
 

@@ -93,10 +93,10 @@ public class DWSet extends DBASet {
 
     }
 
-    public static DWSet reCreateDB(boolean withObserver, boolean dynamicGUI) {
+    public synchronized static DWSet reCreateDB(boolean withObserver, boolean dynamicGUI) {
 
         //OPEN WALLET
-        File dbFile = new File(Settings.getInstance().getDataWalletDir(), "wallet.dat");
+        File dbFile = new File(Settings.getInstance().getDataWalletPath(), "wallet.dat");
         dbFile.getParentFile().mkdirs();
 
         //DELETE TRANSACTIONS
@@ -116,10 +116,10 @@ public class DWSet extends DBASet {
                 //.cacheHardRefEnable()
                 //.cacheLRUEnable()
                 ///.cacheSoftRefEnable()
-                .cacheWeakRefEnable()
+                .cacheWeakRefEnable() // analog new WeakReference() - в случае нехватки ппамяти кеш сам чистится
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                .cacheSize(10000)
+                .cacheSize(1 << 14)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++
@@ -131,7 +131,7 @@ public class DWSet extends DBASet {
                 //.asyncWriteFlushDelay(30000)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(10) // не нагружать процессор для поиска свободного места в базе данных
 
                 .mmapFileEnablePartial()
                 //.compressionEnable()
@@ -421,21 +421,9 @@ public class DWSet extends DBASet {
         if (this.database == null || this.database.isClosed())
             return;
 
+        Controller.getInstance().wallet.synchronizeBodyUsed = false;
+
         int step = 0;
-        if (Controller.getInstance().wallet.synchronizeStatus) {
-            // STOP syncronize Wallet
-            Controller.getInstance().wallet.synchronizeBodyStop = true;
-
-            while (Controller.getInstance().wallet.synchronizeStatus && ++step < 500) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                }
-
-            }
-        }
-
-        step = 0;
         while (uses > 0 && ++step < 100) {
             try {
                 Thread.sleep(100);
@@ -447,6 +435,7 @@ public class DWSet extends DBASet {
         this.uses++;
         this.database.rollback();
         this.database.close();
+        this.tables = null;
         this.uses--;
 
     }

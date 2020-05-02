@@ -32,6 +32,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
@@ -51,7 +52,7 @@ public class RSendResource {
         Map<String, String> help = new LinkedHashMap<String, String>();
         help.put("GET r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&encoding={encoding}&encrypt=true&password={password}",
                 "make and broadcast SEND asset amount and mail");
-        help.put("POST r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&encoding={encoding}&encrypt=true&password={password} (message)",
+        help.put("POST r_send/{creator}/{recipient} {feePowfeePow}&assetKey={assetKey}&amount={amount}&title={title}&encoding={encoding}&encrypt=true&password={password} (message)",
                 "make and broadcast SEND asset amount and mail in body");
         help.put("GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&encoding={encoding}&encrypt=true&password={password}",
                 "make RAW for SEND asset amount and mail");
@@ -453,16 +454,16 @@ public class RSendResource {
                         }
                     } else {
 
-                        RSend transaction = new RSend(creator, (byte) 0, recipient, 2l, null,
+                        WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, (byte) 0, recipient, 2l, null,
                                 "LoadTest_" + address.substring(1, 5) + " " + counter,
                                 (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
-                                new byte[]{(byte) 1}, NTP.getTime(), 0l);
+                                new byte[]{(byte) 1}, NTP.getTime(), 0l));
 
-                        transaction.sign(creator, Transaction.FOR_NETWORK);
+                        weakRef.get().sign(creator, Transaction.FOR_NETWORK);
 
                         // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
-                        cnt.transactionsPool.offerMessage(transaction);
-                        cnt.broadcastTransaction(transaction);
+                        cnt.transactionsPool.offerMessage(weakRef.get());
+                        cnt.broadcastTransaction(weakRef.get());
 
                     }
 
@@ -640,14 +641,14 @@ public class RSendResource {
 
                     } else {
 
-                        RSend transaction = new RSend(creator, (byte) 0, recipient, 2L,
-                                amount, "TEST" + counter, null, isText, encryptMessage, NTP.getTime(), 0l);
+                        WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, (byte) 0, recipient, 2L,
+                                amount, "TEST" + counter, null, isText, encryptMessage, NTP.getTime(), 0l));
 
-                        transaction.sign(creator, Transaction.FOR_NETWORK);
+                        weakRef.get().sign(creator, Transaction.FOR_NETWORK);
 
                         // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
-                        cnt.transactionsPool.offerMessage(transaction);
-                        cnt.broadcastTransaction(transaction);
+                        cnt.transactionsPool.offerMessage(weakRef.get());
+                        cnt.broadcastTransaction(weakRef.get());
 
                     }
 
@@ -681,14 +682,21 @@ public class RSendResource {
     }
 
     /**
+     * Multi send scrip for send asset for many addresses or persons filtered by some parameters.
+     * This command will run as test for calculate FEE and total AMOUNT by default. For run real send set parameter `test=false`.
+     * Unlock wallet.
+     * <br>
      * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1036/2?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1577712486&password=123
      * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1069/1036?amount=0.001&title=probe-multi&onlyperson=true&activeafter=2018-01-01 00:00&activebefore=2019-01-01 00:00&greatequal=0&activetypetx=24&password=1
      * GET r_send/multisend/7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1/1/2?amount=0.001&title=probe-multi&onlyperson=true&gender=0&password=1
+     * get r_send/multisend/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1072/2?amount=1&title=С 8 Марта!&onlyperson=true&gender=1&password=123&test=false
      *
      * @param fromAddress     my address in Wallet
      * @param assetKey        asset Key that send
      * @param forAssetKey     asset key of holders test
      * @param amount          absolute amount to send
+     * @param onlyPerson      Default: false. Use only person accounts
+     * @param gender          Filter by gender. -1 = all, 0 - man, 1 - woman. Default: -1.
      * @param position        test balance position. 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other
      * @param greatEqual      test balance is great or equal
      * @param selfPay         if set - pay to self address too. Default = true
@@ -888,7 +896,8 @@ public class RSendResource {
 
                         } else {
 
-                            int validate = cntr.getTransactionCreator().afterCreate(transaction,
+                            WeakReference<Transaction> weakRef = new WeakReference<>(transaction);
+                            int validate = cntr.getTransactionCreator().afterCreate(weakRef.get(),
                                     // если проба то не шлем в реальности
                                     test ? Transaction.FOR_PACK : Transaction.FOR_NETWORK);
 
@@ -897,8 +906,8 @@ public class RSendResource {
 
                             } else {
                                 // УСПЕХ! учтем все
-                                totalSendAmount = totalSendAmount.add(transaction.getAmount());
-                                totalFee = totalFee.add(transaction.getFee());
+                                totalSendAmount = totalSendAmount.add(weakRef.get().getAmount());
+                                totalFee = totalFee.add(weakRef.get().getFee());
                                 count++;
                                 if (onlyPerson) {
                                     // учтем что такой персоне давали
@@ -907,6 +916,7 @@ public class RSendResource {
                             }
                         }
 
+                        transaction = null;
                         outResult.add(resultOne);
 
                     } catch (java.lang.ArrayIndexOutOfBoundsException e) {

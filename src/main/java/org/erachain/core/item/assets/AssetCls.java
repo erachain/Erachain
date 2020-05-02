@@ -2,8 +2,10 @@ package org.erachain.core.item.assets;
 
 
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
@@ -13,10 +15,13 @@ import org.json.simple.JSONObject;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 
 // 1019 - Movable = true; Divisible = NO; Quantity = 1
 public abstract class AssetCls extends ItemCls {
+
+    public static final long START_KEY = 1000L;
 
     // CORE KEY
     public static final long ERA_KEY = 1l;
@@ -185,6 +190,18 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_INSIDE_VOTE = 56;
 
     /**
+     * bank guarantee - банковская гарантия
+     * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_BANK_GUARANTEE = 60;
+    /**
+     * bank guarantee total - банковская гарантия общая сумма
+     * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_BANK_GUARANTEE_TOTAL = 61;
+
+
+    /**
      * INDEXES (FOREX etc.)
      * +++ требования и обязательства
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
@@ -231,6 +248,16 @@ public abstract class AssetCls extends ItemCls {
     }
 
     @Override
+    public long getStartKey() {
+        long startKey = BlockChain.startKeys[ItemCls.ASSET_TYPE];
+
+        if (BlockChain.MAIN_MODE || startKey > 0 && startKey < START_KEY)
+            return START_KEY;
+
+        return startKey;
+    }
+
+    @Override
     public String getItemTypeName() {
         return "asset";
     }
@@ -246,7 +273,7 @@ public abstract class AssetCls extends ItemCls {
         return db.getIssueAssetMap();
     }
 
-    public abstract Long getQuantity();
+    public abstract long getQuantity();
 
     public abstract BigDecimal getReleased();
     public abstract BigDecimal getReleased(DCSet dc);
@@ -277,6 +304,54 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType;
     }
 
+     public String charAssetType() {
+
+         if (this.key < 100) {
+             return "";
+         }
+
+         switch (this.assetType) {
+             case AS_OUTSIDE_GOODS:
+                 return "▲";
+             case AS_OUTSIDE_IMMOVABLE:
+                 return "▼";
+            case AS_ACCOUNTING:
+                if (this.key == 555l || this.key == 666l || this.key == 777l)
+                    return this.name;
+
+                return "±";
+            case AS_INDEX:
+                return "⤴";
+            case AS_INSIDE_VOTE:
+                return "✋";
+            case AS_OUTSIDE_BILL:
+                return "⬖"; // ⬒
+            case AS_OUTSIDE_SERVICE:
+                return "⬔";
+            case AS_INSIDE_BONUS:
+                return "⮌";
+            case AS_INSIDE_ACCESS:
+                return "⛨";
+            case AS_INSIDE_SHARE:
+                return "◔";
+
+
+        }
+
+        if (this.assetType >= AS_OUTSIDE_CURRENCY
+                && this.assetType <= AS_OUTSIDE_OTHER_CLAIM)
+            return "◄";
+
+        if (this.assetType == AS_INSIDE_ASSETS
+                || this.assetType >= AS_INSIDE_CURRENCY
+                && this.assetType <= AS_INSIDE_OTHER_CLAIM)
+            return "►";
+
+        // ● ⚫ ◆ █ ▇ ■ ◢ ◤ ◔ ◑ ◕ ⬛ ⬜ ⬤ ⛃
+        return "⚫";
+
+    }
+
     @Override
     public String getName() {
 		/*
@@ -295,35 +370,13 @@ public abstract class AssetCls extends ItemCls {
     @Override
     public String viewName() {
 
-        if (this.key < 5) {
-            return "" + this.name; // ®
+        if (this.key < 100) {
+            return this.name;
         }
 
-        switch (this.assetType) {
-            case AS_OUTSIDE_GOODS:
-                return "▲" + this.name;
-            case AS_OUTSIDE_IMMOVABLE:
-                return "▼" + this.name;
-            case AS_ACCOUNTING:
-                if (this.key == 555l || this.key == 666l || this.key == 777l)
-                    return this.name;
-
-                return "±" + this.name;
-        }
-
-        if (this.assetType >= AS_OUTSIDE_CURRENCY
-                && this.assetType <= AS_OUTSIDE_OTHER_CLAIM)
-            return "◄" + this.name;
-
-        if (this.assetType == AS_INSIDE_ASSETS
-                || this.assetType >= AS_INSIDE_CURRENCY
-                && this.assetType <= AS_INSIDE_OTHER_CLAIM)
-            return "►" + this.name;
-
-        return "?" + this.name;
+        return charAssetType() + this.name;
 
     }
-
 
     public PublicKeyAccount getOwner() {
         if (this.key > 10 && this.key < 100 && BlockChain.ASSET_OWNERS.containsKey(this.key)) {
@@ -402,10 +455,15 @@ public abstract class AssetCls extends ItemCls {
 
     @Override
     public byte[] getImage() {
-        if (key < 1000 && image.length > 0 )
+        if (key < 1000 && image.length > 0)
             return new byte[0];
 
         return image;
+    }
+
+    @Override
+    public HashMap getNovaItems() {
+        return BlockChain.NOVA_ASSETS;
     }
 
     public boolean isMovable() {
@@ -426,10 +484,6 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType == AS_INSIDE_ASSETS
                 || this.assetType >= AS_INSIDE_CURRENCY
                 && this.assetType <= AS_INSIDE_OTHER_CLAIM;
-    }
-
-    public boolean isInsideAsset() {
-        return this.assetType == AS_INSIDE_ASSETS;
     }
 
     public boolean isInsideCurrency() {
@@ -497,6 +551,24 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType == AS_ACCOUNTING;
     }
 
+    /**
+     * Без ограничений - только если это счетная единица или сам владелец без огрничений
+     *
+     * @param address
+     * @return
+     */
+    public boolean isUnlimited(Account address) {
+        return isAccounting() || getQuantity() == 0L && owner.equals(address);
+    }
+
+    public BigDecimal defaultAmountAssetType() {
+        switch (assetType) {
+            case AS_BANK_GUARANTEE:
+                return BigDecimal.ONE;
+        }
+        return null;
+    }
+
     public static String viewAssetTypeCls(int asset_type) {
         switch (asset_type) {
             case AS_OUTSIDE_GOODS:
@@ -531,6 +603,10 @@ public abstract class AssetCls extends ItemCls {
                 return "Digital Access";
             case AS_INSIDE_VOTE:
                 return "Digital Vote";
+            case AS_BANK_GUARANTEE:
+                return "Bank Guarantee";
+            case AS_BANK_GUARANTEE_TOTAL:
+                return "Bank Guarantee Total";
             case AS_INDEX:
                 return "Index";
             case AS_INSIDE_OTHER_CLAIM:
@@ -579,6 +655,10 @@ public abstract class AssetCls extends ItemCls {
                 return "Digital Access Rights";
             case AS_INSIDE_VOTE:
                 return "Digital Vote";
+            case AS_BANK_GUARANTEE:
+                return "Bank Guarantee";
+            case AS_BANK_GUARANTEE_TOTAL:
+                return "Bank Guarantee Total";
             case AS_INDEX:
                 return "Digital Index";
             case AS_INSIDE_OTHER_CLAIM:
@@ -627,14 +707,467 @@ public abstract class AssetCls extends ItemCls {
                 return lang.translate("Digital rights of access and control, membership, pass");
             case AS_INSIDE_VOTE:
                 return lang.translate("A digital voice for voting");
+            case AS_BANK_GUARANTEE:
+                return lang.translate("A digital bank guarantee.");
+            case AS_BANK_GUARANTEE_TOTAL:
+                return lang.translate("A digital bank guarantee total accounting.");
             case AS_INDEX:
                 return lang.translate("Index on foreign and domestic assets, for example currencies on FOREX");
             case AS_INSIDE_OTHER_CLAIM:
                 return lang.translate("Other digital rights, requirements and obligations. These assets (as well as other digital assets) can be given in debt and seized by the lender.");
             case AS_ACCOUNTING:
-                return lang.translate("Accounting (bookkeeping) units. They do not have a generally accepted value and can only be exchanged among themselves. Actions with them are possible only for accounting purposes: transfer, take for storage (on balance), lend, take back the debt, etc.");
+                return lang.translate("Accounting units #DESC");
         }
         return "";
+    }
+
+    public String viewAssetTypeAction(boolean backward, int actionType) {
+        switch (assetType) {
+            case AS_OUTSIDE_IMMOVABLE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Transfer in own";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Confiscate from rent" : "Transfer to rent";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Return from rent";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "The employment security/received from security";
+                }
+                break;
+            case AS_OUTSIDE_CURRENCY:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Send payment request";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Confirm repayment"
+                                : "Require repayment";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Return debt";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Take the reception into balance";
+                }
+                break;
+            case AS_OUTSIDE_SERVICE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Transfer Service Requirement";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Confirm the provision of services"
+                                : "To require the provision of services";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Return debt";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Take the reception into balance";
+                }
+                break;
+            case AS_OUTSIDE_SHARE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "To transfer shares in the property";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Confirm receipt of shares"
+                                : "To require the transfer of shares";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Return debt";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Take the reception into balance";
+                }
+                break;
+            case AS_OUTSIDE_BILL:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передать вексель в собственность";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Отменить погашение векселя?"
+                                : "Потребовать погашение векселя!";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Отозвать погашение векселя?";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Подтвердить получение выплаты?";
+                    case TransactionAmount.ACTION_SPEND:
+                    case TransactionAmount.ACTION_PLEDGE:
+                        return null;
+                }
+                break;
+            case AS_OUTSIDE_BILL_EX:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передать вексель в собственность";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Отменить погашение векселя?"
+                                : "Потребовать погашение векселя!";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Отозвать погашение векселя?";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Подтвердить получение выплаты?";
+                    case TransactionAmount.ACTION_SPEND:
+                    case TransactionAmount.ACTION_PLEDGE:
+                        return null;
+                }
+                break;
+            case AS_OUTSIDE_OTHER_CLAIM:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передать в собственность требование";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Подтвердить исполнение своего права"
+                                : "Потребовать исполнения своего права";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Отозвать погашение векселя?";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Учесть прием требования на баланс";
+                    case TransactionAmount.ACTION_SPEND:
+                    case TransactionAmount.ACTION_PLEDGE:
+                        return null;
+                }
+                break;
+            case AS_INSIDE_CURRENCY:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Певести в собственность деньги";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Учесть прием денег на баланс";
+                    case TransactionAmount.ACTION_SPEND:
+                    case TransactionAmount.ACTION_PLEDGE:
+                        return null;
+                }
+                break;
+            case AS_INSIDE_UTILITY:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передать в собственность услугу";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Учесть получение услуги";
+                    case TransactionAmount.ACTION_SPEND:
+                    case TransactionAmount.ACTION_PLEDGE:
+                        return null;
+                }
+                break;
+            case AS_INSIDE_SHARE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передать в собственность акции";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Take the reception into balance";
+                    case TransactionAmount.ACTION_SPEND:
+                    case TransactionAmount.ACTION_PLEDGE:
+                        return null;
+                }
+                break;
+            case AS_INSIDE_BONUS:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Transfer bonuses";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Take the reception into balance";
+                    case TransactionAmount.ACTION_SPEND:
+                    case TransactionAmount.ACTION_PLEDGE:
+                        return null;
+                }
+                break;
+            case AS_INSIDE_ACCESS:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Grant rights";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "To confiscate a delegated rights"
+                                : "Delegate rights";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Return delegate rights";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Take the reception into balance";
+                    case TransactionAmount.ACTION_SPEND:
+                    case TransactionAmount.ACTION_PLEDGE:
+                        return null;
+                }
+                break;
+            case AS_INSIDE_VOTE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Grant voice";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "To confiscate a delegated vote"
+                                : "Delegate voice";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Return delegate vote";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Take the reception into balance";
+                    case TransactionAmount.ACTION_SPEND:
+                    case TransactionAmount.ACTION_PLEDGE:
+                        return null;
+                }
+                break;
+            case AS_BANK_GUARANTEE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передать банковскую гарантию";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Отозвать банковскую гарантию" : "Выдать банковскую гарантию";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Вернуть банковскую гарантию";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Акцептовать банковскую гарантию" : null;
+                    case TransactionAmount.ACTION_SPEND:
+                        return null;
+                }
+                break;
+            case AS_BANK_GUARANTEE_TOTAL:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передать учетную банковскую гарантию";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Отозвать учетную банковскую гарантию" : "Выдать учетную банковскую гарантию";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Вернуть учетную банковскую гарантию";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Hold" : null;
+                }
+                break;
+            case AS_INDEX:
+                break;
+            case AS_INSIDE_OTHER_CLAIM:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передать в собственность требование";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Подтвердить исполнение своего права"
+                                : "Потребовать исполнения своего права";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Отозвать погашение векселя?";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Учесть прием требования на баланс";
+                    case TransactionAmount.ACTION_SPEND:
+                    case TransactionAmount.ACTION_PLEDGE:
+                        return null;
+                }
+                break;
+            case AS_ACCOUNTING:
+                break;
+        }
+
+        switch (actionType) {
+            case TransactionAmount.ACTION_SEND:
+                return "Transfer to the ownership";
+            case TransactionAmount.ACTION_DEBT:
+                return backward ? "To confiscate a debt"
+                        : "Transfer to debt";
+            case TransactionAmount.ACTION_REPAY_DEBT:
+                return "Return debt";
+            case TransactionAmount.ACTION_HOLD:
+                return "Confirm acceptance \"in hand\"";
+            case TransactionAmount.ACTION_SPEND:
+                return backward ? "Produce"
+                        : "Spend";
+            case TransactionAmount.ACTION_PLEDGE:
+                return backward ? "Re-pledge"
+                        : "Pledge";
+        }
+
+        return null;
+    }
+
+    public String viewAssetTypeActionTitle(boolean backward, int actionType) {
+        switch (assetType) {
+            case AS_OUTSIDE_IMMOVABLE:
+            case AS_OUTSIDE_CURRENCY:
+            case AS_OUTSIDE_SERVICE:
+            case AS_OUTSIDE_SHARE:
+            case AS_OUTSIDE_BILL:
+            case AS_OUTSIDE_BILL_EX:
+            case AS_OUTSIDE_OTHER_CLAIM:
+            case AS_INSIDE_ASSETS:
+            case AS_INSIDE_CURRENCY:
+            case AS_INSIDE_UTILITY:
+            case AS_INSIDE_SHARE:
+            case AS_INSIDE_BONUS:
+            case AS_INSIDE_ACCESS:
+            case AS_INSIDE_VOTE:
+                break;
+            case AS_BANK_GUARANTEE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передача банковской гарантии - %asset%";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Отзыв банковской гарантии - %asset%" : "Выдача банковской гарантии - %asset%";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Возврат банковской гарантии - %asset%";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Акцептование банковской гарантии - %asset%" : null;
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Погашение банковской гарантии - %asset%";
+                }
+            case AS_BANK_GUARANTEE_TOTAL:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передача учетной банковской гарантии - %asset%";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Отзыв учетной банковской гарантии - %asset%" : "Выдача учетной банковской гарантии - %asset%";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Возврат учетной банковской гарантии - %asset%";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Акцептование учетной банковской гарантии - %asset%" : null;
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Погашение учетной банковской гарантии - %asset%";
+                }
+            case AS_INDEX:
+            case AS_INSIDE_OTHER_CLAIM:
+            case AS_ACCOUNTING:
+        }
+
+        return viewAssetTypeAction(backward, actionType) + " - %asset%";
+    }
+
+    public String viewAssetTypeCreator(boolean backward, int actionType) {
+        switch (assetType) {
+            case AS_OUTSIDE_IMMOVABLE:
+            case AS_OUTSIDE_CURRENCY:
+            case AS_OUTSIDE_SERVICE:
+            case AS_OUTSIDE_SHARE:
+            case AS_OUTSIDE_BILL:
+            case AS_OUTSIDE_BILL_EX:
+            case AS_OUTSIDE_OTHER_CLAIM:
+            case AS_INSIDE_ASSETS:
+            case AS_INSIDE_CURRENCY:
+            case AS_INSIDE_UTILITY:
+            case AS_INSIDE_SHARE:
+            case AS_INSIDE_BONUS:
+            case AS_INSIDE_ACCESS:
+            case AS_INSIDE_VOTE:
+                break;
+            case AS_BANK_GUARANTEE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                    case TransactionAmount.ACTION_DEBT:
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Guarantee";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Beneficiary";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Beneficiary" : null;
+                }
+            case AS_BANK_GUARANTEE_TOTAL:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                    case TransactionAmount.ACTION_DEBT:
+                        return "Guarantee";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Beneficiary";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Beneficiary" : null;
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Spender";
+                }
+            case AS_INDEX:
+            case AS_INSIDE_OTHER_CLAIM:
+            case AS_ACCOUNTING:
+        }
+
+        switch (actionType) {
+            case TransactionAmount.ACTION_SEND:
+                return "Giver";
+            case TransactionAmount.ACTION_DEBT:
+                return "Creditor";
+            case TransactionAmount.ACTION_REPAY_DEBT:
+                return "Debtor";
+            case TransactionAmount.ACTION_HOLD:
+                return "Taker";
+            case TransactionAmount.ACTION_SPEND:
+                return "Spender";
+        }
+
+        return "unknown";
+    }
+
+    public String viewAssetTypeTarget(boolean backward, int actionType) {
+        switch (assetType) {
+            case AS_OUTSIDE_IMMOVABLE:
+            case AS_OUTSIDE_CURRENCY:
+            case AS_OUTSIDE_SERVICE:
+            case AS_OUTSIDE_SHARE:
+            case AS_OUTSIDE_BILL:
+            case AS_OUTSIDE_BILL_EX:
+            case AS_OUTSIDE_OTHER_CLAIM:
+            case AS_INSIDE_ASSETS:
+            case AS_INSIDE_CURRENCY:
+            case AS_INSIDE_UTILITY:
+            case AS_INSIDE_SHARE:
+            case AS_INSIDE_BONUS:
+            case AS_INSIDE_ACCESS:
+            case AS_INSIDE_VOTE:
+                break;
+            case AS_BANK_GUARANTEE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Recipient";
+                    case TransactionAmount.ACTION_DEBT:
+                        return "Beneficiary";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Guarantee";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Guarantee" : null;
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Spender";
+                }
+            case AS_BANK_GUARANTEE_TOTAL:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Recipient";
+                    case TransactionAmount.ACTION_DEBT:
+                        return "Principal";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Guarantee";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Guarantee" : null;
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Spender";
+                }
+            case AS_INDEX:
+            case AS_INSIDE_OTHER_CLAIM:
+            case AS_ACCOUNTING:
+        }
+
+        switch (actionType) {
+            case TransactionAmount.ACTION_SEND:
+                return "Recipient";
+            case TransactionAmount.ACTION_DEBT:
+                return "Debtor";
+            case TransactionAmount.ACTION_REPAY_DEBT:
+                return "Creditor";
+            case TransactionAmount.ACTION_HOLD:
+                return "Supplier";
+            case TransactionAmount.ACTION_SPEND:
+                return "Spender";
+        }
+
+        return "unknown";
+    }
+
+    public String viewAssetTypeActionOK(boolean backward, int actionType) {
+        switch (assetType) {
+            case AS_OUTSIDE_IMMOVABLE:
+            case AS_OUTSIDE_CURRENCY:
+            case AS_OUTSIDE_SERVICE:
+            case AS_OUTSIDE_SHARE:
+            case AS_OUTSIDE_BILL:
+            case AS_OUTSIDE_BILL_EX:
+            case AS_OUTSIDE_OTHER_CLAIM:
+            case AS_INSIDE_ASSETS:
+            case AS_INSIDE_CURRENCY:
+            case AS_INSIDE_UTILITY:
+            case AS_INSIDE_SHARE:
+            case AS_INSIDE_BONUS:
+            case AS_INSIDE_ACCESS:
+            case AS_INSIDE_VOTE:
+            case AS_BANK_GUARANTEE:
+            case AS_BANK_GUARANTEE_TOTAL:
+            case AS_INDEX:
+            case AS_INSIDE_OTHER_CLAIM:
+            case AS_ACCOUNTING:
+        }
+
+        return viewAssetTypeAction(backward, actionType);
+
     }
 
     public long getOperations(DCSet dcSet) {

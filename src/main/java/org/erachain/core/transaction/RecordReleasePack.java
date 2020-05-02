@@ -40,7 +40,7 @@ public class RecordReleasePack extends Transaction {
                              long timestamp, Long reference, byte[] signature, long feeLong) {
         this(typeBytes, creator, transactions, feePow, timestamp, reference);
         this.signature = signature;
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // as pack - calcFee not needed
@@ -232,8 +232,7 @@ public class RecordReleasePack extends Transaction {
             return INVALID_PAYMENTS_LENGTH;
         }
 
-        DCSet fork = this.dcSet.fork();
-        try {
+        try (DCSet fork = this.dcSet.fork(this.toString())) {
 
             int counter = 0;
             int result = 0;
@@ -250,8 +249,6 @@ public class RecordReleasePack extends Transaction {
                 transaction.process(block, asDeal);
                 counter++;
             }
-        } finally {
-            fork.close();
         }
         // IN FORK
         return super.isValid(asDeal, flags);

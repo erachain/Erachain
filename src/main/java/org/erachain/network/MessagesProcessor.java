@@ -18,7 +18,7 @@ import java.util.concurrent.BlockingQueue;
 public class MessagesProcessor extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
-    private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.TEST_MODE ? true : false;
+    private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.TEST_MODE;
     private boolean LOG_GET_HWEIGHT_TYPE = false;
     private boolean runned;
 
@@ -141,7 +141,7 @@ public class MessagesProcessor extends MonitoredThread {
                 processMessage(blockingQueue.take());
             } catch (OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(56);
+                Controller.getInstance().stopAll(244);
                 return;
             } catch (IllegalMonitorStateException e) {
                 break;

@@ -1,8 +1,11 @@
 package org.erachain.core.transaction;
 
 import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.item.imprints.ImprintCls;
@@ -34,7 +37,7 @@ public class IssueImprintRecord extends IssueItemRecord {
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow,
                               long timestamp, byte[] signature, long feeLong) {
         super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, null, signature);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     // asPack
@@ -60,17 +63,6 @@ public class IssueImprintRecord extends IssueItemRecord {
 
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Imprint"; }
-
-    // RETURN START KEY in tot GEMESIS
-    public long getStartKey(int height) {
-
-        if (height < BlockChain.VERS_4_11) {
-            return 0l;
-        }
-
-        return START_KEY;
-
-    }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
@@ -202,5 +194,28 @@ public class IssueImprintRecord extends IssueItemRecord {
     }
 
     //PROCESS/ORPHAN
+
+    @Override
+    public void process(Block block, int asDeal) {
+        //UPDATE CREATOR
+        super.process(block, asDeal);
+
+        if (!Controller.getInstance().onlyProtocolIndexing) {
+            dcSet.getTransactionFinalMapSigns().put(Base58.decode(item.getName()), dbRef);
+        }
+
+    }
+
+    //@Override
+    @Override
+    public void orphan(Block block, int asDeal) {
+        //UPDATE CREATOR
+        super.orphan(block, asDeal);
+
+        if (!Controller.getInstance().onlyProtocolIndexing) {
+            dcSet.getTransactionFinalMapSigns().delete(Base58.decode(item.getName()));
+        }
+
+    }
 
 }
