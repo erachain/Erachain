@@ -130,15 +130,39 @@ public class SettingsFrame extends JDialog {
         gbc_btnDefaultSettings.weightx = 2;
 
         btnDefaultSettings.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
-                // insert code ...
+
+                try {
+                    SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), new JSONObject());
+                } catch (IOException e1) {
+                    LOGGER.error(e1.getMessage(), e1);
+                    JOptionPane.showMessageDialog(
+                            new JFrame(), "Error writing to the file: " + Settings.getInstance().getSettingsPath()
+                                    + "\nProbably there is no access.",
+                            "Error!",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+
+                Settings.freeInstance();
+
+                JOptionPane.showMessageDialog(
+                        new JFrame(), Lang.getInstance().translate("You need to restart the application for the changes to take effect."),
+                        Lang.getInstance().translate("Attention!"),
+                        JOptionPane.WARNING_MESSAGE);
+
+                settingsTabPane.close();
+                //DISPOSE
+                setVisible(false);
+                dispose();
+
             }
         });
+
         //AS
         //    btnCancel.setPreferredSize(new Dimension(100, 25));
 
         this.add(btnDefaultSettings, gbc_btnDefaultSettings);
-
 
 
         //ON CLOSE

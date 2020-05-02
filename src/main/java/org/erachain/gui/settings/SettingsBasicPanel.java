@@ -238,7 +238,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_resetDataDirButton.gridy = 8;
         resetDataDirButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //insert code....
+                textDataFolder.setText(Settings.DEFAULT_DATA_CHAIN_DIR);
             }
         });
         add(resetDataDirButton, gbc_resetDataDirButton);
@@ -299,7 +299,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_resetWaletDirButton.gridy = 9;
         resetWaletDirButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //insert code....
+                textWallet.setText(Settings.DEFAULT_WALLET_KEYS_DIR);
             }
         });
         add(resetWaletDirButton, gbc_resetWaletDirButton);

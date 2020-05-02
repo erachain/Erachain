@@ -43,11 +43,11 @@ public class Settings {
     public static final String DEFAULT_THEME = "System";
     public static final int DEFAULT_ACCOUNTS = 1;
     //DATA
-    private static final String DEFAULT_DATA_CHAIN_DIR = "datachain";
+    public static final String DEFAULT_DATA_CHAIN_DIR = "datachain";
     private static final String DEFAULT_DATA_LOCAL_DIR = "datalocal";
     private static final String DEFAULT_DATA_TEMP_DIR = "datatemp";
     private static final String DEFAULT_DATA_WALLET_DIR = "dataWallet";
-    private static final String DEFAULT_WALLET_KEYS_DIR = "walletKeys";
+    public static final String DEFAULT_WALLET_KEYS_DIR = "walletKeys";
     private static final String DEFAULT_BACKUP_DIR = "backup";
     private static final String DEFAULT_TEMP_DIR = "temp";
     private static final String DEFAULT_TELEGRAM_DIR = "datatele";
