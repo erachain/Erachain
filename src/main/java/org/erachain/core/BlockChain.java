@@ -221,7 +221,7 @@ public class BlockChain {
     /**
      * Включает реферальную систему
      */
-    public static final int REFERAL_BONUS_FOR_PERSON = SIDE_MODE || TEST_MODE ? 0 : Integer.MAX_VALUE;
+    public static final int REFERAL_BONUS_FOR_PERSON = SIDE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
 
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
