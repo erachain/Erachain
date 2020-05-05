@@ -188,6 +188,7 @@ public class BlockChain {
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0 ? 0 : VERS_4_11;
 
+    public static int ALL_VALID_BEFORE = 0;
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 623904;
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : ALL_BALANCES_OK_TO; //260120;
     /**
@@ -221,7 +222,7 @@ public class BlockChain {
     /**
      * Включает реферальную систему
      */
-    public static final int REFERAL_BONUS_FOR_PERSON = SIDE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
+    public static int REFERAL_BONUS_FOR_PERSON = SIDE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
 
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
@@ -497,6 +498,14 @@ public class BlockChain {
 
                 if (chainParams.containsKey("explorer")) {
                     Settings.getInstance().explorerURL = chainParams.get("explorer").toString();
+                }
+
+                if (chainParams.containsKey("referalsOn")) {
+                    REFERAL_BONUS_FOR_PERSON = (Boolean) chainParams.get("referalsOn") ? 0 : Integer.MAX_VALUE;
+                }
+
+                if (chainParams.containsKey("allValidBefore")) {
+                    ALL_VALID_BEFORE = Integer.parseInt(chainParams.get("allValidBefore").toString());
                 }
 
 
@@ -869,7 +878,7 @@ public class BlockChain {
     }
 
     public static boolean REFERAL_BONUS_FOR_PERSON(int height) {
-        return TEST_DB == 0 && (SIDE_MODE || TEST_MODE || height > REFERAL_BONUS_FOR_PERSON);
+        return TEST_DB == 0 && height > REFERAL_BONUS_FOR_PERSON;
     }
 
     public static int getCheckPoint(DCSet dcSet, boolean useDynamic) {

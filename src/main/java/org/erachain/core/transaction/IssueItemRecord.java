@@ -154,15 +154,16 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @Override
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         //CHECK NAME LENGTH
         String name = this.item.getName();
         // TEST ONLY CHARS
         int nameLen = name.length();
 
-        if (nameLen < item.getMinNameLen()
-                //&& !BlockChain.DEVELOP_USE
-                && height > 114000
-                ) {
+        if (nameLen < item.getMinNameLen()) {
             // IF is NEW NOVA
             if (this.item.isNovaAsset(this.creator, this.dcSet) <= 0) {
                 return INVALID_NAME_LENGTH_MIN;

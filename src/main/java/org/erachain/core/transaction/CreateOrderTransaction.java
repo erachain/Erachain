@@ -406,6 +406,10 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     @Override
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         if (this.haveAsset == null || this.wantAsset == null)
             return ITEM_ASSET_NOT_EXIST;
 

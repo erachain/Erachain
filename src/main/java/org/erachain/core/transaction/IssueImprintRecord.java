@@ -151,6 +151,10 @@ public class IssueImprintRecord extends IssueItemRecord {
     @Override
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         //CHECK NAME LENGTH
         ItemCls item = this.getItem();
         int nameLength = item.getName().getBytes().length;

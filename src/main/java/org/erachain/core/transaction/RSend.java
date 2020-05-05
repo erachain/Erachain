@@ -471,6 +471,10 @@ public class RSend extends TransactionAmount {
     @Override
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         if (head.getBytes(StandardCharsets.UTF_8).length > 255)
             return INVALID_HEAD_LENGTH;
 

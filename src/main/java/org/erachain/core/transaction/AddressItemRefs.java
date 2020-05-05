@@ -110,6 +110,10 @@ public abstract class AddressItemRefs extends Transaction {
     @Override
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         //CHECK NAME LENGTH
         int nameLength = this.item.getName().getBytes(StandardCharsets.UTF_8).length;
         if (nameLength < item.getMinNameLen()) {

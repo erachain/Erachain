@@ -1427,6 +1427,10 @@ public abstract class Transaction implements ExplorerJsonLine {
      */
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         // CHECK IF REFERENCE IS OK
         //Long reference = asDeal == null ? this.creator.getLastTimestamp(dcSet) : asDeal;
         if (asDeal > Transaction.FOR_MYPACK && height > BlockChain.ALL_BALANCES_OK_TO) {
