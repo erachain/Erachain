@@ -87,7 +87,7 @@ public class BlockChain {
      */
     public static final byte[] START_PEER = null; //new byte[]{(byte)138, (byte)197, (byte)135, (byte)122};
 
-    public static final boolean PERSON_SEND_PROTECT = true;
+    public static boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
 
     public static final boolean SIDE_MODE = Settings.getInstance().isSideNet();
@@ -506,6 +506,10 @@ public class BlockChain {
 
                 if (chainParams.containsKey("allValidBefore")) {
                     ALL_VALID_BEFORE = Integer.parseInt(chainParams.get("allValidBefore").toString());
+                }
+
+                if (chainParams.containsKey("protectSendToAnonymous")) {
+                    PERSON_SEND_PROTECT = (Boolean) chainParams.get("protectSendToAnomin");
                 }
 
 

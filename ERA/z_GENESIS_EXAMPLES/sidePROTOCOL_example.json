@@ -19,6 +19,8 @@
   "referalsOn": true,
   // Set valid all transactions before the height. Defaul = 0
   "allValidBefore": 0,
+  // Protect from send assets from personal account to anonymous address. Default = true
+  "protectSendToAnonymous": true,
   //
   "assets": [
     // ASSET KEY, NAME, QUALITY, CREATOR
