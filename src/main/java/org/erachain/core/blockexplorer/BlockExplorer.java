@@ -2522,7 +2522,12 @@ public class BlockExplorer {
             list.add(new Pair<Long, Long>(2L, 92L));
 
             //GOLD
+            list.add(new Pair<Long, Long>(21L, 12L));
             list.add(new Pair<Long, Long>(21L, 95L));
+            list.add(new Pair<Long, Long>(21L, 92L));
+
+            list.add(new Pair<Long, Long>(1010L, 92L));
+
         }
 
         pairsSet.addAll(list);
