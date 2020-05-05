@@ -243,14 +243,16 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
             }
         });
 
-        if (recipient != null) {
+        if (recipient == null) {
+            jButton_ok.setEnabled(false);
+        } else {
             if (recipient instanceof PublicKeyAccount) {
                 jTextField_To.setText(((PublicKeyAccount) recipient).getBase58());
             } else {
                 jTextField_To.setText(recipient.getAddress());
             }
+            jButton_ok.setEnabled(true);
             //refreshReceiverDetails()
-
         }
 
         this.jLabel_Mess_Title.setText(Lang.getInstance().translate("Title") + ":");
@@ -277,7 +279,27 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         jScrollPane2.setViewportView(new AssetInfo(asset, false));
     }
 
+    private void checkReadyToOK() {
+
+        try {
+            String recipientAddress = jTextField_To.getText().trim();
+            if (!Crypto.getInstance().isValidAddress(recipientAddress) && !PublicKeyAccount.isValidPublicKey(recipientAddress)) {
+                jButton_ok.setEnabled(false);
+                return;
+            }
+        } catch (Exception e) {
+            jButton_ok.setEnabled(false);
+            return;
+        }
+
+        jButton_ok.setEnabled(true);
+
+    }
+
     private void refreshReceiverDetails() {
+
+        checkReadyToOK();
+
         String toValue = jTextField_To.getText();
         AssetCls asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
 
@@ -649,15 +671,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
         add(jComboBox_Asset, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 18;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
-        add(jTextField_Amount, gridBagConstraints);
 
         jLabel_AmountHave.setHorizontalAlignment(SwingConstants.RIGHT);
         gridBagConstraints = new java.awt.GridBagConstraints();
