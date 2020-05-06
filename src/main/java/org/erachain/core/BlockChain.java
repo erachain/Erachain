@@ -117,13 +117,24 @@ public class BlockChain {
     //public static final String TIME_ZONE = "GMT+3";
     //
     public static final boolean ROBINHOOD_USE = false;
+
+    /**
+     * Аноним может создавать персон и удостоверять счета
+     */
     public static final boolean ANONIM_SERT_USE = TEST_MODE || BlockChain.ERA_COMPU_ALL_UP;
 
     public static final int MAX_ORPHAN = 10000; // max orphan blocks in chain for 30 sec
     public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
+
+    /**
+     * степень от 2 блоков для усреднения ЦЕЛи победы
+     */
     public static final int TARGET_COUNT_SHIFT = 10;
     public static final int TARGET_COUNT = 1 << TARGET_COUNT_SHIFT;
     public static final int BASE_TARGET = 10000;///1 << 15;
+    /**
+     * минимальное расстояние для сборк блоков
+     */
     public static final int REPEAT_WIN = DEMO_MODE ? 10 : TEST_MODE ? 5 : ERA_COMPU_ALL_UP ? 15 : SIDE_MODE ? 15 : 40; // GENESIS START TOP ACCOUNTS
 
     // RIGHTs
@@ -355,7 +366,7 @@ public class BlockChain {
 
     public static final int FEE_INVITED_SHIFT = 1;
     /**
-     * Постаянная награда за байт трнзакции
+     * Постаянная награда за байт транзакции
      */
     public static final int BONUS_REFERAL = 200 * FEE_PER_BYTE;
     /**
