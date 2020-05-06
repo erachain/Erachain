@@ -114,6 +114,15 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         return this.amountHave.toPlainString();
     }
 
+    @Override
+    public long calcBaseFee() {
+        if (height > BlockChain.VERS_4_23_01) {
+            return 1000 * BlockChain.FEE_PER_BYTE;
+        } else {
+            super.calcBaseFee();
+        }
+    }
+
     /*
      * public void makeOrder() { if (this.order == null) this.order = new
      * Order(new BigInteger(this.signature), this.creator, this.have, this.want,
