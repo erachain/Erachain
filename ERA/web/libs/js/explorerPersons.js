@@ -128,7 +128,14 @@ function person_status(data) {
             data.last.creator + get_lang() + '">' + data.last.creator_name + '</a><br>';
         output += data.Label_transaction + ': <a href ="?tx=' + data.last.txBlock + '-' + data.last.txSeqNo + get_lang()
         + '">' + data.last.txBlock + '-' + data.last.txSeqNo + '</a><br>';
-        output += '<br>';
+
+        // show %D parameter
+        if (data.last.params[5]) {
+            output += '<div>' + data.Label_data + ':<br>' + fformat(data.last.params[5]) + '</div>';
+        } else {
+            output += '<br>';
+        }
+
     }
 
     output += data.Label_person + ': <a href ="?person=' +
@@ -150,7 +157,7 @@ function person_status(data) {
     }
 
     if (data.hasOwnProperty('history')) {
-        output += '<table id=history BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+        output += '<table id=history BORDER=0 cellpadding=15 cellspacing=0 width="1180" class="markdown">';
         output += '<tr><td width="40%"><b>' + data.Label_result + '<td><b>' + data.Label_from
             + '<td><b>' + data.Label_to + '<td><b>' + data.Label_creator + '<td><b>' + data.Label_transaction;
         for (key in data.history) {
@@ -174,6 +181,12 @@ function person_status(data) {
                 item.creator + get_lang() + '">' + cutBlank(item.creator_name, 16) + '...</a>';
             output += '<td> <a href ="?tx=' +
                 item.txBlock + '-' + item.txSeqNo + get_lang() + '">' + item.txBlock + '-' + item.txSeqNo + '</a>';
+
+            // show %D parameter
+            if (item.params[5]) {
+            output += '<tr><td colspan=5>'
+                output += '<div>' + fformat(item.params[5]) + '</div>';
+            }
 
         }
     }
