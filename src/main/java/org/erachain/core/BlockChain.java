@@ -216,15 +216,17 @@ public class BlockChain {
 
     public static final int VERS_4_23_01 = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 800000;
 
+    public static final int VERS_5_01_01 = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 950000;
+
     /**
      * Включает реферальную систему
      */
-    public static final int REFERAL_BONUS_FOR_PERSON_4_21 = SIDE_MODE || TEST_MODE ? 0 : Integer.MAX_VALUE;
+    public static final int REFERAL_BONUS_FOR_PERSON = SIDE_MODE || TEST_MODE ? 0 : Integer.MAX_VALUE;
 
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
      */
-    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : Integer.MAX_VALUE; ///VERS_4_21_02;
+    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
     public static final int DEFAULT_DURATION = 365 * 5; // 5 years
 
     public static final int DEVELOP_FORGING_START = 100;
@@ -818,7 +820,7 @@ public class BlockChain {
 
         if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
             ;
-        } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
+        } else if (totalLIA.compareTo(new BigDecimal("20")) < 0) {
             if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_100_BD) < 0) {
                 return Transaction.NOT_ENOUGH_ERA_OWN_100;
             }
@@ -843,7 +845,7 @@ public class BlockChain {
 
         if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
             ;
-        } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
+        } else if (totalLIA.compareTo(new BigDecimal("20")) < 0) {
             if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_100_BD) < 0) {
                 return Transaction.NOT_ENOUGH_ERA_OWN_100;
             }
@@ -867,7 +869,7 @@ public class BlockChain {
     }
 
     public static boolean REFERAL_BONUS_FOR_PERSON(int height) {
-        return SIDE_MODE || TEST_MODE || height > REFERAL_BONUS_FOR_PERSON_4_21;
+        return TEST_DB == 0 && (SIDE_MODE || TEST_MODE || height > REFERAL_BONUS_FOR_PERSON);
     }
 
     public static int getCheckPoint(DCSet dcSet, boolean useDynamic) {
