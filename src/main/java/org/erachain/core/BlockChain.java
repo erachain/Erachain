@@ -746,7 +746,7 @@ public class BlockChain {
             if (!Arrays.equals(dcSet.getBlockMap().getAndProcess(1).getSignature(),
                     genesisBlock.getSignature())) {
 
-                throw new Exception("wrong DB for GENESIS BLOCK");
+                throw new Exception("Wrong GENESIS BLOCK in datachain");
             }
 
         }
