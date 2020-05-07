@@ -73,9 +73,37 @@ public class Start {
             }
         }
 
+        long genesisStamp;
+        for (String arg : args) {
+            if (arg.equals("-testnet")) {
+                genesisStamp = -1;
+                Settings.simpleTestNet = true;
+                Settings.genesisStamp = genesisStamp;
+                Settings.NET_MODE = Settings.NET_MODE_TEST;
+                break;
+            } else if (arg.startsWith("-testnet=") && arg.length() > 9) {
+                try {
+                    genesisStamp = Long.parseLong(arg.substring(9));
+                    Settings.NET_MODE = Settings.NET_MODE_TEST;
+
+                } catch (Exception e) {
+                    genesisStamp = Settings.DEFAULT_DEMO_NET_STAMP;
+                    Settings.NET_MODE = Settings.NET_MODE_DEMO;
+                }
+                Settings.genesisStamp = genesisStamp;
+                break;
+            } else if (arg.startsWith("-testdb=") && arg.length() > 8) {
+                try {
+                    Settings.TEST_DB_MODE = Integer.parseInt(arg.substring(8));
+                    break;
+                } catch (Exception e) {
+                }
+            }
+        }
+
         ///////////////////  SIDECHAINS ///////////
         file = new File("sideGENESIS.json");
-        if (file.exists()) {
+        if (Settings.NET_MODE == Settings.NET_MODE_MAIN && Settings.TEST_DB_MODE == 0 && file.exists()) {
             // START SIDE CHAIN
             try {
                 List<String> lines = Files.readLines(file, Charsets.UTF_8);
@@ -109,35 +137,6 @@ public class Start {
                 LOGGER.info("Error while reading " + file.getAbsolutePath());
                 LOGGER.error(e.getMessage(), e);
                 System.exit(3);
-            }
-
-        } else {
-            long genesisStamp;
-            for (String arg : args) {
-                if (arg.equals("-testnet")) {
-                    genesisStamp = -1;
-                    Settings.simpleTestNet = true;
-                    Settings.genesisStamp = genesisStamp;
-                    Settings.NET_MODE = Settings.NET_MODE_TEST;
-                    break;
-                } else if (arg.startsWith("-testnet=") && arg.length() > 9) {
-                    try {
-                        genesisStamp = Long.parseLong(arg.substring(9));
-                        Settings.NET_MODE = Settings.NET_MODE_TEST;
-
-                    } catch (Exception e) {
-                        genesisStamp = Settings.DEFAULT_DEMO_NET_STAMP;
-                        Settings.NET_MODE = Settings.NET_MODE_DEMO;
-                    }
-                    Settings.genesisStamp = genesisStamp;
-                    break;
-                } else if (arg.startsWith("-testdb=") && arg.length() > 8) {
-                    try {
-                        Settings.TEST_DB_MODE = Integer.parseInt(arg.substring(8));
-                        break;
-                    } catch (Exception e) {
-                    }
-                }
             }
         }
 
