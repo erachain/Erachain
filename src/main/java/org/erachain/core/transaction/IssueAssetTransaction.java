@@ -57,6 +57,113 @@ public class IssueAssetTransaction extends IssueItemRecord {
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Asset"; }
 
+    public long getAssetKey(DCSet db) {
+        return getItem().getKey(db);
+    }
+
+    @Override
+    public BigDecimal getAmount() {
+        return new BigDecimal(((AssetCls) getItem()).getQuantity());
+    }
+
+    @Override
+    public BigDecimal getAmount(String address) {
+        if (address.equals(creator.getAddress())) {
+            return getAmount();
+        }
+        AssetCls asset = (AssetCls) item;
+        return BigDecimal.ZERO.setScale(asset.getScale());
+    }
+
+	/*
+	@Override
+	public BigDecimal getAmount(Account account) {
+		String address = account.getAddress();
+		return getAmount(address);
+	}
+	 */
+
+	/*
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        super.setDC(dcSet, asDeal, blockHeight, seqNo);
+
+        AssetCls asset = (AssetCls) this.item;
+
+        if (false && dcSet.getItemAssetMap().getLastKey() < BlockChain.AMOUNT_SCALE_FROM) {
+            // MAKE OLD STYLE ASSET with DEVISIBLE:
+            // PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
+            asset = new AssetVenture((byte) 0, asset.getOwner(), asset.getName(),
+                    asset.getIcon(), asset.getImage(), asset.getDescription(), AssetCls.AS_INSIDE_ASSETS, asset.getScale(), asset.getQuantity());
+            this.item = asset;
+        }
+
+    }
+    */
+
+    //VALIDATE
+
+    @Override
+    public String viewAmount(String address) {
+        return this.getAmount().toString();
+    }
+
+    @Override
+    public boolean hasPublicText() {
+        if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
+            return false;
+        }
+
+        String description = item.getDescription();
+        return description != null && description.length() < 100;
+
+    }
+
+    //@Override
+    @Override
+    public int isValid(int asDeal, long flags) {
+
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
+        int result = super.isValid(asDeal, flags);
+        if (result != Transaction.VALIDATE_OK) {
+            return result;
+        }
+
+        //CHECK QUANTITY
+        AssetCls asset = (AssetCls) this.getItem();
+        //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
+        long maxQuantity = Long.MAX_VALUE;
+        long quantity = asset.getQuantity();
+        //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
+        if (quantity > maxQuantity || quantity < -1) {
+            return INVALID_QUANTITY;
+        }
+
+        if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
+            Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
+            if (item.b < quantity) {
+                return INVALID_QUANTITY;
+            }
+        }
+
+        return Transaction.VALIDATE_OK;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public JSONObject toJson() {
+        //GET BASE
+        JSONObject transaction = super.toJson();
+        AssetCls asset = (AssetCls) getItem();
+        //ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
+        transaction.put("asset", asset.toJson());
+        return transaction;
+    }
+
+    //PARSE CONVERT
+
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
         //boolean asPack = releaserReference != null;
 
@@ -127,111 +234,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
             return new IssueAssetTransaction(typeBytes, creator, asset, signatureBytes);
         }
     }
-
-    public long getAssetKey(DCSet db) {
-        return getItem().getKey(db);
-    }
-
-    @Override
-    public BigDecimal getAmount() {
-        return new BigDecimal(((AssetCls) getItem()).getQuantity());
-    }
-
-    @Override
-    public BigDecimal getAmount(String address) {
-        if (address.equals(creator.getAddress())) {
-            return getAmount();
-        }
-        AssetCls asset = (AssetCls) item;
-        return BigDecimal.ZERO.setScale(asset.getScale());
-    }
-
-	/*
-	@Override
-	public BigDecimal getAmount(Account account) {
-		String address = account.getAddress();
-		return getAmount(address);
-	}
-	 */
-
-	/*
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setDC(dcSet, asDeal, blockHeight, seqNo);
-
-        AssetCls asset = (AssetCls) this.item;
-
-        if (false && dcSet.getItemAssetMap().getLastKey() < BlockChain.AMOUNT_SCALE_FROM) {
-            // MAKE OLD STYLE ASSET with DEVISIBLE:
-            // PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
-            asset = new AssetVenture((byte) 0, asset.getOwner(), asset.getName(),
-                    asset.getIcon(), asset.getImage(), asset.getDescription(), AssetCls.AS_INSIDE_ASSETS, asset.getScale(), asset.getQuantity());
-            this.item = asset;
-        }
-
-    }
-    */
-
-    //VALIDATE
-
-    @Override
-    public String viewAmount(String address) {
-        return this.getAmount().toString();
-    }
-
-    //PARSE CONVERT
-
-    @Override
-    public boolean hasPublicText() {
-        if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
-                return false;
-        }
-
-        return true;
-    }
-
-    //@Override
-    @Override
-    public int isValid(int asDeal, long flags) {
-
-        if (height < BlockChain.ALL_VALID_BEFORE) {
-            return VALIDATE_OK;
-        }
-
-        int result = super.isValid(asDeal, flags);
-        if (result != Transaction.VALIDATE_OK) {
-            return result;
-        }
-        //CHECK QUANTITY
-        AssetCls asset = (AssetCls) this.getItem();
-        //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
-        long maxQuantity = Long.MAX_VALUE;
-        long quantity = asset.getQuantity();
-        //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
-        if (quantity > maxQuantity || quantity < -1) {
-            return INVALID_QUANTITY;
-        }
-
-        if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
-            Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
-            if (item.b < quantity) {
-                return INVALID_QUANTITY;
-            }
-        }
-
-        return Transaction.VALIDATE_OK;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public JSONObject toJson() {
-        //GET BASE
-        JSONObject transaction = super.toJson();
-        AssetCls asset = (AssetCls) getItem();
-        //ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
-        transaction.put("asset", asset.toJson());
-        return transaction;
-    }
-
 
 	/*
 	//@Override
