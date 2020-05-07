@@ -173,6 +173,11 @@ public class IssuePersonRecord extends IssueItemRecord {
 
     @Override
     public int isValid(int asDeal, long flags) {
+
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         PersonCls person = (PersonCls) getItem();
         // FOR PERSONS need LIMIT DESCRIPTION because it may be make with 0 COMPU balance
         int descriptionLength = person.getDescription().getBytes(StandardCharsets.UTF_8).length;

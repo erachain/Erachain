@@ -444,6 +444,10 @@ public class IssueStatementRecord extends Transaction {
     @Override
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         //CHECK DATA SIZE
         if (data.length > BlockChain.MAX_REC_DATA_BYTES || data.length < 1) {
             return INVALID_DATA_LENGTH;

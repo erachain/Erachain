@@ -590,6 +590,10 @@ public class RSignNote extends Transaction implements Itemable {
     @Override
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         //CHECK DATA SIZE
         if (data == null && key <= 0)
             return INVALID_DATA_LENGTH;

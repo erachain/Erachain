@@ -344,6 +344,10 @@ public class RHashes extends Transaction {
     //@Override
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         //CHECK DATA SIZE
         if (url != null && url.length > MAX_URL_LENGTH) {
             return INVALID_URL_LENGTH;

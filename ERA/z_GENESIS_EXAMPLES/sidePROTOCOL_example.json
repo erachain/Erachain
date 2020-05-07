@@ -15,6 +15,11 @@
     "polls": 1000,
     "statuses": 1000
   },
+  // switcj ON multi-level referals system. Default is true
+  "referalsOn": true,
+  // Set valid all transactions before the height. Defaul = 0
+  "allValidBefore": 0,
+  //
   "assets": [
     // ASSET KEY, NAME, QUALITY, CREATOR
     [
