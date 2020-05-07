@@ -1484,6 +1484,8 @@ public class BlockExplorer {
         output.put("Label_to", Lang.getInstance().translateFromLangObj("To #date", langObj));
         output.put("Label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
 
+        output.put("Label_data", Lang.getInstance().translateFromLangObj("Data # данные", langObj));
+
         output.put("person_img", a);
         output.put("person_key", person.getKey());
         output.put("person_name", person.viewName());

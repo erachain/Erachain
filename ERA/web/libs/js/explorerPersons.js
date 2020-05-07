@@ -128,11 +128,12 @@ function person_status(data) {
             data.last.creator + get_lang() + '">' + data.last.creator_name + '</a><br>';
         output += data.Label_transaction + ': <a href ="?tx=' + data.last.txBlock + '-' + data.last.txSeqNo + get_lang()
         + '">' + data.last.txBlock + '-' + data.last.txSeqNo + '</a><br>';
-        output += '<br>';
 
         // show %D parameter
         if (data.last.params[5]) {
-            output += '<div>' + fformat(data.last.params[5]) + '</div>';
+            output += '<div>' + data.Label_data + ':<br>' + fformat(data.last.params[5]) + '</div>';
+        } else {
+            output += '<br>';
         }
 
     }
