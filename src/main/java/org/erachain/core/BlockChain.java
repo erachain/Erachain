@@ -522,7 +522,7 @@ public class BlockChain {
                 }
 
                 if (chainParams.containsKey("protectSendToAnonymous")) {
-                    PERSON_SEND_PROTECT = (Boolean) chainParams.get("protectSendToAnomin");
+                    PERSON_SEND_PROTECT = (Boolean) chainParams.get("protectSendToAnonymous");
                 }
 
 
