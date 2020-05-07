@@ -129,6 +129,8 @@ function person_status(data) {
         output += data.Label_transaction + ': <a href ="?tx=' + data.last.txBlock + '-' + data.last.txSeqNo + get_lang()
         + '">' + data.last.txBlock + '-' + data.last.txSeqNo + '</a><br>';
         output += '<br>';
+        // show %D parameter
+        output += '<div>' + fformat(data.last.params[3]) + '</div>';
     }
 
     output += data.Label_person + ': <a href ="?person=' +
@@ -174,6 +176,8 @@ function person_status(data) {
                 item.creator + get_lang() + '">' + cutBlank(item.creator_name, 16) + '...</a>';
             output += '<td> <a href ="?tx=' +
                 item.txBlock + '-' + item.txSeqNo + get_lang() + '">' + item.txBlock + '-' + item.txSeqNo + '</a>';
+
+            output += '<div>' + fformat(item.params[3]) + '</div>';
 
         }
     }
