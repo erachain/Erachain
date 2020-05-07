@@ -667,8 +667,8 @@ public class Order implements Comparable<Order> {
                 //// 	255979-3	255992-1
                 //|| height == 255992
                 ///Transaction.viewDBRef(id).equals("15057-1")
+                id == 3644468729217028L
 
-                Transaction.viewDBRef(id).equals("776446-1")
 
             //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
             //|| height == 253841 // сработал NEW_FLOR 2-й
@@ -788,7 +788,8 @@ public class Order implements Comparable<Order> {
             index++;
 
             if (debug ||
-                    Transaction.viewDBRef(id).equals("776446-1")
+                    //Transaction.viewDBRef(id).equals("776446-1")
+                    id == 3644468729217028L
             ) {
                 debug = true;
             }
@@ -1053,8 +1054,9 @@ public class Order implements Comparable<Order> {
 
     public void orphan(Block block) {
 
-        if (BlockChain.CHECK_BUGS > 3 &&
-                Transaction.viewDBRef(id).equals("776446-1")
+        if (BlockChain.CHECK_BUGS > 1 &&
+                //Transaction.viewDBRef(id).equals("776446-1")
+                id == 3644468729217028L
         ) {
             boolean debug = false;
         }

@@ -202,12 +202,13 @@ public class BlockChain {
     public static final int HOLD_VALID_START = TESTS_VERS > 0 ? 0 : VERS_4_11;
 
     public static int ALL_VALID_BEFORE = 0;
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 623904;
-    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : ALL_BALANCES_OK_TO; //260120;
+    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : 623904; //260120;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам
      */
-    public static final int LEFT_PRICE_HEIGHT = TEST_DB > 0 ? 0 : CANCEL_ORDERS_ALL_VALID;
+    public static final int LEFT_PRICE_HEIGHT = TEST_DB > 0 ? 0 : 623904;
+
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 900000;
     /**
      * {@link LEFT_PRICE_HEIGHT} as SeqNo
      */
