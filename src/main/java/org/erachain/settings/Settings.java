@@ -27,7 +27,7 @@ import java.util.List;
 public class Settings {
 
     public static final long DEFAULT_MAINNET_STAMP = 1487844793333L;
-    public static final long DEFAULT_DEMO_NET_STAMP = 1581001700000L; // default for developers test net
+    public static final long DEFAULT_DEMO_NET_STAMP = 1588932600000L; // default for developers test net
 
     public static String APP_NAME = "";
     public static String APP_FULL_NAME = "";
