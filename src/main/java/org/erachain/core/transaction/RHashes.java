@@ -364,7 +364,7 @@ public class RHashes extends Transaction {
         int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
-        if (BlockChain.VERS_4_23_01 > 0 && height > BlockChain.VERS_4_23_01) {
+        if (height > BlockChain.VERS_4_23_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого
             if (hashes != null && hashes.length > 0) {
                 TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
