@@ -445,6 +445,7 @@ public class BlockChain {
         } else if (SIDE_MODE) {
             File file = new File("sidePROTOCOL.json");
             if (file.exists()) {
+                LOGGER.info("sidePROTOCOL.json USED");
                 // START SIDE CHAIN
                 String jsonString = "";
                 try {

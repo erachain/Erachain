@@ -40,6 +40,7 @@ public class Start {
         //builder.headless(false).run(args);
         File file = new File("startARGS.txt");
         if (file.exists()) {
+            LOGGER.info("startARGS.txt USED");
             try {
                 List<String> lines = Files.readLines(file, Charsets.UTF_8);
 
@@ -105,6 +106,7 @@ public class Start {
         file = new File("sideGENESIS.json");
         if (Settings.NET_MODE == Settings.NET_MODE_MAIN && Settings.TEST_DB_MODE == 0 && file.exists()) {
             // START SIDE CHAIN
+            LOGGER.info("sideGENESIS.json USED");
             try {
                 List<String> lines = Files.readLines(file, Charsets.UTF_8);
 
