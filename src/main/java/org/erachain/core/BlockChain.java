@@ -201,8 +201,7 @@ public class BlockChain {
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = VERS_4_11;
 
-    // TODO убрать в номом ДЕВЕЛОП
-    public static int ALL_VALID_BEFORE = DEMO_MODE ? 30000 : 0;
+    public static int ALL_VALID_BEFORE = DEMO_MODE ? 0 : 0;
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : 623904; //260120;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам<bR>
