@@ -196,31 +196,31 @@ public class BlockChain {
             : new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
-    public static final int VERS_4_11 = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 194400;
+    public static final int VERS_4_11 = TEST_DB > 0 || !MAIN_MODE ? 0 : 194400;
 
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
-    public static final int HOLD_VALID_START = TESTS_VERS > 0 ? 0 : VERS_4_11;
+    public static final int HOLD_VALID_START = VERS_4_11;
 
-    public static int ALL_VALID_BEFORE = 0;
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 623904;
-    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : ALL_BALANCES_OK_TO; //260120;
+    public static int ALL_VALID_BEFORE = DEMO_MODE ? 0 : 0;
+    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : 623904; //260120;
     /**
-     * Включает обработку заявок на бирже по цене рассчитанной по остаткам
+     * Включает обработку заявок на бирже по цене рассчитанной по остаткам<bR>
+     * !!! ВНИМАНИЕ !!! нельзя изменять походу собранной цепочки - так как съедут цены и индекс не удалится у некоторых ордеров - цена о другая.
+     * см issue https://lab.erachain.org/erachain/Erachain/-/issues/1322
      */
-    public static final int LEFT_PRICE_HEIGHT = TEST_DB > 0 ? 0 : CANCEL_ORDERS_ALL_VALID;
+    public static final int LEFT_PRICE_HEIGHT = TEST_DB > 0 || !MAIN_MODE ? 0 : 623904;
+
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 || !MAIN_MODE ? 0 : 900000;
     /**
      * {@link LEFT_PRICE_HEIGHT} as SeqNo
      */
-    public static final long LEFT_PRICE_HEIGHT_SEQ = TEST_DB > 0 ? 0 : Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
+    public static final long LEFT_PRICE_HEIGHT_SEQ = Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
 
-    public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 44666;
+    public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 44666;
 
-    public static final int VERS_4_12 = TEST_DB > 0 ? 0 : VERS_4_11;
+    public static final int VERS_4_12 = VERS_4_11;
 
-    public static final int VERS_30SEC = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 280785; //	2019-09-17 12:01:13
-
-    //public static final long VERS_30SEC_TIME = Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC
-    //        * (DEVELOP_USE ? 120L : TEST_MODE? 30L : 288L);
+    public static final int VERS_30SEC = TEST_DB > 0 || !MAIN_MODE ? 0 : 280785; //	2019-09-17 12:01:13
 
     // TODO поидее отрицательное тоже работать будет как надо
     public static final long VERS_30SEC_TIME =
@@ -228,9 +228,9 @@ public class BlockChain {
 
     public static final int VERS_4_21_02 = 684000;
 
-    public static final int VERS_4_23_01 = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 800000;
+    public static final int VERS_4_23_01 = TEST_DB > 0 || SIDE_MODE || TEST_MODE ? 0 : 800000;
 
-    public static final int VERS_5_01_01 = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 950000;
+    public static final int VERS_5_01_01 = TEST_DB > 0 || SIDE_MODE || TEST_MODE ? 0 : 960000;
 
     /**
      * Включает реферальную систему
@@ -240,7 +240,7 @@ public class BlockChain {
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
      */
-    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
+    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 || SIDE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
     public static final int DEFAULT_DURATION = 365 * 5; // 5 years
 
     public static final int DEVELOP_FORGING_START = 100;

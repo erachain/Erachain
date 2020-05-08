@@ -30,6 +30,7 @@ import java.util.HashMap;
 
 public abstract class ItemCls implements ExplorerJsonLine {
 
+    protected final static long START_KEY = 1L << 14;
     public static final int ASSET_TYPE = 1;
     public static final int IMPRINT_TYPE = 2;
     public static final int TEMPLATE_TYPE = 3;

@@ -690,7 +690,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 || assetType == AssetCls.AS_INSIDE_ACCESS
                                 || assetType == AssetCls.AS_INSIDE_BONUS
                         ) {
-                            if (height > BlockChain.VERS_4_12)
+                            if (height > BlockChain.HOLD_VALID_START)
                                 return NOT_HOLDABLE_ASSET;
                         }
 
@@ -700,10 +700,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                         if (!unLimited) {
                             balance = this.recipient.getBalance(dcSet, absKey, actionType).b;
-                            BigDecimal amountOWN = this.recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
+                            ////BigDecimal amountOWN = this.recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
                             // amontOWN, balance and amount - is
                             // negative
-                            if (balance.add(this.amount).compareTo(amountOWN) < 0) {
+                            if (balance.compareTo(amount) < 0) {
                                 return NO_HOLD_BALANCE;
                             }
                         }

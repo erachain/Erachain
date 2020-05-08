@@ -198,10 +198,10 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
                 Fun.t5(address, Fun.HI(), Fun.HI(), Fun.HI(), Fun.HI())).values().iterator());
     }
 
-    @Override
+    @Override // Tuple4[12, 95, 6236.96848586, 3644468729217028] in haveWantKeyMap
     public HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal stopPrice, Map deleted) {
 
-        // берем все сейчас! так как тут просто перебьор будет и нам надо вщять + одну выше цены
+        // берем все сейчас! так как тут просто перебор будет и нам надо взять + одну выше цены
         // Object limitOrHI = stopPrice == null ? Fun.HI() : stopPrice; // надо тут делать выбор иначе ошибка преобразования в subMap
         Collection<Long> keys = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
@@ -216,6 +216,9 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
             }
 
             Order order = get(key);
+            if (BlockChain.CHECK_BUGS > 1 && order == null) {
+                logger.error("ORDER [" + Transaction.viewDBRef(key) + "] = NULL");
+            }
             result.put(key, order);
             // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
             // причем берем по Остаткам Цену теперь
