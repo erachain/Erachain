@@ -1025,7 +1025,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 // IF send from PERSON to ANONYMOUS
                 // TODO: PERSON RULE 1
                 if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
-                        && actionType != ACTION_DEBT && actionType != ACTION_HOLD
+                        && actionType != ACTION_DEBT && actionType != ACTION_HOLD && actionType != ACTION_SPEND
                         && (absKey < 10 || absKey > asset.getStartKey()) // GATE Assets
                         && assetType != AssetCls.AS_ACCOUNTING
                         && assetType != AssetCls.AS_INSIDE_BONUS
@@ -1130,10 +1130,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     this.recipient.changeBalance(db, backward, backward, key, this.amount, false, false);
                 }
             } else if (actionType == ACTION_SPEND) {
-                // UPDATE SENDER - OWNABLE
-                this.creator.changeBalance(db, true, backward, absKey, this.amount.abs(), true, false);
+                // UPDATE SENDER - OWNABLE + SPEN
+                this.creator.changeBalance(db, true, backward, absKey, this.amount.abs(), true, true);
                 // UPDATE RECIPIENT - SPENDABLE
-                this.recipient.changeBalance(db, false, backward, key, this.amount, false, false);
+                this.recipient.changeBalance(db, true, backward, key, this.amount, false, false);
             } else {
                 // UPDATE SENDER
                 if (absKey == 666L) {
@@ -1245,10 +1245,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 }
 
             } else if (actionType == ACTION_SPEND) {
-                // UPDATE SENDER - OWNABLE
-                this.creator.changeBalance(db, false, backward, absKey, this.amount.abs(), true, false);
+                // UPDATE SENDER - OWNABLE + SPEN
+                this.creator.changeBalance(db, false, backward, absKey, this.amount.abs(), true, true);
                 // UPDATE RECIPIENT - SPENDABLE
-                this.recipient.changeBalance(db, true, backward, key, this.amount, false, false);
+                this.recipient.changeBalance(db, false, backward, key, this.amount, false, false);
 
             } else {
 
