@@ -382,8 +382,13 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         }
 
-        public int calcWinValueTargeted() {
-            return (int) (BlockChain.BASE_TARGET * winValue / target);
+        /**
+         * for percentage
+         *
+         * @return
+         */
+        public float calcWinValueTargeted() {
+            return 100f * winValue / target;
         }
 
         @SuppressWarnings("unchecked")

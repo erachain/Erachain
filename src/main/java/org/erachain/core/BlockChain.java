@@ -553,7 +553,7 @@ public class BlockChain {
             ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
         } else {
 
-            ////////// WPIPED
+            ////////// WIPED
             // WRONG Issue Person #125
             WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("zDLLXWRmL8qhrU9DaxTTG4xrLHgb7xLx5fVrC2NXjRaw2vhzB1PArtgqNe2kxp655saohUcWcsSZ8Bo218ByUzH")));
             // WRONG orders by Person 90 Yakovlev
