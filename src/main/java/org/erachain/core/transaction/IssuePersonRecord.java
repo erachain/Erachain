@@ -238,13 +238,19 @@ public class IssuePersonRecord extends IssueItemRecord {
         }
         if (person instanceof PersonHuman) {
             PersonHuman human = (PersonHuman) person;
-            if (human.isMustBeSigned() && !Arrays.equals(person.getOwner().getPublicKey(), creator.getPublicKey())) {
-                // OWNER of personal INFO not is CREATOR
-                if (human.getOwnerSignature() == null) {
-                    return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
+            if (human.isMustBeSigned()) {
+                if (!Arrays.equals(person.getOwner().getPublicKey(), creator.getPublicKey())) {
+                    // OWNER of personal INFO not is CREATOR
+                    if (human.getOwnerSignature() == null) {
+                        return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
+                    }
+                    if (!human.isSignatureValid(dcSet)) {
+                        return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
+                    }
+
                 }
-                if (!human.isSignatureValid(dcSet)) {
-                    return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
+                if (dcSet.getTransactionFinalMapSigns().contains(human.getOwnerSignature())) {
+                    return Transaction.ITEM_DUPLICATE;
                 }
             }
         }
@@ -320,6 +326,9 @@ public class IssuePersonRecord extends IssueItemRecord {
             if (makerLastTimestamp == null) {
                 maker.setLastTimestamp(new long[]{timestamp, dbRef}, this.dcSet);
             }
+
+            // запомним подпись для поиска потом
+            dcSet.getTransactionFinalMapSigns().put(person.getOwnerSignature(), dbRef);
         }
 
     }
@@ -333,6 +342,10 @@ public class IssuePersonRecord extends IssueItemRecord {
         PublicKeyAccount maker = person.getOwner();
         byte[] makerBytes = maker.getPublicKey();
         this.dcSet.getIssuePersonMap().delete(makerBytes);
+
+        if (person.isMustBeSigned()) {
+            dcSet.getTransactionFinalMapSigns().delete(person.getOwnerSignature());
+        }
 
     }
 
