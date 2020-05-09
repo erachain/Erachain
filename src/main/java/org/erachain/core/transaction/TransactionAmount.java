@@ -954,6 +954,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         }
 
                         if (backward) {
+                            // PRODUCE is denied - only SPEND
                             return INVALID_BACKWARD_ACTION;
                         }
 
