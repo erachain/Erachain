@@ -24,6 +24,11 @@ import java.util.Set;
 public class IssuePersonRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_PERSON_TRANSACTION;
     private static final String NAME_ID = "Issue Person";
+    /**
+     * Нельзя делать большой, так как вся комиссия будет эммитироваться - а значит слишком большой размер будет эммитрировать больше
+     */
+    public static final int MAX_DESCRIPTION_LENGTH = 1 << 15;
+
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, person, feePow, timestamp, reference);
@@ -181,7 +186,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         PersonCls person = (PersonCls) getItem();
         // FOR PERSONS need LIMIT DESCRIPTION because it may be make with 0 COMPU balance
         int descriptionLength = person.getDescription().getBytes(StandardCharsets.UTF_8).length;
-        if (descriptionLength > 8000) {
+        if (descriptionLength > MAX_DESCRIPTION_LENGTH) {
             return INVALID_DESCRIPTION_LENGTH_MAX;
         }
         // birthLatitude -90..90; birthLongitude -180..180
