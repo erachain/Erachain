@@ -953,9 +953,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 return NOT_SPENDABLE_ASSET;
                         }
 
-                        if (backward
-                            // && !asset.getOwner().equals(creator)
-                        ) {
+                        if (backward) {
                             return INVALID_BACKWARD_ACTION;
                         }
 
