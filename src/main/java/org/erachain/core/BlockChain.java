@@ -321,7 +321,7 @@ public class BlockChain {
 
     public static final int ITEM_POLL_FROM = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : VERS_4_11;
 
-    public static final int AMOUNT_SCALE_FROM = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 1033;
+    public static final int AMOUNT_SCALE_FROM = TEST_DB > 0 || !MAIN_MODE ? 0 : 1033;
     public static final int AMOUNT_DEDAULT_SCALE = 8;
     public static final int FREEZE_FROM = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 249222;
     // только на них можно замороженные средства вернуть из списка FOUNDATION_ADDRESSES (там же и замароженные из-за утраты)

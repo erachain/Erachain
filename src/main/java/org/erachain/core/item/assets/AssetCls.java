@@ -284,7 +284,9 @@ public abstract class AssetCls extends ItemCls {
     public abstract BigDecimal getReleased();
     public abstract BigDecimal getReleased(DCSet dc);
 
+
     public int getScale() {
+        // TODO убрать это если будет новая цепочка с регулируемой точностью
         if (BlockChain.MAIN_MODE && this.key > 0 && this.key < 5 ||
                 this.key > 1000 &&
                         this.key < BlockChain.AMOUNT_SCALE_FROM
