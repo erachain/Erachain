@@ -23,16 +23,91 @@
   "protectSendToAnonymous": true,
   //
   "assets": [
-    // ASSET KEY, NAME, QUALITY, CREATOR
+    // **** ASSET KEY, NAME, QUALITY, CREATOR ****
+    /////// CRYPTOCURRENCY
     [
       12,
       "BTC",
       0,
       "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
     ],
+    /////// COMMODITY
+    [
+      21,
+      "GOLD",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      22,
+      "OIL",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      23,
+      "GAS",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      24,
+      "BREND",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    /////// FIATCURRENCY
+    [
+      86,
+      "TRY",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      87,
+      "SGD",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      88,
+      "AUD",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      89,
+      "CHF",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      90,
+      "GBP",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      91,
+      "JPY",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
     [
       92,
       "RUB",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      93,
+      "CNY",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      94,
+      "EUR",
       0,
       "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
     ],
