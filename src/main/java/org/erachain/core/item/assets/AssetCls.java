@@ -284,17 +284,8 @@ public abstract class AssetCls extends ItemCls {
     public abstract BigDecimal getReleased();
     public abstract BigDecimal getReleased(DCSet dc);
 
-	/*
-	public boolean isDivisible() {
-		if (this.key < BlockChain.AMOUNT_SCALE_FROM)
-			return divisible;
-
-		return this.scale > 0;
-	}
-	 */
-
     public int getScale() {
-        if (this.key > 0 && this.key < 5 ||
+        if (BlockChain.MAIN_MODE && this.key > 0 && this.key < 5 ||
                 this.key > 1000 &&
                         this.key < BlockChain.AMOUNT_SCALE_FROM
         ) {
