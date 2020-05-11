@@ -694,6 +694,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 return NOT_HOLDABLE_ASSET;
                         }
 
+                        if (asset.isOutsideType()) {
+                            return INVALID_TRANSFER_TYPE;
+                        }
+
                         // if asset is unlimited and me is creator of this
                         // asset - for RECIPIENT !
                         unLimited = asset.isUnlimited(this.recipient);
@@ -727,8 +731,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         // CLAIMs DEBT - only for OWNER
                         if (asset.isOutsideType()) {
                             if (!this.recipient.equals(this.asset.getOwner())) {
-                                // ERROR
                                 return Transaction.INVALID_CLAIM_DEBT_RECIPIENT;
+                            } else if (this.creator.equals(this.asset.getOwner())) {
+                                return Transaction.INVALID_CLAIM_DEBT_CREATOR;
                             }
                         }
 
@@ -823,10 +828,15 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     // if (balance > 3000)
                                     return INVALID_CREATOR;
                                 }
-
                             }
-
                         }
+
+                        // CLAIMs - invalid for backward to CREATOR - need use SPEND instead
+                        if (asset.isOutsideType() && this.recipient.equals(this.asset.getOwner())) {
+                            // ERROR
+                            return Transaction.INVALID_CLAIM_RECIPIENT;
+                        }
+
 
                         // if asset is unlimited and me is creator of this
                         // asset
@@ -862,26 +872,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                             // ALL OTHER ASSET
 
-                            // CLAIMs invalid
-                            // TODO сейчас сюда не будет приходить!!!
-                            if (asset.isOutsideType() && backward) {
-                                if (!this.recipient.equals(this.asset.getOwner())) {
-                                    // ERROR
-                                    return Transaction.INVALID_CLAIM_RECIPIENT;
-                                }
-
-                                // BACKWARD CLAIM
-                                Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-                                        this.creator.getAddress(), absKey, this.recipient.getAddress());
-                                BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
-                                if (creditAmount.compareTo(amount) < 0) {
-                                    // NOT ENOUGHT INCLAIM from recipient to
-                                    // creator
-                                    return NO_INCLAIM_BALANCE;
-                                }
-
-                            }
-
                             // проверим баланс по КОМПУ
                             if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
                                     && this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b.compareTo(this.fee) < 0
@@ -904,7 +894,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             }
 
                             BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height,
-                                    !(asset.isOutsideType() && backward));
+                                    true);
 
                             if (amount.compareTo(forSale) > 0) {
                                 if (BlockChain.SIDE_MODE || BlockChain.TEST_MODE)
@@ -982,8 +972,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     case ACTION_PLEDGE: // Учеть передачу в залог и возврат из залога
 
                         // пока отключим
-                        if (!BlockChain.TEST_MODE && height > BlockChain.HOLD_VALID_START) {
-                            // вначавле были трнзакции взять на руки без Обратного флага - и она сюда прийдет
+                        if (true) {
+                            return INVALID_TRANSFER_TYPE;
+                        }
+
+                        if (asset.isOutsideType()) {
                             return INVALID_TRANSFER_TYPE;
                         }
 
@@ -1115,7 +1108,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
             
         } else {
-            // STANDART ACTION PROCESS
+            // STANDARD ACTION PROCESS
             if (false && actionType == ACTION_DEBT) {
                 if (backward) {
                     // UPDATE CREDITOR
@@ -1228,8 +1221,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
             
         } else {
-            
-            // STANDART ACTION ORPHAN
+
+            // STANDARD ACTION ORPHAN
             if (false && actionType == ACTION_DEBT) {
                 if (backward) {
                     // UPDATE CREDITOR
