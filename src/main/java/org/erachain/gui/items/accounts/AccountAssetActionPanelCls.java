@@ -11,6 +11,8 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.assets.AssetInfo;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
@@ -168,8 +170,16 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
                 account = ((Account) jComboBox_Account.getSelectedItem());
                 if (asset != null) {
-                    jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
-                            + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
+                    if (balancePosition == TransactionAmount.ACTION_DEBT || balancePosition == TransactionAmount.ACTION_REPAY_DEBT) {
+                        // берем совместно с выданным кредитом
+                        BigDecimal forSale = account.getForSale(DCSet.getInstance(), asset.getKey(), Controller.getInstance().getMyHeight(),
+                                true);
+                        jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
+                                + forSale.toPlainString());
+                    } else {
+                        jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
+                                + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
+                    }
                 }
 
             }
