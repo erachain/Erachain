@@ -7,20 +7,18 @@
   "explorer": "http://my-sidechain.dom:9057",
   "sideLicense": "Sidechain Licence Agreement.pdf",
   // COMPU it is Fee Asset
-  "COMPU_Accuracy": 8,
+  ////"COMPU_Accuracy": 8,
   //
-  "feeForByte": 100,
+  ///"feeForByte": 100,
   //
-  "transferFeePercent": 0.25,
+  ////"transferFeePercent": 0.25,
   //
-  "assetsTransferFeePercent": 0.1,
+  ///"assetsTransferFeePercent": 0.1,
   // default ERA Volume for not MAIN
   //// reserved "ERA": 100000000,
-
   // Set minimal forging stake. Minimal value set as 1/10000 ERA Volume
-  minForgingStake
-  =
-  100000,
+  ////"minForgingStake": 100000,
+
   // start number of items from START_NO
   // for items: assets, imprints, persons, polls, statements, statuses, templates, unouns
   // default is 2^14
