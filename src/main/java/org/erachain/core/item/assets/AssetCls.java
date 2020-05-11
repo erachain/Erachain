@@ -518,8 +518,9 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public boolean isOutsideType() {
-        return this.assetType >= AS_OUTSIDE_CURRENCY
-                && this.assetType <= AS_OUTSIDE_OTHER_CLAIM;
+        return // ?? this.assetType == AS_OUTSIDE_GOODS ||
+                this.assetType >= AS_OUTSIDE_CURRENCY
+                        && this.assetType <= AS_OUTSIDE_OTHER_CLAIM;
     }
 
     public boolean isOutsideCurrency() {
@@ -737,90 +738,67 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_CURRENCY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Send payment request";
+                        return "Передать в собственность денежное требование";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Confirm repayment"
-                                : "Require repayment";
-                    case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Return debt";
-                    case TransactionAmount.ACTION_HOLD:
-                        return "Take the reception into balance";
+                        return backward ? "Отозвать требование исполнения права"
+                                : "Потребовать исполнения денежного требоания";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Подтвердить возврат денег";
+                    default:
+                        return null;
                 }
-                break;
             case AS_OUTSIDE_SERVICE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
                         return "Transfer Service Requirement";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Confirm the provision of services"
+                        return backward ? "Отозвать требование в предоставлении услуг"
                                 : "To require the provision of services";
-                    case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Return debt";
-                    case TransactionAmount.ACTION_HOLD:
-                        return "Take the reception into balance";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Confirm the provision of services";
+                    default:
+                        return null;
                 }
-                break;
             case AS_OUTSIDE_SHARE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
                         return "To transfer shares in the property";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Confirm receipt of shares"
+                        return backward ? "To reduce the transfer of shares"
                                 : "To require the transfer of shares";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Return debt";
-                    case TransactionAmount.ACTION_HOLD:
-                        return "Take the reception into balance";
-                }
-                break;
-            case AS_OUTSIDE_BILL:
-                switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
-                        return "Передать вексель в собственность";
-                    case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отменить погашение векселя?"
-                                : "Потребовать погашение векселя!";
-                    case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Отозвать погашение векселя?";
-                    case TransactionAmount.ACTION_HOLD:
-                        return "Подтвердить получение выплаты?";
                     case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                        return "Confirm receipt of shares";
+                    default:
                         return null;
                 }
-                break;
+            case AS_OUTSIDE_BILL:
             case AS_OUTSIDE_BILL_EX:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Передать вексель в собственность";
+                        return "Передать в собственность вексель";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отменить погашение векселя?"
-                                : "Потребовать погашение векселя!";
-                    case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Отозвать погашение векселя?";
-                    case TransactionAmount.ACTION_HOLD:
-                        return "Подтвердить получение выплаты?";
+                        return backward ? "Отозвать требование погашения векселя"
+                                : "Потребовать погашения векселя";
                     case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                        return "Подтвердить погашение векселя";
+                    default:
                         return null;
                 }
-                break;
             case AS_OUTSIDE_OTHER_CLAIM:
+            case AS_INSIDE_OTHER_CLAIM:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
                         return "Передать в собственность требование";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Подтвердить исполнение своего права"
+                        return backward ? "Отозвать требование исполнения права"
                                 : "Потребовать исполнения своего права";
-                    case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Отозвать погашение векселя?";
-                    case TransactionAmount.ACTION_HOLD:
-                        return "Учесть прием требования на баланс";
                     case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                        return "Подтвердить исполнение своего права";
+                    default:
                         return null;
                 }
-                break;
             case AS_INSIDE_CURRENCY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -924,23 +902,6 @@ public abstract class AssetCls extends ItemCls {
                 }
                 break;
             case AS_INDEX:
-                break;
-            case AS_INSIDE_OTHER_CLAIM:
-                switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
-                        return "Передать в собственность требование";
-                    case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Подтвердить исполнение своего права"
-                                : "Потребовать исполнения своего права";
-                    case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Отозвать погашение векселя?";
-                    case TransactionAmount.ACTION_HOLD:
-                        return "Учесть прием требования на баланс";
-                    case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
-                        return null;
-                }
-                break;
             case AS_ACCOUNTING:
                 break;
         }

@@ -948,6 +948,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             return INVALID_BACKWARD_ACTION;
                         }
 
+                        if (asset.isOutsideType() && !this.recipient.equals(this.asset.getOwner())) {
+                            return Transaction.INVALID_RECEIVER;
+                        }
+
                         // if asset is unlimited and me is creator of this
                         // asset
                         unLimited = asset.isUnlimited(this.creator);
