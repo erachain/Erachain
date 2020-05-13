@@ -937,9 +937,9 @@ public abstract class Transaction implements ExplorerJsonLine {
         long fee = this.fee.unscaledValue().longValue();
 
         // Если слишком большая комиссия, то и награду чуток увеличим
-        if (fee > BlockChain.BONUS_REFERAL << 4)
+        if (fee > BlockChain.BONUS_REFERAL << 3)
             return BlockChain.BONUS_REFERAL << 1;
-        else if (fee < BlockChain.BONUS_REFERAL << 2) {
+        else if (fee < BlockChain.BONUS_REFERAL << 1) {
             // стандартно если обычная то половину отправим на подарки
             return fee >> 1;
         }
