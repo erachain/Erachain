@@ -1242,7 +1242,7 @@ public class Synchronizer extends Thread {
             if (!dcSet.isFork()) {
                 // только запись в нашу цепочку
 
-                if (ctrl.doesWalletExists() && !ctrl.noDataWallet) {
+                if (ctrl.doesWalletExists() && !ctrl.noDataWallet && ctrl.wallet.walletUpdater != null) {
                     ctrl.wallet.walletUpdater.offerMessage(new Pair(doOrphan, block));
                 }
 
