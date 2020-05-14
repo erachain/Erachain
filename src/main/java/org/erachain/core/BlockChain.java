@@ -241,6 +241,10 @@ public class BlockChain {
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
      */
     public static final int START_ISSUE_RIGHTS = TEST_DB > 0 || SIDE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
+
+    public static final int START_ITEM_DUPLICATE = TEST_DB > 0 || !MAIN_MODE ? 0 : 400000;
+
+
     public static final int DEFAULT_DURATION = 365 * 5; // 5 years
 
     public static final int DEVELOP_FORGING_START = 100;

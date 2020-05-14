@@ -249,7 +249,7 @@ public class IssuePersonRecord extends IssueItemRecord {
                     }
 
                 }
-                if (dcSet.getTransactionFinalMapSigns().contains(human.getOwnerSignature())) {
+                if (height > BlockChain.START_ITEM_DUPLICATE && dcSet.getTransactionFinalMapSigns().contains(human.getOwnerSignature())) {
                     return Transaction.ITEM_DUPLICATE;
                 }
             }

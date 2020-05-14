@@ -14,7 +14,6 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.item.imprints.ImprintCls;
-import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.Status;
@@ -452,10 +451,10 @@ public class TransactionCreator {
         this.checkUpdate();
 
         //CHECK FOR UPDATES
-        if (forIssue) {
-
+        if (false // теперь ниже проверяем в форке тут на ДУБЛЬ
+                && forIssue) {
             // IF has not DUPLICATE in UNCONFIRMED RECORDS
-            TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionTab();
+            TransactionMap unconfirmedMap = this.fork.getTransactionTab();
             try {
                 for (Transaction record : unconfirmedMap.values()) {
                     if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
@@ -479,7 +478,7 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        PersonCls person = new PersonHuman(owner, fullName, birthday, deathday,
+        PersonHuman person = new PersonHuman(owner, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, height, icon, image, description, ownerSignature);
 
@@ -497,6 +496,10 @@ public class TransactionCreator {
 
         //VALIDATE AND PROCESS
         if (forIssue) {
+            if (this.fork.getTransactionFinalMapSigns().contains(person.getOwnerSignature())) {
+                return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+            }
+
             boolean asPack = false;
             return new Pair<Transaction, Integer>(issuePersonRecord, 1);//this.afterCreate(issuePersonRecord, asPack));
         } else {
@@ -517,27 +520,6 @@ public class TransactionCreator {
         //CHECK FOR UPDATES
         this.checkUpdate();
 
-        // IF has not DUPLICATE in UNCONFIRMED RECORDS
-        TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionTab();
-        try {
-            for (Transaction record : unconfirmedMap.values()) {
-                if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
-                    if (record instanceof IssuePersonRecord) {
-                        IssuePersonRecord issuePerson = (IssuePersonRecord) record;
-                        if (issuePerson.getItem().getName().equals(human.getName())) {
-                            return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
-                        }
-                    }
-                }
-            }
-        } catch (java.lang.Throwable e) {
-            if (e instanceof java.lang.IllegalAccessError) {
-                // налетели на закрытую таблицу
-            } else {
-                logger.error(e.getMessage(), e);
-            }
-        }
-
         //TIME
         long time = NTP.getTime();
 
@@ -548,6 +530,10 @@ public class TransactionCreator {
         IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, human, (byte) feePow, time, lastReference);
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
         issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
+
+        if (this.fork.getTransactionFinalMapSigns().contains(((PersonHuman) issuePersonRecord.getItem()).getOwnerSignature())) {
+            return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+        }
 
         //VALIDATE AND PROCESS
         boolean asPack = false;
