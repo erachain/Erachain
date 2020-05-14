@@ -374,5 +374,34 @@ public class DealsPopupMenu extends JPopupMenu {
                 break;
 
         }
+
+        // ALL OUTSIDE ASSETS
+        if (asset.isOutsideType()) {
+
+            this.debtAssetReturn.setEnabled(false);
+
+            if (pubKey.equals(asset.getOwner())) {
+                this.holdAsset.setEnabled(false);
+                this.debtAsset.setEnabled(false);
+                this.debtAssetBackward.setEnabled(false);
+                this.spendAsset.setEnabled(false);
+            } else {
+                if (balance.a.b.signum() <= 0) {
+                    this.sendAsset.setEnabled(false);
+                    this.holdAsset.setEnabled(false);
+                    this.debtAsset.setEnabled(false);
+                    this.debtAssetBackward.setEnabled(false);
+                    this.spendAsset.setEnabled(false);
+                } else {
+                    if (balance.b.b.signum() >= 0) {
+                        this.debtAssetBackward.setEnabled(false);
+                    }
+                    if (balance.a.b.add(balance.b.b).signum() <= 0) {
+                        this.debtAsset.setEnabled(false);
+                    }
+                }
+
+            }
+        }
     }
 }

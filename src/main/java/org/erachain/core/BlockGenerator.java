@@ -1478,16 +1478,16 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         FORGING(2, Lang.getInstance().translate("Forging")),
         FORGING_WAIT(3, Lang.getInstance().translate("Forging awaiting another peer sync"));
 
-        private final int statuscode;
+        private final int statusCode;
         private String name;
 
         ForgingStatus(int status, String name) {
-            statuscode = status;
+            statusCode = status;
             this.name = name;
         }
 
-        public int getStatuscode() {
-            return statuscode;
+        public int getStatusCode() {
+            return statusCode;
         }
 
         public String getName() {
