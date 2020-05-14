@@ -31,7 +31,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, NAME_ID, creator, item, feePow, timestamp, reference);
         this.signature = signature;
-        if (item.getReference() == null) item.setReference(signature); // set reference
+        if (true || item.getReference() == null) item.setReference(signature); // set reference
         //item.resolveKey(DLSet.getInstance());
         //if (timestamp > 1000 ) this.calcFee(); // not asPaack
     }
@@ -39,7 +39,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) {
         this(typeBytes, NAME_ID, creator, item, (byte) 0, 0L, null);
         this.signature = signature;
-        if (this.item.getReference() == null) this.item.setReference(signature);
+        if (true || this.item.getReference() == null) this.item.setReference(signature);
         //item.resolveKey(DLSet.getInstance());
     }
 
@@ -98,8 +98,9 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @Override
     public void sign(PrivateKeyAccount creator, int forDeal) {
         super.sign(creator, forDeal);
-        // in IMPRINT reference already setted before sign
-        if (this.item.getReference() == null) this.item.setReference(this.signature);
+        if (this.getType() != ItemCls.IMPRINT_TYPE
+                // in IMPRINT reference already setted before sign
+                || this.item.getReference() == null) this.item.setReference(this.signature);
     }
 
     //PARSE CONVERT
@@ -211,8 +212,9 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         super.process(block, asDeal);
 
         // SET REFERENCE if not setted before (in Imprint it setted)
-        if (this.item.getReference() == null)
-            this.item.setReference(this.signature);
+        if (this.getType() != ItemCls.IMPRINT_TYPE
+                // in IMPRINT reference already setted before sign
+                || this.item.getReference() == null) this.item.setReference(this.signature);
 
         //INSERT INTO DATABASE
         key = this.item.insertToMap(this.dcSet, this.item.getStartKey());
