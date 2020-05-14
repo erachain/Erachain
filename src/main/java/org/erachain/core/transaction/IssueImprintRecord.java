@@ -1,11 +1,9 @@
 package org.erachain.core.transaction;
 
 import com.google.common.primitives.Longs;
-import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.item.imprints.ImprintCls;
@@ -169,8 +167,9 @@ public class IssueImprintRecord extends IssueItemRecord {
         if (result != Transaction.VALIDATE_OK) return result;
 
         // CHECK reference in DB
-        if (item.getDBIssueMap(this.dcSet).contains(item.getReference()))
+        if (dcSet.getTransactionFinalMapSigns().contains(((ImprintCls) item).hashName())) {
             return Transaction.ITEM_DUPLICATE_KEY;
+        }
 
         return Transaction.VALIDATE_OK;
 
@@ -204,9 +203,7 @@ public class IssueImprintRecord extends IssueItemRecord {
         //UPDATE CREATOR
         super.process(block, asDeal);
 
-        if (!Controller.getInstance().onlyProtocolIndexing) {
-            dcSet.getTransactionFinalMapSigns().put(Base58.decode(item.getName()), dbRef);
-        }
+        dcSet.getTransactionFinalMapSigns().put(((ImprintCls) item).hashName(), dbRef);
 
     }
 
@@ -216,9 +213,7 @@ public class IssueImprintRecord extends IssueItemRecord {
         //UPDATE CREATOR
         super.orphan(block, asDeal);
 
-        if (!Controller.getInstance().onlyProtocolIndexing) {
-            dcSet.getTransactionFinalMapSigns().delete(Base58.decode(item.getName()));
-        }
+        dcSet.getTransactionFinalMapSigns().delete(((ImprintCls) item).hashName());
 
     }
 

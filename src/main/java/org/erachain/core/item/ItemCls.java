@@ -352,7 +352,6 @@ public abstract class ItemCls implements ExplorerJsonLine {
     }
 
     public void setReference(byte[] reference) {
-        // TODO - if few items issued in one record - need reference to include nonce here
         this.reference = reference;
 
     }
