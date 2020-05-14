@@ -242,7 +242,7 @@ public class BlockChain {
      */
     public static final int START_ISSUE_RIGHTS = TEST_DB > 0 || SIDE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
 
-    public static final int START_ITEM_DUPLICATE = TEST_DB > 0 || !MAIN_MODE ? 0 : 400000;
+    public static final int START_ITEM_DUPLICATE = TEST_DB > 0 || !MAIN_MODE ? 0 : 800000;
 
 
     public static final int DEFAULT_DURATION = 365 * 5; // 5 years
