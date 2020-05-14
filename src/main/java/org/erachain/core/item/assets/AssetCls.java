@@ -569,6 +569,14 @@ public abstract class AssetCls extends ItemCls {
         return null;
     }
 
+    public PublicKeyAccount defaultRecipient(int actionType, boolean backward) {
+        if (isOutsideType() && (actionType == TransactionAmount.ACTION_SPEND && !backward
+                || actionType == TransactionAmount.ACTION_DEBT)) {
+            return getOwner();
+        }
+        return null;
+    }
+
     public static String viewAssetTypeCls(int asset_type) {
         switch (asset_type) {
             case AS_OUTSIDE_GOODS:

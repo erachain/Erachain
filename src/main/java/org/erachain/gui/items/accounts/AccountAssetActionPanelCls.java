@@ -103,7 +103,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         recipient = accountTo;
         this.balancePosition = balancePosition;
 
-
         initComponents(message);
 
         this.jLabel_Title.setText(Lang.getInstance().translate(this.title).replace("%asset%", asset.viewName()));
@@ -253,18 +252,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
             }
         });
 
-        if (recipient == null) {
-            jButton_ok.setEnabled(false);
-        } else {
-            if (recipient instanceof PublicKeyAccount) {
-                jTextField_To.setText(((PublicKeyAccount) recipient).getBase58());
-            } else {
-                jTextField_To.setText(recipient.getAddress());
-            }
-            jButton_ok.setEnabled(true);
-            //refreshReceiverDetails()
-        }
-
         this.jLabel_Mess_Title.setText(Lang.getInstance().translate("Title") + ":");
         this.jLabel_Mess.setText(Lang.getInstance().translate("Message") + ":");
         this.jCheckBox_Enscript.setText(Lang.getInstance().translate("Encrypt message") + ":");
@@ -287,13 +274,31 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         jTextArea_Account_Description.setWrapStyleWord(true);
         jTextArea_Account_Description.setLineWrap(true);
         jScrollPane2.setViewportView(new AssetInfo(asset, false));
+
+        // возможно есть счет по умолчанию
+        if (recipient == null && asset != null) {
+            recipient = asset.defaultRecipient(balancePosition, backward);
+        }
+
+        if (recipient == null) {
+            jButton_ok.setEnabled(false);
+        } else {
+            if (recipient instanceof PublicKeyAccount) {
+                jTextField_To.setText(((PublicKeyAccount) recipient).getBase58());
+            } else {
+                jTextField_To.setText(recipient.getAddress());
+            }
+            jButton_ok.setEnabled(true);
+        }
+
     }
 
-    private void checkReadyToOK() {
+    protected void checkReadyToOK() {
 
         try {
             String recipientAddress = jTextField_To.getText().trim();
-            if (!Crypto.getInstance().isValidAddress(recipientAddress) && !PublicKeyAccount.isValidPublicKey(recipientAddress)) {
+            if (recipientAddress.isEmpty() ||
+                    !Crypto.getInstance().isValidAddress(recipientAddress) && !PublicKeyAccount.isValidPublicKey(recipientAddress)) {
                 jButton_ok.setEnabled(false);
                 return;
             }

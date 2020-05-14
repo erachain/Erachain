@@ -149,7 +149,7 @@ public class TransactionCreator {
                         this.fork.getTransactionTab().delete(transactionAccount);
                     }
                     // CLEAR for HEAP
-                    transactionAccount.setDC(null);
+                    transactionAccount.resetDCSet();
                 }
             } catch (java.lang.Throwable e) {
                 if (e instanceof java.lang.IllegalAccessError) {
