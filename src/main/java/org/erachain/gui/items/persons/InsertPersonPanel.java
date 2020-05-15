@@ -51,6 +51,12 @@ public class InsertPersonPanel extends IssuePersonPanel {
     public InsertPersonPanel() {
         super();
         init();
+
+        // нужно чтобы нельзя было случайно вставить по Ctrl-C в это поле чего угодно
+        txtBirthLatitude.removeAll();
+        txtBirthLatitude.setComponentPopupMenu(null);
+
+
         copyButton.setVisible(false);
         aliveCheckBox.setSelected(false);
         aliveCheckBox.setVisible(false);
