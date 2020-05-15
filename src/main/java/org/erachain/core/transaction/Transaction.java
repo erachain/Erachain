@@ -106,7 +106,6 @@ public abstract class Transaction implements ExplorerJsonLine {
     // ASSETS
     public static final int INVALID_QUANTITY = 30;
 
-    // public static final int ASSET_DOES_NOT_EXIST = 31;
     public static final int INVALID_AMOUNT_IS_NULL = 31;
     public static final int NEGATIVE_AMOUNT = 32;
     public static final int INVALID_AMOUNT = 33;
@@ -129,6 +128,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int NO_INCLAIM_BALANCE = 49;
 
     public static final int HASH_ALREDY_EXIST = 51;
+
+    public static final int INVALID_CLAIM_DEBT_CREATOR = 61;
 
     public static final int NOT_ENOUGH_ERA_OWN_10 = 101;
     public static final int NOT_ENOUGH_ERA_USE_10 = 102;
@@ -938,7 +939,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         // Если слишком большая комиссия, то и награду чуток увеличим
         if (fee > BlockChain.BONUS_REFERAL << 4)
             return BlockChain.BONUS_REFERAL << 1;
-        else if (fee < BlockChain.BONUS_REFERAL << 2) {
+        else if (fee < BlockChain.BONUS_REFERAL << 1) {
             // стандартно если обычная то половину отправим на подарки
             return fee >> 1;
         }

@@ -116,7 +116,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     @Override
     public long calcBaseFee() {
-        if (!BlockChain.MAIN_MODE || height > BlockChain.VERS_4_23_01) {
+        if (!BlockChain.MAIN_MODE || height > BlockChain.VERS_5_01_01) {
             return 1000 * BlockChain.FEE_PER_BYTE;
         } else {
             return super.calcBaseFee();
@@ -445,8 +445,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             }
         }
 
-        int height = this.getBlockHeightByParentOrLast(this.dcSet);
-
         // CHECK IF ASSETS NOT THE SAME
         if (haveKey == wantKey) {
             return HAVE_EQUALS_WANT;
@@ -481,13 +479,13 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         if (height < BlockChain.ALL_BALANCES_OK_TO ) {
             ; // NOT CHECK
         } else if (FEE_KEY == haveKey) {
-            if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) == -1) {
+            if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) < 0) {
                 return NO_BALANCE;
             }
             // VALID if want to BY COMPU by ERA
         } else if (wantKey == FEE_KEY && haveKey == RIGHTS_KEY
-                && amountHave.compareTo(BigDecimal.ONE) >= 0 // минимально меняем 1 ЭРА
-                && (height < 222047 || this.creator.getBalance(this.dcSet, RIGHTS_KEY).a.b.compareTo(amountHave) >= 0) // ЭРА есть на счету
+                && amountHave.compareTo(BigDecimal.TEN) >= 0 // минимально меняем 1 ЭРА
+                && (height < BlockChain.VERS_30SEC || this.creator.getBalance(this.dcSet, RIGHTS_KEY).a.b.compareTo(amountHave) >= 0) // ЭРА есть на счету
                 && this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.FEE_MIN_1) > 0) { // на балансе компушки не минус
             flags = flags | NOT_VALIDATE_FLAG_FEE;
         } else {

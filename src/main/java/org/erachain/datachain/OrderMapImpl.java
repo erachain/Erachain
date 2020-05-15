@@ -342,6 +342,10 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     @Override
     public boolean set(Long id, Order order) {
         if (BlockChain.CHECK_BUGS > 3) {
+            if (id == 3644468729217028L) {
+                boolean debug = true;
+            }
+
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
                 LOGGER.error("already in Completed");
@@ -356,6 +360,10 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     @Override
     public void put(Long id, Order order) {
         if (BlockChain.CHECK_BUGS > 3) {
+            if (id == 3644468729217028L) {
+                boolean debug = true;
+            }
+
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
                 LOGGER.error("already in Completed");
@@ -370,6 +378,12 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     @Override
     public Order remove(Long id) {
         if (BlockChain.CHECK_BUGS > 3) {
+            if (
+                    id == 3644468729217028L // 848544-4
+            ) {
+                boolean debug = true;
+            }
+
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
                 LOGGER.error("already in Completed");
@@ -383,6 +397,10 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     @Override
     public void delete(Long id) {
         if (BlockChain.CHECK_BUGS > 3) {
+            if (id == 3644468729217028L) {
+                boolean debug = true;
+            }
+
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
                 LOGGER.error("Order [" + Transaction.viewDBRef(id) + "] already in Completed");
@@ -395,16 +413,20 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public void put(Order order) {
-        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(order.getId()).equals("176395-2")) {
-            boolean debug = true;
+        if (BlockChain.CHECK_BUGS > 3) {
+            if (order.getId() == 3644468729217028L) {
+                boolean debug = true;
+            }
         }
         this.put(order.getId(), order);
     }
 
     @Override
     public void delete(Order order) {
-        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(order.getId()).equals("176395-2")) {
-            boolean debug = true;
+        if (BlockChain.CHECK_BUGS > 3) {
+            if (order.getId() == 3644468729217028L) {
+                boolean debug = true;
+            }
         }
         this.delete(order.getId());
     }

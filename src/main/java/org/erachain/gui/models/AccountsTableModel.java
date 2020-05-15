@@ -1,28 +1,18 @@
 package org.erachain.gui.models;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-
-import org.erachain.gui.ObserverWaiter;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple4;
-import org.mapdb.Fun.Tuple5;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
+import org.erachain.gui.ObserverWaiter;
 import org.erachain.utils.NumberAsString;
-import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
+
+import java.math.BigDecimal;
 
 @SuppressWarnings("serial")
 public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> implements ObserverWaiter {
@@ -31,8 +21,8 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
     public static final int COLUMN_BALANCE_1 = 3;
     public static final int COLUMN_BALANCE_2 = 4;
     public static final int COLUMN_BALANCE_3 = 5;
-    public static final int COLUMN_BALANCE_4 = -6;
-    public static final int COLUMN_FEE_BALANCE = 6;
+    public static final int COLUMN_BALANCE_4 = 6;
+    public static final int COLUMN_FEE_BALANCE = 7;
     public final int COLUMN_NO = 0;
     private AssetCls asset;
     private Long assetKey;
@@ -41,7 +31,7 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
     public AccountsTableModel() {
         super(Controller.getInstance().wallet.database.getAccountMap(),
                 new String[]{"No.", "Account", "Name",
-                        "Balance 1 (OWN)", "Balance 2 (DEBT)", "Balance 3 (HOLD)", // "Balance 4 (SPEND)",
+                        "Balance 1 (OWN)", "Balance 2 (DEBT)", "Balance 3 (HOLD)", "Balance 4 (SPEND)",
                         AssetCls.FEE_NAME},
                 new Boolean[]{true, false, false, false, false, false, false, false}, false);
 

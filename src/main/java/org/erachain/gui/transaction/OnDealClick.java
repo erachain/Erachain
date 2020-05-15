@@ -250,7 +250,10 @@ public class OnDealClick {
                 mess = "Invalid: claim recipient can not be the CLAIM issuer";
                 break;
             case Transaction.INVALID_CLAIM_DEBT_RECIPIENT:
-                mess = "Invalid: claim DEBT may be only the CLAIM issuer";
+                mess = "Invalid DEBT Recipient: claim DEBT may be only the CLAIM to issuer";
+                break;
+            case Transaction.INVALID_CLAIM_DEBT_CREATOR:
+                mess = "Invalid DEBT Creator: claim DEBT may be only the CLAIM to issuer";
                 break;
 
             case Transaction.INVALID_QUANTITY:

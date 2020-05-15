@@ -10,7 +10,7 @@ import org.erachain.datachain.ItemMap;
 
 public abstract class ImprintCls extends ItemCls {
 
-    public static final long START_KEY = BlockChain.SIDE_MODE ? 1L << 14 : 1000L;
+    public static final long MIN_START_KEY = 1000L;
     protected static final int IMPRINT = 1;
 
     public ImprintCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
@@ -31,11 +31,16 @@ public abstract class ImprintCls extends ItemCls {
 
     @Override
     public long getStartKey() {
-        long startKey = BlockChain.startKeys[ItemCls.IMPRINT_TYPE];
+        if (!BlockChain.SIDE_MODE)
+            return MIN_START_KEY;
 
-        if (BlockChain.MAIN_MODE || startKey > 0 && startKey < START_KEY)
+        long startKey = BlockChain.startKeys[ItemCls.ASSET_TYPE];
+
+        if (startKey == 0) {
             return START_KEY;
-
+        } else if (startKey < MIN_START_KEY) {
+            return (BlockChain.startKeys[ItemCls.ASSET_TYPE] = MIN_START_KEY);
+        }
         return startKey;
     }
 

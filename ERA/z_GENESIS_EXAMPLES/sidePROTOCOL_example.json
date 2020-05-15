@@ -6,16 +6,29 @@
   // external Block Explorer
   "explorer": "http://my-sidechain.dom:9057",
   "sideLicense": "Sidechain Licence Agreement.pdf",
+  // COMPU it is Fee Asset
+  ////"COMPU_Accuracy": 8,
+  //
+  ///"feeForByte": 100,
+  //
+  ////"transferFeePercent": 0.25,
+  //
+  ///"assetsTransferFeePercent": 0.1,
+  // default ERA Volume for not MAIN
+  //// reserved "ERA": 100000000,
+  // Set minimal forging stake. Minimal value set as 1/10000 ERA Volume
+  ////"minForgingStake": 100000,
+
   // start number of items from START_NO
   // for items: assets, imprints, persons, polls, statements, statuses, templates, unouns
   // default is 2^14
   "startKey": {
-    "assets": 100000,
-    "persons": 1000000,
+    "assets": 10000,
+    "persons": 1000,
     "polls": 1000,
     "statuses": 1000
   },
-  // switcj ON multi-level referals system. Default is true
+  // switch ON multi-level referals system. Default is true
   "referalsOn": true,
   // Set valid all transactions before the height. Defaul = 0
   "allValidBefore": 0,
@@ -23,16 +36,91 @@
   "protectSendToAnonymous": true,
   //
   "assets": [
-    // ASSET KEY, NAME, QUALITY, CREATOR
+    // **** ASSET KEY, NAME, QUALITY, CREATOR ****
+    /////// CRYPTOCURRENCY
     [
       12,
       "BTC",
       0,
       "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
     ],
+    /////// COMMODITY
+    [
+      21,
+      "GOLD",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      22,
+      "OIL",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      23,
+      "GAS",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      24,
+      "BREND",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    /////// FIATCURRENCY
+    [
+      86,
+      "TRY",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      87,
+      "SGD",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      88,
+      "AUD",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      89,
+      "CHF",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      90,
+      "GBP",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      91,
+      "JPY",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
     [
       92,
       "RUB",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      93,
+      "CNY",
+      0,
+      "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
+    ],
+    [
+      94,
+      "EUR",
       0,
       "7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"
     ],

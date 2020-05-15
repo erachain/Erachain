@@ -98,11 +98,19 @@ public class PersonInfo002 extends javax.swing.JPanel {
         jLabel_Owner_Sign = new javax.swing.JLabel();
         jTextField_Owner_Sign = new javax.swing.JTextField();
 
-        human = null;
         PublicKeyAccount owner = null;
+        Transaction issue_record;
         byte[] recordReference = person.getReference();
-        Transaction issue_record = Transaction.findByDBRef(DCSet.getInstance(), recordReference);
-        publisher = issue_record.getCreator();
+        if (recordReference != null) {
+            // если персона взята из буфера и еще не добавлялась то тут НУЛЬ будет
+            issue_record = Transaction.findByDBRef(DCSet.getInstance(), recordReference);
+            publisher = issue_record.getCreator();
+        } else {
+            issue_record = null;
+            boolean debug = true;
+        }
+
+        human = null;
         if (person instanceof PersonHuman) {
             human = (PersonHuman) person;
             if (human.isMustBeSigned()) {
@@ -163,28 +171,28 @@ public class PersonInfo002 extends javax.swing.JPanel {
         //   gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 3, 8);
 
-
         jPanel1.add(lbl_Block, gridBagConstraints);
 
+        if (issue_record != null) {
+            JTextField txt_Block = new JTextField(issue_record.viewHeightSeq());
 
-        JTextField txt_Block = new JTextField(issue_record.viewHeightSeq());
+            txt_Block.setEditable(false);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 4;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+            gridBagConstraints.weightx = 0.1;
+            gridBagConstraints.insets = new java.awt.Insets(8, 8, 3, 8);
 
-        txt_Block.setEditable(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 3, 8);
-
-        jPanel1.add(txt_Block, gridBagConstraints);
-        MenuPopupUtil.installContextMenu(txt_Block);
-        txt_Block.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField_NameActionPerformed(evt);
-            }
-        });
+            jPanel1.add(txt_Block, gridBagConstraints);
+            MenuPopupUtil.installContextMenu(txt_Block);
+            txt_Block.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jTextField_NameActionPerformed(evt);
+                }
+            });
+        }
 
         MButton btn_Block = new MButton(Lang.getInstance().translate("Deals"), 2.0);
         gridBagConstraints = new java.awt.GridBagConstraints();

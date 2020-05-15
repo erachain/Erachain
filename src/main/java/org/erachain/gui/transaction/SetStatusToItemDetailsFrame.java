@@ -19,6 +19,18 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
         ItemCls item = setStatusToItem.getItem();
         StatusCls status = setStatusToItem.getStatus();
 
+        //LABEL RESULT
+        ++labelGBC.gridy;
+        JLabel resutLabel = new JLabel(Lang.getInstance().translate("Result") + ":");
+        this.add(resutLabel, labelGBC);
+
+        //RESULT
+        ++detailGBC.gridy;
+        JTextField result = new JTextField(setStatusToItem.getResultText());
+        result.setEditable(false);
+        MenuPopupUtil.installContextMenu(result);
+        this.add(result, detailGBC);
+
         // STATUS
         //LABEL NAME
         ++labelGBC.gridy;
@@ -164,18 +176,6 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
         //txtAreaItemDescription.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaItemDescription);
         this.add(txtAreaItemDescription, detailGBC);
-
-        //LABEL RESULT
-        ++labelGBC.gridy;
-        JLabel resutLabel = new JLabel(Lang.getInstance().translate("Result") + ":");
-        this.add(resutLabel, labelGBC);
-
-        //RESULT
-        ++detailGBC.gridy;
-        JTextField result = new JTextField(setStatusToItem.getResultText());
-        result.setEditable(false);
-        MenuPopupUtil.installContextMenu(result);
-        this.add(result, detailGBC);
 
         //PACK
         //	this.pack();

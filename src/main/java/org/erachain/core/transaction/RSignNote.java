@@ -619,7 +619,7 @@ public class RSignNote extends Transaction implements Itemable {
             }
         }
 
-        if (BlockChain.VERS_4_23_01 > 0 && height > BlockChain.VERS_4_23_01) {
+        if (height > BlockChain.VERS_4_23_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого
             byte[][] allHashes = ExData.getAllHashesAsBytes(parsed);
             if (allHashes != null && allHashes.length > 0) {

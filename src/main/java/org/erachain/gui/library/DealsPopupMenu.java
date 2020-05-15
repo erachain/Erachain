@@ -69,7 +69,7 @@ public class DealsPopupMenu extends JPopupMenu {
         sendAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // AccountAssetLendPanel
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send") + ":" + asset.getKey(),
+                MainPanel.getInstance().insertNewTab(sendAsset.getText() + ":" + asset.getKey(),
                         new AccountAssetSendPanel(asset, pubKey, null, null, null), AccountAssetSendPanel.getIcon());
 
             }
@@ -82,7 +82,7 @@ public class DealsPopupMenu extends JPopupMenu {
         debtAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //new AccountLendDialog(asset, pubKey);
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Lend") + ":" + asset.getKey(),
+                MainPanel.getInstance().insertNewTab(debtAsset.getText() + ":" + asset.getKey(),
                         new AccountAssetLendPanel(asset, pubKey, null, null), AccountAssetLendPanel.getIcon());
 
             }
@@ -93,7 +93,7 @@ public class DealsPopupMenu extends JPopupMenu {
         debtAssetReturn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Repay Debt") + ":" + asset.getKey(),
+                MainPanel.getInstance().insertNewTab(debtAssetReturn.getText() + ":" + asset.getKey(),
                         new AccountAssetRepayDebtPanel(asset, pubKey, null, null), AccountAssetRepayDebtPanel.getIcon());
 
             }
@@ -105,7 +105,7 @@ public class DealsPopupMenu extends JPopupMenu {
         debtAssetBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Confiscate Debt") + ":" + asset.getKey(),
+                MainPanel.getInstance().insertNewTab(debtAssetBackward.getText() + ":" + asset.getKey(),
                         new AccountAssetConfiscateDebtPanel(asset, pubKey, null, null), AccountAssetConfiscateDebtPanel.getIcon());
 
             }
@@ -118,7 +118,7 @@ public class DealsPopupMenu extends JPopupMenu {
         holdAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Hold") + ":" + asset.getKey(),
+                MainPanel.getInstance().insertNewTab(holdAsset.getText() + ":" + asset.getKey(),
                         new AccountAssetHoldPanel(asset, pubKey, null, null), AccountAssetHoldPanel.getIcon());
 
             }
@@ -131,7 +131,7 @@ public class DealsPopupMenu extends JPopupMenu {
         spendAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Spend") + ":" + asset.getKey(),
+                MainPanel.getInstance().insertNewTab(spendAsset.getText() + ":" + asset.getKey(),
                         new AccountAssetSpendPanel(asset, pubKey, null, null, null), AccountAssetSpendPanel.getIcon());
 
             }
@@ -373,6 +373,35 @@ public class DealsPopupMenu extends JPopupMenu {
 
                 break;
 
+        }
+
+        // ALL OUTSIDE ASSETS
+        if (asset.isOutsideType()) {
+
+            this.debtAssetReturn.setEnabled(false);
+
+            if (pubKey.equals(asset.getOwner())) {
+                this.holdAsset.setEnabled(false);
+                this.debtAsset.setEnabled(false);
+                this.debtAssetBackward.setEnabled(false);
+                this.spendAsset.setEnabled(false);
+            } else {
+                if (balance.a.b.signum() <= 0) {
+                    this.sendAsset.setEnabled(false);
+                    this.holdAsset.setEnabled(false);
+                    this.debtAsset.setEnabled(false);
+                    this.debtAssetBackward.setEnabled(false);
+                    this.spendAsset.setEnabled(false);
+                } else {
+                    if (balance.b.b.signum() >= 0) {
+                        this.debtAssetBackward.setEnabled(false);
+                    }
+                    if (balance.a.b.add(balance.b.b).signum() <= 0) {
+                        this.debtAsset.setEnabled(false);
+                    }
+                }
+
+            }
         }
     }
 }
