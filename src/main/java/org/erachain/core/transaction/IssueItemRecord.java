@@ -31,7 +31,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, NAME_ID, creator, item, feePow, timestamp, reference);
         this.signature = signature;
-        item.setReference(signature); // set reference
+        this.item.setReference(signature);
     }
 
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) {
@@ -203,8 +203,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     //@Override
     @Override
     public void process(Block block, int asDeal) {
-
-        this.item.setReference(this.signature);
 
         //UPDATE CREATOR
         super.process(block, asDeal);
