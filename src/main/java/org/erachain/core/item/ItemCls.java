@@ -63,8 +63,10 @@ public abstract class ItemCls implements ExplorerJsonLine {
     protected String name;
     protected String description;
     protected long key = 0;
-    // TODO: поменять ссылку на Long
-    protected byte[] reference = null; // this is signature of issued record
+    /**
+     * this is signature of issued record
+     */
+    protected byte[] reference = null;
     protected byte[] icon;
     protected byte[] image;
 

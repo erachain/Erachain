@@ -10,6 +10,8 @@ import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -21,7 +23,7 @@ import java.util.*;
  */
 public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredByStringArray<Long> {
 
-    //private static Logger logger;
+    protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
     private static int CUT_NAME_INDEX = 12;
 
