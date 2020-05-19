@@ -353,8 +353,12 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return this.reference;
     }
 
-    public void setReference(byte[] reference) {
-        this.reference = reference;
+    public void setReference(byte[] signature) {
+        if (BlockChain.CHECK_BUGS > 1 && this.reference != null) {
+            Long error = null;
+            error++;
+        }
+        this.reference = signature;
 
     }
 
