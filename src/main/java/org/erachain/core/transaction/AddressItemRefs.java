@@ -139,8 +139,6 @@ public abstract class AddressItemRefs extends Transaction {
         //UPDATE CREATOR
         super.process(block, asDeal);
 
-        this.item.setReference(this.signature);
-
         //INSERT INTO DATABASE
         this.item.insertToMap(this.dcSet, START_KEY);
 
