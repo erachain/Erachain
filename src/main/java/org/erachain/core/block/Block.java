@@ -1524,9 +1524,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         // TEST STRONG of win Value
         //int base = BlockChain.getMinTarget(height);
         ///int targetedWinValue = this.calcWinValueTargeted(dcSet);
-        if (heightBlock > 16941) {
-            boolean debug = true;
-        }
 
         this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 
