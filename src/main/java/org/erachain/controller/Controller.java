@@ -215,8 +215,8 @@ public class Controller extends Observable {
 
         if (withTimestamp)
             return version + (BlockChain.DEMO_MODE ? " DEMO Net"
-                    : BlockChain.TEST_MODE ? " Test Net:" + Settings.getInstance().getGenesisStamp()
-                    : BlockChain.SIDE_MODE ? " Side Net:" + Settings.getInstance().getGenesisStamp() : "")
+                    : BlockChain.TEST_MODE ? " Test Net: " + Settings.getInstance().getGenesisStamp()
+                    : "")
                     + " (" + dbs + ")";
 
         return version + " (" + dbs + ")";
@@ -226,7 +226,7 @@ public class Controller extends Observable {
     public String getApplicationName(boolean withVersion) {
         return APP_NAME + " " + (withVersion ? getVersion(true) :
                 BlockChain.DEMO_MODE ? "DEMO Net" : BlockChain.TEST_MODE ? "Test Net"
-                        : BlockChain.SIDE_MODE ? "Side Net" : "");
+                        : "");
     }
 
     public static String getBuildDateTimeString() {

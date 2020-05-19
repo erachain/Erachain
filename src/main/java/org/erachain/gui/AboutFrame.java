@@ -1,6 +1,7 @@
 package org.erachain.gui;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 
@@ -85,7 +86,10 @@ public class AboutFrame extends JDialog implements Observer {
         gbc_lblAuthorsLabel.gridy = 1;
         aboutPanel.add(lblAuthorsLabel, gbc_lblAuthorsLabel);
 
-        JLabel lblversionLabel = new JLabel(Lang.getInstance().translate("Version: ") + Controller.getVersion(true));
+        JLabel lblversionLabel = new JLabel(
+                BlockChain.SIDE_MODE ?
+                        Controller.getInstance().getApplicationName(true)
+                        : Controller.getVersion(true));
         lblversionLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
         lblversionLabel.setForeground(Color.RED);
         lblversionLabel.setHorizontalAlignment(SwingConstants.CENTER);
