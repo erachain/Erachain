@@ -1118,7 +1118,7 @@ public class BlockChain {
             }
         }
 
-        if (difference < repeatsMin) {
+        if (difference < repeatsMin && (!DEMO_MODE || height > 31515)) {
             return difference - repeatsMin;
         }
 

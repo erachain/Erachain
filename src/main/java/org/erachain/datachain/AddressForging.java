@@ -74,8 +74,9 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple3<Integ
      * заносит новую точку и обновляет Последнюю точку (height & ForgingValue)/
      * При этом если последняя точка уже с той же высотой - то обновляем только ForgingValue/
      * Внимание! нельзя в этот set() заносить при writeToParent иначе будет двойная обработка
-     * @param key Addres + height
-     * @param forgingPoint a: previous Height, b: previous GenBalance, c: current GenBalance
+     *
+     * @param key          Addres + height
+     * @param forgingValue
      * @return
      */
     // TODO надо перенести логику эту наверх в BlockChain поидее

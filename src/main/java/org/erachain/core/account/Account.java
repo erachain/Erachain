@@ -1331,11 +1331,6 @@ public class Account {
     public Tuple3<Integer, Integer, Integer> getForgingData(DCSet db, int height) {
         return db.getAddressForging().get(getAddress(), height);
     }
-    /*
-     * public void setLastForgingData(DCSet db, int height) { getAddressForging
-     * = this.getBal USE db.getAddressForging().setLast(this.address, height,
-     * forgingBalance); }
-     */
 
     public void setForgingData(DCSet db, int height, int forgingBalance) {
         db.getAddressForging().putAndProcess(getAddress(), height, forgingBalance);
