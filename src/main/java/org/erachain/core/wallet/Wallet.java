@@ -29,7 +29,6 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
-import org.erachain.utils.SaveStrToFile;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -39,7 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Timer;
 import java.util.*;
@@ -465,19 +463,9 @@ public class Wallet extends Observable /*implements Observer*/ {
 		// CREATE
 		boolean res = this.create(database, secureDatabase, seed, depth, synchronize);
 		if (res) {
-            // save wallet dir
-
-            JSONObject settingsLangJSON = new JSONObject();
-            settingsLangJSON.putAll(Settings.getInstance().read_setting_JSON());
-            Settings.getInstance().setWalletKeysPath(path);
-            settingsLangJSON.put("walletdir", Settings.getInstance().getWalletKeysPath());
-            try {
-                SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsLangJSON);
-            } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-        } else {
+			// save wallet dir
+			Settings.getInstance().updateSettingsValue("walletdir", path);
+		} else {
             Settings.getInstance().setWalletKeysPath(oldPath);
         }
         return res;
@@ -1836,22 +1824,13 @@ public class Wallet extends Observable /*implements Observer*/ {
             List<Account> aa = Controller.getInstance().wallet.getAccounts();
             if (Controller.getInstance().wallet.getAccounts().size() < 1) return 5;
             if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
-                Controller.getInstance().wallet.initiateItemsFavorites();
-                // save path from setting json
-                JSONObject settingsLangJSON = new JSONObject();
-                settingsLangJSON.putAll(Settings.getInstance().read_setting_JSON());
-                Settings.getInstance().setWalletKeysPath(dir);
-                settingsLangJSON.put("walletdir", Settings.getInstance().getWalletKeysPath());
-                try {
-                    SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsLangJSON);
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-                // is ok
-                return 1;
+				Controller.getInstance().wallet.initiateItemsFavorites();
+				// save path from setting json
+				Settings.getInstance().updateSettingsValue("walletdir", path);
+				// is ok
+				return 1;
 
-            }
+			}
 
 
 		}
