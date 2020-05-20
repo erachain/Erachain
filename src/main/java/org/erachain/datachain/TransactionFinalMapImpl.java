@@ -319,7 +319,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (txsFind.isEmpty())
             return false;
         // если полный диаппазон задан то проверим вхождение - он может быть и отрицательным
-        if (fromSeqNo != null && txsFind.get(0).getDBRef() > toSeqNo) {
+        if (fromSeqNo != null && toSeqNo != null && txsFind.get(0).getDBRef() > toSeqNo) {
             return false;
         }
 
