@@ -10,6 +10,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
+import org.erachain.utils.SaveStrToFile;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -293,9 +294,7 @@ public class Settings {
     public String getWalletKeysPath() {
         if (this.walletKeysPath.isEmpty())
             return this.userPath + DEFAULT_WALLET_KEYS_DIR;
-        if (this.walletKeysPath.endsWith(DEFAULT_WALLET_KEYS_DIR + File.separator))
-            return this.walletKeysPath;
-        return this.walletKeysPath + DEFAULT_WALLET_KEYS_DIR;
+        return this.walletKeysPath;
     }
 
     public void setWalletKeysPath(String path) {
@@ -1222,5 +1221,16 @@ public class Settings {
         this.telegramRatioReciever = str;
     }
 
+    public void updateSettingsValue(String param, Object value) {
+        JSONObject settingsJSON = new JSONObject();
+        settingsJSON.putAll(Settings.getInstance().read_setting_JSON());
+        settingsJSON.put(param, value);
+        try {
+            SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSON);
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+
+    }
 
 }
