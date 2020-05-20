@@ -767,10 +767,12 @@ public class RSendResource {
         Long fromSeqNo = null;
         if (activeAfter != null && activeAfter > 0) {
             fromSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestamp(activeAfter), 0);
+            LOGGER.debug("fromSeqNo:" + Transaction.viewDBRef(fromSeqNo) + " - " + new Date(activeAfter));
         }
         Long toSeqNo = null;
         if (activeBefore != null && activeBefore > 0) {
             toSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestamp(activeBefore), 0);
+            LOGGER.debug("toSeqNo:" + Transaction.viewDBRef(toSeqNo) + " - " + new Date(activeBefore));
         }
 
         if (!test) {

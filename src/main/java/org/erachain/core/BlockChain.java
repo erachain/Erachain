@@ -1233,9 +1233,9 @@ public class BlockChain {
             return height;
 
         // новый шаг между блоками
-        diff -= VERS_30SEC * GENERATING_MIN_BLOCK_TIME_MS(1);
+        diff -= (long) GENERATING_MIN_BLOCK_TIME_MS(1) * (long) VERS_30SEC;
 
-        height = (int) (diff / GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC + 1));
+        height = (int) (diff / (long) GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC + 1));
 
         return VERS_30SEC + height;
 
