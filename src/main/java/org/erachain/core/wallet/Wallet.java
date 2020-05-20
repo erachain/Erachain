@@ -238,11 +238,10 @@ public class Wallet extends Observable /*implements Observer*/ {
 	*/
 
 	public boolean exists() {
-        if (Controller.getInstance().noUseWallet) {
-            return false;
-        }
-        String walletDir = Settings.getInstance().getWalletKeysPath();
-        return new File(walletDir).exists();
+        if (Controller.getInstance().noUseWallet || Settings.SECURE_WALLET_FILE == null) {
+			return false;
+		}
+		return Settings.SECURE_WALLET_FILE.exists();
     }
 
 	public List<Pair<Account, Transaction>> getLastTransactions(int limit) {
@@ -464,7 +463,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 		boolean res = this.create(database, secureDatabase, seed, depth, synchronize);
 		if (res) {
 			// save wallet dir
-			Settings.getInstance().updateSettingsValue("walletdir", path);
+			Settings.getInstance().updateSettingsValue();
 		} else {
             Settings.getInstance().setWalletKeysPath(oldPath);
         }
@@ -1799,41 +1798,43 @@ public class Wallet extends Observable /*implements Observer*/ {
 		this.database.setLicenseKey(key);
 	}
 
-	public Integer loadFromDir(boolean withObserver, boolean dynamicGUI) {
-        // return 1 - is ok
-        // if > 1 - error
-        String pathOld = Settings.getInstance().getWalletKeysPath();
-        JFileChooser fileopen = new JFileChooser();
-        fileopen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        String path = Settings.getInstance().getWalletKeysPath();
-        File ff = new File(path);
-        if (!ff.exists())
-            path = ".." + File.separator;
-        fileopen.setCurrentDirectory(new File(path));
-        int ret = fileopen.showDialog(null, Lang.getInstance().translate("Open Wallet Dir"));
-        if (ret == JFileChooser.APPROVE_OPTION) {
-            String dir = fileopen.getSelectedFile().toString();
+	/**
+	 * @param withObserver
+	 * @param dynamicGUI
+	 * @return 1 - OK, > 1- error
+	 */
+	public int loadFromDir(boolean withObserver, boolean dynamicGUI) {
+		JFileChooser fileopen = new JFileChooser();
+		fileopen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		String pathOld = Settings.getInstance().getWalletKeysPath();
+		File ff = new File(pathOld);
+		if (!ff.exists())
+			pathOld = "." + File.separator;
+		fileopen.setCurrentDirectory(new File(pathOld));
+		int ret = fileopen.showDialog(null, Lang.getInstance().translate("Open Wallet Dir"));
+		if (ret == JFileChooser.APPROVE_OPTION) {
+			String selectedDir = fileopen.getSelectedFile().toString();
 
-            // set wallet dir
-            Settings.getInstance().setWalletKeysPath(dir);
-            // open wallet
-            Controller.getInstance().wallet = new Wallet(withObserver, dynamicGUI);
-            // not wallet return 0;
-            if (!Controller.getInstance().wallet.exists()) return 2;
+			// set wallet dir
+			Settings.getInstance().setWalletKeysPath(selectedDir);
+			// open wallet
+			Controller.getInstance().wallet = new Wallet(withObserver, dynamicGUI);
+			// not wallet return 0;
+			if (!Controller.getInstance().wallet.exists()) return 2;
             // accounts
             List<Account> aa = Controller.getInstance().wallet.getAccounts();
-            if (Controller.getInstance().wallet.getAccounts().size() < 1) return 5;
-            if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
+			if (Controller.getInstance().wallet.getAccounts().size() < 1) return 5;
+			if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
 				Controller.getInstance().wallet.initiateItemsFavorites();
 				// save path from setting json
-				Settings.getInstance().updateSettingsValue("walletdir", path);
+				Settings.getInstance().updateSettingsValue();
 				// is ok
 				return 1;
-
+			} else {
+				Settings.getInstance().setWalletKeysPath(pathOld);
 			}
-
-
 		}
+
 		//is abort
 		return 3;
 	}

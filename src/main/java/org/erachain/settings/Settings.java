@@ -134,6 +134,8 @@ public class Settings {
      */
     private String dataChainPath = "";
     private String walletKeysPath = "";
+    public static File SECURE_WALLET_FILE;
+
     private String dataWalletPath = "";
     private String dataTelePath = "";
     private String backUpPath = "";
@@ -270,6 +272,10 @@ public class Settings {
     }
 
     public String getDataWalletPath() {
+        if (settingsJSON.containsKey("dataWalletPath")) {
+            this.dataWalletPath = settingsJSON.get("dataWalletPath").toString();
+        }
+
         if (this.dataWalletPath.isEmpty())
             return this.userPath + DEFAULT_DATA_WALLET_DIR;
         if (this.dataWalletPath.endsWith(DEFAULT_DATA_WALLET_DIR + File.separator))
@@ -289,9 +295,14 @@ public class Settings {
         }
 
         this.dataWalletPath = path;
+        settingsJSON.put("dataWalletPath", path);
     }
 
     public String getWalletKeysPath() {
+        if (settingsJSON.containsKey("walletKeysPath")) {
+            this.walletKeysPath = settingsJSON.get("walletKeysPath").toString();
+        }
+
         if (this.walletKeysPath.isEmpty())
             return this.userPath + DEFAULT_WALLET_KEYS_DIR;
         return this.walletKeysPath;
@@ -309,6 +320,9 @@ public class Settings {
         }
 
         this.walletKeysPath = path;
+        settingsJSON.put("walletKeysPath", path);
+        SECURE_WALLET_FILE = new File(walletKeysPath, "wallet.s.dat");
+
     }
 
     public String getTelegramDir() {
@@ -337,8 +351,14 @@ public class Settings {
 
     /// Так как в папке все может быть удалено - делаем встроенную папку, иначе по несотарожности все может быть удалено ((
     public String getDataChainPath() {
+
+        if (settingsJSON.containsKey("dataChainPath")) {
+            this.dataChainPath = settingsJSON.get("dataChainPath").toString();
+        }
+
         if (this.dataChainPath.isEmpty()) return this.userPath + DEFAULT_DATA_CHAIN_DIR;
-        if (this.dataChainPath.endsWith(DEFAULT_DATA_CHAIN_DIR + File.separator)) return this.dataChainPath;
+        if (this.dataChainPath.endsWith(DEFAULT_DATA_CHAIN_DIR)
+                || this.dataChainPath.endsWith(DEFAULT_DATA_CHAIN_DIR + File.separator)) return this.dataChainPath;
         return this.dataChainPath + DEFAULT_DATA_CHAIN_DIR;
     }
 
@@ -354,6 +374,8 @@ public class Settings {
         }
 
         this.dataChainPath = path;
+        settingsJSON.put("dataChainPath", path);
+
 
     }
 
@@ -1221,16 +1243,12 @@ public class Settings {
         this.telegramRatioReciever = str;
     }
 
-    public void updateSettingsValue(String param, Object value) {
-        JSONObject settingsJSON = new JSONObject();
-        settingsJSON.putAll(Settings.getInstance().read_setting_JSON());
-        settingsJSON.put(param, value);
+    public void updateSettingsValue() {
         try {
             SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSON);
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
-
     }
 
 }
