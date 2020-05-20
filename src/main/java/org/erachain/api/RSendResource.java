@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -924,7 +923,7 @@ public class RSendResource {
                     }
                 }
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
 
