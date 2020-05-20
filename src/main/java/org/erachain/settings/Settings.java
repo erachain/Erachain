@@ -293,9 +293,7 @@ public class Settings {
     public String getWalletKeysPath() {
         if (this.walletKeysPath.isEmpty())
             return this.userPath + DEFAULT_WALLET_KEYS_DIR;
-        if (this.walletKeysPath.endsWith(DEFAULT_WALLET_KEYS_DIR + File.separator))
-            return this.walletKeysPath;
-        return this.walletKeysPath + DEFAULT_WALLET_KEYS_DIR;
+        return this.walletKeysPath;
     }
 
     public void setWalletKeysPath(String path) {
