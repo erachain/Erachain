@@ -134,7 +134,7 @@ public class Settings {
      */
     private String dataChainPath = "";
     private String walletKeysPath = "";
-    public static File SECURE_WALLET_FILE;
+    public static File SECURE_WALLET_FILE = new File(DEFAULT_WALLET_KEYS_DIR, "wallet.s.dat");
 
     private String dataWalletPath = "";
     private String dataTelePath = "";
