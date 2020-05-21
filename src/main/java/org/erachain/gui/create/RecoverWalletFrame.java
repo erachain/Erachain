@@ -31,7 +31,7 @@ public class RecoverWalletFrame extends JFrame {
     private JTextField passwordTxt;
     private JTextField amountTxt;
     private JTextField confirmPasswordTxt;
-	private JTextField jTextFieldDataDir;
+    private JTextField jTextFieldDataDir;
 
     public RecoverWalletFrame(NoWalletFrame parent) {
         super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Recover Wallet"));
@@ -141,7 +141,7 @@ public class RecoverWalletFrame extends JFrame {
         this.add(this.amountTxt, labelGBC);
 
         // path label
-        labelGBC.gridy = labelGBC.gridy+1;
+        labelGBC.gridy = labelGBC.gridy + 1;
         JLabel labelPath = new JLabel(Lang.getInstance().translate("Set the Wallet directory or leave it as default") + ":");
         this.add(labelPath, labelGBC);
         JPanel pan = new JPanel();
@@ -152,43 +152,43 @@ public class RecoverWalletFrame extends JFrame {
         panGBC.anchor = GridBagConstraints.NORTHWEST;
         panGBC.weightx = 0.2;
         panGBC.gridx = 0;
-        panGBC.gridy =0;
-      //path text
-      //  labelGBC.gridy = labelGBC.gridy+1;
+        panGBC.gridy = 0;
+        //path text
+        //  labelGBC.gridy = labelGBC.gridy+1;
         jTextFieldDataDir = new JTextField(Settings.getInstance().getWalletKeysPath());
         jTextFieldDataDir.setEditable(false);
         pan.add(jTextFieldDataDir, panGBC);
-       // this.add(jTextFieldDataDir, labelGBC);
-     
+        // this.add(jTextFieldDataDir, labelGBC);
+
         // button path  
         JButton btnBrowseWallet = new JButton(Lang.getInstance().translate("Browse..."));
-        labelGBC.gridy = labelGBC.gridy+1;
+        labelGBC.gridy = labelGBC.gridy + 1;
         btnBrowseWallet.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileopen = new JFileChooser();
                 fileopen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                String path = jTextFieldDataDir.getText(); 
+                String path = jTextFieldDataDir.getText();
                 File ff = new File(path);
-                if (!ff.exists()) path = ".." + File.separator;
+                if (!ff.exists()) path = "." + File.separator;
                 fileopen.setCurrentDirectory(new File(path));
                 int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set wallet dir"));
                 if (ret == JFileChooser.APPROVE_OPTION) {
-                	jTextFieldDataDir.setText(fileopen.getSelectedFile().toString());
-                	
+                    jTextFieldDataDir.setText(fileopen.getSelectedFile().toString());
                 }
             }
         });
-        
+
         panGBC = new java.awt.GridBagConstraints();
         panGBC.anchor = java.awt.GridBagConstraints.NORTHEAST;
-       // panGBC.gridx = 1;
+        // panGBC.gridx = 1;
         pan.add(btnBrowseWallet, panGBC);
-        
+
         this.add(pan, labelGBC);
-        
-      
+
+
         //BUTTON confirm
-        buttonGBC.gridy = labelGBC.gridy+1;;
+        buttonGBC.gridy = labelGBC.gridy + 1;
+        ;
         JButton confirmButton = new JButton(Lang.getInstance().translate("Confirm"));
         confirmButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -272,27 +272,26 @@ public class RecoverWalletFrame extends JFrame {
 
         if (amount < 1 /*|| amount > 100*/) {
             //INVALID AMOUNT
-            String message = Lang.getInstance().translate("Amount must be between 1-100!");
+            String message = Lang.getInstance().translate("Amount must be > 0!");
             JOptionPane.showMessageDialog(new JFrame(), message, Lang.getInstance().translate("Invalid amount"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         //RECOVER WALLET
         boolean res = Controller.getInstance().recoverWallet(seed, password, amount, jTextFieldDataDir.getText());
-         if (res){
-        //CALLBACK
-         this.parent.onWalletCreated();
+        if (res) {
+            //CALLBACK
+            this.parent.onWalletCreated();
 
-             //CLOSE THIS WINDOW
-             this.dispose();
+            //CLOSE THIS WINDOW
+            this.dispose();
         } else {
-       	 JOptionPane.showMessageDialog(
+            JOptionPane.showMessageDialog(
                     new JFrame(), Lang.getInstance().translate("Wallet already exists") + "!",
                     "Error!",
                     JOptionPane.ERROR_MESSAGE);
         }
 
-       
     }
 
     private void onBackClick() {
