@@ -179,6 +179,7 @@ function person_status(data) {
             }
             output += '<td> <a href ="?address=' +
                 item.creator + get_lang() + '">' + cutBlank(item.creator_name, 16) + '...</a>';
+
             output += '<td> <a href ="?tx=' +
                 item.txBlock + '-' + item.txSeqNo + get_lang() + '">' + item.txBlock + '-' + item.txSeqNo + '</a>';
 
@@ -273,16 +274,21 @@ function person(data) {
     if (data.Label_statuses) {
         output += '<br>' + data.Label_statuses + ':';
         output += '<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>'
-           + data.Label_Status_table_status + '<td><b>' + data.Label_Status_table_period + '<td><b>' + data.Label_Status_table_appointing + '<tr>';
+           + data.Label_Status_table_status + '<td><b>' + data.Label_Status_table_period + '<td><b>' + data.Label_Status_table_appointing + '<td><b>' + data.Label_Status_table_seqNo + '<tr>';
 
         for (key in data.statuses) {
+
             output += '<tr ><td ><a href ="?person=' + data.key + '&status=' + data.statuses[key].status_key + get_lang() + '">';
             if (data.statuses[key].status_icon) {
                 output += '<img src="data:image/gif;base64,' + data.statuses[key].status_icon + '" style="width:3em;"/> ';
             }
             output += data.statuses[key].status_name
                 + '<td>' + data.statuses[key].status_period
-                + '<td><a href ="?address=' + data.statuses[key].status_creator + get_lang() + '">' + data.statuses[key].status_creator_name + '</a><tr>';
+                + '<td><a href ="?address=' + data.statuses[key].status_creator + get_lang() + '">' + data.statuses[key].status_creator_name + '</a>';
+
+            output += '<td> <a href ="?tx=' +
+                data.statuses[key].status_seqNo + get_lang() + '">' +  data.statuses[key].status_seqNo + '</a>';
+
         }
         output += '</table>';
     }
