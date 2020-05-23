@@ -21,6 +21,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Converter;
 import org.erachain.utils.NumberAsString;
@@ -381,8 +382,13 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         }
 
-        public int calcWinValueTargeted() {
-            return (int) (BlockChain.BASE_TARGET * winValue / target);
+        /**
+         * for percentage
+         *
+         * @return
+         */
+        public float calcWinValueTargeted() {
+            return 100f * winValue / target;
         }
 
         @SuppressWarnings("unchecked")
@@ -1755,9 +1761,10 @@ public class Block implements Closeable, ExplorerJsonLine {
                     // все равно их потом удалим - иначе при откатах может случиться оказия - что и в блоке она есть и в неподтвержденных
                     if (transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION)
                             != Transaction.VALIDATE_OK) {
+                        int error = transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION);
                         LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                 + ":" + transaction.viewFullTypeName()
-                                + " invalid code: " + transaction.isValid(Transaction.FOR_NETWORK, 0l)
+                                + " invalid code: " + OnDealClick.resultMess(error) + "[" + error + "]"
                                 + " " + Base58.encode(transaction.getSignature()));
                         return INVALID_BLOCK_VERSION;
                     }
@@ -1770,8 +1777,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                             return INVALID_BRANCH;
 
                         LOGGER.error("*** " + this.heightBlock + "-" + seqNo
-                                + ":" + transaction.viewFullTypeName() + e.getMessage(), e);
-                        return INVALID_BRANCH;
+                                + ": " + transaction.viewFullTypeName() + " - " + e.getMessage(), e);
+                        throw e;
                     }
 
                     processTimingLocalDiff = System.nanoTime() - processTimingLocal;

@@ -349,7 +349,7 @@ public class RSetStatusToItem extends Transaction {
 
         //READ ADDITIONAL DATA
         byte[] description = null;
-        if (position > data_add.length)
+        if (position < data_add.length)
             description = Arrays.copyOfRange(data_add, position, data_add.length);
 
 
@@ -426,7 +426,7 @@ public class RSetStatusToItem extends Transaction {
 
         //READ ADDITIONAL DATA
         byte[] description = null;
-        if (position > data_add.length)
+        if (position < data_add.length)
             description = Arrays.copyOfRange(data_add, position, data_add.length);
 
 
@@ -731,6 +731,10 @@ public class RSetStatusToItem extends Transaction {
 
     @Override
     public int isValid(int asDeal, long flags) {
+
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
 
         int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) {

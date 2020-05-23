@@ -196,6 +196,10 @@ public class CancelOrderTransaction extends Transaction {
     @Override
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         for (byte[] valid_item : VALID_REC) {
             if (Arrays.equals(this.signature, valid_item)) {
                 return VALIDATE_OK;

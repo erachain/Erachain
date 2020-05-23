@@ -92,7 +92,7 @@ import java.util.jar.Manifest;
 public class Controller extends Observable {
 
     public static String version = "5.01.01";
-    public static String buildTime = "2020-04-25 12:00:00 UTC";
+    public static String buildTime = "2020-05-06 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -3851,7 +3851,8 @@ public class Controller extends Observable {
                 if (useGui) {
                     if (Settings.getInstance().isGuiEnabled()) {
                         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, null,
-                                Lang.getInstance().translate("STARTUP ERROR") + ": " + e.getMessage(), 600, 400, Lang.getInstance().translate(" "));
+                                Lang.getInstance().translate("STARTUP ERROR") + ": "
+                                        + Lang.getInstance().translate(e.getMessage()), 600, 400, Lang.getInstance().translate(" "));
                         dd.jButton1.setVisible(false);
                         dd.jButton2.setText(Lang.getInstance().translate("Cancel"));
                         dd.setLocationRelativeTo(null);

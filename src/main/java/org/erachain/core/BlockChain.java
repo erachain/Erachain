@@ -87,8 +87,10 @@ public class BlockChain {
      */
     public static final byte[] START_PEER = null; //new byte[]{(byte)138, (byte)197, (byte)135, (byte)122};
 
-    public static final boolean PERSON_SEND_PROTECT = true;
-    //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
+    /**
+     * Защита от платажей с удостоверенного на анонима
+     */
+    public static boolean PERSON_SEND_PROTECT = true;
 
     public static final boolean SIDE_MODE = Settings.getInstance().isSideNet();
     public static final boolean DEMO_MODE = Settings.getInstance().isDemoNet();
@@ -115,13 +117,24 @@ public class BlockChain {
     //public static final String TIME_ZONE = "GMT+3";
     //
     public static final boolean ROBINHOOD_USE = false;
+
+    /**
+     * Аноним может создавать персон и удостоверять счета
+     */
     public static final boolean ANONIM_SERT_USE = TEST_MODE || BlockChain.ERA_COMPU_ALL_UP;
 
     public static final int MAX_ORPHAN = 10000; // max orphan blocks in chain for 30 sec
     public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
+
+    /**
+     * степень от 2 блоков для усреднения ЦЕЛи победы
+     */
     public static final int TARGET_COUNT_SHIFT = 10;
     public static final int TARGET_COUNT = 1 << TARGET_COUNT_SHIFT;
     public static final int BASE_TARGET = 10000;///1 << 15;
+    /**
+     * минимальное расстояние для сборк блоков
+     */
     public static final int REPEAT_WIN = DEMO_MODE ? 10 : TEST_MODE ? 5 : ERA_COMPU_ALL_UP ? 15 : SIDE_MODE ? 15 : 40; // GENESIS START TOP ACCOUNTS
 
     // RIGHTs
@@ -183,30 +196,31 @@ public class BlockChain {
             : new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
-    public static final int VERS_4_11 = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 194400;
+    public static final int VERS_4_11 = TEST_DB > 0 || !MAIN_MODE ? 0 : 194400;
 
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
-    public static final int HOLD_VALID_START = TESTS_VERS > 0 ? 0 : VERS_4_11;
+    public static final int HOLD_VALID_START = VERS_4_11;
 
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 623904;
-    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : ALL_BALANCES_OK_TO; //260120;
+    public static int ALL_VALID_BEFORE = DEMO_MODE ? 0 : 0;
+    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : 623904; //260120;
     /**
-     * Включает обработку заявок на бирже по цене рассчитанной по остаткам
+     * Включает обработку заявок на бирже по цене рассчитанной по остаткам<bR>
+     * !!! ВНИМАНИЕ !!! нельзя изменять походу собранной цепочки - так как съедут цены и индекс не удалится у некоторых ордеров - цена о другая.
+     * см issue https://lab.erachain.org/erachain/Erachain/-/issues/1322
      */
-    public static final int LEFT_PRICE_HEIGHT = TEST_DB > 0 ? 0 : CANCEL_ORDERS_ALL_VALID;
+    public static final int LEFT_PRICE_HEIGHT = TEST_DB > 0 || !MAIN_MODE ? 0 : 623904;
+
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 || !MAIN_MODE ? 0 : 900000;
     /**
      * {@link LEFT_PRICE_HEIGHT} as SeqNo
      */
-    public static final long LEFT_PRICE_HEIGHT_SEQ = TEST_DB > 0 ? 0 : Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
+    public static final long LEFT_PRICE_HEIGHT_SEQ = Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
 
-    public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 44666;
+    public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 44666;
 
-    public static final int VERS_4_12 = TEST_DB > 0 ? 0 : VERS_4_11;
+    public static final int VERS_4_12 = VERS_4_11;
 
-    public static final int VERS_30SEC = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 280785; //	2019-09-17 12:01:13
-
-    //public static final long VERS_30SEC_TIME = Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC
-    //        * (DEVELOP_USE ? 120L : TEST_MODE? 30L : 288L);
+    public static final int VERS_30SEC = TEST_DB > 0 || !MAIN_MODE ? 0 : 280785; //	2019-09-17 12:01:13
 
     // TODO поидее отрицательное тоже работать будет как надо
     public static final long VERS_30SEC_TIME =
@@ -214,17 +228,23 @@ public class BlockChain {
 
     public static final int VERS_4_21_02 = 684000;
 
-    public static final int VERS_4_23_01 = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 800000;
+    public static final int VERS_4_23_01 = TEST_DB > 0 || SIDE_MODE || TEST_MODE ? 0 : 800000;
+
+    public static final int VERS_5_01_01 = TEST_DB > 0 || SIDE_MODE || TEST_MODE ? 0 : 990000;
 
     /**
      * Включает реферальную систему
      */
-    public static final int REFERAL_BONUS_FOR_PERSON_4_21 = SIDE_MODE || TEST_MODE ? 0 : Integer.MAX_VALUE;
+    public static int REFERAL_BONUS_FOR_PERSON = SIDE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
 
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
      */
-    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : Integer.MAX_VALUE; ///VERS_4_21_02;
+    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 || SIDE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
+
+    public static final int START_ITEM_DUPLICATE = TEST_DB > 0 || !MAIN_MODE ? 0 : 800000;
+
+
     public static final int DEFAULT_DURATION = 365 * 5; // 5 years
 
     public static final int DEVELOP_FORGING_START = 100;
@@ -305,7 +325,7 @@ public class BlockChain {
 
     public static final int ITEM_POLL_FROM = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : VERS_4_11;
 
-    public static final int AMOUNT_SCALE_FROM = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 1033;
+    public static final int AMOUNT_SCALE_FROM = TEST_DB > 0 || !MAIN_MODE ? 0 : 1033;
     public static final int AMOUNT_DEDAULT_SCALE = 8;
     public static final int FREEZE_FROM = TEST_DB > 0 ? 0 : SIDE_MODE || TEST_MODE ? 0 : 249222;
     // только на них можно замороженные средства вернуть из списка FOUNDATION_ADDRESSES (там же и замароженные из-за утраты)
@@ -350,7 +370,7 @@ public class BlockChain {
 
     public static final int FEE_INVITED_SHIFT = 1;
     /**
-     * Постаянная награда за байт трнзакции
+     * Постаянная награда за байт транзакции
      */
     public static final int BONUS_REFERAL = 200 * FEE_PER_BYTE;
     /**
@@ -429,6 +449,7 @@ public class BlockChain {
         } else if (SIDE_MODE) {
             File file = new File("sidePROTOCOL.json");
             if (file.exists()) {
+                LOGGER.info("sidePROTOCOL.json USED");
                 // START SIDE CHAIN
                 String jsonString = "";
                 try {
@@ -497,6 +518,18 @@ public class BlockChain {
                     Settings.getInstance().explorerURL = chainParams.get("explorer").toString();
                 }
 
+                if (chainParams.containsKey("referalsOn")) {
+                    REFERAL_BONUS_FOR_PERSON = (Boolean) chainParams.get("referalsOn") ? 0 : Integer.MAX_VALUE;
+                }
+
+                if (chainParams.containsKey("allValidBefore")) {
+                    ALL_VALID_BEFORE = Integer.parseInt(chainParams.get("allValidBefore").toString());
+                }
+
+                if (chainParams.containsKey("protectSendToAnonymous")) {
+                    PERSON_SEND_PROTECT = (Boolean) chainParams.get("protectSendToAnonymous");
+                }
+
 
             }
         } else if (DEMO_MODE) {
@@ -524,7 +557,7 @@ public class BlockChain {
             ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
         } else {
 
-            ////////// WPIPED
+            ////////// WIPED
             // WRONG Issue Person #125
             WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("zDLLXWRmL8qhrU9DaxTTG4xrLHgb7xLx5fVrC2NXjRaw2vhzB1PArtgqNe2kxp655saohUcWcsSZ8Bo218ByUzH")));
             // WRONG orders by Person 90 Yakovlev
@@ -735,7 +768,7 @@ public class BlockChain {
             if (!Arrays.equals(dcSet.getBlockMap().getAndProcess(1).getSignature(),
                     genesisBlock.getSignature())) {
 
-                throw new Exception("wrong DB for GENESIS BLOCK");
+                throw new Exception("Wrong GENESIS BLOCK in datachain");
             }
 
         }
@@ -818,7 +851,7 @@ public class BlockChain {
 
         if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
             ;
-        } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
+        } else if (totalLIA.compareTo(new BigDecimal("20")) < 0) {
             if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_100_BD) < 0) {
                 return Transaction.NOT_ENOUGH_ERA_OWN_100;
             }
@@ -843,7 +876,7 @@ public class BlockChain {
 
         if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
             ;
-        } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
+        } else if (totalLIA.compareTo(new BigDecimal("20")) < 0) {
             if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_100_BD) < 0) {
                 return Transaction.NOT_ENOUGH_ERA_OWN_100;
             }
@@ -867,7 +900,7 @@ public class BlockChain {
     }
 
     public static boolean REFERAL_BONUS_FOR_PERSON(int height) {
-        return SIDE_MODE || TEST_MODE || height > REFERAL_BONUS_FOR_PERSON_4_21;
+        return TEST_DB == 0 && height > REFERAL_BONUS_FOR_PERSON;
     }
 
     public static int getCheckPoint(DCSet dcSet, boolean useDynamic) {

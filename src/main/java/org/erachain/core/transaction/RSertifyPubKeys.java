@@ -475,6 +475,10 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
     @Override
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         int result = super.isValid(asDeal, flags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
 
         // сюда без проверки Персоны приходит

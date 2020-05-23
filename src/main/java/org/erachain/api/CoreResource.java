@@ -101,7 +101,7 @@ public class CoreResource {
     public static JSONObject getForgingStatusJson() {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put("code", Controller.getInstance().getForgingStatus().getStatuscode());
+        jsonObject.put("code", Controller.getInstance().getForgingStatus().getStatusCode());
         jsonObject.put("name", Controller.getInstance().getForgingStatus().getName());
 
         return jsonObject;

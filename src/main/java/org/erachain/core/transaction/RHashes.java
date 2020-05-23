@@ -344,6 +344,10 @@ public class RHashes extends Transaction {
     //@Override
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         //CHECK DATA SIZE
         if (url != null && url.length > MAX_URL_LENGTH) {
             return INVALID_URL_LENGTH;
@@ -360,7 +364,7 @@ public class RHashes extends Transaction {
         int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
-        if (BlockChain.VERS_4_23_01 > 0 && height > BlockChain.VERS_4_23_01) {
+        if (height > BlockChain.VERS_4_23_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого
             if (hashes != null && hashes.length > 0) {
                 TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();

@@ -1,22 +1,20 @@
 package org.erachain.lang;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+import org.erachain.settings.Settings;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-
-import org.erachain.settings.Settings;
 
 public class Lang {
 
@@ -216,7 +214,7 @@ public class Lang {
             //	noTranslate(message);
             //IF NO SUITABLE TRANSLATION WITH THE COMMENT THEN RETURN WITHOUT COMMENT
             if (!langObj1.containsKey(messageWithoutComment)) {
-                return messageWithoutComment;
+                return messageWithoutComment.trim();
             } else {
                 return langObj1.get(messageWithoutComment).toString();
             }

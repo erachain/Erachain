@@ -2065,7 +2065,7 @@ button.white-bgc[disabled]:focus,
             //var length = Object.keys(data.pageItems).length;
             //for (var i = 0; i < length - 1; i++) {
             for (var i in data.pageItems) {
-                dtWV = (data.pageItems[i].winValueTargeted - 100000) * 0.001;
+                dtWV = data.pageItems[i].winValueTargeted - 100.0;
                 abs = Math.abs(dtWV);
                 if (abs < 1) {
                     dtWV = dtWV.toFixed(3);

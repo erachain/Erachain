@@ -30,6 +30,7 @@ import java.util.HashMap;
 
 public abstract class ItemCls implements ExplorerJsonLine {
 
+    protected final static long START_KEY = 1L << 14;
     public static final int ASSET_TYPE = 1;
     public static final int IMPRINT_TYPE = 2;
     public static final int TEMPLATE_TYPE = 3;
@@ -351,7 +352,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
     }
 
     public void setReference(byte[] reference) {
-        // TODO - if few itens issued in one recor - need reference to include nonce here
+        // TODO - if few items issued in one record - need reference to include nonce here
         this.reference = reference;
 
     }

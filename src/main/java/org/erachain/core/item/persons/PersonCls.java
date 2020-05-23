@@ -30,7 +30,7 @@ import java.util.Set;
 //birthLatitude -90..90; birthLongitude -180..180
 public abstract class PersonCls extends ItemCls {
 
-    public static final long START_KEY = 0L;
+    public static final long MIN_START_KEY = 0L;
 
     public static int MAX_IMAGE_LENGTH = 28000;
     public static int MIN_IMAGE_LENGTH = 10240;
@@ -115,11 +115,16 @@ public abstract class PersonCls extends ItemCls {
 
     @Override
     public long getStartKey() {
-        long startKey = BlockChain.startKeys[ItemCls.PERSON_TYPE];
+        if (!BlockChain.SIDE_MODE)
+            return MIN_START_KEY;
 
-        if (BlockChain.MAIN_MODE || startKey > 0 && startKey < START_KEY)
+        long startKey = BlockChain.startKeys[ItemCls.ASSET_TYPE];
+
+        if (startKey == 0) {
             return START_KEY;
-
+        } else if (startKey < MIN_START_KEY) {
+            return (BlockChain.startKeys[ItemCls.ASSET_TYPE] = MIN_START_KEY);
+        }
         return startKey;
     }
 

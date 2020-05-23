@@ -238,6 +238,10 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
     @Override
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         //CHECK POLL EXISTS
         if (poll == null) {
             return POLL_NOT_EXISTS;

@@ -590,6 +590,10 @@ public class RSignNote extends Transaction implements Itemable {
     @Override
     public int isValid(int asDeal, long flags) {
 
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
         //CHECK DATA SIZE
         if (data == null && key <= 0)
             return INVALID_DATA_LENGTH;
@@ -615,7 +619,7 @@ public class RSignNote extends Transaction implements Itemable {
             }
         }
 
-        if (BlockChain.VERS_4_23_01 > 0 && height > BlockChain.VERS_4_23_01) {
+        if (height > BlockChain.VERS_4_23_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого
             byte[][] allHashes = ExData.getAllHashesAsBytes(parsed);
             if (allHashes != null && allHashes.length > 0) {
