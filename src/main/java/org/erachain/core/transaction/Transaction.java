@@ -1118,6 +1118,10 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     }
 
+    public static String viewDBRef(int blockHeight, int seqNo) {
+        return blockHeight + "-" + seqNo;
+    }
+
     public String viewHeightSeq() {
         return this.height + "-" + this.seqNo;
     }
