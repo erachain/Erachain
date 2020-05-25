@@ -1118,7 +1118,7 @@ public class BlockChain {
             }
         }
 
-        if (difference < repeatsMin) {
+        if (difference < repeatsMin && (!DEMO_MODE || height > 31515)) {
             return difference - repeatsMin;
         }
 
@@ -1212,12 +1212,12 @@ public class BlockChain {
 
     public long getTimestamp(int height) {
         if (VERS_30SEC == 0 || height <= VERS_30SEC) {
-            return this.genesisTimestamp + (long) height * GENERATING_MIN_BLOCK_TIME_MS(height);
+            return this.genesisTimestamp + (long) height * (long) GENERATING_MIN_BLOCK_TIME_MS(height);
         }
 
         return this.genesisTimestamp + (SIDE_MODE || TEST_MODE ? 0L : 16667L)
-                + (long) VERS_30SEC * GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC)
-                + (long) (height - VERS_30SEC) * GENERATING_MIN_BLOCK_TIME_MS(height);
+                + (long) VERS_30SEC * (long) GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC)
+                + (long) (height - VERS_30SEC) * (long) GENERATING_MIN_BLOCK_TIME_MS(height);
 
     }
 
@@ -1228,14 +1228,14 @@ public class BlockChain {
 
     public int getHeightOnTimestamp(long timestamp) {
         long diff = timestamp - genesisTimestamp;
-        int height = (int) (diff / GENERATING_MIN_BLOCK_TIME_MS(1));
+        int height = (int) (diff / (long) GENERATING_MIN_BLOCK_TIME_MS(1));
         if (height <= VERS_30SEC)
             return height;
 
         // новый шаг между блоками
-        diff -= VERS_30SEC * GENERATING_MIN_BLOCK_TIME_MS(1);
+        diff -= (long) GENERATING_MIN_BLOCK_TIME_MS(1) * (long) VERS_30SEC;
 
-        height = (int) (diff / GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC + 1));
+        height = (int) (diff / (long) GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC + 1));
 
         return VERS_30SEC + height;
 

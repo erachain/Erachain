@@ -63,8 +63,10 @@ public abstract class ItemCls implements ExplorerJsonLine {
     protected String name;
     protected String description;
     protected long key = 0;
-    // TODO: поменять ссылку на Long
-    protected byte[] reference = null; // this is signature of issued record
+    /**
+     * this is signature of issued record
+     */
+    protected byte[] reference = null;
     protected byte[] icon;
     protected byte[] image;
 
@@ -351,9 +353,12 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return this.reference;
     }
 
-    public void setReference(byte[] reference) {
-        // TODO - if few items issued in one record - need reference to include nonce here
-        this.reference = reference;
+    public void setReference(byte[] signature) {
+        if (BlockChain.CHECK_BUGS > 1 && this.reference != null) {
+            Long error = null;
+            error++;
+        }
+        this.reference = signature;
 
     }
 

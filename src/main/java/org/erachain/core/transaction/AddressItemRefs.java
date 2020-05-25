@@ -36,8 +36,7 @@ public abstract class AddressItemRefs extends Transaction {
     public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) {
         this(typeBytes, NAME_ID, creator, item, (byte) 0, 0l, null);
         this.signature = signature;
-        if (this.item.getReference() == null) this.item.setReference(signature);
-        //item.resolveKey(DLSet.getInstance());
+        this.item.setReference(signature);
     }
 
     //GETTERS/SETTERS
@@ -56,8 +55,7 @@ public abstract class AddressItemRefs extends Transaction {
     @Override
     public void sign(PrivateKeyAccount creator, int forDeal) {
         super.sign(creator, forDeal);
-        // in IMPRINT reference already setted before sign
-        if (this.item.getReference() == null) this.item.setReference(this.signature);
+        this.item.setReference(this.signature);
     }
 
     //PARSE CONVERT
@@ -140,9 +138,6 @@ public abstract class AddressItemRefs extends Transaction {
     public void process(Block block, int asDeal) {
         //UPDATE CREATOR
         super.process(block, asDeal);
-
-        // SET REFERENCE if not setted before (in Imprint it setted)
-        if (this.item.getReference() == null) this.item.setReference(this.signature);
 
         //INSERT INTO DATABASE
         this.item.insertToMap(this.dcSet, START_KEY);

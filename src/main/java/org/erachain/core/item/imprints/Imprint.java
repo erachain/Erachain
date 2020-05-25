@@ -1,38 +1,24 @@
 package org.erachain.core.item.imprints;
 
-import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Crypto;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 //import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 public class Imprint extends ImprintCls {
 
     private static final int TYPE_ID = IMPRINT;
-    private static final int CUTTED_REFERENCE_LENGTH = 20;
 
     public Imprint(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
         super(TYPE_ID, owner, name, icon, image, description);
-        this.reference = Bytes.ensureCapacity(Base58.decode(name), REFERENCE_LENGTH, 0);
-
     }
 
     public Imprint(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
         super(typeBytes, owner, name, icon, image, description);
-        this.reference = Bytes.ensureCapacity(Base58.decode(name), REFERENCE_LENGTH, 0);
-    }
-
-    public static String hashNameToBase58(String name_total) {
-        byte[] digest = Crypto.getInstance().digest(name_total.getBytes());
-        digest = Arrays.copyOfRange(digest, 0, Imprint.CUTTED_REFERENCE_LENGTH);
-        return Base58.encode(digest);
     }
 
     //PARSE

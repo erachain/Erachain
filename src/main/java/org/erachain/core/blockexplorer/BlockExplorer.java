@@ -1693,7 +1693,11 @@ public class BlockExplorer {
             output.put("Label_Status_table_status", Lang.getInstance().translateFromLangObj("Status", langObj));
             output.put("Label_Status_table_period", Lang.getInstance().translateFromLangObj("Period", langObj));
             output.put("Label_Status_table_appointing", Lang.getInstance().translateFromLangObj("Appointing", langObj));
+            output.put("Label_Status_table_seqNo", Lang.getInstance().translateFromLangObj("SeqNo", langObj));
 
+            int block;
+            int seqNo;
+            Transaction tx;
             for (Tuple3<Long, StatusCls, Fun.Tuple5<Long, Long, byte[], Integer, Integer>> item : StatusCls.getSortedItems(statuses)) {
                 Map statusJSON = new LinkedHashMap();
                 StatusCls status = item.b;
@@ -1705,7 +1709,12 @@ public class BlockExplorer {
 
                 statusJSON.put("status_period", StatusCls.viewPeriod(item.c.a, item.c.b));
 
-                Account creator = status.getOwner();
+                block = item.c.d;
+                seqNo = item.c.e;
+                statusJSON.put("status_seqNo", Transaction.viewDBRef(block, seqNo));
+
+                tx = Transaction.findByHeightSeqNo(dcSet, block, seqNo);
+                Account creator = tx.getCreator();
                 if (creator != null) {
                     statusJSON.put("status_creator", creator.getAddress());
                     if (creator.isPerson()) {

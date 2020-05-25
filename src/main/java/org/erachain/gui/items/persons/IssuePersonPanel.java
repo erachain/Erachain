@@ -354,10 +354,6 @@ public class IssuePersonPanel extends JPanel  {
         gridBagConstraints.insets = new Insets(0, 0, 0, 16);
         mainPanel.add(txtHeight, gridBagConstraints);
 
-
-
-
-
         /* Added Copy, Paste in GEO (by Samartsev. 18.03.2019) */
         JPopupMenu popup = new JPopupMenu();
         txtBirthLatitude.add(popup);

@@ -1,6 +1,7 @@
 package org.erachain.gui;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 
@@ -85,7 +86,24 @@ public class AboutFrame extends JDialog implements Observer {
         gbc_lblAuthorsLabel.gridy = 1;
         aboutPanel.add(lblAuthorsLabel, gbc_lblAuthorsLabel);
 
-        JLabel lblversionLabel = new JLabel(Lang.getInstance().translate("Version: ") + Controller.getVersion(true));
+        int gridy = 2;
+        if (BlockChain.SIDE_MODE) {
+            JLabel appNameLabel = new JLabel(Lang.getInstance().translate("sidechain") + ": "
+                    + Controller.getInstance().APP_NAME);
+            appNameLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
+            appNameLabel.setForeground(Color.RED);
+            appNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            GridBagConstraints gbc_lbllAppNameLabel = new GridBagConstraints();
+            gbc_lbllAppNameLabel.fill = GridBagConstraints.BOTH;
+            gbc_lbllAppNameLabel.insets = new Insets(0, 0, 5, 5);
+            gbc_lbllAppNameLabel.anchor = GridBagConstraints.NORTHWEST;
+            gbc_lbllAppNameLabel.gridx = 1;
+            gbc_lbllAppNameLabel.gridy = gridy++;
+            aboutPanel.add(appNameLabel, gbc_lbllAppNameLabel);
+        }
+
+        JLabel lblversionLabel = new JLabel(
+                Lang.getInstance().translate("Version") + ": " + Controller.getVersion(true));
         lblversionLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
         lblversionLabel.setForeground(Color.RED);
         lblversionLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -94,7 +112,7 @@ public class AboutFrame extends JDialog implements Observer {
         gbc_lbllversionLabel.insets = new Insets(0, 0, 5, 5);
         gbc_lbllversionLabel.anchor = GridBagConstraints.NORTHWEST;
         gbc_lbllversionLabel.gridx = 1;
-        gbc_lbllversionLabel.gridy = 2;
+        gbc_lbllversionLabel.gridy = gridy++;
         aboutPanel.add(lblversionLabel, gbc_lbllversionLabel);
 
         JLabel label = null;
@@ -108,7 +126,7 @@ public class AboutFrame extends JDialog implements Observer {
         GridBagConstraints gbc_label = new GridBagConstraints();
         gbc_label.insets = new Insets(0, 0, 5, 5);
         gbc_label.gridx = 1;
-        gbc_label.gridy = 3;
+        gbc_label.gridy = gridy++;
         aboutPanel.add(label, gbc_label);
 
 
@@ -121,7 +139,7 @@ public class AboutFrame extends JDialog implements Observer {
         GridBagConstraints gbc_Console = new GridBagConstraints();
         gbc_Console.insets = new Insets(5, 5, 5, 5);
         gbc_Console.gridx = 0;
-        gbc_Console.gridy = 4;
+        gbc_Console.gridy = gridy++;
         gbc_Console.fill = GridBagConstraints.HORIZONTAL;
         gbc_Console.weightx = 1.0;
         gbc_Console.gridwidth = 3;

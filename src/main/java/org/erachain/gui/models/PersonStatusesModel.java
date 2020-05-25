@@ -40,7 +40,7 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
     public PersonStatusesModel(long personKey) {
 
         super(DCSet.getInstance().getPersonStatusMap(),
-                new String[]{"Status", "Period", "Creator"},
+                new String[]{"Status", "Period", "Appointing"},
                 new Boolean[]{true, false}, false);
 
         itemKey = personKey;
@@ -110,14 +110,14 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
                 block = value.b.d;
                 recNo = value.b.e;
                 record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
-                return record == null ? "" : ((Account) record.getCreator()).getPersonAsString();
+                return record == null ? "" : record.getCreator().getPersonAsString();
 
             case COLUMN_CREATOR_NAME:
 
                 block = value.b.d;
                 recNo = value.b.e;
                 record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
-                return record == null ? "" : ((Account) record.getCreator()).getPerson().b.viewName();
+                return record == null ? "" : record.getCreator().getPerson().b.viewName();
 
 
         }
