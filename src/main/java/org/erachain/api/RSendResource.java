@@ -806,6 +806,17 @@ public class RSendResource {
             int count = 0;
             BigDecimal totalFee = BigDecimal.ZERO;
 
+            Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
+            Long myPersonKey = null;
+            if (onlyPerson && !selfPay) {
+                addressDuration = dcSet.getAddressPersonMap().getItem(accountFrom.getShortAddressBytes());
+                if (addressDuration != null) {
+                    myPersonKey = addressDuration.a;
+                }
+            } else {
+                myPersonKey = null;
+            }
+
             HashSet<Long> usedPersons = new HashSet<>();
             boolean needAmount = true;
             long timestampThis = NTP.getTime() - 10000L;
@@ -814,10 +825,6 @@ public class RSendResource {
             try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(forAssetKey)) {
                 while (iterator.hasNext()) {
                     key = iterator.next();
-                    if (!selfPay && accountFrom.equals(key)) {
-                        // сами себе не платим?
-                        continue;
-                    }
 
                     try {
 
@@ -829,7 +836,6 @@ public class RSendResource {
 
                         byte[] recipentShort = ItemAssetBalanceMap.getShortAccountFromKey(key);
 
-                        Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
                         if (onlyPerson) {
                             // так как тут сортировка по убыванию значит первым встретится тот счет на котром больше всего актива
                             // - он и будет выбран куда 1 раз пошлем актив свой
@@ -839,6 +845,11 @@ public class RSendResource {
                             if (usedPersons.contains(addressDuration.a))
                                 continue;
 
+                            if (!selfPay && myPersonKey != null && myPersonKey.equals(addressDuration.a)) {
+                                // сами себе не платим?
+                                continue;
+                            }
+
                             person = (PersonCls) dcSet.getItemPersonMap().get(addressDuration.a);
 
                             if (gender >= 0) {
@@ -847,6 +858,12 @@ public class RSendResource {
                                 }
                             }
                         } else {
+
+                            if (!selfPay && fromAddress.equals(recipentShort)) {
+                                // сами себе не платим?
+                                continue;
+                            }
+
                             addressDuration = null;
                             person = null;
                         }

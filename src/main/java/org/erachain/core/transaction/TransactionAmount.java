@@ -933,8 +933,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                     case ACTION_SPEND: // PRODUCE - SPEND
 
-                        if (absKey == FEE_KEY
-                                || assetType == AssetCls.ERA_KEY
+                        if (absKey < 100
                                 || assetType == AssetCls.AS_INDEX
                                 || assetType == AssetCls.AS_INSIDE_ACCESS
                                 || assetType == AssetCls.AS_INSIDE_BONUS
