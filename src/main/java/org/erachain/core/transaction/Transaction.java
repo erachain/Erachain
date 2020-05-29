@@ -142,6 +142,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int NOT_SELF_PERSONALIZY = 118;
     public static final int PUB_KEY_NOT_PERSONALIZED = 119;
 
+    public static final int INVALID_ISSUE_PROHIBITED = 150;
     public static final int INVALID_NAME_LENGTH_MIN = 151;
     public static final int INVALID_NAME_LENGTH_MAX = 152;
     public static final int INVALID_ICON_LENGTH_MIN = 153;

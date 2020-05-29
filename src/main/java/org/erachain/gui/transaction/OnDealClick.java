@@ -108,6 +108,10 @@ public class OnDealClick {
                 mess = "Invalid public key";
                 break;
 
+            case Transaction.INVALID_ISSUE_PROHIBITED:
+                mess = "Item Issue Prohibited";
+                break;
+
             case Transaction.INVALID_NAME_LENGTH_MIN:
                 mess = "Invalid name MIN length";
                 break;

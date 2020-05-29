@@ -22,6 +22,7 @@
   // start number of items from START_NO
   // for items: assets, imprints, persons, polls, statements, statuses, templates, unouns
   // default is 2^14
+  // if < 0 - The issue of Items is prohibited except for the issue of special Items
   "startKey": {
     "assets": 10000,
     "persons": 1000,
