@@ -26,7 +26,7 @@ public class AboutFrame extends JDialog implements Observer {
 
     public AboutFrame() {
         //CREATE FRAME
-        setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Debug"));
+        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Debug"));
         //setModalityType(DEFAULT_MODALITY_TYPE);
         setModalityType(ModalityType.MODELESS);
 

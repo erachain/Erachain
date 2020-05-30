@@ -94,6 +94,7 @@ public class AssetVenture extends AssetCls {
             throw new Exception("Invalid image length" + name + ": " + imageLength);
         }
 
+
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
 

@@ -35,7 +35,7 @@ public class AssetPairSelect extends JDialog {
 
     public AssetPairSelect(long key, String action, String account) {
 
-        this.setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
+        this.setTitle(Controller.getInstance().getApplicationName(false) + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
         //ICON
         List<Image> icons = new ArrayList<Image>();
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));

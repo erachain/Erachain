@@ -1,22 +1,20 @@
 package org.erachain.gui.items.imprints;
 
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JFrame;
-import javax.swing.JTabbedPane;
-
+import org.erachain.controller.Controller;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.lang.Lang;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public class ImprintFrame extends JFrame {
     private ImprintCls imprint;
 
     public ImprintFrame(ImprintCls imprint) {
-        super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Check Details"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Check Details"));
 
         this.imprint = imprint;
 

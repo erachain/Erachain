@@ -40,7 +40,7 @@ public class PollsDialog extends JDialog {
     private JComboBox<ItemCls> cbxAssets;
 
     public PollsDialog(PollCls poll, int option, AssetCls asset) {
-        // super(Lang.getInstance().translate("Erachain.org") + " - " +
+        // super(Controller.getInstance().getApplicationName(false) + " - " +
         // Lang.getInstance().translate("Vote"));
 
         if (poll == null)

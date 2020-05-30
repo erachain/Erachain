@@ -34,7 +34,7 @@ public class RecoverWalletFrame extends JFrame {
     private JTextField jTextFieldDataDir;
 
     public RecoverWalletFrame(NoWalletFrame parent) {
-        super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Recover Wallet"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Recover Wallet"));
 
         //ICON
         List<Image> icons = new ArrayList<Image>();

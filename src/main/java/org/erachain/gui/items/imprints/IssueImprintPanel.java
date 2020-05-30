@@ -42,8 +42,8 @@ public class IssueImprintPanel extends JPanel {
     private JTextArea txtDescription;
 
     public IssueImprintPanel() {
-        //	super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Issue Imprint"));
-//		this.setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Issue Imprint"));
+        //	super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Issue Imprint"));
+//		this.setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Issue Imprint"));
         //CLOSE
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

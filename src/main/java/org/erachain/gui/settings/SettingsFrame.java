@@ -34,7 +34,7 @@ public class SettingsFrame extends JDialog {
     public SettingsFrame() {
 
         //CREATE FRAME
-        setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Settings"));
+        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Settings"));
         setModal(true);
         setResizable(false);
         //ICON
