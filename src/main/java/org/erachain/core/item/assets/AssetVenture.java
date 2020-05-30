@@ -79,7 +79,7 @@ public class AssetVenture extends AssetCls {
         position += ICON_SIZE_LENGTH;
 
         if (iconLength < 0 || iconLength > MAX_ICON_LENGTH) {
-            throw new Exception("Invalid icon length");
+            throw new Exception("Invalid icon length" + name + ": " + iconLength);
         }
 
         byte[] icon = Arrays.copyOfRange(data, position, position + iconLength);
@@ -91,7 +91,7 @@ public class AssetVenture extends AssetCls {
         position += IMAGE_SIZE_LENGTH;
 
         if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
-            throw new Exception("Invalid image length");
+            throw new Exception("Invalid image length" + name + ": " + imageLength);
         }
 
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
@@ -103,7 +103,7 @@ public class AssetVenture extends AssetCls {
         position += DESCRIPTION_SIZE_LENGTH;
 
         if (descriptionLength > BlockChain.MAX_REC_DATA_BYTES) {
-            throw new Exception("Invalid description length");
+            throw new Exception("Invalid description length" + name + ": " + descriptionLength);
         }
 
         byte[] descriptionBytes = Arrays.copyOfRange(data, position, position + descriptionLength);
