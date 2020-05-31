@@ -633,6 +633,7 @@
   "List": "Список",
   "List View": "Список",
   "Load": "Загрузить",
+  "Local peer discovery": "Поиск пиров локальной сети",
   "Lock Wallet": "Блокировка Кошелька",
   "Lock/Unlock Wallet": "Блокировка/Разблокировка Кошелька",
   "Lock:": "Блокировка:",
@@ -1518,7 +1519,6 @@
   "Enter Person": "Ввод персоны",
   "Public Key was Certified": "Открытый ключ подвержден",
 
-  "Local peer discovery": "Посиск пиров локальной сети",
   "You changed local peer discovery. You need to restart the wallet for the changes to take effect.": "Вы изменили опцию поиска пиров в локальной сети. Вы должны перезапустить кошелек, чтобы изменения вступили в силу.",
 
 
