@@ -671,6 +671,11 @@ public abstract class ItemCls implements ExplorerJsonLine {
             newKey = novaKey;
             dbMap.put(newKey, this);
 
+            // если в Генесиз вносим NOVA ASSET - пересчитаем и Размер
+            if (dbMap.getLastKey() < newKey) {
+                dbMap.setLastKey(newKey);
+            }
+
         } else {
 
             // INSERT WITH NEW KEY
