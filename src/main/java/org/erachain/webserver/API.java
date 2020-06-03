@@ -164,8 +164,12 @@ public class API {
 
     @GET
     @Path("height")
-    public static String getHeight() {
-        return String.valueOf(Controller.getInstance().getMyHeight());
+    public static Response getHeight() {
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(String.valueOf(Controller.getInstance().getMyHeight()))
+                .build();
     }
 
     @GET

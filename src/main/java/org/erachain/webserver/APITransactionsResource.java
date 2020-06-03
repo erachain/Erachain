@@ -417,10 +417,10 @@ public class APITransactionsResource {
     @GET
     @Path("/unconfirmed")
 
-    public String getNetworkTransactions(@QueryParam("address") String address,
-                                         @QueryParam("count") int count,
-                                         @QueryParam("type") int type, @QueryParam("descending") boolean descending,
-                                         @QueryParam("timestamp") long timestamp) {
+    public Response getNetworkTransactions(@QueryParam("address") String address,
+                                           @QueryParam("count") int count,
+                                           @QueryParam("type") int type, @QueryParam("descending") boolean descending,
+                                           @QueryParam("timestamp") long timestamp) {
         JSONArray array = new JSONArray();
         DCSet dcSet = DCSet.getInstance();
 
@@ -431,7 +431,9 @@ public class APITransactionsResource {
             array.add(record.toJson());
         }
 
-        return array.toJSONString();
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(array.toJSONString()).build();
     }
 
     /**
@@ -452,10 +454,10 @@ public class APITransactionsResource {
     @GET
     @Path("/unconfirmedincomes/{address}")
 
-    public String getNetworkIncomesTransactions(@PathParam("address") String address,
-                                                @QueryParam("count") int count,
-                                                @QueryParam("type") int type, @QueryParam("descending") boolean descending,
-                                                @QueryParam("timestamp") long timestamp) {
+    public Response getNetworkIncomesTransactions(@PathParam("address") String address,
+                                                  @QueryParam("count") int count,
+                                                  @QueryParam("type") int type, @QueryParam("descending") boolean descending,
+                                                  @QueryParam("timestamp") long timestamp) {
         JSONArray array = new JSONArray();
         DCSet dcSet = DCSet.getInstance();
 
@@ -466,7 +468,9 @@ public class APITransactionsResource {
             array.add(record.toJson());
         }
 
-        return array.toJSONString();
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(array.toJSONString()).build();
     }
 
     @SuppressWarnings("unchecked")
