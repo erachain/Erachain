@@ -1,25 +1,21 @@
 package org.erachain.gui.items.assets;
 
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-
+import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.models.BalancesTableModel;
 import org.erachain.lang.Lang;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public class AssetFrame extends JFrame {
     private AssetCls asset;
 
     public AssetFrame(AssetCls asset) {
-        super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Check Details"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Check Details"));
 
         this.asset = asset;
 

@@ -19,7 +19,7 @@ public class PollsDetailPanel extends JPanel {
 
     public PollsDetailPanel(PollCls poll, AssetCls asset) {
         // CREATE FRAME
-        // super(Lang.getInstance().translate("Erachain.org") + " - " +
+        // super(Controller.getInstance().getApplicationName(false) + " - " +
         // Lang.getInstance().translate("Poll Details"));
 
         // ICON

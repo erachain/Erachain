@@ -1,5 +1,6 @@
 package org.erachain.gui.items.assets;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.gui.CoreRowSorter;
 import org.erachain.gui.models.WalletOrdersTableModel;
@@ -25,7 +26,7 @@ public class MyOrdersFrame extends JFrame {
 
     public MyOrdersFrame() {
 
-        super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("My Orders"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("My Orders"));
 
         //ICON
         List<Image> icons = new ArrayList<Image>();

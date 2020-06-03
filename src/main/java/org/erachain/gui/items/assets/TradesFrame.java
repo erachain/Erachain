@@ -1,5 +1,6 @@
 package org.erachain.gui.items.assets;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.lang.Lang;
 
@@ -16,8 +17,8 @@ public class TradesFrame extends JDialog {
 
     public TradesFrame(Order order, boolean isSell) {
 
-        //super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Trades"));
-        setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Trades"));
+        //super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Trades"));
+        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Trades"));
         setModal(true);
         //ICON
         List<Image> icons = new ArrayList<Image>();

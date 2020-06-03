@@ -36,7 +36,7 @@ public class PayDividendFrame extends JFrame {
     private JButton generateButton;
 
     public PayDividendFrame(AssetCls asset) {
-        super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Pay dividend"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Pay dividend"));
 
         this.asset = asset;
 

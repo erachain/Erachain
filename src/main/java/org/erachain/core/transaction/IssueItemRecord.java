@@ -154,6 +154,12 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
             return VALIDATE_OK;
         }
 
+        if (BlockChain.startKeys[this.item.getItemType()] < 0) {
+            if (this.item.isNovaAsset(this.creator, this.dcSet) <= 0) {
+                return INVALID_ISSUE_PROHIBITED;
+            }
+        }
+
         //CHECK NAME LENGTH
         String name = this.item.getName();
         // TEST ONLY CHARS

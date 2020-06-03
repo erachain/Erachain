@@ -21,7 +21,7 @@ public class NoWalletFrame extends JFrame {
     private NoWalletFrame th;
 
     public NoWalletFrame(Gui parent) throws Exception {
-        super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("No Wallet"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("No Wallet"));
 
         th = this;
         //ICON
