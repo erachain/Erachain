@@ -131,7 +131,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                         int size = recipients.size();
                         byte[][] keys = new byte[size][];
                         int count = 0;
-                        for (Account recipient: recipients) {
+                        for (Account recipient : recipients) {
                             byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
                             System.arraycopy(recipient.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
                             keys[count++] = addressKey;
@@ -140,10 +140,11 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     }
                 });
 
-        Fun.Tuple2Comparator<Fun.Tuple2Comparator<byte[], Integer>, Long> comparatorAddressType
-                = new Fun.Tuple2Comparator<Fun.Tuple2Comparator<byte[], Integer>, Long>(
-                    new Fun.Tuple2Comparator(
+        Fun.Tuple2Comparator<Fun.Tuple3Comparator<byte[], Integer, Boolean>, Long> comparatorAddressType
+                = new Fun.Tuple2Comparator<Fun.Tuple3Comparator<byte[], Integer, Boolean>, Long>(
+                new Fun.Tuple3Comparator(
                         SignedBytes.lexicographicalComparator(),
+                        Fun.COMPARATOR,
                         Fun.COMPARATOR),
                 Fun.COMPARATOR);
 
