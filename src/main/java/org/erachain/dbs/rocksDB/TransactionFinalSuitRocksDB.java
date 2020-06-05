@@ -45,6 +45,9 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
     SimpleIndexDB<Long, Transaction, byte[]> creatorTxs;
     ListIndexDB<Long, Transaction, byte[]> recipientTxs;
+    /**
+     * С учетом Создатель или Получатель (1 или 0)
+     */
     ListIndexDB<Long, Transaction, byte[]> addressTypeTxs;
     ArrayIndexDB<Long, Transaction, byte[]> titleIndex;
     ListIndexDB<Long, Transaction, byte[]> addressBiDirectionTxs;
@@ -111,9 +114,10 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                     Integer type = transaction.getType();
                     List<byte[]> addressesTypes = new ArrayList<>();
                     for (Account account : transaction.getInvolvedAccounts()) {
-                        byte[] key = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 1];
+                        byte[] key = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 2];
                         System.arraycopy(account.getShortAddressBytes(), 0, key, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
                         key[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
+                        key[TransactionFinalMap.ADDRESS_KEY_LEN + 1] = (byte) (account.equals(transaction.getCreator()) ? 1 : 0);
                         addressesTypes.add(key);
                     }
                     return addressesTypes;
@@ -237,43 +241,44 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, boolean descending) {
-        byte[] key = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 1];
-        System.arraycopy(addressShort, 0, key, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-        key[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
+        byte[] key;
+        if (type != null && type != 0) {
+            if (isCreator != null) {
+                key = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 2];
+                System.arraycopy(addressShort, 0, key, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                key[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
+                key[TransactionFinalMap.ADDRESS_KEY_LEN + 1] = (byte) (isCreator ? 1 : 0);
+            } else {
+                key = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 1];
+                System.arraycopy(addressShort, 0, key, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                key[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
+            }
+        } else {
+            key = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+            System.arraycopy(addressShort, 0, key, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+        }
         return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), key, descending, true);
+
     }
 
     @Override
     public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, boolean descending) {
-        if (fromID == null) {
-            if (type == null || type == 0 && isCreator != null) {
-                byte[] key = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 2];
-                System.arraycopy(addressShort, 0, key, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-                key[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
-                key[TransactionFinalMap.ADDRESS_KEY_LEN + 1] = (byte) (isCreator ? 1 : 0);
-                return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(),
-                        ///key, null, false, true);
-                        key, descending, true); // as filter
-            } else {
-                byte[] key = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 2];
-                System.arraycopy(addressShort, 0, key, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-                key[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
-                key[TransactionFinalMap.ADDRESS_KEY_LEN + 1] = (byte) (isCreator ? 1 : 0);
-                return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(),
-                        ///key, null, false, true);
-                        key, descending, true); // as filter
-            }
+        if (fromID == null || isCreator == null || type == null) {
+            return getIteratorByAddressAndType(addressShort, type, isCreator, descending);
         }
 
         byte[] keyFrom = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 2 + Long.BYTES];
         System.arraycopy(addressShort, 0, keyFrom, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
         keyFrom[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
-        System.arraycopy(Longs.toByteArray(fromID), 0, keyFrom, TransactionFinalMap.ADDRESS_KEY_LEN + 1, Long.BYTES);
+        keyFrom[TransactionFinalMap.ADDRESS_KEY_LEN + 1] = (byte) (isCreator ? 1 : 0);
+        System.arraycopy(Longs.toByteArray(fromID), 0, keyFrom, TransactionFinalMap.ADDRESS_KEY_LEN + 2, Long.BYTES);
 
         byte[] keyTo = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 2 + Long.BYTES];
         System.arraycopy(addressShort, 0, keyFrom, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-        keyFrom[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
-        System.arraycopy(Longs.toByteArray(Long.MAX_VALUE), 0, keyFrom, TransactionFinalMap.ADDRESS_KEY_LEN + 1, Long.BYTES);
+        keyTo[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
+        keyTo[TransactionFinalMap.ADDRESS_KEY_LEN + 1] = (byte) (isCreator ? 1 : 0);
+        System.arraycopy(Longs.toByteArray(descending ? Long.MIN_VALUE : Long.MAX_VALUE),
+                0, keyTo, TransactionFinalMap.ADDRESS_KEY_LEN + 2, Long.BYTES);
 
         return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(),
                 keyFrom, keyTo, descending, true);
