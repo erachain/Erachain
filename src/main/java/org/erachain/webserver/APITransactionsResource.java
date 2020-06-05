@@ -58,7 +58,7 @@ public class APITransactionsResource {
 
         help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
 
-        help.put("apirecords/find?address={address}&sender={sender}&recipient={recipient}&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={des/asc}&offset={offset}&limit={limit}&unconfirmed=true",
+        help.put("apirecords/find?address={address}&creator={creator}&recipient={recipient}&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={des/asc}&offset={offset}&limit={limit}&unconfirmed=true",
                 Lang.getInstance().translate("Find Records"));
 
         help.put("apirecords/rawTransactionsByBlock/{height}?param", "Get raw transaction(encoding Base58). By default param is 3(for network)");
@@ -510,7 +510,7 @@ public class APITransactionsResource {
     @SuppressWarnings("unchecked")
     @GET
     @Path("find")
-    public Response getTransactionsFind(@QueryParam("address") String address, @QueryParam("sender") String sender,
+    public Response getTransactionsFind(@QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
                                         @QueryParam("recipient") String recipient,
                                         @QueryParam("startblock") int minHeight,
                                         @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
@@ -520,7 +520,7 @@ public class APITransactionsResource {
                                         @QueryParam("unconfirmed") boolean unconfirmed
     ) {
 
-        List<Transaction> result = DCSet.getInstance().getTransactionFinalMap().findTransactions(address, sender,
+        List<Transaction> result = DCSet.getInstance().getTransactionFinalMap().findTransactions(address, sender == null ? creator : sender,
                 recipient, minHeight, maxHeight, type, 0, desc, offset, limit);
 
         JSONArray array = new JSONArray();
@@ -529,7 +529,7 @@ public class APITransactionsResource {
         }
 
         if (unconfirmed) {
-            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionTab().findTransactions(address, sender,
+            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionTab().findTransactions(address, sender == null ? creator : sender,
                     recipient, type, desc, 0, limit, 0);
             for (Transaction trans : resultUnconfirmed) {
                 array.add(trans.toJson());

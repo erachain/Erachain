@@ -34,6 +34,8 @@ public class Settings {
     public static String APP_FULL_NAME = "";
     public static boolean ERA_COMPU_ALL_UP;
 
+    public static boolean EXCHANGE_IN_OUT = true;
+
     // FOR TEST by default
     public static long genesisStamp = DEFAULT_MAINNET_STAMP;
 
@@ -148,6 +150,8 @@ public class Settings {
     private Settings() {
         this.localAddress = this.getCurrentIp();
         settingsJSON = read_setting_JSON();
+
+        EXCHANGE_IN_OUT = isMainNet();
 
         File file = new File("");
         //TRY READ PEERS.JSON
