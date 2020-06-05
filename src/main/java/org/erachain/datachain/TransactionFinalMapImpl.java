@@ -336,7 +336,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         List<Transaction> txs = new ArrayList<>();
-        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type)) {
+        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type, isCreator)) {
             int counter = 0;
             Transaction item;
             Long key;
@@ -373,7 +373,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         List<Long> keys = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, fromID)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, isCreator, fromID)) {
             int counter = 0;
             //Transaction item;
             Long key;
@@ -407,7 +407,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         List<Transaction> transactions = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, fromID)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, isCreator, fromID)) {
             int counter = 0;
             Transaction item;
             Long key;
@@ -1036,8 +1036,19 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (creator != null) {
             if (type != 0) {
                 //creatorKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(creator, type));
-                creatorKeys = ((TransactionFinalSuit)map)
-                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(creator), type);
+                creatorKeys = ((TransactionFinalSuit) map)
+                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(creator), type, isCreator);
+                creatorKeys = IteratorCloseableImpl.make(Iterators.filter(
+                        ((TransactionFinalSuit) map)
+                                .getIteratorByCreator(Crypto.getInstance().getShortBytesFromAddress(creator))
+                        , new Predicate<Long>() {
+                            @Override
+                            public boolean apply(Long key) {
+                                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                                return (minHeight == 0 || pair.a >= minHeight) && (maxHeight == 0 || pair.a <= maxHeight);
+                            }
+                        }));
+
             } else {
                 //creatorKeys = Fun.filter(this.senderKey, creator);
                 //int sizeS = Iterators.size(((TransactionFinalSuit)map).getIteratorBySender(creator));
@@ -1050,8 +1061,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (recipient != null) {
             if (type != 0) {
                 //recipientKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(recipient, type));
-                recipientKeys = ((TransactionFinalSuit)map)
-                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(recipient), type);
+                recipientKeys = ((TransactionFinalSuit) map)
+                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(recipient), type, isCreator);
             } else {
                 //int sizeR = Iterators.size(((TransactionFinalSuit)map).getIteratorByRecipient(recipient));
                 //recipientKeys = Fun.filter(this.recipientKey, recipient);

@@ -14,11 +14,18 @@ public interface TransactionFinalSuit {
     IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort);
 
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort);
+
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo);
 
-    IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type);
+    /**
+     * @param addressShort
+     * @param type
+     * @param isCreator    if SET - True - only CREATORS, False - only RECIPIENTS
+     * @return
+     */
+    IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator);
 
-    IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Long fromID);
+    IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Boolean isCreator, Long fromID);
 
     IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending);
 

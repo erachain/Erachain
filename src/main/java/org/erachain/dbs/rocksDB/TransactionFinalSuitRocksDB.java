@@ -236,15 +236,15 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type) {
+    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator) {
         byte[] key = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 1];
         System.arraycopy(addressShort, 0, key, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-        key[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte)(int) type;
+        key[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
         return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), key, false, true);
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Long fromID) {
+    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Boolean isCreator, Long fromID) {
         if (fromID == null) {
             byte[] key = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 1];
             System.arraycopy(addressShort, 0, key, 0, TransactionFinalMap.ADDRESS_KEY_LEN);

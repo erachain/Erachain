@@ -24,7 +24,7 @@ import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Function2;
-import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -152,19 +152,19 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                 .makeOrGet();
 
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.addressTypeKey,
-                new Function2<Tuple2<byte[], Integer>[], Long, Transaction>() {
+                new Function2<Tuple3<byte[], Integer, Boolean>[], Long, Transaction>() {
                     @Override
-                    public Tuple2<byte[], Integer>[] run(Long key, Transaction transaction) {
-                        List<Tuple2<byte[], Integer>> accounts = new ArrayList<Tuple2<byte[], Integer>>();
+                    public Tuple3<byte[], Integer, Boolean>[] run(Long key, Transaction transaction) {
+                        List<Tuple3<byte[], Integer, Boolean>> accounts = new ArrayList<Tuple3<byte[], Integer, Boolean>>();
                         Integer type = transaction.getType();
                         for (Account account : transaction.getInvolvedAccounts()) {
                             byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
                             System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-                            accounts.add(new Tuple2<byte[], Integer>(addressKey, type));
+                            accounts.add(new Tuple3<byte[], Integer, Boolean>(addressKey, type, account.equals(transaction.getCreator())));
                         }
 
-                        Tuple2<byte[], Integer>[] result = (Tuple2<byte[], Integer>[])
-                                Array.newInstance(Tuple2.class, accounts.size());
+                        Tuple3<byte[], Integer, Boolean>[] result = (Tuple3<byte[], Integer, Boolean>[])
+                                Array.newInstance(Tuple3.class, accounts.size());
                         result = accounts.toArray(result);
                         return result;
                     }
@@ -284,22 +284,22 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type) {
+    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator) {
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        Iterable keys = Fun.filter(this.addressTypeKey, new Tuple2<byte[], Integer>(addressKey, type));
+        Iterable keys = Fun.filter(this.addressTypeKey, new Tuple3<byte[], Integer, Boolean>(addressKey, type, isCreator));
         return IteratorCloseableImpl.make(keys.iterator());
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Long fromID) {
+    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Boolean isCreator, Long fromID) {
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         return IteratorCloseableImpl.make(new IndexIterator(this.addressTypeKey.subSet(
-                Fun.t2(Fun.t2(addressKey, type), fromID),
-                Fun.t2(Fun.t2(addressKey, type), Fun.HI())).iterator()));
+                Fun.t2(Fun.t3(addressKey, type, isCreator), fromID),
+                Fun.t2(Fun.t3(addressKey, type, isCreator), Fun.HI())).iterator()));
     }
 
     @Override
