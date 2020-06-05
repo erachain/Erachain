@@ -57,12 +57,12 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
     List<Transaction> getTransactionsByTitle(String filter, String fromWord, Long fromSeqNo, int offset, int limit, boolean descending);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort);
+        // TODO ERROR - not use PARENT MAP and DELETED in FORK
+    IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort, boolean descending);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, int limit, boolean noForge);
+        // TODO ERROR - not use PARENT MAP and DELETED in FORK
+    List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, int limit, boolean noForge, boolean descending);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK

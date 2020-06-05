@@ -75,27 +75,27 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort) {
+    public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, boolean descending) {
         return null;
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort) {
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, boolean descending) {
         return null;
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo) {
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, boolean descending) {
         return null;
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator) {
+    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, boolean descending) {
         return null;
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Boolean isCreator, Long fromID) {
+    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, boolean descending) {
         return null;
     }
 
@@ -105,7 +105,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort) {
+    public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort, boolean descending) {
         return null;
     }
 

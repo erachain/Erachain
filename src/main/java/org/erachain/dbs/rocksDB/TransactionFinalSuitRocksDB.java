@@ -200,58 +200,58 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort) {
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, boolean descending) {
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        return map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(), addressKey, false, true);
+        return map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(), addressKey, descending, true);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo) {
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, boolean descending) {
 
         if (fromSeqNo == null) {
             byte[] fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
             System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-            return map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(), fromKey, false, true);
+            return map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(), fromKey, descending, true);
         }
 
         byte[] fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + Long.BYTES];
         System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
         System.arraycopy(Longs.toByteArray(fromSeqNo), 0, fromKey, TransactionFinalMap.ADDRESS_KEY_LEN, Long.BYTES);
 
-        return map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(), fromKey, null, false, true);
+        return map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(), fromKey, null, descending, true);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort) {
+    public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, boolean descending) {
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        return map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), addressKey, false, true);
+        return map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), addressKey, descending, true);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator) {
+    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, boolean descending) {
         byte[] key = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 1];
         System.arraycopy(addressShort, 0, key, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
         key[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
-        return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), key, false, true);
+        return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), key, descending, true);
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Boolean isCreator, Long fromID) {
+    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, boolean descending) {
         if (fromID == null) {
             byte[] key = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 1];
             System.arraycopy(addressShort, 0, key, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
             key[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
             return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(),
                     ///key, null, false, true);
-                    key, false, true); // as filter
+                    key, descending, true); // as filter
         }
 
         byte[] keyFrom = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 1 + Long.BYTES];
@@ -265,7 +265,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         System.arraycopy(Longs.toByteArray(Long.MAX_VALUE), 0, keyFrom, TransactionFinalMap.ADDRESS_KEY_LEN + 1, Long.BYTES);
 
         return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(),
-                keyFrom, keyTo, false, true);
+                keyFrom, keyTo, descending, true);
 
     }
 
@@ -375,18 +375,24 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort) {
+    public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort, boolean descending) {
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        Iterator senderKeys = map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(), addressKey, false, true);
-        Iterator recipientKeys = map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), addressKey, false, true);
+        if (true) {
+            // тут уже все адреса есть вкупе
+            return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), addressKey, descending, true);
 
-        // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
-        Iterator<Long> mergedIterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+        } else {
+            Iterator senderKeys = map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(), addressKey, descending, true);
+            Iterator recipientKeys = map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), addressKey, descending, true);
 
-        // а тут уже оьбратный порядок дать
-        return new IteratorCloseableImpl(Lists.reverse(Lists.newArrayList(mergedIterator)).iterator());
+            // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
+            Iterator<Long> mergedIterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+
+            // а тут уже оьбратный порядок дать
+            return new IteratorCloseableImpl(Lists.reverse(Lists.newArrayList(mergedIterator)).iterator());
+        }
 
     }
 
