@@ -1047,10 +1047,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             if (address == null) {
                 if (creator != null) {
                     iterator = ((TransactionFinalSuit) map)
-                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(address), type, Boolean.TRUE, descending);
+                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(creator), type, Boolean.TRUE, descending);
                 } else {
                     iterator = ((TransactionFinalSuit) map)
-                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(address), type, Boolean.FALSE, descending);
+                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(recipient), type, Boolean.FALSE, descending);
                 }
             } else {
                 iterator = ((TransactionFinalSuit) map)

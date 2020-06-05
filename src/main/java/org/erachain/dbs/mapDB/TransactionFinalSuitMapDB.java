@@ -290,8 +290,16 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        Iterable keys = Fun.filter(descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey, new Tuple3<byte[], Integer, Boolean>(addressKey, type, isCreator));
-        return IteratorCloseableImpl.make(keys.iterator());
+        if (true) {
+            return IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
+                    Fun.t2(Fun.t3(addressKey, type, isCreator), null),
+                    Fun.t2(Fun.t3(addressKey, type == 0 ? Integer.MAX_VALUE : type, isCreator == null ? Boolean.TRUE : isCreator), Fun.HI())).iterator()));
+
+        } else {
+            Iterable keys = Fun.filter(descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey,
+                    new Tuple3<byte[], Integer, Boolean>(addressKey, type, isCreator));
+            return IteratorCloseableImpl.make(keys.iterator());
+        }
     }
 
     @Override
@@ -301,7 +309,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
                 Fun.t2(Fun.t3(addressKey, type, isCreator), fromID),
-                Fun.t2(Fun.t3(addressKey, type, isCreator), Fun.HI())).iterator()));
+                Fun.t2(Fun.t3(addressKey, type == 0 ? Integer.MAX_VALUE : type, isCreator == null ? Boolean.TRUE : isCreator), Fun.HI())).iterator()));
     }
 
     @Override
