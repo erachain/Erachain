@@ -313,7 +313,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (typeTX == 0) {
             txsFind = getTransactionsByCreator(addressShort, fromSeqNo, 1, 0);
         } else {
-            txsFind = getTransactionsByAddressAndType(addressShort, typeTX, fromSeqNo, 1, 0, true);
+            txsFind = getTransactionsByAddressAndType(addressShort, typeTX, true, fromSeqNo, 1, 0);
         }
 
         if (txsFind.isEmpty())
@@ -366,14 +366,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Long fromID, int limit, int offset) {
+    public List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int limit, int offset) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         List<Long> keys = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, null, fromID, false)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, isCreator, fromID, false)) {
             int counter = 0;
             //Transaction item;
             Long key;
@@ -400,14 +400,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, Long fromID, int limit, int offset, boolean onlyCreator) {
+    public List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, boolean onlyCreator, Long fromID, int limit, int offset) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         List<Transaction> transactions = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, null, fromID, false)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, onlyCreator, fromID, false)) {
             int counter = 0;
             Transaction item;
             Long key;

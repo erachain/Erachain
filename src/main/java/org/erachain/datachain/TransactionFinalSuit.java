@@ -19,13 +19,23 @@ public interface TransactionFinalSuit {
 
     /**
      * @param addressShort
-     * @param type
-     * @param isCreator    if SET - True - only CREATORS, False - only RECIPIENTS
+     * @param type         - TRANSACTION type
+     * @param isCreator    True - only CREATORS, False - only RECIPIENTS
      * @param descending
      * @return
      */
     IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, boolean descending);
 
+    /**
+     * Здесь обязательно нужно задавать тип транзакции и получатель или создатель - иначе по FROM_ID работать не будет в RocksDB
+     *
+     * @param addressShort
+     * @param type         - TRANSACTION type
+     * @param isCreator    True - only CREATORS, False - only RECIPIENTS
+     * @param fromID
+     * @param descending
+     * @return
+     */
     IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, boolean descending);
 
     IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending);
