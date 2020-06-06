@@ -960,14 +960,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings("rawtypes")
     public List<Transaction> findTransactions(String address, String sender, String recipient, final int minHeight,
-                                              final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
+                                              final int maxHeight, int type, int service, boolean desc, int offset, int limit, Long fromSeqNo) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         List<Transaction> txs = new ArrayList<>();
-        try (IteratorCloseable iterator = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight,
+        try (IteratorCloseable iterator = findTransactionsKeys(address, sender, recipient, fromSeqNo, minHeight, maxHeight,
                 type, service, desc, offset, limit)) {
 
             Transaction item;
@@ -987,12 +987,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings("rawtypes")
-    public int findTransactionsCount(String address, String sender, String recipient, final int minHeight,
+    public int findTransactionsCount(String address, String sender, String recipient, Long fromSeqNo, final int minHeight,
                                      final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
-        try (IteratorCloseable iterator = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight,
+        try (IteratorCloseable iterator = findTransactionsKeys(address, sender, recipient, fromSeqNo, minHeight, maxHeight,
                 type, service, desc, offset, limit)) {
             return Iterators.size(iterator);
         } catch (IOException e) {
@@ -1004,18 +1004,19 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
      * @param address
      * @param creator
      * @param recipient
+     * @param fromSeqNo
      * @param minHeight
      * @param maxHeight
      * @param type
      * @param service
-     * @param desc
+     * @param descending
      * @param offset
      * @param limit
      * @return
      */
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public IteratorCloseable findTransactionsKeys(String address, String creator, String recipient, final int minHeight,
+    public IteratorCloseable findTransactionsKeys(String address, String creator, String recipient, Long fromSeqNo, final int minHeight,
                                                   final int maxHeight, int type, final int service, boolean descending, int offset, int limit) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -1032,6 +1033,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             Long tempID = minID;
             minID = maxID;
             maxID = tempID;
+        }
+
+        if (fromSeqNo != null) {
+            minID = fromSeqNo;
         }
 
         if (address == null && creator == null && recipient == null) {

@@ -404,6 +404,15 @@ public class TransactionsResource {
             }
         }
 
+        boolean unconfirmed = false;
+        if (jsonObject.containsKey("unconfirmed")) {
+            try {
+                unconfirmed = (boolean) jsonObject.get("unconfirmed");
+            } catch (Exception e) {
+                throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+            }
+        }
+
         int offset = 0;
         if (jsonObject.containsKey("offset")) {
             try {
@@ -440,6 +449,8 @@ public class TransactionsResource {
             }
         }
 
+        String fromSeqNo = (String) jsonObject.get("from");
+
         int type = 0;
         if (jsonObject.containsKey("type")) {
             try {
@@ -460,32 +471,8 @@ public class TransactionsResource {
             type = Transaction.ARBITRARY_TRANSACTION;
         }
 
-        if (count) {
-            return String.valueOf(DCSet.getInstance().getTransactionFinalMap().findTransactionsCount(address, creator,
-                    recipient, minHeight, maxHeight, type, service, desc, offset, limit));
-        }
-
-        JSONArray array = new JSONArray();
-        try (IteratorCloseable iterator = DCSet.getInstance().getTransactionFinalMap().findTransactionsKeys(address, creator,
-                recipient, minHeight, maxHeight, type, service, desc, offset, limit)) {
-
-            Long key;
-            Transaction transaction;
-            DCSet dcSet = DCSet.getInstance();
-            TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
-            while (iterator.hasNext()) {
-                key = (Long) iterator.next();
-                Fun.Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                transaction = map.get(key);
-                transaction.setDC(dcSet, Transaction.FOR_NETWORK, pair.a, pair.b);
-                array.add(transaction.toJson());
-            }
-
-        } catch (IOException e) {
-            throw ApiErrorFactory.getInstance().createError(e.getMessage());
-        }
-
-        return array.toJSONString();
+        return getTransactionsFind(address, creator, creator, recipient, fromSeqNo, minHeight, maxHeight, type,
+                desc, offset, limit, unconfirmed, count);
     }
 
     @SuppressWarnings("unchecked")
@@ -493,17 +480,26 @@ public class TransactionsResource {
     @Path("find")
     public static String getTransactionsFind(@QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
                                              @QueryParam("recipient") String recipient,
+                                             @QueryParam("from") String fromSeqNoStr,
                                              @QueryParam("startblock") int minHeight,
                                              @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
                                              //@QueryParam("timestamp") long timestamp,
                                              @QueryParam("desc") boolean desc,
                                              @QueryParam("offset") int offset, @QueryParam("limit") int limit,
-                                             @QueryParam("unconfirmed") boolean unconfirmed
+                                             @QueryParam("unconfirmed") boolean unconfirmed,
+                                             @DefaultValue("false") @QueryParam("count") boolean count
     ) {
+
+        Long fromSeqNo = Transaction.parseDBRef(fromSeqNoStr);
+
+        if (count) {
+            return String.valueOf(DCSet.getInstance().getTransactionFinalMap().findTransactionsCount(address, creator,
+                    recipient, fromSeqNo, minHeight, maxHeight, type, 0, desc, offset, limit));
+        }
 
         JSONArray array = new JSONArray();
         try (IteratorCloseable iterator = DCSet.getInstance().getTransactionFinalMap().findTransactionsKeys(address, creator,
-                recipient, minHeight, maxHeight, type, 0, desc, offset, limit)) {
+                recipient, fromSeqNo, minHeight, maxHeight, type, 0, desc, offset, limit)) {
 
             Long key;
             Transaction transaction;

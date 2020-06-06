@@ -1005,7 +1005,7 @@ public class TradeResource {
 
         try (IteratorCloseable<Long> iterator = DCSet.getInstance().getTransactionFinalMap()
                 .findTransactionsKeys(null, address, null,
-                        0, 0, Transaction.CANCEL_ORDER_TRANSACTION,
+                        null, 0, 0, Transaction.CANCEL_ORDER_TRANSACTION,
                         0, false, 0, 0)) {
 
             String result = "";

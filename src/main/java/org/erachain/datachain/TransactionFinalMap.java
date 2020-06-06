@@ -83,14 +83,14 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
 
     @SuppressWarnings("rawtypes")
     List<Transaction> findTransactions(String address, String sender, String recipient, int minHeight,
-                                       int maxHeight, int type, int service, boolean desc, int offset, int limit);
+                                       int maxHeight, int type, int service, boolean desc, int offset, int limit, Long fromSeqNo);
 
     @SuppressWarnings("rawtypes")
-    int findTransactionsCount(String address, String sender, String recipient, int minHeight,
+    int findTransactionsCount(String address, String sender, String recipient, Long fromSeqNo, int minHeight,
                               int maxHeight, int type, int service, boolean desc, int offset, int limit);
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    IteratorCloseable<Long> findTransactionsKeys(String address, String sender, String recipient, int minHeight,
+    IteratorCloseable<Long> findTransactionsKeys(String address, String sender, String recipient, Long fromSeqNo, int minHeight,
                                                  int maxHeight, int type, int service, boolean desc, int offset, int limit);
 
     IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit);

@@ -60,8 +60,8 @@ public class APITransactionsResource {
 
         help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
 
-        help.put("apirecords/find?address={address}&creator={creator}&recipient={recipient}&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={des/asc}&offset={offset}&limit={limit}&unconfirmed=true",
-                Lang.getInstance().translate("Find Records"));
+        help.put("apirecords/find?address={address}&creator={creator}&recipient={recipient}&from=[seqNo]&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={true/false}&offset={offset}&limit={limit}&unconfirmed=true&count=true",
+                Lang.getInstance().translate("Find Records. Set [seqNo] as 1234-1"));
 
         help.put("apirecords/rawTransactionsByBlock/{height}?param", "Get raw transaction(encoding Base58). By default param is 3(for network)");
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -514,13 +514,15 @@ public class APITransactionsResource {
     @Path("find")
     public Response getTransactionsFind(@QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
                                         @QueryParam("recipient") String recipient,
+                                        @QueryParam("from") String fromSeqNo,
                                         @QueryParam("startblock") int minHeight,
                                         @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
                                         //@QueryParam("timestamp") long timestamp,
                                         @QueryParam("desc") boolean desc,
                                         @QueryParam("offset") int offset,
                                         @QueryParam("limit") int limit,
-                                        @QueryParam("unconfirmed") boolean unconfirmed
+                                        @QueryParam("unconfirmed") boolean unconfirmed,
+                                        @DefaultValue("false") @QueryParam("count") boolean count
     ) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
@@ -530,8 +532,8 @@ public class APITransactionsResource {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(TransactionsResource.getTransactionsFind(address, sender, creator, recipient, minHeight, maxHeight, type,
-                        desc, offset, limit, unconfirmed)).build();
+                .entity(TransactionsResource.getTransactionsFind(address, sender, creator, recipient, fromSeqNo, minHeight, maxHeight, type,
+                        desc, offset, limit, unconfirmed, count)).build();
     }
 
     @GET
