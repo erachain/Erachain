@@ -337,7 +337,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         System.arraycopy(Longs.toByteArray(fromID), 0, keyFrom, TransactionFinalMap.ADDRESS_KEY_LEN + 2, Long.BYTES);
 
         byte[] keyTo = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 2 + Long.BYTES];
-        System.arraycopy(addressShort, 0, keyFrom, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+        System.arraycopy(addressShort, 0, keyTo, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
         keyTo[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
         keyTo[TransactionFinalMap.ADDRESS_KEY_LEN + 1] = (byte) (isCreator ? 1 : 0);
         System.arraycopy(Longs.toByteArray(descending ? 0L : Long.MAX_VALUE),
@@ -361,7 +361,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         System.arraycopy(Longs.toByteArray(fromID), 0, keyFrom, TransactionFinalMap.ADDRESS_KEY_LEN + 2, Long.BYTES);
 
         byte[] keyTo = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 2 + Long.BYTES];
-        System.arraycopy(addressShort, 0, keyFrom, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+        System.arraycopy(addressShort, 0, keyTo, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
         keyTo[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
         keyTo[TransactionFinalMap.ADDRESS_KEY_LEN + 1] = (byte) (isCreator ? 1 : 0);
         System.arraycopy(Longs.toByteArray(toID == null ? descending ? 0L : Long.MAX_VALUE : toID),
