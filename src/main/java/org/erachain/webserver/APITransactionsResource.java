@@ -60,7 +60,7 @@ public class APITransactionsResource {
 
         help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
 
-        help.put("apirecords/find?address={address}&creator={creator}&recipient={recipient}&from=[seqNo]&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={true/false}&offset={offset}&limit={limit}&unconfirmed=true&count=true",
+        help.put("apirecords/find?address={address}&creator={creator}&recipient={recipient}&from=[seqNo]&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={false}&offset={offset}&limit={limit}&unconfirmed=false&count=false",
                 Lang.getInstance().translate("Find Records. Set [seqNo] as 1234-1"));
 
         help.put("apirecords/rawTransactionsByBlock/{height}?param", "Get raw transaction(encoding Base58). By default param is 3(for network)");
