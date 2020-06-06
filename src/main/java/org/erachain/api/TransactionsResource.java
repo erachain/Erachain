@@ -490,6 +490,50 @@ public class TransactionsResource {
 
     @SuppressWarnings("unchecked")
     @GET
+    @Path("find")
+    public static String getTransactionsFind(@QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
+                                             @QueryParam("recipient") String recipient,
+                                             @QueryParam("startblock") int minHeight,
+                                             @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
+                                             //@QueryParam("timestamp") long timestamp,
+                                             @QueryParam("desc") boolean desc,
+                                             @QueryParam("offset") int offset, @QueryParam("limit") int limit,
+                                             @QueryParam("unconfirmed") boolean unconfirmed
+    ) {
+
+        JSONArray array = new JSONArray();
+        try (IteratorCloseable iterator = DCSet.getInstance().getTransactionFinalMap().findTransactionsKeys(address, creator,
+                recipient, minHeight, maxHeight, type, 0, desc, offset, limit)) {
+
+            Long key;
+            Transaction transaction;
+            DCSet dcSet = DCSet.getInstance();
+            TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
+            while (iterator.hasNext()) {
+                key = (Long) iterator.next();
+                Fun.Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                transaction = map.get(key);
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+                array.add(transaction.toJson());
+            }
+
+        } catch (IOException e) {
+            throw ApiErrorFactory.getInstance().createError(e.getMessage());
+        }
+
+        if (unconfirmed) {
+            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionTab().findTransactions(address, sender == null ? creator : sender,
+                    recipient, type, desc, 0, limit, 0);
+            for (Transaction trans : resultUnconfirmed) {
+                array.add(trans.toJson());
+            }
+        }
+
+        return array.toJSONString();
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
     @Path("sender/{address}/limit/{limit}")
     public String getTransactionsBySender(@PathParam("address") String address, @PathParam("limit") int limit) {
 

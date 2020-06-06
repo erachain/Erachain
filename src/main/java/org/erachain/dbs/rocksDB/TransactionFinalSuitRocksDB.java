@@ -244,7 +244,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
         byte[] toKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + Long.BYTES];
         System.arraycopy(addressShort, 0, toKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-        System.arraycopy(Longs.toByteArray(toSeqNo == null ? Long.MAX_VALUE : toSeqNo), 0, toKey, TransactionFinalMap.ADDRESS_KEY_LEN, Long.BYTES);
+        System.arraycopy(Longs.toByteArray(toSeqNo == null ? descending ? 0L : Long.MAX_VALUE : toSeqNo), 0, toKey, TransactionFinalMap.ADDRESS_KEY_LEN, Long.BYTES);
 
         return map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(),
                 fromKey, toKey, descending, true);
@@ -293,7 +293,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
         byte[] toKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + Long.BYTES];
         System.arraycopy(addressShort, 0, toKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-        System.arraycopy(Longs.toByteArray(toSeqNo == null ? Long.MAX_VALUE : toSeqNo), 0, toKey, TransactionFinalMap.ADDRESS_KEY_LEN, Long.BYTES);
+        System.arraycopy(Longs.toByteArray(toSeqNo == null ? descending ? 0L : Long.MAX_VALUE : toSeqNo), 0, toKey, TransactionFinalMap.ADDRESS_KEY_LEN, Long.BYTES);
 
         return map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(),
                 fromKey, toKey, descending, true);
@@ -340,7 +340,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         System.arraycopy(addressShort, 0, keyFrom, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
         keyTo[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
         keyTo[TransactionFinalMap.ADDRESS_KEY_LEN + 1] = (byte) (isCreator ? 1 : 0);
-        System.arraycopy(Longs.toByteArray(descending ? Long.MIN_VALUE : Long.MAX_VALUE),
+        System.arraycopy(Longs.toByteArray(descending ? 0L : Long.MAX_VALUE),
                 0, keyTo, TransactionFinalMap.ADDRESS_KEY_LEN + 2, Long.BYTES);
 
         return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(),
@@ -364,7 +364,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         System.arraycopy(addressShort, 0, keyFrom, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
         keyTo[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
         keyTo[TransactionFinalMap.ADDRESS_KEY_LEN + 1] = (byte) (isCreator ? 1 : 0);
-        System.arraycopy(Longs.toByteArray(toID),
+        System.arraycopy(Longs.toByteArray(toID == null ? descending ? 0L : Long.MAX_VALUE : toID),
                 0, keyTo, TransactionFinalMap.ADDRESS_KEY_LEN + 2, Long.BYTES);
 
         return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(),

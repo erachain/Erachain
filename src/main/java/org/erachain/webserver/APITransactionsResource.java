@@ -1,28 +1,26 @@
 package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
+import org.erachain.api.TransactionsResource;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionFinalMapImpl;
-import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.TransactionTimestampComparator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.Map.Entry;
@@ -520,41 +518,20 @@ public class APITransactionsResource {
                                         @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
                                         //@QueryParam("timestamp") long timestamp,
                                         @QueryParam("desc") boolean desc,
-                                        @QueryParam("offset") int offset, @QueryParam("limit") int limit,
+                                        @QueryParam("offset") int offset,
+                                        @DefaultValue("20") @QueryParam("limit") int limit,
                                         @QueryParam("unconfirmed") boolean unconfirmed
     ) {
 
-        JSONArray array = new JSONArray();
-        try (IteratorCloseable iterator = DCSet.getInstance().getTransactionFinalMap().findTransactionsKeys(address, creator,
-                recipient, minHeight, maxHeight, type, 0, desc, offset, limit)) {
-
-            Long key;
-            Transaction transaction;
-            DCSet dcSet = DCSet.getInstance();
-            TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
-            while (iterator.hasNext()) {
-                key = (Long) iterator.next();
-                Fun.Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                transaction = map.get(key);
-                transaction.setDC(dcSet, Transaction.FOR_NETWORK, pair.a, pair.b);
-                array.add(transaction.toJson());
-            }
-
-        } catch (IOException e) {
-            throw ApiErrorFactory.getInstance().createError(e.getMessage());
-        }
-
-        if (unconfirmed) {
-            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionTab().findTransactions(address, sender == null ? creator : sender,
-                    recipient, type, desc, 0, limit, 0);
-            for (Transaction trans : resultUnconfirmed) {
-                array.add(trans.toJson());
-            }
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 50)
+                limit = 50;
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(array.toJSONString()).build();
+                .entity(TransactionsResource.getTransactionsFind(address, sender, creator, recipient, minHeight, maxHeight, type,
+                        desc, offset, limit, unconfirmed)).build();
     }
 
     @GET
