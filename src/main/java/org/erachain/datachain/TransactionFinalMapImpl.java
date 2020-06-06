@@ -1026,7 +1026,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         Long minID;
         Long maxID;
         minID = minHeight == 0 ? null : Transaction.makeDBRef(minHeight, 0);
-        maxID = maxHeight == 0 ? null : Transaction.makeDBRef(maxHeight, Integer.MAX_VALUE);
+        maxID = maxHeight == 0 ? Long.MAX_VALUE : Transaction.makeDBRef(maxHeight, Integer.MAX_VALUE);
 
         if (descending) {
             Long tempID = minID;
