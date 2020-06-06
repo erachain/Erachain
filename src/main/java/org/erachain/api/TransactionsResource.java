@@ -11,11 +11,14 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionFinalMapImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -368,10 +372,10 @@ public class TransactionsResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
         }
 
-        String sender = (String) jsonObject.get("sender");
+        String creator = (String) jsonObject.getOrDefault("creator", jsonObject.get("sender"));
 
         // CHECK IF VALID ADDRESS
-        if (sender != null && !Crypto.getInstance().isValidAddress(sender)) {
+        if (creator != null && !Crypto.getInstance().isValidAddress(creator)) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
         }
 
@@ -457,15 +461,28 @@ public class TransactionsResource {
         }
 
         if (count) {
-            return String.valueOf(DCSet.getInstance().getTransactionFinalMap().findTransactionsCount(address, sender,
+            return String.valueOf(DCSet.getInstance().getTransactionFinalMap().findTransactionsCount(address, creator,
                     recipient, minHeight, maxHeight, type, service, desc, offset, limit));
         }
 
         JSONArray array = new JSONArray();
-        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().findTransactions(address, sender,
-                recipient, minHeight, maxHeight, type, service, desc, offset, limit);
-        for (Transaction transaction : txs) {
-            array.add(transaction.toJson());
+        try (IteratorCloseable iterator = DCSet.getInstance().getTransactionFinalMap().findTransactionsKeys(address, creator,
+                recipient, minHeight, maxHeight, type, service, desc, offset, limit)) {
+
+            Long key;
+            Transaction transaction;
+            DCSet dcSet = DCSet.getInstance();
+            TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
+            while (iterator.hasNext()) {
+                key = (Long) iterator.next();
+                Fun.Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                transaction = map.get(key);
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+                array.add(transaction.toJson());
+            }
+
+        } catch (IOException e) {
+            throw ApiErrorFactory.getInstance().createError(e.getMessage());
         }
 
         return array.toJSONString();

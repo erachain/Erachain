@@ -1031,27 +1031,23 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         IteratorCloseable<Long> iterator;
 
         if (type == 0) {
-            if (address == null) {
-                if (creator != null) {
-                    iterator = ((TransactionFinalSuit) map)
-                            .getIteratorByCreator(Crypto.getInstance().getShortBytesFromAddress(creator), descending);
-                } else {
-                    iterator = ((TransactionFinalSuit) map)
-                            .getIteratorByRecipient(Crypto.getInstance().getShortBytesFromAddress(recipient), descending);
-                }
+            if (creator != null) {
+                iterator = ((TransactionFinalSuit) map)
+                        .getIteratorByCreator(Crypto.getInstance().getShortBytesFromAddress(creator), descending);
+            } else if (recipient != null) {
+                iterator = ((TransactionFinalSuit) map)
+                        .getIteratorByRecipient(Crypto.getInstance().getShortBytesFromAddress(recipient), descending);
             } else {
                 iterator = ((TransactionFinalSuit) map)
                         .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(address), type, null, descending);
             }
         } else {
-            if (address == null) {
-                if (creator != null) {
-                    iterator = ((TransactionFinalSuit) map)
-                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(creator), type, Boolean.TRUE, descending);
-                } else {
-                    iterator = ((TransactionFinalSuit) map)
-                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(recipient), type, Boolean.FALSE, descending);
-                }
+            if (creator != null) {
+                iterator = ((TransactionFinalSuit) map)
+                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(creator), type, Boolean.TRUE, descending);
+            } else if (recipient != null) {
+                iterator = ((TransactionFinalSuit) map)
+                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(recipient), type, Boolean.FALSE, descending);
             } else {
                 iterator = ((TransactionFinalSuit) map)
                         .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(address), type, null, descending);

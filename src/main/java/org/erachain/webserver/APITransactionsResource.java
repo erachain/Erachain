@@ -7,18 +7,22 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionFinalMapImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.TransactionTimestampComparator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.Map.Entry;
@@ -520,12 +524,24 @@ public class APITransactionsResource {
                                         @QueryParam("unconfirmed") boolean unconfirmed
     ) {
 
-        List<Transaction> result = DCSet.getInstance().getTransactionFinalMap().findTransactions(address, sender == null ? creator : sender,
-                recipient, minHeight, maxHeight, type, 0, desc, offset, limit);
-
         JSONArray array = new JSONArray();
-        for (Transaction trans : result) {
-            array.add(trans.toJson());
+        try (IteratorCloseable iterator = DCSet.getInstance().getTransactionFinalMap().findTransactionsKeys(address, creator,
+                recipient, minHeight, maxHeight, type, 0, desc, offset, limit)) {
+
+            Long key;
+            Transaction transaction;
+            DCSet dcSet = DCSet.getInstance();
+            TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
+            while (iterator.hasNext()) {
+                key = (Long) iterator.next();
+                Fun.Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                transaction = map.get(key);
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+                array.add(transaction.toJson());
+            }
+
+        } catch (IOException e) {
+            throw ApiErrorFactory.getInstance().createError(e.getMessage());
         }
 
         if (unconfirmed) {
