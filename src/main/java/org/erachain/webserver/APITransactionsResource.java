@@ -519,12 +519,12 @@ public class APITransactionsResource {
                                         //@QueryParam("timestamp") long timestamp,
                                         @QueryParam("desc") boolean desc,
                                         @QueryParam("offset") int offset,
-                                        @DefaultValue("20") @QueryParam("limit") int limit,
+                                        @QueryParam("limit") int limit,
                                         @QueryParam("unconfirmed") boolean unconfirmed
     ) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limit > 50)
+            if (limit > 50 || limit == 0)
                 limit = 50;
         }
 

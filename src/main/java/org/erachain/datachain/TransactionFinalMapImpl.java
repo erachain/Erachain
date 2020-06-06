@@ -1095,7 +1095,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 // вызывает ошибку преобразования типов iterator = Iterables.mergeSorted((Iterable) ImmutableList.of(creatorKeys, recipientKeys), Fun.COMPARATOR).iterator();
                 // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
                 // поэтому нужно удалить дубли
-                iterator = new MergedIteratorNoDuplicates(ImmutableList.of(creatorIterator, recipientIterator), Fun.COMPARATOR);
+                iterator = new MergedIteratorNoDuplicates(ImmutableList.of(creatorIterator, recipientIterator),
+                        descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
             } else {
                 iterator = creatorIterator;
             }
