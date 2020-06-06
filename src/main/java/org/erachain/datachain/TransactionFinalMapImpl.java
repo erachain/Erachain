@@ -3,7 +3,6 @@ package org.erachain.datachain;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -373,7 +372,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         List<Long> keys = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, isCreator, fromID, false)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type, isCreator, fromID, false)) {
             int counter = 0;
             //Transaction item;
             Long key;
@@ -407,7 +406,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         List<Transaction> transactions = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, onlyCreator, fromID, false)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type, onlyCreator, fromID, false)) {
             int counter = 0;
             Transaction item;
             Long key;
@@ -1021,8 +1020,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
-        IteratorCloseable<Long> creatorKeys = null;
-        IteratorCloseable<Long> recipientKeys = null;
+        IteratorCloseable<Long> creatorIterator = null;
+        IteratorCloseable<Long> recipientIterator = null;
+
+        Long minID;
+        Long maxID;
+        minID = minHeight == 0 ? null : Transaction.makeDBRef(minHeight, 0);
+        maxID = maxHeight == 0 ? null : Transaction.makeDBRef(maxHeight, Integer.MAX_VALUE);
 
         if (address == null && creator == null && recipient == null) {
             return IteratorCloseableImpl.make(new TreeSet<Long>().iterator());
@@ -1030,50 +1034,81 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         IteratorCloseable<Long> iterator;
 
-        if (type == 0) {
-            if (creator != null) {
-                iterator = ((TransactionFinalSuit) map)
-                        .getIteratorByCreator(Crypto.getInstance().getShortBytesFromAddress(creator), descending);
-            } else if (recipient != null) {
-                iterator = ((TransactionFinalSuit) map)
-                        .getIteratorByRecipient(Crypto.getInstance().getShortBytesFromAddress(recipient), descending);
-            } else {
-                iterator = ((TransactionFinalSuit) map)
-                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(address), type, null, descending);
-            }
-        } else {
-            if (creator != null) {
-                iterator = ((TransactionFinalSuit) map)
-                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(creator), type, Boolean.TRUE, descending);
-            } else if (recipient != null) {
-                iterator = ((TransactionFinalSuit) map)
-                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(recipient), type, Boolean.FALSE, descending);
-            } else {
-                iterator = ((TransactionFinalSuit) map)
-                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(address), type, null, descending);
-            }
+        if (address != null) {
+            creator = recipient = address;
         }
 
+        if (type == 0) {
 
-        if (false) {
-            // теперь выше все проще делается
-            if (address != null || creator != null && recipient != null) {
+            if (creator != null) {
+                if (minID == null && maxID == null) {
+                    creatorIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByCreator(Crypto.getInstance().getShortBytesFromAddress(creator), descending);
+                } else {
+                    creatorIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByCreator(Crypto.getInstance().getShortBytesFromAddress(creator), minID, maxID, descending);
+                }
+            }
+
+            if (recipient != null) {
+                if (minID == null && maxID == null) {
+                    recipientIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByRecipient(Crypto.getInstance().getShortBytesFromAddress(recipient), descending);
+                } else {
+                    recipientIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByRecipient(Crypto.getInstance().getShortBytesFromAddress(recipient), minID, maxID, descending);
+                }
+            }
+
+        } else {
+
+            if (creator != null) {
+                if (minID == null && maxID == null) {
+                    creatorIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(creator), type, Boolean.TRUE, descending);
+                } else {
+                    creatorIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(creator), type, Boolean.TRUE, minID, maxID, descending);
+                }
+            }
+            if (recipient != null) {
+                if (minID == null && maxID == null) {
+                    recipientIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(recipient), type, Boolean.FALSE, descending);
+                } else {
+                    recipientIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(recipient), type, Boolean.FALSE, minID, maxID, descending);
+                }
+            }
+
+        }
+
+        if (creatorIterator != null) {
+            if (recipientIterator != null) {
                 // просто добавляет в конец iterator = Iterators.concat(creatorKeys, recipientKeys);
                 // вызывает ошибку преобразования типов iterator = Iterables.mergeSorted((Iterable) ImmutableList.of(creatorKeys, recipientKeys), Fun.COMPARATOR).iterator();
                 // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
                 // поэтому нужно удалить дубли
-                iterator = new MergedIteratorNoDuplicates(ImmutableList.of(creatorKeys, recipientKeys), Fun.COMPARATOR);
+                iterator = new MergedIteratorNoDuplicates(ImmutableList.of(creatorIterator, recipientIterator), Fun.COMPARATOR);
+            } else {
+                iterator = creatorIterator;
             }
+        } else {
+            iterator = recipientIterator;
         }
 
-        if (minHeight != 0 || maxHeight != 0) {
-            iterator = IteratorCloseableImpl.make(Iterators.filter(iterator, new Predicate<Long>() {
-                @Override
-                public boolean apply(Long key) {
-                    Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                    return (minHeight == 0 || pair.a >= minHeight) && (maxHeight == 0 || pair.a <= maxHeight);
-                }
-            }));
+        if (false) {
+            // теперь внутри индексов блок проверяется
+            // как пример работы раньше
+            if (minHeight != 0 || maxHeight != 0) {
+                iterator = IteratorCloseableImpl.make(Iterators.filter(iterator, new Predicate<Long>() {
+                    @Override
+                    public boolean apply(Long key) {
+                        Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                        return (minHeight == 0 || pair.a >= minHeight) && (maxHeight == 0 || pair.a <= maxHeight);
+                    }
+                }));
+            }
         }
 
         if (false && type == Transaction.ARBITRARY_TRANSACTION && service != 0) {
@@ -1085,15 +1120,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     return tx.getService() == service;
                 }
             }));
-        }
-
-        if (descending) {
-            // нужно старый Итератор закрыть и в переменную закатывать новый итератора уже
-            // иначе память может не освободитсья в РоксДБ
-            try (IteratorCloseable iteratorForClose = iterator) {
-                iterator = IteratorCloseableImpl.make(Lists.reverse(Lists.newArrayList(iteratorForClose)).iterator());
-            } catch (IOException e) {
-            }
         }
 
         Iterators.advance(iterator, offset);

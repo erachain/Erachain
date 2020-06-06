@@ -46,8 +46,17 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
     @SuppressWarnings({"unchecked", "rawtypes"})
     List<Transaction> getTransactionsByCreator(byte[] addressShort, int limit, int offset);
 
+    List<Transaction> getTransactionsByCreator(byte[] addressShort, Long fromID, int limit, int offset);
+
+    List<Transaction> getTransactionsByCreator(String address, int limit, int offset);
+
+    List<Transaction> getTransactionsByCreator(String address, Long fromID, int limit, int offset);
+
+    boolean isCreatorWasActive(byte[] addressShort, Long fromSeqNo, int typeTX, Long toSeqNo);
+
+
     @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
+        // TODO ERROR - not use PARENT MAP and DELETED in FORK
     List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, int limit, int offset);
 
     List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int limit, int offset);
