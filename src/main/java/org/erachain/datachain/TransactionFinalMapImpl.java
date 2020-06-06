@@ -1028,6 +1028,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         minID = minHeight == 0 ? null : Transaction.makeDBRef(minHeight, 0);
         maxID = maxHeight == 0 ? null : Transaction.makeDBRef(maxHeight, Integer.MAX_VALUE);
 
+        if (descending) {
+            Long tempID = minID;
+            minID = maxID;
+            maxID = tempID;
+        }
+
         if (address == null && creator == null && recipient == null) {
             return IteratorCloseableImpl.make(new TreeSet<Long>().iterator());
         }
