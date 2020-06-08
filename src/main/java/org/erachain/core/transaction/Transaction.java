@@ -734,8 +734,13 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         System.arraycopy(tagsWords, 0, tagsArray, 0, tagsWords.length);
         for (int i = tagsWords.length; i < tagsArray.length; i++) {
-            Object[] itemKey = itemsKeys[i - tagsWords.length];
-            tagsArray[i] = ItemCls.getItemTypeChar((int) itemKey[0], (Long) itemKey[1]).toLowerCase();
+            try {
+                Object[] itemKey = itemsKeys[i - tagsWords.length];
+                tagsArray[i] = ItemCls.getItemTypeChar((int) itemKey[0], (Long) itemKey[1]).toLowerCase();
+            } catch (Exception e) {
+                LOGGER.error(" itemsKeys[" + i + "] = " + itemsKeys[i - tagsWords.length].toString());
+                throw (e);
+            }
         }
         return tagsArray;
     }
