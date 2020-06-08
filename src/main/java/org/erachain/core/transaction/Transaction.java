@@ -785,15 +785,16 @@ public abstract class Transaction implements ExplorerJsonLine {
     /**
      * Постраничный поиск по строке поиска
      *
+     * @param offest
      * @param filterStr
      * @param useForge
      * @param pageSize
      * @param fromID
-     * @param offest
+     * @param fillFullPage
      * @return
      */
     public static Tuple3<Long, Long, List<Transaction>> searchTransactions(
-            DCSet dcSet, String filterStr, boolean useForge, int pageSize, Long fromID, int offset) {
+            DCSet dcSet, String filterStr, boolean useForge, int pageSize, Long fromID, int offset, boolean fillFullPage) {
 
         List<Transaction> transactions = new ArrayList<>();
 
@@ -823,10 +824,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         }
 
         if (filterStr == null) {
-            transactions = map.getTransactionsFromID(fromID, offset, pageSize, !useForge, true);
+            transactions = map.getTransactionsFromID(fromID, offset, pageSize, !useForge, fillFullPage);
         } else {
-            transactions = map.getTransactionsByTitleFromID(filterStr, fromID,
-                    offset, pageSize, true);
+            transactions.addAll(map.getTransactionsByTitleFromID(filterStr, fromID,
+                    offset, pageSize, fillFullPage));
         }
 
         if (transactions.isEmpty()) {

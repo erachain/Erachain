@@ -2680,7 +2680,7 @@ public class BlockExplorer {
             }
 
             if (true) {
-                Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filterStr, useForge, pageSize, fromID, intOffest);
+                Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filterStr, useForge, pageSize, fromID, intOffest, true);
                 transactions = result.c;
                 if (result.a != null) {
                     output.put("fromSeqNo", Transaction.viewDBRef(result.a));
