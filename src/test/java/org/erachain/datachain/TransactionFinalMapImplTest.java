@@ -155,7 +155,8 @@ public class TransactionFinalMapImplTest {
                 assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
                 dcSet.getTransactionFinalMap().put(assetTransfer);
 
-                Iterator<Long> iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, maxHeight, type, service, desc, offset, limit);
+                Iterator<Long> iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(), sender, recipient,
+                        null, minHeight, maxHeight, type, service, desc, offset, limit);
 
                 // .size сбрасывает Итератор на конец списка
                 assertEquals(3, Iterators.size(iterator));
@@ -172,7 +173,8 @@ public class TransactionFinalMapImplTest {
 
                 //Iterator iteratorU = dcSet.getTransactionTab().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, desc, type, service, offset);
 
-                iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, maxHeight, type, service, desc, offset, limit);
+                iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(), sender, recipient,
+                        null, minHeight, maxHeight, type, service, desc, offset, limit);
 
 
                 // .size сбрасывает Итератор на конец списка

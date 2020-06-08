@@ -70,7 +70,14 @@ public class NetworkStatus extends JLabel implements Observer {
 
     private void viewProgress() {
         currentHeight = Controller.getInstance().getMyHeight();
-        Tuple3<Integer, Long, Peer> heightW = Controller.getInstance().getMaxPeerHWeight(0, false, false);
+        Tuple3<Integer, Long, Peer> heightW = null;
+        try {
+            // иногда там блок не находит при синхре с РоксДБ и ГУИ не открвается по ошибке Нуль
+            heightW = Controller.getInstance().getMaxPeerHWeight(0, false, false);
+        } catch (Exception e) {
+            return;
+        }
+
         if (heightW == null)
             return;
 

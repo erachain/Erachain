@@ -3,7 +3,6 @@ package org.erachain.datachain;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -170,7 +169,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByRecipient(addressShort)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByRecipient(addressShort, false)) {
             List<Transaction> txs = new ArrayList<>();
             int counter = 0;
             Transaction item;
@@ -237,7 +236,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByCreator(addressShort)) {
+        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, false)) {
             List<Transaction> txs = new ArrayList<>();
             int counter = 0;
             Transaction item;
@@ -271,7 +270,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, fromID)) {
+        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, fromID, false)) {
             List<Transaction> txs = new ArrayList<>();
             int counter = 0;
             Transaction item;
@@ -313,7 +312,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (typeTX == 0) {
             txsFind = getTransactionsByCreator(addressShort, fromSeqNo, 1, 0);
         } else {
-            txsFind = getTransactionsByAddressAndType(addressShort, typeTX, fromSeqNo, 1, 0, true);
+            txsFind = getTransactionsByAddressAndType(addressShort, typeTX, true, fromSeqNo, 1, 0);
         }
 
         if (txsFind.isEmpty())
@@ -336,7 +335,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         List<Transaction> txs = new ArrayList<>();
-        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type)) {
+        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type, null, false)) {
             int counter = 0;
             Transaction item;
             Long key;
@@ -366,14 +365,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Long fromID, int limit, int offset) {
+    public List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int limit, int offset) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         List<Long> keys = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, fromID)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type, isCreator, fromID, false)) {
             int counter = 0;
             //Transaction item;
             Long key;
@@ -400,14 +399,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, Long fromID, int limit, int offset, boolean onlyCreator) {
+    public List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, boolean onlyCreator, Long fromID, int limit, int offset) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         List<Transaction> transactions = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, fromID)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type, onlyCreator, fromID, false)) {
             int counter = 0;
             Transaction item;
             Long key;
@@ -867,24 +866,24 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public IteratorCloseable getIteratorByAddress(byte[] addressShort) {
+    public IteratorCloseable getIteratorByAddress(byte[] addressShort, boolean descending) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
-        return ((TransactionFinalSuit) map).getIteratorByAddress(addressShort);
+        return ((TransactionFinalSuit) map).getIteratorByAddress(addressShort, descending);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, int limit, boolean noForge) {
+    public List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, int limit, boolean noForge, boolean descending) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         List<Transaction> txs = new ArrayList<>();
-        try (IteratorCloseable iterator = getIteratorByAddress(addressShort)) {
+        try (IteratorCloseable iterator = getIteratorByAddress(addressShort, descending)) {
             Transaction item;
             Long key;
             while (iterator.hasNext() && (limit == -1 || limit > 0)) {
@@ -910,8 +909,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return txs;
     }
 
-    public List<Transaction> getTransactionsByAddressLimit(String address, int limit, boolean noForge) {
-        return getTransactionsByAddressLimit(Account.makeShortBytes(address), limit, noForge);
+    public List<Transaction> getTransactionsByAddressLimit(String address, int limit, boolean noForge, boolean descending) {
+        return getTransactionsByAddressLimit(Account.makeShortBytes(address), limit, noForge, descending);
     }
 
     @Override
@@ -921,7 +920,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
-        try (IteratorCloseable iterator = getIteratorByAddress(addressShort)) {
+        try (IteratorCloseable iterator = getIteratorByAddress(addressShort, false)) {
             return Iterators.size(iterator);
         } catch (IOException e) {
             return 0;
@@ -938,7 +937,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         //Iterable keys = Fun.filter(this.recipientKey, address);
         //Iterator iter = keys.iterator();
-        try (IteratorCloseable iterator = ((TransactionFinalSuit)map).getIteratorByRecipient(addressShort)) {
+        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByRecipient(addressShort, false)) {
             int prevKey = startHeight;
             while (iterator.hasNext()) {
                 Long key = (Long) iterator.next();
@@ -961,14 +960,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings("rawtypes")
     public List<Transaction> findTransactions(String address, String sender, String recipient, final int minHeight,
-                                              final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
+                                              final int maxHeight, int type, int service, boolean desc, int offset, int limit, Long fromSeqNo) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         List<Transaction> txs = new ArrayList<>();
-        try (IteratorCloseable iterator = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight,
+        try (IteratorCloseable iterator = findTransactionsKeys(address, sender, recipient, fromSeqNo, minHeight, maxHeight,
                 type, service, desc, offset, limit)) {
 
             Transaction item;
@@ -988,12 +987,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings("rawtypes")
-    public int findTransactionsCount(String address, String sender, String recipient, final int minHeight,
+    public int findTransactionsCount(String address, String sender, String recipient, Long fromSeqNo, final int minHeight,
                                      final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
-        try (IteratorCloseable iterator = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight,
+        try (IteratorCloseable iterator = findTransactionsKeys(address, sender, recipient, fromSeqNo, minHeight, maxHeight,
                 type, service, desc, offset, limit)) {
             return Iterators.size(iterator);
         } catch (IOException e) {
@@ -1005,87 +1004,127 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
      * @param address
      * @param creator
      * @param recipient
+     * @param fromSeqNo
      * @param minHeight
      * @param maxHeight
      * @param type
      * @param service
-     * @param desc
+     * @param descending
      * @param offset
      * @param limit
      * @return
      */
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public IteratorCloseable findTransactionsKeys(String address, String creator, String recipient, final int minHeight,
-                                                  final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
+    public IteratorCloseable findTransactionsKeys(String address, String creator, String recipient, Long fromSeqNo, final int minHeight,
+                                                  final int maxHeight, int type, final int service, boolean descending, int offset, int limit) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
-        IteratorCloseable<Long> creatorKeys = null;
-        IteratorCloseable<Long> recipientKeys = null;
+        IteratorCloseable<Long> creatorIterator = null;
+        IteratorCloseable<Long> recipientIterator = null;
 
-        if (address != null) {
-            creator = address;
-            recipient = address;
+        Long minID;
+        Long maxID;
+        minID = minHeight == 0 ? null : Transaction.makeDBRef(minHeight, 0);
+        maxID = maxHeight == 0 ? Long.MAX_VALUE : Transaction.makeDBRef(maxHeight, Integer.MAX_VALUE);
+
+        if (descending) {
+            Long tempID = minID;
+            minID = maxID;
+            maxID = tempID;
         }
 
-        if (creator == null && recipient == null) {
+        if (fromSeqNo != null) {
+            minID = fromSeqNo;
+        }
+
+        if (address == null && creator == null && recipient == null) {
             return IteratorCloseableImpl.make(new TreeSet<Long>().iterator());
         }
 
-        if (creator != null) {
-            if (type != 0) {
-                //creatorKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(creator, type));
-                creatorKeys = ((TransactionFinalSuit)map)
-                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(creator), type);
-            } else {
-                //creatorKeys = Fun.filter(this.senderKey, creator);
-                //int sizeS = Iterators.size(((TransactionFinalSuit)map).getIteratorBySender(creator));
-
-                creatorKeys = ((TransactionFinalSuit)map)
-                        .getIteratorByCreator(Crypto.getInstance().getShortBytesFromAddress(creator));
-            }
-        }
-
-        if (recipient != null) {
-            if (type != 0) {
-                //recipientKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(recipient, type));
-                recipientKeys = ((TransactionFinalSuit)map)
-                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(recipient), type);
-            } else {
-                //int sizeR = Iterators.size(((TransactionFinalSuit)map).getIteratorByRecipient(recipient));
-                //recipientKeys = Fun.filter(this.recipientKey, recipient);
-                recipientKeys = ((TransactionFinalSuit)map).getIteratorByRecipient(Crypto.getInstance().getShortBytesFromAddress(recipient));
-            }
-        }
-
         IteratorCloseable<Long> iterator;
-        if (address != null || creator != null && recipient != null) {
-            // просто добавляет в конец iterator = Iterators.concat(creatorKeys, recipientKeys);
-            // вызывает ошибку преобразования типов iterator = Iterables.mergeSorted((Iterable) ImmutableList.of(creatorKeys, recipientKeys), Fun.COMPARATOR).iterator();
-            // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
-            // поэтому нужно удалить дубли
-            iterator = new MergedIteratorNoDuplicates(ImmutableList.of(creatorKeys, recipientKeys), Fun.COMPARATOR);
 
-        } else if (creator != null) {
-            iterator = creatorKeys;
-        } else if (recipient != null) {
-            iterator = recipientKeys;
-        } else {
-            iterator = IteratorCloseableImpl.make(new TreeSet<Long>().iterator());
+        if (address != null) {
+            creator = recipient = address;
         }
 
-        if (minHeight != 0 || maxHeight != 0) {
-            iterator = IteratorCloseableImpl.make(Iterators.filter(iterator, new Predicate<Long>() {
-                @Override
-                public boolean apply(Long key) {
-                    Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                    return (minHeight == 0 || pair.a >= minHeight) && (maxHeight == 0 || pair.a <= maxHeight);
+        if (type == 0) {
+
+            if (creator != null) {
+                if (minID == null && maxID == null) {
+                    creatorIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByCreator(Crypto.getInstance().getShortBytesFromAddress(creator), descending);
+                } else {
+                    creatorIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByCreator(Crypto.getInstance().getShortBytesFromAddress(creator), minID, maxID, descending);
                 }
-            }));
+            }
+
+            if (recipient != null) {
+                if (minID == null && maxID == null) {
+                    recipientIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByRecipient(Crypto.getInstance().getShortBytesFromAddress(recipient), descending);
+                } else {
+                    recipientIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByRecipient(Crypto.getInstance().getShortBytesFromAddress(recipient), minID, maxID, descending);
+                }
+            }
+
+        } else {
+
+            if (creator != null) {
+                if (minID == null && maxID == null) {
+                    creatorIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(creator), type, Boolean.TRUE, descending);
+                } else {
+                    creatorIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(creator), type, Boolean.TRUE, minID, maxID, descending);
+                }
+            }
+            if (recipient != null) {
+                if (minID == null && maxID == null) {
+                    recipientIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(recipient), type, Boolean.FALSE, descending);
+                } else {
+                    recipientIterator = ((TransactionFinalSuit) map)
+                            .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(recipient), type, Boolean.FALSE, minID, maxID, descending);
+                }
+            }
+
+        }
+
+        if (creatorIterator != null) {
+            if (recipientIterator != null) {
+                // просто добавляет в конец iterator = Iterators.concat(creatorKeys, recipientKeys);
+                // вызывает ошибку преобразования типов iterator = Iterables.mergeSorted((Iterable) ImmutableList.of(creatorKeys, recipientKeys), Fun.COMPARATOR).iterator();
+                // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
+                // поэтому нужно удалить дубли
+                iterator = new MergedIteratorNoDuplicates(ImmutableList.of(creatorIterator, recipientIterator),
+                        descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
+            } else {
+                iterator = creatorIterator;
+            }
+        } else {
+            iterator = recipientIterator;
+        }
+
+        if (false) {
+            // теперь внутри индексов блок проверяется
+            // как пример работы раньше
+            if (minHeight != 0 || maxHeight != 0) {
+                iterator = IteratorCloseableImpl.make(Iterators.filter(iterator, new Predicate<Long>() {
+                    @Override
+                    public boolean apply(Long key) {
+                        Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                        return (minHeight == 0 || pair.a >= minHeight) && (maxHeight == 0 || pair.a <= maxHeight);
+                    }
+                }));
+            }
         }
 
         if (false && type == Transaction.ARBITRARY_TRANSACTION && service != 0) {
+            // СЕРВИС это для AT - сейчас отключен
             iterator = IteratorCloseableImpl.make(Iterators.filter(iterator, new Predicate<Long>() {
                 @Override
                 public boolean apply(Long key) {
@@ -1093,15 +1132,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     return tx.getService() == service;
                 }
             }));
-        }
-
-        if (desc) {
-            // нужно старый Итератор закрыть и в переменную закатывать новый итератора уже
-            // иначе память может не освободитсья в РоксДБ
-            try (IteratorCloseable iteratorForClose = iterator) {
-                iterator = IteratorCloseableImpl.make(Lists.reverse(Lists.newArrayList(iteratorForClose)).iterator());
-            } catch (IOException e) {
-            }
         }
 
         Iterators.advance(iterator, offset);

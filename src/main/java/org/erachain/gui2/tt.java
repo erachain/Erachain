@@ -190,10 +190,12 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         assets_Node.add(new ASMutableTreeNode("MyBalanceTab", Lang.getInstance().translate("My Balance"), MyBalanceTab.getIcon()));
         //assets_Node.add(new ASMutableTreeNode(Lang.getInstance().translate("Exchange")));
 
-        exchange_Node.add(new ASMutableTreeNode("ExchangePanel",Lang.getInstance().translate("Exchange"),ExchangePanel.getIcon()));
-        exchange_Node.add(new ASMutableTreeNode("DepositExchange", Lang.getInstance().translate("Deposit Exchange"), DepositExchange.getIcon()));
-        exchange_Node.add(new ASMutableTreeNode("WithdrawExchange", Lang.getInstance().translate("Withdraw Exchange"),WithdrawExchange.getIcon()));
-        exchange_Node.add(new ASMutableTreeNode("MyOrderTab", Lang.getInstance().translate("My Orders"),MyOrderTab.getIcon()));
+        if (Settings.EXCHANGE_IN_OUT) {
+            exchange_Node.add(new ASMutableTreeNode("DepositExchange", Lang.getInstance().translate("Deposit Exchange"), DepositExchange.getIcon()));
+            exchange_Node.add(new ASMutableTreeNode("WithdrawExchange", Lang.getInstance().translate("Withdraw Exchange"), WithdrawExchange.getIcon()));
+        }
+        exchange_Node.add(new ASMutableTreeNode("ExchangePanel", Lang.getInstance().translate("Exchange"), ExchangePanel.getIcon()));
+        exchange_Node.add(new ASMutableTreeNode("MyOrderTab", Lang.getInstance().translate("My Orders"), MyOrderTab.getIcon()));
 
         templates_Node.add(new ASMutableTreeNode("TemplatesFavoriteSplitPanel", Lang.getInstance().translate("Favorite Templates"), TemplatesFavoriteSplitPanel.getIcon()));
         templates_Node.add(new ASMutableTreeNode("SearchTemplatesSplitPanel", Lang.getInstance().translate("Search Templates"), SearchTemplatesSplitPanel.getIcon()));

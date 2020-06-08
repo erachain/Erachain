@@ -1237,6 +1237,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (this.height > 0) {
             transaction.put("height", this.height);
             transaction.put("sequence", this.seqNo);
+            transaction.put("seqNo", viewHeightSeq());
             if (isWiped()) {
                 transaction.put("wiped", true);
             }
