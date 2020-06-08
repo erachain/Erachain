@@ -738,7 +738,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                 Object[] itemKey = itemsKeys[i - tagsWords.length];
                 tagsArray[i] = ItemCls.getItemTypeChar((int) itemKey[0], (Long) itemKey[1]).toLowerCase();
             } catch (Exception e) {
-                LOGGER.error(" itemsKeys[" + i + "] = " + itemsKeys[i - tagsWords.length].toString());
+                LOGGER.error("itemsKeys[" + i + "] = " + itemsKeys[i - tagsWords.length].toString());
                 throw (e);
             }
         }
@@ -746,7 +746,12 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public String[] getTags() {
-        return tags(viewTypeName(), getTitle(), itemsKeys);
+        try {
+            return tags(viewTypeName(), getTitle(), itemsKeys);
+        } catch (Exception e) {
+            LOGGER.error(toString() + " - itemsKeys.len: " + itemsKeys.length);
+            throw e;
+        }
     }
 
     /*
