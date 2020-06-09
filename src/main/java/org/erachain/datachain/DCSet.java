@@ -1702,6 +1702,7 @@ public class DCSet extends DBASet implements Closeable {
                 // если основная база то с откатом
                 if (parent == null) {
                     if (this.getBlockMap().isProcessing()) {
+                        LOGGER.debug("TRY ROLLBACK");
                         for (DBTab tab : tables) {
                             try {
                                 tab.rollback();

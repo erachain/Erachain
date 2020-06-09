@@ -530,6 +530,37 @@ public class TransactionsResource {
 
     @SuppressWarnings("unchecked")
     @GET
+    @Path("search")
+    public static String getTransactionsSearch(
+            @QueryParam("q") String query,
+            @QueryParam("from") String fromSeqNoStr,
+            @QueryParam("useforge") boolean useForge,
+            @QueryParam("fullpage") boolean fullPage,
+            @QueryParam("offset") int offset, @QueryParam("limit") int limit
+    ) {
+
+        Long fromID = Transaction.parseDBRef(fromSeqNoStr);
+
+        Fun.Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(DCSet.getInstance(), query, useForge, limit, fromID, offset, fullPage);
+
+        JSONArray array = new JSONArray();
+        if (result == null || result.c == null)
+            return array.toJSONString();
+
+        array.add(result.a == null ? null : Transaction.viewDBRef(result.a));
+        array.add(result.b == null ? null : Transaction.viewDBRef(result.b));
+
+        JSONArray txs = new JSONArray();
+        for (Transaction transaction : result.c) {
+            txs.add((transaction.toJson()));
+        }
+        array.add(txs);
+
+        return array.toJSONString();
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
     @Path("sender/{address}/limit/{limit}")
     public String getTransactionsBySender(@PathParam("address") String address, @PathParam("limit") int limit) {
 

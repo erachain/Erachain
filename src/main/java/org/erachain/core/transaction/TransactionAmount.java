@@ -191,7 +191,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     @Override
     public void makeItemsKeys() {
         // запомним что тут две сущности
-        if (amount != null) {
+        if (key != 0) {
             if (creatorPersonDuration != null) {
                 if (recipientPersonDuration != null) {
                     itemsKeys = new Object[][]{

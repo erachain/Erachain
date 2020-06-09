@@ -63,6 +63,9 @@ public class APITransactionsResource {
         help.put("apirecords/find?address={address}&creator={creator}&recipient={recipient}&from=[seqNo]&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={false}&offset={offset}&limit={limit}&unconfirmed=false&count=false",
                 Lang.getInstance().translate("Find Records. Set [seqNo] as 1234-1"));
 
+        help.put("apirecords/search?q={query}&from=[seqNo]&useforge={false}&offset={offset}&limit={limit}&fullpage={false}",
+                Lang.getInstance().translate("Search Records by Query. Query=SeqNo|Signature|FilterWords. Result[0-1] - START & END Seq-No for use in paging (see as make it in blockexplorer. Signature as Base58. Set Set FilterWords as preffix words separated by space. Set [seqNo] as 1234-1. For use forge set &useforge=true. For fill full page - use fullpage=true"));
+
         help.put("apirecords/rawTransactionsByBlock/{height}?param", "Get raw transaction(encoding Base58). By default param is 3(for network)");
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
@@ -534,6 +537,27 @@ public class APITransactionsResource {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(TransactionsResource.getTransactionsFind(address, sender, creator, recipient, fromSeqNo, minHeight, maxHeight, type,
                         desc, offset, limit, unconfirmed, count)).build();
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("search")
+    public Response getTransactionsSearch(
+            @QueryParam("q") String query,
+            @QueryParam("from") String fromSeqNoStr,
+            @QueryParam("useforge") boolean useForge,
+            @QueryParam("fullpage") boolean fullPage,
+            @QueryParam("offset") int offset, @QueryParam("limit") int limit
+    ) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 50 || limit == 0)
+                limit = 50;
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(TransactionsResource.getTransactionsSearch(query, fromSeqNoStr, useForge, fullPage, offset, limit)).build();
     }
 
     @GET

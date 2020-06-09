@@ -734,14 +734,24 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         System.arraycopy(tagsWords, 0, tagsArray, 0, tagsWords.length);
         for (int i = tagsWords.length; i < tagsArray.length; i++) {
-            Object[] itemKey = itemsKeys[i - tagsWords.length];
-            tagsArray[i] = ItemCls.getItemTypeChar((int) itemKey[0], (Long) itemKey[1]).toLowerCase();
+            try {
+                Object[] itemKey = itemsKeys[i - tagsWords.length];
+                tagsArray[i] = ItemCls.getItemTypeChar((int) itemKey[0], (Long) itemKey[1]).toLowerCase();
+            } catch (Exception e) {
+                LOGGER.error("itemsKeys[" + i + "] = " + itemsKeys[i - tagsWords.length].toString());
+                throw (e);
+            }
         }
         return tagsArray;
     }
 
     public String[] getTags() {
-        return tags(viewTypeName(), getTitle(), itemsKeys);
+        try {
+            return tags(viewTypeName(), getTitle(), itemsKeys);
+        } catch (Exception e) {
+            LOGGER.error(toString() + " - itemsKeys.len: " + itemsKeys.length);
+            throw e;
+        }
     }
 
     /*
@@ -775,15 +785,16 @@ public abstract class Transaction implements ExplorerJsonLine {
     /**
      * Постраничный поиск по строке поиска
      *
+     * @param offest
      * @param filterStr
      * @param useForge
      * @param pageSize
      * @param fromID
-     * @param offest
+     * @param fillFullPage
      * @return
      */
     public static Tuple3<Long, Long, List<Transaction>> searchTransactions(
-            DCSet dcSet, String filterStr, boolean useForge, int pageSize, Long fromID, int offset) {
+            DCSet dcSet, String filterStr, boolean useForge, int pageSize, Long fromID, int offset, boolean fillFullPage) {
 
         List<Transaction> transactions = new ArrayList<>();
 
@@ -813,10 +824,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         }
 
         if (filterStr == null) {
-            transactions = map.getTransactionsFromID(fromID, offset, pageSize, !useForge, true);
+            transactions = map.getTransactionsFromID(fromID, offset, pageSize, !useForge, fillFullPage);
         } else {
-            transactions = map.getTransactionsByTitleFromID(filterStr, fromID,
-                    offset, pageSize, true);
+            transactions.addAll(map.getTransactionsByTitleFromID(filterStr, fromID,
+                    offset, pageSize, fillFullPage));
         }
 
         if (transactions.isEmpty()) {
