@@ -102,6 +102,7 @@ abstract public class DBASet implements IDB {
     }
 
     public void clearCache() {
+        logger.debug("CLEAR CACHE");
         this.database.getEngine().clearCache();
     }
 
