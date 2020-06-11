@@ -1,6 +1,7 @@
 package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -120,6 +121,13 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         // without reference
         data = Bytes.concat(data, this.item.toBytes(false, false));
 
+        if (forDeal == FOR_DB_RECORD) {
+            byte[] keyBytes = Longs.toByteArray(key);
+            keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
+            data = Bytes.concat(data, keyBytes);
+
+        }
+
         return data;
     }
 
@@ -133,7 +141,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         else if (forDeal == FOR_PACK)
             base_len = BASE_LENGTH_AS_PACK;
         else if (forDeal == FOR_DB_RECORD)
-            base_len = BASE_LENGTH_AS_DBRECORD;
+            base_len = BASE_LENGTH_AS_DBRECORD + KEY_LENGTH;
         else
             base_len = BASE_LENGTH;
 

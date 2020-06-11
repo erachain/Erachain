@@ -116,6 +116,16 @@ public class IssueStatusRecord extends IssueItemRecord {
         StatusCls status = StatusFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += status.getDataLength(false);
 
+        if (asDeal == FOR_DB_RECORD) {
+            //READ KEY
+            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+            long key = Longs.fromByteArray(timestampBytes);
+            position += KEY_LENGTH;
+
+            status.setKey(key);
+
+        }
+
         if (asDeal > Transaction.FOR_MYPACK) {
             return new IssueStatusRecord(typeBytes, creator, status, feePow, timestamp, reference, signatureBytes, feeLong);
         } else {

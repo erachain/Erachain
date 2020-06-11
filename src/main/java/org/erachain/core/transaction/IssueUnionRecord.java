@@ -116,6 +116,16 @@ public class IssueUnionRecord extends IssueItemRecord {
         UnionCls union = UnionFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += union.getDataLength(false);
 
+        if (asDeal == FOR_DB_RECORD) {
+            //READ KEY
+            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+            long key = Longs.fromByteArray(timestampBytes);
+            position += KEY_LENGTH;
+
+            union.setKey(key);
+
+        }
+
         if (asDeal > Transaction.FOR_MYPACK) {
             return new IssueUnionRecord(typeBytes, creator, union, feePow, timestamp, reference, signatureBytes, feeLong);
         } else {
