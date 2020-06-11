@@ -622,7 +622,7 @@ public class WebTransactionsHTML {
 
         if (tr.getAmount() != null) {
             out += "<BR>" + Lang.getInstance().translateFromLangObj("Amount", langObj) + ": <b>"
-                    + tr.getAmount().toPlainString() + " "
+                    + tr.getAmount().toPlainString() + " х "
                     + itemNameHTML(Controller.getInstance().getAsset(tr.getAbsKey())) + "</b>";
         }
 
