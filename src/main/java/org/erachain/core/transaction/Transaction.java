@@ -1695,6 +1695,8 @@ public abstract class Transaction implements ExplorerJsonLine {
             error++;
         }
 
+        makeItemsKeys();
+
         if (asDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
