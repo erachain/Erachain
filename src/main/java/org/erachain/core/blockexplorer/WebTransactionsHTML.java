@@ -451,9 +451,14 @@ public class WebTransactionsHTML {
             out += "<b>" + Lang.getInstance().translateFromLangObj("Parent", langObj) + ":</b> "
                     + setStatusToItem.viewRefParent() + "<br>";
         }
-        out += Lang.getInstance().translateFromLangObj("Item Name", langObj) + ":</b> "
+        out += Lang.getInstance().translateFromLangObj("Item Name", langObj) + ": <b>"
                 + item.getItemTypeName() + " - " + item.getItemSubType()
-                + ": " + itemNameHTML(item) + "<br>";
+                + ": " + itemNameHTML(item) + "</b><br>";
+
+        out += Lang.getInstance().translateFromLangObj("Result", langObj) + ": <b>"
+                + setStatusToItem.getResultText() + "</b><br>";
+
+
         return out;
     }
 
