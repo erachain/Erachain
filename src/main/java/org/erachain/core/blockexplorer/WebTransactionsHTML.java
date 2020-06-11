@@ -187,7 +187,7 @@ public class WebTransactionsHTML {
         if (item.getKey() >= item.getStartKey()) {
             out += "[" + item.getKey() + "] ";
         }
-        if (item.getIcon() != null) {
+        if (item.getIcon() != null && item.getIcon().length > 0) {
             out += "<img src='data:image/gif;base64," + Base64.encodeBase64String(item.getIcon()) + "' style='width:1.8em;'/> ";
         }
         out += item.viewName() + "</a>";
@@ -209,18 +209,23 @@ public class WebTransactionsHTML {
         // TODO Auto-generated method stub
         String out = "";
         GenesisTransferAssetTransaction assetTransfer = (GenesisTransferAssetTransaction) transaction;
-        boolean isCredit = false;
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?address="
-                + assetTransfer.getCreator().getAddress() + get_Lang() + ">" + assetTransfer.getCreator().getPersonAsString()
-                + "</a><br>";
+        if (assetTransfer.getCreator() != null) {
+            out += Lang.getInstance().translateFromLangObj("Creator", langObj) + ": <a href=?address="
+                    + assetTransfer.getCreator().getAddress() + get_Lang() + "><b>" + assetTransfer.getCreator().getPersonAsString()
+                    + "</b></a>";
+        } else {
+            out += "<b>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + ": GENESIS";
+        }
 
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?address="
-                + assetTransfer.getRecipient().getAddress() + get_Lang() + ">" + assetTransfer.getRecipient().getPersonAsString()
-                + "</a><br>";
+        out += "<br>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ": <a href=?address="
+                + assetTransfer.getRecipient().getAddress() + get_Lang() + "><b>" + assetTransfer.getRecipient().getPersonAsString()
+                + "</b></a><br>";
 
-        out += "<br>" + Lang.getInstance().translateFromLangObj("Asset", langObj) + ": <b>" + itemNameHTML(assetTransfer.getAsset()) + "</b>";
-        out += "<br>" + Lang.getInstance().translateFromLangObj(isCredit ? "Credit" : "Amount", langObj)
-                + ": <b>" + assetTransfer.getAmount().toPlainString() + "</b>";
+        out += "<br>" + Lang.getInstance().translateFromLangObj(assetTransfer.viewActionTypeWas(), langObj)
+                + ": <b>" + assetTransfer.getAmount().toPlainString() + " x "
+                + itemNameHTML(Controller.getInstance().getAsset(assetTransfer.getAbsKey())) + "</b>";
+
+
         return out;
     }
 
@@ -464,7 +469,7 @@ public class WebTransactionsHTML {
                 + record.getAddDay() + "<br>";
         int i = 0;
         for (String address : record.getSertifiedPublicKeysB58()) {
-            out += "<b>   " + Lang.getInstance().translateFromLangObj("Account", langObj) + " " + ++i + ":</b> " + address + "<br>";
+            out += "<b>   " + Lang.getInstance().translateFromLangObj("Key", langObj) + " " + ++i + ":</b> " + address + "<br>";
         }
         return out;
     }
@@ -613,21 +618,21 @@ public class WebTransactionsHTML {
 
     private String r_Send_HTML(Transaction transaction) {
         // TODO Auto-generated method stub
-        RSend tr = (RSend) transaction;
+        RSend rSend = (RSend) transaction;
         String out = "";
 
         out += Lang.getInstance().translateFromLangObj("Recipient", langObj) + ": <a href=?address="
-                + tr.getRecipient().getAddress() + get_Lang() + "><b>" + tr.getRecipient().getPersonAsString()
+                + rSend.getRecipient().getAddress() + get_Lang() + "><b>" + rSend.getRecipient().getPersonAsString()
                 + "</b></a>";
 
-        if (tr.getAmount() != null) {
-            out += "<BR>" + Lang.getInstance().translateFromLangObj("Amount", langObj) + ": <b>"
-                    + tr.getAmount().toPlainString() + " х "
-                    + itemNameHTML(Controller.getInstance().getAsset(tr.getAbsKey())) + "</b>";
+        if (rSend.getAmount() != null) {
+            out += "<br>" + Lang.getInstance().translateFromLangObj(rSend.viewActionTypeWas(), langObj)
+                    + ": <b>" + rSend.getAmount().toPlainString() + " х "
+                    + itemNameHTML(Controller.getInstance().getAsset(rSend.getAbsKey())) + "</b>";
         }
 
-        if (!tr.getHead().equals(""))
-            out += "<BR>" + Lang.getInstance().translateFromLangObj("Title", langObj) + ": <b>" + tr.getHead() + "</b>";
+        if (!rSend.getHead().equals(""))
+            out += "<BR>" + Lang.getInstance().translateFromLangObj("Title", langObj) + ": <b>" + rSend.getHead() + "</b>";
 
         return out;
 

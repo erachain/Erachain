@@ -95,10 +95,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
      * String NAME_ACTION_TYPE_BACKWARD_CREDIT = "backward CREDIT"; public
      * static final String NAME_ACTION_TYPE_BACKWARD_SPEND = "backward SPEND";
      */
-    public static final String NAME_ACTION_TYPE_PROPERTY = "PROPERTY";
+    public static final String NAME_ACTION_TYPE_PROPERTY = "SEND";
+    public static final String NAME_ACTION_TYPE_PROPERTY_WAS = "Send # was";
     public static final String NAME_ACTION_TYPE_HOLD = "HOLD";
+    public static final String NAME_ACTION_TYPE_HOLD_WAS = "Hold # was";
     public static final String NAME_CREDIT = "CREDIT";
+    public static final String NAME_CREDIT_WAS = "Credit # was";
     public static final String NAME_SPEND = "SPEND";
+    public static final String NAME_SPEND_WAS = "Spend # was";
     public static final int AMOUNT_LENGTH = 8;
     public static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
 
@@ -374,23 +378,49 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             case ACTION_SPEND:
                 return NAME_SPEND;
         }
-        
+
         return "???";
-        
+
+    }
+
+    public static String viewActionTypeWas(long assetKey, BigDecimal amount, boolean isBackward) {
+
+        if (amount == null || amount.signum() == 0)
+            return "";
+
+        int actionType = Account.balancePosition(assetKey, amount, isBackward);
+
+        switch (actionType) {
+            case ACTION_SEND:
+                return NAME_ACTION_TYPE_PROPERTY_WAS;
+            case ACTION_DEBT:
+                return NAME_CREDIT_WAS;
+            case ACTION_HOLD:
+                return NAME_ACTION_TYPE_HOLD_WAS;
+            case ACTION_SPEND:
+                return NAME_SPEND_WAS;
+        }
+
+        return "???";
+
     }
 
     public String viewActionType() {
         return viewActionType(this.key, this.amount, this.isBackward());
     }
-        
+
+    public String viewActionTypeWas() {
+        return viewActionTypeWas(this.key, this.amount, this.isBackward());
+    }
+
 
     // PARSE/CONVERT
     // @Override
     @Override
     public byte[] toBytes(int forDeal, boolean withSignature) {
-        
+
         byte[] data = super.toBytes(forDeal, withSignature);
-        
+
         // WRITE RECIPIENT
         data = Bytes.concat(data, this.recipient.getAddressBytes());
         
