@@ -11,7 +11,9 @@ function tx(data) {
     if (data.body.hasOwnProperty('head')) {
         output += data.body.head + '<br>';
         output += '<b>' + data.body.timestampLabel + '</b>: ' + convertTimestamp(data.body.timestamp, true) + ' / ' + data.body.timestamp + '<br>';
+        output += '<hr>';
     }
+
     if (data.body.hasOwnProperty('body')) {
         var body = data.body.body;
         if (body.hasOwnProperty("type_name")) {
@@ -23,9 +25,10 @@ function tx(data) {
                 output += 'recipient: ' + body.recipient + '<br>';
             }
         } else {
-            output += fformat(data.body.body) + '<br>';
+            output += data.body.body + '<br>';
         }
     }
+
     if (data.body.hasOwnProperty('message')) {
         output += fformat(data.body.message) + '<br>';
     }

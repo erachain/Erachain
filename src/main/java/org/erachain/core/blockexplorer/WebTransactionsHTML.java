@@ -1,5 +1,6 @@
 package org.erachain.core.blockexplorer;
 
+import org.apache.commons.net.util.Base64;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
@@ -64,7 +65,7 @@ public class WebTransactionsHTML {
 
         // она и так в заголовке будет
         //out += "<br><b>" + Lang.getInstance().translateFromLangObj("Type", langObj) + ": </b>" + tras_json.get("type_name");
-        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Confirmations", langObj) + ": </b>" + tras_json.get("confirmations");
+        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Confirmations", langObj) + ": </b>" + transaction.getConfirmations(DCSet.getInstance());
 
         if (!(transaction instanceof RCalculated)) {
             out += "<br><b>" + Lang.getInstance().translateFromLangObj("Size", langObj) + ": </b>" + tras_json.get("size");
@@ -75,7 +76,8 @@ public class WebTransactionsHTML {
                 out += "<BR><b>" + Lang.getInstance().translateFromLangObj("WIPED", langObj) + ": </b>" + "true";
             }
             out += "<br> ";
-            out += "<b>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang() + ">" + tras_json.get("creator") + "</a>";
+            out += "<b>" + Lang.getInstance().translateFromLangObj("Creator", langObj)
+                    + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang() + ">" + tras_json.get("creator") + "</a>";
         }
 
         output.put("head", out);
@@ -181,7 +183,16 @@ public class WebTransactionsHTML {
     }
 
     public String itemNameHTML(ItemCls item) {
-        return "<a href=?" + item.getItemTypeName() + "=" + item.getKey(DCSet.getInstance()) + get_Lang() + ">" + item.viewName() + "</a>";
+        String out = "<a href=?" + item.getItemTypeName() + "=" + item.getKey(DCSet.getInstance()) + get_Lang() + ">";
+        if (item.getKey() >= item.getStartKey()) {
+            out += "[" + item.getKey() + "] ";
+        }
+        if (item.getIcon() != null) {
+            out += "<img src='data:image/gif;base64," + Base64.encodeBase64String(item.getIcon()) + "' style='width:1.8em;'/> ";
+        }
+        out += item.viewName() + "</a>";
+
+        return out;
     }
 
     private String getItemDescription(Itemable itemIssueTx) {
@@ -320,9 +331,6 @@ public class WebTransactionsHTML {
 
         CreateOrderTransaction orderCreation = (CreateOrderTransaction) transaction;
 
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Signature", langObj) + ":</b> " + orderCreation.viewSignature() + "</br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("SeqNo", langObj) + ":</b> " + transaction.viewHeightSeq() + "</br>";
-
         Long refDB = orderCreation.getDBRef();
         Order order = null;
         String status;
@@ -342,22 +350,21 @@ public class WebTransactionsHTML {
 
         out += "<h4><a href='?order=" + Transaction.viewDBRef(refDB) + get_Lang() + "'>" + Lang.getInstance().translateFromLangObj(status, langObj) + "</a></h4>";
 
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Have", langObj) + ":</b> "
+        out += Lang.getInstance().translateFromLangObj("Have", langObj) + ": <b>"
                 + orderCreation.getAmountHave().toPlainString() + " x "
-                + itemNameHTML(orderCreation.getHaveAsset())
-                + (order != null ? " (" + order.getFulfilledHave().toPlainString() + " "
-                + Lang.getInstance().translateFromLangObj("fulfilled", langObj) + ")" : "")
+                + itemNameHTML(orderCreation.getHaveAsset()) + "</b>"
+                + (order != null ? "<br>" + Lang.getInstance().translateFromLangObj("Fulfilled", langObj)
+                + ": <b>" + order.getFulfilledHave().toPlainString() + "</b>" : "")
                 + "<br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Want", langObj) + ":</b> "
+        out += Lang.getInstance().translateFromLangObj("Want", langObj) + ": <b>"
                 + orderCreation.getAmountWant().toPlainString() + " x "
-                + itemNameHTML(orderCreation.getWantAsset())
-                + (order != null ? " (" + order.getFulfilledWant().toPlainString() + " "
-                + Lang.getInstance().translateFromLangObj("fulfilled", langObj) + ")" : "")
+                + itemNameHTML(orderCreation.getWantAsset()) + "</b>"
+                + (order != null ? "<br>" + Lang.getInstance().translateFromLangObj("Fulfilled", langObj)
+                + ": <b>" + order.getFulfilledWant().toPlainString() + "</b>" : "")
                 + "<br>";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Price", langObj) + ":</b> "
+        out += Lang.getInstance().translateFromLangObj("Price", langObj) + ": <b>"
                 + orderCreation.makeOrder().calcPrice().toPlainString()
-                + " / " + orderCreation.makeOrder().calcPriceReverse().toPlainString() + "<br>";
-
+                + " / " + orderCreation.makeOrder().calcPriceReverse().toPlainString() + "</b><br>";
 
         return out;
     }
@@ -611,12 +618,12 @@ public class WebTransactionsHTML {
 
         out += Lang.getInstance().translateFromLangObj("Recipient", langObj) + ": <a href=?address="
                 + tr.getRecipient().getAddress() + get_Lang() + "><b>" + tr.getRecipient().getPersonAsString()
-                + "</b></a><br>";
+                + "</b></a>";
 
         if (tr.getAmount() != null) {
             out += "<BR>" + Lang.getInstance().translateFromLangObj("Amount", langObj) + ": <b>"
-                    + tr.getAmount().toPlainString() + " ("
-                    + itemNameHTML(Controller.getInstance().getAsset(tr.getAbsKey())) + ")</b>";
+                    + tr.getAmount().toPlainString() + " "
+                    + itemNameHTML(Controller.getInstance().getAsset(tr.getAbsKey())) + "</b>";
         }
 
         if (!tr.getHead().equals(""))
