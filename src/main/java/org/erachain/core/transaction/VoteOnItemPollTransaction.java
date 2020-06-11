@@ -79,7 +79,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
     public ItemCls getItem()
     {
         if (poll == null) {
-            poll = (PollCls) dcSet.getItemPersonMap().get(key);
+            poll = (PollCls) dcSet.getItemPollMap().get(key);
         }
         return this.poll;
     }

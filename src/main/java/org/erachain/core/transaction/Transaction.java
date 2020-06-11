@@ -580,6 +580,9 @@ public abstract class Transaction implements ExplorerJsonLine {
                 creatorPerson = (PersonCls) dcSet.getItemPersonMap().get(creatorPersonDuration.a);
             }
         }
+
+        makeItemsKeys();
+
     }
 
     public void setDC_HeightSeq(DCSet dcSet) {
@@ -745,6 +748,13 @@ public abstract class Transaction implements ExplorerJsonLine {
         return tagsArray;
     }
 
+    /**
+     * При удалении - транзакция то берется из базы для создания индексов к удалению.
+     * И она скелет - нужно базу данных задать и водтянуть номера сущностей и все заново просчитать чтобы правильно удалить метки.
+     * Для этого проверку делаем в таблтцк при создании индексов
+     *
+     * @return
+     */
     public String[] getTags() {
         try {
             return tags(viewTypeName(), getTitle(), itemsKeys);
@@ -1653,8 +1663,6 @@ public abstract class Transaction implements ExplorerJsonLine {
             error++;
         }
 
-        makeItemsKeys();
-
         if (asDeal > Transaction.FOR_PACK) {
             // this.calcFee();
 
@@ -1694,8 +1702,6 @@ public abstract class Transaction implements ExplorerJsonLine {
             int error = 0;
             error++;
         }
-
-        makeItemsKeys();
 
         if (asDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {

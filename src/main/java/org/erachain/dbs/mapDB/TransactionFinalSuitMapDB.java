@@ -125,7 +125,9 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     @Override
                     public byte[][] run(Long key, Transaction transaction) {
                         // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                        transaction.setDC((DCSet) databaseSet);
+                        if (transaction.noDCSet()) {
+                            transaction.setDC((DCSet) databaseSet);
+                        }
 
                         HashSet<Account> recipients = transaction.getRecipientAccounts();
                         int size = recipients.size();
@@ -178,6 +180,14 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                 new Function2<String[], Long, Transaction>() {
                     @Override
                     public String[] run(Long key, Transaction transaction) {
+
+                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                        // При удалении - транзакция то берется из базы для создания индексов к удалению.
+                        // И она скелет - нужно базу данных задать и водтянуть номера сущностей и все заново просчитать чтобы правильно удалить метки
+                        if (transaction.noDCSet()) {
+                            transaction.setDC((DCSet) databaseSet);
+                        }
+
                         String[] tokens = transaction.getTags();
                         if (tokens == null || tokens.length == 0)
                             return null;

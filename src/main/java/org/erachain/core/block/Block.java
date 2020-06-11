@@ -2480,6 +2480,9 @@ public class Block implements Closeable, ExplorerJsonLine {
         this.getTransactions();
         //ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
         int seqNo;
+        if (heightBlock == 97856) {
+            boolean debug = true;
+        }
         for (int i = this.transactionCount - 1; i >= 0; i--) {
             seqNo = i + 1;
             if (cnt.isOnStopping()) {
