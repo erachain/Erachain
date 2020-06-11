@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 
-public class GenesisIssueItemRecord extends GenesisRecord {
+public class GenesisIssueItemRecord extends GenesisRecord implements Itemable {
 
     protected ItemCls item;
 
@@ -42,6 +42,9 @@ public class GenesisIssueItemRecord extends GenesisRecord {
 
     }
 
+    public String getItemDescription() {
+        return item.getDescription();
+    }
 
     @Override
     @SuppressWarnings("unchecked")

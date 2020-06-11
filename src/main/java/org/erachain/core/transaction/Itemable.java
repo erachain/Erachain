@@ -4,5 +4,5 @@ import org.erachain.core.item.ItemCls;
 
 public interface Itemable {
 
-    abstract ItemCls getItem();
+    ItemCls getItem();
 }
