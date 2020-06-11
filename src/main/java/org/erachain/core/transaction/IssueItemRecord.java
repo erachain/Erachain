@@ -8,6 +8,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
+import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,8 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
         this.item = item;
+        if (item.getKey() != 0)
+            key = item.getKey();
     }
 
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -69,13 +72,30 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     @Override
     public void makeItemsKeys() {
-        // запомним что тут две сущности
+        if (key == null)
+            return;
+
         if (creatorPersonDuration != null) {
+            // запомним что тут две сущности
             itemsKeys = new Object[][]{
                     new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
                     new Object[]{item.getItemType(), key}
             };
+        } else {
+            itemsKeys = new Object[][]{
+                    new Object[]{item.getItemType(), key}
+            };
         }
+    }
+
+    @Override
+    public void setDC(DCSet dcSet) {
+        super.setDC(dcSet);
+
+        key = item.getKey(dcSet);
+
+        makeItemsKeys();
+
     }
 
     @Override

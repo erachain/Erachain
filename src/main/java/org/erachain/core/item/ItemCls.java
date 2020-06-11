@@ -200,7 +200,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
     }
 
     public long getKey() {
-        return getKey(DCSet.getInstance());
+        return this.key; //getKey(DCSet.getInstance());
     }
 
     public void setKey(long key) {

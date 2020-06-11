@@ -2258,9 +2258,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
 
         // for DEBUG
-        if (this.heightBlock == 65431
-                || this.heightBlock == 86549) {
-            int rrrr = 0;
+        if (this.heightBlock == 97815) {
+            boolean debug = true;
         }
 
         //PROCESS TRANSACTIONS
