@@ -3213,8 +3213,6 @@ public class BlockExplorer {
         transactionsJSON(output, null, block.getTransactions(), start, pageSize,
                 Lang.getInstance().translateFromLangObj("Transactions found", langObj));
 
-        int txsCount = all.size();
-
         LinkedHashMap<Tuple2<Integer, Integer>, ATTransaction> atTxs = dcSet.getATTransactionMap()
                 .getATTransactions(block.getHeight());
 
@@ -3225,6 +3223,8 @@ public class BlockExplorer {
 
         output.put("blockSignature", Base58.encode(block.getSignature()));
         output.put("blockHeight", block.getHeight());
+        output.put("blockCreator", block.getCreator().getAddress());
+        output.put("blockCreatorPerson", block.getCreator().getPersonAsString());
 
         if (block.getHeight() > 1) {
             if (block.getParent(dcSet) != null) {
@@ -3241,34 +3241,16 @@ public class BlockExplorer {
 
         Map txCountJSON = new LinkedHashMap();
 
-        txCountJSONPut(txsTypeCount, txsCount, txCountJSON);
+        txCountJSONPut(txsTypeCount, block.getTransactionCount(), txCountJSON);
 
         if (aTTxsCount > 0) {
             txCountJSON.put("aTTxsCount", aTTxsCount);
         }
 
-        txCountJSON.put("allCount", txsCount);
+        txCountJSON.put("allCount", block.getTransactionCount());
 
         output.put("countTx", txCountJSON);
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (Transaction transaction : block.getTransactions()) {
-            for (Account account : transaction.getInvolvedAccounts()) {
-                BigDecimal amount = transaction.getAmount(account);
-                if (amount.compareTo(BigDecimal.ZERO) > 0) {
-                    totalAmount = totalAmount.add(amount);
-                }
-            }
-        }
 
-        output.put("totalAmount", totalAmount.toPlainString());
-
-        BigDecimal totalATAmount = BigDecimal.ZERO;
-
-        for (Map.Entry<Tuple2<Integer, Integer>, ATTransaction> e : atTxs.entrySet()) {
-            totalATAmount = totalATAmount.add(BigDecimal.valueOf(e.getValue().getAmount()));
-        }
-
-        output.put("totalATAmount", totalATAmount.toPlainString());
         output.put("totalFee", block.viewFeeAsBigDecimal());
         output.put("version", block.getVersion());
 
@@ -3307,6 +3289,7 @@ public class BlockExplorer {
         }
         output.put("label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
         output.put("label_Block_version", Lang.getInstance().translateFromLangObj("Block version", langObj));
+        output.put("label_Forger", Lang.getInstance().translateFromLangObj("Forger", langObj));
         output.put("label_Transactions_count",
                 Lang.getInstance().translateFromLangObj("Transactions count", langObj));
         output.put("label_Total_Amount", Lang.getInstance().translateFromLangObj("Total Amount", langObj));

@@ -1718,46 +1718,33 @@ button.white-bgc[disabled]:focus,
             urlstart = url;
 
             output += '<table width="1280" border=0><tr><td align=left>';
-            output += '<font size="+1">' + data.label_block + ': ';
+            output += '<font size="+2">' + data.label_block + ': ';
             if (data.hasOwnProperty('parentBlockSignature')) {
-                output += '<a style="text-decoration: none" href="?block=' + (data.blockHeight - 1) + get_lang() + '"><b>&lt;</b></a> ';
+                output += '<a class="button ll-blue-bgc" href="?block=' + (data.blockHeight - 1) + get_lang() + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a> ';
             }
             output += '<a href="?block=' + data.blockHeight + get_lang() + '">' + data.blockHeight + '</a> ';
             if (data.hasOwnProperty('childBlockSignature')) {
-                output += '<a style="text-decoration: none" href="?block=' + (data.blockHeight + 1) + get_lang() + '"><b>&gt;</b></a>';
+                output += '<a class="button ll-blue-bgc" href="?block=' + (data.blockHeight + 1) + get_lang() + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a> ';
             }
             output += '</font>';
             output += '<br><br>';
 
-            output += data.label_Block_version + ': <span title="v1 - from 1 block (2014-05-16 13:34:34 UTC)\nv2 - from 99000 block (2015-05-17 11:13:40 UTC)\nv3 - from 2016-02-15 19:00:00 UTC">' + data.version + '</span><br><br>';
+            output += data.label_Block_version + ': <b>' + data.version + '</b><br>';
+
+            output += data.label_Forger + ': <a href=?address=' + data.blockCreator + get_lang() + '><b>' + data.blockCreatorPerson + '</b></a><br>';
 
             if (data.countTx.hasOwnProperty('txsCount')) {
-                output += data.label_Transactions_count + ': ' + data.countTx.txsCount + '<br>' + data.label_Including + ':<br>';
-
-            } else {
-                output += data.label_Transactions_count + ': 0<br>';
+                output += data.label_Transactions_count + ': <b>' + data.countTx.txsCount + '</b><br>';
             }
 
-            if (data.countTx.tradesCount > 0) {
-                output += '<br>+ Trades: ' + data.countTx.tradesCount + '<br>\n';
-            }
-
-            if (data.countTx.aTTxsCount > 0) {
-                output += '<br>+ AT Transactions: ' + data.countTx.aTTxsCount + '<br>\n';
-            }
-
-            output += '<br>' + data.label_Total_Amount + ': ' + data.totalAmount;
-            output += '<br>' + data.label_Total_AT_Amount + ':' + data.totalATAmount;
-            output += '<br>' + data.label_Total_Fee + ': ' + data.totalFee;
-
+            output += data.label_Total_Fee + ': <b>' + data.totalFee + '</b><br>';
             output += '<br>';
 
-            output += '<br>' + data.label_Generating_Balance + ': ' + addCommas(data.generatingBalance);
-            output += '<br>' + data.label_Win_Value + ':' + addCommas(data.winValue);
-            output += '<br>' + data.label_Target + ': ' + addCommas(data.target);
-            output += '<br>' + data.label_Targeted_Win_Value + ': ' + addCommas(data.winValueTargeted);
-
-            output += '<br><br>';
+            output += data.label_Generating_Balance + ': <b>' + addCommas(data.generatingBalance) + '</b><br>';
+            output += data.label_Win_Value + ': <b>' + addCommas(data.winValue) + '</b><br>';
+            output += data.label_Target + ': <b>' + addCommas(data.target) + '</b><br>';
+            output += data.label_Targeted_Win_Value + ': <b>' + addCommas(data.winValueTargeted) + '</b><br>';
+            output += '<br>';
 
             if (data.hasOwnProperty('parentBlockSignature')) {
 
