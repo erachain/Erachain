@@ -217,7 +217,7 @@ public class APITransactionsResource {
                 if (type != 0 && type != transaction.getType())
                     continue;
 
-                transaction.setDC(dcSet);
+                transaction.setDC(dcSet, true);
                 HashSet<Account> recipients = transaction.getRecipientAccounts();
                 for (Account recipient : recipients) {
                     if (recipient.equals(address)) {

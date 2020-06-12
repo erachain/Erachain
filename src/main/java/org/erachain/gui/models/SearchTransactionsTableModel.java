@@ -49,7 +49,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
         } catch (NumberFormatException e) {
             Transaction transaction = ((TransactionFinalMap)map).getRecord(string);
             if (transaction != null) {
-                transaction.setDC(DCSet.getInstance());
+                transaction.setDC(DCSet.getInstance(), true);
                 list.add(transaction);
             }
             this.fireTableDataChanged();
@@ -63,7 +63,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
                 list.remove(item);
                 continue;
             }
-            item.setDC_HeightSeq(dcSet);
+            item.setDC_HeightSeq(dcSet, true);
         }
 
         this.fireTableDataChanged();
@@ -112,7 +112,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
                 list.remove(item);
                 continue;
             }
-            item.setDC_HeightSeq(dcSet);
+            item.setDC_HeightSeq(dcSet, true);
         }
 
         this.fireTableDataChanged();

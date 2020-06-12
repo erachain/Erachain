@@ -83,7 +83,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         }
     }
 
-    public void setup() {
+    public void setupFromStateDB() {
         if (key == null || key == 0) {
             // эта трнзакция взята как скелет из набора блока
             // найдем сохраненную транзакцию - в ней есь Номер Сути

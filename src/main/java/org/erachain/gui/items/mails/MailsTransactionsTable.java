@@ -82,7 +82,7 @@ public class MailsTransactionsTable extends JTable implements Observer {
         }
 
         for (Transaction messagetx : transactions) {
-            messagetx.setDC(DCSet.getInstance());
+            messagetx.setDC(DCSet.getInstance(), true);
             
             boolean is = false;
             for (MessageBuf message : messageBufs) {
@@ -278,7 +278,7 @@ public class MailsTransactionsTable extends JTable implements Observer {
 
         for (Transaction messagetx : transactions) {
 
-            messagetx.setDC(DCSet.getInstance());
+            messagetx.setDC(DCSet.getInstance(), true);
 
             if (asset.getKey() == messagetx.getAssetKey()) {
                 boolean is = false;

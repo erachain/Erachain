@@ -166,7 +166,7 @@ public class TestRecSend {
             r_Send.sign(maker, Transaction.FOR_NETWORK);
             assertEquals(r_Send.isSignatureValid(db), true);
             //r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
-            r_Send.setDC(db, Transaction.FOR_NETWORK, this.gb.heightBlock, 2);
+            r_Send.setDC(db, Transaction.FOR_NETWORK, this.gb.heightBlock, 2, true);
             assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
             
             raw_r_Send = r_Send.toBytes(Transaction.FOR_NETWORK, true);
@@ -193,7 +193,7 @@ public class TestRecSend {
 
             //r_Send_2.sign(maker, false);
             assertEquals(r_Send_2.isSignatureValid(db), true);
-            r_Send_2.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1);
+            r_Send_2.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1, true);
             assertEquals(r_Send_2.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);
@@ -233,7 +233,7 @@ public class TestRecSend {
                 head, data, isText, encrypted, timestamp, 123l
         );
         r_Send.sign(maker, Transaction.FOR_NETWORK);
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.VALIDATE_OK);
 
         // INVALID
@@ -242,7 +242,7 @@ public class TestRecSend {
                 bal_A_keyA,
                 head, data, isText, encrypted, timestamp, 123l
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);
 
         ///////////////////////
@@ -252,7 +252,7 @@ public class TestRecSend {
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.ITEM_ASSET_NOT_EXIST);
 
         // INVALID
@@ -264,14 +264,14 @@ public class TestRecSend {
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);
 
         r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 amountInvalid.negate(),
                 head, data, isText, encrypted, timestamp, 123l
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);
 
         // INVALID
@@ -280,7 +280,7 @@ public class TestRecSend {
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);
 
         amountInvalid = amountForParse.scaleByPowerOfTen(-toScale + 1);
@@ -288,7 +288,7 @@ public class TestRecSend {
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);            
 
     }
@@ -367,7 +367,7 @@ public class TestRecSend {
             r_Send.sign(maker, Transaction.FOR_NETWORK);
             assertEquals(r_Send.isSignatureValid(db), true);
             //r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
-            r_Send.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1);
+            r_Send.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1, true);
             assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
             
             raw_r_Send = r_Send.toBytes(Transaction.FOR_NETWORK, true);
@@ -394,7 +394,7 @@ public class TestRecSend {
 
             //r_Send_2.sign(maker, false);
             assertEquals(r_Send_2.isSignatureValid(db), true);
-            r_Send_2.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1);
+            r_Send_2.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1, true);
             assertEquals(r_Send_2.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);
@@ -434,7 +434,7 @@ public class TestRecSend {
                 head, data, isText, encrypted, timestamp, 123l
         );
         r_Send.sign(maker, Transaction.FOR_NETWORK);
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.VALIDATE_OK);
 
         // VALID because trailing ZERO - amount.stripTrailingZeros()
@@ -443,7 +443,7 @@ public class TestRecSend {
                 bal_A_keyA,
                 head, data, isText, encrypted, timestamp, 123l
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.VALIDATE_OK);
 
         ///////////////////////
@@ -453,7 +453,7 @@ public class TestRecSend {
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.ITEM_ASSET_NOT_EXIST);
 
         // INVALID
@@ -461,14 +461,14 @@ public class TestRecSend {
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);
 
         r_Send = new RSend(maker, FEE_POWER, recipient, assetKey,
                 amountInvalid.negate(),
                 head, data, isText, encrypted, timestamp, 123l
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);
 
         // INVALID
@@ -477,7 +477,7 @@ public class TestRecSend {
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.VALIDATE_OK);
 
         amountInvalid = amountForParse.scaleByPowerOfTen(-toScale + 1);
@@ -485,7 +485,7 @@ public class TestRecSend {
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);            
 
     }
@@ -511,7 +511,7 @@ public class TestRecSend {
                 maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags),Transaction.VALIDATE_OK ); //);
 
@@ -560,7 +560,7 @@ public class TestRecSend {
                 timestamp, maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK); //Transaction.VALIDATE_OK);
 
@@ -609,7 +609,7 @@ public class TestRecSend {
                 timestamp, maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
@@ -654,7 +654,7 @@ public class TestRecSend {
                 timestamp, maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
@@ -700,7 +700,7 @@ public class TestRecSend {
                 ++timestamp, maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK); //ransaction.VALIDATE_OK);
 
@@ -780,7 +780,7 @@ public class TestRecSend {
                 ++timestamp, 0l
         );
         arbitraryTransactionV3.sign(maker, Transaction.FOR_NETWORK);
-        arbitraryTransactionV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        arbitraryTransactionV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
         //if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
         if (false) {
@@ -853,7 +853,7 @@ public class TestRecSend {
                 timestamp, maker.getLastTimestamp(db)[0]
         );
         arbitraryTransactionV3.sign(maker, Transaction.FOR_NETWORK);
-        arbitraryTransactionV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        arbitraryTransactionV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
         //if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
         if (false) {

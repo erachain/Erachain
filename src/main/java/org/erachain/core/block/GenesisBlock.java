@@ -764,7 +764,7 @@ public class GenesisBlock extends Block {
         //VALIDATE TRANSACTIONS
         byte[] transactionsSignatures = new byte[0];
         for (Transaction transaction : this.getTransactions()) {
-            transaction.setDC(db);
+            transaction.setDC(db, false);
             if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
                 return INVALID_BLOCK_VERSION;
             }

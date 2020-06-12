@@ -147,8 +147,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     // GETTERS/SETTERS
 
-    public void setDC(DCSet dcSet) {
-        super.setDC(dcSet);
+    public void setDC(DCSet dcSet, boolean andSetup) {
+        super.setDC(dcSet, false);
         if (BlockChain.TEST_DB == 0 && recipient != null) {
             recipientPersonDuration = recipient.getPersonDuration(dcSet);
             if (recipientPersonDuration != null) {
@@ -156,10 +156,13 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
         }
 
+        if (andSetup)
+            setupFromStateDB();
+
     }
 
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setDC(dcSet, asDeal, blockHeight, seqNo);
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo, boolean andSetup) {
+        super.setDC(dcSet, asDeal, blockHeight, seqNo, false);
 
         if (BlockChain.CHECK_BUGS > 3// && viewDBRef(dbRef).equals("18165-1")
         ) {
@@ -169,6 +172,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (this.amount != null && dcSet != null) {
             this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());
         }
+
+        if (andSetup)
+            setupFromStateDB();
     }
 
     // public static String getName() { return "unknown subclass Amount"; }

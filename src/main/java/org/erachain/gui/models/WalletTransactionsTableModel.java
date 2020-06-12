@@ -184,7 +184,7 @@ public class WalletTransactionsTableModel extends WalletAutoKeyTableModel<Tuple2
                 continue;
             }
 
-            item.getB().b.setDC_HeightSeq(dcSet);
+            item.getB().b.setDC_HeightSeq(dcSet, true);
             item.getB().b.calcFee();
         }
 

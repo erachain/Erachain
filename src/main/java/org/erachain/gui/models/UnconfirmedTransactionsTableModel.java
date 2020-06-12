@@ -150,7 +150,7 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
             if (item.getB() == null)
                 continue;
 
-            item.getB().setDC_HeightSeq(dcSet);
+            item.getB().setDC_HeightSeq(dcSet, true);
             item.getB().calcFee();
         }
 

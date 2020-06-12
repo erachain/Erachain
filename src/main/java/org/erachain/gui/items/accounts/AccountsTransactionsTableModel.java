@@ -156,7 +156,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
         if (this.asset == null)
             return false;
 
-        transaction.setDC_HeightSeq(dcSet);
+        transaction.setDC_HeightSeq(dcSet, true);
 
         if (transaction.getAbsKey() != this.asset.getKey()
                 // все для Компушек

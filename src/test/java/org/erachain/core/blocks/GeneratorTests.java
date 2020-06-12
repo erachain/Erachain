@@ -678,7 +678,7 @@ public class GeneratorTests {
                     "sss", new byte[3000], new byte[]{1}, new byte[]{0},
                     timestamp++, generator.getLastTimestamp(snapshot)[0]);
 
-            payment.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+            payment.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
             payment.sign(generator, Transaction.FOR_NETWORK);
             assertEquals(payment.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 

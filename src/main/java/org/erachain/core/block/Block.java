@@ -1184,7 +1184,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         JSONArray transactionsArray = new JSONArray();
 
         for (Transaction transaction : this.getTransactions()) {
-            transaction.setDC(dcSet);
+            transaction.setDC(dcSet, true);
             transactionsArray.add(transaction.toJson());
         }
 
@@ -1754,7 +1754,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                         return INVALID_BLOCK_VERSION;
                     }
 
-                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
+                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo, false);
 
                     //CHECK IF VALID
                     // так как мы в блоке такие транзакции уже проверяем то коллизию с неподтвержденными не проверяем
@@ -1787,7 +1787,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 } else {
 
-                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
+                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo, false);
 
                     //UPDATE REFERENCE OF SENDER
                     transaction.getCreator().setLastTimestamp(
@@ -2302,7 +2302,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                 //logger.debug("[" + seqNo + "] record is process" );
 
                 // NEED set DC for WIPED too
-                transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, seqNo,
+                        false); // здесь ще нет ничего в базе данных - нечего наращивать
 
                 //PROCESS
                 if (transaction.isWiped()
@@ -2492,8 +2493,9 @@ public class Block implements Closeable, ExplorerJsonLine {
             //logger.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
 
             // (!) seqNo = i + 1
-            transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo);
-            transaction.setup();
+            transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo,
+                    true); // тут наращиваем мясо - чтобы ключи удалялись правильно
+            transaction.setupFromStateDB();
 
             if (!transaction.isWiped()) {
                 transaction.orphan(this, Transaction.FOR_NETWORK);

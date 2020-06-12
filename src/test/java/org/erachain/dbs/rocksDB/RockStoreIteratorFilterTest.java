@@ -95,17 +95,17 @@ public class RockStoreIteratorFilterTest {
 
             RSend assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc, 1, amount_asset, timestamp++, 0L);
             assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
-            assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+            assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
             txMap.put(assetTransfer);
 
             assetTransfer = new RSend(accountB, FEE_POWER, recipientAcc, 1, amount_asset, timestamp++, 0L);
             assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
-            assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+            assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
             txMap.put(assetTransfer);
 
             assetTransfer = new RSend(accountB, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
             assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
-            assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+            assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
             txMap.put(assetTransfer);
 
 
@@ -115,12 +115,12 @@ public class RockStoreIteratorFilterTest {
 
             assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc2, 1, amount_asset, timestamp++, 0L);
             assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
-            assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+            assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
             txMap.put(assetTransfer);
 
             assetTransfer = new RSend(accountB, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
             assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
-            assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+            assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
             txMap.put(assetTransfer);
 
             Account findAccount = recipientAcc;

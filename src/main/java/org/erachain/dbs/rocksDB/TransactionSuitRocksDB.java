@@ -98,7 +98,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                 (aLong, transaction) -> {
                     // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
                     if (transaction.noDCSet()) {
-                        transaction.setDC((DCSet) databaseSet);
+                        transaction.setDC((DCSet) databaseSet, true);
                     }
                     return transaction.getRecipientAccounts().stream().map(Account::getAddress).toArray(String[]::new);
                 },
@@ -110,7 +110,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                 (aLong, transaction) -> {
                     // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
                     if (transaction.noDCSet()) {
-                        transaction.setDC((DCSet) databaseSet);
+                        transaction.setDC((DCSet) databaseSet, true);
                     }
                     Integer type = transaction.getType();
                     return transaction.getInvolvedAccounts().stream().map(

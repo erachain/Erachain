@@ -112,7 +112,7 @@ public class OrderTest {
         assetA = new AssetVenture(new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
 
         issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
         keyA = issueAssetTransaction.getAssetKey(dcSet);
@@ -121,7 +121,7 @@ public class OrderTest {
         assetB = new AssetVenture(new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 0L, new byte[64]);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
         keyB = issueAssetTransaction.getAssetKey(dcSet);
 
@@ -183,7 +183,7 @@ public class OrderTest {
                     orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
                             amountSell, (byte) 0, timestamp++, 0L);
                     orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                     orderCreation.process(null, Transaction.FOR_NETWORK);
 
                     iterator = ordersMap.getIterator(0, false);
@@ -229,7 +229,7 @@ public class OrderTest {
                         new BigDecimal("10"),
                         new BigDecimal("10"), (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountB, Transaction.FOR_NETWORK);
-                orderCreation.setDC(forkDC, Transaction.FOR_NETWORK, height, ++seqNo);
+                orderCreation.setDC(forkDC, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
 
                 ordersMap = forkDC.getOrderMap();
@@ -337,7 +337,7 @@ public class OrderTest {
                     orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
                             amountSell, (byte) 0, timestamp++, 0L);
                     orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                     orderCreation.process(null, Transaction.FOR_NETWORK);
 
                 }
@@ -426,7 +426,7 @@ public class OrderTest {
                 orderCreation = new CreateOrderTransaction(accountA, have, want, amountBuy,
                         amountSell, (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
 
             }

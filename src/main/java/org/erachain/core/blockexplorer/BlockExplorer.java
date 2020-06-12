@@ -3203,7 +3203,8 @@ public class BlockExplorer {
 
         int seqNo = 0;
         for (Transaction transaction : block.getTransactions()) {
-            transaction.setDC(dcSet, block.heightBlock, block.heightBlock, ++seqNo);
+            transaction.setDC(dcSet, block.heightBlock, block.heightBlock, ++seqNo, true);
+            transaction.setupFromStateDB();
             all.add(transaction);
             txsTypeCount[transaction.getType() - 1]++;
         }
@@ -3461,7 +3462,7 @@ public class BlockExplorer {
                             transaction.isWiped())
                         continue;
 
-                    transaction.setDC(dcSet);
+                    transaction.setDC(dcSet, true);
 
                     outcome = true;
 

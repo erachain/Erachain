@@ -129,8 +129,8 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         return this.key;
     }
 
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setDC(dcSet, asDeal, blockHeight, seqNo);
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo, boolean andSetup) {
+        super.setDC(dcSet, asDeal, blockHeight, seqNo, false);
 
         if (this.amount != null) {
             long assetKey = this.getAbsKey();
@@ -143,6 +143,9 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
                 }
             }
         }
+
+        if (andSetup)
+            setupFromStateDB();
     }
 
     @Override

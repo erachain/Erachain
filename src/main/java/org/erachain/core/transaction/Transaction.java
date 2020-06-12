@@ -571,7 +571,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     // NEED FOR DB SECONDATY KEYS
     // see org.mapdb.Bind.secondaryKeys
-    public void setDC(DCSet dcSet) {
+    public void setDC(DCSet dcSet, boolean andSetup) {
         this.dcSet = dcSet;
 
         if (BlockChain.TEST_DB == 0 && creator != null) {
@@ -580,10 +580,13 @@ public abstract class Transaction implements ExplorerJsonLine {
                 creatorPerson = (PersonCls) dcSet.getItemPersonMap().get(creatorPersonDuration.a);
             }
         }
+
+        if (andSetup)
+            setupFromStateDB();
     }
 
-    public void setDC_HeightSeq(DCSet dcSet) {
-        setDC(dcSet);
+    public void setDC_HeightSeq(DCSet dcSet, boolean andSetup) {
+        setDC(dcSet, false);
 
         if (this.typeBytes[0] == Transaction.CALCULATED_TRANSACTION) {
 
@@ -597,22 +600,34 @@ public abstract class Transaction implements ExplorerJsonLine {
         Tuple2<Integer, Integer> pair = Transaction.parseDBRef(dbRef2);
         this.height = pair.a;
         this.seqNo = pair.b;
+
+        if (andSetup)
+            setupFromStateDB();
     }
 
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        setDC(dcSet);
+    /**
+     * @param dcSet
+     * @param asDeal
+     * @param blockHeight
+     * @param seqNo
+     * @param andSetup    - если нужно нарастить мясо на скелет из базв Финал. Не нужно для неподтвержденных и если ее нет в базе еще
+     */
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo, boolean andSetup) {
+        setDC(dcSet, false);
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
         this.seqNo = seqNo;
         this.dbRef = Transaction.makeDBRef(height, seqNo);
         if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
             this.calcFee();
 
+        if (andSetup)
+            setupFromStateDB();
     }
 
     /**
-     * Нужно для установки значений скелета из базы данных например
+     * Нарастить мясо на скелет из базы состояния - нужно например для созданим вторичных ключей и Номер Сущности
      */
-    public void setup() {
+    public void setupFromStateDB() {
     }
 
     public boolean noDCSet() {

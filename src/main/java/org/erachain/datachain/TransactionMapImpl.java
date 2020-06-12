@@ -536,7 +536,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                     ok = false;
 
                 if (!ok) {
-                    transaction.setDC((DCSet) databaseSet);
+                    transaction.setDC((DCSet) databaseSet, true);
                     HashSet<Account> recipients = transaction.getRecipientAccounts();
 
                     if (recipients == null || recipients.isEmpty() || !recipients.contains(account)) {
@@ -572,7 +572,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                     break;
 
                 transaction = this.get(iterator.next());
-                transaction.setDC((DCSet) databaseSet);
+                transaction.setDC((DCSet) databaseSet, true);
                 values.add(transaction);
             }
         } catch (IOException e) {
@@ -603,7 +603,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                         || transaction.getTimestamp() < timestamp)
                     continue;
 
-                transaction.setDC((DCSet) databaseSet);
+                transaction.setDC((DCSet) databaseSet, true);
 
                 if ((account == null || transaction.isInvolved(account))) {
                     values.add(transaction);
@@ -631,7 +631,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                 if (type != 0 && type != transaction.getType())
                     continue;
 
-                transaction.setDC((DCSet) databaseSet);
+                transaction.setDC((DCSet) databaseSet, true);
                 HashSet<Account> recipients = transaction.getRecipientAccounts();
                 if (recipients == null || recipients.isEmpty())
                     continue;

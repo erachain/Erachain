@@ -183,7 +183,7 @@ public class UnconfirmedTransactionsPanel extends JPanel {
                 row = record_stpit.jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 Transaction trans = transactionsModel.getItem(row);
                 DCSet dcSet = DCSet.getInstance();
-                trans.setDC(dcSet, Transaction.FOR_NETWORK, DCSet.getInstance().getBlockMap().size() + 1, 1);
+                trans.setDC(dcSet, Transaction.FOR_NETWORK, DCSet.getInstance().getBlockMap().size() + 1, 1, true);
                 if (trans.isValid(Transaction.FOR_NETWORK, 0) == Transaction.VALIDATE_OK)
                     Controller.getInstance().broadcastTransaction(trans);
 
