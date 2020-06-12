@@ -58,10 +58,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
      */
     @Override
     public long getKey() {
-        if (key == null) {
-            key = item.getKey(dcSet);
-        }
-
         return key;
     }
 
@@ -72,7 +68,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     @Override
     public void makeItemsKeys() {
-        if (key == null)
+        if (key == null || key == 0)
             return;
 
         if (creatorPersonDuration != null) {
@@ -89,14 +85,25 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     }
 
     @Override
-    public void setDC(DCSet dcSet) {
-        super.setDC(dcSet);
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        super.setDC(dcSet, asDeal, blockHeight, seqNo);
 
-        key = item.getKey(dcSet);
+        if (key == null || key == 0) {
+            // эта трнзакция взята как скелет из набора блока
+            // найдем сохраненную транзакцию - в ней есь Номер Сути
+            IssueItemRecord issueItemRecord = (IssueItemRecord) dcSet.getTransactionFinalMap().get(this.dbRef);
+            key = issueItemRecord.getKey();
+            item.setKey(key);
 
-        makeItemsKeys();
-
+            makeItemsKeys();
+        } else if (itemsKeys == null) {
+            item.setKey(key);
+            makeItemsKeys();
+        } else if (item.getKey() == 0) {
+            item.setKey(key);
+        }
     }
+
 
     @Override
     public String viewItemName() {
