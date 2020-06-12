@@ -2493,6 +2493,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
             // (!) seqNo = i + 1
             transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo);
+            transaction.setup();
 
             if (!transaction.isWiped()) {
                 transaction.orphan(this, Transaction.FOR_NETWORK);

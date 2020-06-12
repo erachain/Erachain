@@ -8,7 +8,6 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
-import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,26 +83,17 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         }
     }
 
-    @Override
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setDC(dcSet, asDeal, blockHeight, seqNo);
-
+    public void setup() {
         if (key == null || key == 0) {
             // эта трнзакция взята как скелет из набора блока
             // найдем сохраненную транзакцию - в ней есь Номер Сути
             IssueItemRecord issueItemRecord = (IssueItemRecord) dcSet.getTransactionFinalMap().get(this.dbRef);
             key = issueItemRecord.getKey();
             item.setKey(key);
-
-            makeItemsKeys();
-        } else if (itemsKeys == null) {
-            item.setKey(key);
-            makeItemsKeys();
         } else if (item.getKey() == 0) {
             item.setKey(key);
         }
     }
-
 
     @Override
     public String viewItemName() {
@@ -132,6 +122,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @SuppressWarnings("unchecked")
     @Override
     public JSONObject toJson() {
+
         //GET BASE
         JSONObject transaction = this.getJsonBase();
 

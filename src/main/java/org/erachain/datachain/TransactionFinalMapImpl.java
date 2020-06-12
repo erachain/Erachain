@@ -1319,20 +1319,30 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return this.get(key);
     }
 
+    @Override
     public Transaction get(Long key) {
         // [167726]
-        Transaction item = super.get(key);
-        if (item == null)
+        Transaction transaction = super.get(key);
+        if (transaction == null)
             return null;
 
         Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-        item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
-        return item;
+        transaction.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+        // наращивание всех данных для скелета - так же необходимо для создания ключей tags
+        transaction.setup();
+
+        return transaction;
+    }
+
+    @Override
+    public void put(Long key, Transaction transaction) {
+        transaction.setup();
+        super.put(key, transaction);
     }
 
     @Override
     public void put(Transaction transaction) {
-        super.put(transaction.getDBRef(), transaction);
+        put(transaction.getDBRef(), transaction);
     }
 
 }

@@ -580,9 +580,6 @@ public abstract class Transaction implements ExplorerJsonLine {
                 creatorPerson = (PersonCls) dcSet.getItemPersonMap().get(creatorPersonDuration.a);
             }
         }
-
-        makeItemsKeys();
-
     }
 
     public void setDC_HeightSeq(DCSet dcSet) {
@@ -609,6 +606,13 @@ public abstract class Transaction implements ExplorerJsonLine {
         this.dbRef = Transaction.makeDBRef(height, seqNo);
         if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
             this.calcFee();
+
+    }
+
+    /**
+     * Нужно для установки значений скелета из базы данных например
+     */
+    public void setup() {
     }
 
     public boolean noDCSet() {
@@ -756,6 +760,10 @@ public abstract class Transaction implements ExplorerJsonLine {
      * @return
      */
     public String[] getTags() {
+
+        if (itemsKeys == null)
+            makeItemsKeys();
+
         try {
             return tags(viewTypeName(), getTitle(), itemsKeys);
         } catch (Exception e) {

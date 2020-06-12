@@ -1504,6 +1504,7 @@ public class BlockChain {
             for (Transaction transaction : block.getTransactions()) {
 
                 transaction.setDC(dcSet, Transaction.FOR_NETWORK, block.heightBlock, ++seqNo);
+                transaction.setup();
 
                 //CHECK IF ACCOUNT INVOLVED
                 if (account != null && !transaction.isInvolved(account)) {
