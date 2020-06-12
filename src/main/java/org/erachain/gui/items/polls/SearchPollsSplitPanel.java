@@ -32,25 +32,7 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
         jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setMaxWidth(200);
         jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setPreferredWidth(100);
 
-        // ADD MENU ITEMS
-        JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
-        confirm_Menu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //			new UnionConfirmDialog(th, (UnionCls) itemMenu);
-            }
-        });
-        this.menuTable.add(confirm_Menu);
-
-        JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set status"));
-        setStatus_Menu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //			new UnionSetStatusDialog(th, (UnionCls) itemMenu);
-            }
-        });
-        this.menuTable.add(setStatus_Menu);
-
-
-        JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("Voting"));
+        JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("To Vote"));
         setVote_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 //			new UnionSetStatusDialog(th, (UnionCls) itemMenu);
@@ -63,6 +45,14 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
         this.menuTable.add(setVote_Menu);
 
         menuTable.addSeparator();
+
+        JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set status"));
+        setStatus_Menu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //			new UnionSetStatusDialog(th, (UnionCls) itemMenu);
+            }
+        });
+        this.menuTable.add(setStatus_Menu);
 
         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
@@ -80,6 +70,15 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
             }
         });
         menuTable.add(setSeeInBlockexplorer);
+
+        // ADD MENU ITEMS
+        JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        confirm_Menu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //			new UnionConfirmDialog(th, (UnionCls) itemMenu);
+            }
+        });
+        this.menuTable.add(confirm_Menu);
 
     }
 	
