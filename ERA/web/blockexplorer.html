@@ -2036,12 +2036,12 @@ button.white-bgc[disabled]:focus,
                 'class="tiny table table-striped" style="border: 1px solid #ddd;">';
             output += '<tr>' +
                 '<td><b>' + data.Label_Height +
-                '<td><b>' + data.Label_Target +
                 '<td><b>' + data.Label_Time +
                 '<td><b>' + data.Label_Generator +
                 '<td><b>' + data.Label_Gen_balance +
                 '<td><b>' + data.Label_Delta_Height +
                 '<td><b>' + data.Label_WV +
+                '<td><b>' + data.Label_Target +
                 '<td><b>' + data.Label_dtWV +
                 '<td><b>' + data.Label_TXs +
                 '<td><b>' + data.Label_Fee;
@@ -2064,15 +2064,13 @@ button.white-bgc[disabled]:focus,
 
                 output += '<tr>' +
                     '<td><a href=?block=' + data.pageItems[i].height + get_lang() + '>' + data.pageItems[i].height + '</a>' +
-                    '<td>' + addCommas(data.pageItems[i].target) +
                     '<td>' + convertTimestamp(data.pageItems[i].timestamp, true) +
                     '<td>' + '<a href=?address=' + data.pageItems[i].generator + get_lang() + '>' + data.pageItems[i].generator +
                     '<td>' + addCommas(data.pageItems[i].generatingBalance) +
                     '<td>' + data.pageItems[i].deltaHeight +
                     '<td>' + addCommas(data.pageItems[i].winValue) +
-
+                    '<td>' + addCommas(data.pageItems[i].target) +
                     '<td>' + dtWV + '%' +
-
                     '<td>' + data.pageItems[i].transactionsCount +
                     '<td>' + addCommas(data.pageItems[i].totalFee);
             }
