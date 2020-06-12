@@ -1006,7 +1006,12 @@ public class BlockExplorer {
         output.put("search", "order");
         output.put("search_message", orderIdStr);
 
-        long orderId = Transaction.parseDBRef(orderIdStr);
+        Long orderId = Transaction.parseDBRef(orderIdStr);
+        if (orderId == null) {
+            output.put("error", "order ID wrong");
+            return output;
+        }
+
         Map output = new LinkedHashMap();
 
         boolean isCompleted;
@@ -2642,10 +2647,12 @@ public class BlockExplorer {
             if (Base58.isExtraSymbols(filterStr)) {
                 try {
                     Long dbRef = Transaction.parseDBRef(filterStr);
-                    Transaction one = map.get(dbRef);
-                    if (one != null) {
-                        transactions.add(one);
-                        needFound = false;
+                    if (dbRef != null) {
+                        Transaction one = map.get(dbRef);
+                        if (one != null) {
+                            transactions.add(one);
+                            needFound = false;
+                        }
                     }
                 } catch (Exception e1) {
                 }
@@ -2830,15 +2837,23 @@ public class BlockExplorer {
         } else {
             String[] refs = query.split("/");
 
-            long refInitator = Transaction.parseDBRef(refs[0]);
-            long refTarget = Transaction.parseDBRef(refs[1]);
-            trade = dcSet.getTradeMap().get(Fun.t2(refInitator, refTarget));
+            Long refInitiator = Transaction.parseDBRef(refs[0]);
+            if (refInitiator == null) {
+                output.put("error", "Initiator ID wrong");
+                return output;
+            }
+            Long refTarget = Transaction.parseDBRef(refs[1]);
+            if (refTarget == null) {
+                output.put("error", "Target ID wrong");
+                return output;
+            }
+            trade = dcSet.getTradeMap().get(Fun.t2(refInitiator, refTarget));
             if (trade == null) {
                 output.put("error", "Trade not Found");
                 return output;
             }
 
-            all.add(DCSet.getInstance().getTransactionFinalMap().get(refInitator));
+            all.add(DCSet.getInstance().getTransactionFinalMap().get(refInitiator));
             all.add(DCSet.getInstance().getTransactionFinalMap().get(refTarget));
 
         }

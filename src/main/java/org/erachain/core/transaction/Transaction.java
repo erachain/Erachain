@@ -814,9 +814,11 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (Base58.isExtraSymbols(filterStr)) {
                 try {
                     Long dbRef = parseDBRef(filterStr);
-                    Transaction one = map.get(dbRef);
-                    if (one != null) {
-                        transactions.add(one);
+                    if (dbRef != null) {
+                        Transaction one = map.get(dbRef);
+                        if (one != null) {
+                            transactions.add(one);
+                        }
                     }
                 } catch (Exception e1) {
                 }

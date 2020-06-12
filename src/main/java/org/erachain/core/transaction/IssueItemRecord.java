@@ -142,9 +142,14 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         data = Bytes.concat(data, this.item.toBytes(false, false));
 
         if (forDeal == FOR_DB_RECORD) {
-            byte[] keyBytes = Longs.toByteArray(key);
-            keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
-            data = Bytes.concat(data, keyBytes);
+            if (key == null) {
+                // для неподтвержденных когда еще номера нету
+                data = Bytes.concat(data, new byte[KEY_LENGTH]);
+            } else {
+                byte[] keyBytes = Longs.toByteArray(key);
+                keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
+                data = Bytes.concat(data, keyBytes);
+            }
 
         }
 
