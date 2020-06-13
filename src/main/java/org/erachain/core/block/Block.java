@@ -1667,12 +1667,6 @@ public class Block implements Closeable, ExplorerJsonLine {
                     this.txCalculated = new ArrayList<RCalculated>();
                 }
             } else {
-                long processTiming = System.nanoTime();
-                processTiming = (System.nanoTime() - processTiming) / 1000;
-                if (processTiming < 999999999999l) {
-                    LOGGER.debug("VALIDATING[" + this.heightBlock + "]="
-                            + this.transactionCount + " db.FORK: " + processTiming + "[us]");
-                }
                 this.txCalculated = null;
             }
 
@@ -1853,7 +1847,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 } else {
 
-                    // for some TRANSACTIONs need add to FINAM MAP etc.
+                    // for some TRANSACTIONS need add to FINAL MAP etc.
                     // RSertifyPubKeys - in same BLOCK with IssuePersonRecord
 
                     processTimingLocal = System.nanoTime();
@@ -2495,7 +2489,6 @@ public class Block implements Closeable, ExplorerJsonLine {
             // (!) seqNo = i + 1
             transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo,
                     true); // тут наращиваем мясо - чтобы ключи удалялись правильно
-            transaction.setupFromStateDB();
 
             if (!transaction.isWiped()) {
                 transaction.orphan(this, Transaction.FOR_NETWORK);

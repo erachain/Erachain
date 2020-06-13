@@ -85,7 +85,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     public void setupFromStateDB() {
         if (key == null || key == 0) {
-            // эта трнзакция взята как скелет из набора блока
+            // эта транзакция взята как скелет из набора блока
             // найдем сохраненную транзакцию - в ней есь Номер Сути
             IssueItemRecord issueItemRecord = (IssueItemRecord) dcSet.getTransactionFinalMap().get(this.dbRef);
             key = issueItemRecord.getKey();
@@ -255,10 +255,8 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         //UPDATE CREATOR
         super.orphan(block, asDeal);
 
-        //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 1");
         //DELETE FROM DATABASE
-        long key = this.item.deleteFromMap(this.dcSet, item.getStartKey());
-        //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 2");
+        key = this.item.deleteFromMap(this.dcSet, item.getStartKey());
     }
 
     @Override

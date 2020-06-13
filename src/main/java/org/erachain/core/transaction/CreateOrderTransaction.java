@@ -253,7 +253,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
         }
 
-        if (andSetup)
+        if (andSetup && !isWiped())
             setupFromStateDB();
 
     }

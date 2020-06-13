@@ -1328,15 +1328,17 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
         transaction.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+        
         // наращивание всех данных для скелета - так же необходимо для создания ключей tags
-        transaction.setupFromStateDB();
+        if (parent == null && !transaction.isWiped()) {
+            transaction.setupFromStateDB();
+        }
 
         return transaction;
     }
 
     @Override
     public void put(Long key, Transaction transaction) {
-        transaction.setupFromStateDB();
         super.put(key, transaction);
     }
 

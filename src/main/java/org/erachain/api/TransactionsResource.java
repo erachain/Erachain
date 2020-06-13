@@ -621,7 +621,6 @@ public class TransactionsResource {
             synchronized (accounts) {
                 for (Account account : accounts) {
                     transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
-                    transaction.setupFromStateDB();
                     // CHECK IF INVOLVED
                     if (!account.equals(transaction.getCreator()) && transaction.isInvolved(account)) {
                         array.add(transaction.toJson());
@@ -666,7 +665,6 @@ public class TransactionsResource {
             for (Account recipient : recipients) {
                 if (recipient.equals(address)) {
                     transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
-                    transaction.setupFromStateDB();
                     array.add(transaction.toJson());
                     break;
                 }
@@ -717,7 +715,6 @@ public class TransactionsResource {
                 if (recipient.equals(address)) {
 
                     transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
-                    transaction.setupFromStateDB();
                     JSONObject json = transaction.toJson();
 
                     if (transaction instanceof RSend) {

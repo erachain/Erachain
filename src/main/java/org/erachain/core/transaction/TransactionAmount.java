@@ -156,7 +156,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
         }
 
-        if (andSetup)
+        if (andSetup && !isWiped())
             setupFromStateDB();
 
     }
@@ -173,7 +173,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());
         }
 
-        if (andSetup)
+        if (andSetup && !isWiped())
             setupFromStateDB();
     }
 

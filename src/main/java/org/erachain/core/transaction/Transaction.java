@@ -581,7 +581,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
         }
 
-        if (andSetup)
+        if (andSetup && !isWiped())
             setupFromStateDB();
     }
 
@@ -601,7 +601,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         this.height = pair.a;
         this.seqNo = pair.b;
 
-        if (andSetup)
+        if (andSetup && !isWiped())
             setupFromStateDB();
     }
 
@@ -620,7 +620,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
             this.calcFee();
 
-        if (andSetup)
+        if (andSetup && !isWiped())
             setupFromStateDB();
     }
 
