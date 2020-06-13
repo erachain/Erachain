@@ -1,7 +1,6 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.IssueTemplateRecord;
-import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
@@ -12,7 +11,7 @@ import java.awt.*;
 @SuppressWarnings("serial")
 public class IssueTemplateDetailsFrame extends RecDetailsFrame {
     public IssueTemplateDetailsFrame(IssueTemplateRecord templateIssue) {
-        super(templateIssue);
+        super(templateIssue, false);
 
         //LABEL NAME
         ++labelGBC.gridy;

@@ -9,7 +9,7 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class CancelSellNameDetailsFrame extends RecDetailsFrame {
     public CancelSellNameDetailsFrame(CancelSellNameTransaction cancelNameSale) {
-        super(cancelNameSale);
+        super(cancelNameSale, true);
 
         //LABEL NAME
         ++labelGBC.gridy;

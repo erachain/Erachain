@@ -24,7 +24,7 @@ public class RecStatementDetailsFrame extends RecDetailsFrame {
     private RecStatementDetailsFrame th;
 
     public RecStatementDetailsFrame(final RSignNote r_Statement) {
-        super(r_Statement);
+        super(r_Statement, true);
         th = this;
         if (r_Statement.getKey() > 0) {
             ++labelGBC.gridy;

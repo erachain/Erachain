@@ -16,7 +16,7 @@ import javax.swing.table.TableRowSorter;
 public class CreatePollDetailsFrame extends RecDetailsFrame {
     @SuppressWarnings("unchecked")
     public CreatePollDetailsFrame(CreatePollTransaction pollCreation) {
-        super(pollCreation);
+        super(pollCreation, true);
 
         //LABEL NAME
         ++labelGBC.gridy;

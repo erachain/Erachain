@@ -12,7 +12,7 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class VoteOnItemPollDetailsFrame extends RecDetailsFrame {
     public VoteOnItemPollDetailsFrame(VoteOnItemPollTransaction pollVote) {
-        super(pollVote);
+        super(pollVote, true);
 
         PollCls poll = Controller.getInstance().getPoll(pollVote.getAbsKey());
 

@@ -26,11 +26,11 @@ public class RecDetailsFrame extends JPanel //JFrame
     public JTextField signature;
     Transaction record;
 
-    public RecDetailsFrame(Transaction record1) {
+    public RecDetailsFrame(Transaction record1, boolean andSetup) {
 
         this.record = record1;
         DCSet dcSet = DCSet.getInstance();
-        this.record.setDC(dcSet, true);
+        this.record.setDC(dcSet, andSetup);
 
         //ICON
         List<Image> icons = new ArrayList<Image>();

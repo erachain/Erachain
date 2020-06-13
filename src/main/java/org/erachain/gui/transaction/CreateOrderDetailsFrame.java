@@ -10,7 +10,7 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class CreateOrderDetailsFrame extends RecDetailsFrame {
     public CreateOrderDetailsFrame(CreateOrderTransaction orderCreation) {
-        super(orderCreation);
+        super(orderCreation, true);
 
         orderCreation.setDC(DCSet.getInstance(), true);
 

@@ -28,7 +28,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
     private Send_RecordDetailsFrame th;
 
     public Send_RecordDetailsFrame(final RSend r_Send) {
-        super(r_Send);
+        super(r_Send, true);
         th = this;
         //LABEL RECIPIENT
         ++labelGBC.gridy;

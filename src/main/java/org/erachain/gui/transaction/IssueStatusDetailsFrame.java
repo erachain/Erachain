@@ -1,7 +1,6 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.IssueStatusRecord;
-import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
@@ -13,7 +12,7 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class IssueStatusDetailsFrame extends RecDetailsFrame {
     public IssueStatusDetailsFrame(IssueStatusRecord statusIssue) {
-        super(statusIssue);
+        super(statusIssue, false);
 
         //LABEL NAME
         ++labelGBC.gridy;
