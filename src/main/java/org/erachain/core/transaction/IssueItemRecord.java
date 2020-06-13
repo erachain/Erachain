@@ -57,7 +57,8 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
      */
     @Override
     public long getKey() {
-        return key;
+        return key == null ? (isWiped() ? 0 : null) // выдаст ошибку специально если боевая и NULL, see issues/1347
+                : key;
     }
 
     @Override

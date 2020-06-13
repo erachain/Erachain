@@ -174,7 +174,7 @@ public class RSetStatusToItem extends Transaction {
         super.setDC(dcSet, false);
         status = (StatusCls) ItemCls.getItem(dcSet, ItemCls.STATUS_TYPE, this.key);
 
-        if (andSetup && !isWiped())
+        if (false && andSetup && !isWiped())
             setupFromStateDB();
 
     }

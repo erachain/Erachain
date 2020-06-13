@@ -88,7 +88,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
         this.poll = (PollCls) this.dcSet.getItemPollMap().get(this.key);
 
-        if (andSetup && !isWiped())
+        if (false && andSetup && !isWiped())
             setupFromStateDB();
     }
 

@@ -139,7 +139,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             this.person = (PersonCls) this.dcSet.getItemPersonMap().get(this.key);
         }
 
-        if (andSetup && !isWiped())
+        if (false && andSetup && !isWiped())
             setupFromStateDB();
 
     }

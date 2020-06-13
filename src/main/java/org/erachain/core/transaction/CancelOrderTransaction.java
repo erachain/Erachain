@@ -81,7 +81,7 @@ public class CancelOrderTransaction extends Transaction {
         }
         this.orderID = createDBRef;
 
-        if (andSetup && !isWiped())
+        if (false && andSetup && !isWiped())
             setupFromStateDB();
 
     }
