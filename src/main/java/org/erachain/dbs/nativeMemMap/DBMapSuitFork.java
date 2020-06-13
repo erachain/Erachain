@@ -21,6 +21,7 @@ import java.util.*;
 Поэтому нужно добавлять униальность
 
  */
+
 public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements ForkedMap {
 
     protected DBTab<T, U> parent;
@@ -44,11 +45,11 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this.cover = cover;
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
-            // System.out.println("########################### Free Memory:"
-            // + Runtime.getRuntime().freeMemory());
+            logger.debug("########################### Free Memory:" + Runtime.getRuntime().freeMemory());
             if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                     + (Controller.MIN_MEMORY_TAIL)) {
-                databaseSet.clearCache();
+                // у родителя чистим - у себя нет, так как только создали
+                ((DBASet) parent.getDBSet()).clearCache();
                 System.gc();
                 if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                         + (Controller.MIN_MEMORY_TAIL << 1))

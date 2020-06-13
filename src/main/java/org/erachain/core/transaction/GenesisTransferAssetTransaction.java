@@ -105,6 +105,10 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         return TransactionAmount.viewActionType(this.key, this.amount, false);
     }
 
+    public String viewActionTypeWas() {
+        return TransactionAmount.viewActionTypeWas(this.key, this.amount, false);
+    }
+
     @Override
     public String viewSubTypeName() {
         return viewActionType();

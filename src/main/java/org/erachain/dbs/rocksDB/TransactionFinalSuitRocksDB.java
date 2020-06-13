@@ -94,7 +94,9 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                     List<byte[]> recipients = new ArrayList<>();
 
                     // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                    transaction.setDC((DCSet) databaseSet);
+                    if (transaction.noDCSet()) {
+                        transaction.setDC((DCSet) databaseSet);
+                    }
 
                     for (Account account : transaction.getRecipientAccounts()) {
                         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
@@ -109,7 +111,9 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                 (aLong, transaction) -> {
 
                     // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                    transaction.setDC((DCSet) databaseSet);
+                    if (transaction.noDCSet()) {
+                        transaction.setDC((DCSet) databaseSet);
+                    }
 
                     Integer type = transaction.getType();
                     List<byte[]> addressesTypes = new ArrayList<>();
@@ -128,7 +132,11 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                 (aLong, transaction) -> {
 
                     // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                    transaction.setDC((DCSet) databaseSet);
+                    // При удалении - транзакция то берется из базы для создания индексов к удалению.
+                    // И она скелет - нужно базу данных задать и водтянуть номера сущностей и все заново просчитать чтобы правильно удалить метки
+                    if (transaction.noDCSet()) {
+                        transaction.setDC((DCSet) databaseSet);
+                    }
 
                     String[] tokens = transaction.getTags();
                     if (tokens == null || tokens.length == 0)
@@ -159,7 +167,9 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                 (aLong, transaction) -> {
 
                     // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                    transaction.setDC((DCSet) databaseSet);
+                    if (transaction.noDCSet()) {
+                        transaction.setDC((DCSet) databaseSet);
+                    }
 
                     List<byte[]> secondaryKeys = new ArrayList<>();
                     for (Account account : transaction.getInvolvedAccounts()) {

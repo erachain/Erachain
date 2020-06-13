@@ -35,7 +35,7 @@ public class VoteOnItemPollDetailsFrame extends RecDetailsFrame {
 
         //OPTION
         ++detailGBC.gridy;
-        JTextField option = new JTextField(poll.viewOption(pollVote.getOption()));
+        JTextField option = new JTextField(pollVote.viewOption());
         option.setEditable(false);
         MenuPopupUtil.installContextMenu(option);
         this.add(option, detailGBC);
