@@ -84,6 +84,9 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         }
     }
 
+    /**
+     * нельзя вызывать для Форка и для isWIPED
+     */
     public void setupFromStateDB() {
         if (key == null || key == 0) {
             // эта транзакция взята как скелет из набора блока
