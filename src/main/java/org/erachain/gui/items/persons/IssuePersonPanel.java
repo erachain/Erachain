@@ -386,7 +386,10 @@ public class IssuePersonPanel extends JPanel  {
                     return;
                 }
                 try {
-                    txtBirthLatitude.setText((String) transferable.getTransferData(DataFlavor.stringFlavor));
+                    String dataBase58 = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+                    dataBase58 = dataBase58.trim();
+                    dataBase58 = dataBase58.replaceAll("\n", "");
+                    txtBirthLatitude.setText(dataBase58);
                 } catch (Exception exception) {
                     logger.error("Error menu paste", exception);
                 }

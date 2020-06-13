@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -11,7 +12,10 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.lang.Lang;
-import org.erachain.utils.*;
+import org.erachain.utils.DateTimeFormat;
+import org.erachain.utils.NumberAsString;
+import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.TableMenuPopupUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -495,9 +499,9 @@ public class MailsTransactionsTable extends JTable implements Observer {
                 if (decryptedData == null) {
                     messageBufs.get(row).setDecryptedMessage(Lang.getInstance().translate("Decrypt Error!"));
                 } else {
-                        messageBufs.get(row).setDecryptedMessage((messageBufs.get(row).isText()) ?
-                                new String(decryptedData, StandardCharsets.UTF_8)
-                            : Converter.toHex(decryptedData));
+                    messageBufs.get(row).setDecryptedMessage((messageBufs.get(row).isText()) ?
+                            new String(decryptedData, StandardCharsets.UTF_8)
+                            : Base58.encode(decryptedData)); //Converter.toHex(decryptedData));
                     messageBufs.get(row).setOpend(true);
                     menuDecrypt.setText(Lang.getInstance().translate("Hide decrypted"));
                 }
@@ -591,7 +595,7 @@ public class MailsTransactionsTable extends JTable implements Observer {
                 if (!this.encrypted) {
                     this.decryptedMessage = (isText) ?
                             new String(this.rawMessage, StandardCharsets.UTF_8)
-                            : Converter.toHex(this.rawMessage);
+                            : Base58.encode(this.rawMessage); //Converter.toHex(this.rawMessage);
                 }
             }
             return this.decryptedMessage;

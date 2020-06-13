@@ -16,7 +16,6 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.Converter;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -152,7 +151,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel  {
                 messageBytes = message.getBytes(StandardCharsets.UTF_8);
             } else {
                 try {
-                    messageBytes = Converter.parseHexString(message);
+                    messageBytes = Base58.decode(message); //Converter.parseHexString(message);
                 } catch (Exception g) {
                     try {
                         messageBytes = Base58.decode(message);

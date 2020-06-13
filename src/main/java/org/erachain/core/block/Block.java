@@ -23,7 +23,6 @@ import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
-import org.erachain.utils.Converter;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -1193,7 +1192,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         //ADD AT BYTES
         if (atBytes != null) {
-            block.put("blockATs", Converter.toHex(atBytes));
+            block.put("blockATs", Base58.encode(atBytes)); //Converter.toHex(atBytes));
             //block.put("atFees", this.atFees);
         }
 

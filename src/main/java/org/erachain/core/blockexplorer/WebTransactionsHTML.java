@@ -17,7 +17,6 @@ import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.lang.Lang;
-import org.erachain.utils.Converter;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -488,7 +487,8 @@ public class WebTransactionsHTML {
                     + itemNameHTML(Controller.getInstance().getTemplate(r_Statement.getKey())) + "</b><br>";
         }
         if (r_Statement.getData() != null) {
-            String ss = ((r_Statement.isText()) ? new String(r_Statement.getData(), StandardCharsets.UTF_8) : Converter.toHex(r_Statement.getData()));
+            String ss = ((r_Statement.isText()) ? new String(r_Statement.getData(), StandardCharsets.UTF_8) :
+                    Base58.encode(r_Statement.getData())); //Converter.toHex(r_Statement.getData()));
             ss = "<div  style='word-wrap: break-word;'>" + ss;
             out += "<b>" + Lang.getInstance().translateFromLangObj("Message", langObj) + ":</b> "
                     + ss + "<br>";

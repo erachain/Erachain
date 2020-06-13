@@ -70,6 +70,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         if (hasTransferableText) {
             try {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
+                result = result.trim().replaceAll("\n", "");
             } catch (Exception e) {
                 logger.error("Clipboard error", e);
             }

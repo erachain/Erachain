@@ -1,12 +1,12 @@
 package org.erachain.gui.telegrams;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.Converter;
 import org.erachain.utils.DateTimeFormat;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
@@ -163,7 +163,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
 
             return trans.isText() ?
                     new String(decryptedData, StandardCharsets.UTF_8)
-                    : Converter.toHex(decryptedData);
+                    : Base58.encode(decryptedData); //Converter.toHex(decryptedData);
         }
 
     }
