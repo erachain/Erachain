@@ -81,7 +81,7 @@ public class SendTableModel extends JTable implements Observer {
         }
 
         for (Transaction messagetx : transactions) {
-            messagetx.setDC(DCSet.getInstance());
+            messagetx.setDC(DCSet.getInstance(), true);
 
             boolean is = false;
             for (MessageBuf message : messageBufs) {
@@ -326,7 +326,7 @@ public class SendTableModel extends JTable implements Observer {
                 if (!is) {
                     
                     Transaction messagetx = (Transaction)message.getValue();
-                    messagetx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK, DCSet.getInstance().getBlockMap().size() + 1, 1);
+                    messagetx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK, DCSet.getInstance().getBlockMap().size() + 1, 1, true);
 
                     addMessage(0, (RSend) messagetx);
 

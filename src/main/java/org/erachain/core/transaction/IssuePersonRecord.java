@@ -140,6 +140,16 @@ public class IssuePersonRecord extends IssueItemRecord {
         PersonCls person = PersonFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += person.getDataLength(false);
 
+        if (asDeal == FOR_DB_RECORD) {
+            //READ KEY
+            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+            long key = Longs.fromByteArray(timestampBytes);
+            position += KEY_LENGTH;
+
+            person.setKey(key);
+
+        }
+
         if (asDeal > Transaction.FOR_MYPACK) {
             return new IssuePersonRecord(typeBytes, creator, person, feePow, timestamp, reference, signatureBytes, feeLong);
         } else {

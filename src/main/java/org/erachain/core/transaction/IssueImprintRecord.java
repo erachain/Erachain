@@ -122,12 +122,23 @@ public class IssueImprintRecord extends IssueItemRecord {
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
             position += FEE_LENGTH;
+
         }
 
         //READ IMPRINT
         // imprint parse without reference - if is = signature
         ImprintCls imprint = Imprint.parse(Arrays.copyOfRange(data, position, data.length), false);
         position += imprint.getDataLength(false);
+
+        if (asDeal == FOR_DB_RECORD) {
+            //READ KEY
+            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+            long key = Longs.fromByteArray(timestampBytes);
+            position += KEY_LENGTH;
+
+            imprint.setKey(key);
+
+        }
 
         if (asDeal > Transaction.FOR_MYPACK) {
             return new IssueImprintRecord(typeBytes, creator, imprint, feePow, timestamp, signatureBytes, feeLong);
@@ -185,7 +196,7 @@ public class IssueImprintRecord extends IssueItemRecord {
         else if (forDeal == FOR_PACK)
             base_len = BASE_LENGTH_AS_PACK;
         else if (forDeal == FOR_DB_RECORD)
-            base_len = BASE_LENGTH_AS_DBRECORD;
+            base_len = BASE_LENGTH_AS_DBRECORD + KEY_LENGTH;
         else
             base_len = BASE_LENGTH;
 

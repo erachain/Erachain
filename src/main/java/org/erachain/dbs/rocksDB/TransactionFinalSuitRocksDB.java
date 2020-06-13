@@ -95,7 +95,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
                     // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
                     if (transaction.noDCSet()) {
-                        transaction.setDC((DCSet) databaseSet);
+                        transaction.setDC((DCSet) databaseSet, true);
                     }
 
                     for (Account account : transaction.getRecipientAccounts()) {
@@ -112,7 +112,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
                     // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
                     if (transaction.noDCSet()) {
-                        transaction.setDC((DCSet) databaseSet);
+                        transaction.setDC((DCSet) databaseSet, true);
                     }
 
                     Integer type = transaction.getType();
@@ -135,7 +135,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                     // При удалении - транзакция то берется из базы для создания индексов к удалению.
                     // И она скелет - нужно базу данных задать и водтянуть номера сущностей и все заново просчитать чтобы правильно удалить метки
                     if (transaction.noDCSet()) {
-                        transaction.setDC((DCSet) databaseSet);
+                        transaction.setDC((DCSet) databaseSet, true);
                     }
 
                     String[] tokens = transaction.getTags();
@@ -168,7 +168,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
                     // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
                     if (transaction.noDCSet()) {
-                        transaction.setDC((DCSet) databaseSet);
+                        transaction.setDC((DCSet) databaseSet, true);
                     }
 
                     List<byte[]> secondaryKeys = new ArrayList<>();

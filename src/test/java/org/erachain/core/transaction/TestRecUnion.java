@@ -160,7 +160,7 @@ public class TestRecUnion {
     public void validateIssueUnionRecord() {
 
         init();
-        issueUnionTransaction.setDC(db,Transaction.FOR_NETWORK, 1, 1);
+        issueUnionTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueUnionTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE UNION IS VALID
@@ -218,7 +218,7 @@ public class TestRecUnion {
 
         // PARSE ISSEU UNION RECORD
         issueUnionTransaction.sign(certifier, Transaction.FOR_NETWORK);
-        issueUnionTransaction.setDC(db,Transaction.FOR_NETWORK, 1, 1);
+        issueUnionTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueUnionTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -286,7 +286,7 @@ public class TestRecUnion {
     public void processIssueUnionRecord() {
 
         init();
-        issueUnionTransaction.setDC(db,Transaction.FOR_NETWORK, 1, 1);
+        issueUnionTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         issueUnionTransaction.sign(certifier, Transaction.FOR_NETWORK);

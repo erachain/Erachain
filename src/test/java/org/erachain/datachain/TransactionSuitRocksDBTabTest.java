@@ -58,14 +58,14 @@ public class TransactionSuitRocksDBTabTest {
         transaction = new RSend(creator, feePow, recipient, 01, new BigDecimal("0.00000001"), timestamp++, 0L);
 
         transaction.sign(creator, Transaction.FOR_NETWORK);
-        transaction.setDC(db, Transaction.FOR_NETWORK, blockHeight, seqNo++);
+        transaction.setDC(db, Transaction.FOR_NETWORK, blockHeight, seqNo++, true);
 
         db.getTransactionTab().put(transaction);
 
         transaction = new RSend(creator, feePow, recipient, 01, new BigDecimal("0.00000001"), timestamp++, 0L);
 
         transaction.sign(creator, Transaction.FOR_NETWORK);
-        transaction.setDC(db, Transaction.FOR_NETWORK, blockHeight, seqNo++);
+        transaction.setDC(db, Transaction.FOR_NETWORK, blockHeight, seqNo++, true);
 
         db.getTransactionTab().put(transaction);
 

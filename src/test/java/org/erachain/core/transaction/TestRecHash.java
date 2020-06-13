@@ -150,7 +150,7 @@ public class TestRecHash {
         hashes[0] = hash0;
 
         hashesRecord = new RHashes(maker, FEE_POWER, null, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0]);
-        hashesRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        hashesRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
         assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(Transaction.FOR_NETWORK, flags));
 

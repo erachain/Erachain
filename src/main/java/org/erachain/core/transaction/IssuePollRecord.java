@@ -115,6 +115,16 @@ public class IssuePollRecord extends IssueItemRecord {
         PollCls poll = PollFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += poll.getDataLength(false);
 
+        if (asDeal == FOR_DB_RECORD) {
+            //READ KEY
+            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+            long key = Longs.fromByteArray(timestampBytes);
+            position += KEY_LENGTH;
+
+            poll.setKey(key);
+
+        }
+
         if (asDeal > Transaction.FOR_MYPACK) {
             return new IssuePollRecord(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes, feeLong);
         } else {

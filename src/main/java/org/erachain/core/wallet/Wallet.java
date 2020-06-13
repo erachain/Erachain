@@ -1283,7 +1283,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 			}
 
 			if (transaction.noDCSet())
-                transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
 
 			this.processTransaction(transaction);
 
@@ -1353,7 +1353,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 			}
 
             if (transaction.noDCSet())
-                transaction.setDC(dcSet, Transaction.FOR_NETWORK, block.blockHead.heightBlock, seqNo);
+				transaction.setDC(dcSet, Transaction.FOR_NETWORK, block.blockHead.heightBlock, seqNo, true);
 
 			this.orphanTransaction(transaction);
 

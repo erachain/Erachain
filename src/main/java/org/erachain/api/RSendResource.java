@@ -419,7 +419,7 @@ public class RSendResource {
 
                         Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
                         // CLEAR for HEAP
-                        transaction.setDC(null);
+                        transaction.setDC(null, false);
 
 
                         // CHECK VALIDATE MESSAGE
@@ -606,7 +606,7 @@ public class RSendResource {
 
                         Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
                         // CLEAR for HEAP
-                        transaction.setDC(null);
+                        transaction.setDC(null, false);
 
                         // CHECK VALIDATE MESSAGE
                         if (result == Transaction.VALIDATE_OK) {

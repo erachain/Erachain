@@ -178,13 +178,13 @@ public class RSertifyPubKeysTest {
         //personGeneral.setKey(genesisPersonKey);
 
         GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
-        genesis_issue_person.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
+        genesis_issue_person.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++, true);
         genesis_issue_person.process(gb, Transaction.FOR_NETWORK);
         //genesisPersonKey = dcSet.getIssuePersonMap().size();
         genesisPersonKey = genesis_issue_person.getAssetKey(dcSet);
 
         GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(registrar, genesisPersonKey);
-        genesis_certify.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
+        genesis_certify.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++, true);
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
         person = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
@@ -211,7 +211,7 @@ public class RSertifyPubKeysTest {
 
     public void initPersonalize() {
 
-        issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
+        issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++, true);
         assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         issuePersonTransaction.sign(registrar, Transaction.FOR_NETWORK);
@@ -248,7 +248,7 @@ public class RSertifyPubKeysTest {
 
             RSertifyPubKeys certPubKey = new RSertifyPubKeys(0, registrar, FEE_POWER,
                     person.getKey(dcSet), sertifiedPublicKeys, timestamp, 0L);
-            certPubKey.setDC(dcSet, Transaction.FOR_NETWORK, 3, 5);
+            certPubKey.setDC(dcSet, Transaction.FOR_NETWORK, 3, 5, true);
             certPubKey.process(null, Transaction.FOR_NETWORK);
 
             registrar.getLastTimestamp(dcSet);

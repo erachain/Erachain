@@ -203,7 +203,7 @@ public class PollsDialog extends JDialog {
 
         // ADD EXCHANGE BUTTON
         detailGBC.gridy = 7;
-        voteButton = new JButton(Lang.getInstance().translate("Vote"));
+        voteButton = new JButton(Lang.getInstance().translate("To Vote"));
         voteButton.setPreferredSize(new Dimension(100, 25));
         voteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

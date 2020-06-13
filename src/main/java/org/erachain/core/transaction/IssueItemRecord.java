@@ -1,6 +1,7 @@
 package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -26,6 +27,8 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
         this.item = item;
+        if (item.getKey() != 0)
+            key = item.getKey();
     }
 
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -54,10 +57,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
      */
     @Override
     public long getKey() {
-        if (key == null) {
-            key = item.getKey(dcSet);
-        }
-
         return key;
     }
 
@@ -68,12 +67,31 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     @Override
     public void makeItemsKeys() {
-        // запомним что тут две сущности
+        if (key == null || key == 0)
+            return;
+
         if (creatorPersonDuration != null) {
+            // запомним что тут две сущности
             itemsKeys = new Object[][]{
                     new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
                     new Object[]{item.getItemType(), key}
             };
+        } else {
+            itemsKeys = new Object[][]{
+                    new Object[]{item.getItemType(), key}
+            };
+        }
+    }
+
+    public void setupFromStateDB() {
+        if (key == null || key == 0) {
+            // эта трнзакция взята как скелет из набора блока
+            // найдем сохраненную транзакцию - в ней есь Номер Сути
+            IssueItemRecord issueItemRecord = (IssueItemRecord) dcSet.getTransactionFinalMap().get(this.dbRef);
+            key = issueItemRecord.getKey();
+            item.setKey(key);
+        } else if (item.getKey() == 0) {
+            item.setKey(key);
         }
     }
 
@@ -104,6 +122,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @SuppressWarnings("unchecked")
     @Override
     public JSONObject toJson() {
+
         //GET BASE
         JSONObject transaction = this.getJsonBase();
 
@@ -120,6 +139,18 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         // without reference
         data = Bytes.concat(data, this.item.toBytes(false, false));
 
+        if (forDeal == FOR_DB_RECORD) {
+            if (key == null) {
+                // для неподтвержденных когда еще номера нету
+                data = Bytes.concat(data, new byte[KEY_LENGTH]);
+            } else {
+                byte[] keyBytes = Longs.toByteArray(key);
+                keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
+                data = Bytes.concat(data, keyBytes);
+            }
+
+        }
+
         return data;
     }
 
@@ -133,7 +164,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         else if (forDeal == FOR_PACK)
             base_len = BASE_LENGTH_AS_PACK;
         else if (forDeal == FOR_DB_RECORD)
-            base_len = BASE_LENGTH_AS_DBRECORD;
+            base_len = BASE_LENGTH_AS_DBRECORD + KEY_LENGTH;
         else
             base_len = BASE_LENGTH;
 

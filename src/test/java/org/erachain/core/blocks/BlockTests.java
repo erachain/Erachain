@@ -426,11 +426,11 @@ public class BlockTests {
         // need add VOLUME for generating new block - 0l asset!
         transaction = new GenesisTransferAssetTransaction(generator,
                 ERM_KEY, BigDecimal.valueOf(100000));
-        transaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        transaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         transaction.process(gb, Transaction.FOR_NETWORK);
         transaction = new GenesisTransferAssetTransaction(generator,
                 FEE_KEY, BigDecimal.valueOf(1000));
-        transaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        transaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         transaction.process(gb, Transaction.FOR_NETWORK);
 
         //GENERATE NEXT BLOCK
@@ -536,7 +536,7 @@ public class BlockTests {
         Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
         long timestamp = block.getTimestamp();
         Transaction payment1 = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100), timestamp, generator.getLastTimestamp(db)[0]);
-        payment1.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        payment1.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         payment1.sign(generator, Transaction.FOR_NETWORK);
         assertEquals(Transaction.VALIDATE_OK, payment1.isValid(Transaction.FOR_NETWORK, flags));
 
@@ -548,7 +548,7 @@ public class BlockTests {
         //GENERATE PAYMENT 2
         Account recipient2 = new Account("7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r");
         Transaction payment2 = new RSend(generator, FEE_POWER, recipient2, FEE_KEY, BigDecimal.valueOf(100), timestamp, generator.getLastTimestamp(fork)[0]);
-        payment2.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        payment2.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         payment2.sign(generator, Transaction.FOR_NETWORK);
         assertEquals(Transaction.VALIDATE_OK, payment2.isValid(Transaction.FOR_NETWORK, flags));
 
@@ -634,7 +634,7 @@ public class BlockTests {
         // TIMESTAMP for org.erachain.records make lower
         long timestamp = block.getTimestamp() - 1000;
         Transaction payment1 = new RSend(generator, FEE_POWER, recipient1, FEE_KEY, BigDecimal.valueOf(100), timestamp++, generator.getLastTimestamp(fork)[0]);
-        payment1.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        payment1.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         payment1.sign(generator, Transaction.FOR_NETWORK);
         assertEquals(Transaction.VALIDATE_OK, payment1.isValid(Transaction.FOR_NETWORK, flags));
 
@@ -646,7 +646,7 @@ public class BlockTests {
         Account recipient2 = new Account("7G1G45RX4td59daBv6PoN84nAJA49NZ47i");
         Transaction payment2 = new RSend(generator, FEE_POWER, recipient2, ERM_KEY,
                 BigDecimal.valueOf(10), timestamp++, generator.getLastTimestamp(fork)[0]);
-        payment2.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        payment2.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         payment2.sign(generator, Transaction.FOR_NETWORK);
         assertEquals(Transaction.VALIDATE_OK, payment2.isValid(Transaction.FOR_NETWORK, flags));
 

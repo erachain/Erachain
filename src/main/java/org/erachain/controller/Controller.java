@@ -190,7 +190,12 @@ public class Controller extends Observable {
                         put("ru", Transaction.makeDBRef(159727, 1));
                     }
                 };
-        APP_NAME = "Erachain" + "-" + Settings.getInstance().APP_NAME;
+
+        if (Settings.getInstance().isSideNet()) {
+            APP_NAME = "Erachain-" + Settings.getInstance().APP_NAME;
+        } else {
+            APP_NAME = "Erachain";
+        }
 
     }
 
@@ -1794,7 +1799,7 @@ public class Controller extends Observable {
         int seq = 0;
         for (Transaction transaction : transactions) {
 
-            transaction.setDC(dcSet);
+            transaction.setDC(dcSet, true);
 
             // FOR ALL ACCOUNTS
             synchronized (accounts) {

@@ -126,7 +126,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     public byte[][] run(Long key, Transaction transaction) {
                         // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
                         if (transaction.noDCSet()) {
-                            transaction.setDC((DCSet) databaseSet);
+                            transaction.setDC((DCSet) databaseSet, true);
                         }
 
                         HashSet<Account> recipients = transaction.getRecipientAccounts();
@@ -158,6 +158,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                 new Function2<Tuple3<byte[], Integer, Boolean>[], Long, Transaction>() {
                     @Override
                     public Tuple3<byte[], Integer, Boolean>[] run(Long key, Transaction transaction) {
+                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                        if (transaction.noDCSet()) {
+                            transaction.setDC((DCSet) databaseSet, true);
+                        }
                         List<Tuple3<byte[], Integer, Boolean>> accounts = new ArrayList<Tuple3<byte[], Integer, Boolean>>();
                         Integer type = transaction.getType();
                         for (Account account : transaction.getInvolvedAccounts()) {
@@ -185,7 +189,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                         // При удалении - транзакция то берется из базы для создания индексов к удалению.
                         // И она скелет - нужно базу данных задать и водтянуть номера сущностей и все заново просчитать чтобы правильно удалить метки
                         if (transaction.noDCSet()) {
-                            transaction.setDC((DCSet) databaseSet);
+                            transaction.setDC((DCSet) databaseSet, true);
                         }
 
                         String[] tokens = transaction.getTags();
@@ -223,6 +227,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                 Long, Transaction>() {
             @Override
             public byte[][] run(Long key, Transaction transaction) {
+                // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                if (transaction.noDCSet()) {
+                    transaction.setDC((DCSet) databaseSet, true);
+                }
                 HashSet<Account> accounts = transaction.getInvolvedAccounts();
                 int size = accounts.size();
                 byte[][] result = new byte[size][];

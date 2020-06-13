@@ -195,7 +195,7 @@ public class TestRecGenesisPerson2 {
 
         //CHECK REFERENCE RECIPIENT
         //assertNotEquals((long)genesisIssuePersonTransaction.getTimestamp(), (long)maker.getLastReference(db));
-        genesisIssuePersonTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        genesisIssuePersonTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         genesisIssuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
         keyPerson = person.getKey(db);
 

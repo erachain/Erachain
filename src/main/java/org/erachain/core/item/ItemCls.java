@@ -199,17 +199,42 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return this.image;
     }
 
-    public long getKey() {
-        return getKey(DCSet.getInstance());
-    }
-
     public void setKey(long key) {
         this.key = key;
     }
 
+    public long getKey() {
+        return this.key; //getKey(DCSet.getInstance());
+    }
+
     public long getKey(DCSet db) {
         // resolve key in that DB
-        resolveKey(db);
+        ////resolveKey(db);
+        return this.key;
+    }
+
+    public long resolveKey(DCSet db) {
+
+        if (this.reference == null || BlockChain.isWiped(this.reference))
+            return 0L;
+
+        if (false && this.key == 0 // & this.reference != null
+        ) {
+            if (this.getDBIssueMap(db).contains(this.reference)) {
+                this.key = this.getDBIssueMap(db).get(this.reference);
+            } else if (BlockChain.CHECK_BUGS > 0
+                    && !BlockChain.SIDE_MODE && !BlockChain.TEST_MODE
+                    && Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
+
+            ) {
+                LOGGER.error("Item [" + this.name + "] not found for REFERENCE: " + Base58.encode(this.reference));
+                if (BlockChain.CHECK_BUGS > 3) {
+                    Long error = null;
+                    error++;
+                }
+            }
+        }
+
         return this.key;
     }
 
@@ -308,31 +333,6 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
     }
 
-    public long resolveKey(DCSet db) {
-
-        if (this.reference == null || BlockChain.isWiped(this.reference))
-            return 0L;
-
-        if (this.key == 0 // & this.reference != null
-                ) {
-            if (this.getDBIssueMap(db).contains(this.reference)) {
-                this.key = this.getDBIssueMap(db).get(this.reference);
-            } else if (BlockChain.CHECK_BUGS > 0
-                    && !BlockChain.SIDE_MODE && !BlockChain.TEST_MODE
-                    && Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
-
-            ) {
-                LOGGER.error("Item [" + this.name + "] not found for REFERENCE: " + Base58.encode(this.reference));
-                if (BlockChain.CHECK_BUGS > 3) {
-                    Long error = null;
-                    error++;
-                }
-            }
-        }
-
-        return this.key;
-    }
-
     public void resetKey() {
         this.key = 0;
     }
@@ -372,7 +372,11 @@ public abstract class ItemCls implements ExplorerJsonLine {
     }
 
     public boolean isConfirmed(DCSet db) {
-        return this.getDBIssueMap(db).contains(this.reference);
+        if (true) {
+            return key != 0;
+        } else {
+            return this.getDBIssueMap(db).contains(this.reference);
+        }
     }
 
     public boolean isFavorite() {
@@ -689,8 +693,12 @@ public abstract class ItemCls implements ExplorerJsonLine {
         }
 
         this.key = newKey;
-        //SET ORPHAN DATA
-        this.getDBIssueMap(db).put(this.reference, newKey);
+
+        if (false) {
+            // теперь ключ прямо в записи храним и не нужно его отдельно хранить
+            //SET ORPHAN DATA
+            this.getDBIssueMap(db).put(this.reference, newKey);
+        }
 
         return key;
     }
@@ -718,8 +726,11 @@ public abstract class ItemCls implements ExplorerJsonLine {
             map.delete(thisKey);
         }
 
-        //DELETE ORPHAN DATA
-        this.getDBIssueMap(db).delete(this.reference);
+        if (false) {
+            // теперь ключ прямо в записи храним и не нужно его отдельно хранить
+            //DELETE ORPHAN DATA
+            this.getDBIssueMap(db).delete(this.reference);
+        }
 
         return thisKey;
 

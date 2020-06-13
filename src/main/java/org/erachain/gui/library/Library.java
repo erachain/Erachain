@@ -1,7 +1,6 @@
 package org.erachain.gui.library;
 
 import com.github.rjeschke.txtmark.Processor;
-//import net.sf.tinylaf.Theme;
 import net.sf.tinylaf.Theme;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
@@ -24,6 +23,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 
+//import net.sf.tinylaf.Theme;
+
 // почемуто иногда она не может найти эту библиотеку при запуске JAR - надо закоментить ее и опять вставить здесь
 // по Alt-Enter на Класса с вызовом Theme. ниже в коде
 
@@ -44,7 +45,7 @@ public class Library {
             return;
 
         if (transaction.noDCSet())
-            transaction.setDC_HeightSeq(DCSet.getInstance());
+            transaction.setDC_HeightSeq(DCSet.getInstance(), true);
 
         switch ( transaction.getType()) {
             case Transaction.SEND_ASSET_TRANSACTION:

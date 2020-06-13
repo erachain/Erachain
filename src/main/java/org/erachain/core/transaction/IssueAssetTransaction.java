@@ -228,6 +228,16 @@ public class IssueAssetTransaction extends IssueItemRecord {
         AssetCls asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += asset.getDataLength(false);
 
+        if (asDeal == FOR_DB_RECORD) {
+            //READ KEY
+            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+            long key = Longs.fromByteArray(timestampBytes);
+            position += KEY_LENGTH;
+
+            asset.setKey(key);
+
+        }
+
         if (asDeal > Transaction.FOR_MYPACK) {
             return new IssueAssetTransaction(typeBytes, creator, asset, feePow, timestamp, reference, signatureBytes, feeLong);
         } else {

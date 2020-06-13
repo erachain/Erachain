@@ -112,7 +112,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
 
                         // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
                         if (transaction.noDCSet()) {
-                            transaction.setDC((DCSet) databaseSet);
+                            transaction.setDC((DCSet) databaseSet, true);
                         }
 
                         for (Account acc : transaction.getRecipientAccounts()) {
@@ -136,7 +136,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
 
                         // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
                         if (transaction.noDCSet()) {
-                            transaction.setDC((DCSet) databaseSet);
+                            transaction.setDC((DCSet) databaseSet, true);
                         }
 
                         for (Account acc : transaction.getInvolvedAccounts()) {

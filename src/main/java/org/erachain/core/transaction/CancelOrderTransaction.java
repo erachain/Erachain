@@ -68,8 +68,8 @@ public class CancelOrderTransaction extends Transaction {
 
     //GETTERS/SETTERS
 
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setDC(dcSet, asDeal, blockHeight, seqNo);
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo, boolean andSetup) {
+        super.setDC(dcSet, asDeal, blockHeight, seqNo, false);
 
         Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
         if (createDBRef == null && blockHeight > BlockChain.CANCEL_ORDERS_ALL_VALID) {
@@ -80,6 +80,9 @@ public class CancelOrderTransaction extends Transaction {
             }
         }
         this.orderID = createDBRef;
+
+        if (andSetup)
+            setupFromStateDB();
 
     }
 

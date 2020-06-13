@@ -115,6 +115,16 @@ public class IssueTemplateRecord extends IssueItemRecord {
         TemplateCls template = TemplateFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += template.getDataLength(false);
 
+        if (asDeal == FOR_DB_RECORD) {
+            //READ KEY
+            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+            long key = Longs.fromByteArray(timestampBytes);
+            position += KEY_LENGTH;
+
+            template.setKey(key);
+
+        }
+
         if (asDeal > Transaction.FOR_MYPACK) {
             return new IssueTemplateRecord(typeBytes, creator, template, feePow, timestamp, reference, signatureBytes, feeLong);
         } else {

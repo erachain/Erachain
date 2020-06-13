@@ -571,7 +571,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     // NEED FOR DB SECONDATY KEYS
     // see org.mapdb.Bind.secondaryKeys
-    public void setDC(DCSet dcSet) {
+    public void setDC(DCSet dcSet, boolean andSetup) {
         this.dcSet = dcSet;
 
         if (BlockChain.TEST_DB == 0 && creator != null) {
@@ -581,12 +581,12 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
         }
 
-        makeItemsKeys();
-
+        if (andSetup)
+            setupFromStateDB();
     }
 
-    public void setDC_HeightSeq(DCSet dcSet) {
-        setDC(dcSet);
+    public void setDC_HeightSeq(DCSet dcSet, boolean andSetup) {
+        setDC(dcSet, false);
 
         if (this.typeBytes[0] == Transaction.CALCULATED_TRANSACTION) {
 
@@ -600,15 +600,34 @@ public abstract class Transaction implements ExplorerJsonLine {
         Tuple2<Integer, Integer> pair = Transaction.parseDBRef(dbRef2);
         this.height = pair.a;
         this.seqNo = pair.b;
+
+        if (andSetup)
+            setupFromStateDB();
     }
 
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        setDC(dcSet);
+    /**
+     * @param dcSet
+     * @param asDeal
+     * @param blockHeight
+     * @param seqNo
+     * @param andSetup    - если нужно нарастить мясо на скелет из базв Финал. Не нужно для неподтвержденных и если ее нет в базе еще
+     */
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo, boolean andSetup) {
+        setDC(dcSet, false);
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
         this.seqNo = seqNo;
         this.dbRef = Transaction.makeDBRef(height, seqNo);
         if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
             this.calcFee();
+
+        if (andSetup)
+            setupFromStateDB();
+    }
+
+    /**
+     * Нарастить мясо на скелет из базы состояния - нужно например для созданим вторичных ключей и Номер Сущности
+     */
+    public void setupFromStateDB() {
     }
 
     public boolean noDCSet() {
@@ -756,6 +775,10 @@ public abstract class Transaction implements ExplorerJsonLine {
      * @return
      */
     public String[] getTags() {
+
+        if (itemsKeys == null)
+            makeItemsKeys();
+
         try {
             return tags(viewTypeName(), getTitle(), itemsKeys);
         } catch (Exception e) {
@@ -814,9 +837,11 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (Base58.isExtraSymbols(filterStr)) {
                 try {
                     Long dbRef = parseDBRef(filterStr);
-                    Transaction one = map.get(dbRef);
-                    if (one != null) {
-                        transactions.add(one);
+                    if (dbRef != null) {
+                        Transaction one = map.get(dbRef);
+                        if (one != null) {
+                            transactions.add(one);
+                        }
                     }
                 } catch (Exception e1) {
                 }
