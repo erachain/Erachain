@@ -129,7 +129,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     }
 
     @Override
-    public void getIntervalThis(long start, int limit) {
+    public void getInterval() {
 
         if (this.sender == null || this.asset == null)
             return;

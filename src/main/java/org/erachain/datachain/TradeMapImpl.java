@@ -167,7 +167,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getTrades(long have, long want, int offset, int limit) {
+    public List<Trade> getTrades(long have, long want, Object fromKey, int limit) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
@@ -177,7 +177,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             if (iterator == null)
                 return new ArrayList<Trade>();
 
-            Iterators.advance(iterator, offset);
+            //Iterators.advance(iterator, offset);
 
             // тут итератор нен ужно закрывтьа так как базовый итератор уже закроем
             Iterator<Tuple2<Long, Long>> iteratorLimit = Iterators.limit(iterator, limit);

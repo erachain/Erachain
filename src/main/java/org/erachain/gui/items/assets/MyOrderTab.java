@@ -309,7 +309,7 @@ public class MyOrderTab extends SplitPanel {
         }
         if (end > start) {
             int step = end - start;
-            ordersModel.setInterval(start, step);
+            ordersModel.setInterval(start);
             ordersModel.fireTableDataChanged();
         }
     }

@@ -174,12 +174,12 @@ public class WalletTransactionsTableModel extends WalletAutoKeyTableModel<Tuple2
 
     }
 
-    public void getIntervalThis(long startBack, int limit) {
+    public void getInterval() {
 
-        super.getIntervalThis(startBack, limit);
+        super.getInterval();
 
         DCSet dcSet = DCSet.getInstance();
-        for (Pair<Tuple2<Long, Long>, Tuple2<Long, Transaction>> item: listSorted) {
+        for (Pair<Tuple2<Long, Long>, Tuple2<Long, Transaction>> item : listSorted) {
             if (item.getB() == null) {
                 continue;
             }

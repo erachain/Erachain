@@ -358,7 +358,7 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
         }
         if (end > start) {
             int step = end - start;
-            this.records_model.setInterval(start, step);
+            this.records_model.setInterval(start);
             this.records_model.fireTableDataChanged();
         }
     }

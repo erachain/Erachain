@@ -126,7 +126,7 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
     }
 
     @Override
-    public void getIntervalThis(long start, int limit) {
+    public void getInterval() {
         TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = dcSet.getPersonStatusMap().get(itemKey);
 
         list = new ArrayList<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>>();

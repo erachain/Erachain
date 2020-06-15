@@ -77,9 +77,9 @@ public abstract class WalletAutoKeyTableModel<T, U> extends WalletSortedTableMod
     }
 
     @Override
-    public void getIntervalThis(long startBack, int limit) {
+    public void getInterval() {
 
-        Collection<T> keys = ((NavigableMap) map).tailMap(startBack).keySet();
+        Collection<T> keys = ((NavigableMap) map).tailMap(startKey).keySet();
         listSorted = new SortableList<T, U>(map, keys);
 
     }

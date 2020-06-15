@@ -180,13 +180,13 @@ public class PersonAccountsModel extends TimerTableModelCls<Fun.Tuple5<String, I
 
     }
 
-    public void getIntervalThis(long start, int limit) {
+    public void getInterval() {
 
         list = new ArrayList<>();
         TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey);
         TransactionFinalMap transactionsMap = DCSet.getInstance().getTransactionFinalMap();
 
-        for (String address: addresses.keySet()) {
+        for (String address : addresses.keySet()) {
             Stack<Tuple3<Integer, Integer, Integer>> stack = addresses.get(address);
             if (stack == null || stack.isEmpty()) {
                 continue;

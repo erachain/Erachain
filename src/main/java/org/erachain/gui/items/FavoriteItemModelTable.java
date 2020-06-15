@@ -90,26 +90,13 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
         return list.get(k);
     }
 
-    //public abstract int getMapSize();
-    @Override
-    public long getMapSize() {
-        return favoriteMap.size();
-    }
-
     @Override
     public void getInterval() {
-
-        getIntervalThis(start, step);
-
-    }
-
-    @Override
-    public void getIntervalThis(long startBack, int limit) {
         listSorted = new SortableList<Long, Object>(map, favoriteMap.getFromToKeys(0, Long.MAX_VALUE));
         listSorted.sort();
 
         list = new ArrayList<>();
-        for (Pair<Long, Object> key: listSorted) {
+        for (Pair<Long, Object> key : listSorted) {
             if (key.getB() == null) {
                 continue;
             }

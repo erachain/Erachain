@@ -36,9 +36,9 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
 
     private Boolean[] columnAutoHeight; // = new Boolean[]{true, true, true, true, true, true, true, false, false};
 
-    protected long start = 0;
+    protected Object startKey;
     protected int step = 50;
-    protected long size = 0;
+    protected Object lastPageKey;
 
     protected DBTabImpl map;
     protected Logger logger;
@@ -140,7 +140,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
      * убираем synchronized - так как теперь все размеренно по таймеру вызывается. Иначе блокировка при нажатии
      * на Синхронизировать кошелек очень часто бывает
      */
-    public /*synchronized*/ void syncUpdate(Observable o, Object arg) {
+    public void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
         if (message.getType() == ADD_EVENT
@@ -156,8 +156,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         }
     }
 
-    //public abstract void getIntervalThis(int startBack, int endBack);
-    public void getIntervalThis(long start, int limit) {
+    public void getInterval() {
     }
 
     public int getMapDefaultIndex() {
@@ -167,32 +166,8 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         return map.getDefaultIndex();
     }
 
-    public long getMapSize() {
-        if (map == null)
-            return 0;
-
-        return map.size();
-    }
-
-    /**
-     * если descending установлен, то ключ отрицательный значит и его вычисляем обратно.
-     * То есть 10-я запись имеет ключ -9 (отричательный). Тогда отсчет start=0 будет идти от последней записи
-     * с отступом step
-     */
-    public void getInterval() {
-
-        if (descending) {
-            long startBack = -getMapSize() + start;
-            getIntervalThis(startBack, step);
-        } else {
-             getIntervalThis(start, step);
-        }
-
-    }
-
-    public void setInterval(int start, int step) {
-        this.start = start;
-        this.step = step;
+    public void setInterval(Object startKey) {
+        this.startKey = startKey;
 
         getInterval();
     }

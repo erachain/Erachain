@@ -99,7 +99,7 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
     }
 
     @Override
-    public void getIntervalThis(long start, int limit) {
+    public void getInterval() {
 
         if (list == null) {
             list = new ArrayList<>();
@@ -108,7 +108,7 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
         }
 
         // read indexes to DB
-        Tuple2<BigDecimal, List<Long>> vouches = ((VouchRecordMap)map).get(Transaction.makeDBRef(this.blockNo, this.recNo));
+        Tuple2<BigDecimal, List<Long>> vouches = ((VouchRecordMap) map).get(Transaction.makeDBRef(this.blockNo, this.recNo));
         if (vouches == null) {
             fireTableDataChanged();
             return;
