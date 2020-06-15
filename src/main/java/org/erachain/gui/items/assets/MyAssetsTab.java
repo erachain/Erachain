@@ -12,7 +12,6 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.erachain.utils.URLViewer;
-import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -110,10 +109,10 @@ public class MyAssetsTab extends SplitPanel {
                 int row = jTableJScrollPanelLeftPanel.rowAtPoint(point);
                 jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
 
-                Fun.Tuple2<Long, AssetCls> itemTableSelected = assetsModel.getItem(row);
+                AssetCls itemSelected = assetsModel.getItem(row);
 
                 if (e.getClickCount() == 2) {
-                    tableMouse2Click(itemTableSelected.b);
+                    tableMouse2Click(itemSelected);
                 }
 
             }
@@ -237,7 +236,7 @@ public class MyAssetsTab extends SplitPanel {
         sell.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row).b;
+                AssetCls asset = assetsModel.getItem(row);
                 MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
                         new ExchangePanel(asset, null, "To sell", ""), ExchangePanel.getIcon());
 
@@ -250,7 +249,7 @@ public class MyAssetsTab extends SplitPanel {
         excahge.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row).b;
+                AssetCls asset = assetsModel.getItem(row);
                 MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
                         new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
             }
@@ -261,7 +260,7 @@ public class MyAssetsTab extends SplitPanel {
         buy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row).b;
+                AssetCls asset = assetsModel.getItem(row);
                 MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
                         new ExchangePanel(asset, null, "Buy", ""), ExchangePanel.getIcon());
 
@@ -295,7 +294,7 @@ public class MyAssetsTab extends SplitPanel {
 
                                                 int row = table.getSelectedRow();
                                                 row = table.convertRowIndexToModel(row);
-                                                AssetCls asset = assetsModel.getItem(row).b;
+                                                AssetCls asset = assetsModel.getItem(row);
 
                                                 //IF ASSET CONFIRMED AND NOT ERM
 
@@ -333,7 +332,7 @@ public class MyAssetsTab extends SplitPanel {
         details.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row).b;
+                AssetCls asset = assetsModel.getItem(row);
                 //			new AssetFrame(asset);
             }
         });
@@ -342,7 +341,7 @@ public class MyAssetsTab extends SplitPanel {
         dividend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row).b;
+                AssetCls asset = assetsModel.getItem(row);
                 new PayDividendFrame(asset);
             }
         });
@@ -355,7 +354,7 @@ public class MyAssetsTab extends SplitPanel {
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row).b;
+                AssetCls asset = assetsModel.getItem(row);
 
                 try {
                     URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
@@ -392,7 +391,7 @@ public class MyAssetsTab extends SplitPanel {
 
                 if (e.getClickCount() == 2) {
                     row = table.convertRowIndexToModel(row);
-                    AssetCls asset = assetsModel.getItem(row).b;
+                    AssetCls asset = assetsModel.getItem(row);
                     MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
                             new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
 
@@ -402,7 +401,7 @@ public class MyAssetsTab extends SplitPanel {
 
                     if (table.getSelectedColumn() == WalletItemAssetsTableModel.COLUMN_FAVORITE) {
                         row = table.convertRowIndexToModel(row);
-                        AssetCls asset = assetsModel.getItem(row).b;
+                        AssetCls asset = assetsModel.getItem(row);
                         favorite_set(table);
 
 
@@ -431,7 +430,7 @@ public class MyAssetsTab extends SplitPanel {
     public void favorite_set(JTable assetsTable) {
 
 
-        AssetCls asset = assetsModel.getItem(row).b;
+        AssetCls asset = assetsModel.getItem(row);
         //new AssetPairSelect(asset.getKey());
 
         if (asset.getKey() >= AssetCls.INITIAL_FAVORITES) {
@@ -467,7 +466,7 @@ public class MyAssetsTab extends SplitPanel {
         public void valueChanged(ListSelectionEvent arg0) {
             AssetCls asset = null;
             if (table.getSelectedRow() >= 0)
-                asset = assetsModel.getItem(table.convertRowIndexToModel(table.getSelectedRow())).b;
+                asset = assetsModel.getItem(table.convertRowIndexToModel(table.getSelectedRow()));
             if (asset == null) return;
             //AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
             //info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));

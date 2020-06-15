@@ -1,7 +1,6 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.gui.CoreRowSorter;
 import org.erachain.gui.models.WalletItemAssetsTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -51,8 +50,8 @@ public class AssetsPanel extends JPanel {
 
         //POLLS SORTER
         Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-        CoreRowSorter sorter = new CoreRowSorter(assetsModel, indexes);
-        table.setRowSorter(sorter);
+        //CoreRowSorter sorter = new CoreRowSorter(assetsModel, indexes);
+        //table.setRowSorter(sorter);
 
         //CHECKBOX FOR ASSET TYPE
         TableColumn divisibleColumn = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_ASSET_TYPE);
@@ -75,7 +74,7 @@ public class AssetsPanel extends JPanel {
                 int row = table.getSelectedRow();
                 row = table.convertRowIndexToModel(row);
 
-                AssetCls asset = assetsModel.getItem(row).b;
+                AssetCls asset = assetsModel.getItem(row);
                 new AssetFrame(asset);
             }
         });
@@ -87,7 +86,7 @@ public class AssetsPanel extends JPanel {
                 int row = table.getSelectedRow();
                 row = table.convertRowIndexToModel(row);
 
-                AssetCls asset = assetsModel.getItem(row).b;
+                AssetCls asset = assetsModel.getItem(row);
                 new PayDividendFrame(asset);
             }
         });
@@ -115,7 +114,7 @@ public class AssetsPanel extends JPanel {
 
                 if (e.getClickCount() == 2) {
                     row = table.convertRowIndexToModel(row);
-                    AssetCls asset = assetsModel.getItem(row).b;
+                    AssetCls asset = assetsModel.getItem(row);
                     new AssetFrame(asset);
                 }
             }
