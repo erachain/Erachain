@@ -2,9 +2,11 @@ package org.erachain.gui.items.templates;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletItemAssetsTableModel;
+import org.erachain.gui.models.WalletItemTemplatesTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -27,8 +29,8 @@ public class MyTemplatesTab extends SplitPanel {
     /**
      *
      */
-    WalletItemAssetsTableModel assetsModel;
-    RowSorter<WalletItemAssetsTableModel> sorter;
+    WalletItemTemplatesTableModel templatesModel;
+    RowSorter<WalletItemTemplatesTableModel> sorter;
 
     public MyTemplatesTab() {
         super("MyTemplatesTab");
@@ -42,11 +44,11 @@ public class MyTemplatesTab extends SplitPanel {
         jButton2_jToolBar_RightPanel.setVisible(false);
 
         //TABLE
-        assetsModel = new WalletItemAssetsTableModel();
-        table = new MTable(assetsModel);
+        templatesModel = new WalletItemTemplatesTableModel();
+        table = new MTable(templatesModel);
         //assetsModel.getAsset(row)
         //POLLS SORTER
-        sorter = new TableRowSorter<WalletItemAssetsTableModel>(assetsModel);
+        sorter = new TableRowSorter<WalletItemTemplatesTableModel>(templatesModel);
         table.setRowSorter(sorter);
         //	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         //	CoreRowSorter sorter = new CoreRowSorter(assetsModel, indexes);
@@ -90,7 +92,7 @@ public class MyTemplatesTab extends SplitPanel {
         // add listener
         //		jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(table);
         // show
-        this.jTableJScrollPanelLeftPanel.setModel(assetsModel);
+        this.jTableJScrollPanelLeftPanel.setModel(templatesModel);
         this.jTableJScrollPanelLeftPanel = table;
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
@@ -117,10 +119,10 @@ public class MyTemplatesTab extends SplitPanel {
                 String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
 
                 // SET FILTER
-                assetsModel.fireTableDataChanged();
+                templatesModel.fireTableDataChanged();
                 RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
                 ((DefaultRowSorter) sorter).setRowFilter(filter);
-                assetsModel.fireTableDataChanged();
+                templatesModel.fireTableDataChanged();
 
             }
         });
@@ -227,13 +229,13 @@ public class MyTemplatesTab extends SplitPanel {
 
                     row = table.getSelectedRow();
                     row = table.convertRowIndexToModel(row);
-                    AssetCls asset = assetsModel.getItem(row).b;
+                    TemplateCls template = templatesModel.getItem(row).b;
 
                     //IF ASSET CONFIRMED AND NOT ERM
 
                     favorite.setVisible(true);
                     //CHECK IF FAVORITES
-                    if (Controller.getInstance().isItemFavorite(asset)) {
+                    if (Controller.getInstance().isItemFavorite(template)) {
                         favorite.setText(Lang.getInstance().translate("Remove Favorite"));
                     } else {
                         favorite.setText(Lang.getInstance().translate("Add Favorite"));
@@ -250,7 +252,7 @@ public class MyTemplatesTab extends SplitPanel {
         details.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row).b;
+                TemplateCls template = templatesModel.getItem(row).b;
                 //			new AssetFrame(asset);
             }
         });
@@ -259,7 +261,7 @@ public class MyTemplatesTab extends SplitPanel {
         dividend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row).b;
+                TemplateCls template = templatesModel.getItem(row).b;
                 //		new PayDividendFrame(asset);
             }
         });
@@ -275,12 +277,12 @@ public class MyTemplatesTab extends SplitPanel {
 
                 row = table.getSelectedRow();
                 row = table.convertRowIndexToModel(row);
-                AssetCls asset = assetsModel.getItem(row).b;
+                TemplateCls template = templatesModel.getItem(row).b;
 
                 try {
                     URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
                             + "/index/blockexplorer.html"
-                            + "?template=" + asset.getKey()));
+                            + "?template=" + template.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }
@@ -311,7 +313,7 @@ public class MyTemplatesTab extends SplitPanel {
 
                 if (e.getClickCount() == 2) {
                     row = table.convertRowIndexToModel(row);
-                    AssetCls asset = assetsModel.getItem(row).b;
+                    TemplateCls template = templatesModel.getItem(row).b;
                     //				new AssetPairSelect(asset.getKey(), "","");
                     //		new AssetFrame(asset);
                 }
@@ -319,7 +321,7 @@ public class MyTemplatesTab extends SplitPanel {
 
                     if (table.getSelectedColumn() == WalletItemAssetsTableModel.COLUMN_FAVORITE) {
                         row = table.convertRowIndexToModel(row);
-                        AssetCls asset = assetsModel.getItem(row).b;
+                        TemplateCls template = templatesModel.getItem(row).b;
                         favorite_set(table);
 
 
@@ -348,17 +350,17 @@ public class MyTemplatesTab extends SplitPanel {
     public void favorite_set(JTable assetsTable) {
 
 
-        AssetCls asset = assetsModel.getItem(row).b;
+        TemplateCls template = templatesModel.getItem(row).b;
         //new AssetPairSelect(asset.getKey());
 
-        if (asset.getKey() >= AssetCls.INITIAL_FAVORITES) {
+        if (template.getKey() >= AssetCls.INITIAL_FAVORITES) {
             //CHECK IF FAVORITES
-            if (Controller.getInstance().isItemFavorite(asset)) {
+            if (Controller.getInstance().isItemFavorite(template)) {
 
-                Controller.getInstance().removeItemFavorite(asset);
+                Controller.getInstance().removeItemFavorite(template);
             } else {
 
-                Controller.getInstance().addItemFavorite(asset);
+                Controller.getInstance().addItemFavorite(template);
             }
 
 

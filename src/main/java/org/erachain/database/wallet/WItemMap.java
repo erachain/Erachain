@@ -78,6 +78,12 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         map = new TreeMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>>(Fun.TUPLE2_COMPARATOR);
     }
 
+    public Tuple2<Long, ItemCls> get(Tuple2<Long, Long> key) {
+        Tuple2<Long, ItemCls> item = super.get(key);
+        item.b.setKey(item.a);
+        return item;
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Tuple2<Long, ItemCls>> get(Account account) {
         List<Tuple2<Long, ItemCls>> items = new ArrayList<Tuple2<Long, ItemCls>>();
@@ -155,7 +161,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         this.put(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()),
                 refDB), new Tuple2<Long, ItemCls>(item.getKey(), item));
     }
-	
+
 	/*
 	public void addAll1(Map<Account, List<ItemCls>> items)
 	{

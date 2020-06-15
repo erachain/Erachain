@@ -78,7 +78,7 @@ public abstract class WalletAutoKeyTableModel<T, U> extends WalletSortedTableMod
     public void getIntervalThis(long startBack, int limit) {
 
         // тут могут быть пустые элементы - пропустим их
-        Collection<T> keys = ((AutoKeyDBMap) map).getFromToKeys(startBack, limit);
+        Collection<T> keys = ((AutoKeyDBMap) map).getFromToKeys(startBack);
         listSorted = new SortableList<T, U>(map, keys);
 
     }
