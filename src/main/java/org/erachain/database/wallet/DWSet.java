@@ -2,7 +2,6 @@ package org.erachain.database.wallet;
 // 30/03 ++
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.imprints.ImprintCls;
@@ -367,32 +366,8 @@ public class DWSet extends DBASet {
     public TelegramsMap getTelegramsMap() {
         return this.telegramsMap;
     }
-    
-    public void delete(PublicKeyAccount account) {
-        this.uses++;
-
-        this.accountMap.delete(account);
-        this.blocksHeadMap.delete(account);
-        this.transactionMap.delete(account);
-        this.nameMap.delete(account);
-        this.nameSaleMap.delete(account);
-        this.pollMap_old.delete(account);
-        this.assetMap.delete(account);
-        this.imprintMap.delete(account);
-        this.TemplateMap.delete(account);
-        this.unionMap.delete(account);
-        this.pollMap.delete(account);
-        this.personMap.delete(account);
-        this.statusMap.delete(account);
-        this.orderMap.delete(account);
-        this.accountsPropertisMap.delete(account.getAddress());
-        this.telegramsMap.deleteFromAccount(account);
-        this.uses--;
-
-    }
 
     long commitPoint;
-
 
     public synchronized void hardFlush() {
         this.uses++;

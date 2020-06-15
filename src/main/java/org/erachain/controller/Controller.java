@@ -2315,10 +2315,6 @@ public class Controller extends Observable {
         return this.wallet.exportSeed();
     }
 
-    public boolean deleteAccount(PrivateKeyAccount account) {
-        return this.wallet.deleteAccount(account);
-    }
-
     /**
      * Check if wallet is unlocked
      *

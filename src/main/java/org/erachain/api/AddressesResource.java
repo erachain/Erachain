@@ -310,38 +310,6 @@ public class AddressesResource {
         }
     }
 
-    @DELETE
-    @Path("/{address}")
-    public String deleteAddress(@PathParam("address") String address, @QueryParam("password") String password) {
-
-        APIUtils.askAPICallAllowed(password, "DELETE addresses/" + address, request, true);
-
-        // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-        }
-
-        // CHECK WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_WALLET_LOCKED);
-        }
-
-        // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
-            throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
-                    Transaction.INVALID_ADDRESS);
-
-        }
-
-        // DELETE
-        PrivateKeyAccount account = Controller.getInstance()
-                .getPrivateKeyAccountByAddress(address);
-        return String.valueOf(Controller.getInstance().deleteAccount(account));
-    }
-
     @GET
     @Path("/generatingbalance/{address}")
     public String getGeneratingBalanceOfAddress(

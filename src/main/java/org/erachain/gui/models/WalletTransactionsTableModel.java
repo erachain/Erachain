@@ -6,13 +6,11 @@ import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.Pair;
-import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
 
 @SuppressWarnings("serial")
-public class WalletTransactionsTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, Transaction>>{
+public class WalletTransactionsTableModel extends WalletTableModel<Transaction> {
 
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -41,32 +39,12 @@ public class WalletTransactionsTableModel extends WalletAutoKeyTableModel<Tuple2
     @Override
     public Object getValueAt(int row, int column) {
 
-        if (this.listSorted == null || this.listSorted.size() - 1 < row) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
 
-        Pair<Tuple2<Long, Long>, Tuple2<Long, Transaction>> data = this.listSorted.get(row);
+        Transaction transaction = this.list.get(row);
 
-        if (data == null) {
-            return null;
-        }
-
-        if (data.getB() == null)
-            return null;
-
-        Transaction transaction = data.getB().b;
-        if (transaction == null)
-            return null;
-
-        Tuple2<Long, Long> address = data.getA();
-        if (address == null)
-            return null;
-
-        //String creator_address = data.getA().a;
-        //Account creator = new Account(data.getA().a);
-        //Account recipient = null; // = new Account(data.getA().b);
-
-        //creator = transaction.getCreator();
         String itemName = "";
         if (transaction instanceof TransactionAmount && transaction.getAbsKey() > 0) {
             TransactionAmount transAmo = (TransactionAmount) transaction;
@@ -167,7 +145,7 @@ public class WalletTransactionsTableModel extends WalletAutoKeyTableModel<Tuple2
                 return transaction.viewSize(Transaction.FOR_NETWORK);
 
             case COLUMN_NUMBER:
-                return data.getB();
+                return transaction.viewHeightSeq();
         }
 
         return null;
@@ -179,13 +157,10 @@ public class WalletTransactionsTableModel extends WalletAutoKeyTableModel<Tuple2
         super.getInterval();
 
         DCSet dcSet = DCSet.getInstance();
-        for (Pair<Tuple2<Long, Long>, Tuple2<Long, Transaction>> item : listSorted) {
-            if (item.getB() == null) {
-                continue;
-            }
+        for (Transaction item : list) {
 
-            item.getB().b.setDC_HeightSeq(dcSet, true);
-            item.getB().b.calcFee();
+            item.setDC_HeightSeq(dcSet, true);
+            item.calcFee();
         }
 
     }

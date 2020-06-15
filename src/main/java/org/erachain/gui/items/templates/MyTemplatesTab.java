@@ -229,7 +229,7 @@ public class MyTemplatesTab extends SplitPanel {
 
                     row = table.getSelectedRow();
                     row = table.convertRowIndexToModel(row);
-                    TemplateCls template = templatesModel.getItem(row).b;
+                    TemplateCls template = templatesModel.getItem(row);
 
                     //IF ASSET CONFIRMED AND NOT ERM
 
@@ -252,7 +252,7 @@ public class MyTemplatesTab extends SplitPanel {
         details.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                TemplateCls template = templatesModel.getItem(row).b;
+                TemplateCls template = templatesModel.getItem(row);
                 //			new AssetFrame(asset);
             }
         });
@@ -261,7 +261,7 @@ public class MyTemplatesTab extends SplitPanel {
         dividend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                TemplateCls template = templatesModel.getItem(row).b;
+                TemplateCls template = templatesModel.getItem(row);
                 //		new PayDividendFrame(asset);
             }
         });
@@ -277,7 +277,7 @@ public class MyTemplatesTab extends SplitPanel {
 
                 row = table.getSelectedRow();
                 row = table.convertRowIndexToModel(row);
-                TemplateCls template = templatesModel.getItem(row).b;
+                TemplateCls template = templatesModel.getItem(row);
 
                 try {
                     URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
@@ -313,7 +313,7 @@ public class MyTemplatesTab extends SplitPanel {
 
                 if (e.getClickCount() == 2) {
                     row = table.convertRowIndexToModel(row);
-                    TemplateCls template = templatesModel.getItem(row).b;
+                    TemplateCls template = templatesModel.getItem(row);
                     //				new AssetPairSelect(asset.getKey(), "","");
                     //		new AssetFrame(asset);
                 }
@@ -321,7 +321,7 @@ public class MyTemplatesTab extends SplitPanel {
 
                     if (table.getSelectedColumn() == WalletItemAssetsTableModel.COLUMN_FAVORITE) {
                         row = table.convertRowIndexToModel(row);
-                        TemplateCls template = templatesModel.getItem(row).b;
+                        TemplateCls template = templatesModel.getItem(row);
                         favorite_set(table);
 
 
@@ -350,7 +350,7 @@ public class MyTemplatesTab extends SplitPanel {
     public void favorite_set(JTable assetsTable) {
 
 
-        TemplateCls template = templatesModel.getItem(row).b;
+        TemplateCls template = templatesModel.getItem(row);
         //new AssetPairSelect(asset.getKey());
 
         if (template.getKey() >= AssetCls.INITIAL_FAVORITES) {

@@ -17,7 +17,6 @@ import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
-import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -88,10 +87,10 @@ public class MyOrderTab extends SplitPanel {
                 int row = jTableJScrollPanelLeftPanel.rowAtPoint(point);
                 jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
 
-                Fun.Tuple2<Long, Order> itemTableSelected = ordersModel.getItem(row);
+                Order itemTableSelected = ordersModel.getItem(row);
 
                 if (e.getClickCount() == 2) {
-                    tableMouse2Click(itemTableSelected.b);
+                    tableMouse2Click(itemTableSelected);
                 }
 
             }
@@ -158,10 +157,10 @@ public class MyOrderTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                if (ordersModel.getSortableList().isEmpty())
+                if (ordersModel.isEmpty())
                     return;
 
-                Order order = ordersModel.getItem(row).b;
+                Order order = ordersModel.getItem(row);
                 Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
                 IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, createOrder,
@@ -185,7 +184,7 @@ public class MyOrderTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                Order order = ordersModel.getItem(row).b;
+                Order order = ordersModel.getItem(row);
                 if (order != null)
                     new TradesFrame(order, false);
             }
@@ -197,7 +196,7 @@ public class MyOrderTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                Order order = ordersModel.getItem(row).b;
+                Order order = ordersModel.getItem(row);
                 new CancelOrderFrame(order);
             }
         });
@@ -208,7 +207,7 @@ public class MyOrderTab extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                tableMouse2Click(ordersModel.getItem(row).b);
+                tableMouse2Click(ordersModel.getItem(row));
 
             }
         });
@@ -241,7 +240,7 @@ public class MyOrderTab extends SplitPanel {
                 int row = jTableJScrollPanelLeftPanel.rowAtPoint(p);
                 jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
 
-                Order order = ordersModel.getItem(row).b;
+                Order order = ordersModel.getItem(row);
                 if (order.isActive(DCSet.getInstance()))
                     orderMenu.getComponent(2).setEnabled(true);
                 else
@@ -281,7 +280,7 @@ public class MyOrderTab extends SplitPanel {
                 if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0)
                     i = jTableJScrollPanelLeftPanel
                             .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow());
-                order = ordersModel.getItem(i).b;
+                order = ordersModel.getItem(i);
                 if (order == null)
                     return;
                 jScrollPaneJPanelRightPanel.setViewportView(new OrderInfoPanel(order));

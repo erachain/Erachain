@@ -13,7 +13,6 @@ public abstract class WalletTableModel<T> extends TimerTableModelCls<T> implemen
         addObservers();
     }
 
-
     public void addObservers() {
 
         if (Controller.getInstance().doesWalletDatabaseExists()) {

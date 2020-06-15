@@ -253,31 +253,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 		return this.database.getTransactionMap().get(accounts, limit);
 	}
 
-	public List<Transaction> getTransactionsByType(int type, int offset, int limit, boolean descending) {
-		if (!this.exists()) {
-			new ArrayList<Transaction>();
-		}
-
-		Iterator<Tuple2<Long, Long>> iterator = this.database.getTransactionMap().getTypeIterator((byte) type, descending);
-		List<Transaction> result = new ArrayList<Transaction>();
-		int count = limit;
-		while (iterator.hasNext()) {
-			if (offset > 0) {
-				offset--;
-				iterator.next();
-				continue;
-			}
-			if (limit > 0) {
-				if (count-- == 0)
-					break;
-			}
-			result.add(this.database.getTransactionMap().get(iterator.next()).b);
-		}
-
-		return result;
-	}
-
-	public Iterator<Tuple2<Long, Long>> getTransactionsIteratorByType(int type, boolean descending) {
+	public Iterator<Long> getTransactionsIteratorByType(int type, boolean descending) {
 		if (!this.exists()) {
 			return null;
 		}
@@ -286,7 +262,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 	}
 
-	public Tuple2<Long, Transaction> getTransaction(Tuple2<Long, Long> key) {
+	public Transaction getTransaction(Long key) {
 		if (!this.exists()) {
 			return null;
 		}
@@ -565,29 +541,6 @@ public class Wallet extends Observable /*implements Observer*/ {
 		}
 
 		return account.getAddress();
-	}
-
-	// DELETE
-
-	public boolean deleteAccount(PrivateKeyAccount account) {
-		// CHECK IF WALLET IS OPEN
-		if (!this.isUnlocked()) {
-			return false;
-		}
-
-		// DELETE FROM DATABASE
-		this.database.delete(account);
-		this.secureDatabase.delete(account);
-
-		// SAVE TO DISK
-		this.database.hardFlush();
-
-		// NOTIFY
-		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.REMOVE_ACCOUNT_TYPE, account));
-
-		// RETURN
-		return true;
 	}
 
 	// SYNCRHONIZE
@@ -1115,7 +1068,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 				// CHECK IF INVOLVED
 				if (transaction.isInvolved(account)) {
 					// ADD TO ACCOUNT TRANSACTIONS
-					if (!this.database.getTransactionMap().add(account, transaction)) {
+					if (!this.database.getTransactionMap().set(transaction.getDBRef(), transaction)) {
 						// UPDATE UNCONFIRMED BALANCE for ASSET
 						deal_transaction(account, transaction, false);
 					}
@@ -1161,7 +1114,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 				// CHECK IF INVOLVED
 				if (transaction.isInvolved(account)) {
 					// DELETE FROM ACCOUNT TRANSACTIONS
-					this.database.getTransactionMap().delete(account, transaction);
+					this.database.getTransactionMap().delete(transaction.getDBRef());
 
 					// UPDATE UNCONFIRMED BALANCE
 					deal_transaction(account, transaction, true);
@@ -1418,11 +1371,12 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 		// CHECK IF WE ARE OWNER
 		ItemCls item = issueItem.getItem();
+		Account owner = item.getOwner();
 
-		if (this.accountExists(issueItem.getCreator().getAddress())) {
+		if (this.accountExists(issueItem.getCreator().getAddress())
+				|| owner != null && this.accountExists(owner.getAddress())) {
 			// ADD ASSET
-			this.database.getItemMap(item).add(
-					issueItem.getCreator(), issueItem.getDBRef(), item);
+			this.database.getItemMap(item).put(item.getKey(), item);
 			// ADD to FAVORITES
 			this.database.getItemFavoritesSet(item).add(item.getKey());
 
@@ -1430,18 +1384,6 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 		}
 
-		// item.resolveKey(DLSet.getInstance());
-		Account owner = item.getOwner();
-
-		if (owner != null && this.accountExists(owner.getAddress())) {
-
-			// ADD ASSET
-			this.database.getItemMap(item).add(
-					owner, issueItem.getDBRef(), item);
-
-			// ADD to FAVORITES
-			this.database.getItemFavoritesSet(item).add(item.getKey());
-		}
 	}
 
 	private void orphanItemIssue(IssueItemRecord issueItem) {
@@ -1452,13 +1394,12 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 		// CHECK IF WE ARE OWNER
 		ItemCls item = issueItem.getItem();
-		Account creator = item.getOwner();
-		if (creator == null)
-			return;
+		Account owner = item.getOwner();
 
-		if (this.accountExists(creator.getAddress())) {
+		if (this.accountExists(issueItem.getCreator().getAddress())
+				|| owner != null && this.accountExists(owner.getAddress())) {
 			// DELETE ASSET
-			this.database.getItemMap(item).delete(creator, issueItem.getDBRef());
+			this.database.getItemMap(item).delete(item.getKey());
 		}
 	}
 
@@ -1711,7 +1652,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 						// CHECK IF INVOLVED
 						if (transaction.isInvolved(account)) {
 							// ADD TO ACCOUNT TRANSACTIONS
-							if (!this.database.getTransactionMap().add(account, transaction)) {
+							if (!this.database.getTransactionMap().set(transaction.getDBRef(), transaction)) {
 								// UPDATE UNCONFIRMED BALANCE for ASSET
 							}
 						}

@@ -106,7 +106,7 @@ public class MyUnionsTab extends SplitPanel {
                 UnionCls union;
                 if (tableUnion.getSelectedRow() >= 0) {
                     // select person
-                    union = unionsModel.getItem(tableUnion.convertRowIndexToModel(tableUnion.getSelectedRow())).b;
+                    union = unionsModel.getItem(tableUnion.convertRowIndexToModel(tableUnion.getSelectedRow()));
                     info1.show_Union_002(union);
                     jSplitPanel.setDividerLocation(jSplitPanel.getDividerLocation());
                     searchTextFieldSearchToolBarLeftPanelDocument.setEnabled(true);

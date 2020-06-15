@@ -3,11 +3,9 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.utils.Pair;
-import org.mapdb.Fun.Tuple2;
 
 @SuppressWarnings("serial")
-public class WalletItemPersonsTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, PersonCls>> {
+public class WalletItemPersonsTableModel extends WalletTableModel<PersonCls> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -23,14 +21,11 @@ public class WalletItemPersonsTableModel extends WalletAutoKeyTableModel<Tuple2<
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.listSorted == null || row > this.listSorted.size() - 1) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
-        Pair<Tuple2<Long , Long>, Tuple2<Long, PersonCls>> pair = this.listSorted.get(row);
-        if (pair == null || pair.getB() == null|| pair.getB().b == null) {
-            return null;
-        }
-        PersonCls person = pair.getB().b;
+
+        PersonCls person = this.list.get(row);
 
         switch (column) {
             case COLUMN_KEY:
