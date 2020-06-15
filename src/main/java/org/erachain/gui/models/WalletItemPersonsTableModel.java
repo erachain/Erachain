@@ -3,11 +3,8 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.datachain.DCSet;
-import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
 public class WalletItemPersonsTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, PersonCls>> {
@@ -37,7 +34,7 @@ public class WalletItemPersonsTableModel extends WalletAutoKeyTableModel<Tuple2<
 
         switch (column) {
             case COLUMN_KEY:
-                return person.getKey(DCSet.getInstance());
+                return person.getKey();
             case COLUMN_NAME:
                 return person;
             case COLUMN_ADDRESS:

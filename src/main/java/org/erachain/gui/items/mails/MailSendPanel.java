@@ -149,6 +149,24 @@ public class MailSendPanel extends JPanel {
         txtToGBC.gridy = y;
 
         txtTo = new JTextField();
+        txtTo.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void changedUpdate(DocumentEvent arg0) {
+                refreshReceiverDetails();
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent arg0) {
+                refreshReceiverDetails();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent arg0) {
+                refreshReceiverDetails();
+            }
+        });
+
         // if person show selectbox with all adresses for person
         if (person != null) {
 
@@ -188,23 +206,6 @@ public class MailSendPanel extends JPanel {
             }
             this.add(txtTo, txtToGBC);
         }
-
-        txtTo.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void changedUpdate(DocumentEvent arg0) {
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent arg0) {
-                refreshReceiverDetails();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent arg0) {
-                refreshReceiverDetails();
-            }
-        });
 
         // LABEL RECEIVER
         GridBagConstraints labelDetailsGBC = new GridBagConstraints();
@@ -504,6 +505,7 @@ public class MailSendPanel extends JPanel {
         String toValue = txtTo.getText();
 
         AssetCls asset = Controller.getInstance().getAsset(Transaction.FEE_KEY);
+        sendButton.setEnabled(false);
 
         if (toValue.isEmpty()) {
             txtRecDetails.setText("");
@@ -521,6 +523,7 @@ public class MailSendPanel extends JPanel {
         // CHECK IF RECIPIENT IS VALID ADDRESS
         if (accountRes.a == null) {
             txtRecDetails.setText(accountRes.b);
+            return;
         } else {
             account = accountRes.a;
 
@@ -532,13 +535,7 @@ public class MailSendPanel extends JPanel {
             }
         }
 
-        if (false && account != null && account.getAddress().startsWith(wrongFirstCharOfAddress)) {
-            encrypted.setEnabled(false);
-            encrypted.setSelected(false);
-            isText.setSelected(false);
-        } else {
-            encrypted.setEnabled(true);
-        }
+        sendButton.setEnabled(true);
 
     }
 
