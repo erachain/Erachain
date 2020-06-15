@@ -3,11 +3,14 @@ package org.erachain.database.wallet;
 import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
-import org.erachain.database.AutoKeyDBMap;
 import org.erachain.database.serializer.LongItemSerializer;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.Pair;
-import org.mapdb.*;
+import org.mapdb.BTreeKeySerializer;
+import org.mapdb.BTreeMap;
+import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +23,8 @@ import java.util.*;
  * key: Address + refDB</br>
  * Value: autoIncrement + Object
  */
-public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> {
+public class WItemMap extends  // AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>>
+        DCUMapImpl<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> {
 
     public static final int NAME_INDEX = 1;
     public static final int CREATOR_INDEX = 2;
@@ -47,7 +51,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         // ИМЯ и ТИП заданы, создаем карту и ИНдексы
         openMap();
 
-        makeAutoKey(database, (Bind.MapWithModificationListener)map, name + "_wak");
+        ///makeAutoKey(database, (Bind.MapWithModificationListener)map, name + "_wak");
 
         this.createIndexes();
 

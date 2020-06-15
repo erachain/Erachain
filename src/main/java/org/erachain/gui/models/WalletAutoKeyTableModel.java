@@ -1,13 +1,14 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.database.AutoKeyDBMap;
 import org.erachain.database.SortableList;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.utils.ObserverMessage;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.NavigableMap;
 import java.util.Observable;
 
 @SuppressWarnings("serial")
@@ -17,13 +18,14 @@ public abstract class WalletAutoKeyTableModel<T, U> extends WalletSortedTableMod
     private final int LIST_EVENT;
     private final int ADD_EVENT;
     private final int REMOVE_EVENT;
+
     /**
      * В динамическом режиме перерисовывается автоматически по событию GUI_REPAINT
      * - перерисовка страницы целой, поэтому не так тормозит основные процессы.<br>
      * Без динамического режима перерисовывается только принудительно - по нажатию кнопки тут
      * org.erachain.gui.items.records.MyTransactionsSplitPanel#setIntervalPanel
      */
-    public WalletAutoKeyTableModel(AutoKeyDBMap map, String[] columnNames, Boolean[] column_AutoHeight, boolean descending) {
+    public WalletAutoKeyTableModel(DBTabImpl map, String[] columnNames, Boolean[] column_AutoHeight, boolean descending) {
 
         super(map, columnNames, column_AutoHeight, descending);
 
@@ -77,8 +79,7 @@ public abstract class WalletAutoKeyTableModel<T, U> extends WalletSortedTableMod
     @Override
     public void getIntervalThis(long startBack, int limit) {
 
-        // тут могут быть пустые элементы - пропустим их
-        Collection<T> keys = ((AutoKeyDBMap) map).getFromToKeys(startBack);
+        Collection<T> keys = ((NavigableMap) map).tailMap(startBack).keySet();
         listSorted = new SortableList<T, U>(map, keys);
 
     }
