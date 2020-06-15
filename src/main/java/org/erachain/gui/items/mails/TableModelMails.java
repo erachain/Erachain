@@ -10,7 +10,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,7 +207,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
         } else {
             Wallet wallet = Controller.getInstance().wallet;
-            Iterator<Fun.Tuple2<Long, Long>> iterator = wallet.getTransactionsIteratorByType(Transaction.SEND_ASSET_TRANSACTION, true);
+            Iterator<Long> iterator = wallet.getTransactionsIteratorByType(Transaction.SEND_ASSET_TRANSACTION, true);
             if (iterator == null) {
                 transactions = new ArrayList<RSend>();
                 return;
@@ -216,11 +215,11 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
             RSend rsend;
             boolean outcome;
-            Fun.Tuple2<Long, Long> key;
+            Long key;
             while (iterator.hasNext()) {
                 key = iterator.next();
                 try {
-                    rsend = (RSend) wallet.getTransaction(key).b;
+                    rsend = (RSend) wallet.getTransaction(key);
                 } catch (Exception e) {
                     rsend = null;
                 }
@@ -231,7 +230,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
                     continue;
 
                 // это исходящее письмо?
-                outcome = key.a.equals(Longs.fromByteArray(rsend.getCreator().getShortAddressBytes()));
+                outcome = key.equals(Longs.fromByteArray(rsend.getCreator().getShortAddressBytes()));
 
                 if (incoming ^ outcome) {
                     if (rsend.getSignature() != null)
