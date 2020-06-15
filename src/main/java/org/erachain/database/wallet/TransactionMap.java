@@ -4,7 +4,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.IndexIterator;
-import org.erachain.database.serializer.LongAndTransactionSerializer;
+import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
@@ -54,11 +54,11 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
     protected void createIndexes() {
         //TIMESTAMP INDEX
         NavigableSet<Long> timestampIndex = database.createTreeSet("transactions_index_timestamp")
-                .comparator(Fun.COMPARATOR)
+                .comparator(Fun.LONG_ARRAY_COMPARATOR)
                 .makeOrGet();
 
         NavigableSet<Long> descendingTimestampIndex = database.createTreeSet("transactions_index_timestamp_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
+                .comparator(new ReverseComparator(Fun.LONG_ARRAY_COMPARATOR))
                 .makeOrGet();
 
         createIndex(TIMESTAMP_INDEX, timestampIndex, descendingTimestampIndex, new Fun.Function2<Long, Long, Transaction>() {
@@ -114,10 +114,10 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
         this.typeKey = database.createTreeSet("type_txs").comparator(Fun.TUPLE2_COMPARATOR)
                 .makeOrGet();
         Bind.secondaryKey((Bind.MapWithModificationListener) map, this.typeKey,
-                new Fun.Function2<Tuple2<Byte, Tuple2<Long, Long>>, Tuple2<Long, Long>, Tuple2<Long, Transaction>>() {
+                new Fun.Function2<Tuple2<Byte, Long>, Long, Transaction>() {
                     @Override
-                    public Tuple2<Byte, Tuple2<Long, Long>> run(Tuple2<Long, Long> key, Tuple2<Long, Transaction> value) {
-                        return new Tuple2<>((byte) value.b.getType(), key);
+                    public Tuple2<Byte, Long> run(Long key, Transaction value) {
+                        return new Tuple2<>((byte) value.getType(), key);
                     }
                 });
 
@@ -128,8 +128,8 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
     public void openMap() {
         //OPEN MAP
         BTreeMap mapTree = database.createTreeMap("transactions")
-                .keySerializer(BTreeKeySerializer.TUPLE2)
-                .valueSerializer(new LongAndTransactionSerializer())
+                .keySerializer(BTreeKeySerializer.ZERO_OR_POSITIVE_LONG)
+                .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
 
