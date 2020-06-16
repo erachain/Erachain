@@ -3,11 +3,15 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.*;
+import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 @SuppressWarnings("serial")
 public class WalletTransactionsTableModel extends WalletTableModel<Transaction> {
@@ -154,7 +158,26 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
 
     public void getInterval() {
 
-        super.getInterval();
+        Object key;
+        int count = 0;
+        list = new ArrayList<>();
+        if (startKey == null) {
+            try (IteratorCloseable iterator = map.getIterator(((TransactionMap) map).TIMESTAMP_INDEX, true)) {
+                while (iterator.hasNext() && count++ < step) {
+                    key = iterator.next();
+                    list.add((Transaction) map.get(key));
+                }
+            } catch (IOException e) {
+            }
+        } else {
+            try (IteratorCloseable iterator = map.getIterator(((TransactionMap) map).TIMESTAMP_INDEX, true)) {
+                while (iterator.hasNext() && count++ < step) {
+                    key = iterator.next();
+                    list.add((Transaction) map.get(key));
+                }
+            } catch (IOException e) {
+            }
+        }
 
         DCSet dcSet = DCSet.getInstance();
         for (Transaction item : list) {
