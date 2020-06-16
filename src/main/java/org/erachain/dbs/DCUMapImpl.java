@@ -5,7 +5,6 @@ import com.google.common.collect.Iterators;
 import lombok.Getter;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -218,19 +217,6 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             return new IteratorCloseableImpl(u);
 
         }
-    }
-
-    @Override
-    public SortableList<T, U> getList() {
-        SortableList<T, U> list;
-        if (this.size() < 1000) {
-            list = new SortableList<T, U>(this);
-        } else {
-            // обрезаем полный список в базе до 1000
-            list = SortableList.makeSortableList(this, false, 1000);
-        }
-
-        return list;
     }
 
     public void makeDeletedMap(T key) {

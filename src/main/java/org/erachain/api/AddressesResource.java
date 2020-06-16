@@ -490,7 +490,7 @@ public class AddressesResource {
 
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
         SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
-                = map.getBalancesSortableList(new Account(address));
+                = map.getBalancesList(new Account(address));
 
         JSONObject assetsBalancesJSON = new JSONObject();
 

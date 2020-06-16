@@ -3,17 +3,16 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -28,10 +27,12 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
     private int balanceIndex;
     private long key;
     private int scale;
-    private String[] columnNames = Lang.getInstance().translate(new String[] { "Account", "In own", "In debt", "In use", "On hand" });
-    private Boolean[] column_AutuHeight = new Boolean[] { true, false };
-    private SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
-    
+    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "In own", "In debt", "In use", "On hand"});
+    private Boolean[] column_AutuHeight = new Boolean[]{true, false};
+    private List<Tuple2<byte[], Tuple5<
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> balances;
+
     public BalancesTableModel(AssetCls asset, int balanceIndex) {
         this.asset = asset;
         this.balanceIndex = balanceIndex;
@@ -78,18 +79,20 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
         if (this.balances == null || row > this.balances.size() - 1) {
             return null;
         }
-        
-        Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow
-                = this.balances.get(row);
-        Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(aRow.getA()));
-        
+
+        Tuple2<byte[], Tuple5<
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                aRow = this.balances.get(row);
+        Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(aRow.a));
+
         switch (column) {
             case COLUMN_ADDRESS:
-                
+
                 return account.getPersonAsString();
 
             case COLUMN_OWN:
-                
+
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = account
                         .getBalance(this.key);
                 return (balance.a.b.setScale(scale));

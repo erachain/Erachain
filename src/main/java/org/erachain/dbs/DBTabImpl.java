@@ -454,19 +454,6 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     @Override
-    public SortableList<T, U> getList() {
-        SortableList<T, U> list;
-        if (this.size() < 1000) {
-            list = new SortableList<T, U>(this);
-        } else {
-            // обрезаем полный список в базе до 1000
-            list = SortableList.makeSortableList(this, false, 1000);
-        }
-
-        return list;
-    }
-
-    @Override
     public Integer deleteObservableData(int index) {
         return this.observableData.remove(index);
     }

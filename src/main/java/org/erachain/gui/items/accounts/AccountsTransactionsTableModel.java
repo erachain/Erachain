@@ -4,13 +4,11 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.*;
-import org.erachain.database.SortableList;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -38,7 +36,6 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Type Asset"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
-    private SortableList<Tuple2<Long, Long>, Transaction> sortableItems;
     private Account sender;
 
     private AssetCls asset;

@@ -3,7 +3,6 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -18,7 +17,8 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> implements Observer {
 
-    private SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+    private Tuple2<Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+            balances;
 
     Account account;
 
@@ -63,7 +63,7 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
 
         //INSERT ALL ACCOUNTS
         for (int i = 0; i < this.balances.size(); i++) {
-            Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                     item = this.balances.get(i);
 
             long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(item.getA());

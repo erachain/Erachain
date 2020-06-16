@@ -2,13 +2,13 @@ package org.erachain.datachain;
 
 import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
-import org.erachain.database.SortableList;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Observer;
 
 /**
@@ -52,13 +52,13 @@ public interface ItemAssetBalanceMap extends DBTab<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> get(byte[] address, long key);
 
-    SortableList<byte[], Tuple5<
+    List<Tuple2<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(long key);
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> getBalancesList(long key);
 
-    SortableList<byte[], Tuple5<
+    List<Tuple2<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(Account account);
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> getBalancesList(Account account);
 
     //Set<byte[]> keySet();
 

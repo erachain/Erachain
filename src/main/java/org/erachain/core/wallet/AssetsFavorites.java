@@ -51,7 +51,7 @@ public class AssetsFavorites implements Observer {
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
         for (Account account : Controller.getInstance().getWalletAccounts()) {
             SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balancesList
-                    = map.getBalancesSortableList(account);
+                    = map.getBalancesList(account);
             if (balancesList == null)
                 return;
 

@@ -1058,7 +1058,7 @@ public class API {
         Account account = new Account(address);
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
         SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
-                = map.getBalancesSortableList(account);
+                = map.getBalancesList(account);
 
         JSONObject out = new JSONObject();
 
