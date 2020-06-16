@@ -3,6 +3,7 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.wallet.FavoriteItemMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
@@ -10,8 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -58,7 +62,7 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
 
         int type = message.getType();
         //CHECK IF LIST UPDATED
-        if (type == LIST_EVENT) {
+        if (type == LIST_EVENT || type == RESET_EVENT) {
             sortAndAdd();
         } else if (type == ADD_EVENT) {
             this.addElement(getElementByEvent((Long) message.getValue()));
@@ -79,34 +83,33 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
     public void sortAndAdd() {
         //GET SELECTED ITEM
         ItemCls selected = (ItemCls) this.getSelectedItem();
-        int selectedIndex = -1;
 
         //EMPTY LIST
         this.removeAllElements();
 
-        //INSERT ALL ITEMS
-        Collection<Long> keys = ((FavoriteItemMap)observable).getFromToKeys(0, 9999999);
         List<ItemCls> items = new ArrayList<ItemCls>();
-        int i = 0;
-        for (Long key : keys) {
-            i++;
 
-            //GET ASSET
-            ItemCls item = Controller.getInstance().getItem(item_type, key);
-            if (item == null)
-                continue;
+        //INSERT ALL ITEMS
+        try (IteratorCloseable<Long> iterator = ((FavoriteItemMap) observable).getIterator()) {
+            while (iterator.hasNext()) {
 
-            items.add(item);
+                //GET ASSET
+                ItemCls item = Controller.getInstance().getItem(item_type, iterator.next());
+                if (item == null)
+                    continue;
 
-            //ADD
+                items.add(item);
 
-            this.addElement(item);
+                //ADD
 
-            if (selected != null && item.getKey() == selected.getKey()) {
-                selectedIndex = i;
-                selected = item; // need for SELECT as OBJECT
+                this.addElement(item);
+
+                if (selected != null && item.getKey() == selected.getKey()) {
+                    selected = item; // need for SELECT as OBJECT
+                }
+
             }
-
+        } catch (IOException e) {
         }
 
         //RESET SELECTED ITEM
@@ -147,12 +150,12 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
 
             setObservable();
 
-            LIST_EVENT = (Integer) ((FavoriteItemMap)observable).getObserverEvent();
+            LIST_EVENT = (Integer) ((FavoriteItemMap) observable).getObserverEvent();
 
-            //RESET_EVENT = (Integer) ((DBMap)observable).getObservableData().get(DBMap.NOTIFY_RESET);
-            //LIST_EVENT = (Integer) ((DBMap)observable).getObservableData().get(DBMap.NOTIFY_LIST);
-            //ADD_EVENT = (Integer) ((DBMap)observable).getObservableData().get(DBMap.NOTIFY_ADD);
-            //DELETE_EVENT = (Integer) ((DBMap)observable).getObservableData().get(DBMap.NOTIFY_REMOVE);
+            //RESET_EVENT = (Integer) ((FavoriteItemMap)observable).getObservableData().get(DBMap.NOTIFY_RESET);
+            //LIST_EVENT = (Integer) ((FavoriteItemMap)observable).getObservableData().get(DBMap.NOTIFY_LIST);
+            //ADD_EVENT = (Integer) ((FavoriteItemMap)observable).getObservableData().get(DBMap.NOTIFY_ADD);
+            //DELETE_EVENT = (Integer) ((FavoriteItemMap)observable).getObservableData().get(DBMap.NOTIFY_REMOVE);
 
             sortAndAdd();
 

@@ -1,25 +1,25 @@
 package org.erachain.gui.items.accounts;
 
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.IssueConfirmDialog;
-import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RendererBigDecimals;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
+
+import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.table.TableRowSorter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import javax.swing.*;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import javax.swing.table.TableRowSorter;
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.datachain.DCSet;
 public class AccountsRightPanel extends JPanel {
 
     /**
@@ -174,20 +174,20 @@ public class AccountsRightPanel extends JPanel {
                 dd.setLocationRelativeTo(th);
                 dd.setVisible(true);
             }
-            
+
         });
-        mainMenu.add(viewInfo);
-     //   jTable1.setComponentPopupMenu(mainMenu);
-        TableMenuPopupUtil.installContextMenu(jTable1, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
-    }// </editor-fold>
-    
-    public void set_Asset(AssetCls asset){
-        table_Model.set_Asset(asset);
-        table_Model.set_Encryption(false);
+         mainMenu.add(viewInfo);
+         //   jTable1.setComponentPopupMenu(mainMenu);
+         TableMenuPopupUtil.installContextMenu(jTable1, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+     }// </editor-fold>
+
+    public void setAsset(AssetCls asset) {
+        table_Model.setAsset(asset);
+        table_Model.setEncryption(false);
         table_Model.getInterval();
         table_Model.fireTableDataChanged();
         jTable1.setDefaultRenderer(BigDecimal.class, new RendererBigDecimals(asset.getScale()));
     }
-    
-    
+
+
 }

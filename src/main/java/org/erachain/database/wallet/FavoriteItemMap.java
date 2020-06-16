@@ -1,9 +1,14 @@
 package org.erachain.database.wallet;
 
-import org.mapdb.DB;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.DB;
 
-import java.util.*;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.SortedSet;
 
 public class FavoriteItemMap extends Observable {
 
@@ -59,8 +64,8 @@ public class FavoriteItemMap extends Observable {
         return itemsSet.size();
     }
 
-    public Collection<Long> getFromToKeys(long fromKey, long toKey) {
-        return itemsSet.subSet(fromKey, toKey);
+    public IteratorCloseable<Long> getIterator() {
+        return IteratorCloseableImpl.make(itemsSet.iterator());
     }
 
     public int getObserverEvent() {

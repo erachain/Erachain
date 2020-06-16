@@ -8,7 +8,6 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.lang.Lang;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -30,19 +29,15 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     public static final int COLUMN_CONFIRM = 8;
     public static final int COLUMN_ACTION_TYPE = 19;
 
-    private boolean isEncrypted = true;
-
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Date", "RecNo", "Amount",
-            "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Type Asset"});
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
+    private boolean isEncrypted;
 
     private Account sender;
 
     private AssetCls asset;
 
-    private byte[] privateKey;
+    //private byte[] privateKey;
 
-    private byte[] publicKey;
+    //private byte[] publicKey;
 
     private HashSet actionTypes;
     private DCSet dcSet;
@@ -57,15 +52,15 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
 
     }
 
-    public void set_Account(Account sender) {
+    public void setAccount(Account sender) {
         this.sender = sender;
     }
 
-    public void set_Asset(AssetCls asset) {
+    public void setAsset(AssetCls asset) {
         this.asset = asset;
     }
 
-    public void set_Encryption(boolean encr) {
+    public void setEncryption(boolean encr) {
         this.isEncrypted = encr;
     }
 
@@ -128,16 +123,13 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     @Override
     public void getInterval() {
 
-        if (this.sender == null || this.asset == null)
-            return;
-
-        /// WALLET addesses
-        Iterator<Long> keysIterator = ((WTransactionMap) map).getAddressDescendingIterator(this.sender);
+        Iterator<Long> keysIterator = ((WTransactionMap) map).getAddressDescendingIterator(this.sender,
+                asset == null ? null : asset.getKey());
 
         list = new ArrayList<>();
 
         int counter = 0;
-        while (keysIterator.hasNext() && counter < 999) {
+        while (keysIterator.hasNext() && counter < step) {
             Transaction transaction = (Transaction) map.get(keysIterator.next());
             if (trans_Parse(transaction)) {
                 counter++;
@@ -149,15 +141,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     private boolean trans_Parse(Transaction transaction) {
 
 
-        if (this.asset == null)
-            return false;
-
         transaction.setDC_HeightSeq(dcSet, true);
-
-        if (transaction.getAbsKey() != this.asset.getKey()
-                // все для Компушек
-                && this.asset.getKey() != Transaction.FEE_KEY)
-            return false;
 
         if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
             RCalculated tx = (RCalculated) transaction;
