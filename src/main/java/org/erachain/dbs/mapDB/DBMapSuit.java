@@ -174,6 +174,17 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
 
     }
 
+    @Override
+    public IteratorCloseable<T> getDescendingIterator() {
+        this.addUses();
+
+        Iterator<T> u = ((NavigableMap) map).descendingMap().keySet().iterator();
+
+        this.outUses();
+        return new IteratorCloseableImpl(u);
+
+    }
+
     public void addUses() {
         if (this.databaseSet != null) {
             this.databaseSet.addUses();

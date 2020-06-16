@@ -3,7 +3,6 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.*;
-import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
@@ -162,7 +161,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
         int count = 0;
         list = new ArrayList<>();
         if (startKey == null) {
-            try (IteratorCloseable iterator = ((WTransactionMap) map).getIterator()) {
+            try (IteratorCloseable iterator = map.getDescendingIterator()) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
                     list.add((Transaction) map.get(key));
@@ -170,7 +169,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
             } catch (IOException e) {
             }
         } else {
-            try (IteratorCloseable iterator = ((WTransactionMap) map).getIterator()) {
+            try (IteratorCloseable iterator = map.getDescendingIterator()) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
                     list.add((Transaction) map.get(key));

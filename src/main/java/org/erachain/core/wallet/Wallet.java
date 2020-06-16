@@ -227,6 +227,10 @@ public class Wallet extends Observable /*implements Observer*/ {
 		waitingObservers.add(observer);
 	}
 
+	public void removeWaitingObserver(ObserverWaiter observer) {
+		waitingObservers.remove(observer);
+	}
+
 	/*
 	public PublicKeyAccount getPublicKeyAccount(String address) {
 		if (this.database == null) {

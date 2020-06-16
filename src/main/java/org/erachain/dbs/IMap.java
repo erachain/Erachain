@@ -73,14 +73,15 @@ public interface IMap<T, U> {
     boolean contains(T key);
 
     /**
-     *
-     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
+     * @param index      <b>primary Index = 0</b>, secondary index = 1...10000
      * @param descending true if need descending sort
      * @return
      */
     IteratorCloseable<T> getIterator(int index, boolean descending);
 
     IteratorCloseable<T> getIterator();
+
+    IteratorCloseable<T> getDescendingIterator();
 
     int getDefaultIndex();
 
