@@ -32,7 +32,8 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
     private int DELETE_EVENT;
     private int LIST_EVENT;
 
-    private final int item_type;
+    protected final int item_type;
+    protected List<ItemCls> items = new ArrayList<ItemCls>();
 
     public FavoriteComboBoxModel(int item_type) {
         this.item_type = item_type;
@@ -85,8 +86,6 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
 
         //EMPTY LIST
         this.removeAllElements();
-
-        List<ItemCls> items = new ArrayList<ItemCls>();
 
         //INSERT ALL ITEMS
         try (IteratorCloseable<Long> iterator = ((FavoriteItemMap) observable).getIterator()) {

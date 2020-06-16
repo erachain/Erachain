@@ -68,7 +68,7 @@ public class MyAccountsSplitPanel extends SplitPanel  {
             if (accountPanel.table.getSelectedRow() >= 0)
                 account = accountPanel.tableModel.getItem(accountPanel.table.convertRowIndexToModel(accountPanel.table.getSelectedRow()));
 
-            if (account.equals(selecArg) && asset.equals(assetSelect)) return;
+            if (account != null && account.equals(selecArg) && asset != null && asset.equals(assetSelect)) return;
             selecArg = account;
             assetSelect = asset;
             rightPanel.table_Model.setAccount(account);

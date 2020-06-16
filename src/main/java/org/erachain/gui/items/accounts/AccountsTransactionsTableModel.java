@@ -124,7 +124,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     public void getInterval() {
 
         Iterator<Long> keysIterator = ((WTransactionMap) map).getAddressDescendingIterator(this.sender,
-                asset == null ? null : asset.getKey());
+                asset == null || asset.getKey() == AssetCls.FEE_KEY ? null : asset.getKey());
 
         list = new ArrayList<>();
 

@@ -210,7 +210,7 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
         return new IndexIterator((NavigableSet) this.addressKey.subSet(
                 Fun.t2(Fun.t2(account == null ? null : Ints.fromByteArray(account.getShortAddressBytes()), assetKey), null),
                 Fun.t2(Fun.t2(account == null ? null : Ints.fromByteArray(account.getShortAddressBytes()),
-                        assetKey == null ? Long.MIN_VALUE : assetKey), Fun.HI())));
+                        assetKey == null ? Long.MAX_VALUE : assetKey), Fun.HI())));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -218,7 +218,7 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
 
         return new IndexIterator((NavigableSet) this.addressKey.descendingSet().subSet(
                 Fun.t2(Fun.t2(account == null ? null : Ints.fromByteArray(account.getShortAddressBytes()),
-                        assetKey == null ? Long.MIN_VALUE : assetKey), Fun.HI()),
+                        assetKey == null ? Long.MAX_VALUE : assetKey), Fun.HI()),
                 Fun.t2(Fun.t2(account == null ? null : Ints.fromByteArray(account.getShortAddressBytes()), assetKey), null)));
 
     }
