@@ -5,18 +5,14 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.SortableList;
-import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.models.SortedListTableModelCls;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +20,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long>, Transaction> implements Observer {
+public class CreditsTableModel extends TimerTableModelCls<Transaction> implements Observer {
     public static final int COLUMN_AMOUNT = 1;
     public static final int COLUMN_TRANSACTION = 2;
     private static final int COLUMN_ADDRESS = 0;
@@ -37,9 +33,8 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long
     List<Tuple2<Tuple3<String, Long, String>, BigDecimal>> cred;
     private Boolean[] column_AutuHeight = new Boolean[]{true, false, false, false};
     private List<PublicKeyAccount> publicKeyAccounts;
-    private long asset_Key = 1l;
-    private SortableList<Tuple2<Long, Long>, Transaction> transactions;
-    private List<Tuple2<Tuple2<Long, Long>, Transaction>> transactions_Asset;
+    private long asset_Key = 1L;
+    private List<Transaction> transactions_Asset;
 
     @SuppressWarnings("unchecked")
     public CreditsTableModel() {
@@ -49,29 +44,6 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long
         logger = LoggerFactory.getLogger(CreditsTableModel.class);
 
     }
-
-    @Override
-    public SortableList<Tuple2<Long, Long>, Transaction> getSortableList() {
-        return this.transactions;
-    }
-
-    @Override
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] getColumnAutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void setColumnAutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
 
     public Account getAccount(int row) {
         return publicKeyAccounts.get(row);
@@ -85,40 +57,21 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long
         asset_Key = asset.getKey();
         cred.clear();
         for (PublicKeyAccount account : this.publicKeyAccounts) {
-            List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getShortAddressBytes(), 1000, true, descending);
+            //List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap()
+            //        .getTransactionsByAddressLimit(account.getShortAddressBytes(), 1000, true, descending);
             cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
         }
-		/*		for (Pair<Tuple2<Long, Long>, Transaction> trans:this.transactions){
-			long a = trans.getB().getAssetKey();
-			this.transactions_Asset.clear();
-				if (a == asset_Key){
 
-					this.transactions_Asset.add(trans);
-
-
-				}
-
-
-			}
-		 */
         this.transactions_Asset.clear();
-        ;
-        for (Pair<Tuple2<Long, Long>, Transaction> trans : this.transactions) {
-            long a = trans.getB().getAssetKey();
-            Tuple2<Tuple2<Long, Long>, Transaction> ss = null;
+
+        for (Transaction trans : this.list) {
+            long a = trans.getAssetKey();
             if (a == asset_Key || a == -asset_Key) {
-                ss = new Tuple2(trans.getA(), trans.getB());
-                this.transactions_Asset.add(ss);
+                this.transactions_Asset.add(trans);
             }
         }
 
         this.fireTableDataChanged();
-    }
-
-    @Override
-    public int getRowCount() {
-
-        return transactions_Asset.size();
     }
 
     @Override
@@ -140,11 +93,11 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long
 		 */
         switch (column) {
             case COLUMN_ADDRESS:
-                return transactions_Asset.get(row).b.getKey();
+                return transactions_Asset.get(row).getKey();
             case COLUMN_AMOUNT:
-                return transactions_Asset.get(row).b.getAmount().toPlainString();
+                return transactions_Asset.get(row).getAmount().toPlainString();
             case COLUMN_TRANSACTION:
-                return Lang.getInstance().translate(transactions_Asset.get(row).b.viewTypeName());
+                return Lang.getInstance().translate(transactions_Asset.get(row).viewTypeName());
 			/*
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
@@ -183,14 +136,6 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
 
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
@@ -199,32 +144,6 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-            if (this.transactions == null) {
-                this.transactions = (SortableList<Tuple2<Long, Long>, Transaction>) message.getValue();
-                //this.transactions.registerObserver();
-                this.transactions.sort(WTransactionMap.TIMESTAMP_INDEX, true);
-
-                this.transactions_Asset.clear();
-                ;
-                for (Pair<Tuple2<Long, Long>, Transaction> trans : this.transactions) {
-                    long a = trans.getB().getAssetKey();
-                    Tuple2<Tuple2<Long, Long>, Transaction> ss = null;
-                    if (a == asset_Key || a == -asset_Key) {
-
-                        ss = new Tuple2(trans.getA(), trans.getB());
-
-
-                        this.transactions_Asset.add(ss);
-
-
-                    }
-
-
-                }
-
-
-            }
-
             this.fireTableDataChanged();
         }
 
@@ -267,7 +186,7 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long
 
     public void addObservers() {
 
-        this.transactions_Asset = new ArrayList<Tuple2<Tuple2<Long, Long>, Transaction>>();
+        this.transactions_Asset = new ArrayList<Transaction>();
         this.publicKeyAccounts = Controller.getInstance().getWalletPublicKeyAccounts();
 
         cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
@@ -283,12 +202,4 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long
     }
 
 
-    public void deleteObservers() {
-    }
-
-    @Override
-    public Transaction getItem(int k) {
-        // TODO Auto-generated method stub
-        return transactions_Asset.get(k).b;
-    }
 }

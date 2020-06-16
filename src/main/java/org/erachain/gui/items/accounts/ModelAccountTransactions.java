@@ -6,18 +6,15 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.SortableList;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.models.SortedListTableModelCls;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +22,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Long, Long>, Transaction> implements Observer {
+public class ModelAccountTransactions extends TimerTableModelCls<Transaction> implements Observer {
     public static final int COLUMN_AMOUNT = 1;
     public static final int COLUMN_TRANSACTION = 2;
     private static final int COLUMN_ADDRESS = 0;
@@ -40,7 +37,6 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Lon
     private Account account;
     private long asset_Key = 1l;
     private AssetCls asset = GenesisBlock.makeAsset(asset_Key);
-    private SortableList<Tuple2<Long, Long>, Transaction> transactions;
     private List<Transaction> transactions_Asset;
     //private  Account_Cls account;
 
@@ -56,29 +52,6 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Lon
         account = new Account("");
 
     }
-
-    @Override
-    public SortableList<Tuple2<Long, Long>, Transaction> getSortableList() {
-        return this.transactions;
-    }
-
-    @Override
-    public Class<? extends Object> getColumnClass(int c) {     // set column type
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    // читаем колонки которые изменяем высоту
-    public Boolean[] getColumnAutoHeight() {
-
-        return this.column_AutuHeight;
-    }
-
-    // устанавливаем колонки которым изменить высоту
-    public void setColumnAutoHeight(Boolean[] arg0) {
-        this.column_AutuHeight = arg0;
-    }
-
 
     public Account getAccount(int row) {
         return publicKeyAccounts.get(row);
@@ -114,12 +87,6 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Lon
 
 
         this.fireTableDataChanged();
-    }
-
-    @Override
-    public int getRowCount() {
-
-        return transactions_Asset.size();
     }
 
     @Override
@@ -184,15 +151,6 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Lon
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -200,20 +158,18 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Lon
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-            if (this.transactions == null) {
-                this.transactions = (SortableList<Tuple2<Long, Long>, Transaction>) message.getValue();
-                //this.transactions.registerObserver();
-                this.transactions.sort(WTransactionMap.TIMESTAMP_INDEX, true);
+            if (this.list == null) {
+                this.list = ((WTransactionMap) message.getValue()).get(account, 1000);
 
                 this.transactions_Asset.clear();
-                ;
-                for (Pair<Tuple2<Long, Long>, Transaction> trans : this.transactions) {
-                    long a = trans.getB().getAssetKey();
-                    Transaction trans1 = trans.getB();
+
+                for (Transaction trans : this.list) {
+                    long a = trans.getAssetKey();
+                    Transaction trans1 = trans;
                     Tuple2<Tuple2<Long, Long>, Transaction> ss = null;
 
                     if ((a == asset_Key || a == -asset_Key) && (account.getAddress() == trans1.viewCreator() || account.getAddress() == trans1.viewRecipient())) {
-                        this.transactions_Asset.add(trans.getB());
+                        this.transactions_Asset.add(trans);
 
 
                     }

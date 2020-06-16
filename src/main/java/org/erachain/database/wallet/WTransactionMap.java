@@ -1,6 +1,6 @@
 package org.erachain.database.wallet;
 
-import com.google.common.primitives.Longs;
+import com.google.common.primitives.Ints;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.IndexIterator;
@@ -25,18 +25,24 @@ import java.util.*;
  * Тогда неподтвержденные будут показывать что они не исполнились.
  * И их пользователь сможет сам удалить вручную или командой - удалить все неподтвержденные.
  * <hr>
- * Ключ: время создания + первых 8 байт счета - так по времени сортируем. Вторичный ключ по первых 8 байт счета + время создания - отображения по счетам.
+ * Ключ: время создания + первых 4 байта счета - так по времени сортируем. Вторичный ключ по первых 8 байт счета + время создания - отображения по счетам.
  * Причем счет ищем как Involved - то есть и входящие тоже будут браться<br>
  * Значение: транзакция
  */
-public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Long>, Transaction> {
+public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transaction> {
 
     //public static final int TIMESTAMP_INDEX = 1;
     //public static final int ADDRESS_INDEX = 2;
     //public static final int AMOUNT_INDEX = 3;
 
-    NavigableSet typeKey;
-    NavigableSet addressKey;
+    /**
+     * Поиск по типу транзакции
+     */
+    NavigableSet<Tuple2<Byte, Tuple2<Long, Integer>>> typeKey;
+    /**
+     * Поиск по данному счету с сортировкой по времени
+     */
+    NavigableSet<Tuple2<Integer, Tuple2<Long, Integer>>> addressKey;
 
     static Logger LOGGER = LoggerFactory.getLogger(WTransactionMap.class.getName());
 
@@ -87,6 +93,7 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Long>, Transaction>
             }
         });
 
+
         //ADDRESS INDEX
         NavigableSet<Tuple2<String[], Tuple2<Long, Long>>> addressIndex = database.createTreeSet("transactions_index_address")
                 .comparator(Fun.COMPARATOR)
@@ -129,26 +136,24 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Long>, Transaction>
         });
         */
 
-        this.typeKey = database.createTreeSet("type_txs").comparator(Fun.TUPLE2_COMPARATOR)
+        this.typeKey = database.createTreeSet("type_txs").comparator(Fun.COMPARATOR)
                 .makeOrGet();
         Bind.secondaryKey((Bind.MapWithModificationListener) map, this.typeKey,
-                new Fun.Function2<Tuple2<Byte, Long>, Tuple2<Long, Long>, Transaction>() {
+                new Fun.Function2<Byte, Tuple2<Long, Integer>, Transaction>() {
                     @Override
-                    public Tuple2<Byte, Long> run(Tuple2<Long, Long> key, Transaction value) {
-                        return new Tuple2<>((byte) value.getType(), key);
+                    public Byte run(Tuple2<Long, Integer> key, Transaction value) {
+                        return (byte) value.getType();
                     }
                 });
-
 
         this.addressKey = database.createTreeSet("address_txs").comparator(Fun.TUPLE2_COMPARATOR)
                 .makeOrGet();
         Bind.secondaryKey((Bind.MapWithModificationListener) map, this.addressKey,
-                new Fun.Function2<Tuple2<Long, Long>, Long, Transaction>() {
+                new Fun.Function2<Integer, Tuple2<Long, Integer>, Transaction>() {
                     @Override
-                    public Tuple2<Long, Long> run(Long key, Transaction value) {
+                    public Integer run(Tuple2<Long, Integer> key, Transaction value) {
                         Account creator = value.getCreator();
-                        Long addressKey = creator == null ? 0L : Longs.fromByteArray(value.getCreator().getShortAddressBytes());
-                        return new Tuple2<>(addressKey, key);
+                        return creator == null ? 0 : Ints.fromByteArray(value.getCreator().getShortAddressBytes());
                     }
                 });
 
@@ -160,13 +165,13 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Long>, Transaction>
 
         try {
             //GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-            Set<Long> accountTransactions = ((NavigableSet) this.addressKey).subSet(
-                    Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
-                    Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
+            SortedSet accountTransactions = ((NavigableSet) this.addressKey).subSet(
+                    Fun.t2(Ints.fromByteArray(account.getShortAddressBytes()), null),
+                    Fun.t2(Ints.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
 
             //GET ITERATOR
             //Iterator<Long> iterator = accountTransactions.iterator();
-            Iterator<Long> iterator = null;
+            Iterator<Tuple2<Long, Integer>> iterator = accountTransactions.iterator();
 
             //RETURN {LIMIT} TRANSACTIONS
             int counter = 0;
@@ -185,34 +190,34 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Long>, Transaction>
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator<Long> getTypeIterator(Byte type, boolean descending) {
+    public Iterator<Tuple2<Long, Integer>> getTypeIterator(Byte type, boolean descending) {
 
         if (descending) {
             return new IndexIterator((NavigableSet) typeKey.descendingSet().subSet(
-                    Fun.t2(new Tuple2(type, Fun.HI()), Fun.HI()),
-                    Fun.t2(new Tuple2(type, null), null)));
+                    Fun.t2(type, Fun.HI()),
+                    Fun.t2(type, null)));
         } else {
             return new IndexIterator((NavigableSet) typeKey.subSet(
-                    Fun.t2(new Tuple2(type, null), null),
-                    Fun.t2(new Tuple2(type, Fun.HI()), Fun.HI())));
+                    Fun.t2(type, null),
+                    Fun.t2(type, Fun.HI())));
         }
 
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator<Long> getAddressIterator(Account account) {
+    public Iterator<Tuple2<Long, Integer>> getAddressIterator(Account account) {
 
         return new IndexIterator((NavigableSet) this.addressKey.subSet(
-                Fun.t2(Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null), null),
-                Fun.t2(Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()), Fun.HI())));
+                Fun.t2(Ints.fromByteArray(account.getShortAddressBytes()), null),
+                Fun.t2(Ints.fromByteArray(account.getShortAddressBytes()), Fun.HI())));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Long> getAddressDescendingIterator(Account account) {
 
         return new IndexIterator((NavigableSet) this.addressKey.descendingSet().subSet(
-                Fun.t2(Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()), Fun.HI()),
-                Fun.t2(Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null), null)));
+                Fun.t2(Ints.fromByteArray(account.getShortAddressBytes()), Fun.HI()),
+                Fun.t2(Ints.fromByteArray(account.getShortAddressBytes()), null)));
 
     }
 
@@ -236,4 +241,21 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Long>, Transaction>
 
         return transactions;
     }
+
+    public boolean set(Account account, Transaction transaction) {
+        return super.set(new Tuple2<Long, Integer>(transaction.getTimestamp(), Ints.fromByteArray(account.getShortAddressBytes())), transaction);
+    }
+
+    public void put(Account account, Transaction transaction) {
+        super.put(new Tuple2<Long, Integer>(transaction.getTimestamp(), Ints.fromByteArray(account.getShortAddressBytes())), transaction);
+    }
+
+    public void delete(Account account, Transaction transaction) {
+        super.delete(new Tuple2<Long, Integer>(transaction.getTimestamp(), Ints.fromByteArray(account.getShortAddressBytes())));
+    }
+
+    public void delete(Transaction transaction) {
+        this.delete(transaction.getCreator(), transaction);
+    }
+
 }

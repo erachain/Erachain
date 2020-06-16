@@ -253,7 +253,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 		return this.database.getTransactionMap().get(accounts, limit);
 	}
 
-	public Iterator<Long> getTransactionsIteratorByType(int type, boolean descending) {
+	public Iterator<Tuple2<Long, Integer>> getTransactionsIteratorByType(int type, boolean descending) {
 		if (!this.exists()) {
 			return null;
 		}
@@ -262,7 +262,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 	}
 
-	public Transaction getTransaction(Long key) {
+	public Transaction getTransaction(Tuple2<Long, Integer> key) {
 		if (!this.exists()) {
 			return null;
 		}
@@ -1068,7 +1068,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 				// CHECK IF INVOLVED
 				if (transaction.isInvolved(account)) {
 					// ADD TO ACCOUNT TRANSACTIONS
-					if (!this.database.getTransactionMap().set(transaction.getDBRef(), transaction)) {
+					if (!this.database.getTransactionMap().set(account, transaction)) {
 						// UPDATE UNCONFIRMED BALANCE for ASSET
 						deal_transaction(account, transaction, false);
 					}
@@ -1114,7 +1114,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 				// CHECK IF INVOLVED
 				if (transaction.isInvolved(account)) {
 					// DELETE FROM ACCOUNT TRANSACTIONS
-					this.database.getTransactionMap().delete(transaction.getDBRef());
+					this.database.getTransactionMap().delete(account, transaction);
 
 					// UPDATE UNCONFIRMED BALANCE
 					deal_transaction(account, transaction, true);
@@ -1650,7 +1650,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 						// CHECK IF INVOLVED
 						if (transaction.isInvolved(account)) {
 							// ADD TO ACCOUNT TRANSACTIONS
-							if (!this.database.getTransactionMap().set(transaction.getDBRef(), transaction)) {
+							if (!this.database.getTransactionMap().set(account, transaction)) {
 								// UPDATE UNCONFIRMED BALANCE for ASSET
 							}
 						}

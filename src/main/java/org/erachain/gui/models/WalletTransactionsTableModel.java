@@ -162,7 +162,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
         int count = 0;
         list = new ArrayList<>();
         if (startKey == null) {
-            try (IteratorCloseable iterator = map.getIterator(((WTransactionMap) map).TIMESTAMP_INDEX, true)) {
+            try (IteratorCloseable iterator = ((WTransactionMap) map).getIterator()) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
                     list.add((Transaction) map.get(key));
@@ -170,7 +170,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
             } catch (IOException e) {
             }
         } else {
-            try (IteratorCloseable iterator = map.getIterator(((WTransactionMap) map).TIMESTAMP_INDEX, true)) {
+            try (IteratorCloseable iterator = ((WTransactionMap) map).getIterator()) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
                     list.add((Transaction) map.get(key));

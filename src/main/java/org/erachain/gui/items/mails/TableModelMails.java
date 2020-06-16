@@ -10,6 +10,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,7 +208,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
         } else {
             Wallet wallet = Controller.getInstance().wallet;
-            Iterator<Long> iterator = wallet.getTransactionsIteratorByType(Transaction.SEND_ASSET_TRANSACTION, true);
+            Iterator<Fun.Tuple2<Long, Integer>> iterator = wallet.getTransactionsIteratorByType(Transaction.SEND_ASSET_TRANSACTION, true);
             if (iterator == null) {
                 transactions = new ArrayList<RSend>();
                 return;
@@ -215,7 +216,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
             RSend rsend;
             boolean outcome;
-            Long key;
+            Fun.Tuple2<Long, Integer> key;
             while (iterator.hasNext()) {
                 key = iterator.next();
                 try {
