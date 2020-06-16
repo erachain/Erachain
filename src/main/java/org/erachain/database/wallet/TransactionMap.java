@@ -54,11 +54,10 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
     protected void createIndexes() {
         //TIMESTAMP INDEX
         NavigableSet<Long> timestampIndex = database.createTreeSet("transactions_index_timestamp")
-                .comparator(Fun.LONG_ARRAY_COMPARATOR)
                 .makeOrGet();
 
         NavigableSet<Long> descendingTimestampIndex = database.createTreeSet("transactions_index_timestamp_descending")
-                .comparator(new ReverseComparator(Fun.LONG_ARRAY_COMPARATOR))
+                .comparator(new ReverseComparator(Fun.COMPARATOR))
                 .makeOrGet();
 
         createIndex(TIMESTAMP_INDEX, timestampIndex, descendingTimestampIndex, new Fun.Function2<Long, Long, Transaction>() {
