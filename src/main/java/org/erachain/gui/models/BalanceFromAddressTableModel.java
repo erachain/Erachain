@@ -17,9 +17,9 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple5<
+public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple2<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> implements Observer {
+        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> implements Observer {
     public static final int COLUMN_C = 4;
     public static final int COLUMN_B = 3;
     public static final int COLUMN_A = 2;
@@ -42,7 +42,7 @@ public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple5<
                 new String[]{"key Asset", "Asset", "Balance A", "Balance B", "Balance C"}, false);
         Controller.getInstance().addObserver(this);
         List<Account> accounts = Controller.getInstance().getWalletAccounts();
-        tableBalance = new ArrayList<>();// Pair();
+        tableBalance = new ArrayList<>();
         tableBalance1 = new ArrayList<>();
         HashSet<Long> assetKeys = new HashSet();
 
@@ -106,7 +106,7 @@ public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple5<
     }
 
     public AssetCls getAsset(int row) {
-        return Controller.getInstance().getAsset(tableBalance.get(row).b.a);
+        return Controller.getInstance().getAsset(tableBalance1.get(row).b.a);
     }
 
     public String getAccount(int row) {
@@ -120,7 +120,7 @@ public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple5<
             return null;
         }
 
-        AssetCls asset = Controller.getInstance().getAsset(tableBalance.get(row).b.a);
+        AssetCls asset = Controller.getInstance().getAsset(tableBalance1.get(row).b.a);
 
         switch (column) {
             case COLUMN_ASSET_KEY:
