@@ -1,21 +1,7 @@
 package org.erachain.api;
 
-import java.nio.charset.StandardCharsets;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.StringUtil;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Crypto;
@@ -28,6 +14,14 @@ import org.erachain.utils.APIUtils;
 import org.erachain.utils.BlogUtils;
 import org.erachain.utils.Corekeys;
 import org.erachain.utils.Pair;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import java.nio.charset.StandardCharsets;
 
 @Path("blogpost")
 @Produces(MediaType.APPLICATION_JSON)
@@ -83,7 +77,7 @@ public class BlogPostResource {
 
             // CHECK ACCOUNT IN WALLET
 
-            if (Controller.getInstance().getAccountByAddress(creator) == null) {
+            if (Controller.getInstance().getWalletAccountByAddress(creator) == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_INVALID_COMMENT_OWNER);
             }
@@ -114,7 +108,7 @@ public class BlogPostResource {
 
             // GET ACCOUNT
             PrivateKeyAccount account = Controller.getInstance()
-                    .getPrivateKeyAccountByAddress(creator);
+                    .getWalletPrivateKeyAccountByAddress(creator);
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.INVALID_ADDRESS);
@@ -235,14 +229,14 @@ public class BlogPostResource {
 
             // CHECK ACCOUNT IN WALLET
 
-            if (Controller.getInstance().getAccountByAddress(creator) == null) {
+            if (Controller.getInstance().getWalletAccountByAddress(creator) == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
             }
 
             // GET ACCOUNT
             PrivateKeyAccount account = Controller.getInstance()
-                    .getPrivateKeyAccountByAddress(creator);
+                    .getWalletPrivateKeyAccountByAddress(creator);
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.INVALID_ADDRESS);
@@ -349,14 +343,14 @@ public class BlogPostResource {
 
             // CHECK ACCOUNT IN WALLET
 
-            if (Controller.getInstance().getAccountByAddress(creator) == null) {
+            if (Controller.getInstance().getWalletAccountByAddress(creator) == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
             }
 
             // GET ACCOUNT
             PrivateKeyAccount account = Controller.getInstance()
-                    .getPrivateKeyAccountByAddress(creator);
+                    .getWalletPrivateKeyAccountByAddress(creator);
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.INVALID_ADDRESS);

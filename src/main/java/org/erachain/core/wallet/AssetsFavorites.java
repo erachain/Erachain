@@ -49,7 +49,7 @@ public class AssetsFavorites implements Observer {
         List<Long> favoritesUpadate = new ArrayList<Long>();
 
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
-        for (Account account : Controller.getInstance().getAccounts()) {
+        for (Account account : Controller.getInstance().getWalletAccounts()) {
             SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balancesList
                     = map.getBalancesSortableList(account);
             if (balancesList == null)

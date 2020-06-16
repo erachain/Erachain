@@ -541,7 +541,7 @@ public void onSendClick() {
 
         if (encryptMessage) {
             //sender
-            PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress().toString());
+            PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress().toString());
             byte[] privateKey = account.getPrivateKey();
 
             //recipient
@@ -569,7 +569,7 @@ public void onSendClick() {
 
    // CREATE TX MESSAGE
     Transaction transaction = Controller.getInstance().r_Send(
-            Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key,
+            Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key,
             amount, head, messageBytes, isTextByte, encrypted, 0);
     
     Controller.getInstance().broadcastTelegram(transaction, true);

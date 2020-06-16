@@ -45,7 +45,7 @@ public class BalanceFromAssets extends AbstractTableModel implements Observer {
 
         //this.key = key;
         Controller.getInstance().addObserver(this);
-        List<Account> accounts = Controller.getInstance().getAccounts();
+        List<Account> accounts = Controller.getInstance().getWalletAccounts();
         //	 table_balance = new List();
         table_balance = new ArrayList<>();//Pair();
 

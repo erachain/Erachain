@@ -683,7 +683,7 @@ public class MailSendPanel extends JPanel {
             if (encryptMessage) {
                 // sender
                 PrivateKeyAccount creator = Controller.getInstance()
-                        .getPrivateKeyAccountByAddress(sender.getAddress());
+                        .getWalletPrivateKeyAccountByAddress(sender.getAddress());
                 if (creator == null) {
                     JOptionPane.showMessageDialog(new JFrame(),
                             Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
@@ -728,7 +728,7 @@ public class MailSendPanel extends JPanel {
 
         }
 
-        PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+        PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
         if (creator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),

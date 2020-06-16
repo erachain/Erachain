@@ -7,11 +7,11 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.naming.Name;
 import org.erachain.core.naming.NameSale;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.utils.APIUtils;
+import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.erachain.utils.APIUtils;
-import org.erachain.utils.Pair;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -78,7 +78,7 @@ public class NameSalesResource {
         }
 
         //CHECK ACCOUNT IN WALLET
-        Account account = Controller.getInstance().getAccountByAddress(address);
+        Account account = Controller.getInstance().getWalletAccountByAddress(address);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
         }
@@ -152,7 +152,7 @@ public class NameSalesResource {
             }
 
             //GET OWNER
-            PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(name.getOwner().getAddress());
+            PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(name.getOwner().getAddress());
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
             }
@@ -208,7 +208,7 @@ public class NameSalesResource {
             }
 
             //GET OWNER
-            PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(nameSale.getName().getOwner().getAddress());
+            PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(nameSale.getName().getOwner().getAddress());
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
             }
@@ -274,7 +274,7 @@ public class NameSalesResource {
             }
 
             //GET BUYER
-            PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(buyer);
+            PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(buyer);
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
             }

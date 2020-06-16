@@ -51,7 +51,7 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Lon
         logger = LoggerFactory.getLogger(ModelAccountTransactions.class);
 
         this.transactions_Asset = new ArrayList<Transaction>();
-        this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+        this.publicKeyAccounts = Controller.getInstance().getWalletPublicKeyAccounts();
         cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
         account = new Account("");
 
@@ -230,7 +230,7 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Lon
 
         if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
                 || message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-            this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+            this.publicKeyAccounts = Controller.getInstance().getWalletPublicKeyAccounts();
             cred.clear();
             for (PublicKeyAccount account : this.publicKeyAccounts) {
                 cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));

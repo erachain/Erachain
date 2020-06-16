@@ -199,7 +199,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel  {
             if (encryptMessage) {
                 // sender
                 PrivateKeyAccount account = Controller.getInstance()
-                        .getPrivateKeyAccountByAddress(sender.getAddress().toString());
+                        .getWalletPrivateKeyAccountByAddress(sender.getAddress().toString());
                 byte[] privateKey = account.getPrivateKey();
 
                 // recipient
@@ -235,7 +235,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel  {
 
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(
-                Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), 0, recipient, key,
+                Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), 0, recipient, key,
                 null, head, messageBytes, isTextByte, encrypted, 0);
         // test result = new Pair<Transaction, Integer>(null,
         // Transaction.VALIDATE_OK);

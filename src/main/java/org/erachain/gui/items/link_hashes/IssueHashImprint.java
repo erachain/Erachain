@@ -137,7 +137,7 @@ public class IssueHashImprint extends javax.swing.JPanel {
             List<String> hashes = this.table_Model.getValues(0);
 
             //CREATE IMPRINT
-            PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+            PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
             if (creator == null) {
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),

@@ -80,7 +80,7 @@ public class SendTableModel extends JTable implements Observer {
             }
         }
 
-        for (Account account : Controller.getInstance().getAccounts()) {
+        for (Account account : Controller.getInstance().getWalletAccounts()) {
             transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
         }
 

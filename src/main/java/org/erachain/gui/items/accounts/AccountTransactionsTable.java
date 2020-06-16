@@ -87,7 +87,7 @@ public class AccountTransactionsTable extends JTable implements Observer {
         }
 
 
-        for (Account account : Controller.getInstance().getAccounts()) {
+        for (Account account : Controller.getInstance().getWalletAccounts()) {
             transactions.addAll(dcSet.getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
         }
 

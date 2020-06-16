@@ -71,7 +71,7 @@ public class AddressesResource {
         }
 
         // GET ACCOUNTS
-        List<Account> accounts = Controller.getInstance().getAccounts();
+        List<Account> accounts = Controller.getInstance().getWalletAccounts();
 
         // CONVERT TO LIST OF ADDRESSES
         JSONArray addresses = new JSONArray();
@@ -180,7 +180,7 @@ public class AddressesResource {
         }
 
         // CHECK ACCOUNT IN WALLET
-        Account account = Controller.getInstance().getAccountByAddress(address);
+        Account account = Controller.getInstance().getWalletAccountByAddress(address);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
@@ -216,13 +216,13 @@ public class AddressesResource {
         }
 
         // CHECK ACCOUNT IN WALLET
-        Account account = Controller.getInstance().getAccountByAddress(address);
+        Account account = Controller.getInstance().getWalletAccountByAddress(address);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
         }
 
-        byte[] privateKey = Controller.getInstance().getPrivateKeyAccountByAddress(address).getPrivateKey();
+        byte[] privateKey = Controller.getInstance().getWalletPrivateKeyAccountByAddress(address).getPrivateKey();
         return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
                 //.header("Access-Control-Allow-Origin", "*")
                 .entity(Base58.encode(privateKey)).build(); // " ! " + Base58.encode(privateKey) - норм работает
@@ -246,7 +246,7 @@ public class AddressesResource {
                     ApiErrorFactory.ERROR_WALLET_LOCKED);
         }
 
-        return Controller.getInstance().generateNewAccount();
+        return Controller.getInstance().generateNewWalletAccount();
     }
 
     @POST
@@ -271,7 +271,7 @@ public class AddressesResource {
                         ApiErrorFactory.ERROR_WALLET_LOCKED);
             }
 
-            return Controller.getInstance().generateNewAccount();
+            return Controller.getInstance().generateNewWalletAccount();
         } else {
             APIUtils.askAPICallAllowed(password, "POST addresses import Account seed\n " + x, request, true);
 
@@ -530,7 +530,7 @@ public class AddressesResource {
 
         // GET OWNER
         PrivateKeyAccount account = Controller.getInstance()
-                .getPrivateKeyAccountByAddress(address);
+                .getWalletPrivateKeyAccountByAddress(address);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);

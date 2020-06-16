@@ -269,7 +269,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
             }
 
             PrivateKeyAccount creator = Controller.getInstance()
-                    .getPrivateKeyAccountByAddress(creatorAccount.getAddress());
+                    .getWalletPrivateKeyAccountByAddress(creatorAccount.getAddress());
 
             if (creator == null) {
                 JOptionPane.showMessageDialog(new JFrame(),

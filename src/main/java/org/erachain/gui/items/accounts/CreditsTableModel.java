@@ -231,7 +231,7 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long
 
         if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
                 || message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-            this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+            this.publicKeyAccounts = Controller.getInstance().getWalletPublicKeyAccounts();
             cred.clear();
             for (PublicKeyAccount account : this.publicKeyAccounts) {
                 cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
@@ -268,7 +268,7 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long
     public void addObservers() {
 
         this.transactions_Asset = new ArrayList<Tuple2<Tuple2<Long, Long>, Transaction>>();
-        this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+        this.publicKeyAccounts = Controller.getInstance().getWalletPublicKeyAccounts();
 
         cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
         for (PublicKeyAccount account : this.publicKeyAccounts) {

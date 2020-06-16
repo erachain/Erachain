@@ -41,7 +41,7 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public BalanceFromAddressTableModel() {
         Controller.getInstance().addObserver(this);
-        List<Account> accounts = Controller.getInstance().getAccounts();
+        List<Account> accounts = Controller.getInstance().getWalletAccounts();
         tableBalance = new ArrayList<>();// Pair();
         tableBalance1 = new ArrayList<>();
         HashSet<Long> assetKeys = new HashSet();

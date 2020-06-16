@@ -148,7 +148,7 @@ public class ATResource {
         }
 
         //GET ACCOUNT
-        PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(creator);
+        PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_CREATOR);
         }
@@ -288,7 +288,7 @@ public class ATResource {
         byte[] creationBytes = null;
         creationBytes = creation.array();
 
-        PrivateKeyAccount sender = Controller.getInstance().getPrivateKeyAccountByAddress(creator);
+        PrivateKeyAccount sender = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator);
 
         Pair<Transaction, Integer> result = Controller.getInstance().deployAT(sender, name, desc, type, tags, creationBytes, quantity, feePow);
 

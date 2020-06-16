@@ -186,7 +186,7 @@ public class MultiPaymentFrame extends JFrame {
             int feePow = Integer.parseInt(txtFeePow.getText());
 
             //CREATE MULTI PAYMENT
-            PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(this.asset.getOwner().getAddress());
+            PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(this.asset.getOwner().getAddress());
             if (creator == null) {
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),

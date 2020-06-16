@@ -97,7 +97,7 @@ public class TransactionCreator {
 
         if (false) {
             // У форка нет вторичных индексов поэтому этот вариант не покатит
-            for (Account account: Controller.getInstance().getAccounts()) {
+            for (Account account : Controller.getInstance().getWalletAccounts()) {
                 try (IteratorCloseable<Long> iterator = transactionTab.findTransactionsKeys(account.getAddress(), null, null,
                         0, false, 0, 0, 0L)) {
                     while (iterator.hasNext()) {
@@ -117,7 +117,7 @@ public class TransactionCreator {
             // здесь нужен протокольный итератор!
 
             try (IteratorCloseable<Long> iterator = transactionTab.getIterator()) {
-                List<Account> accountMap = Controller.getInstance().getAccounts();
+                List<Account> accountMap = Controller.getInstance().getWalletAccounts();
 
                 while (iterator.hasNext()) {
                     transaction = transactionTab.get(iterator.next());

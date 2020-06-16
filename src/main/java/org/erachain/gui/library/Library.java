@@ -52,7 +52,7 @@ public class Library {
                 RSend r_Send = (RSend) transaction;
 
                 // AS RECIPIENT
-                Account account = Controller.getInstance().getAccountByAddress(r_Send.getRecipient().getAddress());
+                Account account = Controller.getInstance().getWalletAccountByAddress(r_Send.getRecipient().getAddress());
                 if (account != null) {
                     if (r_Send.hasAmount()) {
                         if (Settings.getInstance().isSoundReceivePaymentEnabled())
@@ -81,7 +81,7 @@ public class Library {
                     return;
                 }
 
-                account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());
+                account = Controller.getInstance().getWalletAccountByAddress(r_Send.getCreator().getAddress());
                 if (account != null) {
                     if (r_Send.hasAmount()) {
 
@@ -112,7 +112,7 @@ public class Library {
                 }
 
             default:
-                account = Controller.getInstance().getAccountByAddress(transaction.getCreator().getAddress());
+                account = Controller.getInstance().getWalletAccountByAddress(transaction.getCreator().getAddress());
                 if (account != null) {
                     if (Settings.getInstance().isSoundNewTransactionEnabled()) {
                         PlaySound.getInstance().playSound("newtransaction.wav", transaction.getSignature());

@@ -1562,8 +1562,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 			// DELETE ORDER
 			if (false) {
 				// order STATUS is ORPHANED
-				this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
-						Transaction.makeDBRef(orderCreation.getHeightSeqNo())));
+				this.database.getOrderMap().delete(orderCreation.getDBRef());
 			}
 		}
 	}
@@ -1581,8 +1580,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
 			if (false) {
 				// DELETE ORDER
-				this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
-						Transaction.makeDBRef(orderCancel.getHeightSeqNo())));
+				this.database.getOrderMap().delete(orderCancel.getDBRef());
 			}
 		}
 	}
@@ -1680,7 +1678,7 @@ public class Wallet extends Observable /*implements Observer*/ {
             if (!this.accountExists(order.getCreator().getAddress()))
                 return;
 
-            Tuple2<String, Long> key = new Tuple2<String, Long>(order.getCreator().getAddress(), order.getId());
+			Long key = order.getId();
             if (this.database.getOrderMap().contains(key)) {
 				this.database.getOrderMap().set(key, order);
 			}

@@ -135,14 +135,13 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             return;
 
         /// WALLET addesses
-        Iterator<Tuple2<Long, Long>> keysIterator = ((TransactionMap) map).getAddressDescendingIterator(this.sender);
+        Iterator<Long> keysIterator = ((TransactionMap) map).getAddressDescendingIterator(this.sender);
 
         list = new ArrayList<>();
 
         int counter = 0;
         while (keysIterator.hasNext() && counter < 999) {
-            Tuple2<Long, Long> key = keysIterator.next();
-            Transaction transaction = ((Tuple2<Long, Transaction>) map.get(key)).b;
+            Transaction transaction = (Transaction) map.get(keysIterator.next());
             if (trans_Parse(transaction)) {
                 counter++;
             }

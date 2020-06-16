@@ -154,7 +154,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
         ArrayList<Transaction> all_transactions = new ArrayList<Transaction>();
 
         if (false) {
-            for (Account account : Controller.getInstance().getAccounts()) {
+            for (Account account : Controller.getInstance().getWalletAccounts()) {
                 all_transactions.addAll(dcSet.getTransactionFinalMap()
                         .getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
             }
@@ -179,7 +179,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
                 if (!is) {
 
                     if (messagetx.getAssetKey() == 0) {
-                        for (Account account1 : Controller.getInstance().getAccounts()) {
+                        for (Account account1 : Controller.getInstance().getWalletAccounts()) {
                             RSend a = (RSend) messagetx;
                             if (a.getRecipient().getAddress().equals(account1.getAddress()) && incoming) {
                                 this.transactions.add(a);

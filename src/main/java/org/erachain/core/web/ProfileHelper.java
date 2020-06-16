@@ -1,11 +1,10 @@
 package org.erachain.core.web;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.naming.Name;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 public class ProfileHelper {
 
@@ -55,7 +54,7 @@ public class ProfileHelper {
 
         if (profileString != null) {
             Name name = Controller.getInstance().getName(profileString);
-            if (name != null && Controller.getInstance().getNamesAsList().contains(name)) {
+            if (name != null && Controller.getInstance().getWalletNamesAsList().contains(name)) {
                 Profile profile = Profile.getProfileOpt(name);
                 if (profile != null && profile.isProfileEnabled()) {
                     currentProfile = profile;

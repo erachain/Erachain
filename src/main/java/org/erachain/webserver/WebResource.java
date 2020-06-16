@@ -447,7 +447,7 @@ public class WebResource {
         DCSet dcSet = DCSet.getInstance();
         Collection<Transaction> values = dcSet.getTransactionTab().values();
 
-        List<PrivateKeyAccount> privateKeyAccounts = Controller.getInstance().getPrivateKeyAccounts();
+        List<PrivateKeyAccount> privateKeyAccounts = Controller.getInstance().getWalletPrivateKeyAccounts();
 
         for (Transaction transaction : values) {
             if (privateKeyAccounts.contains(transaction.getCreator())) {
@@ -470,7 +470,7 @@ public class WebResource {
                     "web/namestorage.html", request);
 
             List<Name> namesAsList = new CopyOnWriteArrayList<Name>(Controller
-                    .getInstance().getNamesAsList());
+                    .getInstance().getWalletNamesAsList());
 
             pebbleHelper.getContextMap().put("names", namesAsList);
 
@@ -569,7 +569,7 @@ public class WebResource {
                     name = activeProfileOpt.getName().getName();
                 } else {
                     List<Name> namesAsList = new CopyOnWriteArrayList<Name>(
-                            Controller.getInstance().getNamesAsList());
+                            Controller.getInstance().getWalletNamesAsList());
 
                     if (!namesAsList.isEmpty()) {
                         name = namesAsList.get(0).getName();
@@ -1000,7 +1000,7 @@ public class WebResource {
             String profileName = request.getParameter("profilename");
 
             List<Name> namesAsList = new CopyOnWriteArrayList<Name>(Controller
-                    .getInstance().getNamesAsList());
+                    .getInstance().getWalletNamesAsList());
 
             for (Name name : namesAsList) {
                 if (!Profile.isAllowedProfileName(name.getName())) {
@@ -1715,12 +1715,12 @@ public class WebResource {
              */
             if (Controller.getInstance().doesWalletDatabaseExists()) {
                 resultingAccounts = new ArrayList<Account>(Controller.getInstance()
-                        .getAccounts());
+                        .getWalletAccounts());
             } else {
                 resultingAccounts = new ArrayList<Account>();
             }
             List<Name> resultingNames = new ArrayList<Name>(Controller.getInstance()
-                    .getNamesAsList());
+                    .getWalletNamesAsList());
 
             for (Name name : resultingNames) {
                 // No balance account not shown
@@ -1907,7 +1907,7 @@ public class WebResource {
 
                             // Prevent following of own profiles
                             if (Controller.getInstance()
-                                    .getNamesAsListAsString()
+                                    .getWalletNamesAsListAsString()
                                     .contains(blogname)) {
                                 result = "<center><div class=\"alert alert-danger\" role=\"alert\">Blog follow not successful<br>"
                                         + "You can't follow your own profiles"
@@ -2172,7 +2172,7 @@ public class WebResource {
                 String creator = blogEntryOpt.getCreator();
 
                 Account accountByAddress = Controller.getInstance()
-                        .getAccountByAddress(creator);
+                        .getWalletAccountByAddress(creator);
                 String blognameOpt = blogEntryOpt.getBlognameOpt();
                 // Did I create that blogpost?
                 JSONObject jsonBlogPost = new JSONObject();
@@ -2192,7 +2192,7 @@ public class WebResource {
                     jsonBlogPost.put("fee", 0);
                     // I am not author, but am I the owner of the blog?
                 } else if (blognameOpt != null
-                        && Controller.getInstance().getNamesAsListAsString()
+                        && Controller.getInstance().getWalletNamesAsListAsString()
                         .contains(blognameOpt)) {
                     Name name = DCSet.getInstance().getNameMap()
                             .get(blognameOpt);
@@ -2416,7 +2416,7 @@ public class WebResource {
 
                         boolean ownPost = false;
                         if (blogEntryOpt != null) {
-                            if (Controller.getInstance().getAccountByAddress(
+                            if (Controller.getInstance().getWalletAccountByAddress(
                                     blogEntryOpt.getCreator()) != null) {
                                 ownPost = true;
                             }
@@ -2726,7 +2726,7 @@ public class WebResource {
                 if (profile == null || !profile.isProfileEnabled()) {
                     pebbleHelper = PebbleHelper.getPebbleHelper(
                             "web/profiledisabled.html", request);
-                    if (Controller.getInstance().getAccountByAddress(
+                    if (Controller.getInstance().getWalletAccountByAddress(
                             name.getOwner().getAddress()) != null) {
                         pebbleHelper.getContextMap().put("ownProfileName",
                                 blogname);
@@ -2742,7 +2742,7 @@ public class WebResource {
                 pebbleHelper.getContextMap().put("blogenabled",
                         profile.isBlogEnabled());
                 if (Controller.getInstance().doesWalletDatabaseExists()) {
-                    if (Controller.getInstance().getAccountByAddress(
+                    if (Controller.getInstance().getWalletAccountByAddress(
                             name.getOwner().getAddress()) != null) {
                         pebbleHelper.getContextMap().put("ownProfileName",
                                 blogname);

@@ -35,6 +35,7 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
     //public static final int AMOUNT_INDEX = 3;
 
     NavigableSet typeKey;
+    NavigableSet addressKey;
 
     static Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class.getName());
 
@@ -121,6 +122,16 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
                 });
 
 
+        this.addressKey = database.createTreeSet("address_txs").comparator(Fun.TUPLE2_COMPARATOR)
+                .makeOrGet();
+        Bind.secondaryKey((Bind.MapWithModificationListener) map, this.typeKey,
+                new Fun.Function2<Tuple2<Long, Long>, Long, Transaction>() {
+                    @Override
+                    public Tuple2<Long, Long> run(Long key, Transaction value) {
+                        return new Tuple2<>(Longs.fromByteArray(value.getCreator().getShortAddressBytes()), key);
+                    }
+                });
+
     }
 
     @Override
@@ -139,7 +150,6 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
 
     @Override
     protected void getMemoryMap() {
-        //map = new TreeMap<Tuple2<Long, Long>, Tuple2<Long, Transaction>>(Fun.TUPLE2_COMPARATOR);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -148,7 +158,7 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
 
         try {
             //GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-            Set<Tuple2<Long, Long>> accountTransactions = ((NavigableMap) this.map).subMap(
+            Set<Long> accountTransactions = ((NavigableMap) this.map).subMap(
                     Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
                     Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI())).keySet();
 
@@ -190,9 +200,9 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator<Tuple2<Long, Long>> getAddressIterator(Account account) {
+    public Iterator<Long> getAddressIterator(Account account) {
 
-        Set<Tuple2<Long, Long>> accountKeys = ((BTreeMap) this.map).subMap(
+        Set<Long> accountKeys = ((BTreeMap) this.map).subMap(
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI())).keySet();
 
@@ -200,20 +210,12 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator<Tuple2<Long, Long>> getAddressDescendingIterator(Account account) {
+    public Iterator<Long> getAddressDescendingIterator(Account account) {
 
-        /*
-        SortedSet<Tuple2<String, Tuple2<Long, Long>>> accountKeys = ((NavigableSet) this.indexes.get(ADDRESS_INDEX)).subSet(
-                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
-                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
-         */
-
-        Set<Tuple2<Long, Long>> accountKeys = ((BTreeMap) this.map).subMap(
+        Set<Long> accountKeys = ((BTreeMap) this.addressKey).subMap(
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI())).descendingKeySet();
 
-
-        //return ((NavigableSet<Tuple2<Long, Long>>) accountKeys).descendingIterator();
         return accountKeys.iterator();
 
     }

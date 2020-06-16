@@ -81,7 +81,7 @@ public class MailsTransactionsTable extends JTable implements Observer {
             }
         }
 
-        for (Account account : Controller.getInstance().getAccounts()) {
+        for (Account account : Controller.getInstance().getWalletAccounts()) {
             transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
         }
 
@@ -98,7 +98,7 @@ public class MailsTransactionsTable extends JTable implements Observer {
             if (!is) {
 
                 if (messagetx.getAssetKey() == 0) {
-                    for (Account account1 : Controller.getInstance().getAccounts()) {
+                    for (Account account1 : Controller.getInstance().getWalletAccounts()) {
                         RSend a = (RSend) messagetx;
                         String aa = a.getRecipient().getAddress();
                         String aaa = account1.getAddress();
@@ -470,21 +470,21 @@ public class MailsTransactionsTable extends JTable implements Observer {
                 }
 
 
-                Account account = Controller.getInstance().getAccountByAddress(messageBufs.get(row).getSender().getAddress());
+                Account account = Controller.getInstance().getWalletAccountByAddress(messageBufs.get(row).getSender().getAddress());
 
 
                 byte[] privateKey = null;
                 byte[] publicKey = null;
                 //IF SENDER ANOTHER
                 if (account == null) {
-                    PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(messageBufs.get(row).getRecipient().getAddress());
+                    PrivateKeyAccount accountRecipient = Controller.getInstance().getWalletPrivateKeyAccountByAddress(messageBufs.get(row).getRecipient().getAddress());
                     privateKey = accountRecipient.getPrivateKey();
 
                     publicKey = messageBufs.get(row).getSenderPublicKey();
                 }
                 //IF SENDER ME
                 else {
-                    PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
+                    PrivateKeyAccount accountRecipient = Controller.getInstance().getWalletPrivateKeyAccountByAddress(account.getAddress());
                     privateKey = accountRecipient.getPrivateKey();
 
                     if (messageBufs.get(row).getToPublicKey() == null) {

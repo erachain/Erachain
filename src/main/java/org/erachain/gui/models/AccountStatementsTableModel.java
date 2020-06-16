@@ -25,7 +25,7 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
     private TemplateCls template;
 
     public AccountStatementsTableModel() {
-        this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+        this.publicKeyAccounts = Controller.getInstance().getWalletPublicKeyAccounts();
         Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
     }
@@ -127,7 +127,7 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 
             if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
                     || message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-                this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+                this.publicKeyAccounts = Controller.getInstance().getWalletPublicKeyAccounts();
 
                 this.fireTableRowsUpdated(0, this.getRowCount() - 1);  // WHEN UPDATE DATA - SELECTION DOES NOT DISAPPEAR
             }

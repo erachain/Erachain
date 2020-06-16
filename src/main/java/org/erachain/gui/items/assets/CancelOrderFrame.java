@@ -218,7 +218,7 @@ public class CancelOrderFrame extends JDialog {
         }
 
         //CREATE NAME UPDATE
-        PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(order.getCreator().getAddress());
+        PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(order.getCreator().getAddress());
         if (creator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),

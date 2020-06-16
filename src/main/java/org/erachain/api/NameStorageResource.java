@@ -1,29 +1,7 @@
 package org.erachain.api;
 
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -37,6 +15,17 @@ import org.erachain.utils.APIUtils;
 import org.erachain.utils.GZIP;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StorageUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @Path("namestorage")
 @Produces(MediaType.APPLICATION_JSON)
@@ -162,7 +151,7 @@ public class NameStorageResource {
             if (nameObj == null) {
 
                 //check if addressstorage
-                Account accountByAddress = Controller.getInstance().getAccountByAddress(name);
+                Account accountByAddress = Controller.getInstance().getWalletAccountByAddress(name);
 
                 if (accountByAddress == null) {
                     throw ApiErrorFactory.getInstance().createError(
@@ -182,7 +171,7 @@ public class NameStorageResource {
             }
 
             // CHECK ACCOUNT IN WALLET
-            if (Controller.getInstance().getAccountByAddress(creator) == null) {
+            if (Controller.getInstance().getWalletAccountByAddress(creator) == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
             }
@@ -386,7 +375,7 @@ public class NameStorageResource {
 
                     // GET ACCOUNT
                     PrivateKeyAccount account = Controller.getInstance()
-                            .getPrivateKeyAccountByAddress(creator);
+                            .getWalletPrivateKeyAccountByAddress(creator);
                     if (account == null) {
                         throw ApiErrorFactory.getInstance().createError(
                                 Transaction.CREATOR_NOT_OWNER);
@@ -443,7 +432,7 @@ public class NameStorageResource {
 
             // GET ACCOUNT
             PrivateKeyAccount account = Controller.getInstance()
-                    .getPrivateKeyAccountByAddress(creator);
+                    .getWalletPrivateKeyAccountByAddress(creator);
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.CREATOR_NOT_OWNER);

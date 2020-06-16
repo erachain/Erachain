@@ -101,7 +101,7 @@ public class PollsResource {
             }
 
             //GET ACCOUNT
-            PrivateKeyAccount account = controller.getPrivateKeyAccountByAddress(creator);
+            PrivateKeyAccount account = controller.getWalletPrivateKeyAccountByAddress(creator);
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
             }
@@ -178,7 +178,7 @@ public class PollsResource {
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 
             //GET ACCOUNT
-            PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(creator);
+            PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator);
             if (account == null)
                 throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
 
@@ -236,7 +236,7 @@ public class PollsResource {
             }
 
             //GET ACCOUNT
-            PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(voter);
+            PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(voter);
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
             }
@@ -292,7 +292,7 @@ public class PollsResource {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 
         //GET ACCOUNT
-        PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(voter);
+        PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(voter);
         if (account == null)
             throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
 
@@ -355,7 +355,7 @@ public class PollsResource {
         }
 
         //CHECK ACCOUNT IN WALLET
-        Account account = Controller.getInstance().getAccountByAddress(address);
+        Account account = Controller.getInstance().getWalletAccountByAddress(address);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
         }

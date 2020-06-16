@@ -32,7 +32,7 @@ public class ControllerWebResource {
     public List<WebName> getNames(String removeZeroBalance) {
         List<WebName> results = new ArrayList<>();
         List<Name> myNames = new ArrayList<Name>(Controller.getInstance()
-                .getNamesAsList());
+                .getWalletNamesAsList());
         for (Name name : myNames) {
             if (Boolean.valueOf(removeZeroBalance)) {
                 if (name.getOwner().getConfBalance3(0, Transaction.FEE_KEY).a.compareTo(BigDecimal.ZERO) > 0) {
@@ -52,7 +52,7 @@ public class ControllerWebResource {
 
         if (Controller.getInstance().doesWalletDatabaseExists()) {
             ArrayList<Account> realAccs = new ArrayList<Account>(Controller.getInstance()
-                    .getAccounts());
+                    .getWalletAccounts());
 
             for (Account account : realAccs) {
                 if (Boolean.valueOf(removeZeroBalance)) {

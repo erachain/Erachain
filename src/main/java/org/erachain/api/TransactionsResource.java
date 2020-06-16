@@ -97,7 +97,7 @@ public class TransactionsResource {
         }
 
         // GET TRANSACTIONS
-        List<Pair<Account, Transaction>> transactions = Controller.getInstance().getLastTransactions(limit);
+        List<Pair<Account, Transaction>> transactions = Controller.getInstance().getLastWalletTransactions(limit);
 
         // ORGANIZE TRANSACTIONS
         Map<Account, List<Transaction>> orderedTransactions = new HashMap<Account, List<Transaction>>();
@@ -145,13 +145,13 @@ public class TransactionsResource {
         }
 
         // CHECK ACCOUNT IN WALLET
-        Account account = Controller.getInstance().getAccountByAddress(address);
+        Account account = Controller.getInstance().getWalletAccountByAddress(address);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
         }
 
         JSONArray array = new JSONArray();
-        for (Transaction transaction : Controller.getInstance().getLastTransactions(account, limit)) {
+        for (Transaction transaction : Controller.getInstance().getLastWalletTransactions(account, limit)) {
             array.add(transaction.toJson());
         }
 
@@ -610,7 +610,7 @@ public class TransactionsResource {
         }
 
         // GET ACCOUNTS
-        List<Account> accounts = Controller.getInstance().getAccounts();
+        List<Account> accounts = Controller.getInstance().getWalletAccounts();
 
         JSONArray array = new JSONArray();
         DCSet dcSet = DCSet.getInstance();
@@ -863,7 +863,7 @@ public class TransactionsResource {
         Transaction transaction;
         try {
             transaction = Controller.getInstance().r_Send(
-                    Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), 0, recip, asset1, amount,
+                    Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), 0, recip, asset1, amount,
                     head, message.getBytes(StandardCharsets.UTF_8), isTextByte, encrypted, 0);
             // test result = new Pair<Transaction, Integer>(null,
             // Transaction.VALIDATE_OK);
@@ -923,7 +923,7 @@ public class TransactionsResource {
         JSONObject out = new JSONObject();
 
         RSend r_Send = (RSend) transaction;
-        Account account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());
+        Account account = Controller.getInstance().getWalletAccountByAddress(r_Send.getCreator().getAddress());
         byte[] r_data = r_Send.getData();
         if (r_data == null || r_data.length == 0)
             return null;

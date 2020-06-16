@@ -1,20 +1,20 @@
 package org.erachain.core.web;
 // 30/03 
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.naming.Name;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.json.simple.JSONObject;
 import org.erachain.utils.Corekeys;
 import org.erachain.utils.NameUtils;
 import org.erachain.utils.NameUtils.NameResult;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ProfileUtils;
+import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -155,12 +155,12 @@ public class BlogBlackWhiteList {
         List<Account> myaccounts;
         if (Controller.getInstance().doesWalletDatabaseExists()) {
             myaccounts = new ArrayList<Account>(Controller.getInstance()
-                    .getAccounts());
+                    .getWalletAccounts());
         } else {
             myaccounts = new ArrayList<Account>();
         }
         List<Name> myNames = new ArrayList<Name>(Controller.getInstance()
-                .getNamesAsList());
+                .getWalletNamesAsList());
 
         if (isWhitelist()) {
             for (String accountOrName : blackwhiteList) {
@@ -183,7 +183,7 @@ public class BlogBlackWhiteList {
 
                 } else if (Crypto.getInstance().isValidAddress(accountOrName)) {
                     Account accountByAddress = Controller.getInstance()
-                            .getAccountByAddress(accountOrName);
+                            .getWalletAccountByAddress(accountOrName);
 
                     // DO I OWN THAT ADDRESS?
                     if (accountByAddress != null) {
@@ -225,7 +225,7 @@ public class BlogBlackWhiteList {
 
                 } else if (!Crypto.getInstance().isValidAddress(accountOrName)) {
                     Account accountByAddress = Controller.getInstance()
-                            .getAccountByAddress(accountOrName);
+                            .getWalletAccountByAddress(accountOrName);
 
                     // DO I OWN THAT ADDRESS?
                     if (accountByAddress != null) {
