@@ -1,15 +1,11 @@
 package org.erachain.gui.models;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.polls.PollCls;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.utils.ObserverMessage;
 
 import java.math.BigDecimal;
-import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
@@ -64,31 +60,6 @@ public class ItemPollsTableModel extends TimerTableModelCls<ItemCls> implements 
         }
 
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.LIST_POLL_TYPE) {
-            if (this.list == null) {
-                this.list = (SortableList<Long, ItemCls>) message.getValue();
-                ///this.polls.registerObserver();
-            }
-
-            this.fireTableDataChanged();
-        }
-
-        //CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.ADD_POLL_TYPE || message.getType() == ObserverMessage.REMOVE_POLL_TYPE) {
-            this.fireTableDataChanged();
-        }
-    }
-
-    public void addObservers() {
-        this.asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
-        super.addObservers();
     }
 
 }

@@ -6,6 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -16,9 +17,9 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple2<byte[], Tuple5<
+public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> implements Observer {
+        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> implements Observer {
     public static final int COLUMN_C = 4;
     public static final int COLUMN_B = 3;
     public static final int COLUMN_A = 2;
@@ -33,11 +34,12 @@ public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple2<byte
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> tableBalance;
     private List<Tuple2<Account, Tuple2<Long, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> tableBalance1;
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> tableBalance1;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public BalanceFromAddressTableModel() {
-        super(DCSet.getInstance().getAssetBalanceMap(), new String[]{"key Asset", "Asset", "Balance A", "Balance B", "Balance C"}, false);
+        super((DBTabImpl) DCSet.getInstance().getAssetBalanceMap(),
+                new String[]{"key Asset", "Asset", "Balance A", "Balance B", "Balance C"}, false);
         Controller.getInstance().addObserver(this);
         List<Account> accounts = Controller.getInstance().getWalletAccounts();
         tableBalance = new ArrayList<>();// Pair();

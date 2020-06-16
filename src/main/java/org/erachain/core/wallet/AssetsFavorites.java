@@ -3,12 +3,10 @@ package org.erachain.core.wallet;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.gui.Gui;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
@@ -50,19 +48,20 @@ public class AssetsFavorites implements Observer {
 
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
         for (Account account : Controller.getInstance().getWalletAccounts()) {
-            SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balancesList
-                    = map.getBalancesList(account);
+            List<Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> balancesList = map.getBalancesList(account);
             if (balancesList == null)
                 return;
 
-            for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance : balancesList) {
-                if (balance.getB().a.b.compareTo(BigDecimal.ZERO) != 0
-                        || balance.getB().b.b.compareTo(BigDecimal.ZERO) != 0
-                        || balance.getB().c.b.compareTo(BigDecimal.ZERO) != 0
-                        || balance.getB().d.b.compareTo(BigDecimal.ZERO) != 0
-                        || balance.getB().e.b.compareTo(BigDecimal.ZERO) != 0) {
-                    if (!favoritesUpadate.contains(ItemAssetBalanceMap.getAssetKeyFromKey(balance.getA()))) {
-                        favoritesUpadate.add(ItemAssetBalanceMap.getAssetKeyFromKey(balance.getA()));
+            for (Tuple2<byte[], Tuple5<
+                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance : balancesList) {
+                if (balance.b.a.b.compareTo(BigDecimal.ZERO) != 0
+                        || balance.b.b.b.compareTo(BigDecimal.ZERO) != 0
+                        || balance.b.c.b.compareTo(BigDecimal.ZERO) != 0
+                        || balance.b.d.b.compareTo(BigDecimal.ZERO) != 0
+                        || balance.b.e.b.compareTo(BigDecimal.ZERO) != 0) {
+                    if (!favoritesUpadate.contains(ItemAssetBalanceMap.getAssetKeyFromKey(balance.a))) {
+                        favoritesUpadate.add(ItemAssetBalanceMap.getAssetKeyFromKey(balance.a));
                     }
                 }
             }

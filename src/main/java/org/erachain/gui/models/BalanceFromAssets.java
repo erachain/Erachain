@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -34,7 +35,9 @@ public class BalanceFromAssets extends AbstractTableModel implements Observer {
     private long key;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Asset", "key Asset", "Balance"});
     // balances;
-    private List<Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+    private List<Tuple2<byte[], Tuple5<
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> balances;
     private ArrayList<Pair<Account, Pair<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>>>> table_balance;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -52,9 +55,11 @@ public class BalanceFromAssets extends AbstractTableModel implements Observer {
             account = accounts.get(ia);
             balances = Controller.getInstance().getBalances(account); //.getBalances(key);
             for (int ib = 0; this.balances.size() > ib; ib++) {
-                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> item = this.balances.get(ib);
-                long assetKey = 0;//ItemAssetBalanceMap.getAssetKeyFromKey((byte[]) item);
-                Tuple5 balance = item;
+                Tuple2<byte[], Tuple5<
+                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> item = this.balances.get(ib);
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(item.a);
+                Tuple5 balance = item.b;
                 if (BlockChain.ERA_COMPU_ALL_UP) {
                     balance = account.balanceAddDEVAmount(assetKey, balance);
                 }

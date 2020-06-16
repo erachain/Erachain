@@ -15,14 +15,14 @@ import java.math.BigDecimal;
 import java.util.Observable;
 
 @SuppressWarnings("serial")
-public class AccountsNameTableModel extends TimerTableModelCls<Tuple2<String, String>> implements ObserverWaiter {
+public class AccountsNameTableModel extends TimerTableModelCls<Tuple2<String, Tuple2<String, String>>> implements ObserverWaiter {
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_NAME = 2;
     public static final int COLUMN_DESCRIPTION = 3;
     public static final int COLUMN_PERSON = 4;
     public final int COLUMN_NO = 0;
 
-    private Tuple2<String, String> account;
+    private Tuple2<String, Tuple2<String, String>> account;
 
     public AccountsNameTableModel() {
         super(Controller.getInstance().wallet.database.getAccountsPropertisMap(),
@@ -51,7 +51,8 @@ public class AccountsNameTableModel extends TimerTableModelCls<Tuple2<String, St
             return null;
         }
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance;
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                balance;
         Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;
         String str;
 
@@ -62,12 +63,12 @@ public class AccountsNameTableModel extends TimerTableModelCls<Tuple2<String, St
             case COLUMN_NAME:
                 return account.a;
             case COLUMN_PERSON:
-                return new Account(account.b).viewPerson();
+                return new Account(account.a).viewPerson();
             case COLUMN_NO:
                 return row + 1;
             case COLUMN_DESCRIPTION:
 
-                answer = (JSONObject) JSONValue.parse(account.b);
+                answer = (JSONObject) JSONValue.parse(account.b.b);
                 answer = answer == null ? new JSONObject() : answer;
                 // set papams
                 if (answer.containsKey("description")) {
