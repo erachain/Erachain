@@ -4,7 +4,7 @@ package org.erachain.utils;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.wallet.TransactionMap;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.*;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
@@ -192,8 +192,8 @@ public class SysTray implements Observer {
 
                 //TRANSACTIONS SORTER
                 Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-                indexes.put(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS, TransactionMap.TIMESTAMP_INDEX);
-                indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
+                indexes.put(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS, WTransactionMap.TIMESTAMP_INDEX);
+                indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, WTransactionMap.TIMESTAMP_INDEX);
                 //indexes.put(WalletTransactionsTableModel.COLUMN_CREATOR, TransactionMap.ADDRESS_INDEX);
                 //indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT, TransactionMap.AMOUNT_INDEX);
                 //  CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);

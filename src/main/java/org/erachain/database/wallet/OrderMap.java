@@ -12,24 +12,6 @@ import org.mapdb.DB;
 
 import java.util.Map;
 
-/*
- * Tuple4
- * 	private BigInteger id;
-	private Account creator;
-	protected long timestamp;
-	private boolean isExecutable = true;
-
-Tuple3
-	private long have;
-	private BigDecimal amountHave;
-	private BigDecimal fulfilledHave;
-
-Tuple3
-	private long want;
-	private BigDecimal amountWant;
-	private BigDecimal fulfilledWant;
-
- */
 public class OrderMap extends DCUMapImpl<Long, Order> {
 
     public OrderMap(DBASet databaseSet, DB database) {

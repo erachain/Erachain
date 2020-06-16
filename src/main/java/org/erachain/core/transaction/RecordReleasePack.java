@@ -36,10 +36,13 @@ public class RecordReleasePack extends Transaction {
         this(typeBytes, creator, transactions, feePow, timestamp, reference);
         this.signature = signature;
     }
+
     public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, byte feePow,
-                             long timestamp, Long reference, byte[] signature, long feeLong) {
+                             long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, transactions, feePow, timestamp, reference);
         this.signature = signature;
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -116,7 +119,13 @@ public class RecordReleasePack extends Transaction {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -145,7 +154,7 @@ public class RecordReleasePack extends Transaction {
 
         if (asDeal > Transaction.FOR_MYPACK) {
             return new RecordReleasePack(typeBytes, creator, transactions, feePow, timestamp, reference,
-                    signatureBytes, feeLong);
+                    signatureBytes, seqNo, feeLong);
         } else {
             return new RecordReleasePack(typeBytes, creator, transactions, reference, signatureBytes);
         }

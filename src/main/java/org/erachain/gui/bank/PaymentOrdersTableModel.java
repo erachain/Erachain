@@ -4,11 +4,13 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
-import org.erachain.database.wallet.TransactionMap;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
-import org.erachain.utils.*;
+import org.erachain.utils.DateTimeFormat;
+import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.LoggerFactory;
 
@@ -202,7 +204,7 @@ public class PaymentOrdersTableModel extends SortedListTableModelCls<Tuple2<Long
             if (this.transactions == null) {
                 transactions = (SortableList<Tuple2<Long, Long>, Transaction>) message.getValue();
                 //transactions.registerObserver();
-                transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
+                transactions.sort(WTransactionMap.TIMESTAMP_INDEX, true);
                 read_trans();
                 this.fireTableDataChanged();
             }

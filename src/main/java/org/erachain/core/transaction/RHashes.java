@@ -65,10 +65,13 @@ public class RHashes extends Transaction {
         this(typeBytes, creator, feePow, url, data, hashes, timestamp, reference);
         this.signature = signature;
     }
+
     public RHashes(byte[] typeBytes, PublicKeyAccount creator, byte feePow, byte[] url, byte[] data, byte[][] hashes,
-                   long timestamp, Long reference, byte[] signature, long feeLong) {
+                   long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, feePow, url, data, hashes, timestamp, reference);
         this.signature = signature;
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -153,7 +156,13 @@ public class RHashes extends Transaction {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -201,7 +210,7 @@ public class RHashes extends Transaction {
 
         if (asDeal > Transaction.FOR_MYPACK) {
             return new RHashes(typeBytes, creator, feePow, url, arbitraryData, hashes, timestamp, reference,
-                    signatureBytes, feeLong);
+                    signatureBytes, seqNo, feeLong);
         } else {
             return new RHashes(typeBytes, creator, url, arbitraryData, hashes, reference, signatureBytes);
         }

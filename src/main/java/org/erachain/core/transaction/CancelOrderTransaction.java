@@ -52,10 +52,13 @@ public class CancelOrderTransaction extends Transaction {
         this(typeBytes, creator, order, feePow, timestamp, reference);
         this.signature = signature;
     }
-    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] order, byte feePow, long timestamp, Long reference, byte[] signature, long feeLong) {
+
+    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] order, byte feePow, long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, order, feePow, timestamp, reference);
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
     }
 
     public CancelOrderTransaction(PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -153,7 +156,13 @@ public class CancelOrderTransaction extends Transaction {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -164,7 +173,7 @@ public class CancelOrderTransaction extends Transaction {
         byte[] orderSignature = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
         position += ORDER_LENGTH;
 
-        return new CancelOrderTransaction(typeBytes, creator, orderSignature, feePow, timestamp, reference, signatureBytes, feeLong);
+        return new CancelOrderTransaction(typeBytes, creator, orderSignature, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
     }
 
     //@Override

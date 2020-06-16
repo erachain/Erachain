@@ -23,9 +23,12 @@ public class IssueUnionRecord extends IssueItemRecord {
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) {
         super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference, signature);
     }
+
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp,
-                            Long reference, byte[] signature, long feeLong) {
+                            Long reference, byte[] signature, long seqNo, long feeLong) {
         super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference, signature);
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -104,7 +107,13 @@ public class IssueUnionRecord extends IssueItemRecord {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -127,7 +136,7 @@ public class IssueUnionRecord extends IssueItemRecord {
         }
 
         if (asDeal > Transaction.FOR_MYPACK) {
-            return new IssueUnionRecord(typeBytes, creator, union, feePow, timestamp, reference, signatureBytes, feeLong);
+            return new IssueUnionRecord(typeBytes, creator, union, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
         } else {
             return new IssueUnionRecord(typeBytes, creator, union, signatureBytes);
         }

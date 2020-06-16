@@ -53,11 +53,14 @@ public class IssueStatementRecord extends Transaction {
         this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
     }
+
     public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
-                                byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature, long feeLong) {
+                                byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
     }
 
 
@@ -87,14 +90,17 @@ public class IssueStatementRecord extends Transaction {
         this.signatures = signatures;
         this.setTypeBytes();
     }
+
     public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
                                 byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures,
-                                long timestamp, Long reference, byte[] signature, long feeLong) {
+                                long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
     }
 
     // as Pack
@@ -174,7 +180,13 @@ public class IssueStatementRecord extends Transaction {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -237,14 +249,14 @@ public class IssueStatementRecord extends Transaction {
         if (signersLen == 0) {
             if (asDeal > Transaction.FOR_MYPACK) {
                 return new IssueStatementRecord(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte,
-                        timestamp, reference, signatureBytes, feeLong);
+                        timestamp, reference, signatureBytes, seqNo, feeLong);
             } else {
                 return new IssueStatementRecord(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
             }
         } else {
             if (asDeal > Transaction.FOR_MYPACK) {
                 return new IssueStatementRecord(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte,
-                        signers, signatures, timestamp, reference, signatureBytes, feeLong);
+                        signers, signatures, timestamp, reference, signatureBytes, seqNo, feeLong);
             } else {
                 return new IssueStatementRecord(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, reference, signatureBytes);
             }

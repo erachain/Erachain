@@ -9,7 +9,6 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
-import org.erachain.utils.ReverseComparator;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -25,24 +24,23 @@ import java.util.*;
  * А когда они подтверждаются они будут перезаписываться поверх.
  * Тогда неподтвержденные будут показывать что они не исполнились.
  * И их пользователь сможет сам удалить вручную или командой - удалить все неподтвержденные.
- * Вообще тут реализация как СТЕК - удалить можно только если это верхний элемент.
- * Добавление вверх или обновляем существующий по AUTOKEY_INDEX
  * <hr>
- * Ключ: первых байт счета + время создания, причем счет Involved - то есть и входящие тоже будут<br>
+ * Ключ: время создания + первых 8 байт счета - так по времени сортируем. Вторичный ключ по первых 8 байт счета + время создания - отображения по счетам.
+ * Причем счет ищем как Involved - то есть и входящие тоже будут браться<br>
  * Значение: транзакция
  */
-public class TransactionMap extends DCUMapImpl<Long, Transaction> {
+public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Long>, Transaction> {
 
-    public static final int TIMESTAMP_INDEX = 1;
+    //public static final int TIMESTAMP_INDEX = 1;
     //public static final int ADDRESS_INDEX = 2;
     //public static final int AMOUNT_INDEX = 3;
 
     NavigableSet typeKey;
     NavigableSet addressKey;
 
-    static Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(WTransactionMap.class.getName());
 
-    public TransactionMap(DWSet dWSet, DB database) {
+    public WTransactionMap(DWSet dWSet, DB database) {
         super(dWSet, database);
 
         if (databaseSet.isWithObserver()) {
@@ -59,7 +57,7 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
         //OPEN MAP
 
         this.map = database.createTreeMap("transactions")
-                .keySerializer(BTreeKeySerializer.ZERO_OR_POSITIVE_LONG)
+                .keySerializer(BTreeKeySerializer.TUPLE2)
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
@@ -72,6 +70,8 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
 
+        /*
+
         //TIMESTAMP INDEX
         NavigableSet<Long> timestampIndex = database.createTreeSet("transactions_index_timestamp")
                 .makeOrGet();
@@ -80,14 +80,13 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
                 .comparator(new ReverseComparator(Fun.COMPARATOR))
                 .makeOrGet();
 
-        createIndex(TIMESTAMP_INDEX, timestampIndex, descendingTimestampIndex, new Fun.Function2<Long, Long, Transaction>() {
+        createIndex(TIMESTAMP_INDEX, timestampIndex, descendingTimestampIndex, new Fun.Function2<Long, Tuple2<Long, Long>, Transaction>() {
             @Override
-            public Long run(Long key, Transaction value) {
+            public Long run(Tuple2<Long, Long> key, Transaction value) {
                 return value.getTimestamp();
             }
         });
 
-        /*
         //ADDRESS INDEX
         NavigableSet<Tuple2<String[], Tuple2<Long, Long>>> addressIndex = database.createTreeSet("transactions_index_address")
                 .comparator(Fun.COMPARATOR)
@@ -133,9 +132,9 @@ public class TransactionMap extends DCUMapImpl<Long, Transaction> {
         this.typeKey = database.createTreeSet("type_txs").comparator(Fun.TUPLE2_COMPARATOR)
                 .makeOrGet();
         Bind.secondaryKey((Bind.MapWithModificationListener) map, this.typeKey,
-                new Fun.Function2<Tuple2<Byte, Long>, Long, Transaction>() {
+                new Fun.Function2<Tuple2<Byte, Long>, Tuple2<Long, Long>, Transaction>() {
                     @Override
-                    public Tuple2<Byte, Long> run(Long key, Transaction value) {
+                    public Tuple2<Byte, Long> run(Tuple2<Long, Long> key, Transaction value) {
                         return new Tuple2<>((byte) value.getType(), key);
                     }
                 });

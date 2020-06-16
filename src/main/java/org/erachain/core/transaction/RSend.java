@@ -102,11 +102,14 @@ public class RSend extends TransactionAmount {
         this(typeBytes, creator, feePow, recipient, key, amount, head, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
     }
+
     public RSend(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key,
                  BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
-                 Long reference, byte[] signature, long feeLong) {
+                 Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, feePow, recipient, key, amount, head, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -247,7 +250,13 @@ public class RSend extends TransactionAmount {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -325,7 +334,7 @@ public class RSend extends TransactionAmount {
 
         if (asDeal > Transaction.FOR_MYPACK) {
             return new RSend(typeBytes, creator, feePow, recipient, key, amount, head, arbitraryData, isTextByte,
-                    encryptedByte, timestamp, reference, signatureBytes, feeLong);
+                    encryptedByte, timestamp, reference, signatureBytes, seqNo, feeLong);
         } else {
             return new RSend(typeBytes, creator, recipient, key, amount, head, arbitraryData, isTextByte,
                     encryptedByte, reference, signatureBytes);

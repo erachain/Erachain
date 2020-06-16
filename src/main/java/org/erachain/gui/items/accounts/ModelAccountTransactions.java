@@ -7,7 +7,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
-import org.erachain.database.wallet.TransactionMap;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
@@ -203,7 +203,7 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Lon
             if (this.transactions == null) {
                 this.transactions = (SortableList<Tuple2<Long, Long>, Transaction>) message.getValue();
                 //this.transactions.registerObserver();
-                this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
+                this.transactions.sort(WTransactionMap.TIMESTAMP_INDEX, true);
 
                 this.transactions_Asset.clear();
                 ;

@@ -5,7 +5,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
-import org.erachain.database.wallet.TransactionMap;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.TimerTableModelCls;
@@ -135,7 +135,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             return;
 
         /// WALLET addesses
-        Iterator<Long> keysIterator = ((TransactionMap) map).getAddressDescendingIterator(this.sender);
+        Iterator<Long> keysIterator = ((WTransactionMap) map).getAddressDescendingIterator(this.sender);
 
         list = new ArrayList<>();
 

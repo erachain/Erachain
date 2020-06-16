@@ -121,15 +121,18 @@ public class RSetStatusToItem extends Transaction {
                 timestamp, reference);
         this.signature = signature;
     }
+
     public RSetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
                             Long beg_date, Long end_date,
                             long value_1, long value_2, byte[] data_1, byte[] data_2, long ref_to_parent, byte[] description,
-                            long timestamp, Long reference, byte[] signature, long feeLong) {
+                            long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, feePow, key, itemType, itemKey,
                 beg_date, end_date,
                 value_1, value_2, data_1, data_2, ref_to_parent, description,
                 timestamp, reference);
         this.signature = signature;
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -528,7 +531,13 @@ public class RSetStatusToItem extends Transaction {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -623,7 +632,7 @@ public class RSetStatusToItem extends Transaction {
         if (asDeal > Transaction.FOR_MYPACK) {
             return new RSetStatusToItem(typeBytes, creator, feePow, key, itemType, itemKey,
                     beg_date, end_date, value_1, value_2, data_1, data_2, ref_to_parent, additonalData,
-                    timestamp, reference, signature, feeLong);
+                    timestamp, reference, signature, seqNo, feeLong);
         } else {
             return new RSetStatusToItem(typeBytes, creator, key, itemType, itemKey,
                     beg_date, end_date, value_1, value_2, data_1, data_2, ref_to_parent, additonalData,

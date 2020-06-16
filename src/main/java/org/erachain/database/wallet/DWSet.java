@@ -28,7 +28,7 @@ public class DWSet extends DBASet {
 
     private AccountMap accountMap;
     private AccountsPropertisMap accountsPropertisMap;
-    private TransactionMap transactionMap;
+    private WTransactionMap transactionMap;
     private BlocksHeadMap blocksHeadMap;
     private NameMap nameMap;
     private NameSaleMap nameSaleMap;
@@ -65,7 +65,7 @@ public class DWSet extends DBASet {
 
         this.accountMap = new AccountMap(this, this.database);
         this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
-        this.transactionMap = new TransactionMap(this, this.database);
+        this.transactionMap = new WTransactionMap(this, this.database);
         this.blocksHeadMap = new BlocksHeadMap(this, this.database);
         this.nameMap = new NameMap(this, this.database);
         this.nameSaleMap = new NameSaleMap(this, this.database);
@@ -183,9 +183,10 @@ public class DWSet extends DBASet {
      * <hr>
      * Ключ: счет + подпись<br>
      * Значение: транзакция
+     *
      * @return TransactionMap
      */
-    public TransactionMap getTransactionMap() {
+    public WTransactionMap getTransactionMap() {
         return this.transactionMap;
     }
 

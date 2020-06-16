@@ -68,11 +68,14 @@ public class RSetUnionStatusToItem extends Transaction {
                 beg_date, end_date, timestamp, reference);
         this.signature = signature;
     }
+
     public RSetUnionStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
-                                 Long beg_date, Long end_date, long timestamp, Long reference, byte[] signature, long feeLong) {
+                                 Long beg_date, Long end_date, long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, feePow, key, itemType, itemKey,
                 beg_date, end_date, timestamp, reference);
         this.signature = signature;
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -169,7 +172,13 @@ public class RSetUnionStatusToItem extends Transaction {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -203,7 +212,7 @@ public class RSetUnionStatusToItem extends Transaction {
 
         if (asDeal > Transaction.FOR_MYPACK) {
             return new RSetUnionStatusToItem(typeBytes, creator, feePow, key, itemType, itemKey,
-                    beg_date, end_date, timestamp, reference, signature, feeLong);
+                    beg_date, end_date, timestamp, reference, signature, seqNo, feeLong);
         } else {
             return new RSetUnionStatusToItem(typeBytes, creator, key, itemType, itemKey,
                     beg_date, end_date, signature);

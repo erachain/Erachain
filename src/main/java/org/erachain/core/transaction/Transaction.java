@@ -366,7 +366,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected static final int BASE_LENGTH_AS_PACK = BASE_LENGTH_AS_MYPACK + TIMESTAMP_LENGTH
             + CREATOR_LENGTH + SIGNATURE_LENGTH;
     protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + REFERENCE_LENGTH;
-    protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + FEE_LENGTH;
+    protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + TIMESTAMP_LENGTH + FEE_LENGTH;
 
     /**
      * Используется для разделения строки поисковых слов для всех трнзакций.<br>
@@ -562,6 +562,12 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     // GETTERS/SETTERS
+
+    public void setHeightSeq(long seqNo) {
+        this.dbRef = seqNo;
+        this.height = parseDBRefHeight(seqNo);
+        this.seqNo = (int) seqNo;
+    }
 
     public void setHeightSeq(int height, int seqNo) {
         this.dbRef = makeDBRef(height, seqNo);
@@ -1398,6 +1404,11 @@ public abstract class Transaction implements ExplorerJsonLine {
             data = Bytes.concat(data, this.signature);
 
         if (forDeal == FOR_DB_RECORD) {
+            // WRITE DBREF
+            byte[] dbRefBytes = Longs.toByteArray(this.dbRef);
+            dbRefBytes = Bytes.ensureCapacity(dbRefBytes, TIMESTAMP_LENGTH, 0);
+            data = Bytes.concat(data, dbRefBytes);
+
             // WRITE FEE
             byte[] feeBytes = Longs.toByteArray(this.fee.unscaledValue().longValue());
             data = Bytes.concat(data, feeBytes);
