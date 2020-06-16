@@ -69,7 +69,6 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
 
         } else if (type == DELETE_EVENT) {
             this.removeElement(getElementByEvent((Long) message.getValue()));
-
         }
     }
 
@@ -132,6 +131,9 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
         {
             JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
+            if (value == null)
+                return label;
+
             // Get icon to use for the list item value
             byte[] iconBytes = ((ItemCls) value).getIcon();
             if (iconBytes != null && iconBytes.length > 0) {
@@ -150,7 +152,8 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
 
             setObservable();
 
-            LIST_EVENT = (Integer) ((FavoriteItemMap) observable).getObserverEvent();
+            LIST_EVENT = ((FavoriteItemMap) observable).getObserverEvent();
+            observable.addObserver(this);
 
             //RESET_EVENT = (Integer) ((FavoriteItemMap)observable).getObservableData().get(DBMap.NOTIFY_RESET);
             //LIST_EVENT = (Integer) ((FavoriteItemMap)observable).getObservableData().get(DBMap.NOTIFY_LIST);
