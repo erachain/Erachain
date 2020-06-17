@@ -2916,15 +2916,16 @@ public class Controller extends Observable {
     public void onTransactionCreate(Transaction transaction) {
         // ADD TO UNCONFIRMED TRANSACTIONS
         //////this.dcSet.getTransactionTab().add(transaction);
-        /// чтобы не налететь на очситку таблицы - туда передадим
+        /// чтобы не налететь на очистку таблицы - туда передадим
         this.transactionsPool.offerMessage(transaction);
 
         // BROADCAST
         this.broadcastTransaction(transaction);
 
-        if (doesWalletExists()) {
+        if (doesWalletExists() && HARD_WORK < 4) {
             wallet.database.getTransactionMap().set(transaction.getCreator(), transaction);
         }
+
     }
 
     public Pair<Transaction, Integer> registerName(PrivateKeyAccount registrant, Account owner, String name,
