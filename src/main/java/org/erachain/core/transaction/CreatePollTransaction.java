@@ -351,9 +351,8 @@ public class CreatePollTransaction extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress()) || address.equals(this.poll.getCreator().getAddress())) {
+        if (account.equals(this.creator) || account.equals(this.poll.getCreator())) {
             return true;
         }
 

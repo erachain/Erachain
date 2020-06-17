@@ -483,13 +483,12 @@ public class DeployATTransaction extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 
-        if (address.equals(this.getATaccount(dcSet).getAddress())) {
+        if (account.equals(this.getATaccount(dcSet))) {
             return true;
         }
 

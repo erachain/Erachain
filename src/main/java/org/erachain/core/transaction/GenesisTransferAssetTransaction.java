@@ -367,10 +367,9 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (this.creator != null && address.equals(creator.getAddress())
-                || address.equals(recipient.getAddress())) {
+        if (account.equals(creator)
+                || account.equals(recipient)) {
             return true;
         }
 

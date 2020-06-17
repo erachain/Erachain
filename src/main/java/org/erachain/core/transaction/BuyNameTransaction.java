@@ -303,13 +303,12 @@ public class BuyNameTransaction extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 
-        if (address.equals(this.getSeller().getAddress())) {
+        if (account.equals(this.getSeller())) {
             return true;
         }
 

@@ -499,13 +499,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
-        
-        if (this.creator != null && address.equals(creator.getAddress())
-                || address.equals(recipient.getAddress())) {
+        if (account.equals(creator)
+                || account.equals(recipient)) {
             return true;
         }
-        
+
         return false;
     }
     

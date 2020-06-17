@@ -282,11 +282,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @Override
     public boolean isInvolved(Account account) {
 
-        String address = account.getAddress();
-
-        if (address.equals(this.creator.getAddress())) {
-            return true;
-        } else if (address.equals(this.item.getOwner().getAddress())) {
+        if (account.equals(this.creator) || account.equals(this.item.getOwner())) {
             return true;
         }
 
