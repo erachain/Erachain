@@ -1365,15 +1365,11 @@ public class Wallet extends Observable /*implements Observer*/ {
 				continue;
 			}
 
-            if (transaction.noDCSet())
+			if (transaction.noDCSet())
 				transaction.setDC(dcSet, Transaction.FOR_NETWORK, block.blockHead.heightBlock, seqNo, true);
 
 			// CHECK IF PAYMENT
-			if (transaction instanceof RSend) {
-				continue;
-			}
-			// CHECK IF ITEM ISSUE
-			else if (transaction instanceof IssueItemRecord) {
+			if (transaction instanceof IssueItemRecord) {
 				this.orphanItemIssue((IssueItemRecord) transaction);
 			}
 
