@@ -63,7 +63,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
                 list.remove(item);
                 continue;
             }
-            item.setDC_HeightSeq(dcSet, true);
+            item.setDC(dcSet, false);
         }
 
         this.fireTableDataChanged();
@@ -112,7 +112,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
                 list.remove(item);
                 continue;
             }
-            item.setDC_HeightSeq(dcSet, true);
+            item.setDC(dcSet, false);
         }
 
         this.fireTableDataChanged();

@@ -135,7 +135,7 @@ public class UnconfirmedTransactionsTableModel extends TimerTableModelCls<Transa
         DCSet dcSet = DCSet.getInstance();
         for (Transaction item : list) {
 
-            item.setDC_HeightSeq(dcSet, true);
+            item.setDC(dcSet, false);
             item.calcFee();
         }
 

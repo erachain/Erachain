@@ -1171,14 +1171,13 @@ public class Wallet extends Observable /*implements Observer*/ {
 					// UPDATE UNCONFIRMED BALANCE
 					deal_transaction(account, transaction, true);
 
-					if (false) {
-						// DELETE FROM ACCOUNT TRANSACTIONS
-						this.database.getTransactionMap().delete(account, transaction);
-					} else {
-						// место этого перезапишем ее как неподтвержденныю
-						transaction.resetSeqNo();
-						this.database.getTransactionMap().put(account, transaction);
-					}
+					// 1. DELETE FROM ACCOUNT TRANSACTIONS - с нарощенным мясом
+					this.database.getTransactionMap().delete(account, transaction);
+
+					// 2. а теперь сбросим все и сахраним без ссылки на блок
+					transaction.resetSeqNo();
+					this.database.getTransactionMap().put(account, transaction);
+
 				}
 			}
 		}
@@ -1369,8 +1368,6 @@ public class Wallet extends Observable /*implements Observer*/ {
             if (transaction.noDCSet())
 				transaction.setDC(dcSet, Transaction.FOR_NETWORK, block.blockHead.heightBlock, seqNo, true);
 
-			this.orphanTransaction(transaction);
-
 			// CHECK IF PAYMENT
 			if (transaction instanceof RSend) {
 				continue;
@@ -1394,6 +1391,8 @@ public class Wallet extends Observable /*implements Observer*/ {
 			else if (transaction instanceof CancelOrderTransaction) {
 				this.orphanOrderCancel((CancelOrderTransaction) transaction);
 			}
+
+			this.orphanTransaction(transaction);
 
 		}
 

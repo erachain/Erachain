@@ -2512,6 +2512,9 @@ public class Block implements Closeable, ExplorerJsonLine {
                     transFinalMapSinds.delete(itemSignature);
                 }
             }
+
+            // сбросим данные блока - для правильного отображения неподтвержденных
+            transaction.resetSeqNo();
         }
 
         // DELETE ALL CALCULATED

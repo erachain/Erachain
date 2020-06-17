@@ -591,26 +591,6 @@ public abstract class Transaction implements ExplorerJsonLine {
             setupFromStateDB();
     }
 
-    public void setDC_HeightSeq(DCSet dcSet, boolean andSetup) {
-        setDC(dcSet, false);
-
-        if (this.typeBytes[0] == Transaction.CALCULATED_TRANSACTION) {
-
-        }
-
-        Long dbRef2 = dcSet.getTransactionFinalMapSigns().get(this.signature);
-        if (dbRef2 == null)
-            return;
-
-        this.dbRef = dbRef2;
-        Tuple2<Integer, Integer> pair = Transaction.parseDBRef(dbRef2);
-        this.height = pair.a;
-        this.seqNo = pair.b;
-
-        if (andSetup && !isWiped())
-            setupFromStateDB();
-    }
-
     /**
      * @param dcSet
      * @param asDeal

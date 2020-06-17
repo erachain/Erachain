@@ -358,7 +358,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         try {
             Transaction transaction = super.get(key);
             if (transaction != null) {
-                transaction.setHeightSeq(0, 0);
+                transaction.resetSeqNo();
             }
             return transaction;
         } catch (Exception e) {

@@ -8,7 +8,7 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
-import org.erachain.gui.models.TimerTableModelCls;
+import org.erachain.gui.models.WalletTableModel;
 import org.mapdb.Fun;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ import java.util.HashSet;
 ////////
 
 @SuppressWarnings("serial")
-public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsTransactionsTableModel.Trans> implements ObserverWaiter {
+public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTransactionsTableModel.Trans> implements ObserverWaiter {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TRANSACTION = 1;
     public static final int COLUMN_AMOUNT = 2;
@@ -31,26 +31,17 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     public static final int COLUMN_CONFIRM = 8;
     public static final int COLUMN_ACTION_TYPE = 19;
 
-    private boolean isEncrypted;
-
     private Account filterAccount;
 
     private AssetCls asset;
 
-    //private byte[] privateKey;
-
-    //private byte[] publicKey;
-
     private HashSet actionTypes;
-    private DCSet dcSet;
+    private DCSet dcSet = DCSet.getInstance();
 
     public AccountsTransactionsTableModel() {
         super(Controller.getInstance().wallet.database.getTransactionMap(),
                 new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation"},
                 new Boolean[]{false, true, true, false, false}, false);
-
-        dcSet = DCSet.getInstance();
-        addObservers();
 
     }
 
@@ -60,10 +51,6 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
 
     public void setAsset(AssetCls asset) {
         this.asset = asset;
-    }
-
-    public void setEncryption(boolean encr) {
-        this.isEncrypted = encr;
     }
 
     @Override

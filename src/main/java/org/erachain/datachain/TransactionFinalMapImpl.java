@@ -176,10 +176,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             Long key;
             while (iterator.hasNext() && (limit == 0 || counter < limit)) {
 
-                key = iterator.next();
-                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                item = this.map.get(key);
-                item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+                item = this.map.get(iterator.next());
+                item.setDC((DCSet) databaseSet, true);
 
                 txs.add(item);
                 counter++;
@@ -236,7 +234,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, false)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, false)) {
             List<Transaction> txs = new ArrayList<>();
             int counter = 0;
             Transaction item;
@@ -246,10 +244,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     offset--;
                     continue;
                 }
-                key = (Long) iterator.next();
-                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                item = this.map.get(key);
-                item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+                item = this.map.get(iterator.next());
+                item.setDC((DCSet) databaseSet, true);
 
                 txs.add(item);
                 counter++;
@@ -270,7 +266,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, fromID, false)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, fromID, false)) {
             List<Transaction> txs = new ArrayList<>();
             int counter = 0;
             Transaction item;
@@ -280,10 +276,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     offset--;
                     continue;
                 }
-                key = (Long) iterator.next();
-                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                item = this.map.get(key);
-                item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+                item = this.map.get(iterator.next());
+                item.setDC((DCSet) databaseSet, true);
 
                 txs.add(item);
                 counter++;
@@ -335,22 +329,19 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         List<Transaction> txs = new ArrayList<>();
-        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type, null, false)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type, null, false)) {
             int counter = 0;
             Transaction item;
             Long key;
             while (iterator.hasNext() && (limit == 0 || counter < limit)) {
-                key = (Long) iterator.next();
 
                 if (offset > 0) {
                     offset--;
                     continue;
                 }
 
-
-                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                item = this.map.get(key);
-                item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+                item = this.map.get(iterator.next());
+                item.setDC((DCSet) databaseSet, true);
 
                 txs.add(item); // 628853-1
                 counter++;
@@ -411,10 +402,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             Transaction item;
             Long key;
             while (iterator.hasNext() && (limit == 0 || counter < limit)) {
-                key = iterator.next();
 
-                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                item = this.map.get(key);
+                item = this.map.get(iterator.next());
                 if (onlyCreator && item.getCreator() != null && !item.getCreator().equals(addressShort)) {
                     // пропустим всех кто не создатель
                     continue;
@@ -425,7 +414,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     continue;
                 }
 
-                item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+                item.setDC((DCSet) databaseSet, true);
 
                 transactions.add(item);
                 counter++;
@@ -779,8 +768,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                         continue;
                     }
 
-                    Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                    item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+                    item.setDC((DCSet) databaseSet, true);
 
                     count++;
 
@@ -830,8 +818,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                         continue;
                     }
 
-                    Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                    item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+                    item.setDC((DCSet) databaseSet, true);
 
                     count++;
 
@@ -897,8 +884,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     }
                 }
 
-                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+                item.setDC((DCSet) databaseSet, true);
 
                 --limit;
 
@@ -967,17 +953,15 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         List<Transaction> txs = new ArrayList<>();
-        try (IteratorCloseable iterator = findTransactionsKeys(address, sender, recipient, fromSeqNo, minHeight, maxHeight,
+        try (IteratorCloseable<Long> iterator = findTransactionsKeys(address, sender, recipient, fromSeqNo, minHeight, maxHeight,
                 type, service, desc, offset, limit)) {
 
             Transaction item;
             Long key;
 
             while (iterator.hasNext()) {
-                key = (Long) iterator.next();
-                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                item = this.map.get(key);
-                item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+                item = this.map.get(iterator.next());
+                item.setDC((DCSet) databaseSet, true);
                 txs.add(item);
             }
         } catch (IOException e) {
@@ -1192,8 +1176,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                         continue;
                     }
 
-                    Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                    item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+                    item.setDC((DCSet) databaseSet, true);
 
                     count++;
 
@@ -1243,8 +1226,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                         continue;
                     }
 
-                    Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                    item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+                    item.setDC((DCSet) databaseSet, true);
 
                     count++;
 
@@ -1326,8 +1308,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (transaction == null)
             return null;
 
-        Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-        transaction.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+        transaction.setDC((DCSet) databaseSet, true);
         
         // наращивание всех данных для скелета - так же необходимо для создания ключей tags
         if (parent == null && !transaction.isWiped()) {

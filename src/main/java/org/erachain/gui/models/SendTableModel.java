@@ -330,7 +330,7 @@ public class SendTableModel extends JTable implements Observer {
                 if (!is) {
                     
                     Transaction messagetx = (Transaction)message.getValue();
-                    messagetx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK, DCSet.getInstance().getBlockMap().size() + 1, 1, true);
+                    messagetx.setDC(DCSet.getInstance(), false);
 
                     addMessage(0, (RSend) messagetx);
 

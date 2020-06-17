@@ -234,8 +234,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
                 outcome = key.equals(Longs.fromByteArray(rsend.getCreator().getShortAddressBytes()));
 
                 if (incoming ^ outcome) {
-                    if (rsend.getSignature() != null)
-                        rsend.setDC_HeightSeq(dcSet, true);
+                    rsend.setDC(dcSet, false);
                     transactions.add(rsend);
                 }
             }

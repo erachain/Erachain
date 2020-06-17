@@ -186,7 +186,6 @@ public class AccountsRightPanel extends JPanel {
 
     public void setAsset(AssetCls asset) {
         table_Model.setAsset(asset);
-        table_Model.setEncryption(false);
         table_Model.getInterval();
         table_Model.fireTableDataChanged();
         jTable1.setDefaultRenderer(BigDecimal.class, new RendererBigDecimals(asset.getScale()));

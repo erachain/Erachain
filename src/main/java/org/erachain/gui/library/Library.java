@@ -45,7 +45,7 @@ public class Library {
             return;
 
         if (transaction.noDCSet())
-            transaction.setDC_HeightSeq(DCSet.getInstance(), true);
+            transaction.setDC(DCSet.getInstance(), false);
 
         switch ( transaction.getType()) {
             case Transaction.SEND_ASSET_TRANSACTION:
