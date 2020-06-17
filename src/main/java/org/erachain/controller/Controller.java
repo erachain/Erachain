@@ -2921,6 +2921,10 @@ public class Controller extends Observable {
 
         // BROADCAST
         this.broadcastTransaction(transaction);
+
+        if (doesWalletExists()) {
+            wallet.database.getTransactionMap().set(transaction.getCreator(), transaction);
+        }
     }
 
     public Pair<Transaction, Integer> registerName(PrivateKeyAccount registrant, Account owner, String name,
