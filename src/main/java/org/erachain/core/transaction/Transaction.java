@@ -1830,6 +1830,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     public void resetDCSet() {
         dcSet = null;
         itemsKeys = null;
+    }
+
+    public void resetSeqNo() {
+        dbRef = 0l;
         height = 0;
         seqNo = 0;
     }

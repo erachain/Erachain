@@ -86,7 +86,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
            
             case COLUMN_TRANSACTION:
 
-                if (r_Tran.transaction.isConfirmed(DCSet.getInstance()))
+                if (r_Tran.transaction.getBlockHeight() > 0)
                     return r_Tran.transaction.viewHeightSeq();
                 return "-";
 
@@ -151,7 +151,8 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     private boolean trans_Parse(Transaction transaction) {
 
 
-        transaction.setDC_HeightSeq(dcSet, true);
+        //transaction.setDC_HeightSeq(dcSet, true);
+        transaction.setDC(dcSet, false);
 
         if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
             RCalculated tx = (RCalculated) transaction;
