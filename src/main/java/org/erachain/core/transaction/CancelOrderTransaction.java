@@ -249,7 +249,7 @@ public class CancelOrderTransaction extends Transaction {
             Order order = this.dcSet.getOrderMap().get(this.orderID);
 
             //CHECK IF CREATOR IS CREATOR
-            if (!order.getCreator().equals(this.creator.getAddress())) {
+            if (!order.getCreator().equals(this.creator)) {
                 return INVALID_ORDER_CREATOR;
             }
         }

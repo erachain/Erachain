@@ -343,9 +343,8 @@ public class VoteOnPollTransaction extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 
@@ -356,7 +355,7 @@ public class VoteOnPollTransaction extends Transaction {
     //@Override
     @Override
     public BigDecimal getAmount(Account account) {
-        if (account.getAddress().equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return BigDecimal.ZERO.subtract(this.fee);
         }
 

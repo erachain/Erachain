@@ -246,9 +246,8 @@ public class UpdateNameTransaction extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress()) || address.equals(this.name.getOwner().getAddress())) {
+        if (account.equals(this.creator) || account.equals(this.name.getOwner())) {
             return true;
         }
 
@@ -258,7 +257,7 @@ public class UpdateNameTransaction extends Transaction {
     //@Override
     @Override
     public BigDecimal getAmount(Account account) {
-        if (account.getAddress().equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return BigDecimal.ZERO.subtract(this.fee);
         }
 

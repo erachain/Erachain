@@ -103,7 +103,8 @@ public class TelegramStore extends Observable implements Observer {
 
          ArrayList<Transaction> list = new ArrayList<Transaction>();
          for (Transaction transaction : this.database.getTelegramsMap().values()) {
-             if (transaction.getCreator().getAddress().equals(address)) list.add(transaction);
+             if (transaction.getCreator().equals(address))
+                 list.add(transaction);
          }
          return list;
      }
@@ -116,8 +117,8 @@ public class TelegramStore extends Observable implements Observer {
 	 */
 	public void deleteFromCreator(String address){
         for (Transaction transaction : database.getTelegramsMap().values()) {
-             if ( transaction.getCreator().getAddress().equals(address))
-                 database.getTelegramsMap().delete(transaction.viewSignature());
+            if (transaction.getCreator().equals(address))
+                database.getTelegramsMap().delete(transaction.viewSignature());
             }
         
      }
@@ -130,7 +131,7 @@ public class TelegramStore extends Observable implements Observer {
 
         ArrayList<Transaction> list = new ArrayList<Transaction>();
         for (Transaction transaction : this.database.getTelegramsMap().values()) {
-            if (transaction.getCreator().getAddress().equals(address)) {
+            if (transaction.getCreator().equals(address)) {
                 list.add(transaction);
                 database.getTelegramsMap().delete(transaction.viewSignature());
             }

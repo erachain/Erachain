@@ -808,17 +808,11 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
     @Override
     public boolean isInvolved(Account account) {
-        if (false) {
-            return getInvolvedAccounts().contains(account);
+        if (account.equals(creator)) return true;
 
-        } else {
-            String address = account.getAddress();
-            if (address.equals(creator.getAddress())) return true;
-
-            for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
-                if (address.equals(publicAccount.getAddress()))
-                    return true;
-            }
+        for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
+            if (publicAccount.equals(account))
+                return true;
         }
 
         return false;

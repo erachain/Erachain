@@ -356,11 +356,10 @@ public class RVouch extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
-        if (address.equals(creator.getAddress())) return true;
+        if (account.equals(creator)) return true;
 
         for (Account recipient : this.getRecipientAccounts()) {
-            if (address.equals(recipient.getAddress()))
+            if (account.equals(recipient))
                 return true;
         }
 

@@ -1,24 +1,5 @@
 package org.erachain.gui.items.accounts;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -31,9 +12,23 @@ import org.erachain.gui.library.WalletSyncButton;
 import org.erachain.gui.models.AccountsTableModel;
 import org.erachain.gui.models.FavoriteComboBoxModel;
 import org.erachain.lang.Lang;
-import org.erachain.utils.NumberAsString;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.mapdb.Fun;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public class AccountsPanel extends JPanel // implements ItemListener
@@ -125,18 +120,19 @@ public class AccountsPanel extends JPanel // implements ItemListener
         tableModel.setAsset((AssetCls) cbxFavorites.getSelectedItem());
         table = Gui.createSortableTable(tableModel, 1);
 
-        //TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
-        //sorter.setComparator(0, new IntegerComparator());
-        RowSorter sorter = new TableRowSorter(tableModel);
-        table.setRowSorter(sorter);
+        if (false) {
+            //TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
+            //sorter.setComparator(0, new IntegerComparator());
+            RowSorter sorter = new TableRowSorter(tableModel);
+            table.setRowSorter(sorter);
 
-        List<RowSorter.SortKey> sortKeys = new ArrayList<>(4);
-        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
-        // IF NEED add SORTED ROW
-        //sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
-        sorter.setSortKeys(sortKeys);
-        //sorter.setComparator(AccountsTableModel.COLUMN_FEE_BALANCE, new BigDecimalStringComparator());
-
+            List<RowSorter.SortKey> sortKeys = new ArrayList<>(4);
+            sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+            // IF NEED add SORTED ROW
+            //sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+            sorter.setSortKeys(sortKeys);
+            //sorter.setComparator(AccountsTableModel.COLUMN_FEE_BALANCE, new BigDecimalStringComparator());
+        }
         // render
 
 

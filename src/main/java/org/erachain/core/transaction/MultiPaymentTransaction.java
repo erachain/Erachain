@@ -307,12 +307,12 @@ public class MultiPaymentTransaction extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        for (Account involved : this.getInvolvedAccounts()) {
-            if (address.equals(involved.getAddress())) {
+        if (account.equals(creator)) return true;
+
+        for (Account recipient : this.getRecipientAccounts()) {
+            if (recipient.equals(account))
                 return true;
-            }
         }
 
         return false;

@@ -884,9 +884,8 @@ public class RSetStatusToItem extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 

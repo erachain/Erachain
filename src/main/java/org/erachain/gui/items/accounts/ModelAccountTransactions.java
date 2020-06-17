@@ -26,19 +26,13 @@ public class ModelAccountTransactions extends TimerTableModelCls<Transaction> im
     public static final int COLUMN_AMOUNT = 1;
     public static final int COLUMN_TRANSACTION = 2;
     private static final int COLUMN_ADDRESS = 0;
-    //	public static final int COLUMN_CONFIRMED_BALANCE = 1;
-    //	public static final int COLUMN_WAINTING_BALANCE = 2;
-    //public static final int COLUMN_GENERATING_BALANCE = 3;
-    //	public static final int COLUMN_FEE_BALANCE = 3;
     List<Tuple2<Tuple3<String, Long, String>, BigDecimal>> cred;
-    //private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Amount", "Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
     private Boolean[] column_AutuHeight = new Boolean[]{true, false, false, false};
     private List<PublicKeyAccount> publicKeyAccounts;
     private Account account;
-    private long asset_Key = 1l;
-    private AssetCls asset = GenesisBlock.makeAsset(asset_Key);
-    private List<Transaction> transactions_Asset;
-    //private  Account_Cls account;
+    private long filterAssetKey = 1l;
+    private AssetCls asset = GenesisBlock.makeAsset(filterAssetKey);
+    private List<Transaction> assetTransactions;
 
     @SuppressWarnings("unchecked")
     public ModelAccountTransactions() {
@@ -46,7 +40,7 @@ public class ModelAccountTransactions extends TimerTableModelCls<Transaction> im
 
         logger = LoggerFactory.getLogger(ModelAccountTransactions.class);
 
-        this.transactions_Asset = new ArrayList<Transaction>();
+        this.assetTransactions = new ArrayList<Transaction>();
         this.publicKeyAccounts = Controller.getInstance().getWalletPublicKeyAccounts();
         cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
         account = new Account("");
@@ -57,95 +51,18 @@ public class ModelAccountTransactions extends TimerTableModelCls<Transaction> im
         return publicKeyAccounts.get(row);
     }
 
-    public PublicKeyAccount getPublicKeyAccount(int row) {
-        return publicKeyAccounts.get(row);
-    }
-
-    public void setParam(AssetCls asset, Account account) {
-        if (account != null) this.account = account;
-        if (asset != null) {
-            this.asset = asset;
-            asset_Key = asset.getKey();
-        }
-
-        List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(this.account.getShortAddressBytes(), 1000, true, descending);
-
-
-        this.transactions_Asset.clear();
-        ;
-        for (Transaction trans1 : transactions) {
-            long a = trans1.getAssetKey();
-            if ((a == asset_Key || a == -asset_Key)) {
-
-                this.transactions_Asset.add(trans1);
-
-
-            }
-
-
-        }
-
-
-        this.fireTableDataChanged();
-    }
-
     @Override
     public Object getValueAt(int row, int column) {
 
-        if (transactions_Asset.isEmpty()) return null;
+        if (assetTransactions.isEmpty()) return null;
 
-		/*	if(this.publicKeyAccounts == null || row > this.publicKeyAccounts.size() - 1 )
-		{
-			return null;
-		}
-
-
-		account = this.publicKeyAccounts.get(row);
-
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance;
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;
-		String str;
-		 */
         switch (column) {
             case COLUMN_ADDRESS:
-                return transactions_Asset.get(row).getKey();
+                return assetTransactions.get(row).getKey();
             case COLUMN_AMOUNT:
-                return transactions_Asset.get(row).getAmount().toPlainString();
+                return assetTransactions.get(row).getAmount().toPlainString();
             case COLUMN_TRANSACTION:
-                return Lang.getInstance().translate(transactions_Asset.get(row).viewTypeName());
-			/*
-		case COLUMN_CONFIRMED_BALANCE:
-			if (this.asset == null) return "-";
-			balance = account.getBalance(this.asset.getKey(DLSet.getInstance()));
-			str = NumberAsString.getInstance().numberAsString(balance.a) + "/" + balance.b.toPlainString() + "/" + balance.c.toPlainString();
-			return str;
-		case COLUMN_WAINTING_BALANCE:
-			if (this.asset == null) return "-";
-			balance = account.getBalance(this.asset.getKey(DLSet.getInstance()));
-			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DLSet.getInstance()));
-			str = NumberAsString.getInstance().numberAsString(unconfBalance.a.subtract(balance.a))
-					+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()
-					+ "/" + unconfBalance.c.subtract(balance.c).toPlainString();
-			return str;
-		case COLUMN_FEE_BALANCE:
-			if (this.asset == null) return "-";
-			return NumberAsString.getInstance().numberAsString(account.getBalanceUSE(Transaction.FEE_KEY));
-			 */
-
-			/*
-
-		case COLUMN_GENERATING_BALANCE:
-
-			if(this.asset == null || this.asset.getKey() == AssetCls.FEE_KEY)
-			{
-				return  NumberAsString.getInstance().numberAsString(account.getGeneratingBalance());
-			}
-			else
-			{
-				return NumberAsString.getInstance().numberAsString(BigDecimal.ZERO);
-			}
-			 */
-
+                return Lang.getInstance().translate(assetTransactions.get(row).viewTypeName());
         }
 
         return null;
@@ -161,23 +78,17 @@ public class ModelAccountTransactions extends TimerTableModelCls<Transaction> im
             if (this.list == null) {
                 this.list = ((WTransactionMap) message.getValue()).get(account, 1000);
 
-                this.transactions_Asset.clear();
+                this.assetTransactions.clear();
 
                 for (Transaction trans : this.list) {
-                    long a = trans.getAssetKey();
-                    Transaction trans1 = trans;
-                    Tuple2<Tuple2<Long, Long>, Transaction> ss = null;
+                    long assetKey = trans.getAssetKey();
 
-                    if ((a == asset_Key || a == -asset_Key) && (account.getAddress() == trans1.viewCreator() || account.getAddress() == trans1.viewRecipient())) {
-                        this.transactions_Asset.add(trans);
-
+                    if (assetKey == filterAssetKey
+                            && (trans.isInvolved(account))) {
+                        this.assetTransactions.add(trans);
 
                     }
-
-
                 }
-
-
             }
 
             this.fireTableDataChanged();
@@ -189,8 +100,7 @@ public class ModelAccountTransactions extends TimerTableModelCls<Transaction> im
             this.publicKeyAccounts = Controller.getInstance().getWalletPublicKeyAccounts();
             cred.clear();
             for (PublicKeyAccount account : this.publicKeyAccounts) {
-                cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
-                //cred.addAll(DLSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
+                cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -filterAssetKey));
             }
 
 
@@ -249,6 +159,6 @@ public class ModelAccountTransactions extends TimerTableModelCls<Transaction> im
     @Override
     public Transaction getItem(int k) {
         // TODO Auto-generated method stub
-        return transactions_Asset.get(k);
+        return assetTransactions.get(k);
     }
 }

@@ -1059,6 +1059,58 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 	}
 
+	private static final Account[] acctArrayCLS = new Account[]{};
+
+	public Account[] getInvolvedAccounts(Transaction transaction) {
+
+		// CHECK IF WALLET IS OPEN
+		if (!this.exists()) {
+			return null;
+		}
+
+		List<Account> involved = new ArrayList<>();
+
+		// FOR ALL ACCOUNTS
+		List<Account> accounts = this.getAccounts();
+		synchronized (accounts) {
+			for (Account account : accounts) {
+				// CHECK IF INVOLVED
+				if (transaction.isInvolved(account)) {
+					// ADD TO ACCOUNT TRANSACTIONS
+					involved.add(account);
+				}
+			}
+		}
+		return involved.toArray(acctArrayCLS);
+
+	}
+
+	private static final Integer[] intArrayCLS = new Integer[]{};
+
+	public Integer[] getInvolvedAccountHashes(Transaction transaction) {
+
+		// CHECK IF WALLET IS OPEN
+		if (!this.exists()) {
+			return null;
+		}
+
+		List<Integer> involved = new ArrayList<>();
+
+		// FOR ALL ACCOUNTS
+		List<Account> accounts = this.getAccounts();
+		synchronized (accounts) {
+			for (Account account : accounts) {
+				// CHECK IF INVOLVED
+				if (transaction.isInvolved(account)) {
+					// ADD TO ACCOUNT TRANSACTIONS
+					involved.add(account.hashCode());
+				}
+			}
+		}
+		return involved.toArray(intArrayCLS);
+
+	}
+
 	public void processTransaction(Transaction transaction) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {

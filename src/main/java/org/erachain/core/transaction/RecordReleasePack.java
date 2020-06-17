@@ -315,10 +315,9 @@ public class RecordReleasePack extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
         for (Account involved : this.getInvolvedAccounts()) {
-            if (address.equals(involved.getAddress())) {
+            if (account.equals(involved)) {
                 return true;
             }
         }

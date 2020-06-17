@@ -130,6 +130,8 @@ public class UnconfirmedTransactionsTableModel extends TimerTableModelCls<Transa
     @Override
     public void getInterval() {
 
+        super.getInterval();
+
         DCSet dcSet = DCSet.getInstance();
         for (Transaction item : list) {
 

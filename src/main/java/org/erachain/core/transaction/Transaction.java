@@ -726,7 +726,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public BigDecimal getFee(Account account) {
-        return this.getFee(account.getAddress());
+        if (this.creator != null)
+            if (this.creator.getAddress().equals(account))
+                return this.fee;
+        return BigDecimal.ZERO;
     }
 
     public BigDecimal getFee() {
