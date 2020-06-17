@@ -1059,27 +1059,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 	}
 
-	public boolean isInvolved(Transaction transaction) {
-		// CHECK IF WALLET IS OPEN
-		if (!this.exists()) {
-			return false;
-		}
-
-		// FOR ALL ACCOUNTS
-		List<Account> accounts = this.getAccounts();
-		synchronized (accounts) {
-			for (Account account : accounts) {
-				// CHECK IF INVOLVED
-				if (transaction.isInvolved(account)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	private void processTransaction(Transaction transaction) {
+	public void processTransaction(Transaction transaction) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;

@@ -2923,7 +2923,8 @@ public class Controller extends Observable {
         this.broadcastTransaction(transaction);
 
         if (doesWalletExists() && HARD_WORK < 4) {
-            wallet.database.getTransactionMap().set(transaction.getCreator(), transaction);
+            // для всех счетов - может сам себе послал
+            wallet.processTransaction(transaction);
         }
 
     }

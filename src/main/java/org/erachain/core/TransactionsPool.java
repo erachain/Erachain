@@ -197,9 +197,9 @@ public class TransactionsPool extends MonitoredThread {
             // BROADCAST
             controller.network.broadcast(transactionMessage, false);
 
-            if (controller.doesWalletExists() && Controller.HARD_WORK < 3
-                    && controller.wallet.isInvolved(transaction)) {
-                controller.wallet.database.getTransactionMap().set(transaction.getCreator(), transaction);
+            if (controller.doesWalletExists() && Controller.HARD_WORK < 3) {
+                // для всех счетов - може это прилетела или улетела или между своими счетами
+                controller.wallet.processTransaction(transaction);
             }
 
         }
