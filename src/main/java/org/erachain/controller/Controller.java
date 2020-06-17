@@ -2924,6 +2924,7 @@ public class Controller extends Observable {
 
         if (doesWalletExists() && HARD_WORK < 4) {
             // для всех счетов - может сам себе послал
+            transaction.resetDCSet(); // сбросим назначения после Форкнутой Базы
             wallet.processTransaction(transaction);
         }
 

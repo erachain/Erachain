@@ -1827,6 +1827,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     public void resetDCSet() {
         dcSet = null;
         itemsKeys = null;
+        height = 0;
+        seqNo = 0;
     }
 
     // ПРОЫЕРЯЛОСЬ! действует в совокупк с Финализе в Блоке

@@ -199,6 +199,7 @@ public class TransactionsPool extends MonitoredThread {
 
             if (controller.doesWalletExists() && Controller.HARD_WORK < 3) {
                 // для всех счетов - може это прилетела или улетела или между своими счетами
+                transaction.resetDCSet(); // сбросим назначения после Форкнутой Базы
                 controller.wallet.processTransaction(transaction);
             }
 
