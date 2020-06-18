@@ -54,14 +54,14 @@ public class IssueTemplateRecord extends IssueItemRecord {
 
     //GETTERS/SETTERS
 
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
         int test_len;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len = BASE_LENGTH_AS_PACK;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len = BASE_LENGTH_AS_DBRECORD;
         } else {
             test_len = BASE_LENGTH;
@@ -76,7 +76,7 @@ public class IssueTemplateRecord extends IssueItemRecord {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -94,7 +94,7 @@ public class IssueTemplateRecord extends IssueItemRecord {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -107,7 +107,7 @@ public class IssueTemplateRecord extends IssueItemRecord {
 
         long feeLong = 0;
         long seqNo = 0;
-        if (asDeal == FOR_DB_RECORD) {
+        if (forDeal == FOR_DB_RECORD) {
             //READ SEQ_NO
             byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             seqNo = Longs.fromByteArray(seqNoBytes);
@@ -124,7 +124,7 @@ public class IssueTemplateRecord extends IssueItemRecord {
         TemplateCls template = TemplateFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += template.getDataLength(false);
 
-        if (asDeal == FOR_DB_RECORD) {
+        if (forDeal == FOR_DB_RECORD) {
             //READ KEY
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
             long key = Longs.fromByteArray(timestampBytes);
@@ -134,7 +134,7 @@ public class IssueTemplateRecord extends IssueItemRecord {
 
         }
 
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             return new IssueTemplateRecord(typeBytes, creator, template, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
         } else {
             return new IssueTemplateRecord(typeBytes, creator, template, signatureBytes);
@@ -144,13 +144,13 @@ public class IssueTemplateRecord extends IssueItemRecord {
     //PARSE CONVERT
 
     //@Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
-        int result = super.isValid(asDeal, flags);
+        int result = super.isValid(forDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
 		/*

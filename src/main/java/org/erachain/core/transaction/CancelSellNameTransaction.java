@@ -178,7 +178,7 @@ public class CancelSellNameTransaction extends Transaction {
 
     //@Override
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
         //CHECK NAME LENGTH
         int nameLength = this.name.getBytes(StandardCharsets.UTF_8).length;
         if (nameLength > 400 || nameLength < 1) {
@@ -201,16 +201,16 @@ public class CancelSellNameTransaction extends Transaction {
             return NAME_NOT_FOR_SALE;
         }
 
-        return super.isValid(asDeal, flags);
+        return super.isValid(forDeal, flags);
     }
 
     //PROCESS/ORPHAN
 
     //@Override
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
         //UPDATE creator
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         //SET ORPHAN DATA
         NameSale nameSale = this.dcSet.getNameExchangeMap().getNameSale(this.name);
@@ -223,9 +223,9 @@ public class CancelSellNameTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
         //UPDATE creator
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
         //ADD TO DATABASE
         BigDecimal amount = this.dcSet.getCancelSellNameMap().get(this);

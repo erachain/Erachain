@@ -65,17 +65,17 @@ public class IssueImprintRecord extends IssueItemRecord {
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Imprint"; }
 
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
         //boolean asPack = releaserReference != null;
 
         //CHECK IF WE MATCH BLOCK LENGTH
         int test_len;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len = BASE_LENGTH_AS_PACK;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len = BASE_LENGTH_AS_DBRECORD;
         } else {
             test_len = BASE_LENGTH;
@@ -90,7 +90,7 @@ public class IssueImprintRecord extends IssueItemRecord {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -108,7 +108,7 @@ public class IssueImprintRecord extends IssueItemRecord {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -121,7 +121,7 @@ public class IssueImprintRecord extends IssueItemRecord {
 
         long feeLong = 0;
         long seqNo = 0;
-        if (asDeal == FOR_DB_RECORD) {
+        if (forDeal == FOR_DB_RECORD) {
             //READ SEQ_NO
             byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             seqNo = Longs.fromByteArray(seqNoBytes);
@@ -139,7 +139,7 @@ public class IssueImprintRecord extends IssueItemRecord {
         ImprintCls imprint = Imprint.parse(Arrays.copyOfRange(data, position, data.length), false);
         position += imprint.getDataLength(false);
 
-        if (asDeal == FOR_DB_RECORD) {
+        if (forDeal == FOR_DB_RECORD) {
             //READ KEY
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
             long key = Longs.fromByteArray(timestampBytes);
@@ -149,7 +149,7 @@ public class IssueImprintRecord extends IssueItemRecord {
 
         }
 
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             return new IssueImprintRecord(typeBytes, creator, imprint, feePow, timestamp, signatureBytes, seqNo, feeLong);
         } else {
             return new IssueImprintRecord(typeBytes, creator, imprint, signatureBytes);
@@ -167,7 +167,7 @@ public class IssueImprintRecord extends IssueItemRecord {
     //VALIDATE
     //
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -183,7 +183,7 @@ public class IssueImprintRecord extends IssueItemRecord {
             return INVALID_NAME_LENGTH_MAX;
         }
 
-        int result = super.isValid(asDeal, flags);
+        int result = super.isValid(forDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         // CHECK reference in DB
@@ -219,9 +219,9 @@ public class IssueImprintRecord extends IssueItemRecord {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         dcSet.getTransactionFinalMapSigns().put(((ImprintCls) item).hashName(), dbRef);
 
@@ -229,9 +229,9 @@ public class IssueImprintRecord extends IssueItemRecord {
 
     //@Override
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
         dcSet.getTransactionFinalMapSigns().delete(((ImprintCls) item).hashName());
 

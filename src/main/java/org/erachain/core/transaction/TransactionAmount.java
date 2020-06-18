@@ -161,8 +161,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     }
 
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo, boolean andSetup) {
-        super.setDC(dcSet, asDeal, blockHeight, seqNo, false);
+    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andSetup) {
+        super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
 
         if (BlockChain.CHECK_BUGS > 3// && viewDBRef(dbRef).equals("18165-1")
         ) {
@@ -529,7 +529,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     //@Override // - fee + balance - calculate here
     private static long pointLogg;
-    public int isValid(int asDeal, long flags) {
+
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -564,7 +565,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
         
         // CHECK IF REFERENCE IS OK
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
                 /// вообще не проверяем в тесте
                 if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
@@ -1098,9 +1099,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
 
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         if (this.amount == null)
             return;
@@ -1211,11 +1212,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             block.addForgingInfoUpdate(this.recipient);
         }
     }
-    
-    @Override
-    public void orphan(Block block, int asDeal) {
 
-        super.orphan(block, asDeal);
+    @Override
+    public void orphan(Block block, int forDeal) {
+
+        super.orphan(block, forDeal);
 
         if (this.amount == null)
             return;

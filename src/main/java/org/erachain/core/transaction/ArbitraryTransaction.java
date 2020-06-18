@@ -186,7 +186,7 @@ public abstract class ArbitraryTransaction extends Transaction {
     // PROCESS/ORPHAN
     //@Override
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
 
 
         try {
@@ -203,7 +203,7 @@ public abstract class ArbitraryTransaction extends Transaction {
         }
 
         // UPDATE CREATOR
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         // PROCESS PAYMENTS
         for (Payment payment : this.getPayments()) {
@@ -218,7 +218,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
 
         // NAME STORAGE UPDATE ORPHAN
         // if (service == 10) {
@@ -229,7 +229,7 @@ public abstract class ArbitraryTransaction extends Transaction {
         // }
 
         // UPDATE CREATOR
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
         // ORPHAN PAYMENTS
         for (Payment payment : this.getPayments()) {

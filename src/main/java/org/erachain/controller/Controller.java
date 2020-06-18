@@ -3326,26 +3326,26 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction r_SignNote(byte version, byte property1, byte property2, int asDeal,
+    public Transaction r_SignNote(byte version, byte property1, byte property2, int forDeal,
                                   PrivateKeyAccount sender, int feePow, long key, byte[] message, byte[] isText, byte[] encrypted) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_SignNote(version, property1, property2, asDeal, sender, feePow, key,
+            return this.transactionCreator.r_SignNote(version, property1, property2, forDeal, sender, feePow, key,
                     message, isText, encrypted);
         }
     }
 
-    public Transaction r_SertifyPerson(int version, int asDeal, PrivateKeyAccount creator, int feePow, long key,
+    public Transaction r_SertifyPerson(int version, int forDeal, PrivateKeyAccount creator, int feePow, long key,
                                        List<PublicKeyAccount> userAccounts, int add_day) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_SertifyPerson(version, asDeal, creator, feePow, key, userAccounts,
+            return this.transactionCreator.r_SertifyPerson(version, forDeal, creator, feePow, key, userAccounts,
                     add_day);
         }
     }
 
-    public Transaction r_Vouch(int version, int asDeal, PrivateKeyAccount creator, int feePow, int height,
+    public Transaction r_Vouch(int version, int forDeal, PrivateKeyAccount creator, int feePow, int height,
                                int seq) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Vouch(version, asDeal, creator, feePow, height, seq);
+            return this.transactionCreator.r_Vouch(version, forDeal, creator, feePow, height, seq);
         }
     }
 

@@ -754,7 +754,7 @@ public class TransactionCreator {
     }
 
     public Transaction r_SignNote(byte version, byte property1, byte property2,
-                                  int asDeal, PrivateKeyAccount creator,
+                                  int forDeal, PrivateKeyAccount creator,
                                   int feePow, long key, byte[] message, byte[] isText, byte[] encrypted) {
 
         this.checkUpdate();
@@ -766,14 +766,14 @@ public class TransactionCreator {
         //CREATE MESSAGE TRANSACTION
         recordNoteTx = new RSignNote(version, property1, property1,
                 creator, (byte) feePow, key, message, isText, encrypted, timestamp, 0l);
-        recordNoteTx.sign(creator, asDeal);
-        recordNoteTx.setDC(this.fork, asDeal, this.blockHeight, ++this.seqNo, false);
+        recordNoteTx.sign(creator, forDeal);
+        recordNoteTx.setDC(this.fork, forDeal, this.blockHeight, ++this.seqNo, false);
 
         return recordNoteTx;
 
     }
 
-    public Transaction r_SertifyPerson(int version, int asDeal,
+    public Transaction r_SertifyPerson(int version, int forDeal,
                                        PrivateKeyAccount creator, int feePow, long key,
                                        List<PublicKeyAccount> userAccounts,
                                        int add_day) {
@@ -789,13 +789,13 @@ public class TransactionCreator {
         record = new RSertifyPubKeys(version, creator, (byte) feePow, key,
                 userAccounts,
                 add_day, timestamp, 0l);
-        record.sign(creator, asDeal);
-        record.setDC(this.fork, asDeal, this.blockHeight, ++this.seqNo, false);
+        record.sign(creator, forDeal);
+        record.setDC(this.fork, forDeal, this.blockHeight, ++this.seqNo, false);
 
         return record;
     }
 
-    public Transaction r_Vouch(int version, int asDeal,
+    public Transaction r_Vouch(int version, int forDeal,
                                PrivateKeyAccount creator, int feePow,
                                int height, int seq) {
 
@@ -810,8 +810,8 @@ public class TransactionCreator {
         record = new RVouch(creator, (byte) feePow,
                 height, seq,
                 timestamp, 0l);
-        record.sign(creator, asDeal);
-        record.setDC(this.fork, asDeal, this.blockHeight, ++this.seqNo, false);
+        record.sign(creator, forDeal);
+        record.setDC(this.fork, forDeal, this.blockHeight, ++this.seqNo, false);
 
         return record;
     }
@@ -974,7 +974,7 @@ public class TransactionCreator {
         return new Pair<Transaction, Integer>(transaction, this.afterCreate(transaction, Transaction.FOR_NETWORK));
     }
 
-    public Integer afterCreate(Transaction transaction, int asDeal) {
+    public Integer afterCreate(Transaction transaction, int forDeal) {
         //CHECK IF PAYMENT VALID
 
         if (false && // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
@@ -984,14 +984,14 @@ public class TransactionCreator {
             return Transaction.KEY_COLLISION;
         }
 
-        transaction.setDC(this.fork, asDeal, this.blockHeight, ++this.seqNo, false);
-        int valid = transaction.isValid(asDeal, 0l);
+        transaction.setDC(this.fork, forDeal, this.blockHeight, ++this.seqNo, false);
+        int valid = transaction.isValid(forDeal, 0l);
 
         if (valid == Transaction.VALIDATE_OK) {
 
-            if (asDeal > Transaction.FOR_PACK) {
+            if (forDeal > Transaction.FOR_PACK) {
                 //PROCESS IN FORK
-                transaction.process(null, asDeal);
+                transaction.process(null, forDeal);
 
                 // if it ISSUE - reset key
                 if (transaction instanceof IssueItemRecord) {
@@ -1008,9 +1008,9 @@ public class TransactionCreator {
         return valid;
     }
 
-    public Integer afterCreateRaw(Transaction transaction, int asDeal, long flags) {
+    public Integer afterCreateRaw(Transaction transaction, int forDeal, long flags) {
         this.checkUpdate();
-        return this.afterCreate(transaction, asDeal);
+        return this.afterCreate(transaction, forDeal);
     }
 
 }

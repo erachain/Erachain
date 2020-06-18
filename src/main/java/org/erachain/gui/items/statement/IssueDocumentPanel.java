@@ -159,7 +159,7 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
 
     }// </editor-fold>
 
-    public Integer makeDeal(int asDeal) {
+    public Integer makeDeal(int forDeal) {
         // check title
         if (exData_Panel.jTextField_Title_Message.getText() == ""
                 || exData_Panel.jTextField_Title_Message.getText().length() < 5) {
@@ -249,7 +249,7 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
             return null;
         }
 
-        RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2, asDeal,
+        RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2, forDeal,
                 creator, feePow, key, messageBytes,
                 new byte[]{1}, new byte[]{0});
 
@@ -298,7 +298,7 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         if (dd.isConfirm) { // s!= JOptionPane.OK_OPTION) {
 
             // VALIDATE AND PROCESS
-            result = Controller.getInstance().getTransactionCreator().afterCreate(issueDoc, asDeal);
+            result = Controller.getInstance().getTransactionCreator().afterCreate(issueDoc, forDeal);
 
             // CHECK VALIDATE MESSAGE
             if (result == Transaction.VALIDATE_OK) {

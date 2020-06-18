@@ -593,17 +593,17 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     /**
      * @param dcSet
-     * @param asDeal
+     * @param forDeal
      * @param blockHeight
      * @param seqNo
      * @param andSetup    - если нужно нарастить мясо на скелет из базв Финал. Не нужно для неподтвержденных и если ее нет в базе еще
      */
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo, boolean andSetup) {
+    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andSetup) {
         setDC(dcSet, false);
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
         this.seqNo = seqNo;
         this.dbRef = Transaction.makeDBRef(height, seqNo);
-        if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
+        if (forDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
             this.calcFee();
 
         if (andSetup && !isWiped())
@@ -1472,15 +1472,15 @@ public abstract class Transaction implements ExplorerJsonLine {
      *   = 2 - not check person
      *   = 4 - not check PublicText
      */
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
         // CHECK IF REFERENCE IS OK
-        //Long reference = asDeal == null ? this.creator.getLastTimestamp(dcSet) : asDeal;
-        if (asDeal > Transaction.FOR_MYPACK && height > BlockChain.ALL_BALANCES_OK_TO) {
+        //Long reference = forDeal == null ? this.creator.getLastTimestamp(dcSet) : forDeal;
+        if (forDeal > Transaction.FOR_MYPACK && height > BlockChain.ALL_BALANCES_OK_TO) {
             if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
                 /// вообще не проверяем в тесте
                 if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
@@ -1672,7 +1672,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     // REST
 
     // public abstract void process(DLSet db);
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
 
         if (false
             //this.signature != null && Base58.encode(this.signature)
@@ -1682,7 +1682,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             error++;
         }
 
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             // this.calcFee();
 
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
@@ -1711,7 +1711,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     }
 
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
 
         if (false && BlockChain.CHECK_BUGS > 1
             ///&& viewHeightSeq().equals("628853-1") // is forging 628853-1
@@ -1722,7 +1722,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             error++;
         }
 
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
                 this.creator.changeBalance(this.dcSet, false, false, FEE_KEY, this.fee, true, true);
