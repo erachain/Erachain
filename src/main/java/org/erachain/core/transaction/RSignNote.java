@@ -67,10 +67,13 @@ public class RSignNote extends Transaction implements Itemable {
         this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
     }
+
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
-                     byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature, long feeLong) {
+                     byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -106,13 +109,16 @@ public class RSignNote extends Transaction implements Itemable {
         this.signatures = signatures;
         this.setTypeBytes();
     }
+
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
                      byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, long timestamp,
-                     Long reference, byte[] signature, long feeLong) {
+                     Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -219,7 +225,13 @@ public class RSignNote extends Transaction implements Itemable {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -282,14 +294,14 @@ public class RSignNote extends Transaction implements Itemable {
         if (signersLen == 0) {
             if (asDeal > Transaction.FOR_MYPACK) {
                 return new RSignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte,
-                        timestamp, reference, signatureBytes, feeLong);
+                        timestamp, reference, signatureBytes, seqNo, feeLong);
             } else {
                 return new RSignNote(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
             }
         } else {
             if (asDeal > Transaction.FOR_MYPACK) {
                 return new RSignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, signers,
-                        signatures, timestamp, reference, signatureBytes, feeLong);
+                        signatures, timestamp, reference, signatureBytes, seqNo, feeLong);
             } else {
                 return new RSignNote(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, reference, signatureBytes);
             }
@@ -650,9 +662,8 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 

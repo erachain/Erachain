@@ -3,6 +3,7 @@ package org.erachain.gui.create;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.slf4j.Logger;
@@ -231,15 +232,15 @@ public class RecoverWalletFrame extends JFrame {
         //CHECK IF SEEDS MATCH
         byte[] seed = null;
         try {
-            seed = Base58.decode(this.seedTxt.getText().trim());
+            seed = Base58.decode(this.seedTxt.getText().trim().replaceAll("\n", ""));
         } catch (Exception e) {
             seed = null;
         }
 
-        if (seed == null || seed.length != 32) {
+        if (seed == null || seed.length < Crypto.HASH_LENGTH - 3 || seed.length > Crypto.HASH_LENGTH) {
             //INVALID SEED
-            String message = Lang.getInstance().translate("Invalid or incorrect seed!");
-            JOptionPane.showMessageDialog(new JFrame(), message, Lang.getInstance().translate("Invalid seed"), JOptionPane.ERROR_MESSAGE);
+            String message = Lang.getInstance().translate("Invalid or incorrect seed!") + " - " + (seed == null ? "NULL" : "byte[" + seed.length + "]");
+            JOptionPane.showMessageDialog(new JFrame(), message, Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 

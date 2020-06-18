@@ -9,7 +9,7 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class VoteOnPollDetailsFrame extends RecDetailsFrame {
     public VoteOnPollDetailsFrame(VoteOnPollTransaction pollVote) {
-        super(pollVote);
+        super(pollVote, true);
 
         //NAME
         ++detailGBC.gridy;

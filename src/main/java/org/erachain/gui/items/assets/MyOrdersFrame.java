@@ -2,7 +2,6 @@ package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
-import org.erachain.gui.CoreRowSorter;
 import org.erachain.gui.models.WalletOrdersTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -82,8 +81,8 @@ public class MyOrdersFrame extends JFrame {
 
         //ASSETS SORTER
         Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-        CoreRowSorter sorter = new CoreRowSorter(this.ordersTableModel, indexes);
-        ordersTable.setRowSorter(sorter);
+        //CoreRowSorter sorter = new CoreRowSorter(this.ordersTableModel, indexes);
+        //ordersTable.setRowSorter(sorter);
 
 
         // MENU
@@ -95,7 +94,7 @@ public class MyOrdersFrame extends JFrame {
                 int row = ordersTable.getSelectedRow();
                 row = ordersTable.convertRowIndexToModel(row);
 
-                Order order = ordersTableModel.getItem(row).b;
+                Order order = ordersTableModel.getItem(row);
                 new TradesFrame(order, true);
             }
         });
@@ -107,7 +106,7 @@ public class MyOrdersFrame extends JFrame {
                 int row = ordersTable.getSelectedRow();
                 row = ordersTable.convertRowIndexToModel(row);
 
-                Order order = ordersTableModel.getItem(row).b;
+                Order order = ordersTableModel.getItem(row);
                 new CancelOrderFrame(order);
             }
         });
@@ -126,7 +125,7 @@ public class MyOrdersFrame extends JFrame {
 
                 if (e.getClickCount() == 2) {
                     row = ordersTable.convertRowIndexToModel(row);
-                    Order order = ordersTableModel.getItem(row).b;
+                    Order order = ordersTableModel.getItem(row);
                     new TradesFrame(order, false);
                 }
             }

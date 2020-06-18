@@ -30,10 +30,13 @@ public class IssueAssetTransaction extends IssueItemRecord {
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
         super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference, signature);
     }
+
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow,
-                                 long timestamp, Long reference, byte[] signature, long feeLong) {
+                                 long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
     }
 
     // as pack
@@ -216,7 +219,13 @@ public class IssueAssetTransaction extends IssueItemRecord {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -239,7 +248,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
         }
 
         if (asDeal > Transaction.FOR_MYPACK) {
-            return new IssueAssetTransaction(typeBytes, creator, asset, feePow, timestamp, reference, signatureBytes, feeLong);
+            return new IssueAssetTransaction(typeBytes, creator, asset, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
         } else {
             return new IssueAssetTransaction(typeBytes, creator, asset, signatureBytes);
         }

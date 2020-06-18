@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 @SuppressWarnings("serial")
 public class HashesDetailsFrame extends RecDetailsFrame {
     public HashesDetailsFrame(RHashes r_Hashes) {
-        super(r_Hashes);
+        super(r_Hashes, true);
 
         //LABEL NAME
         ++labelGBC.gridy;

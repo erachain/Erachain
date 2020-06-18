@@ -296,7 +296,7 @@ public class IssueAssetPanel extends JPanel  {
             // CREATE ASSET
             parsestep++;
             // SCALE, ASSET_TYPE, QUANTITY
-            PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+            PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
             if (creator == null) {
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),

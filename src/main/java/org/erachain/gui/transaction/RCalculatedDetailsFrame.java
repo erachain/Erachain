@@ -3,8 +3,8 @@ package org.erachain.gui.transaction;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.RCalculated;
-import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.library.MAccoutnTextField;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ public class RCalculatedDetailsFrame extends RecDetailsFrame {
     private RCalculatedDetailsFrame th;
 
     public RCalculatedDetailsFrame(final RCalculated r_Calc) {
-        super(r_Calc);
+        super(r_Calc, true);
         th = this;
         //LABEL RECIPIENT
         ++labelGBC.gridy;

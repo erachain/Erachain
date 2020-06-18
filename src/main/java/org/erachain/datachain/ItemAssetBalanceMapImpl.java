@@ -5,7 +5,6 @@ import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.database.SortableList;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -23,6 +22,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static org.erachain.database.IDB.DBS_MAP_DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
@@ -132,15 +132,18 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value = this.get(
-                        Bytes.concat(address, Longs.toByteArray(key)));
+                Bytes.concat(address, Longs.toByteArray(key)));
 
         return value;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public SortableList<byte[], Tuple5<
+    /**
+     * @param assetKey KEY for balance found + found balance
+     * @return
+     */
+    public List<Tuple2<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(long assetKey) {
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> getBalancesList(long assetKey) {
 
         if (Controller.getInstance().onlyProtocolIndexing)
             return null;
@@ -159,19 +162,28 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
             } catch (IOException e) {
             }
         } else {
-            keys = ((ItemAssetBalanceSuit)map).assetKeys(assetKey);
+            keys = ((ItemAssetBalanceSuit) map).assetKeys(assetKey);
         }
 
-        //RETURN
-        return new SortableList<byte[], Tuple5<
+        List<Tuple2<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
+                list = new ArrayList<>();
+
+        for (byte[] key : keys) {
+            list.add(new Tuple2<>(key, map.get(key)));
+        }
+
+        return list;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public SortableList<byte[], Tuple5<
+    /**
+     * @param account KEY for balance found + found balance
+     * @return
+     */
+    public List<Tuple2<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(Account account) {
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> getBalancesList(Account account) {
 
         if (Controller.getInstance().onlyProtocolIndexing)
             return null;
@@ -187,12 +199,19 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
             } catch (IOException e) {
             }
         } else {
-            keys = ((ItemAssetBalanceSuit)map).accountKeys(account);
+            keys = ((ItemAssetBalanceSuit) map).accountKeys(account);
         }
 
-        //RETURN
-        return new SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
+        List<Tuple2<byte[], Tuple5<
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
+                list = new ArrayList<>();
+
+        for (byte[] key : keys) {
+            list.add(new Tuple2<>(key, map.get(key)));
+        }
+
+        return list;
     }
 
     public IteratorCloseable<byte[]> getIteratorByAccount(Account account) {

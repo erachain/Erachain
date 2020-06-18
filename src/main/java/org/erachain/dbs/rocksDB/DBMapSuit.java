@@ -159,6 +159,11 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     }
 
     @Override
+    public IteratorCloseable<T> getDescendingIterator() {
+        return map.getIterator(true, false);
+    }
+
+    @Override
     public void close() {
         map.close();
         //logger.info("closed");

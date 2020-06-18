@@ -2,21 +2,18 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionMap;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<Long, Transaction> implements Observer {
+public class UnconfirmedTransactionsTableModel extends TimerTableModelCls<Transaction> implements Observer {
 
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TYPE = 1;
@@ -24,8 +21,7 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
     public static final int COLUMN_CREATOR = 3;
     public static final int COLUMN_FEE = 4;
 
-    public UnconfirmedTransactionsTableModel()
-    {
+    public UnconfirmedTransactionsTableModel() {
         super((DBTabImpl) DCSet.getInstance().getTransactionTab(),
                 new String[]{"Timestamp", "Type", "Name", "Creator", "Fee"},
                 new Boolean[]{true, false, true, true, false}, false);
@@ -37,16 +33,11 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
     @Override
     public Object getValueAt(int row, int column) {
         try {
-            if (this.listSorted == null || this.listSorted.size() <= row) {
+            if (this.list == null || this.list.size() <= row) {
                 return null;
             }
 
-            Pair<Long, Transaction> pair = this.listSorted.get(row);
-
-            if (pair == null)
-                return null;
-
-            Transaction transaction = pair.getB();
+            Transaction transaction = this.list.get(row);
             if (transaction == null)
                 return null;
 
@@ -137,21 +128,15 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
     }
 
     @Override
-    public long getMapSize() {
-        return map.size();
-    }
+    public void getInterval() {
 
-    @Override
-    public void getIntervalThis(long startBack, int limit) {
-        listSorted = new SortableList<Long, Transaction>(map, ((TransactionMap) map).getFromToKeys(startBack, limit));
+        super.getInterval();
 
         DCSet dcSet = DCSet.getInstance();
-        for (Pair<Long, Transaction> item: listSorted) {
-            if (item.getB() == null)
-                continue;
+        for (Transaction item : list) {
 
-            item.getB().setDC_HeightSeq(dcSet, true);
-            item.getB().calcFee();
+            item.setDC(dcSet, false);
+            item.calcFee();
         }
 
     }

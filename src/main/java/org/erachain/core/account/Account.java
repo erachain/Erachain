@@ -356,7 +356,7 @@ public class Account {
 
     // BALANCE
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance(long key) {
-        return Controller.getInstance().getUnconfirmedBalance(this, key);
+        return Controller.getInstance().getWalletUnconfirmedBalance(this, key);
     }
 
     /*

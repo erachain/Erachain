@@ -356,7 +356,7 @@ public class TelegramsResource {
 
         // CREATE TX MESSAGE
         Transaction transaction;
-        PrivateKeyAccount account = cntr.getPrivateKeyAccountByAddress(sender.getAddress());
+        PrivateKeyAccount account = cntr.getWalletPrivateKeyAccountByAddress(sender.getAddress());
         if (account == null) {
             //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
             out.put("error", ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
@@ -681,7 +681,7 @@ public class TelegramsResource {
         }
 
         // CACHE private keys
-        test1Creators = Controller.getInstance().getPrivateKeyAccounts();
+        test1Creators = Controller.getInstance().getWalletPrivateKeyAccounts();
 
 
         JSONObject out = new JSONObject();

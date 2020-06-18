@@ -143,7 +143,7 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RSertifyPubKey
     }
 
     @Override
-    public void getIntervalThis(long start, int limit) {
+    public void getInterval() {
     }
 
     public void addObservers() {

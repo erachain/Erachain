@@ -42,10 +42,13 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         this(typeBytes, creator, pollKey, option, feePow, timestamp, reference);
         this.signature = signature;
     }
+
     public VoteOnItemPollTransaction(byte[] typeBytes, PublicKeyAccount creator, long pollKey, int option, byte feePow,
-                                     long timestamp, Long reference, byte[] signature, long feeLong) {
+                                     long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, pollKey, option, feePow, timestamp, reference);
         this.signature = signature;
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -88,7 +91,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
         this.poll = (PollCls) this.dcSet.getItemPollMap().get(this.key);
 
-        if (andSetup)
+        if (false && andSetup && !isWiped())
             setupFromStateDB();
     }
 
@@ -164,7 +167,13 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -184,7 +193,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
         if (asDeal > Transaction.FOR_MYPACK) {
             return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, feePow, timestamp, reference,
-                    signatureBytes, feeLong);
+                    signatureBytes, seqNo, feeLong);
         } else {
             return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, reference, signatureBytes);
         }
@@ -299,9 +308,8 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 

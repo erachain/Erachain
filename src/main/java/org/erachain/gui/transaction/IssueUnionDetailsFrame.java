@@ -2,7 +2,6 @@ package org.erachain.gui.transaction;
 
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.IssueUnionRecord;
-import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
@@ -12,7 +11,7 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class IssueUnionDetailsFrame extends RecDetailsFrame {
     public IssueUnionDetailsFrame(IssueUnionRecord unionIssue) {
-        super(unionIssue);
+        super(unionIssue, false);
 
         //LABEL NAME
         ++labelGBC.gridy;

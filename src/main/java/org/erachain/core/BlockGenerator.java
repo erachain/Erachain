@@ -646,7 +646,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     private List<PrivateKeyAccount> getKnownAccounts() {
         //CHECK IF CACHING ENABLED
         if (Settings.getInstance().isGeneratorKeyCachingEnabled()) {
-            List<PrivateKeyAccount> privateKeyAccounts = ctrl.getPrivateKeyAccounts();
+            List<PrivateKeyAccount> privateKeyAccounts = ctrl.getWalletPrivateKeyAccounts();
 
             //IF ACCOUNTS EXISTS
             if (!privateKeyAccounts.isEmpty()) {
@@ -658,13 +658,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             return this.cachedAccounts;
         } else {
             //RETURN ACCOUNTS
-            return ctrl.getPrivateKeyAccounts();
+            return ctrl.getWalletPrivateKeyAccounts();
         }
     }
 
     public void cacheKnownAccounts() {
         if (Settings.getInstance().isGeneratorKeyCachingEnabled()) {
-            List<PrivateKeyAccount> privateKeyAccounts = ctrl.getPrivateKeyAccounts();
+            List<PrivateKeyAccount> privateKeyAccounts = ctrl.getWalletPrivateKeyAccounts();
 
             //IF ACCOUNTS EXISTS
             if (!privateKeyAccounts.isEmpty()) {

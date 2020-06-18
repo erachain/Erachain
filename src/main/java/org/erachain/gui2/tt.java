@@ -183,7 +183,10 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         mails_Node.add(new ASMutableTreeNode("MailSendPanel", Lang.getInstance().translate("Send Mail"), MailSendPanel.getIcon()));
 
         assets_Node.add(new ASMutableTreeNode("AssetsFavoriteSplitPanel", Lang.getInstance().translate("Favorite Assets"), AssetsFavoriteSplitPanel.getIcon()));
-        assets_Node.add(new ASMutableTreeNode("MyAssetsTab", Lang.getInstance().translate("My Assets"), MyAssetsTab.getIcon()));
+        // old assets_Node.add(new ASMutableTreeNode("MyAssetsTab", Lang.getInstance().translate("My Assets"), MyAssetsTab.getIcon()));
+        assets_Node.add(new ASMutableTreeNode("AssetsMySplitPanel", Lang.getInstance().translate("My Assets"), AssetsMySplitPanel.getIcon()));
+
+
         assets_Node.add(new ASMutableTreeNode("SearchAssetsSplitPanel", Lang.getInstance().translate("Search Assets"), SearchAssetsSplitPanel.getIcon()));
         assets_Node.add(new ASMutableTreeNode("IssueAssetPanel", Lang.getInstance().translate("Issue Asset"), IssueAssetPanel.getIcon()));
         //assets_Node.add(new ASMutableTreeNode(Lang.getInstance().translate("My Orders")));

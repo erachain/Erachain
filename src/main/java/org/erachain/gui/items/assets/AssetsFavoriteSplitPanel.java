@@ -46,6 +46,19 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel   {
                         new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", ""), ExchangePanel.getIcon()));
 
 
+        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status to Asset"));
+
+        set_Status_Item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                @SuppressWarnings("unused")
+                AssetSetStatusDialog fm = new AssetSetStatusDialog((AssetCls) itemTableSelected);
+
+            }
+        });
+        this.menuTable.add(set_Status_Item);
+
         JMenuItem vouchMenu = new JMenuItem(Lang.getInstance().translate("Vouch"));
         vouchMenu.addActionListener(e -> {
             DCSet db = DCSet.getInstance();

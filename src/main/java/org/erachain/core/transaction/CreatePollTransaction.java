@@ -40,12 +40,15 @@ public class CreatePollTransaction extends Transaction {
         this.signature = signature;
         //this.calcFee();
     }
+
     public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp,
-                                 Long reference, byte[] signature, long feeLong) {
+                                 Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, poll, feePow, timestamp, reference);
 
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
     }
 
     public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -119,14 +122,20 @@ public class CreatePollTransaction extends Transaction {
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
             position += FEE_LENGTH;
         }
 
-        return new CreatePollTransaction(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes, feeLong);
+        return new CreatePollTransaction(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
     }
 
     public Poll getPoll() {
@@ -342,9 +351,8 @@ public class CreatePollTransaction extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress()) || address.equals(this.poll.getCreator().getAddress())) {
+        if (account.equals(this.creator) || account.equals(this.poll.getCreator())) {
             return true;
         }
 

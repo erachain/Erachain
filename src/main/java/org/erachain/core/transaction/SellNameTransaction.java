@@ -248,9 +248,8 @@ public class SellNameTransaction extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 
@@ -260,9 +259,8 @@ public class SellNameTransaction extends Transaction {
     //@Override
     @Override
     public BigDecimal getAmount(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return BigDecimal.ZERO.subtract(this.fee);
         }
 

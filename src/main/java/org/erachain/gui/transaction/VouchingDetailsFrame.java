@@ -11,7 +11,7 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class VouchingDetailsFrame extends RecDetailsFrame {
     public VouchingDetailsFrame(RVouch vouchRecord) {
-        super(vouchRecord);
+        super(vouchRecord, true);
 
         //LABEL NAME
         ++labelGBC.gridy;

@@ -186,7 +186,7 @@ public class StatementInfo extends javax.swing.JPanel {
 
         setLayout(new java.awt.GridBagLayout());
 
-        JPanel pp = new RecDetailsFrame(transaction);
+        JPanel pp = new RecDetailsFrame(transaction, true);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

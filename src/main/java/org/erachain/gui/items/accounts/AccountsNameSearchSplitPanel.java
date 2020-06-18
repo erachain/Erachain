@@ -5,7 +5,6 @@ import com.google.common.io.Files;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.database.SortableList;
 import org.erachain.database.wallet.AccountsPropertisMap;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
@@ -17,7 +16,6 @@ import org.erachain.gui.models.WalletItemImprintsTableModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.Pair;
 import org.erachain.utils.SaveStrToFile;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.json.simple.JSONObject;
@@ -55,9 +53,9 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
     static Logger LOGGER = LoggerFactory.getLogger(AccountsNameSearchSplitPanel.class);
     protected FileChooser chooser;
     protected int row;
-    private AccountsNameTableModel tableModelImprints;
+    private AccountsNameTableModel accountsTableModel;
     private JButton button3_ToolBar_LeftPanel;
-    private AccountsPropertisMap db;
+    private AccountsPropertisMap accountsMap;
 
     public AccountsNameSearchSplitPanel() {
         super("AccountsNameSearchSplitPanel");
@@ -66,7 +64,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
         gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0};
 
         if (Controller.getInstance().doesWalletDatabaseExists())
-            db = Controller.getInstance().wallet.database.getAccountsPropertisMap();
+            accountsMap = Controller.getInstance().wallet.database.getAccountsPropertisMap();
 
         setName(Lang.getInstance().translate("Favorite Accounts"));
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
@@ -85,8 +83,8 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
         jButton2_jToolBar_RightPanel.setVisible(false);
 
         // CREATE TABLE
-        this.tableModelImprints = new AccountsNameTableModel();
-        final MTable imprintsTable = new MTable(this.tableModelImprints);
+        this.accountsTableModel = new AccountsNameTableModel();
+        final MTable imprintsTable = new MTable(this.accountsTableModel);
 
         // CHECKBOX FOR FAVORITE
         // TableColumn favoriteColumn =
@@ -103,7 +101,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
         column1.setPreferredWidth(50);
 
         // set showvideo
-        jTableJScrollPanelLeftPanel.setModel(this.tableModelImprints);
+        jTableJScrollPanelLeftPanel.setModel(this.accountsTableModel);
         jTableJScrollPanelLeftPanel = imprintsTable;
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
@@ -198,8 +196,8 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
             public void actionPerformed(ActionEvent e) {
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                Pair<String, Tuple2<String, String>> account = tableModelImprints.getPairItem(row);
-                StringSelection value = new StringSelection(account.getA());
+                Tuple2<String, Tuple2<String, String>> account = accountsTableModel.getItem(row);
+                StringSelection value = new StringSelection(account.a);
                 clipboard.setContents(value, null);
             }
         });
@@ -210,8 +208,8 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-                Pair<String, Tuple2<String, String>> account = tableModelImprints.getPairItem(row);
-                byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(account.getA());
+                Tuple2<String, Tuple2<String, String>> account = accountsTableModel.getItem(row);
+                byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(account.a);
                 PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
                 StringSelection value = new StringSelection(public_Account.getBase58());
                 clipboard.setContents(value, null);
@@ -224,10 +222,11 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
         JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
-                Account account = new Account(account1.getA());
+                Tuple2<String, Tuple2<String, String>> account1 = accountsTableModel.getItem(row);
+                Account account = new Account(account1.a);
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"),
+                        new MailSendPanel(null, account, null), MailSendPanel.getIcon());
             }
         });
         menu.add(Send_Mail_item_Menu);
@@ -237,8 +236,8 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
         JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
-                Account accountTo = new Account(account1.getA());
+                Tuple2<String, Tuple2<String, String>> account1 = accountsTableModel.getItem(row);
+                Account accountTo = new Account(account1.a);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send"), new AccountAssetSendPanel(null,
                         null, accountTo, null, null), AccountAssetSendPanel.getIcon());
 
@@ -251,9 +250,9 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
         JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit name"));
         setName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
+                Tuple2<String, Tuple2<String, String>> account1 = accountsTableModel.getItem(row);
 
-                new AccountSetNameDialog(account1.getA());
+                new AccountSetNameDialog(account1.a);
                 imprintsTable.repaint();
 
             }
@@ -284,8 +283,8 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
                 int row = imprintsTable.getSelectedRow();
                 try {
                     row = imprintsTable.convertRowIndexToModel(row);
-                    Pair<String, Tuple2<String, String>> ac = tableModelImprints.getPairItem(row);
-                    db.delete(ac.getA());
+                    Tuple2<String, Tuple2<String, String>> ac = accountsTableModel.getItem(row);
+                    accountsMap.delete(ac.a);
                 } catch (Exception e1) {
                     logger.error(e1.getMessage(), e1);
                 }
@@ -345,13 +344,12 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
                         JSONObject output = new JSONObject();
 
                         // TODO переделать с  db.getList() на перебор по ключу
-                        SortableList<String, Tuple2<String, String>> lists = db.getList();
-
-                        for (Pair<String, Tuple2<String, String>> list : lists) {
+                        for (String key : accountsMap.keySet()) {
                             JSONObject account = new JSONObject();
-                            account.put("name", list.getB().a);
-                            account.put("json", list.getB().b);
-                            output.put(list.getA(), account);
+                            Tuple2<String, String> item = accountsMap.get(key);
+                            account.put("name", item.a);
+                            account.put("json", item.b);
+                            output.put(key, account);
 
                         }
                         // byte[] buffer =(byte[]) ;
@@ -429,7 +427,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
                             JSONObject ss = (JSONObject) inJSON.get(a);
                             Object a1 = ss.get("name");
                             Object a2 = ss.get("json");
-                            db.put(a, new Tuple2(ss.get("name"), ss.get("json")));
+                            accountsMap.put(a, new Tuple2(ss.get("name"), ss.get("json")));
                         }
 
                         // while (it.hasNext()){
@@ -454,7 +452,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
     @Override
     public void onClose() {
         // delete observer left panel
-        tableModelImprints.deleteObservers();
+        accountsTableModel.deleteObservers();
         // get component from right panel
         Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close

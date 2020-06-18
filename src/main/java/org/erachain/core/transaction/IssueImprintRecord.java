@@ -32,10 +32,13 @@ public class IssueImprintRecord extends IssueItemRecord {
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] signature) {
         super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, null, signature);
     }
+
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow,
-                              long timestamp, byte[] signature, long feeLong) {
+                              long timestamp, byte[] signature, long seqNo, long feeLong) {
         super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, null, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
     }
 
     // asPack
@@ -117,7 +120,13 @@ public class IssueImprintRecord extends IssueItemRecord {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -141,7 +150,7 @@ public class IssueImprintRecord extends IssueItemRecord {
         }
 
         if (asDeal > Transaction.FOR_MYPACK) {
-            return new IssueImprintRecord(typeBytes, creator, imprint, feePow, timestamp, signatureBytes, feeLong);
+            return new IssueImprintRecord(typeBytes, creator, imprint, feePow, timestamp, signatureBytes, seqNo, feeLong);
         } else {
             return new IssueImprintRecord(typeBytes, creator, imprint, signatureBytes);
         }

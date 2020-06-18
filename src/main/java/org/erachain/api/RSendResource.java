@@ -351,7 +351,7 @@ public class RSendResource {
         }
 
         // CACHE private keys
-        test1Creators = Controller.getInstance().getPrivateKeyAccounts();
+        test1Creators = Controller.getInstance().getWalletPrivateKeyAccounts();
 
         // запомним счетчики для счетов
         HashMap<String, Long> counters = new HashMap<String, Long>();
@@ -534,7 +534,7 @@ public class RSendResource {
         }
 
         // CACHE private keys
-        test2Creators = Controller.getInstance().getPrivateKeyAccounts();
+        test2Creators = Controller.getInstance().getWalletPrivateKeyAccounts();
 
         // запомним счетчики для счетов
         HashMap<String, Long> counters = new HashMap<String, Long>();

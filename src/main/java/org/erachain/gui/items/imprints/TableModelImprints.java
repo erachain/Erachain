@@ -1,48 +1,28 @@
 package org.erachain.gui.items.imprints;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.item.imprints.ImprintCls;
-import org.erachain.database.SortableList;
-import org.erachain.gui.models.SortedListTableModelCls;
-import org.erachain.utils.ObserverMessage;
+import org.erachain.gui.models.TimerTableModelCls;
 
-import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class TableModelImprints extends SortedListTableModelCls<Long, ImprintCls> implements Observer {
+public class TableModelImprints extends TimerTableModelCls<ImprintCls> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
-    private SortableList<Long, ImprintCls> imprints;
 
     public TableModelImprints() {
         super(new String[]{"Key", "Name", "Owner"}, new Boolean[]{false, true, true}, false);
     }
 
-    @Override
-    public SortableList<Long, ImprintCls> getSortableList() {
-        return this.imprints;
-    }
-
-    public ImprintCls getImprint(int row) {
-        return this.imprints.get(row).getB();
-    }
-
-    @Override
-    public int getRowCount() {
-        if (this.imprints == null) return 0;
-        return this.imprints.size();
-
-    }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.imprints == null || row > this.imprints.size() - 1) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
 
-        ImprintCls imprint = this.imprints.get(row).getB();
+        ImprintCls imprint = this.list.get(row);
 
         switch (column) {
             case COLUMN_KEY:
@@ -62,15 +42,8 @@ public class TableModelImprints extends SortedListTableModelCls<Long, ImprintCls
         return null;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
 
+    /*
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -92,6 +65,7 @@ public class TableModelImprints extends SortedListTableModelCls<Long, ImprintCls
         }
     }
 
+
     public void addObservers() {
         Controller.getInstance().addObserver(this);
     }
@@ -106,4 +80,5 @@ public class TableModelImprints extends SortedListTableModelCls<Long, ImprintCls
         // TODO Auto-generated method stub
         return this.imprints.get(k).getB();
     }
+     */
 }

@@ -48,10 +48,13 @@ public class VoteOnPollTransaction extends Transaction {
         this(typeBytes, creator, poll, option, feePow, timestamp, reference);
         this.signature = signature;
     }
+
     public VoteOnPollTransaction(byte[] typeBytes, PublicKeyAccount creator, String poll, int option, byte feePow,
-                                 long timestamp, Long reference, byte[] signature, long feeLong) {
+                                 long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, poll, option, feePow, timestamp, reference);
         this.signature = signature;
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -131,7 +134,13 @@ public class VoteOnPollTransaction extends Transaction {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -160,7 +169,7 @@ public class VoteOnPollTransaction extends Transaction {
 
         if (asDeal > Transaction.FOR_MYPACK) {
             return new VoteOnPollTransaction(typeBytes, creator, poll, option, feePow, timestamp, reference,
-                    signatureBytes, feeLong);
+                    signatureBytes, seqNo, feeLong);
         } else {
             return new VoteOnPollTransaction(typeBytes, creator, poll, option, reference, signatureBytes);
         }
@@ -334,9 +343,8 @@ public class VoteOnPollTransaction extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 
@@ -347,7 +355,7 @@ public class VoteOnPollTransaction extends Transaction {
     //@Override
     @Override
     public BigDecimal getAmount(Account account) {
-        if (account.getAddress().equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return BigDecimal.ZERO.subtract(this.fee);
         }
 

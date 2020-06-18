@@ -289,7 +289,7 @@ public class APIUtils {
         }
         
         // GET ACCOUNT
-        PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(sender);
+        PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_WALLET_ADDRESS);
         }
@@ -389,7 +389,7 @@ public class APIUtils {
             }
             
             // GET ACCOUNT
-            PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(creator);
+            PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator);
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
             }

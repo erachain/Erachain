@@ -23,9 +23,12 @@ public class IssueTemplateRecord extends IssueItemRecord {
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) {
         super(typeBytes, NAME_ID, creator, template, feePow, timestamp, reference, signature);
     }
+
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow,
-                               long timestamp, Long reference, byte[] signature, long feeLong) {
+                               long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         super(typeBytes, NAME_ID, creator, template, feePow, timestamp, reference, signature);
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -103,7 +106,13 @@ public class IssueTemplateRecord extends IssueItemRecord {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -126,7 +135,7 @@ public class IssueTemplateRecord extends IssueItemRecord {
         }
 
         if (asDeal > Transaction.FOR_MYPACK) {
-            return new IssueTemplateRecord(typeBytes, creator, template, feePow, timestamp, reference, signatureBytes, feeLong);
+            return new IssueTemplateRecord(typeBytes, creator, template, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
         } else {
             return new IssueTemplateRecord(typeBytes, creator, template, signatureBytes);
         }

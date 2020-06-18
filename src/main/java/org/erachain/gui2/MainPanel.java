@@ -385,8 +385,9 @@ public class MainPanel extends javax.swing.JPanel {
                 return;
             }
 
-            if (str.equals(Lang.getInstance().translate("My Assets")) || str.equals("MyAssetsTab")) {
-                insertTab(Lang.getInstance().translate("My Assets"), new MyAssetsTab(), MyAssetsTab.getIcon());
+            if (str.equals(Lang.getInstance().translate("My Assets")) || str.equals("AssetsMySplitPanel")) {
+                ///insertTab(Lang.getInstance().translate("My Assets"), new MyAssetsTab(), MyAssetsTab.getIcon());
+                insertTab(Lang.getInstance().translate("My Assets"), new AssetsMySplitPanel(), AssetsMySplitPanel.getIcon());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Search Assets")) || str.equals("SearchAssetsSplitPanel")) {

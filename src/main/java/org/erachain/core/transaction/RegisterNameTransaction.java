@@ -246,9 +246,8 @@ public class RegisterNameTransaction extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress()) || address.equals(this.name.getOwner().getAddress())) {
+        if (account.equals(this.creator) || account.equals(this.name.getOwner())) {
             return true;
         }
 

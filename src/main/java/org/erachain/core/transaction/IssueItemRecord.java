@@ -57,7 +57,8 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
      */
     @Override
     public long getKey() {
-        return key;
+        return key == null ? (isWiped() ? 0 : null) // выдаст ошибку специально если боевая и NULL, see issues/1347
+                : key;
     }
 
     @Override
@@ -83,9 +84,12 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         }
     }
 
+    /**
+     * нельзя вызывать для Форка и для isWIPED
+     */
     public void setupFromStateDB() {
         if (key == null || key == 0) {
-            // эта трнзакция взята как скелет из набора блока
+            // эта транзакция взята как скелет из набора блока
             // найдем сохраненную транзакцию - в ней есь Номер Сути
             IssueItemRecord issueItemRecord = (IssueItemRecord) dcSet.getTransactionFinalMap().get(this.dbRef);
             key = issueItemRecord.getKey();
@@ -255,10 +259,8 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         //UPDATE CREATOR
         super.orphan(block, asDeal);
 
-        //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 1");
         //DELETE FROM DATABASE
-        long key = this.item.deleteFromMap(this.dcSet, item.getStartKey());
-        //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 2");
+        key = this.item.deleteFromMap(this.dcSet, item.getStartKey());
     }
 
     @Override
@@ -280,11 +282,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @Override
     public boolean isInvolved(Account account) {
 
-        String address = account.getAddress();
-
-        if (address.equals(this.creator.getAddress())) {
-            return true;
-        } else if (address.equals(this.item.getOwner().getAddress())) {
+        if (account.equals(this.creator) || account.equals(this.item.getOwner())) {
             return true;
         }
 

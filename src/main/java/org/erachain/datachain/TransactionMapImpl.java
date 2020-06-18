@@ -358,7 +358,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         try {
             Transaction transaction = super.get(key);
             if (transaction != null) {
-                transaction.setHeightSeq(0, 0);
+                transaction.resetSeqNo();
             }
             return transaction;
         } catch (Exception e) {
@@ -367,14 +367,14 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         return null;
     }
 
-    public Collection<Long> getFromToKeys(long fromKey, int limit) {
+    public Collection<Long> getFromToKeys(Long fromKey, int limit) {
 
         List<Long> treeKeys = new ArrayList<Long>();
 
         // DESCENDING + 1000
         try (IteratorCloseable<Long> iterator = ((TransactionSuit) map).getTimestampIterator(true)) {
 
-            Iterators.advance(iterator, (int) fromKey);
+            //Iterators.advance(iterator, (int) fromKey);
 
             // тут не нужно уже делать Закрываемый Итератор - так достаточно того что внутренний Итератор закроется
             Iterator<Long> iteratorLimited = Iterators.limit(iterator, limit);

@@ -15,8 +15,15 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Closeable
-{
+/**
+ * Тормознутый класс который нельзя использовать
+ *
+ * @param <T>
+ * @param <U>
+ * @deprecated
+ */
+
+public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Closeable {
 
     static Logger LOGGER = LoggerFactory.getLogger(SortableList.class.getName());
     private DBTab<T, U> db;
@@ -87,10 +94,8 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Clos
     //}
 
     //public void removeObserver() {
-     //   this.db.deleteObserver(this);
+    //   this.db.deleteObserver(this);
     //}
-
-
     @Override
     public Pair<T, U> get(int i) {
 
@@ -198,7 +203,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Clos
 	*/
 
 
-	private long timePoint;
+    private long timePoint;
 
     /*
      * нужно только для сортировки при измнении таблицы

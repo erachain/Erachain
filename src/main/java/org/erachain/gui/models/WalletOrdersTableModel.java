@@ -7,13 +7,12 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletOrdersTableModel extends WalletAutoKeyTableModel<Tuple2<String, Long>, Tuple2<Long, Order>> implements Observer {
+public class WalletOrdersTableModel extends WalletTableModel<Order> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_BLOCK = 1;
     public static final int COLUMN_AMOUNT = 2;
@@ -28,27 +27,23 @@ public class WalletOrdersTableModel extends WalletAutoKeyTableModel<Tuple2<Strin
     public WalletOrdersTableModel() {
         super(Controller.getInstance().wallet.database.getOrderMap(),
                 new String[]{"Timestamp", "Block - transaction", "Amount", "Have", "Price",
-                "Want", "Total", "Left", "Creator", "Status"}, new Boolean[]{true}, true);
+                        "Want", "Total", "Left", "Creator", "Status"}, new Boolean[]{true}, true);
+
+        step = 200;
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.listSorted == null || row >= this.listSorted.size()) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
-        Pair<Tuple2<String, Long>, Tuple2<Long, Order>> item = this.listSorted.get(row);
-        if (item == null)
-            return null;
 
-        Order order = item.getB().b;
-
-        Long blockDBrefLong = item.getA().b;
-
-        Tuple2<Integer, Integer> blockDBref = Transaction.parseDBRef(blockDBrefLong);
+        Order order = this.list.get(row);
 
         switch (column) {
             case COLUMN_TIMESTAMP:
 
+                Tuple2<Integer, Integer> blockDBref = Transaction.parseDBRef(order.getId());
                 return DateTimeFormat.timestamptoString(Controller.getInstance().getBlockChain().getTimestamp(blockDBref.a));
 
             case COLUMN_AMOUNT:
@@ -88,6 +83,7 @@ public class WalletOrdersTableModel extends WalletAutoKeyTableModel<Tuple2<Strin
 
             case COLUMN_BLOCK:
 
+                blockDBref = Transaction.parseDBRef(order.getId());
                 return blockDBref == null ? "?-?" : blockDBref.a + "-" + blockDBref.b;
 
         }

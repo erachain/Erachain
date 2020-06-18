@@ -198,7 +198,10 @@ public class CreateWalletFrame extends JFrame {
 
     private byte[] generateSeed() {
         byte[] seed = new byte[32];
-        this.random.nextBytes(seed);
+        // нужно быть уверенным что длинна при обратном преобразовании даст 32 байта
+        do {
+            this.random.nextBytes(seed);
+        } while (Base58.decode(Base58.encode(seed)).length != seed.length);
         return seed;
     }
 }

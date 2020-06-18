@@ -81,12 +81,15 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         //this.order = new Order(new BigInteger(signature), creator, haveKey, wantKey, amountHave, amountWant, timestamp);
 
     }
+
     public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference,
-                                  byte[] signature, long feeLong) {
+                                  byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
 
     }
 
@@ -193,7 +196,13 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -241,7 +250,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         }
 
         return new CreateOrderTransaction(typeBytes, creator, have, want, amountHave, amountWant, feePow, timestamp,
-                reference, signatureBytes, feeLong);
+                reference, signatureBytes, seqNo, feeLong);
     }
 
     public void setDC(DCSet dcSet, boolean andSetup) {
@@ -253,7 +262,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
         }
 
-        if (andSetup)
+        if (false && andSetup && !isWiped())
             setupFromStateDB();
 
     }
@@ -636,9 +645,8 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 

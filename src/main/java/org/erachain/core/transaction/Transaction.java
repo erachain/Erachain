@@ -366,7 +366,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected static final int BASE_LENGTH_AS_PACK = BASE_LENGTH_AS_MYPACK + TIMESTAMP_LENGTH
             + CREATOR_LENGTH + SIGNATURE_LENGTH;
     protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + REFERENCE_LENGTH;
-    protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + FEE_LENGTH;
+    protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + TIMESTAMP_LENGTH + FEE_LENGTH;
 
     /**
      * Используется для разделения строки поисковых слов для всех трнзакций.<br>
@@ -563,6 +563,12 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     // GETTERS/SETTERS
 
+    public void setHeightSeq(long seqNo) {
+        this.dbRef = seqNo;
+        this.height = parseDBRefHeight(seqNo);
+        this.seqNo = (int) seqNo;
+    }
+
     public void setHeightSeq(int height, int seqNo) {
         this.dbRef = makeDBRef(height, seqNo);
         this.height = height;
@@ -581,27 +587,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
         }
 
-        if (andSetup)
-            setupFromStateDB();
-    }
-
-    public void setDC_HeightSeq(DCSet dcSet, boolean andSetup) {
-        setDC(dcSet, false);
-
-        if (this.typeBytes[0] == Transaction.CALCULATED_TRANSACTION) {
-
-        }
-
-        Long dbRef2 = dcSet.getTransactionFinalMapSigns().get(this.signature);
-        if (dbRef2 == null)
-            return;
-
-        this.dbRef = dbRef2;
-        Tuple2<Integer, Integer> pair = Transaction.parseDBRef(dbRef2);
-        this.height = pair.a;
-        this.seqNo = pair.b;
-
-        if (andSetup)
+        if (andSetup && !isWiped())
             setupFromStateDB();
     }
 
@@ -620,7 +606,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
             this.calcFee();
 
-        if (andSetup)
+        if (andSetup && !isWiped())
             setupFromStateDB();
     }
 
@@ -720,7 +706,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public BigDecimal getFee(Account account) {
-        return this.getFee(account.getAddress());
+        if (this.creator != null)
+            if (this.creator.getAddress().equals(account))
+                return this.fee;
+        return BigDecimal.ZERO;
     }
 
     public BigDecimal getFee() {
@@ -1398,6 +1387,11 @@ public abstract class Transaction implements ExplorerJsonLine {
             data = Bytes.concat(data, this.signature);
 
         if (forDeal == FOR_DB_RECORD) {
+            // WRITE DBREF
+            byte[] dbRefBytes = Longs.toByteArray(this.dbRef);
+            dbRefBytes = Bytes.ensureCapacity(dbRefBytes, TIMESTAMP_LENGTH, 0);
+            data = Bytes.concat(data, dbRefBytes);
+
             // WRITE FEE
             byte[] feeBytes = Longs.toByteArray(this.fee.unscaledValue().longValue());
             data = Bytes.concat(data, feeBytes);
@@ -1816,6 +1810,12 @@ public abstract class Transaction implements ExplorerJsonLine {
     public void resetDCSet() {
         dcSet = null;
         itemsKeys = null;
+    }
+
+    public void resetSeqNo() {
+        dbRef = 0l;
+        height = 0;
+        seqNo = 0;
     }
 
     // ПРОЫЕРЯЛОСЬ! действует в совокупк с Финализе в Блоке

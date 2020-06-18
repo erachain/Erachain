@@ -3,7 +3,6 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -12,13 +11,18 @@ import org.mapdb.Fun.Tuple5;
 
 import javax.swing.*;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> implements Observer {
+public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<String, Long>,
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> implements Observer {
 
-    private SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+    private List<Tuple2<byte[], Tuple5<
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
+            balances;
 
     Account account;
 
@@ -63,11 +67,15 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
 
         //INSERT ALL ACCOUNTS
         for (int i = 0; i < this.balances.size(); i++) {
-            Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+            Tuple2<byte[], Tuple5<
+                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
                     item = this.balances.get(i);
 
-            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(item.getA());
-            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = item.getB();
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(item.a);
+            Tuple5<
+                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = item.b;
             if (BlockChain.ERA_COMPU_ALL_UP) {
                 balance = account.balanceAddDEVAmount(assetKey, balance);
             }

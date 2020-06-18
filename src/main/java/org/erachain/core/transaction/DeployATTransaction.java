@@ -16,7 +16,6 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.datachain.DCSet;
-import org.erachain.utils.Converter;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -205,7 +204,7 @@ public class DeployATTransaction extends Transaction {
         transaction.put("description", this.description);
         transaction.put("atType", this.type);
         transaction.put("tags", this.tags);
-        transaction.put("creationBytes", Converter.toHex(this.creationBytes));
+        transaction.put("creationBytes", Base58.encode(this.creationBytes)); //Converter.toHex(this.creationBytes));
         transaction.put("amount", this.amount.toPlainString());
 
         return transaction;
@@ -484,13 +483,12 @@ public class DeployATTransaction extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 
-        if (address.equals(this.getATaccount(dcSet).getAddress())) {
+        if (account.equals(this.getATaccount(dcSet))) {
             return true;
         }
 

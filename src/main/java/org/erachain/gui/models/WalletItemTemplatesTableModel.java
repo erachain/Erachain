@@ -3,17 +3,10 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.templates.TemplateCls;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
-import org.mapdb.Fun.Tuple2;
-
-import java.util.Observable;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletItemTemplatesTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, TemplateCls>> {
+public class WalletItemTemplatesTableModel extends WalletTableModel<TemplateCls> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -28,16 +21,11 @@ public class WalletItemTemplatesTableModel extends WalletAutoKeyTableModel<Tuple
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.listSorted == null || row > this.listSorted.size() - 1) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
 
-        Pair<Tuple2<Long , Long>, Tuple2<Long, TemplateCls>> pair = this.listSorted.get(row);
-        if (pair == null) {
-            return null;
-        }
-
-        TemplateCls template = pair.getB().b;
+        TemplateCls template = this.list.get(row);
 
         switch (column) {
             case COLUMN_KEY:

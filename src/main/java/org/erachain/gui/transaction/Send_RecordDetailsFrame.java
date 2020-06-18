@@ -2,13 +2,13 @@ package org.erachain.gui.transaction;
 // 30/03
 
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
-import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
     private Send_RecordDetailsFrame th;
 
     public Send_RecordDetailsFrame(final RSend r_Send) {
-        super(r_Send);
+        super(r_Send, true);
         th = this;
         //LABEL RECIPIENT
         ++labelGBC.gridy;
@@ -186,7 +186,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
                             } else {
                                 jTextArea_Messge.setText(r_Send.isText() ?
                                         new String(decryptedData, StandardCharsets.UTF_8)
-                                        : Converter.toHex(decryptedData));
+                                        : Base58.encode(decryptedData)); //Converter.toHex(decryptedData));
 
                                 encrypted.setSelected(!encrypted.isSelected());
                             }

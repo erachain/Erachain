@@ -5,9 +5,9 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSertifyPubKeys;
 import org.erachain.lang.Lang;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.utils.MenuPopupUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 
@@ -17,7 +17,7 @@ public class SertifyPubKeysDetailsFrame extends RecDetailsFrame {
     private JTextField messageText;
 
     public SertifyPubKeysDetailsFrame(final RSertifyPubKeys sertifyPubKeysRecord) {
-        super(sertifyPubKeysRecord);
+        super(sertifyPubKeysRecord, true);
 
         //LABEL PERSON
         ++labelGBC.gridy;

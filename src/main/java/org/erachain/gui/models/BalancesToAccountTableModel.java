@@ -2,18 +2,17 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -24,7 +23,9 @@ public class BalancesToAccountTableModel extends AbstractTableModel implements O
     private long key;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Balance"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, false};
-    private SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+    private List<Tuple2<byte[], Tuple5<
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> balances;
 
     public BalancesToAccountTableModel(long key) {
         this.key = key;
@@ -72,8 +73,11 @@ public class BalancesToAccountTableModel extends AbstractTableModel implements O
             return null;
         }
 
-        Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow = this.balances.get(row);
-        Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(aRow.getA()));
+        Tuple2<byte[], Tuple5<
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                aRow = this.balances.get(row);
+        Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(aRow.a));
 
         switch (column) {
             case COLUMN_ADDRESS:

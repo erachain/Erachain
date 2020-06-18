@@ -8,7 +8,10 @@ import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
-import org.erachain.gui.library.*;
+import org.erachain.gui.library.AddImageLabel;
+import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.CreateOptionsTableModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -236,7 +239,7 @@ public class IssuePollPanel extends JPanel {
         byte[] image = addImageLabel.getImgBytes();
 
         // CREATE POLL
-        PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+        PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
         if (creator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),

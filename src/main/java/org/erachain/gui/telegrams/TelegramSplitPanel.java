@@ -173,8 +173,8 @@ public class TelegramSplitPanel extends SplitPanel {
         rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(Settings.getInstance().getTelegramDefaultReciever());
         int k = accountModel.getRowCount();
         for(int i = 0;i<k;i++){
-           if(accountModel.getPairItem(i).getA().equals(Settings.getInstance().getTelegramDefaultReciever())){
-               tableFavoriteAccounts.setRowSelectionInterval(tableFavoriteAccounts.convertRowIndexToModel(i), tableFavoriteAccounts.convertRowIndexToModel(i)); 
+           if (accountModel.getItem(i).a.equals(Settings.getInstance().getTelegramDefaultReciever())) {
+               tableFavoriteAccounts.setRowSelectionInterval(tableFavoriteAccounts.convertRowIndexToModel(i), tableFavoriteAccounts.convertRowIndexToModel(i));
            }
         }
         
@@ -317,8 +317,8 @@ public class TelegramSplitPanel extends SplitPanel {
         public void actionPerformed(ActionEvent e) {
 
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            Pair<String, Tuple2<String, String>> account = accountModel.getPairItem(row);
-            StringSelection value = new StringSelection(account.getA());
+            Tuple2<String, Tuple2<String, String>> account = accountModel.getItem(row);
+            StringSelection value = new StringSelection(account.a);
             clipboard.setContents(value, null);
         }
     });
@@ -329,8 +329,8 @@ public class TelegramSplitPanel extends SplitPanel {
         public void actionPerformed(ActionEvent e) {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-            Pair<String, Tuple2<String, String>> account = accountModel.getPairItem(row);
-            byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(account.getA());
+            Tuple2<String, Tuple2<String, String>> account = accountModel.getItem(row);
+            byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(account.a);
             PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
             StringSelection value = new StringSelection(public_Account.getBase58());
             clipboard.setContents(value, null);
@@ -341,8 +341,8 @@ public class TelegramSplitPanel extends SplitPanel {
     JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
     Send_Coins_item_Menu.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
-            Account account = new Account(account1.getA());
+            Tuple2<String, Tuple2<String, String>> account1 = accountModel.getItem(row);
+            Account account = new Account(account1.a);
             MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"),
                     new AccountAssetSendPanel(null,
                             null, account, null, null), AccountAssetSendPanel.getIcon());
@@ -355,8 +355,8 @@ public class TelegramSplitPanel extends SplitPanel {
     JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
     Send_Mail_item_Menu.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
-            Account account = new Account(account1.getA());
+            Tuple2<String, Tuple2<String, String>> account1 = accountModel.getItem(row);
+            Account account = new Account(account1.a);
             MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"),
                     new MailSendPanel(null, account, null), MailSendPanel.getIcon());
 
@@ -367,9 +367,9 @@ public class TelegramSplitPanel extends SplitPanel {
     JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit name"));
     setName.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
+            Tuple2<String, Tuple2<String, String>> account1 = accountModel.getItem(row);
 
-            new AccountSetNameDialog(account1.getA());
+            new AccountSetNameDialog(account1.b.a);
             tableFavoriteAccounts.repaint();
 
         }
@@ -400,8 +400,8 @@ public class TelegramSplitPanel extends SplitPanel {
             int row = tableFavoriteAccounts.getSelectedRow();
             try {
                 row = tableFavoriteAccounts.convertRowIndexToModel(row);
-                Pair<String, Tuple2<String, String>> ac = accountModel.getPairItem(row);
-                Controller.getInstance().wallet.database.getAccountsPropertisMap().delete(ac.getA());
+                Tuple2<String, Tuple2<String, String>> ac = accountModel.getItem(row);
+                Controller.getInstance().wallet.database.getAccountsPropertisMap().delete(ac.a);
             } catch (Exception e1) {
                 logger.error(e1.getMessage(), e1);
             }
@@ -541,7 +541,7 @@ public void onSendClick() {
 
         if (encryptMessage) {
             //sender
-            PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress().toString());
+            PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress().toString());
             byte[] privateKey = account.getPrivateKey();
 
             //recipient
@@ -569,7 +569,7 @@ public void onSendClick() {
 
    // CREATE TX MESSAGE
     Transaction transaction = Controller.getInstance().r_Send(
-            Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key,
+            Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key,
             amount, head, messageBytes, isTextByte, encrypted, 0);
     
     Controller.getInstance().broadcastTelegram(transaction, true);

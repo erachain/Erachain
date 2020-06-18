@@ -86,15 +86,18 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         this.signature = signature;
         this.sertifiedSignatures = sertifiedSignatures;
     }
+
     public RSertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
                            List<PublicKeyAccount> sertifiedPublicKeys,
                            int add_day, long timestamp, Long reference, byte[] signature, long feeLong,
-                           List<byte[]> sertifiedSignatures) {
+                           long seqNo, List<byte[]> sertifiedSignatures) {
         this(typeBytes, creator, feePow, key,
                 sertifiedPublicKeys,
                 add_day, timestamp, reference);
         this.signature = signature;
         this.sertifiedSignatures = sertifiedSignatures;
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -139,7 +142,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             this.person = (PersonCls) this.dcSet.getItemPersonMap().get(this.key);
         }
 
-        if (andSetup)
+        if (false && andSetup && !isWiped())
             setupFromStateDB();
 
     }
@@ -210,7 +213,13 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
+        long seqNo = 0;
         if (asDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -245,7 +254,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             return new RSertifyPubKeys(typeBytes, creator, feePow, key,
                     sertifiedPublicKeys,
                     add_day, timestamp, reference, signature, feeLong,
-                    sertifiedSignatures);
+                    seqNo, sertifiedSignatures);
         } else {
             return new RSertifyPubKeys(typeBytes, creator, key,
                     sertifiedPublicKeys,
@@ -799,17 +808,11 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
     @Override
     public boolean isInvolved(Account account) {
-        if (false) {
-            return getInvolvedAccounts().contains(account);
+        if (account.equals(creator)) return true;
 
-        } else {
-            String address = account.getAddress();
-            if (address.equals(creator.getAddress())) return true;
-
-            for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
-                if (address.equals(publicAccount.getAddress()))
-                    return true;
-            }
+        for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
+            if (publicAccount.equals(account))
+                return true;
         }
 
         return false;

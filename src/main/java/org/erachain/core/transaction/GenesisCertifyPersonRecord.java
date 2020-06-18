@@ -189,9 +189,8 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(recipient.getAddress())) {
+        if (account.equals(recipient)) {
             return true;
         }
 

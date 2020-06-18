@@ -52,7 +52,7 @@ public class WalletSyncButton extends JButton implements Observer {
                 /// deadlock org.erachain.database.wallet.AccountMap
                 AccountMap mapAccs = Controller.getInstance().wallet.database.getAccountMap();
                 synchronized (mapAccs) {
-                    for (PrivateKeyAccount privateAccount : Controller.getInstance().getPrivateKeyAccounts()) {
+                    for (PrivateKeyAccount privateAccount : Controller.getInstance().getWalletPrivateKeyAccounts()) {
                         mapAccs.add(privateAccount, ++number);
                     }
                 }
