@@ -43,6 +43,8 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
                 new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation"},
                 new Boolean[]{false, true, true, false, false}, false);
 
+        step = 200;
+
     }
 
     public void setAccount(Account sender) {
