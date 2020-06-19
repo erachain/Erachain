@@ -228,9 +228,9 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
     //@Override
     @Override
-    public int isValid(int asDeal, long flags) {
-        
-        int result = super.isValid(asDeal, flags);
+    public int isValid(int forDeal, long flags) {
+
+        int result = super.isValid(forDeal, flags);
         if (result != VALIDATE_OK) {
             return result;
         }

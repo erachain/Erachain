@@ -161,14 +161,14 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
     // releaserReference = null - not a pack
     // releaserReference = reference for releaser account - it is as pack
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
         int test_len;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len = BASE_LENGTH_AS_PACK;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len = BASE_LENGTH_AS_DBRECORD;
         } else {
             test_len = BASE_LENGTH;
@@ -183,7 +183,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -201,7 +201,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -214,7 +214,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
         long feeLong = 0;
         long seqNo = 0;
-        if (asDeal == FOR_DB_RECORD) {
+        if (forDeal == FOR_DB_RECORD) {
             //READ SEQ_NO
             byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             seqNo = Longs.fromByteArray(seqNoBytes);
@@ -250,7 +250,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         int add_day = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + DATE_DAY_LENGTH));
         position += DATE_DAY_LENGTH;
 
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             return new RSertifyPubKeys(typeBytes, creator, feePow, key,
                     sertifiedPublicKeys,
                     add_day, timestamp, reference, signature, feeLong,
@@ -486,13 +486,13 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
     //
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
-        int result = super.isValid(asDeal, flags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
+        int result = super.isValid(forDeal, flags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
 
         // сюда без проверки Персоны приходит
         if (result != VALIDATE_OK)
@@ -588,10 +588,10 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
 
         //UPDATE SENDER
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         int transactionIndex = -1;
         int blockIndex = -1;
@@ -716,10 +716,10 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
     }
 
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
 
         //UPDATE SENDER
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
         //UPDATE RECIPIENT
         String address;

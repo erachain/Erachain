@@ -97,17 +97,17 @@ public class RVouch extends Transaction {
     //PARSE/CONVERT
 
 
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
         //boolean asPack = releaserReference != null;
 
         //CHECK IF WE MATCH BLOCK LENGTH
         int test_len;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len = BASE_LENGTH_AS_PACK;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len = BASE_LENGTH_AS_DBRECORD;
         } else {
             test_len = BASE_LENGTH;
@@ -122,7 +122,7 @@ public class RVouch extends Transaction {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -140,7 +140,7 @@ public class RVouch extends Transaction {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -153,7 +153,7 @@ public class RVouch extends Transaction {
 
         long feeLong = 0;
         long seqNo = 0;
-        if (asDeal == FOR_DB_RECORD) {
+        if (forDeal == FOR_DB_RECORD) {
             //READ SEQ_NO
             byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             seqNo = Longs.fromByteArray(seqNoBytes);
@@ -175,7 +175,7 @@ public class RVouch extends Transaction {
         int vouchSeqNo = Ints.fromByteArray(seqBytes);
         position += SEQ_LENGTH;
 
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             return new RVouch(typeBytes, creator, feePow, vouchHeight, vouchSeqNo, timestamp, reference,
                     signatureBytes, seqNo, feeLong);
         } else {
@@ -236,7 +236,7 @@ public class RVouch extends Transaction {
     }
 
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -252,7 +252,7 @@ public class RVouch extends Transaction {
             return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
 
-        int result = super.isValid(asDeal, flags);
+        int result = super.isValid(forDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         Transaction transaction = this.dcSet.getTransactionFinalMap().get(Transaction.makeDBRef(this.vouchHeight, this.vouchSeqNo));
@@ -267,9 +267,9 @@ public class RVouch extends Transaction {
 
 
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
 
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         if (block == null)
             return;
@@ -302,9 +302,9 @@ public class RVouch extends Transaction {
     }
 
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
 
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
         // make key for vouching record
         Long recordKey = Transaction.makeDBRef(this.vouchHeight, this.vouchSeqNo);

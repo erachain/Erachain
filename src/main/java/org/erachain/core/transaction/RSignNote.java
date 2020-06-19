@@ -171,16 +171,16 @@ public class RSignNote extends Transaction implements Itemable {
 
     // releaserReference = null - not a pack
     // releaserReference = reference for releaser account - it is as pack
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
-        //boolean asPack = asDeal != null;
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
+        //boolean asPack = forDeal != null;
 
         //CHECK IF WE MATCH BLOCK LENGTH
         int test_len;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len = BASE_LENGTH_AS_PACK;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len = BASE_LENGTH_AS_DBRECORD;
         } else {
             test_len = BASE_LENGTH;
@@ -195,7 +195,7 @@ public class RSignNote extends Transaction implements Itemable {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -213,7 +213,7 @@ public class RSignNote extends Transaction implements Itemable {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -226,7 +226,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         long feeLong = 0;
         long seqNo = 0;
-        if (asDeal == FOR_DB_RECORD) {
+        if (forDeal == FOR_DB_RECORD) {
             //READ SEQ_NO
             byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             seqNo = Longs.fromByteArray(seqNoBytes);
@@ -292,14 +292,14 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         if (signersLen == 0) {
-            if (asDeal > Transaction.FOR_MYPACK) {
+            if (forDeal > Transaction.FOR_MYPACK) {
                 return new RSignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte,
                         timestamp, reference, signatureBytes, seqNo, feeLong);
             } else {
                 return new RSignNote(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
             }
         } else {
-            if (asDeal > Transaction.FOR_MYPACK) {
+            if (forDeal > Transaction.FOR_MYPACK) {
                 return new RSignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, signers,
                         signatures, timestamp, reference, signatureBytes, seqNo, feeLong);
             } else {
@@ -526,9 +526,9 @@ public class RSignNote extends Transaction implements Itemable {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
 
-        super.process(block, asDeal);
+        super.process(block, forDeal);
         if (Controller.getInstance().onlyProtocolIndexing)
             return;
 
@@ -550,9 +550,9 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
 
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
         if (Controller.getInstance().onlyProtocolIndexing)
             return;
@@ -600,7 +600,7 @@ public class RSignNote extends Transaction implements Itemable {
 
     //@Override
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -614,7 +614,7 @@ public class RSignNote extends Transaction implements Itemable {
             return INVALID_DATA_LENGTH;
         }
 
-        int result = super.isValid(asDeal, flags);
+        int result = super.isValid(forDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         // ITEM EXIST? - for assets transfer not need - amount expect instead

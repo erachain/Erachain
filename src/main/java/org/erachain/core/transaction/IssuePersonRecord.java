@@ -75,17 +75,17 @@ public class IssuePersonRecord extends IssueItemRecord {
 
     //PARSE CONVERT
 
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
         //boolean asPack = releaserReference != null;
 
         //CHECK IF WE MATCH BLOCK LENGTH
         int test_len;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len = BASE_LENGTH_AS_PACK;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len = BASE_LENGTH_AS_DBRECORD;
         } else {
             test_len = BASE_LENGTH;
@@ -100,7 +100,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -118,7 +118,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -131,7 +131,7 @@ public class IssuePersonRecord extends IssueItemRecord {
 
         long feeLong = 0;
         long seqNo = 0;
-        if (asDeal == FOR_DB_RECORD) {
+        if (forDeal == FOR_DB_RECORD) {
             //READ SEQ_NO
             byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             seqNo = Longs.fromByteArray(seqNoBytes);
@@ -148,7 +148,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         PersonCls person = PersonFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += person.getDataLength(false);
 
-        if (asDeal == FOR_DB_RECORD) {
+        if (forDeal == FOR_DB_RECORD) {
             //READ KEY
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
             long key = Longs.fromByteArray(timestampBytes);
@@ -158,7 +158,7 @@ public class IssuePersonRecord extends IssueItemRecord {
 
         }
 
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             return new IssuePersonRecord(typeBytes, creator, person, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
         } else {
             return new IssuePersonRecord(typeBytes, creator, person, signatureBytes);
@@ -195,7 +195,7 @@ public class IssuePersonRecord extends IssueItemRecord {
     //VALIDATE
 
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -282,7 +282,7 @@ public class IssuePersonRecord extends IssueItemRecord {
 
         // IF BALANCE 0 or more - not check FEE
         boolean checkFeeBalance = creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0;
-        int res = super.isValid(asDeal, flags |
+        int res = super.isValid(forDeal, flags |
                 (checkFeeBalance ? 0L : NOT_VALIDATE_FLAG_FEE) | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
         // FIRST PERSONS INSERT as ADMIN
         boolean creatorAdmin = false;
@@ -324,9 +324,9 @@ public class IssuePersonRecord extends IssueItemRecord {
     //PROCESS/ORPHAN
 
     //@Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getOwner();
@@ -352,9 +352,9 @@ public class IssuePersonRecord extends IssueItemRecord {
     }
 
     //@Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getOwner();

@@ -477,16 +477,16 @@ public class RSetStatusToItem extends Transaction {
 
     // releaserReference = null - not a pack
     // releaserReference = reference for releaser account - it is as pack
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
         //boolean asPack = releaserReference != null;
 
         //CHECK IF WE MATCH BLOCK LENGTH
         int test_len;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len = BASE_LENGTH_AS_PACK;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len = BASE_LENGTH_AS_DBRECORD;
         } else {
             test_len = BASE_LENGTH;
@@ -501,7 +501,7 @@ public class RSetStatusToItem extends Transaction {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -519,7 +519,7 @@ public class RSetStatusToItem extends Transaction {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -532,7 +532,7 @@ public class RSetStatusToItem extends Transaction {
 
         long feeLong = 0;
         long seqNo = 0;
-        if (asDeal == FOR_DB_RECORD) {
+        if (forDeal == FOR_DB_RECORD) {
             //READ SEQ_NO
             byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             seqNo = Longs.fromByteArray(seqNoBytes);
@@ -629,7 +629,7 @@ public class RSetStatusToItem extends Transaction {
             //position += dataSize;
         }
 
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             return new RSetStatusToItem(typeBytes, creator, feePow, key, itemType, itemKey,
                     beg_date, end_date, value_1, value_2, data_1, data_2, ref_to_parent, additonalData,
                     timestamp, reference, signature, seqNo, feeLong);
@@ -743,13 +743,13 @@ public class RSetStatusToItem extends Transaction {
     //VALIDATE
 
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
-        int result = super.isValid(asDeal, flags);
+        int result = super.isValid(forDeal, flags);
         if (result != Transaction.VALIDATE_OK) {
             return result;
         }
@@ -813,10 +813,10 @@ public class RSetStatusToItem extends Transaction {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
 
         //UPDATE SENDER
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         // pack additional data
         byte[] add_data = packData();
@@ -854,10 +854,10 @@ public class RSetStatusToItem extends Transaction {
     }
 
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
 
         //UPDATE SENDER
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
 
         // UNDO ALIVE PERSON for DURATION

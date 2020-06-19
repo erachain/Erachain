@@ -85,14 +85,14 @@ public class VoteOnPollTransaction extends Transaction {
         return true;
     }
 
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
         int test_len = BASE_LENGTH;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len -= Transaction.TIMESTAMP_LENGTH;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len += Transaction.FEE_POWER_LENGTH;
         }
         if (data.length < test_len) {
@@ -104,7 +104,7 @@ public class VoteOnPollTransaction extends Transaction {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -122,7 +122,7 @@ public class VoteOnPollTransaction extends Transaction {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -135,7 +135,7 @@ public class VoteOnPollTransaction extends Transaction {
 
         long feeLong = 0;
         long seqNo = 0;
-        if (asDeal == FOR_DB_RECORD) {
+        if (forDeal == FOR_DB_RECORD) {
             //READ SEQ_NO
             byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             seqNo = Longs.fromByteArray(seqNoBytes);
@@ -167,7 +167,7 @@ public class VoteOnPollTransaction extends Transaction {
         int option = Ints.fromByteArray(optionBytes);
         position += OPTION_SIZE_LENGTH;
 
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             return new VoteOnPollTransaction(typeBytes, creator, poll, option, feePow, timestamp, reference,
                     signatureBytes, seqNo, feeLong);
         } else {
@@ -249,7 +249,7 @@ public class VoteOnPollTransaction extends Transaction {
 
     //@Override
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (this.height > BlockChain.ITEM_POLL_FROM)
             return INVALID_TRANSACTION_TYPE;
@@ -282,7 +282,7 @@ public class VoteOnPollTransaction extends Transaction {
             return ALREADY_VOTED_FOR_THAT_OPTION;
         }
 
-        return super.isValid(asDeal, flags);
+        return super.isValid(forDeal, flags);
 
     }
 
@@ -290,10 +290,10 @@ public class VoteOnPollTransaction extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
 
         //UPDATE CREATOR
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         //ADD VOTE TO POLL
         Poll poll = this.dcSet.getPollMap().get(this.poll).copy();
@@ -310,10 +310,10 @@ public class VoteOnPollTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
 
         //UPDATE CREATOR
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
         //DELETE VOTE FROM POLL
         Poll poll = this.dcSet.getPollMap().get(this.poll).copy();

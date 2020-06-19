@@ -83,7 +83,7 @@ public class GenesisIssueItemRecord extends GenesisRecord implements Itemable {
     //VALIDATE
 
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         //CHECK NAME LENGTH
         int nameLength = this.item.getName().getBytes(StandardCharsets.UTF_8).length;
@@ -103,7 +103,7 @@ public class GenesisIssueItemRecord extends GenesisRecord implements Itemable {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
 
         //INSERT INTO DATABASE
         this.item.insertToMap(this.dcSet, 0L);
@@ -112,7 +112,7 @@ public class GenesisIssueItemRecord extends GenesisRecord implements Itemable {
 
 
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
 
         //DELETE FROM DATABASE
         this.item.deleteFromMap(this.dcSet, 0L);

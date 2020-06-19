@@ -57,14 +57,14 @@ public class MultiPaymentTransaction extends Transaction {
 
     //public static String getName() { return "Multi Send"; }
 
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
         int test_len = BASE_LENGTH;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len -= Transaction.TIMESTAMP_LENGTH;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len += Transaction.FEE_POWER_LENGTH;
         }
         if (data.length < test_len) {
@@ -77,7 +77,7 @@ public class MultiPaymentTransaction extends Transaction {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -95,7 +95,7 @@ public class MultiPaymentTransaction extends Transaction {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -125,7 +125,7 @@ public class MultiPaymentTransaction extends Transaction {
             position += Payment.BASE_LENGTH;
         }
 
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             return new MultiPaymentTransaction(typeBytes, creator, payments, feePow, timestamp, reference, signatureBytes);
         } else {
             return new MultiPaymentTransaction(typeBytes, creator, payments, reference, signatureBytes);
@@ -199,7 +199,7 @@ public class MultiPaymentTransaction extends Transaction {
 
     //@Override
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         //CHECK PAYMENTS SIZE
         if (this.payments.size() < 1 || this.payments.size() > 400) {
@@ -245,16 +245,16 @@ public class MultiPaymentTransaction extends Transaction {
             }
         }
 
-        return super.isValid(asDeal, flags);
+        return super.isValid(forDeal, flags);
     }
 
     //PROCESS/ORPHAN
 
     //@Override
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         //PROCESS PAYMENTS
         for (Payment payment : this.payments) {
@@ -269,9 +269,9 @@ public class MultiPaymentTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
         //ORPHAN PAYMENTS
         for (Payment payment : this.payments) {
