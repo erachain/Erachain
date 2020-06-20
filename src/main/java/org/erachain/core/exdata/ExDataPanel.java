@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -67,7 +68,7 @@ public class ExDataPanel extends javax.swing.JPanel {
     private javax.swing.JTabbedPane jTabbedPane_Other;
     private MTable jTable_Attached_Files;
     private MTable jTable_Other_Hashes;
-    private javax.swing.JTextPane jTextPane_Message_Private;
+    private javax.swing.JTextPane jTextPane_Message;
     private MImprintEDITPane jTextPane_Message_Public;
     /**
      * Creates new form IssueDocumentPanel
@@ -287,7 +288,7 @@ public class ExDataPanel extends javax.swing.JPanel {
         jScrollPane_Params_Template_Public_TextPane = new javax.swing.JScrollPane();
         jPanel_Message = new javax.swing.JPanel();
         jScrollPane_Message_TextPane = new javax.swing.JScrollPane();
-        jTextPane_Message_Private = new javax.swing.JTextPane();
+        jTextPane_Message = new javax.swing.JTextPane();
         jTabbedPane_Other = new javax.swing.JTabbedPane();
         jPanel_Attached_Files = new javax.swing.JPanel();
         jScrollPane_Attached_Files_Table = new javax.swing.JScrollPane();
@@ -367,7 +368,8 @@ public class ExDataPanel extends javax.swing.JPanel {
 
         jPanel_Message.setLayout(new java.awt.GridBagLayout());
 
-        jScrollPane_Message_TextPane.setViewportView(jTextPane_Message_Private);
+        ////////////
+        jScrollPane_Message_TextPane.setViewportView(jTextPane_Message);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -723,6 +725,8 @@ public class ExDataPanel extends javax.swing.JPanel {
 
     public byte[] getExData() throws Exception {
 
+        List<String> recipients = multipleRecipientsPanel.recipientsTableModel.getValues(0);
+
         // hashes StandardCharsets.UTF_8
         HashMap<String, String> hashes_Map = new HashMap<String, String>();
         int hR = hashes_Table_Model.getRowCount();
@@ -738,7 +742,7 @@ public class ExDataPanel extends javax.swing.JPanel {
         }
 
         return ExData.toByte(jTextField_Title_Message.getText(), (TemplateCls) fill_Template_Panel.sel_Template,
-                this.fill_Template_Panel.get_Params(), hashes_Map, jTextPane_Message_Private.getText(), files_1);
+                this.fill_Template_Panel.get_Params(), hashes_Map, jTextPane_Message.getText(), files_1);
 
     }
     // End of variables declaration

@@ -1,7 +1,9 @@
 package org.erachain.gui.library;
 
 
+import org.erachain.core.crypto.Base58;
 import org.erachain.lang.Lang;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.validation.constraints.Null;
@@ -12,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MultipleRecipientsPanel extends JPanel {
-    private final Table_Model recipientsTableModel;
+    public final Table_Model recipientsTableModel;
     private final MTable jTableRecipients;
     private JScrollPane jScrollPaneRecipients;
     private JButton jButtonAddRecipient;
@@ -122,6 +124,7 @@ public class MultipleRecipientsPanel extends JPanel {
     // table model class
 
     @SuppressWarnings("serial")
+    public
     class Table_Model extends DefaultTableModel {
 
         public Table_Model(int rows) {
@@ -177,13 +180,13 @@ public class MultipleRecipientsPanel extends JPanel {
             }
         }
 
-        public java.util.List<String> getValues(int column) {
-            List<String> values = new ArrayList<String>();
+        public java.util.List<byte[]> getValues(int column) {
+            List<byte[]> values = new ArrayList<>();
 
             for (int i = 0; i < this.getRowCount(); i++) {
                 String value = String.valueOf(this.getValueAt(i, column));
 
-                if (value.length() > 24) values.add(value);
+                values.add(Base58.decode(value));
 
             }
 

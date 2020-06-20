@@ -184,6 +184,7 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
             }
         }
 
+
         // READ SENDER
         Account sender = (Account) this.jComboBox_Account_Work.getSelectedItem();
         int feePow = 0;
@@ -202,9 +203,16 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
             // read byte[] from exData Panel
             messageBytes = exData_Panel.getExData();
 
-            if (messageBytes.length < 10 || messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
+            if (messageBytes.length < 10) {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Message size exceeded! 10...MAX"),
+                        Lang.getInstance().translate("Message is so short"),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+                return null;
+            } else if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.getInstance().translate("Message size exceeded %1 kB")
+                                .replace("%1", "" + (BlockChain.MAX_REC_DATA_BYTES >> 10)),
                         Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
                 return null;
