@@ -177,14 +177,14 @@ public class BlockExplorerTest {
 
         List<Object> all = new ArrayList<Object>();
 
-        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit("QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4", 555, true));
+        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit("QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4", 555, true, false));
 
         LOGGER.error("getTransactionsByAddress QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4. " + all.size() + " " + stopwatchAll.elapsedTime());
 
         all.clear();
         stopwatchAll = new Stopwatch();
 
-        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit("QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU", 555, true));
+        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit("QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU", 555, true, false));
 
         LOGGER.error("getTransactionsByAddress QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU. " + all.size() + " " + stopwatchAll.elapsedTime());
 
@@ -257,7 +257,7 @@ public class BlockExplorerTest {
 
         stopwatchAll = new Stopwatch();
 
-        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", 555, true));
+        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", 555, true, false));
 
         LOGGER.error("getTransactionsByAddress QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ. " + all.size() + " " + stopwatchAll.elapsedTime());
 

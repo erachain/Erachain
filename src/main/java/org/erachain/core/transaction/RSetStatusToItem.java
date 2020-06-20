@@ -121,15 +121,18 @@ public class RSetStatusToItem extends Transaction {
                 timestamp, reference);
         this.signature = signature;
     }
+
     public RSetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
                             Long beg_date, Long end_date,
                             long value_1, long value_2, byte[] data_1, byte[] data_2, long ref_to_parent, byte[] description,
-                            long timestamp, Long reference, byte[] signature, long feeLong) {
+                            long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, feePow, key, itemType, itemKey,
                 beg_date, end_date,
                 value_1, value_2, data_1, data_2, ref_to_parent, description,
                 timestamp, reference);
         this.signature = signature;
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -170,9 +173,13 @@ public class RSetStatusToItem extends Transaction {
 
     //public static String getName() { return "Send"; }
 
-    public void setDC(DCSet dcSet) {
-        super.setDC(dcSet);
+    public void setDC(DCSet dcSet, boolean andSetup) {
+        super.setDC(dcSet, false);
         status = (StatusCls) ItemCls.getItem(dcSet, ItemCls.STATUS_TYPE, this.key);
+
+        if (false && andSetup && !isWiped())
+            setupFromStateDB();
+
     }
 
     @Override
@@ -470,16 +477,16 @@ public class RSetStatusToItem extends Transaction {
 
     // releaserReference = null - not a pack
     // releaserReference = reference for releaser account - it is as pack
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
         //boolean asPack = releaserReference != null;
 
         //CHECK IF WE MATCH BLOCK LENGTH
         int test_len;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len = BASE_LENGTH_AS_PACK;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len = BASE_LENGTH_AS_DBRECORD;
         } else {
             test_len = BASE_LENGTH;
@@ -494,7 +501,7 @@ public class RSetStatusToItem extends Transaction {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -512,7 +519,7 @@ public class RSetStatusToItem extends Transaction {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -524,7 +531,13 @@ public class RSetStatusToItem extends Transaction {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
-        if (asDeal == FOR_DB_RECORD) {
+        long seqNo = 0;
+        if (forDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -616,10 +629,10 @@ public class RSetStatusToItem extends Transaction {
             //position += dataSize;
         }
 
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             return new RSetStatusToItem(typeBytes, creator, feePow, key, itemType, itemKey,
                     beg_date, end_date, value_1, value_2, data_1, data_2, ref_to_parent, additonalData,
-                    timestamp, reference, signature, feeLong);
+                    timestamp, reference, signature, seqNo, feeLong);
         } else {
             return new RSetStatusToItem(typeBytes, creator, key, itemType, itemKey,
                     beg_date, end_date, value_1, value_2, data_1, data_2, ref_to_parent, additonalData,
@@ -730,13 +743,13 @@ public class RSetStatusToItem extends Transaction {
     //VALIDATE
 
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
-        int result = super.isValid(asDeal, flags);
+        int result = super.isValid(forDeal, flags);
         if (result != Transaction.VALIDATE_OK) {
             return result;
         }
@@ -800,10 +813,10 @@ public class RSetStatusToItem extends Transaction {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
 
         //UPDATE SENDER
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         // pack additional data
         byte[] add_data = packData();
@@ -841,10 +854,10 @@ public class RSetStatusToItem extends Transaction {
     }
 
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
 
         //UPDATE SENDER
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
 
         // UNDO ALIVE PERSON for DURATION
@@ -871,9 +884,8 @@ public class RSetStatusToItem extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 

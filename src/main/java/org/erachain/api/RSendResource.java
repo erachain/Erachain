@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -352,7 +351,7 @@ public class RSendResource {
         }
 
         // CACHE private keys
-        test1Creators = Controller.getInstance().getPrivateKeyAccounts();
+        test1Creators = Controller.getInstance().getWalletPrivateKeyAccounts();
 
         // запомним счетчики для счетов
         HashMap<String, Long> counters = new HashMap<String, Long>();
@@ -420,7 +419,7 @@ public class RSendResource {
 
                         Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
                         // CLEAR for HEAP
-                        transaction.setDC(null);
+                        transaction.setDC(null, false);
 
 
                         // CHECK VALIDATE MESSAGE
@@ -535,7 +534,7 @@ public class RSendResource {
         }
 
         // CACHE private keys
-        test2Creators = Controller.getInstance().getPrivateKeyAccounts();
+        test2Creators = Controller.getInstance().getWalletPrivateKeyAccounts();
 
         // запомним счетчики для счетов
         HashMap<String, Long> counters = new HashMap<String, Long>();
@@ -607,7 +606,7 @@ public class RSendResource {
 
                         Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
                         // CLEAR for HEAP
-                        transaction.setDC(null);
+                        transaction.setDC(null, false);
 
                         // CHECK VALIDATE MESSAGE
                         if (result == Transaction.VALIDATE_OK) {
@@ -690,6 +689,7 @@ public class RSendResource {
      * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1069/1036?amount=0.001&title=probe-multi&onlyperson=true&activeafter=2018-01-01 00:00&activebefore=2019-01-01 00:00&greatequal=0&activetypetx=24&password=1
      * GET r_send/multisend/7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1/1/2?amount=0.001&title=probe-multi&onlyperson=true&gender=0&password=1
      * get r_send/multisend/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1072/2?amount=1&title=С 8 Марта!&onlyperson=true&gender=1&password=123&test=false
+     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1/2?amount=100&title=probe-multi&onlyperson=true&activeafter=2019-09-11 00:00&greatequal=0&password=1
      *
      * @param fromAddress     my address in Wallet
      * @param assetKey        asset Key that send
@@ -767,10 +767,12 @@ public class RSendResource {
         Long fromSeqNo = null;
         if (activeAfter != null && activeAfter > 0) {
             fromSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestamp(activeAfter), 0);
+            //LOGGER.debug("fromSeqNo:" + Transaction.viewDBRef(fromSeqNo) + " - " + new Date(activeAfter));
         }
         Long toSeqNo = null;
         if (activeBefore != null && activeBefore > 0) {
             toSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestamp(activeBefore), 0);
+            //LOGGER.debug("toSeqNo:" + Transaction.viewDBRef(toSeqNo) + " - " + new Date(activeBefore));
         }
 
         if (!test) {
@@ -804,6 +806,17 @@ public class RSendResource {
             int count = 0;
             BigDecimal totalFee = BigDecimal.ZERO;
 
+            Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
+            Long myPersonKey = null;
+            if (onlyPerson && !selfPay) {
+                addressDuration = dcSet.getAddressPersonMap().getItem(accountFrom.getShortAddressBytes());
+                if (addressDuration != null) {
+                    myPersonKey = addressDuration.a;
+                }
+            } else {
+                myPersonKey = null;
+            }
+
             HashSet<Long> usedPersons = new HashSet<>();
             boolean needAmount = true;
             long timestampThis = NTP.getTime() - 10000L;
@@ -812,10 +825,6 @@ public class RSendResource {
             try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(forAssetKey)) {
                 while (iterator.hasNext()) {
                     key = iterator.next();
-                    if (!selfPay && accountFrom.equals(key)) {
-                        // сами себе не платим?
-                        continue;
-                    }
 
                     try {
 
@@ -827,7 +836,6 @@ public class RSendResource {
 
                         byte[] recipentShort = ItemAssetBalanceMap.getShortAccountFromKey(key);
 
-                        Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
                         if (onlyPerson) {
                             // так как тут сортировка по убыванию значит первым встретится тот счет на котром больше всего актива
                             // - он и будет выбран куда 1 раз пошлем актив свой
@@ -837,6 +845,11 @@ public class RSendResource {
                             if (usedPersons.contains(addressDuration.a))
                                 continue;
 
+                            if (!selfPay && myPersonKey != null && myPersonKey.equals(addressDuration.a)) {
+                                // сами себе не платим?
+                                continue;
+                            }
+
                             person = (PersonCls) dcSet.getItemPersonMap().get(addressDuration.a);
 
                             if (gender >= 0) {
@@ -845,6 +858,12 @@ public class RSendResource {
                                 }
                             }
                         } else {
+
+                            if (!selfPay && fromAddress.equals(recipentShort)) {
+                                // сами себе не платим?
+                                continue;
+                            }
+
                             addressDuration = null;
                             person = null;
                         }
@@ -892,6 +911,10 @@ public class RSendResource {
                                 totalSendAmount = totalSendAmount.add(sendAmount);
                                 ///totalFee = totalFee.add(transaction.getFee());
                                 count++;
+                                if (onlyPerson) {
+                                    // учтем что такой персоне давали
+                                    usedPersons.add(addressDuration.a);
+                                }
                             }
 
                         } else {
@@ -924,7 +947,7 @@ public class RSendResource {
                     }
                 }
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
 

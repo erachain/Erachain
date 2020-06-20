@@ -107,14 +107,16 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.recipientKey,
                 new Fun.Function2<String[], Long, Transaction>() {
                     @Override
-                    public String[] run(Long key, Transaction val) {
+                    public String[] run(Long key, Transaction transaction) {
                         List<String> recps = new ArrayList<String>();
 
                         // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                        val.setDC((DCSet) databaseSet);
+                        if (transaction.noDCSet()) {
+                            transaction.setDC((DCSet) databaseSet, true);
+                        }
 
-                        for (Account acc : val.getRecipientAccounts()) {
-                            // recps.add(acc.getAddress() + val.viewTimestamp()); уникальнось внутри Бинда делается
+                        for (Account acc : transaction.getRecipientAccounts()) {
+                            // recps.add(acc.getAddress() + transaction.viewTimestamp()); уникальнось внутри Бинда делается
                             recps.add(acc.getAddress());
                         }
                         String[] ret = new String[recps.size()];
@@ -128,15 +130,17 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.typeKey,
                 new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], Long, Transaction>() {
                     @Override
-                    public Fun.Tuple3<String, Long, Integer>[] run(Long key, Transaction val) {
+                    public Fun.Tuple3<String, Long, Integer>[] run(Long key, Transaction transaction) {
                         List<Fun.Tuple3<String, Long, Integer>> recps = new ArrayList<Fun.Tuple3<String, Long, Integer>>();
-                        Integer type = val.getType();
+                        Integer type = transaction.getType();
 
                         // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                        val.setDC((DCSet) databaseSet);
+                        if (transaction.noDCSet()) {
+                            transaction.setDC((DCSet) databaseSet, true);
+                        }
 
-                        for (Account acc : val.getInvolvedAccounts()) {
-                            recps.add(new Fun.Tuple3<String, Long, Integer>(acc.getAddress(), val.getTimestamp(), type));
+                        for (Account acc : transaction.getInvolvedAccounts()) {
+                            recps.add(new Fun.Tuple3<String, Long, Integer>(acc.getAddress(), transaction.getTimestamp(), type));
 
                         }
                         // Tuple2<Integer, String>[] ret = (Tuple2<Integer,

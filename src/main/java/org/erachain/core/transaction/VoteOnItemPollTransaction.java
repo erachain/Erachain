@@ -42,10 +42,13 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         this(typeBytes, creator, pollKey, option, feePow, timestamp, reference);
         this.signature = signature;
     }
+
     public VoteOnItemPollTransaction(byte[] typeBytes, PublicKeyAccount creator, long pollKey, int option, byte feePow,
-                                     long timestamp, Long reference, byte[] signature, long feeLong) {
+                                     long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, pollKey, option, feePow, timestamp, reference);
         this.signature = signature;
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
@@ -76,27 +79,33 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
     }
 
     @Override
-    public ItemCls getItem()
-    {
+    public ItemCls getItem() {
         if (poll == null) {
-            poll = (PollCls) dcSet.getItemPersonMap().get(key);
+            poll = (PollCls) dcSet.getItemPollMap().get(key);
         }
         return this.poll;
     }
 
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setDC(dcSet, asDeal, blockHeight, seqNo);
+    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andSetup) {
+        super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
 
         this.poll = (PollCls) this.dcSet.getItemPollMap().get(this.key);
+
+        if (false && andSetup && !isWiped())
+            setupFromStateDB();
     }
 
     public int getOption() {
         return this.option;
     }
 
+    public String viewOption() {
+        return ((PollCls) getItem()).viewOption(option);
+    }
+
     @Override
     public String getTitle() {
-        return "##" + option + " > " + ItemCls.getItemTypeChar(ItemCls.POLL_TYPE, key);
+        return "##" + viewOption() + " > " + ItemCls.getItemTypeChar(ItemCls.POLL_TYPE, key);
     }
 
     @Override
@@ -106,14 +115,14 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
     //PARSE CONVERT
 
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
         int test_len;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len = BASE_LENGTH_AS_PACK;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len = BASE_LENGTH_AS_DBRECORD;
         } else {
             test_len = BASE_LENGTH;
@@ -128,7 +137,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -146,7 +155,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -158,7 +167,13 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
-        if (asDeal == FOR_DB_RECORD) {
+        long seqNo = 0;
+        if (forDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -176,9 +191,9 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         int option = Ints.fromByteArray(optionBytes);
         position += OPTION_SIZE_LENGTH;
 
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, feePow, timestamp, reference,
-                    signatureBytes, feeLong);
+                    signatureBytes, seqNo, feeLong);
         } else {
             return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, reference, signatureBytes);
         }
@@ -236,7 +251,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
     //@Override
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -252,15 +267,15 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
             return POLL_OPTION_NOT_EXISTS;
         }
 
-        return super.isValid(asDeal, flags);
+        return super.isValid(forDeal, flags);
 
     }
 
     //PROCESS/ORPHAN
 
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         //ADD VOTE TO POLL
         this.dcSet.getVoteOnItemPollMap().addItem(this.key, this.option, new BigInteger(this.creator.getShortAddressBytes()),
@@ -271,9 +286,9 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
     //@Override
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
         //DELETE VOTE FROM POLL
         this.dcSet.getVoteOnItemPollMap().removeItem(this.key, this.option, new BigInteger(this.creator.getShortAddressBytes()));
@@ -293,9 +308,8 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 

@@ -4,7 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.payment.Payment;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.gui.items.accounts.BalanceRenderer;
@@ -36,7 +35,7 @@ public class PayDividendFrame extends JFrame {
     private JButton generateButton;
 
     public PayDividendFrame(AssetCls asset) {
-        super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Pay dividend"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Pay dividend"));
 
         this.asset = asset;
 
@@ -183,17 +182,19 @@ public class PayDividendFrame extends JFrame {
 
             //BALANCES
             ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
-            SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances
+            List<Tuple2<byte[], Tuple5<
+                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> balances
                     = Controller.getInstance().getBalances(this.asset.getKey());
 
             //GET ACCOUNTS AND THEIR TOTAL BALANCE
             List<Account> accounts = new ArrayList<Account>();
             BigDecimal total = BigDecimal.ZERO;
             for (int i = 0; i < holders && i < balances.size(); i++) {
-                Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(balances.get(i).getA()));
+                Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(balances.get(i).a));
                 accounts.add(account);
 
-                total = total.add(balances.get(i).getB().a.b);
+                total = total.add(balances.get(i).b.a.b);
             }
 
             //CREATE PAYMENTS

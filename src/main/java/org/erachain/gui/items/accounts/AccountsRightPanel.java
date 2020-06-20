@@ -1,12 +1,19 @@
 package org.erachain.gui.items.accounts;
 
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.IssueConfirmDialog;
-import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RendererBigDecimals;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
+
+import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.table.TableRowSorter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
@@ -14,12 +21,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import javax.swing.table.TableRowSorter;
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.datachain.DCSet;
 public class AccountsRightPanel extends JPanel {
 
     /**
@@ -58,50 +59,52 @@ public class AccountsRightPanel extends JPanel {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
-        jMenuBar2 = new javax.swing.JMenuBar();
-        jMenu3 = new javax.swing.JMenu();
-        jMenu4 = new javax.swing.JMenu();
-        jToggleButton1 = new javax.swing.JToggleButton();
-        new javax.swing.JPopupMenu();
-        jMenu5 = new javax.swing.JMenu();
-        jToggleButton2 = new javax.swing.JToggleButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        table_Model = new AccountsTransactionsTableModel();
-        jTable1 = new MTable(table_Model);
-        
-    // sort from column     
-        @SuppressWarnings("unchecked")
-        TableRowSorter t = new TableRowSorter(table_Model);
-    // comparator
-        t.setComparator(table_Model.COLUMN_TRANSACTION, new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                 BigDecimal transaction1 = Library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o1));
-                 BigDecimal transaction2 = Library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o2));
-               return transaction1.compareTo(transaction2);
-            }
-          });
-        
-       // sort list  - AUTO sort
-        List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(table_Model.COLUMN_TRANSACTION, SortOrder.DESCENDING));
-        t.setSortKeys(sortKeys);
-       // sort table
-        jTable1.setRowSorter(t);
-      
-        
-        
-        
-        
+         jMenuBar2 = new javax.swing.JMenuBar();
+         jMenu3 = new javax.swing.JMenu();
+         jMenu4 = new javax.swing.JMenu();
+         jToggleButton1 = new javax.swing.JToggleButton();
+         new javax.swing.JPopupMenu();
+         jMenu5 = new javax.swing.JMenu();
+         jToggleButton2 = new javax.swing.JToggleButton();
+         jScrollPane1 = new javax.swing.JScrollPane();
+         table_Model = new AccountsTransactionsTableModel();
+         jTable1 = new MTable(table_Model);
 
-        jMenu1.setText("File");
-        jMenuBar1.add(jMenu1);
+         if (false) {
+             // не правильная сортировка - по существующим только и не дает неподтвержденные сюда внести
+             // и при этом еще у записей Номера блоков обновляет и присваивает для неподтвержденных как будто они включенв в +1 блок верхний
+             // темболее что сейчас основная сортировка в кошельке - по времени что для не подтвержденных так же правильно
 
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
+             // sort from column
+             @SuppressWarnings("unchecked")
+             TableRowSorter t = new TableRowSorter(table_Model);
+             // comparator
+             t.setComparator(table_Model.COLUMN_TRANSACTION, new Comparator<String>() {
+                 @Override
+                 public int compare(String o1, String o2) {
+                     BigDecimal transaction1 = Library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o1));
+                     BigDecimal transaction2 = Library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o2));
+                     return transaction1.compareTo(transaction2);
+                 }
+             });
 
-        jMenu3.setText("File");
-        jMenuBar2.add(jMenu3);
+             // sort list  - AUTO sort
+             List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+             sortKeys.add(new RowSorter.SortKey(table_Model.COLUMN_TRANSACTION, SortOrder.DESCENDING));
+             t.setSortKeys(sortKeys);
+             // sort table
+             jTable1.setRowSorter(t);
+
+         }
+
+         jMenu1.setText("File");
+         jMenuBar1.add(jMenu1);
+
+         jMenu2.setText("Edit");
+         jMenuBar1.add(jMenu2);
+
+         jMenu3.setText("File");
+         jMenuBar2.add(jMenu3);
 
         jMenu4.setText("Edit");
         jMenuBar2.add(jMenu4);
@@ -174,20 +177,19 @@ public class AccountsRightPanel extends JPanel {
                 dd.setLocationRelativeTo(th);
                 dd.setVisible(true);
             }
-            
+
         });
-        mainMenu.add(viewInfo);
-     //   jTable1.setComponentPopupMenu(mainMenu);
-        TableMenuPopupUtil.installContextMenu(jTable1, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
-    }// </editor-fold>
-    
-    public void set_Asset(AssetCls asset){
-        table_Model.set_Asset(asset);
-        table_Model.set_Encryption(false);
+         mainMenu.add(viewInfo);
+         //   jTable1.setComponentPopupMenu(mainMenu);
+         TableMenuPopupUtil.installContextMenu(jTable1, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+     }// </editor-fold>
+
+    public void setAsset(AssetCls asset) {
+        table_Model.setAsset(asset);
         table_Model.getInterval();
         table_Model.fireTableDataChanged();
         jTable1.setDefaultRenderer(BigDecimal.class, new RendererBigDecimals(asset.getScale()));
     }
-    
-    
+
+
 }

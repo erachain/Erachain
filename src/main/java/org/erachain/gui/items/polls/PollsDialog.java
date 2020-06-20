@@ -40,7 +40,7 @@ public class PollsDialog extends JDialog {
     private JComboBox<ItemCls> cbxAssets;
 
     public PollsDialog(PollCls poll, int option, AssetCls asset) {
-        // super(Lang.getInstance().translate("Erachain.org") + " - " +
+        // super(Controller.getInstance().getApplicationName(false) + " - " +
         // Lang.getInstance().translate("Vote"));
 
         if (poll == null)
@@ -203,7 +203,7 @@ public class PollsDialog extends JDialog {
 
         // ADD EXCHANGE BUTTON
         detailGBC.gridy = 7;
-        voteButton = new JButton(Lang.getInstance().translate("Vote"));
+        voteButton = new JButton(Lang.getInstance().translate("To Vote"));
         voteButton.setPreferredSize(new Dimension(100, 25));
         voteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -262,7 +262,7 @@ public class PollsDialog extends JDialog {
         }
 
         // CREATE POLL
-        PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+        PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
         if (creator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),

@@ -155,7 +155,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
         ArrayList<Transaction> all_transactions = new ArrayList<Transaction>();
 
         if (false) {
-            for (Account account : Controller.getInstance().getAccounts()) {
+            for (Account account : Controller.getInstance().getWalletAccounts()) {
                 all_transactions.addAll(dcSet.getTransactionFinalMap()
                         .getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
             }
@@ -180,7 +180,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
                 if (!is) {
 
                     if (messagetx.getAssetKey() == 0) {
-                        for (Account account1 : Controller.getInstance().getAccounts()) {
+                        for (Account account1 : Controller.getInstance().getWalletAccounts()) {
                             RSend a = (RSend) messagetx;
                             if (a.getRecipient().getAddress().equals(account1.getAddress()) && incoming) {
                                 this.transactions.add(a);
@@ -208,7 +208,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
         } else {
             Wallet wallet = Controller.getInstance().wallet;
-            Iterator<Fun.Tuple2<Long, Long>> iterator = wallet.getTransactionsIteratorByType(Transaction.SEND_ASSET_TRANSACTION, true);
+            Iterator<Fun.Tuple2<Long, Integer>> iterator = wallet.getTransactionsIteratorByType(Transaction.SEND_ASSET_TRANSACTION, true);
             if (iterator == null) {
                 transactions = new ArrayList<RSend>();
                 return;
@@ -216,11 +216,11 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
             RSend rsend;
             boolean outcome;
-            Fun.Tuple2<Long, Long> key;
+            Fun.Tuple2<Long, Integer> key;
             while (iterator.hasNext()) {
                 key = iterator.next();
                 try {
-                    rsend = (RSend) wallet.getTransaction(key).b;
+                    rsend = (RSend) wallet.getTransaction(key);
                 } catch (Exception e) {
                     rsend = null;
                 }
@@ -231,11 +231,10 @@ public class TableModelMails extends AbstractTableModel implements Observer {
                     continue;
 
                 // это исходящее письмо?
-                outcome = key.a.equals(Longs.fromByteArray(rsend.getCreator().getShortAddressBytes()));
+                outcome = key.equals(Longs.fromByteArray(rsend.getCreator().getShortAddressBytes()));
 
                 if (incoming ^ outcome) {
-                    if (rsend.getSignature() != null)
-                        rsend.setDC_HeightSeq(dcSet);
+                    rsend.setDC(dcSet, false);
                     transactions.add(rsend);
                 }
             }

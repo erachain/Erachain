@@ -72,7 +72,7 @@ public class TableModelOwnerPersons extends TimerTableModelCls<PersonCls> {
     }
 
     @Override
-    public void getIntervalThis(long start, int limit) {
+    public void getInterval() {
 
         list = new ArrayList<>();
 

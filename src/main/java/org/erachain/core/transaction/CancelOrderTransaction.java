@@ -52,10 +52,13 @@ public class CancelOrderTransaction extends Transaction {
         this(typeBytes, creator, order, feePow, timestamp, reference);
         this.signature = signature;
     }
-    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] order, byte feePow, long timestamp, Long reference, byte[] signature, long feeLong) {
+
+    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] order, byte feePow, long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, order, feePow, timestamp, reference);
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
     }
 
     public CancelOrderTransaction(PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -68,8 +71,8 @@ public class CancelOrderTransaction extends Transaction {
 
     //GETTERS/SETTERS
 
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setDC(dcSet, asDeal, blockHeight, seqNo);
+    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andSetup) {
+        super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
 
         Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
         if (createDBRef == null && blockHeight > BlockChain.CANCEL_ORDERS_ALL_VALID) {
@@ -80,6 +83,9 @@ public class CancelOrderTransaction extends Transaction {
             }
         }
         this.orderID = createDBRef;
+
+        if (false && andSetup && !isWiped())
+            setupFromStateDB();
 
     }
 
@@ -98,14 +104,14 @@ public class CancelOrderTransaction extends Transaction {
 
     //PARSE CONVERT
 
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
         int test_len;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len = BASE_LENGTH_AS_PACK;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len = BASE_LENGTH_AS_DBRECORD;
         } else {
             test_len = BASE_LENGTH;
@@ -120,7 +126,7 @@ public class CancelOrderTransaction extends Transaction {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -138,7 +144,7 @@ public class CancelOrderTransaction extends Transaction {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -150,7 +156,13 @@ public class CancelOrderTransaction extends Transaction {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
-        if (asDeal == FOR_DB_RECORD) {
+        long seqNo = 0;
+        if (forDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -161,7 +173,7 @@ public class CancelOrderTransaction extends Transaction {
         byte[] orderSignature = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
         position += ORDER_LENGTH;
 
-        return new CancelOrderTransaction(typeBytes, creator, orderSignature, feePow, timestamp, reference, signatureBytes, feeLong);
+        return new CancelOrderTransaction(typeBytes, creator, orderSignature, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
     }
 
     //@Override
@@ -194,7 +206,7 @@ public class CancelOrderTransaction extends Transaction {
     //VALIDATE
     //@Override
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -237,12 +249,12 @@ public class CancelOrderTransaction extends Transaction {
             Order order = this.dcSet.getOrderMap().get(this.orderID);
 
             //CHECK IF CREATOR IS CREATOR
-            if (!order.getCreator().equals(this.creator.getAddress())) {
+            if (!order.getCreator().equals(this.creator)) {
                 return INVALID_ORDER_CREATOR;
             }
         }
 
-        return super.isValid(asDeal, flags);
+        return super.isValid(forDeal, flags);
     }
 
 
@@ -269,9 +281,9 @@ public class CancelOrderTransaction extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         if (this.orderID == null) {
             if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
@@ -309,12 +321,12 @@ public class CancelOrderTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
 
         // FIRST GET DB REF from FINAL
 
         // ORPHAN
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
         if (this.orderID == null) {
             if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
@@ -360,9 +372,7 @@ public class CancelOrderTransaction extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
-
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 

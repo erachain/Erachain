@@ -10,7 +10,7 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class IssueAssetDetailsFrame extends RecDetailsFrame {
     public IssueAssetDetailsFrame(IssueAssetTransaction assetIssue) {
-        super(assetIssue);
+        super(assetIssue, false);
 
         AssetInfo as_info = new AssetInfo((AssetCls) assetIssue.getItem(), false);
         //LABEL NAME

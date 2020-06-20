@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 @SuppressWarnings("serial")
 public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
     public SetStatusToItemDetailsFrame(RSetStatusToItem setStatusToItem) {
-        super(setStatusToItem);
+        super(setStatusToItem, true);
 
         ItemCls item = setStatusToItem.getItem();
         StatusCls status = setStatusToItem.getStatus();

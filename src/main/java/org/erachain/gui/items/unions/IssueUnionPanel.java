@@ -46,7 +46,7 @@ public class IssueUnionPanel extends JPanel {
     private JTextArea txtareaDescription = new JTextArea();
     private JTextField txtBirthday = new JTextField();
     private JTextField txtParent = new JTextField();
-    //		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Issue Union"));
+    //		super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Issue Union"));
 
     private JButton issueButton = new JButton();
     // Variables declaration - do not modify
@@ -143,7 +143,7 @@ public class IssueUnionPanel extends JPanel {
         }
 
         byte[] image = null;
-        PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+        PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
         if (creator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),

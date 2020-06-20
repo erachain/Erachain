@@ -125,10 +125,11 @@ function poll(data) {
     var number = 1;
     for (var i in data.poll.votes) {
         var item = data.poll.votes[i];
+        var voteNo = i * 1 + 1;
         output += '<tr><td><b>' + number++ + ' - ' + item.name + ':</b></td>';
         output += '<td>' + item.persons + '</td>';
         output += '<td>' + (100.0 * item.persons / data.poll.personsTotal).toPrecision(6)  + '</td>';
-        output += '<td>' + item.votes + '</td>';
+        output += '<td><a href=?q=' + data.charKey + '%20%23%23' + voteNo + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + item.votes + '</b></a></td>';
         output += '<td>' + (100.0 * item.votes / data.poll.votesTotal).toPrecision(6) + '</td>';
 
         output += '</td></tr>';

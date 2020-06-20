@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 @SuppressWarnings("serial")
 public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
     public ArbitraryTransactionDetailsFrame(ArbitraryTransaction arbitraryTransaction) {
-        super(arbitraryTransaction);
+        super(arbitraryTransaction, true);
 
 
         //LABEL SERVICE

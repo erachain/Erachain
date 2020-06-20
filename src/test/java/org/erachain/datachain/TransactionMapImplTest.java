@@ -96,10 +96,12 @@ public class TransactionMapImplTest {
                 map.put(messageTx);
 
             } catch (Exception e10) {
+                logger.debug(e10.getMessage(), e10);
             }
 
         } while (--counter > 0);
 
+        assertEquals(map.size(), records);
         assertEquals(map.size(), records);
     }
 
@@ -113,7 +115,7 @@ public class TransactionMapImplTest {
 
             make();
 
-            Collection<Long> keys = map.getFromToKeys(10, 20);
+            Collection<Long> keys = map.getFromToKeys(10L, 20);
             assertEquals(keys.size(), 10);
 
             map.clear();

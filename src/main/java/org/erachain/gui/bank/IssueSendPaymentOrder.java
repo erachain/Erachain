@@ -16,7 +16,6 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.Converter;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -152,7 +151,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel  {
                 messageBytes = message.getBytes(StandardCharsets.UTF_8);
             } else {
                 try {
-                    messageBytes = Converter.parseHexString(message);
+                    messageBytes = Base58.decode(message); //Converter.parseHexString(message);
                 } catch (Exception g) {
                     try {
                         messageBytes = Base58.decode(message);
@@ -200,7 +199,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel  {
             if (encryptMessage) {
                 // sender
                 PrivateKeyAccount account = Controller.getInstance()
-                        .getPrivateKeyAccountByAddress(sender.getAddress().toString());
+                        .getWalletPrivateKeyAccountByAddress(sender.getAddress().toString());
                 byte[] privateKey = account.getPrivateKey();
 
                 // recipient
@@ -236,7 +235,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel  {
 
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(
-                Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), 0, recipient, key,
+                Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), 0, recipient, key,
                 null, head, messageBytes, isTextByte, encrypted, 0);
         // test result = new Pair<Transaction, Integer>(null,
         // Transaction.VALIDATE_OK);

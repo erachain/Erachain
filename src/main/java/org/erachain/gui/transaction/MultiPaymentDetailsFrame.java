@@ -13,7 +13,7 @@ import javax.swing.table.TableRowSorter;
 public class MultiPaymentDetailsFrame extends RecDetailsFrame {
     @SuppressWarnings("unchecked")
     public MultiPaymentDetailsFrame(MultiPaymentTransaction multiPayment) {
-        super(multiPayment);
+        super(multiPayment, true);
 
         //LABEL PAYMENTS
         ++labelGBC.gridy;

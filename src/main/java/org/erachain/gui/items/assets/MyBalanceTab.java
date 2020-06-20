@@ -2,7 +2,6 @@ package org.erachain.gui.items.assets;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
@@ -12,8 +11,6 @@ import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -24,7 +21,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
 
 public class MyBalanceTab extends SplitPanel  {
 
@@ -36,8 +32,6 @@ public class MyBalanceTab extends SplitPanel  {
     final MTable table;
     protected int row;
     BalanceFromAddressTableModel balancesModel;
-    private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
-    //private MyBalanceTab th;
 
     @SuppressWarnings({"null", "unchecked", "rawtypes"})
     public MyBalanceTab() {

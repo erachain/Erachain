@@ -4,6 +4,7 @@ package org.erachain.gui.items.accounts;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.RCalculated;
@@ -13,7 +14,10 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.lang.Lang;
-import org.erachain.utils.*;
+import org.erachain.utils.DateTimeFormat;
+import org.erachain.utils.NumberAsString;
+import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.TableMenuPopupUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,12 +87,12 @@ public class AccountTransactionsTable extends JTable implements Observer {
         }
 
 
-        for (Account account : Controller.getInstance().getAccounts()) {
+        for (Account account : Controller.getInstance().getWalletAccounts()) {
             transactions.addAll(dcSet.getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
         }
 
         for (Transaction messagetx : transactions) {
-            messagetx.setDC(DCSet.getInstance());
+            messagetx.setDC(DCSet.getInstance(), true);
 
             boolean is = false;
             for (MessageBuf message : messageBufs) {
@@ -270,7 +274,7 @@ public class AccountTransactionsTable extends JTable implements Observer {
         }
 
         for (Transaction messagetx : transactions) {
-            messagetx.setDC(DCSet.getInstance());
+            messagetx.setDC(DCSet.getInstance(), true);
             
             if (asset.getKey() == messagetx.getAssetKey()) {
                 boolean is = false;
@@ -383,7 +387,7 @@ public class AccountTransactionsTable extends JTable implements Observer {
                 if (!is) {
                     
                     Transaction transactopn = (Transaction)message.getValue();
-                    transactopn.setDC(DCSet.getInstance());
+                    transactopn.setDC(DCSet.getInstance(), true);
                     addMessage(0, (RSend) transactopn, null);
 
                     messagesModel.setRowCount(messageBufs.size());
@@ -522,7 +526,8 @@ public class AccountTransactionsTable extends JTable implements Observer {
                 if (decryptedData == null) {
                     messageBufs.get(row).setDecryptedMessage(Lang.getInstance().translate("Decrypt Error!"));
                 } else {
-                    messageBufs.get(row).setDecryptedMessage((messageBufs.get(row).isText()) ? new String(decryptedData, StandardCharsets.UTF_8) : Converter.toHex(decryptedData));
+                    messageBufs.get(row).setDecryptedMessage((messageBufs.get(row).isText()) ? new String(decryptedData, StandardCharsets.UTF_8) :
+                            Base58.encode(decryptedData)); //Converter.toHex(decryptedData));
                     messageBufs.get(row).setOpend(true);
                     menuDecrypt.setText(Lang.getInstance().translate("Hide decrypted"));
                 }
@@ -629,7 +634,8 @@ public class AccountTransactionsTable extends JTable implements Observer {
                     this.decryptedMessage = "Encrypted";
                 }
                 if (!this.encrypted) {
-                    this.decryptedMessage = (isText) ? new String(this.rawMessage, StandardCharsets.UTF_8) : Converter.toHex(this.rawMessage);
+                    this.decryptedMessage = (isText) ? new String(this.rawMessage, StandardCharsets.UTF_8) :
+                            Base58.encode(this.rawMessage); //Converter.toHex(this.rawMessage);
                 }
             }
             return this.decryptedMessage;

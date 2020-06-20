@@ -8,11 +8,9 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.utils.APIUtils;
-import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -71,7 +69,7 @@ public class AddressesResource {
         }
 
         // GET ACCOUNTS
-        List<Account> accounts = Controller.getInstance().getAccounts();
+        List<Account> accounts = Controller.getInstance().getWalletAccounts();
 
         // CONVERT TO LIST OF ADDRESSES
         JSONArray addresses = new JSONArray();
@@ -180,7 +178,7 @@ public class AddressesResource {
         }
 
         // CHECK ACCOUNT IN WALLET
-        Account account = Controller.getInstance().getAccountByAddress(address);
+        Account account = Controller.getInstance().getWalletAccountByAddress(address);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
@@ -216,13 +214,13 @@ public class AddressesResource {
         }
 
         // CHECK ACCOUNT IN WALLET
-        Account account = Controller.getInstance().getAccountByAddress(address);
+        Account account = Controller.getInstance().getWalletAccountByAddress(address);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
         }
 
-        byte[] privateKey = Controller.getInstance().getPrivateKeyAccountByAddress(address).getPrivateKey();
+        byte[] privateKey = Controller.getInstance().getWalletPrivateKeyAccountByAddress(address).getPrivateKey();
         return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
                 //.header("Access-Control-Allow-Origin", "*")
                 .entity(Base58.encode(privateKey)).build(); // " ! " + Base58.encode(privateKey) - норм работает
@@ -246,7 +244,7 @@ public class AddressesResource {
                     ApiErrorFactory.ERROR_WALLET_LOCKED);
         }
 
-        return Controller.getInstance().generateNewAccount();
+        return Controller.getInstance().generateNewWalletAccount();
     }
 
     @POST
@@ -271,7 +269,7 @@ public class AddressesResource {
                         ApiErrorFactory.ERROR_WALLET_LOCKED);
             }
 
-            return Controller.getInstance().generateNewAccount();
+            return Controller.getInstance().generateNewWalletAccount();
         } else {
             APIUtils.askAPICallAllowed(password, "POST addresses import Account seed\n " + x, request, true);
 
@@ -308,38 +306,6 @@ public class AddressesResource {
             // CONVERT TO BYTE
             return Controller.getInstance().importAccountSeed(seedBytes);
         }
-    }
-
-    @DELETE
-    @Path("/{address}")
-    public String deleteAddress(@PathParam("address") String address, @QueryParam("password") String password) {
-
-        APIUtils.askAPICallAllowed(password, "DELETE addresses/" + address, request, true);
-
-        // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-        }
-
-        // CHECK WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_WALLET_LOCKED);
-        }
-
-        // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
-            throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
-                    Transaction.INVALID_ADDRESS);
-
-        }
-
-        // DELETE
-        PrivateKeyAccount account = Controller.getInstance()
-                .getPrivateKeyAccountByAddress(address);
-        return String.valueOf(Controller.getInstance().deleteAccount(account));
     }
 
     @GET
@@ -521,13 +487,17 @@ public class AddressesResource {
         }
 
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
-        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
-                = map.getBalancesSortableList(new Account(address));
+        List<Tuple2<byte[], Tuple5<
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> assetsBalances
+                = map.getBalancesList(new Account(address));
 
         JSONObject assetsBalancesJSON = new JSONObject();
 
-        for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
-            assetsBalancesJSON.put(ItemAssetBalanceMap.getAssetKeyFromKey(assetsBalance.getA()), tuple5_toJson(assetsBalance.getB()));
+        for (Tuple2<byte[], Tuple5<
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
+            assetsBalancesJSON.put(ItemAssetBalanceMap.getAssetKeyFromKey(assetsBalance.a), tuple5_toJson(assetsBalance.b));
         }
 
         return assetsBalancesJSON.toJSONString();
@@ -562,7 +532,7 @@ public class AddressesResource {
 
         // GET OWNER
         PrivateKeyAccount account = Controller.getInstance()
-                .getPrivateKeyAccountByAddress(address);
+                .getWalletPrivateKeyAccountByAddress(address);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);

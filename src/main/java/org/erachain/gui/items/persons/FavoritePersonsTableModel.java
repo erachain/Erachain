@@ -16,7 +16,7 @@ public class FavoritePersonsTableModel extends FavoriteItemModelTable {
 
     public FavoritePersonsTableModel() {
         super(DCSet.getInstance().getItemPersonMap(),
-                Controller.getInstance().wallet.database.getPersonFavoritesSet(),
+                Controller.getInstance().getWallet().database.getPersonFavoritesSet(),
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false},
                 ObserverMessage.RESET_PERSON_FAVORITES_TYPE,

@@ -88,7 +88,7 @@ public class SearchImprintsSplitPanel extends SplitPanel {
             public void valueChanged(ListSelectionEvent arg0) {
                 ImprintCls imprint = null;
                 if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0)
-                    imprint = tableModelImprints.getImprint(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                    imprint = tableModelImprints.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
 
 
                 //	info.show_001(person);

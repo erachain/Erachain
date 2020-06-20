@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 
-public class GenesisIssueItemRecord extends GenesisRecord {
+public class GenesisIssueItemRecord extends GenesisRecord implements Itemable {
 
     protected ItemCls item;
 
@@ -42,6 +42,9 @@ public class GenesisIssueItemRecord extends GenesisRecord {
 
     }
 
+    public String getItemDescription() {
+        return item.getDescription();
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -80,7 +83,7 @@ public class GenesisIssueItemRecord extends GenesisRecord {
     //VALIDATE
 
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         //CHECK NAME LENGTH
         int nameLength = this.item.getName().getBytes(StandardCharsets.UTF_8).length;
@@ -100,7 +103,7 @@ public class GenesisIssueItemRecord extends GenesisRecord {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
 
         //INSERT INTO DATABASE
         this.item.insertToMap(this.dcSet, 0L);
@@ -109,7 +112,7 @@ public class GenesisIssueItemRecord extends GenesisRecord {
 
 
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
 
         //DELETE FROM DATABASE
         this.item.deleteFromMap(this.dcSet, 0L);

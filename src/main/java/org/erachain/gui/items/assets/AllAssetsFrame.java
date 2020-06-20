@@ -1,8 +1,7 @@
 package org.erachain.gui.items.assets;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.gui.CoreRowSorter;
-import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RendererIcon;
 import org.erachain.lang.Lang;
@@ -21,8 +20,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 @SuppressWarnings("serial")
 public class AllAssetsFrame extends JFrame {
@@ -31,7 +28,7 @@ public class AllAssetsFrame extends JFrame {
 
     public AllAssetsFrame() {
 
-        super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("All Assets"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("All Assets"));
 
         //ICON
         List<Image> icons = new ArrayList<Image>();

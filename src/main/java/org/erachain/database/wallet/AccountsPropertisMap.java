@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.TreeMap;
 
-// <Account, Tuple2<Title,JSON_String>>
+/**
+ * key: address -> value: name + description
+ */
 public class AccountsPropertisMap extends DCUMapImpl<String, Tuple2<String, String>> {
     public static final int NAME_INDEX = 1;
     public static final int OWNER_INDEX = 2;

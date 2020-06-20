@@ -1,17 +1,5 @@
 package org.erachain.gui.models;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -21,6 +9,16 @@ import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class AccountsOfDealsTableModel extends AbstractTableModel implements Observer {
@@ -38,7 +36,7 @@ public class AccountsOfDealsTableModel extends AbstractTableModel implements Obs
     private Account account;
 
     public AccountsOfDealsTableModel(int deal) {
-        this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+        this.publicKeyAccounts = Controller.getInstance().getWalletPublicKeyAccounts();
         Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
         this.deal = deal;
@@ -217,14 +215,14 @@ public class AccountsOfDealsTableModel extends AbstractTableModel implements Obs
 
             if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
                     || message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
-                this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+                this.publicKeyAccounts = Controller.getInstance().getWalletPublicKeyAccounts();
 
                 this.fireTableRowsUpdated(0, this.getRowCount() - 1);  // WHEN UPDATE DATA - SELECTION DOES NOT DISAPPEAR
             }
 
             if (message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE) {
                 // обновляем данные
-                this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+                this.publicKeyAccounts = Controller.getInstance().getWalletPublicKeyAccounts();
                 this.fireTableDataChanged();
             }
         }

@@ -4,11 +4,9 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
-import org.erachain.utils.Pair;
-import org.mapdb.Fun.Tuple2;
 
 @SuppressWarnings("serial")
-public class WalletItemAssetsTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, AssetCls>> {
+public class WalletItemAssetsTableModel extends WalletTableModel<AssetCls> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
@@ -26,16 +24,11 @@ public class WalletItemAssetsTableModel extends WalletAutoKeyTableModel<Tuple2<L
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.listSorted == null || row > this.listSorted.size() - 1) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
 
-        Pair<Tuple2<Long , Long>, Tuple2<Long, AssetCls>> pair = this.listSorted.get(row);
-        //Tuple2<Long, AssetCls> pair = this.listSorted.get(row);
-        if (pair == null || pair.getB() == null) {
-            return null;
-        }
-        AssetCls asset = pair.getB().b;
+        AssetCls asset = this.list.get(row);
 
         switch (column) {
             case COLUMN_KEY:

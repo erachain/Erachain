@@ -1,13 +1,12 @@
 package org.erachain.gui.transaction;
 
-import com.github.rjeschke.txtmark.Processor;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
-import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,7 @@ public class RecStatementDetailsFrame extends RecDetailsFrame {
     private RecStatementDetailsFrame th;
 
     public RecStatementDetailsFrame(final RSignNote r_Statement) {
-        super(r_Statement);
+        super(r_Statement, true);
         th = this;
         if (r_Statement.getKey() > 0) {
             ++labelGBC.gridy;
@@ -49,7 +48,8 @@ public class RecStatementDetailsFrame extends RecDetailsFrame {
             detailGBC.gridwidth = 2;
             messageText = new JTextPane();
             messageText.setContentType("text/html");
-            String ss = ((r_Statement.isText()) ? Library.viewDescriptionHTML(new String(r_Statement.getData(), StandardCharsets.UTF_8)) : Processor.process(Converter.toHex(r_Statement.getData())));
+            String ss = ((r_Statement.isText()) ? Library.viewDescriptionHTML(new String(r_Statement.getData(), StandardCharsets.UTF_8)) :
+                    Base58.encode(r_Statement.getData())); //Converter.toHex(r_Statement.getData()));
             messageText.setEditable(false);
             //messageText.setSize(200, 300);
             //messageText.setPreferredSize(new Dimension(800,200));
@@ -116,7 +116,7 @@ public class RecStatementDetailsFrame extends RecDetailsFrame {
                         } else {
                             messageText.setText(r_Statement.isText() ?
                                     new String(decryptedData, StandardCharsets.UTF_8)
-                                    : Converter.toHex(decryptedData));
+                                    : Base58.encode(decryptedData)); //Converter.toHex(decryptedData));
 
                         }
 

@@ -142,20 +142,21 @@ public class TransactionFinalMapImplTest {
 
                 RSend assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc, 1, amount_asset, timestamp++, 0L);
                 assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
-                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                 dcSet.getTransactionFinalMap().put(assetTransfer);
 
                 assetTransfer = new RSend(accountB, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
                 assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
-                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                 dcSet.getTransactionFinalMap().put(assetTransfer);
 
                 assetTransfer = new RSend(accountB, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
                 assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
-                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                 dcSet.getTransactionFinalMap().put(assetTransfer);
 
-                Iterator<Long> iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, maxHeight, type, service, desc, offset, limit);
+                Iterator<Long> iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(), sender, recipient,
+                        null, minHeight, maxHeight, type, service, desc, offset, limit);
 
                 // .size сбрасывает Итератор на конец списка
                 assertEquals(3, Iterators.size(iterator));
@@ -163,7 +164,7 @@ public class TransactionFinalMapImplTest {
                 /// пошлем сами себе - эта трнзакция будет в обоих Итераторах
                 assetTransfer = new RSend(accountA, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
                 assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
-                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                 dcSet.getTransactionFinalMap().put(assetTransfer);
 
                 //Set<BlExpUnit> iteratorA = dcSet.getTransactionFinalCalculatedMap().getBlExpCalculatedsByAddress(accountA.getAddress());
@@ -172,7 +173,8 @@ public class TransactionFinalMapImplTest {
 
                 //Iterator iteratorU = dcSet.getTransactionTab().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, desc, type, service, offset);
 
-                iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, maxHeight, type, service, desc, offset, limit);
+                iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(), sender, recipient,
+                        null, minHeight, maxHeight, type, service, desc, offset, limit);
 
 
                 // .size сбрасывает Итератор на конец списка
@@ -201,17 +203,17 @@ public class TransactionFinalMapImplTest {
 
                 RSend assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc, 1, amount_asset, timestamp++, 0L);
                 assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
-                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                 dcSet.getTransactionFinalMap().put(assetTransfer);
 
                 assetTransfer = new RSend(accountB, FEE_POWER, recipientAcc, 1, amount_asset, timestamp++, 0L);
                 assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
-                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                 dcSet.getTransactionFinalMap().put(assetTransfer);
 
                 assetTransfer = new RSend(accountB, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
                 assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
-                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                 dcSet.getTransactionFinalMap().put(assetTransfer);
 
 
@@ -221,12 +223,12 @@ public class TransactionFinalMapImplTest {
 
                 assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc2, 1, amount_asset, timestamp++, 0L);
                 assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
-                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                 dcSet.getTransactionFinalMap().put(assetTransfer);
 
                 assetTransfer = new RSend(accountB, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
                 assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
-                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                 dcSet.getTransactionFinalMap().put(assetTransfer);
 
                 List<Transaction> find = dcSet.getTransactionFinalMap().getTransactionsByAddressFromID(
@@ -270,19 +272,19 @@ public class TransactionFinalMapImplTest {
                     assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc, 1L, amount_asset, title + i,
                             null, isText, enCrypted, timestamp++, 0L);
                     assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
-                    assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                    assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                     map.put(assetTransfer);
 
                     assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc, 1L, amount_asset, "for",
                             null, isText, enCrypted, timestamp++, 0L);
                     assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
-                    assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                    assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                     map.put(assetTransfer);
 
                     assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc, 1L, amount_asset, "forgen",
                             null, isText, enCrypted, timestamp++, 0L);
                     assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
-                    assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                    assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                     map.put(assetTransfer);
 
                 }

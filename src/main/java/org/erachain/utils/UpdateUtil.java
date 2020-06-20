@@ -6,8 +6,6 @@ import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.SortableList;
-import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -25,9 +23,6 @@ public class UpdateUtil {
         DCSet.getInstance().getOrphanNameStorageHelperMap().clear();
         DCSet.getInstance().getOrphanNameStorageMap().clear();
         DCSet.getInstance().getHashtagPostMap().clear();
-
-        SortableList<Integer, Block> blocks = DCSet.getInstance().getBlockMap().getList();
-        blocks.sort(BlockMap.HEIGHT_INDEX);
 
         Block b = new GenesisBlock();
         do {
@@ -123,7 +118,7 @@ public class UpdateUtil {
             List<Transaction> txs = b.getTransactions();
             int seqNo = 0;
             for (Transaction tx : txs) {
-                tx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK, height, ++seqNo);
+                tx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK, height, ++seqNo, true);
 
                 if (tx instanceof ArbitraryTransaction) {
                     int service = ((ArbitraryTransaction) tx).getService();

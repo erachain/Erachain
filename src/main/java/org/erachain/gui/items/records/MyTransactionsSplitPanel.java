@@ -114,8 +114,8 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
                 int row = jTableJScrollPanelLeftPanel.getSelectedRow();
                 row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 if (row < 0) return;
-                selectedTransaction = records_model.getItem(row).b;
-                selectedTransactionKey = records_model.getPairItem(row).getA();
+                selectedTransaction = records_model.getItem(row);
+                //selectedTransactionKey = records_model.getItem(row);
             }
 
             @Override
@@ -131,8 +131,8 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
                 int row = jTableJScrollPanelLeftPanel.getSelectedRow();
                 row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 if (row < 0) return;
-                selectedTransaction = records_model.getItem(row).b;
-                selectedTransactionKey = records_model.getPairItem(row).getA();
+                selectedTransaction = records_model.getItem(row);
+                //selectedTransactionKey = records_model.getPairItem(row).getA();
 
             }
 
@@ -165,7 +165,7 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
 
                 // code delete
                 Controller.getInstance().getWallet().database.getTransactionMap()
-                        .delete(selectedTransactionKey);
+                        .delete(selectedTransaction);
 
             }
         });
@@ -294,7 +294,7 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
             Transaction trans = null;
             if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0 && jTableJScrollPanelLeftPanel.getSelectedRow() < records_model.getRowCount()) {
                 trans = (Transaction) records_model
-                        .getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow())).b;
+                        .getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
 
                 records_Info_Panel = new JPanel();
                 records_Info_Panel.setLayout(new GridBagLayout());
@@ -358,7 +358,7 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
         }
         if (end > start) {
             int step = end - start;
-            this.records_model.setInterval(start, step);
+            this.records_model.setInterval(start);
             this.records_model.fireTableDataChanged();
         }
     }

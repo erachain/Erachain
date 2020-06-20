@@ -81,12 +81,15 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         //this.order = new Order(new BigInteger(signature), creator, haveKey, wantKey, amountHave, amountWant, timestamp);
 
     }
+
     public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference,
-                                  byte[] signature, long feeLong) {
+                                  byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
 
     }
 
@@ -139,16 +142,16 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         return amount;
     }
 
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
         //boolean asPack = releaserReference != null;
 
         // CHECK IF WE MATCH BLOCK LENGTH
         int test_len;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len = BASE_LENGTH_AS_PACK;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len = BASE_LENGTH_AS_DBRECORD;
         } else {
             test_len = BASE_LENGTH;
@@ -163,7 +166,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -181,7 +184,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             // READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -193,7 +196,13 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
-        if (asDeal == FOR_DB_RECORD) {
+        long seqNo = 0;
+        if (forDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -241,17 +250,20 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         }
 
         return new CreateOrderTransaction(typeBytes, creator, have, want, amountHave, amountWant, feePow, timestamp,
-                reference, signatureBytes, feeLong);
+                reference, signatureBytes, seqNo, feeLong);
     }
 
-    public void setDC(DCSet dcSet) {
+    public void setDC(DCSet dcSet, boolean andSetup) {
 
-        super.setDC(dcSet);
+        super.setDC(dcSet, false);
 
         if (dcSet != null && dcSet.getItemAssetMap() != null) {
             this.haveAsset = this.dcSet.getItemAssetMap().get(this.haveKey);
             this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
         }
+
+        if (false && andSetup && !isWiped())
+            setupFromStateDB();
 
     }
 
@@ -413,7 +425,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     }
 
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -580,16 +592,16 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             }
         }
 
-        return super.isValid(asDeal, flags);
+        return super.isValid(forDeal, flags);
     }
 
     // PROCESS/ORPHAN
 
     // @Override
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
         // UPDATE CREATOR
-        super.process(block, asDeal);
+        super.process(block, forDeal);
 
         // PROCESS ORDER
         // изменяемые объекты нужно заново создавать
@@ -605,9 +617,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     // @Override
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
         // UPDATE CREATOR
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
         // ORPHAN ORDER
         // изменяемые объекты нужно заново создавать
@@ -633,9 +645,8 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 

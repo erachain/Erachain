@@ -33,7 +33,7 @@ public class MultiPaymentFrame extends JFrame {
 
     @SuppressWarnings("unchecked")
     public MultiPaymentFrame(AssetCls asset, List<Payment> payments) {
-        super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Pay dividend"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Pay dividend"));
 
         this.asset = asset;
         this.payments = payments;
@@ -186,7 +186,7 @@ public class MultiPaymentFrame extends JFrame {
             int feePow = Integer.parseInt(txtFeePow.getText());
 
             //CREATE MULTI PAYMENT
-            PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(this.asset.getOwner().getAddress());
+            PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(this.asset.getOwner().getAddress());
             if (creator == null) {
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),

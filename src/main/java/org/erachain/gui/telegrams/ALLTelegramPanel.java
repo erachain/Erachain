@@ -209,7 +209,7 @@ public ALLTelegramPanel() {
            public void actionPerformed(ActionEvent e) {
                
                
-             Transaction tt =  walletTelegramsFilterTableModel.getTelegramMessage(row);
+             Transaction tt = walletTelegramsFilterTableModel.getItem(row);
                Controller.getInstance().telegramStore.database.getTelegramsMap().delete(tt.viewSignature());
         //     System.out.println(row);
            }

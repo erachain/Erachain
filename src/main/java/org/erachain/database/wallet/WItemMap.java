@@ -1,18 +1,16 @@
 package org.erachain.database.wallet;
 
-import com.google.common.primitives.Longs;
-import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
-import org.erachain.database.AutoKeyDBMap;
-import org.erachain.database.serializer.LongItemSerializer;
+import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.dbs.DBTab;
-import org.erachain.utils.Pair;
-import org.mapdb.*;
-import org.mapdb.Fun.Tuple2;
+import org.erachain.dbs.DCUMapImpl;
+import org.mapdb.BTreeKeySerializer;
+import org.mapdb.BTreeMap;
+import org.mapdb.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
 
 // TODO reference as TIMESTAMP of transaction
 
@@ -20,7 +18,7 @@ import java.util.*;
  * key: Address + refDB</br>
  * Value: autoIncrement + Object
  */
-public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> {
+public class WItemMap extends DCUMapImpl<Long, ItemCls> {
 
     public static final int NAME_INDEX = 1;
     public static final int CREATOR_INDEX = 2;
@@ -47,7 +45,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         // ИМЯ и ТИП заданы, создаем карту и ИНдексы
         openMap();
 
-        makeAutoKey(database, (Bind.MapWithModificationListener)map, name + "_wak");
+        ///makeAutoKey(database, (Bind.MapWithModificationListener)map, name + "_wak");
 
         this.createIndexes();
 
@@ -67,107 +65,20 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
             return;
 
         map = database.createTreeMap(this.name)
-                .keySerializer(BTreeKeySerializer.TUPLE2)
-                .valueSerializer(new LongItemSerializer(this.type))
+                .keySerializer(BTreeKeySerializer.ZERO_OR_POSITIVE_LONG)
+                .valueSerializer(new ItemSerializer(this.type))
                 .counterEnable()
                 .makeOrGet();
+        map = ((BTreeMap) map).descendingMap();
     }
 
     @Override
     protected void getMemoryMap() {
-        map = new TreeMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>>(Fun.TUPLE2_COMPARATOR);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Tuple2<Long, ItemCls>> get(Account account) {
-        List<Tuple2<Long, ItemCls>> items = new ArrayList<Tuple2<Long, ItemCls>>();
-
-        try {
-            Map<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> accountItems = ((BTreeMap) this.map).subMap(
-                    Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
-                    Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
-
-            //GET ITERATOR
-            // TODO Closeable добавить потом
-            Iterator<Tuple2<Long, ItemCls>> iterator = accountItems.values().iterator();
-
-            while (iterator.hasNext()) {
-                items.add(iterator.next());
-            }
-        } catch (Exception e) {
-            //ERROR
-            LOGGER.error(e.getMessage(), e);
-        }
-
-        return items;
+    public ItemCls get(Long key) {
+        ItemCls item = super.get(key);
+        item.setKey(key);
+        return item;
     }
-
-    public List<Pair<Account, ItemCls>> get(List<Account> accounts) {
-        List<Pair<Account, ItemCls>> items = new ArrayList<Pair<Account, ItemCls>>();
-
-        try {
-            //FOR EACH ACCOUNTS
-            synchronized (accounts) {
-                for (Account account : accounts) {
-                    List<Tuple2<Long, ItemCls>> accountItems = get(account);
-                    for (Tuple2<Long, ItemCls> item : accountItems) {
-                        items.add(new Pair<Account, ItemCls>(account, item.b));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            //ERROR
-            LOGGER.error(e.getMessage(), e);
-        }
-
-        return items;
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public void delete(Account account) {
-        //GET ALL POLLS THAT BELONG TO THAT ADDRESS
-        Map<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> accountItems = ((BTreeMap) this.map).subMap(
-                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
-                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
-
-        //DELETE NAMES
-        for (Tuple2<Long, Long> key : accountItems.keySet()) {
-            this.delete(key);
-        }
-    }
-
-    public void delete(Account account, long refDB) {
-        this.delete(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()),
-                refDB));
-    }
-	
-	/*
-	public void deleteAll1(List<Account> accounts)
-	{
-		for(Account account: accounts)
-		{
-			this.delete(account);
-		}
-	}
-	*/
-
-    public void add(Account account, long refDB, ItemCls item) {
-        this.put(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()),
-                refDB), new Tuple2<Long, ItemCls>(item.getKey(), item));
-    }
-	
-	/*
-	public void addAll1(Map<Account, List<ItemCls>> items)
-	{
-		//FOR EACH ACCOUNT
-	    for(Account account: items.keySet())
-	    {
-	    	//FOR EACH TRANSACTION
-	    	for(ItemCls item: items.get(account))
-	    	{
-	    		this.add(item);
-	    	}
-	    }
-	}
-    */
 }

@@ -16,7 +16,6 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.datachain.DCSet;
-import org.erachain.utils.Converter;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -205,7 +204,7 @@ public class DeployATTransaction extends Transaction {
         transaction.put("description", this.description);
         transaction.put("atType", this.type);
         transaction.put("tags", this.tags);
-        transaction.put("creationBytes", Converter.toHex(this.creationBytes));
+        transaction.put("creationBytes", Base58.encode(this.creationBytes)); //Converter.toHex(this.creationBytes));
         transaction.put("amount", this.amount.toPlainString());
 
         return transaction;
@@ -306,7 +305,7 @@ public class DeployATTransaction extends Transaction {
     //VALIDATE
 
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
         return isValid(0);
     }
 
@@ -378,9 +377,9 @@ public class DeployATTransaction extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
         //UPDATE ISSUER
-        super.process(block, asDeal);
+        super.process(block, forDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).subtract(this.amount), db);
         this.creator.changeBalance(this.dcSet, true, false, Transaction.FEE_KEY, this.amount, false, false);
 
@@ -440,10 +439,10 @@ public class DeployATTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
 
         //UPDATE ISSUER
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.amount), db);
         this.creator.changeBalance(this.dcSet, false, false, Transaction.FEE_KEY, this.amount, false, false);
 
@@ -484,13 +483,12 @@ public class DeployATTransaction extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 
-        if (address.equals(this.getATaccount(dcSet).getAddress())) {
+        if (account.equals(this.getATaccount(dcSet))) {
             return true;
         }
 

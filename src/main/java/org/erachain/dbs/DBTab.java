@@ -1,7 +1,6 @@
 package org.erachain.dbs;
 
 import org.erachain.database.IDB;
-import org.erachain.database.SortableList;
 
 import java.util.Map;
 
@@ -28,10 +27,6 @@ public interface DBTab<T, U> extends IMap<T, U>, ForkedMap {
     Integer setObservableData(int index, Integer data);
 
     boolean checkObserverMessageType(int messageType, int thisMessageType);
-
-    //NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending);
-
-    SortableList<T, U> getList();
 
     void notifyObserverList();
 

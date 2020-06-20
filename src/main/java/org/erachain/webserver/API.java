@@ -17,7 +17,6 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.*;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.utils.APIUtils;
@@ -164,8 +163,12 @@ public class API {
 
     @GET
     @Path("height")
-    public static String getHeight() {
-        return String.valueOf(Controller.getInstance().getMyHeight());
+    public static Response getHeight() {
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(String.valueOf(Controller.getInstance().getMyHeight()))
+                .build();
     }
 
     @GET
@@ -1053,25 +1056,29 @@ public class API {
 
         Account account = new Account(address);
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
-        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
-                = map.getBalancesSortableList(account);
+        List<Tuple2<byte[], Tuple5<
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> assetsBalances
+                = map.getBalancesList(account);
 
         JSONObject out = new JSONObject();
 
-        for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+        for (Tuple2<byte[], Tuple5<
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
                 assetsBalance : assetsBalances) {
             JSONArray array = new JSONArray();
-            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(assetsBalance.getA());
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(assetsBalance.a);
 
             if (BlockChain.ERA_COMPU_ALL_UP) {
-                array.add(setJSONArray(account.balAaddDEVAmount(assetKey, assetsBalance.getB().a)));
+                array.add(setJSONArray(account.balAaddDEVAmount(assetKey, assetsBalance.b.a)));
             } else {
-                array.add(setJSONArray(assetsBalance.getB().a));
+                array.add(setJSONArray(assetsBalance.b.a));
             }
-            array.add(setJSONArray(assetsBalance.getB().b));
-            array.add(setJSONArray(assetsBalance.getB().c));
-            array.add(setJSONArray(assetsBalance.getB().d));
-            array.add(setJSONArray(assetsBalance.getB().e));
+            array.add(setJSONArray(assetsBalance.b.b));
+            array.add(setJSONArray(assetsBalance.b.c));
+            array.add(setJSONArray(assetsBalance.b.d));
+            array.add(setJSONArray(assetsBalance.b.e));
             out.put(assetKey, array);
         }
 

@@ -135,7 +135,7 @@ public class TradeResource {
         if (wantAsset == null)
             throw ApiErrorFactory.getInstance().createError(Transaction.ITEM_ASSET_NOT_EXIST);
 
-        PrivateKeyAccount privateKeyAccount = cntr.getPrivateKeyAccountByAddress(resultCreator.a.getAddress());
+        PrivateKeyAccount privateKeyAccount = cntr.getWalletPrivateKeyAccountByAddress(resultCreator.a.getAddress());
         if (privateKeyAccount == null) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_WALLET_ADDRESS);
         }
@@ -263,7 +263,7 @@ public class TradeResource {
         }
 
 
-        PrivateKeyAccount privateKeyAccount = cntr.getPrivateKeyAccountByAddress(resultCreator.a.getAddress());
+        PrivateKeyAccount privateKeyAccount = cntr.getWalletPrivateKeyAccountByAddress(resultCreator.a.getAddress());
         if (privateKeyAccount == null) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_WALLET_ADDRESS);
         }
@@ -594,7 +594,7 @@ public class TradeResource {
         TransactionFinalMapImpl finalMap = DCSet.getInstance().getTransactionFinalMap();
         CreateOrderTransaction createOrder;
 
-        List<Long> keys = finalMap.getKeysByAddressAndType(Account.makeShortBytes(address), Transaction.CREATE_ORDER_TRANSACTION, startOrderID, limit, 0);
+        List<Long> keys = finalMap.getKeysByAddressAndType(Account.makeShortBytes(address), Transaction.CREATE_ORDER_TRANSACTION, Boolean.TRUE, startOrderID, limit, 0);
 
         OrderMap ordersMap = DCSet.getInstance().getOrderMap();
         CompletedOrderMap completedOrdersMap = DCSet.getInstance().getCompletedOrderMap();
@@ -742,7 +742,7 @@ public class TradeResource {
         Controller controller = Controller.getInstance();
 
         // CACHE private keys
-        test1Creators = controller.getPrivateKeyAccounts();
+        test1Creators = controller.getWalletPrivateKeyAccounts();
 
         // запомним счетчики для счетов
         HashMap<String, Long> counters = new HashMap<String, Long>();
@@ -920,7 +920,7 @@ public class TradeResource {
 
                             Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
                             // CLEAR for HEAP
-                            transaction.setDC(null);
+                            transaction.setDC(null, false);
 
                             // CHECK VALIDATE MESSAGE
                             if (result == Transaction.VALIDATE_OK) {
@@ -1005,7 +1005,7 @@ public class TradeResource {
 
         try (IteratorCloseable<Long> iterator = DCSet.getInstance().getTransactionFinalMap()
                 .findTransactionsKeys(null, address, null,
-                        0, 0, Transaction.CANCEL_ORDER_TRANSACTION,
+                        null, 0, 0, Transaction.CANCEL_ORDER_TRANSACTION,
                         0, false, 0, 0)) {
 
             String result = "";

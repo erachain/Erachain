@@ -1,5 +1,6 @@
 package org.erachain.gui.items.assets;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.lang.Lang;
@@ -25,7 +26,7 @@ public class IssueAssetFrame extends JFrame {
     private JButton issueButton;
 
     public IssueAssetFrame() {
-        super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Issue Asset"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Issue Asset"));
 
         //CLOSE
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

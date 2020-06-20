@@ -30,17 +30,7 @@ public class Polls_My_SplitPanel extends ItemSplitPanel {
         jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setMaxWidth(200);
         jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(100);
 
-        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
-        vouch_menu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                DCSet db = DCSet.getInstance();
-                Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
-                new VouchRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
-
-            }
-        });
-        menuTable.add(vouch_menu);
-        JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("Voting"));
+        JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("To Vote"));
         setVote_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -52,6 +42,14 @@ public class Polls_My_SplitPanel extends ItemSplitPanel {
         menuTable.add(setVote_Menu);
 
         menuTable.addSeparator();
+
+        JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set status"));
+        setStatus_Menu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //			new UnionSetStatusDialog(th, (UnionCls) itemMenu);
+            }
+        });
+        this.menuTable.add(setStatus_Menu);
 
         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
@@ -69,6 +67,17 @@ public class Polls_My_SplitPanel extends ItemSplitPanel {
             }
         });
         menuTable.add(setSeeInBlockexplorer);
+
+        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        vouch_menu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                DCSet db = DCSet.getInstance();
+                Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
+                new VouchRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
+
+            }
+        });
+        menuTable.add(vouch_menu);
 
     }
 

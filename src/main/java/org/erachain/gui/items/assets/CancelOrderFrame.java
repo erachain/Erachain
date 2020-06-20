@@ -29,8 +29,8 @@ public class CancelOrderFrame extends JDialog {
     private JButton cancelOrderButton;
 
     public CancelOrderFrame(Order order) {
-        //super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Cancel Order"));
-        setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Cancel Order"));
+        //super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Cancel Order"));
+        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Cancel Order"));
         this.order = order;
         //	setAlwaysOnTop(true);
         setModal(true);
@@ -218,7 +218,7 @@ public class CancelOrderFrame extends JDialog {
         }
 
         //CREATE NAME UPDATE
-        PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(order.getCreator().getAddress());
+        PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(order.getCreator().getAddress());
         if (creator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),

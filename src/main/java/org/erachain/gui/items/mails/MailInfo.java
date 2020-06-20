@@ -1,13 +1,13 @@
 package org.erachain.gui.items.mails;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSend;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.library.VouchLibraryPanel;
 import org.erachain.lang.Lang;
-import org.erachain.utils.Converter;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MenuPopupUtil;
 import org.slf4j.Logger;
@@ -317,7 +317,7 @@ public class MailInfo extends javax.swing.JPanel {
             } else {
                 jTextArea_Messge.setText(trans.isText() ?
                         new String(decryptedData, StandardCharsets.UTF_8)
-                        : Converter.toHex(decryptedData));
+                        : Base58.encode(decryptedData)); //Converter.toHex(decryptedData));
 
                 jButton1.setText(Lang.getInstance().translate("Encrypt message"));
                 encrypted = !encrypted;

@@ -3,7 +3,6 @@ package org.erachain.dbs;
 import lombok.Getter;
 import org.erachain.database.DBASet;
 import org.erachain.database.IDB;
-import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.DB;
@@ -320,6 +319,11 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
         return map.getIterator();
     }
 
+    @Override
+    public IteratorCloseable<T> getDescendingIterator() {
+        return map.getDescendingIterator();
+    }
+
     /**
      * уведомляет только счетчик если он разрешен, иначе Сбросить
      */
@@ -395,10 +399,8 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
 ///////////////
 
     /**
-     * Соединяется прямо к списку SortableList для отображения в ГУИ
-     * Нужен только для сортировки<br>
-     * TODO надо его убрать отсюла нафиг чтобы не тормозило и только
-     * по месту работало окнкретно как надо
+     * Теперь просто передает себя
+     *
      * @param o
      */
     @Override
@@ -410,60 +412,14 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
         //NOTIFY
         if (this.observableData != null) {
             if (this.observableData.containsKey(NOTIFY_LIST)) {
-                if (false) {
-                    //CREATE LIST
-                    SortableList<T, U> list;
-                    if (this.size() < 1000) {
-                        list = new SortableList<T, U>(this);
-                    } else {
-                        List<T> keys = new ArrayList<T>();
-                        // тут может быть ошибка если основной индекс не TreeMap
-                        try {
-                            // обрезаем полный список в базе до 1000
-                            Iterator iterator = this.getIterator(DEFAULT_INDEX, false);
-                            int i = 0;
-                            while (iterator.hasNext() && ++i < 1000) {
-                                keys.add((T) iterator.next());
-                            }
-                        } catch (Exception e) {
-                            LOGGER.error(e.getMessage(), e);
-                        }
-
-                        list = new SortableList<T, U>(this, keys);
-                    }
-
-                    //UPDATE
-                    o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), list));
-                } else {
-
-                    //UPDATE
-                    o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), this));
-
-                }
+                //UPDATE
+                o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), this));
             }
         }
     }
 
-    //@Override
-    //public NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending) {
-    //    return map.getIndex(index, descending);
-    //}
-
     public int getDefaultIndex() {
         return DEFAULT_INDEX;
-    }
-
-    @Override
-    public SortableList<T, U> getList() {
-        SortableList<T, U> list;
-        if (this.size() < 1000) {
-            list = new SortableList<T, U>(this);
-        } else {
-            // обрезаем полный список в базе до 1000
-            list = SortableList.makeSortableList(this, false, 1000);
-        }
-
-        return list;
     }
 
     @Override

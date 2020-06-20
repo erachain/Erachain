@@ -2,7 +2,6 @@ package org.erachain.gui.transaction;
 
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.transaction.IssuePollRecord;
-import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
@@ -12,7 +11,7 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class IssuePollDetailsFrame extends RecDetailsFrame {
     public IssuePollDetailsFrame(IssuePollRecord pollIssue) {
-        super(pollIssue);
+        super(pollIssue, false);
 
         PollCls poll = (PollCls) pollIssue.getItem();
 

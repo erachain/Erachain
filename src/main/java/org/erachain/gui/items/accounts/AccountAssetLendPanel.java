@@ -37,7 +37,7 @@ public class AccountAssetLendPanel extends AccountAssetActionPanelCls  {
 
         //CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance()
-                .r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
+                .r_Send(Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
                         -key, amount,
                         head, messageBytes, isTextByte, encrypted, 0);
 

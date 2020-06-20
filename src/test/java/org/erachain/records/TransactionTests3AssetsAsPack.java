@@ -79,7 +79,7 @@ public class TransactionTests3AssetsAsPack {
 
         //CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         issueAssetTransaction.sign(maker, asPack);
@@ -114,7 +114,7 @@ public class TransactionTests3AssetsAsPack {
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
 
@@ -192,7 +192,7 @@ public class TransactionTests3AssetsAsPack {
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueAssetTransaction.sign(maker, asPack);
 
         assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags));
@@ -230,7 +230,7 @@ public class TransactionTests3AssetsAsPack {
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l);
         issueAssetTransaction.sign(maker, asPack);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueAssetTransaction.process(gb, asPack);
         long key = db.getIssueAssetMap().get(issueAssetTransaction);
         assertEquals(new BigDecimal(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
@@ -264,7 +264,7 @@ public class TransactionTests3AssetsAsPack {
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l);
         issueAssetTransaction.sign(maker, asPack);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueAssetTransaction.process(gb, asPack);
         long key = db.getIssueAssetMap().get(issueAssetTransaction);
 
@@ -296,7 +296,7 @@ public class TransactionTests3AssetsAsPack {
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueAssetTransaction.sign(maker, asPack);
         assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
@@ -426,7 +426,7 @@ public class TransactionTests3AssetsAsPack {
         maker.changeBalance(db, false, false, key, BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
         Transaction assetTransfer = new RSend(maker, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), 0l);
         assetTransfer.sign(maker, asPack);
-        assetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        assetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assetTransfer.process(gb, asPack);
 
         //CHECK BALANCE SENDER
@@ -458,7 +458,7 @@ public class TransactionTests3AssetsAsPack {
         maker.changeBalance(db, false, false, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
         Transaction assetTransfer = new RSend(maker, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), 0l);
         assetTransfer.sign(maker, asPack);
-        assetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        assetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assetTransfer.process(gb, asPack);
         assetTransfer.orphan(gb, asPack);
 
@@ -504,7 +504,7 @@ public class TransactionTests3AssetsAsPack {
 
         //CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, System.currentTimeMillis(), 0l, new byte[64]);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueAssetTransaction.sign(maker, asPack);
         issueAssetTransaction.process(gb, asPack);
         //logger.info("IssueAssetTransaction .creator.getBalance(1, db): " + account.getBalance(1, dcSet));
@@ -512,7 +512,7 @@ public class TransactionTests3AssetsAsPack {
 
         //CREATE ORDER
         CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(0.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, System.currentTimeMillis(), 0l, new byte[]{5, 6});
-        createOrderTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        createOrderTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         createOrderTransaction.sign(maker, asPack);
         createOrderTransaction.process(gb, asPack);
 
@@ -525,7 +525,7 @@ public class TransactionTests3AssetsAsPack {
         //CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(account, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), account.getLastReference(dcSet));
         //cancelOrderTransaction.sign(account);
         //CHECK IF CANCEL ORDER IS VALID
-        cancelOrderTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        cancelOrderTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(Transaction.VALIDATE_OK, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID CANCEL ORDER ORDER DOES NOT EXIST
@@ -633,19 +633,19 @@ public class TransactionTests3AssetsAsPack {
         //CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, System.currentTimeMillis(), 0l, new byte[64]);
         issueAssetTransaction.sign(maker, asPack);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueAssetTransaction.process(gb, asPack);
         key = asset.getKey(db);
 
         //CREATE ORDER
         CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, System.currentTimeMillis(), 0l, new byte[]{5, 6});
-        createOrderTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        createOrderTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         createOrderTransaction.sign(maker, asPack);
         createOrderTransaction.process(gb, asPack);
 
         //CREATE CANCEL ORDER
         CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[]{5, 6}, FEE_POWER, System.currentTimeMillis(), 0l, new byte[]{1, 2});
-        cancelOrderTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        cancelOrderTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         cancelOrderTransaction.sign(maker, asPack);
         cancelOrderTransaction.process(gb, asPack);
 
@@ -667,7 +667,7 @@ public class TransactionTests3AssetsAsPack {
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, System.currentTimeMillis(), 0l);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueAssetTransaction.sign(maker, asPack);
         assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags));
         issueAssetTransaction.process(gb, asPack);
@@ -733,7 +733,7 @@ public class TransactionTests3AssetsAsPack {
                 new byte[]{0},
                 maker.getLastTimestamp()[0]
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         r_Send.sign(creator, asPack);
 
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);

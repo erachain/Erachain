@@ -5,7 +5,6 @@ import com.google.common.collect.Iterators;
 import lombok.Getter;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -187,10 +186,44 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         }
     }
 
+    public IteratorCloseable<T> getDescendingIterator() {
+        this.addUses();
+
+        try {
+            if (parent == null) {
+                if (map instanceof NavigableMap) {
+                    return new IteratorCloseableImpl(((NavigableMap) map).descendingMap().keySet().iterator());
+                } else {
+                    return null;
+                }
+            }
+
+            List<T> list = new ArrayList<>();
+            Iterator<T> parentIterator = parent.getDescendingIterator();
+            while (parentIterator.hasNext()) {
+                T key = parentIterator.next();
+                // пропустим если он есть в удаленных
+                if (deleted != null && deleted.containsKey(key)
+                        || map.containsKey(key))
+                    continue;
+                list.add(key);
+            }
+
+            /// тут нет дублей они уже удалены и дубли не взяты
+            /// return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
+            return new IteratorCloseableImpl(Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(),
+                    ((NavigableMap) map).descendingMap().keySet().iterator()), Fun.COMPARATOR));
+
+        } finally {
+            this.outUses();
+        }
+
+    }
+
     // TODO: сделать два итератора и удаленные чтобы без создания новых списков работало
+
     /**
-     *
-     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
+     * @param index      <b>primary Index = 0</b>, secondary index = 1...10000
      * @param descending true if need descending sort
      * @return
      */
@@ -218,19 +251,6 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             return new IteratorCloseableImpl(u);
 
         }
-    }
-
-    @Override
-    public SortableList<T, U> getList() {
-        SortableList<T, U> list;
-        if (this.size() < 1000) {
-            list = new SortableList<T, U>(this);
-        } else {
-            // обрезаем полный список в базе до 1000
-            list = SortableList.makeSortableList(this, false, 1000);
-        }
-
-        return list;
     }
 
     public void makeDeletedMap(T key) {

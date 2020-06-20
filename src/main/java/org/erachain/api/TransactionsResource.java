@@ -11,11 +11,14 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionFinalMapImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -93,7 +97,7 @@ public class TransactionsResource {
         }
 
         // GET TRANSACTIONS
-        List<Pair<Account, Transaction>> transactions = Controller.getInstance().getLastTransactions(limit);
+        List<Pair<Account, Transaction>> transactions = Controller.getInstance().getLastWalletTransactions(limit);
 
         // ORGANIZE TRANSACTIONS
         Map<Account, List<Transaction>> orderedTransactions = new HashMap<Account, List<Transaction>>();
@@ -141,13 +145,13 @@ public class TransactionsResource {
         }
 
         // CHECK ACCOUNT IN WALLET
-        Account account = Controller.getInstance().getAccountByAddress(address);
+        Account account = Controller.getInstance().getWalletAccountByAddress(address);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
         }
 
         JSONArray array = new JSONArray();
-        for (Transaction transaction : Controller.getInstance().getLastTransactions(account, limit)) {
+        for (Transaction transaction : Controller.getInstance().getLastWalletTransactions(account, limit)) {
             array.add(transaction.toJson());
         }
 
@@ -201,7 +205,7 @@ public class TransactionsResource {
         DCSet dcSet = DCSet.getInstance();
 
         for (Transaction record : dcSet.getTransactionTab().getIncomedTransactions(address, type, from, count, descending)) {
-            record.setDC(dcSet);
+            record.setDC(dcSet, false);
             array.add(record.toJson());
         }
 
@@ -368,10 +372,10 @@ public class TransactionsResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
         }
 
-        String sender = (String) jsonObject.get("sender");
+        String creator = (String) jsonObject.getOrDefault("creator", jsonObject.get("sender"));
 
         // CHECK IF VALID ADDRESS
-        if (sender != null && !Crypto.getInstance().isValidAddress(sender)) {
+        if (creator != null && !Crypto.getInstance().isValidAddress(creator)) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
         }
 
@@ -395,6 +399,15 @@ public class TransactionsResource {
         if (jsonObject.containsKey("desc")) {
             try {
                 desc = (boolean) jsonObject.get("desc");
+            } catch (Exception e) {
+                throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+            }
+        }
+
+        boolean unconfirmed = false;
+        if (jsonObject.containsKey("unconfirmed")) {
+            try {
+                unconfirmed = (boolean) jsonObject.get("unconfirmed");
             } catch (Exception e) {
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
             }
@@ -436,6 +449,8 @@ public class TransactionsResource {
             }
         }
 
+        String fromSeqNo = (String) jsonObject.get("from");
+
         int type = 0;
         if (jsonObject.containsKey("type")) {
             try {
@@ -456,17 +471,90 @@ public class TransactionsResource {
             type = Transaction.ARBITRARY_TRANSACTION;
         }
 
+        return getTransactionsFind(address, creator, creator, recipient, fromSeqNo, minHeight, maxHeight, type,
+                desc, offset, limit, unconfirmed, count);
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("find")
+    public static String getTransactionsFind(@QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
+                                             @QueryParam("recipient") String recipient,
+                                             @QueryParam("from") String fromSeqNoStr,
+                                             @QueryParam("startblock") int minHeight,
+                                             @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
+                                             //@QueryParam("timestamp") long timestamp,
+                                             @QueryParam("desc") boolean desc,
+                                             @QueryParam("offset") int offset, @QueryParam("limit") int limit,
+                                             @QueryParam("unconfirmed") boolean unconfirmed,
+                                             @DefaultValue("false") @QueryParam("count") boolean count
+    ) {
+
+        Long fromSeqNo = Transaction.parseDBRef(fromSeqNoStr);
+
         if (count) {
-            return String.valueOf(DCSet.getInstance().getTransactionFinalMap().findTransactionsCount(address, sender,
-                    recipient, minHeight, maxHeight, type, service, desc, offset, limit));
+            return String.valueOf(DCSet.getInstance().getTransactionFinalMap().findTransactionsCount(address, creator,
+                    recipient, fromSeqNo, minHeight, maxHeight, type, 0, desc, offset, limit));
         }
 
         JSONArray array = new JSONArray();
-        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().findTransactions(address, sender,
-                recipient, minHeight, maxHeight, type, service, desc, offset, limit);
-        for (Transaction transaction : txs) {
-            array.add(transaction.toJson());
+        try (IteratorCloseable iterator = DCSet.getInstance().getTransactionFinalMap().findTransactionsKeys(address, creator,
+                recipient, fromSeqNo, minHeight, maxHeight, type, 0, desc, offset, limit)) {
+
+            Long key;
+            Transaction transaction;
+            DCSet dcSet = DCSet.getInstance();
+            TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
+            while (iterator.hasNext()) {
+                key = (Long) iterator.next();
+                Fun.Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                transaction = map.get(key);
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+                array.add(transaction.toJson());
+            }
+
+        } catch (IOException e) {
+            throw ApiErrorFactory.getInstance().createError(e.getMessage());
         }
+
+        if (unconfirmed) {
+            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionTab().findTransactions(address, sender == null ? creator : sender,
+                    recipient, type, desc, 0, limit, 0);
+            for (Transaction trans : resultUnconfirmed) {
+                array.add(trans.toJson());
+            }
+        }
+
+        return array.toJSONString();
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("search")
+    public static String getTransactionsSearch(
+            @QueryParam("q") String query,
+            @QueryParam("from") String fromSeqNoStr,
+            @QueryParam("useforge") boolean useForge,
+            @QueryParam("fullpage") boolean fullPage,
+            @QueryParam("offset") int offset, @QueryParam("limit") int limit
+    ) {
+
+        Long fromID = Transaction.parseDBRef(fromSeqNoStr);
+
+        Fun.Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(DCSet.getInstance(), query, useForge, limit, fromID, offset, fullPage);
+
+        JSONArray array = new JSONArray();
+        if (result == null || result.c == null)
+            return array.toJSONString();
+
+        array.add(result.a == null ? null : Transaction.viewDBRef(result.a));
+        array.add(result.b == null ? null : Transaction.viewDBRef(result.b));
+
+        JSONArray txs = new JSONArray();
+        for (Transaction transaction : result.c) {
+            txs.add((transaction.toJson()));
+        }
+        array.add(txs);
 
         return array.toJSONString();
     }
@@ -522,7 +610,7 @@ public class TransactionsResource {
         }
 
         // GET ACCOUNTS
-        List<Account> accounts = Controller.getInstance().getAccounts();
+        List<Account> accounts = Controller.getInstance().getWalletAccounts();
 
         JSONArray array = new JSONArray();
         DCSet dcSet = DCSet.getInstance();
@@ -532,7 +620,7 @@ public class TransactionsResource {
             // FOR ALL ACCOUNTS
             synchronized (accounts) {
                 for (Account account : accounts) {
-                    transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+                    transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                     // CHECK IF INVOLVED
                     if (!account.equals(transaction.getCreator()) && transaction.isInvolved(account)) {
                         array.add(transaction.toJson());
@@ -571,12 +659,12 @@ public class TransactionsResource {
 
         int seqNo = 0;
         for (Transaction transaction : block.getTransactions()) {
-            transaction.setDC(dcSet);
+            transaction.setDC(dcSet, true);
             // TODO: тут наверное поиск быстрее по HsahSet будет
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             for (Account recipient : recipients) {
                 if (recipient.equals(address)) {
-                    transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+                    transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                     array.add(transaction.toJson());
                     break;
                 }
@@ -621,12 +709,12 @@ public class TransactionsResource {
 
         int seqNo = 0;
         for (Transaction transaction : block.getTransactions()) {
-            transaction.setDC(dcSet);
+            transaction.setDC(dcSet, true);
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             for (Account recipient : recipients) {
                 if (recipient.equals(address)) {
 
-                    transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+                    transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                     JSONObject json = transaction.toJson();
 
                     if (transaction instanceof RSend) {
@@ -775,7 +863,7 @@ public class TransactionsResource {
         Transaction transaction;
         try {
             transaction = Controller.getInstance().r_Send(
-                    Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), 0, recip, asset1, amount,
+                    Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), 0, recip, asset1, amount,
                     head, message.getBytes(StandardCharsets.UTF_8), isTextByte, encrypted, 0);
             // test result = new Pair<Transaction, Integer>(null,
             // Transaction.VALIDATE_OK);
@@ -835,7 +923,7 @@ public class TransactionsResource {
         JSONObject out = new JSONObject();
 
         RSend r_Send = (RSend) transaction;
-        Account account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());
+        Account account = Controller.getInstance().getWalletAccountByAddress(r_Send.getCreator().getAddress());
         byte[] r_data = r_Send.getData();
         if (r_data == null || r_data.length == 0)
             return null;

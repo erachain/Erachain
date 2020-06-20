@@ -1,20 +1,20 @@
 package org.erachain.api;
 
-import org.erachain.at.ATConstants;
-import org.erachain.at.ATTransaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import org.erachain.at.ATConstants;
+import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.utils.APIUtils;
+import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.erachain.utils.APIUtils;
-import org.erachain.utils.Converter;
-import org.erachain.utils.Pair;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -148,7 +148,7 @@ public class ATResource {
         }
 
         //GET ACCOUNT
-        PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(creator);
+        PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_CREATOR);
         }
@@ -273,7 +273,7 @@ public class ATResource {
             creation.putShort((short) (code.length() / 2));
         else
             creation.putInt(code.length() / 2);
-        byte[] codeBytes = Converter.parseHexString(code);
+        byte[] codeBytes = Base58.decode(code); //Converter.parseHexString(code);
         if (codeBytes != null)
             creation.put(codeBytes);
         if (dpages * 256 <= 256)
@@ -282,13 +282,13 @@ public class ATResource {
             creation.putShort((short) (data.length() / 2));
         else
             creation.putInt(data.length() / 2);
-        byte[] dataBytes = Converter.parseHexString(data);
+        byte[] dataBytes = Base58.decode(data); //Converter.parseHexString(data);
         if (dataBytes != null)
             creation.put(dataBytes);
         byte[] creationBytes = null;
         creationBytes = creation.array();
 
-        PrivateKeyAccount sender = Controller.getInstance().getPrivateKeyAccountByAddress(creator);
+        PrivateKeyAccount sender = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator);
 
         Pair<Transaction, Integer> result = Controller.getInstance().deployAT(sender, name, desc, type, tags, creationBytes, quantity, feePow);
 

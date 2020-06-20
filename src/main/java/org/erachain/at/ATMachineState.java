@@ -8,8 +8,8 @@
 
 package org.erachain.at;
 
+import org.erachain.core.crypto.Base58;
 import org.json.simple.JSONObject;
-import org.erachain.utils.Converter;
 
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
@@ -151,8 +151,8 @@ public class ATMachineState {
     @SuppressWarnings("unchecked")
     public JSONObject getStateJSON() {
         JSONObject json = new JSONObject();
-        json.put("machineCode", Converter.toHex(ap_code.array()));
-        json.put("machineData", Converter.toHex(ap_data.array()));
+        json.put("machineCode", Base58.encode(ap_code.array())); //Converter.toHex(ap_code.array()));
+        json.put("machineData", Base58.encode(ap_data.array())); //Converter.toHex(ap_data.array()));
         json.put("currentBalance", BigDecimal.valueOf(getG_balance()).toPlainString());
         json.put("prevBalance", BigDecimal.valueOf(getP_balance()).toPlainString());
         json.put("frozen", freezeOnSameBalance());

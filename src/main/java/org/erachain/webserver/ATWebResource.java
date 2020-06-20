@@ -11,7 +11,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.utils.Converter;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -163,7 +162,7 @@ public class ATWebResource {
             if ((!message.isEncrypted())) {
                 return (message.isText()) ?
                         new String(message.getData(), StandardCharsets.UTF_8) :
-                        Converter.toHex(message.getData());
+                        Base58.encode(message.getData()); //Converter.toHex(message.getData());
             } else {
                 return "encrypted";
             }

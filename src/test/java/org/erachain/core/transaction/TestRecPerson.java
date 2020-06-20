@@ -189,13 +189,13 @@ public class TestRecPerson {
         //personGeneral.setKey(genesisPersonKey);
 
         GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
-        genesis_issue_person.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
+        genesis_issue_person.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++, true);
         genesis_issue_person.process(gb, Transaction.FOR_NETWORK);
         //genesisPersonKey = dcSet.getIssuePersonMap().size();
         genesisPersonKey = genesis_issue_person.getAssetKey(dcSet);
 
         GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(registrar, genesisPersonKey);
-        genesis_certify.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
+        genesis_certify.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++, true);
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
         person = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
@@ -222,7 +222,7 @@ public class TestRecPerson {
 
     public void initPersonalize() {
 
-        issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
+        issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++, true);
         assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         issuePersonTransaction.sign(registrar, Transaction.FOR_NETWORK);
@@ -281,7 +281,7 @@ public class TestRecPerson {
             try {
                 init(dbs);
 
-                issuePersonTransaction.setDC(dcSet);
+                issuePersonTransaction.setDC(dcSet, true);
 
                 //issuePersonTransaction.sign(registrar, Transaction.FOR_NETWORK);
 
@@ -293,7 +293,7 @@ public class TestRecPerson {
 
                 //CREATE INVALID ISSUE PERSON - INVALID PERSONALIZE
                 issuePersonTransaction = new IssuePersonRecord(certifier, person, FEE_POWER, timestamp, timestamp + 10L, new byte[64]);
-                issuePersonTransaction.setDC(dcSet);
+                issuePersonTransaction.setDC(dcSet, true);
                 assertEquals(Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
                 ((PersonHuman) person).sign(registrar);
@@ -433,10 +433,10 @@ public class TestRecPerson {
             try {
                 init(dbs);
 
-                issuePersonTransaction.setDC(dcSet);
+                issuePersonTransaction.setDC(dcSet, true);
 
                 assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
-                issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
+                issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++, true);
                 issuePersonTransaction.sign(registrar, Transaction.FOR_NETWORK);
 
                 issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
@@ -501,7 +501,7 @@ public class TestRecPerson {
 
                 initPersonalize();
 
-                r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 3);
+                r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 3, true);
 
                 assertEquals(Transaction.VALIDATE_OK, r_SertifyPubKeys.isValid(Transaction.FOR_NETWORK, flags));
 
@@ -515,7 +515,7 @@ public class TestRecPerson {
                 RSertifyPubKeys personalizeRecord_0 = new RSertifyPubKeys(0, userAccount1, FEE_POWER, personKey,
                         sertifiedPublicKeys,
                         356, timestamp);
-                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 4);
+                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 4, true);
                 if (!Settings.getInstance().isTestNet()) {
                     assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
                 }
@@ -523,14 +523,14 @@ public class TestRecPerson {
                 //CREATE INVALID PERSONALIZE RECORD KEY NOT EXIST
                 personalizeRecord_0 = new RSertifyPubKeys(0, registrar, FEE_POWER, personKey + 10,
                         sertifiedPublicKeys, registrar.getLastTimestamp(dcSet)[0] + 1, 0L);
-                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 5);
+                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 5, true);
                 assertEquals(Transaction.ITEM_PERSON_NOT_EXIST, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
 
                 //CREATE INVALID ISSUE PERSON FOR INVALID PERSONALIZE
                 personalizeRecord_0 = new RSertifyPubKeys(0, userAccount2, FEE_POWER, personKey,
                         sertifiedPublicKeys,
                         356, timestamp);
-                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 1, 5);
+                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 1, 5, true);
 
                 //CREATE INVALID ISSUE PERSON - NOT FEE
                 userAccount2.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
@@ -549,7 +549,7 @@ public class TestRecPerson {
                 personalizeRecord_0 = new RSertifyPubKeys(0, registrar, FEE_POWER, personKey,
                         sertifiedPublicKeys011,
                         356, timestamp, registrar.getLastTimestamp(dcSet)[0]);
-                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 1, 5);
+                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 1, 5, true);
                 assertEquals(Transaction.INVALID_PUBLIC_KEY, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
 
             } finally {
@@ -747,7 +747,7 @@ public class TestRecPerson {
 
                 //// PROCESS /////
                 r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
-                r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12, 3);
+                r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12, 3, true);
                 r_SertifyPubKeys.sign(registrar, Transaction.FOR_NETWORK);
                 r_SertifyPubKeys.process(gb, Transaction.FOR_NETWORK);
                 int transactionIndex = gb.getTransactionSeq(r_SertifyPubKeys.getSignature());
@@ -880,7 +880,7 @@ public class TestRecPerson {
                         end_date, timestamp, registrar.getLastTimestamp(dcSet)[0]);
                 r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
                 r_SertifyPubKeys.sign(registrar, Transaction.FOR_NETWORK);
-                r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12, 3);
+                r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12, 3, true);
                 r_SertifyPubKeys.process(gb, Transaction.FOR_NETWORK);
 
                 // у нас перезапись времени - по максимум сразу берем если не минус
@@ -903,7 +903,7 @@ public class TestRecPerson {
                         end_date2, currentTimestamp, registrar.getLastTimestamp(dcSet)[0]);
                 r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
                 r_SertifyPubKeys.sign(registrar, Transaction.FOR_NETWORK);
-                r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 3);
+                r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 3, true);
                 r_SertifyPubKeys.process(gb, Transaction.FOR_NETWORK);
 
                 int abs_end_date2 = end_date2 + (int) (r_SertifyPubKeys.getTimestamp() / 86400000L);
@@ -1001,7 +1001,7 @@ public class TestRecPerson {
                 KKPersonStatusMap dbPS_fork = fork.getPersonStatusMap();
 
                 /////////////// PROCESS ///////////////
-                r_SertifyPubKeys.setDC(fork);
+                r_SertifyPubKeys.setDC(fork, true);
                 r_SertifyPubKeys.process(gb, Transaction.FOR_NETWORK);
                 int transactionIndex = gb.getTransactionSeq(r_SertifyPubKeys.getSignature());
 
@@ -1168,7 +1168,7 @@ public class TestRecPerson {
                         "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
                 GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
-                genesis_issue_person.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
+                genesis_issue_person.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++, true);
                 genesis_issue_person.process(gb, Transaction.FOR_NETWORK);
                 //genesisPersonKey = dcSet.getIssuePersonMap().size();
                 genesisPersonKey = genesis_issue_person.getAssetKey(dcSet);
@@ -1265,7 +1265,7 @@ public class TestRecPerson {
                 AddressPersonMap dbAP_dcSet = dcSet.getAddressPersonMap();
                 KKPersonStatusMap dbPS_dcSet = dcSet.getPersonStatusMap();
 
-                r_SertifyPubKeys.setDC(dcSet);
+                r_SertifyPubKeys.setDC(dcSet, true);
                 r_SertifyPubKeys.process(gb, Transaction.FOR_NETWORK);
                 int transactionIndex = gb.getTransactionSeq(r_SertifyPubKeys.getSignature());
 
@@ -1340,7 +1340,7 @@ public class TestRecPerson {
 
                 ////////// ORPHAN //////////////////
                 DCSet fork = dcSet.fork(this.toString());
-                r_SertifyPubKeys.setDC(fork);
+                r_SertifyPubKeys.setDC(fork, true);
 
                 r_SertifyPubKeys.orphan(gb, Transaction.FOR_NETWORK);
 

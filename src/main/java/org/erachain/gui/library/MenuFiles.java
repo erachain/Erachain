@@ -213,7 +213,7 @@ public class MenuFiles extends JMenu {
                     if (!js.containsKey("amount")) return;
                     String amount = (String) js.get("amount");
                     AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey),
-                            ct.getAccountByAddress(creator), ct.getAccountByAddress(recipient), null, null);
+                            ct.getWalletAccountByAddress(creator), ct.getWalletAccountByAddress(recipient), null, null);
                     MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Read Transaction"),
                             panel, AccountAssetSendPanel.getIcon());
 

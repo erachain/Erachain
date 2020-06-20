@@ -161,7 +161,7 @@ public class BlocksResource {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
-        List<Pair<Account, Block.BlockHead>> blocks = Controller.getInstance().getLastBlocks(limit);
+        List<Pair<Account, Block.BlockHead>> blocks = Controller.getInstance().getLastWalletBlocks(limit);
         JSONArray array = new JSONArray();
 
         for (Pair<Account, Block.BlockHead> block : blocks) {
@@ -206,13 +206,13 @@ public class BlocksResource {
         }
 
         //CHECK ACCOUNT IN WALLET
-        Account account = Controller.getInstance().getAccountByAddress(address);
+        Account account = Controller.getInstance().getWalletAccountByAddress(address);
         if (account == null) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
         }
 
         JSONArray array = new JSONArray();
-        for (Block.BlockHead block : Controller.getInstance().getLastBlocks(account, limit)) {
+        for (Block.BlockHead block : Controller.getInstance().getLastWalletBlocks(account, limit)) {
             array.add(block.toJson());
         }
 

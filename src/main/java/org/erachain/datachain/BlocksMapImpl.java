@@ -190,12 +190,17 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
         PublicKeyAccount creator = block.getCreator();
         if (BlockChain.ERA_COMPU_ALL_UP && creator.getLastForgingData(dcSet) == null) {
-            // так как у нас новые счета сами стартуют без инициализации - надо тут учеть начало
+            // так как у нас новые счета сами стартуют без инициализации - надо тут учесть начало
             int diff = height - BlockChain.DEVELOP_FORGING_START;
             if (diff <= 0) {
                 diff = height;
             }
-            creator.setForgingData(dcSet, diff, block.getForgingValue());
+            int forgingValue = block.getForgingValue();
+            // учитываем начало - там внутри оно установится само
+            creator.setForgingData(dcSet, diff, forgingValue);
+            // учитываем тут сам факт сборки блока
+            // тогда будет правильно все - иначе была ошибка - повторный сбор через 1 блок с этого счет после первого сбора
+            creator.setForgingData(dcSet, height, forgingValue);
         } else {
             creator.setForgingData(dcSet, height, block.getForgingValue());
         }

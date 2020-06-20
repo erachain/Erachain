@@ -9,7 +9,7 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class BuyNameDetailsFrame extends RecDetailsFrame {
     public BuyNameDetailsFrame(BuyNameTransaction namePurchase) {
-        super(namePurchase);
+        super(namePurchase, true);
 
 
         //LABEL SELLER

@@ -36,8 +36,7 @@ public abstract class AddressItemRefs extends Transaction {
     public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) {
         this(typeBytes, NAME_ID, creator, item, (byte) 0, 0l, null);
         this.signature = signature;
-        if (this.item.getReference() == null) this.item.setReference(signature);
-        //item.resolveKey(DLSet.getInstance());
+        this.item.setReference(signature);
     }
 
     //GETTERS/SETTERS
@@ -56,8 +55,7 @@ public abstract class AddressItemRefs extends Transaction {
     @Override
     public void sign(PrivateKeyAccount creator, int forDeal) {
         super.sign(creator, forDeal);
-        // in IMPRINT reference already setted before sign
-        if (this.item.getReference() == null) this.item.setReference(this.signature);
+        this.item.setReference(this.signature);
     }
 
     //PARSE CONVERT
@@ -108,7 +106,7 @@ public abstract class AddressItemRefs extends Transaction {
 
     //@Override
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -129,7 +127,7 @@ public abstract class AddressItemRefs extends Transaction {
             return INVALID_DESCRIPTION_LENGTH_MAX;
         }
 
-        return super.isValid(asDeal, flags);
+        return super.isValid(forDeal, flags);
 
     }
 
@@ -137,12 +135,9 @@ public abstract class AddressItemRefs extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, int asDeal) {
+    public void process(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.process(block, asDeal);
-
-        // SET REFERENCE if not setted before (in Imprint it setted)
-        if (this.item.getReference() == null) this.item.setReference(this.signature);
+        super.process(block, forDeal);
 
         //INSERT INTO DATABASE
         this.item.insertToMap(this.dcSet, START_KEY);
@@ -151,9 +146,9 @@ public abstract class AddressItemRefs extends Transaction {
 
     //@Override
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
         //DELETE FROM DATABASE
         long key = this.item.deleteFromMap(this.dcSet, START_KEY);
@@ -173,9 +168,7 @@ public abstract class AddressItemRefs extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
-
-        if (address.equals(this.creator.getAddress())) {
+        if (account.equals(this.creator)) {
             return true;
         }
 

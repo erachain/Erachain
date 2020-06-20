@@ -1,6 +1,7 @@
 package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -26,21 +27,20 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
         this.item = item;
+        if (item.getKey() != 0)
+            key = item.getKey();
     }
 
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, NAME_ID, creator, item, feePow, timestamp, reference);
         this.signature = signature;
-        if (true || item.getReference() == null) item.setReference(signature); // set reference
-        //item.resolveKey(DLSet.getInstance());
-        //if (timestamp > 1000 ) this.calcFee(); // not asPaack
+        this.item.setReference(signature);
     }
 
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) {
         this(typeBytes, NAME_ID, creator, item, (byte) 0, 0L, null);
         this.signature = signature;
-        if (true || this.item.getReference() == null) this.item.setReference(signature);
-        //item.resolveKey(DLSet.getInstance());
+        this.item.setReference(signature);
     }
 
     //GETTERS/SETTERS
@@ -57,11 +57,8 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
      */
     @Override
     public long getKey() {
-        if (key == null) {
-            key = item.getKey(dcSet);
-        }
-
-        return key;
+        return key == null ? (isWiped() ? 0 : null) // выдаст ошибку специально если боевая и NULL, see issues/1347
+                : key;
     }
 
     @Override
@@ -71,12 +68,34 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     @Override
     public void makeItemsKeys() {
-        // запомним что тут две сущности
+        if (key == null || key == 0)
+            return;
+
         if (creatorPersonDuration != null) {
+            // запомним что тут две сущности
             itemsKeys = new Object[][]{
                     new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
                     new Object[]{item.getItemType(), key}
             };
+        } else {
+            itemsKeys = new Object[][]{
+                    new Object[]{item.getItemType(), key}
+            };
+        }
+    }
+
+    /**
+     * нельзя вызывать для Форка и для isWIPED
+     */
+    public void setupFromStateDB() {
+        if (key == null || key == 0) {
+            // эта транзакция взята как скелет из набора блока
+            // найдем сохраненную транзакцию - в ней есь Номер Сути
+            IssueItemRecord issueItemRecord = (IssueItemRecord) dcSet.getTransactionFinalMap().get(this.dbRef);
+            key = issueItemRecord.getKey();
+            item.setKey(key);
+        } else if (item.getKey() == 0) {
+            item.setKey(key);
         }
     }
 
@@ -98,9 +117,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @Override
     public void sign(PrivateKeyAccount creator, int forDeal) {
         super.sign(creator, forDeal);
-        if (this.getType() != ItemCls.IMPRINT_TYPE
-                // in IMPRINT reference already setted before sign
-                || this.item.getReference() == null) this.item.setReference(this.signature);
+        this.item.setReference(this.signature);
     }
 
     //PARSE CONVERT
@@ -109,6 +126,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @SuppressWarnings("unchecked")
     @Override
     public JSONObject toJson() {
+
         //GET BASE
         JSONObject transaction = this.getJsonBase();
 
@@ -125,6 +143,18 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         // without reference
         data = Bytes.concat(data, this.item.toBytes(false, false));
 
+        if (forDeal == FOR_DB_RECORD) {
+            if (key == null) {
+                // для неподтвержденных когда еще номера нету
+                data = Bytes.concat(data, new byte[KEY_LENGTH]);
+            } else {
+                byte[] keyBytes = Longs.toByteArray(key);
+                keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
+                data = Bytes.concat(data, keyBytes);
+            }
+
+        }
+
         return data;
     }
 
@@ -138,7 +168,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         else if (forDeal == FOR_PACK)
             base_len = BASE_LENGTH_AS_PACK;
         else if (forDeal == FOR_DB_RECORD)
-            base_len = BASE_LENGTH_AS_DBRECORD;
+            base_len = BASE_LENGTH_AS_DBRECORD + KEY_LENGTH;
         else
             base_len = BASE_LENGTH;
 
@@ -153,10 +183,16 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     //@Override
     @Override
-    public int isValid(int asDeal, long flags) {
+    public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
+        }
+
+        if (BlockChain.startKeys[this.item.getItemType()] < 0) {
+            if (this.item.isNovaAsset(this.creator, this.dcSet) <= 0) {
+                return INVALID_ISSUE_PROHIBITED;
+            }
         }
 
         //CHECK NAME LENGTH
@@ -200,21 +236,17 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
             return INVALID_DESCRIPTION_LENGTH_MAX;
         }
 
-        return super.isValid(asDeal, flags);
+        return super.isValid(forDeal, flags);
 
     }
 
     //PROCESS/ORPHAN
     //@Override
     @Override
-    public void process(Block block, int asDeal) {
-        //UPDATE CREATOR
-        super.process(block, asDeal);
+    public void process(Block block, int forDeal) {
 
-        // SET REFERENCE if not setted before (in Imprint it setted)
-        if (this.getType() != ItemCls.IMPRINT_TYPE
-                // in IMPRINT reference already setted before sign
-                || this.item.getReference() == null) this.item.setReference(this.signature);
+        //UPDATE CREATOR
+        super.process(block, forDeal);
 
         //INSERT INTO DATABASE
         key = this.item.insertToMap(this.dcSet, this.item.getStartKey());
@@ -223,14 +255,12 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     //@Override
     @Override
-    public void orphan(Block block, int asDeal) {
+    public void orphan(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.orphan(block, asDeal);
+        super.orphan(block, forDeal);
 
-        //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 1");
         //DELETE FROM DATABASE
-        long key = this.item.deleteFromMap(this.dcSet, item.getStartKey());
-        //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 2");
+        key = this.item.deleteFromMap(this.dcSet, item.getStartKey());
     }
 
     @Override
@@ -252,11 +282,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @Override
     public boolean isInvolved(Account account) {
 
-        String address = account.getAddress();
-
-        if (address.equals(this.creator.getAddress())) {
-            return true;
-        } else if (address.equals(this.item.getOwner().getAddress())) {
+        if (account.equals(this.creator) || account.equals(this.item.getOwner())) {
             return true;
         }
 

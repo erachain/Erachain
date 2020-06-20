@@ -43,44 +43,44 @@ public class TransactionFinalSignsSuitRocksDB extends DBMapSuit<byte[], Long> im
     @Override
     public boolean contains(byte[] signature) {
 
-        byte[] key = new byte[KEY_LEN];
-        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        byte[] key = new byte[Integer.min(KEY_LEN, signature.length)];
+        System.arraycopy(signature, 0, key, 0, key.length);
         return super.contains(key);
     }
 
     @Override
     public Long get(byte[] signature) {
-        byte[] key = new byte[KEY_LEN];
-        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        byte[] key = new byte[Integer.min(KEY_LEN, signature.length)];
+        System.arraycopy(signature, 0, key, 0, key.length);
         return super.get(key);
     }
 
     @Override
     public void delete(byte[] signature) {
-        byte[] key = new byte[KEY_LEN];
-        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        byte[] key = new byte[Integer.min(KEY_LEN, signature.length)];
+        System.arraycopy(signature, 0, key, 0, key.length);
         super.delete(key);
     }
 
     @Override
     public Long remove(byte[] signature) {
-        byte[] key = new byte[KEY_LEN];
-        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        byte[] key = new byte[Integer.min(KEY_LEN, signature.length)];
+        System.arraycopy(signature, 0, key, 0, key.length);
         return super.remove(key);
     }
 
     @Override
     public boolean set(byte[] signature, Long refernce) {
-        byte[] key = new byte[KEY_LEN];
-        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        byte[] key = new byte[Integer.min(KEY_LEN, signature.length)];
+        System.arraycopy(signature, 0, key, 0, key.length);
         return super.set(key, refernce);
 
     }
 
     @Override
     public void put(byte[] signature, Long refernce) {
-        byte[] key = new byte[KEY_LEN];
-        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        byte[] key = new byte[Integer.min(KEY_LEN, signature.length)];
+        System.arraycopy(signature, 0, key, 0, key.length);
         super.put(key, refernce);
 
     }

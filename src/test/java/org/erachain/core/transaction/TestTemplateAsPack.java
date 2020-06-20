@@ -105,7 +105,7 @@ public class TestTemplateAsPack {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
-        issueTemplateRecord.setDC(db, Transaction.FOR_PACK,1, 1);
+        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, 1, 1, true);
         issueTemplateRecord.sign(maker, asPack);
         issueTemplateRecord.process(gb, asPack);
 
@@ -155,7 +155,7 @@ public class TestTemplateAsPack {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
-        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, 1, 1);
+        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, 1, 1, true);
         issueTemplateRecord.sign(maker, asPack);
 
         assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(Transaction.FOR_PACK, flags));
@@ -196,7 +196,7 @@ public class TestTemplateAsPack {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
-        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, 1,1);
+        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, 1, 1, true);
         issueTemplateRecord.sign(maker, asPack);
         issueTemplateRecord.process(gb, asPack);
         long key = db.getIssueTemplateMap().get(issueTemplateRecord);

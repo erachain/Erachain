@@ -2,11 +2,12 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.utils.AccountBalanceComparator;
 import org.erachain.utils.ObserverMessage;
 
 import javax.swing.*;
-import java.util.*;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class AccountsComboBoxModel extends DefaultComboBoxModel<Account> implements Observer {
@@ -21,7 +22,7 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel<Account> impleme
         this.viewBalancePosition = viewBalancePosition;
 
         //INSERT ALL ACCOUNTS
-        List<Account> accounts = Controller.getInstance().getAccountsAndSetBalancePosition(viewBalancePosition);
+        List<Account> accounts = Controller.getInstance().getWalletAccountsAndSetBalancePosition(viewBalancePosition);
         synchronized (accounts) {
             sortAndAdd();
         }
@@ -74,7 +75,7 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel<Account> impleme
 
     //SORTING BY BALANCE (BIGGEST BALANCE FIRST)
     private void sortAndAdd() {
-        List<Account> accounts = Controller.getInstance().getAccountsAndSetBalancePosition(viewBalancePosition);
+        List<Account> accounts = Controller.getInstance().getWalletAccountsAndSetBalancePosition(viewBalancePosition);
         for (Account account : accounts) {
             this.addElement(account);
         }

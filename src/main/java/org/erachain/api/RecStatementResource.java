@@ -2,13 +2,13 @@ package org.erachain.api;
 
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.utils.APIUtils;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
-import org.erachain.utils.APIUtils;
-import org.erachain.utils.Converter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -75,7 +75,7 @@ public class RecStatementResource {
                     messageBytes = message.getBytes(StandardCharsets.UTF_8);
                 } else {
                     try {
-                        messageBytes = Converter.parseHexString(message);
+                        messageBytes = Base58.decode(message); //Converter.parseHexString(message);
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
                         throw ApiErrorFactory.getInstance().createError(

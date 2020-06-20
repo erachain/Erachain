@@ -62,7 +62,7 @@ public class Profile {
     }
 
     public static List<Profile> getEnabledProfiles() {
-        List<Name> namesAsList = Controller.getInstance().getNamesAsList();
+        List<Name> namesAsList = Controller.getInstance().getWalletNamesAsList();
         List<Profile> results = new ArrayList<Profile>();
         for (Name name : namesAsList) {
             Profile profile = Profile.getProfileOpt(name);

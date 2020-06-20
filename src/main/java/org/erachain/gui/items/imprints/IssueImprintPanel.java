@@ -42,8 +42,8 @@ public class IssueImprintPanel extends JPanel {
     private JTextArea txtDescription;
 
     public IssueImprintPanel() {
-        //	super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Issue Imprint"));
-//		this.setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Issue Imprint"));
+        //	super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Issue Imprint"));
+//		this.setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Issue Imprint"));
         //CLOSE
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -312,7 +312,7 @@ public class IssueImprintPanel extends JPanel {
             byte[] icon = null;
             byte[] image = null;
             //CREATE IMPRINT
-            PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+            PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
             if (creator == null) {
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
@@ -320,14 +320,14 @@ public class IssueImprintPanel extends JPanel {
                 return;
             }
 
-            IssueImprintRecord result = (IssueImprintRecord) Controller.getInstance().issueImprint1(creator, name_total,  description,
+            IssueImprintRecord imprint = (IssueImprintRecord) Controller.getInstance().issueImprint1(creator, name_total, description,
                     icon, image, feePow);
 
             //Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
             String text = "<HTML><body>";
             text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;" + Lang.getInstance().translate("Issue Imprint") + "<br><br><br>";
-            text += Lang.getInstance().translate("Creator") + ":&nbsp;" + result.getCreator() + "<br>";
-            text += Library.to_HTML(result.getItem().getDescription()) + "<br>";
+            text += Lang.getInstance().translate("Creator") + ":&nbsp;" + imprint.getCreator() + "<br>";
+            text += Library.to_HTML(imprint.getItem().getDescription()) + "<br>";
 
             String Status_text = "";
 
@@ -337,7 +337,7 @@ public class IssueImprintPanel extends JPanel {
 
             //	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
 
-            IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, result,
+            IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, imprint,
                     text, (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
             dd.setLocationRelativeTo(this);
             dd.setVisible(true);
@@ -351,26 +351,27 @@ public class IssueImprintPanel extends JPanel {
             }
 
 
-            int result1 = Controller.getInstance().getTransactionCreator().afterCreate(result, Transaction.FOR_NETWORK);
+            int result = Controller.getInstance().getTransactionCreator().afterCreate(imprint, Transaction.FOR_NETWORK);
 
 
             //CHECK VALIDATE MESSAGE
-            if (result1 == Transaction.VALIDATE_OK) {
+            if (result == Transaction.VALIDATE_OK) {
                 JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Imprint issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
                 //			this.dispose();
 
-                this.txtAmount.setText("");
-                this.txtCreditor.setText("");
-                this.txtDate.setText("");
-                this.txtFeePow.setSelectedItem("0");
-                this.txtNumber.setText("");
-                this.txtDebitor.setText("");
-                this.cbxFrom.setSelectedIndex(0);
+                //this.txtAmount.setText("");
+                //this.txtCreditor.setText("");
+                //this.txtDate.setText("");
+                //this.txtFeePow.setSelectedItem("0");
+                //this.txtNumber.setText("");
+                //this.txtDebitor.setText("");
+                //this.cbxFrom.setSelectedIndex(0);
 
 
             } else {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
-                        + "[" + result1 + "]!", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.getInstance().translate(OnDealClick.resultMess(result)),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (Exception e) {

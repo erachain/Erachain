@@ -1,9 +1,10 @@
 package org.erachain.utils;
 // 30/03
 
-import org.erachain.api.BlogPostResource;
 import com.google.common.collect.Lists;
-//import com.twitter.Extractor;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.util.StringUtil;
+import org.erachain.api.BlogPostResource;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
@@ -15,15 +16,15 @@ import org.erachain.core.web.Profile;
 import org.erachain.core.web.blog.BlogEntry;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.PostCommentMap;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.eclipse.jetty.util.StringUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+//import com.twitter.Extractor;
 
 public class BlogUtils {
 
@@ -435,7 +436,7 @@ public class BlogUtils {
         String creator = blogEntryOpt.getCreator();
 
         //WE don't have creator account
-        if (Controller.getInstance().getAccountByAddress(creator) == null) {
+        if (Controller.getInstance().getWalletAccountByAddress(creator) == null) {
             creator = null;
             String blognameOpt = blogEntryOpt.getBlognameOpt();
             Profile profileOpt = Profile.getProfileOpt(blognameOpt);
@@ -443,7 +444,7 @@ public class BlogUtils {
             if (profileOpt != null) {
                 String blogowner = profileOpt.getName().getOwner().getAddress();
                 //are we the owner of the blog?
-                if (Controller.getInstance().getAccountByAddress(blogowner) != null) {
+                if (Controller.getInstance().getWalletAccountByAddress(blogowner) != null) {
                     creator = blogowner;
                 }
 

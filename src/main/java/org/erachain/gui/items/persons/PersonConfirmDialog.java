@@ -20,8 +20,8 @@ import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.gui.transaction.SertifyPubKeysDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
-import org.mapdb.Fun.Tuple4;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple4;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -208,7 +208,7 @@ public class PersonConfirmDialog extends JDialog {
         }
 
         // Account authenticator = new Account(address);
-        PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
+        PrivateKeyAccount authenticator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator.getAddress());
         if (authenticator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),

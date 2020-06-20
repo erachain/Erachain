@@ -6,21 +6,23 @@ import org.erachain.controller.Controller;
 import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.database.SortableList;
 import org.erachain.database.wallet.FavoriteItemMapAsset;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.datachain.ItemMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.utils.Pair;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.Fun.Tuple6;
 import org.erachain.utils.NumberAsString;
-import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun.Tuple6;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> implements Observer {
@@ -38,10 +40,9 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> imple
 
     private String filter_Name;
 
-    public AssetPairSelectTableModel(long key)
-    {
+    public AssetPairSelectTableModel(long key) {
         super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "<html>Orders<br>count</html>", "Orders Volume",
-                "<html>Trades<br>count</html>", "Trades Volume"},
+                        "<html>Trades<br>count</html>", "Trades Volume"},
                 new Boolean[]{false, true, false, false, false, false}, false);
 
         this.key = key;
@@ -51,17 +52,18 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> imple
 
         ItemAssetMap assetMap = DCSet.getInstance().getItemAssetMap();
         FavoriteItemMapAsset favoriteMap = Controller.getInstance().wallet.database.getAssetFavoritesSet();
-
-        Collection<Long> favorites = favoriteMap.getFromToKeys(0, Long.MAX_VALUE);
-        //favorites.sort();
-
         list = new ArrayList<>();
-        for (Long itemKey: favorites) {
-            AssetCls asset = assetMap.get(itemKey);
-            if (asset == null){
-                continue;
+
+        try (IteratorCloseable<Long> iterator = favoriteMap.getIterator()) {
+
+            while (iterator.hasNext()) {
+                AssetCls asset = assetMap.get(iterator.next());
+                if (asset == null) {
+                    continue;
+                }
+                list.add(asset);
             }
-            list.add(asset);
+        } catch (IOException e) {
         }
 
     }

@@ -11,13 +11,13 @@ import org.erachain.core.transaction.RegisterNameTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.UpdateNameTransaction;
 import org.erachain.datachain.DCSet;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Corekeys;
 import org.erachain.utils.GZIP;
 import org.erachain.utils.Pair;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -59,7 +59,7 @@ public class NamesResource {
                     ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
-        List<Pair<Account, Name>> names = Controller.getInstance().getNames();
+        List<Pair<Account, Name>> names = Controller.getInstance().getWalletNames();
         JSONArray array = new JSONArray();
 
         for (Pair<Account, Name> name : names) {
@@ -93,7 +93,7 @@ public class NamesResource {
         JSONArray array = new JSONArray();
 
         // CHECK ACCOUNT IN WALLET
-        Account account = Controller.getInstance().getAccountByAddress(address);
+        Account account = Controller.getInstance().getWalletAccountByAddress(address);
         if (account == null) {
             //SLOW METHOD FOR FOREIGN ADDRESSES
 
@@ -126,7 +126,7 @@ public class NamesResource {
             }
         } else {
             //FAST METHOD FOR OWN ADDRESS
-            for (Name name : Controller.getInstance().getNames(account)) {
+            for (Name name : Controller.getInstance().getWalletNames(account)) {
                 if (values) {
                     array.add(name.toJson());
                 } else {
@@ -181,7 +181,7 @@ public class NamesResource {
 
             // GET ACCOUNT
             PrivateKeyAccount account = Controller.getInstance()
-                    .getPrivateKeyAccountByAddress(registrant);
+                    .getWalletPrivateKeyAccountByAddress(registrant);
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.INVALID_ADDRESS);
@@ -256,7 +256,7 @@ public class NamesResource {
             // GET ACCOUNT
             PrivateKeyAccount account = Controller
                     .getInstance()
-                    .getPrivateKeyAccountByAddress(name.getOwner().getAddress());
+                    .getWalletPrivateKeyAccountByAddress(name.getOwner().getAddress());
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.CREATOR_NOT_OWNER);
@@ -386,7 +386,7 @@ public class NamesResource {
             // GET ACCOUNT
             PrivateKeyAccount account = Controller
                     .getInstance()
-                    .getPrivateKeyAccountByAddress(name.getOwner().getAddress());
+                    .getWalletPrivateKeyAccountByAddress(name.getOwner().getAddress());
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.CREATOR_NOT_OWNER);
@@ -490,7 +490,7 @@ public class NamesResource {
             // GET ACCOUNT
             PrivateKeyAccount account = Controller
                     .getInstance()
-                    .getPrivateKeyAccountByAddress(name.getOwner().getAddress());
+                    .getWalletPrivateKeyAccountByAddress(name.getOwner().getAddress());
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.CREATOR_NOT_OWNER);

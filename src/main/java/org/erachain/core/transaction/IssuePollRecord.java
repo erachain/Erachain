@@ -22,9 +22,11 @@ public class IssuePollRecord extends IssueItemRecord {
     }
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp,
-                           Long reference, byte[] signature, long feeLong) {
+                           Long reference, byte[] signature, long seqNo, long feeLong) {
         super(typeBytes, NAME_ID, creator, poll, feePow, timestamp, reference, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
     }
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte[] signature) {
@@ -51,14 +53,14 @@ public class IssuePollRecord extends IssueItemRecord {
 
     // RETURN START KEY in tot GEMESIS
 
-    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
         int test_len;
-        if (asDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (asDeal == Transaction.FOR_PACK) {
+        } else if (forDeal == Transaction.FOR_PACK) {
             test_len = BASE_LENGTH_AS_PACK;
-        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
             test_len = BASE_LENGTH_AS_DBRECORD;
         } else {
             test_len = BASE_LENGTH;
@@ -73,7 +75,7 @@ public class IssuePollRecord extends IssueItemRecord {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (asDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -91,7 +93,7 @@ public class IssuePollRecord extends IssueItemRecord {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (asDeal > Transaction.FOR_PACK) {
+        if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -103,7 +105,13 @@ public class IssuePollRecord extends IssueItemRecord {
         position += SIGNATURE_LENGTH;
 
         long feeLong = 0;
-        if (asDeal == FOR_DB_RECORD) {
+        long seqNo = 0;
+        if (forDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
             // READ FEE
             byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             feeLong = Longs.fromByteArray(feeBytes);
@@ -115,8 +123,18 @@ public class IssuePollRecord extends IssueItemRecord {
         PollCls poll = PollFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += poll.getDataLength(false);
 
-        if (asDeal > Transaction.FOR_MYPACK) {
-            return new IssuePollRecord(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes, feeLong);
+        if (forDeal == FOR_DB_RECORD) {
+            //READ KEY
+            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+            long key = Longs.fromByteArray(timestampBytes);
+            position += KEY_LENGTH;
+
+            poll.setKey(key);
+
+        }
+
+        if (forDeal > Transaction.FOR_MYPACK) {
+            return new IssuePollRecord(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
         } else {
             return new IssuePollRecord(typeBytes, creator, poll, signatureBytes);
         }

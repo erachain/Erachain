@@ -6,10 +6,7 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Serializer;
 
-import java.io.File;
-
 public class SecureWalletDatabase {
-    private final File SECURE_WALLET_FILE;
 
     private static final String SEED = "seed";
     private static final String NONCE = "nonce";
@@ -20,15 +17,14 @@ public class SecureWalletDatabase {
 
     public SecureWalletDatabase(String password) {
         //OPEN WALLET
-        SECURE_WALLET_FILE = new File(Settings.getInstance().getWalletKeysPath(), "wallet.s.dat");
-        SECURE_WALLET_FILE.getParentFile().mkdirs();
+        Settings.SECURE_WALLET_FILE.getParentFile().mkdirs();
 
         //DELETE TRANSACTIONS
         //File transactionFile = new File(Settings.getInstance().getWalletDir(), "wallet.s.dat.t");
         //transactionFile.delete();
 
         // тут база данных еще пустая или закрыта выше по .lock()
-        this.database = DBMaker.newFileDB(SECURE_WALLET_FILE)
+        this.database = DBMaker.newFileDB(Settings.SECURE_WALLET_FILE)
                 .encryptionEnable(password)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 .cacheSize(1 << 11)

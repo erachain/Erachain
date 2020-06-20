@@ -10,7 +10,6 @@ package org.erachain.at;
 
 import org.erachain.core.crypto.Base58;
 import org.json.simple.JSONObject;
-import org.erachain.utils.Converter;
 
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
@@ -155,7 +154,8 @@ public class ATTransaction {
         ob.put("recipient", getRecipient());
         ob.put("key", key);
         ob.put("amount", BigDecimal.valueOf(amount).toPlainString());
-        ob.put("message", (message != null) ? Converter.toHex(message) : "");
+        ob.put("message", (message != null) ? Base58.encode(message) ///Converter.toHex(message)
+                : "");
         return ob;
     }
 

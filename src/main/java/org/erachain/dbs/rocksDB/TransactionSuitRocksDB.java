@@ -97,7 +97,9 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
         recipientsIndex = new ArrayIndexDB<>(recipientsIndexName,
                 (aLong, transaction) -> {
                     // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                    transaction.setDC((DCSet) databaseSet);
+                    if (transaction.noDCSet()) {
+                        transaction.setDC((DCSet) databaseSet, true);
+                    }
                     return transaction.getRecipientAccounts().stream().map(Account::getAddress).toArray(String[]::new);
                 },
                 (result) -> new ByteableString().toBytesObject(result));
@@ -107,7 +109,9 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                 = new ListIndexDB<>(addressTypeIndexName,
                 (aLong, transaction) -> {
                     // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                    transaction.setDC((DCSet) databaseSet);
+                    if (transaction.noDCSet()) {
+                        transaction.setDC((DCSet) databaseSet, true);
+                    }
                     Integer type = transaction.getType();
                     return transaction.getInvolvedAccounts().stream().map(
                             (account) -> (new Fun.Tuple3<>(account.getAddress(), transaction.getTimestamp(), type))).collect(Collectors.toList());

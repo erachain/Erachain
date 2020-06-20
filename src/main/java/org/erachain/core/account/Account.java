@@ -356,7 +356,7 @@ public class Account {
 
     // BALANCE
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance(long key) {
-        return Controller.getInstance().getUnconfirmedBalance(this, key);
+        return Controller.getInstance().getWalletUnconfirmedBalance(this, key);
     }
 
     /*
@@ -874,7 +874,7 @@ public class Account {
         for (int i = 1; i < confirmations && block != null && block.getVersion() > 0; i++) {
             for (Transaction transaction : block.getTransactions()) {
 
-                transaction.setDC(db); // need for Involved
+                transaction.setDC(db, true); // need for Involved
 
                 if (transaction.isInvolved(this)) {
                     if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
@@ -1331,11 +1331,6 @@ public class Account {
     public Tuple3<Integer, Integer, Integer> getForgingData(DCSet db, int height) {
         return db.getAddressForging().get(getAddress(), height);
     }
-    /*
-     * public void setLastForgingData(DCSet db, int height) { getAddressForging
-     * = this.getBal USE db.getAddressForging().setLast(this.address, height,
-     * forgingBalance); }
-     */
 
     public void setForgingData(DCSet db, int height, int forgingBalance) {
         db.getAddressForging().putAndProcess(getAddress(), height, forgingBalance);

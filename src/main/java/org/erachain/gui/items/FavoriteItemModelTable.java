@@ -1,20 +1,17 @@
 package org.erachain.gui.items;
 
 import org.erachain.controller.Controller;
-import org.erachain.database.SortableList;
 import org.erachain.database.wallet.FavoriteItemMap;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.gui.ObserverWaiter;
-import org.erachain.gui.models.SortedListTableModelCls;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Long, Object> implements Observer, ObserverWaiter {
+public abstract class FavoriteItemModelTable extends TimerTableModelCls implements Observer, ObserverWaiter {
 
     private final int RESET_EVENT;
     private final int ADD_EVENT;
@@ -72,50 +69,6 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
             fireTableDataChanged();
             needUpdate = false;
         }
-    }
-
-    // необходимо переопределить так у супер класса по размеру SortedList
-    // а нам надо по Лист
-    @Override
-    public int getRowCount() {
-        if (list == null) {
-            return 0;
-        }
-
-        return list.size();
-    }
-
-    @Override
-    public Object getItem(int k) {
-        return list.get(k);
-    }
-
-    //public abstract int getMapSize();
-    @Override
-    public long getMapSize() {
-        return favoriteMap.size();
-    }
-
-    @Override
-    public void getInterval() {
-
-        getIntervalThis(start, step);
-
-    }
-
-    @Override
-    public void getIntervalThis(long startBack, int limit) {
-        listSorted = new SortableList<Long, Object>(map, favoriteMap.getFromToKeys(0, Long.MAX_VALUE));
-        listSorted.sort();
-
-        list = new ArrayList<>();
-        for (Pair<Long, Object> key: listSorted) {
-            if (key.getB() == null) {
-                continue;
-            }
-            list.add(map.get(key.getA()));
-        }
-
     }
 
     public void addObservers() {

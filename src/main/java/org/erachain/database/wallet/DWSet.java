@@ -2,7 +2,6 @@ package org.erachain.database.wallet;
 // 30/03 ++
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.imprints.ImprintCls;
@@ -29,7 +28,7 @@ public class DWSet extends DBASet {
 
     private AccountMap accountMap;
     private AccountsPropertisMap accountsPropertisMap;
-    private TransactionMap transactionMap;
+    private WTransactionMap transactionMap;
     private BlocksHeadMap blocksHeadMap;
     private NameMap nameMap;
     private NameSaleMap nameSaleMap;
@@ -66,7 +65,7 @@ public class DWSet extends DBASet {
 
         this.accountMap = new AccountMap(this, this.database);
         this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
-        this.transactionMap = new TransactionMap(this, this.database);
+        this.transactionMap = new WTransactionMap(this, this.database);
         this.blocksHeadMap = new BlocksHeadMap(this, this.database);
         this.nameMap = new NameMap(this, this.database);
         this.nameSaleMap = new NameSaleMap(this, this.database);
@@ -184,9 +183,10 @@ public class DWSet extends DBASet {
      * <hr>
      * Ключ: счет + подпись<br>
      * Значение: транзакция
+     *
      * @return TransactionMap
      */
-    public TransactionMap getTransactionMap() {
+    public WTransactionMap getTransactionMap() {
         return this.transactionMap;
     }
 
@@ -367,32 +367,8 @@ public class DWSet extends DBASet {
     public TelegramsMap getTelegramsMap() {
         return this.telegramsMap;
     }
-    
-    public void delete(PublicKeyAccount account) {
-        this.uses++;
-
-        this.accountMap.delete(account);
-        this.blocksHeadMap.delete(account);
-        this.transactionMap.delete(account);
-        this.nameMap.delete(account);
-        this.nameSaleMap.delete(account);
-        this.pollMap_old.delete(account);
-        this.assetMap.delete(account);
-        this.imprintMap.delete(account);
-        this.TemplateMap.delete(account);
-        this.unionMap.delete(account);
-        this.pollMap.delete(account);
-        this.personMap.delete(account);
-        this.statusMap.delete(account);
-        this.orderMap.delete(account);
-        this.accountsPropertisMap.delete(account.getAddress());
-        this.telegramsMap.deleteFromAccount(account);
-        this.uses--;
-
-    }
 
     long commitPoint;
-
 
     public synchronized void hardFlush() {
         this.uses++;

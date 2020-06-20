@@ -15,7 +15,7 @@ public class OtherConsolePanel extends JPanel  {
 
     public OtherConsolePanel() {
         //CREATE FRAME
-        //	setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Debug"));
+        //	setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Debug"));
         //	setModal(true);
 
 

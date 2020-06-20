@@ -37,7 +37,7 @@ public class ExchangePanel extends JPanel  {
         this.want = want;
 
         install();
-        // this.setTitle(Lang.getInstance().translate("Erachain.org") + " - " +
+        // this.setTitle(Controller.getInstance().getApplicationName(false) + " - " +
         // Lang.getInstance().translate("Check Exchange")+" - " +
         // this.have.toString() + " / " + this.want.toString());
         initComponents();

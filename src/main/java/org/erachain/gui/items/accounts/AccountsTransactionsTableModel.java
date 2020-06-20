@@ -4,23 +4,22 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.*;
-import org.erachain.database.SortableList;
-import org.erachain.database.wallet.TransactionMap;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
-import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.lang.Lang;
-import org.mapdb.Fun.Tuple2;
+import org.erachain.gui.models.WalletTableModel;
+import org.mapdb.Fun;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 
 ////////
 
 @SuppressWarnings("serial")
-public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsTransactionsTableModel.Trans> implements ObserverWaiter {
+public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTransactionsTableModel.Trans> implements ObserverWaiter {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TRANSACTION = 1;
     public static final int COLUMN_AMOUNT = 2;
@@ -32,50 +31,34 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     public static final int COLUMN_CONFIRM = 8;
     public static final int COLUMN_ACTION_TYPE = 19;
 
-    private boolean isEncrypted = true;
-
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Date", "RecNo", "Amount",
-            "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Type Asset"});
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
-
-    private SortableList<Tuple2<Long, Long>, Transaction> sortableItems;
-    private Account sender;
+    private Account filterAccount;
 
     private AssetCls asset;
 
-    private byte[] privateKey;
-
-    private byte[] publicKey;
-
     private HashSet actionTypes;
-    private DCSet dcSet;
+    private DCSet dcSet = DCSet.getInstance();
 
     public AccountsTransactionsTableModel() {
         super(Controller.getInstance().wallet.database.getTransactionMap(),
                 new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation"},
                 new Boolean[]{false, true, true, false, false}, false);
 
-        dcSet = DCSet.getInstance();
-        addObservers();
+        step = 200;
 
     }
 
-    public void set_Account(Account sender) {
-        this.sender = sender;
+    public void setAccount(Account sender) {
+        this.filterAccount = sender;
     }
 
-    public void set_Asset(AssetCls asset) {
+    public void setAsset(AssetCls asset) {
         this.asset = asset;
-    }
-
-    public void set_Encryption(boolean encr) {
-        this.isEncrypted = encr;
     }
 
     @Override
     public Object getValueAt(int row, int column) {
 
-        if (this.list == null || this.list.size() == 0 || sender == null) {
+        if (this.list == null || this.list.size() == 0 || filterAccount == null) {
             return null;
         }
 
@@ -92,7 +75,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
            
             case COLUMN_TRANSACTION:
 
-                if (r_Tran.transaction.isConfirmed(DCSet.getInstance()))
+                if (r_Tran.transaction.getBlockHeight() > 0)
                     return r_Tran.transaction.viewHeightSeq();
                 return "-";
 
@@ -129,23 +112,27 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     }
 
     @Override
-    public void getIntervalThis(long start, int limit) {
+    public void getInterval() {
 
-        if (this.sender == null || this.asset == null)
-            return;
+        try {
+            try (IteratorCloseable<Fun.Tuple2<Long, Integer>> keysIterator =
+                         asset == null || asset.getKey() == AssetCls.FEE_KEY ?
+                                 ((WTransactionMap) map).getAddressIterator(this.filterAccount, true)
+                                 : ((WTransactionMap) map).getAddressAssetIterator(this.filterAccount, asset.getKey(), true)
+            ) {
 
-        /// WALLET addesses
-        Iterator<Tuple2<Long, Long>> keysIterator = ((TransactionMap) map).getAddressDescendingIterator(this.sender);
+                list = new ArrayList<>();
 
-        list = new ArrayList<>();
-
-        int counter = 0;
-        while (keysIterator.hasNext() && counter < 999) {
-            Tuple2<Long, Long> key = keysIterator.next();
-            Transaction transaction = ((Tuple2<Long, Transaction>) map.get(key)).b;
-            if (trans_Parse(transaction)) {
-                counter++;
+                int counter = 0;
+                while (keysIterator.hasNext() && counter < step) {
+                    Transaction transaction = (Transaction) map.get(keysIterator.next());
+                    if (trans_Parse(transaction)) {
+                        counter++;
+                    }
+                }
+            } finally {
             }
+        } catch (IOException e) {
         }
 
     }
@@ -153,15 +140,8 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     private boolean trans_Parse(Transaction transaction) {
 
 
-        if (this.asset == null)
-            return false;
-
-        transaction.setDC_HeightSeq(dcSet);
-
-        if (transaction.getAbsKey() != this.asset.getKey()
-                // все для Компушек
-                && this.asset.getKey() != Transaction.FEE_KEY)
-            return false;
+        //transaction.setDC_HeightSeq(dcSet, true);
+        transaction.setDC(dcSet, false);
 
         if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
             RCalculated tx = (RCalculated) transaction;
@@ -181,22 +161,24 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             trr.amount = r_send.getAmountAndBackward();
             trr.title = r_send.getTitle();
 
-            //if send for *-1
-            // view all types
-            if (actionTypes == null || actionTypes.isEmpty()) {
+            if (filterAccount != null) {
+                //if send for *-1
+                // view all types
+                if (actionTypes == null || actionTypes.isEmpty()) {
 
-                if (r_send.getCreator().getAddress().equals(this.sender.getAddress()))
-                    if (trr.amount != null) {
-                        trr.amount = trr.amount.negate();
-                    }
-
-            } else {
-                // view set types
-                if (actionTypes.contains(r_send.viewFullTypeName())) {
-
-                    if (r_send.getCreator().getAddress().equals(this.sender.getAddress())) {
+                    if (this.filterAccount.equals(r_send.getCreator()))
                         if (trr.amount != null) {
                             trr.amount = trr.amount.negate();
+                        }
+
+                } else {
+                    // view set types
+                    if (actionTypes.contains(r_send.viewFullTypeName())) {
+
+                        if (this.filterAccount.equals(r_send.getCreator())) {
+                            if (trr.amount != null) {
+                                trr.amount = trr.amount.negate();
+                            }
                         }
                     }
                 }
@@ -204,8 +186,6 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
         } else if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
             GenesisTransferAssetTransaction gen_send = (GenesisTransferAssetTransaction) transaction;
 
-            String cr = "";
-            if (gen_send.getCreator() != null) cr = gen_send.getCreator().getAddress();
             // if is owner
             String own = "";
             if (gen_send.getCreator() != null) own = gen_send.getCreator().getAddress();
@@ -216,7 +196,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             trr.amount = gen_send.getAmount();
             trr.title = gen_send.getTitle();
 
-            if (!gen_send.getRecipient().getAddress().equals(this.sender.getAddress()))
+            if (filterAccount != null && !gen_send.getRecipient().getAddress().equals(this.filterAccount.getAddress()))
                 trr.amount = gen_send.getAmount().negate();
             // if is creator
             if (gen_send.getCreator() != null) trr.owner = gen_send.getCreator();

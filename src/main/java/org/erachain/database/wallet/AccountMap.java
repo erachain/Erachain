@@ -25,6 +25,9 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
     private static final String ADDRESSES = "addresses";
     private static final String ADDRESSES_NO = "addresses_nomer";
 
+    /**
+     * address + itemKey -> balance
+     */
     private Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalanceMap;
     private Set<byte[]> publickKeys;
     List<Account> accounts;

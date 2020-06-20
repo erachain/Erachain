@@ -49,6 +49,10 @@ public class Trade {
         this.sequence = sequence;
     }
 
+    public String viewID() {
+        return Transaction.viewDBRef(initiator) + "/" + Transaction.viewDBRef(target);
+    }
+
     public Long getInitiator() {
         return this.initiator;
     }
@@ -118,6 +122,7 @@ public class Trade {
     public JSONObject toJson(long keyForBuySell, boolean withCreators) {
 
         JSONObject trade = new JSONObject();
+        trade.put("id", viewID());
         trade.put("initiator", Transaction.viewDBRef(initiator));
         trade.put("target", Transaction.viewDBRef(target));
 
@@ -381,7 +386,7 @@ public class Trade {
 
     @Override
     public String toString() {
-        return Transaction.viewDBRef(this.initiator) + ">" + Transaction.viewDBRef(this.target) + "=" + this.haveKey + "/" + this.wantKey;
+        return viewID() + " : " + this.haveKey + "/" + this.wantKey;
     }
 
 }

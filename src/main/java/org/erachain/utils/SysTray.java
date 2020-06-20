@@ -4,7 +4,6 @@ package org.erachain.utils;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.*;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
@@ -28,10 +27,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.TreeMap;
 
 public class SysTray implements Observer {
 
@@ -191,13 +188,13 @@ public class SysTray implements Observer {
                 final JTable transactionsTable = new JTable(transactionsModel);
 
                 //TRANSACTIONS SORTER
-                Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-                indexes.put(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS, TransactionMap.TIMESTAMP_INDEX);
-                indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
+                //Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
+                //indexes.put(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS, WTransactionMap.TIMESTAMP_INDEX);
+                //indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, WTransactionMap.TIMESTAMP_INDEX);
                 //indexes.put(WalletTransactionsTableModel.COLUMN_CREATOR, TransactionMap.ADDRESS_INDEX);
                 //indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT, TransactionMap.AMOUNT_INDEX);
-                CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
-                transactionsTable.setRowSorter(sorter);
+                //  CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
+                //  transactionsTable.setRowSorter(sorter);
 
                 //TRANSACTION DETAILS
                 transactionsTable.addMouseListener(new MouseAdapter() {
@@ -208,7 +205,7 @@ public class SysTray implements Observer {
                             row = transactionsTable.convertRowIndexToModel(row);
 
                             //GET TRANSACTION
-                            Transaction transaction = transactionsModel.getItem(row).b;
+                            Transaction transaction = transactionsModel.getItem(row);
 
                             //SHOW DETAIL SCREEN OF TRANSACTION
                             TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
