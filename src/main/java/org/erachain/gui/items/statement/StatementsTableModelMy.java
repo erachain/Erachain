@@ -10,29 +10,25 @@ import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class StatementsTableModelMy extends AbstractTableModel implements Observer {
 
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_CREATOR = 1;
-    public static final int COLUMN_TEMPLATE = 2;
-    public static final int COLUMN_BODY = 3;
+    public static final int COLUMN_TITLE = 2;
+    public static final int COLUMN_TEMPLATE = 3;
     /**
      *
      */
     private static final long serialVersionUID = 1L;
     List<Transaction> transactions;
     Object[] collection;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Template", "Statement"});//, AssetCls.FEE_NAME});
+    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Title", "Template"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, false};
 
 
@@ -98,47 +94,26 @@ public class StatementsTableModelMy extends AbstractTableModel implements Observ
             if (this.collection == null || this.collection.length == 0) {
                 return null;
             }
-            Transaction trans = (Transaction) collection[row];
-            if (trans == null)
+            RSignNote record = (RSignNote) collection[row];
+            if (record == null)
                 return null;
 
-            RSignNote record = (RSignNote) trans;
+            record.parseData();
 
             PublicKeyAccount creator;
             switch (column) {
                 case COLUMN_TIMESTAMP:
 
-                    //return DateTimeFormat.timestamptoString(transaction.getTimestamp()) + " " + transaction.getTimestamp();
-                    return record.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
+                    return record.viewTimestamp();
 
                 case COLUMN_TEMPLATE:
 
-                    ItemCls item = ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, record.getKey());
+                    ItemCls item = record.getItem();
                     return item == null ? null : item.toString();
 
-                case COLUMN_BODY:
+                case COLUMN_TITLE:
 
-                    if (record.getData() == null)
-                        return "";
-                    if (record.getVersion() == 2) {
-                        Fun.Tuple4<String, String, JSONObject, HashMap<String, Fun.Tuple3<byte[], Boolean, byte[]>>> a = record.parseDataV2WithoutFiles();
-
-                        return a.b;
-                    }
-
-                    String str = "";
-                    try {
-                        JSONObject data = (JSONObject) JSONValue.parseWithException(new String(record.getData(), StandardCharsets.UTF_8));
-                        str = (String) data.get("!!&_Title");
-                        if (str == null) str = (String) data.get("Title");
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-
-                        str = new String(record.getData(), StandardCharsets.UTF_8);
-                    }
-                    if (str == null) return "";
-                    if (str.length() > 50) return str.substring(0, 50) + "...";
-                    return str;//transaction.viewReference();//.viewProperies();
+                    return record.getTitle();
 
                 case COLUMN_CREATOR:
 

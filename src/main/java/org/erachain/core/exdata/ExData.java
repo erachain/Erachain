@@ -13,7 +13,6 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.ZipBytes;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.ParseException;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,13 +46,20 @@ public class ExData {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExData.class);
 
+    /**
+     * 0 - not parsed; 1 - not files; 2 - all
+     */
+    private int parsedLevel;
 
+    /**
+     * 0 - version; 1 - flag 1;
+     */
     private byte[] flags;
     private String title;
     private JSONObject json;
 
     private String message;
-    private JSONObject hasHes;
+    private JSONObject hashes;
 
     /**
      * Name: hash, is ZIP?, file data
@@ -80,9 +86,9 @@ public class ExData {
      * @param json
      * @param files
      */
-    public ExData(String version, String title,
+    public ExData(int version, String title,
                   JSONObject json, HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) {
-        //this.version = version;
+        this.flags = new byte[]{(byte) version, 0, 0, 0};
         this.title = title;
         this.json = json;
         this.files = files;
@@ -99,14 +105,15 @@ public class ExData {
      * @param files
      */
     public ExData(byte[] flags, String title,
-                  Account[] recipients,
+                  byte recipientsFlags, Account[] recipients,
                   JSONObject json, HashMap<String, Tuple3<byte[], Boolean, byte[]>> files
     ) {
         this.flags = flags;
         this.title = title;
+        this.recipientsFlags = recipientsFlags;
+        this.recipients = recipients;
         this.json = json;
         this.files = files;
-        this.recipients = recipients;
 
     }
 
@@ -119,13 +126,18 @@ public class ExData {
      * @param encryptedData
      */
     public ExData(byte[] flags, String title,
-                  Account[] recipients, byte[][] secrets,
+                  byte recipientsFlags, Account[] recipients,
+                  byte secretsFlags, byte[][] secrets,
                   byte[] encryptedData) {
         this.flags = flags;
         this.title = title;
-        this.encryptedData = encryptedData;
+
+        this.recipientsFlags = recipientsFlags;
         this.recipients = recipients;
+
+        this.secretsFlags = secretsFlags;
         this.secrets = secrets;
+        this.encryptedData = encryptedData;
 
     }
 
@@ -133,6 +145,9 @@ public class ExData {
      * for set up all values from JSON etc.
      */
     public void resolveValues(DCSet dcSet) {
+
+        parsedLevel = 2;
+
         String str = "";
         JSONObject params;
         Set<String> kS;
@@ -183,11 +198,11 @@ public class ExData {
 
             // 2.1
             if (json.containsKey("HS")) {
-                hasHes = (JSONObject) json.get("HS");
+                hashes = (JSONObject) json.get("HS");
             } else
                 // v2.0
                 if (json.containsKey("Hashes")) {
-                    hasHes = (JSONObject) json.get("Hashes");
+                    hashes = (JSONObject) json.get("Hashes");
                 }
 
             // v 2.1
@@ -204,7 +219,17 @@ public class ExData {
     }
 
     public String getTitle() {
+        //if (parsedLevel > 0)
+        //    return title;
         return title;
+    }
+
+    public TemplateCls getTemplate() {
+        return template;
+    }
+
+    public long getTemplateKey() {
+        return templateKey;
     }
 
     public String getValuedText() {
@@ -299,16 +324,15 @@ public class ExData {
             outStream.write(new byte[DATA_TITLE_PART_LENGTH]);
         }
 
-        if ((flags[0] & RECIPIENTS_FLAG_MASK) > 0) {
+        if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {
             outStream.write(recipientsFlags);
             for (int i = 0; i < recipients.length; i++) {
                 outStream.write(recipients[i].getShortAddressBytes());
             }
-
         }
 
         // IF JSON and FILES ENCRYPTED?
-        if ((flags[0] & ENCRYPT_FLAG_MASK) > 0) {
+        if ((flags[1] & ENCRYPT_FLAG_MASK) > 0) {
             // SECRETS
             outStream.write(secretsFlags);
             for (int i = 0; i < secrets.length; i++) {
@@ -350,17 +374,30 @@ public class ExData {
 
         switch (version) {
             case 0:
-                return new ExData("0", new String(data, StandardCharsets.UTF_8), null, null);
+                String text = new String(data, StandardCharsets.UTF_8);
+                String[] items = text.split("\n");
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("Message", text.substring(items[0].length()));
+                return new ExData(0, items[0], dataJson, null);
+
+            /// return new ExData(0, new String(data, StandardCharsets.UTF_8), null, null);
             case 1:
-                String[] items = new String(data, StandardCharsets.UTF_8).split("\n");
-                return new ExData("" + version, items[0], null, null);
+                text = new String(data, StandardCharsets.UTF_8);
+                dataJson = (JSONObject) JSONValue.parseWithException(text);
+                String title = dataJson.get("Title").toString();
+                return new ExData(1, title, dataJson, null);
+
+            //String[] items = new String(data, StandardCharsets.UTF_8).split("\n");
+            //return new ExData(1, items[0], null, null);
             default:
 
                 byte[] flags;
                 String versiondata;
                 int titleSize;
+                byte recipientsFlags;
                 Account[] recipients;
                 boolean isEncrypted;
+                byte secretsFlags;
                 byte[][] secrets;
                 int jsonDataPos;
                 int filesDataPos;
@@ -369,13 +406,18 @@ public class ExData {
                 if (version == 2) {
 
                     flags = null;
+                    recipientsFlags = 0;
                     recipients = null;
+                    secretsFlags = 0;
                     secrets = null;
 
                     // read version
-                    byte[] versionByte;
-                    versionByte = Arrays.copyOfRange(data, position, Transaction.DATA_VERSION_PART_LENGTH);
-                    versiondata = new String(versionByte, StandardCharsets.UTF_8);
+                    if (false) {
+                        /////// SKIP
+                        byte[] versionByte;
+                        versionByte = Arrays.copyOfRange(data, position, Transaction.DATA_VERSION_PART_LENGTH);
+                        versiondata = new String(versionByte, StandardCharsets.UTF_8);
+                    }
                     position += Transaction.DATA_VERSION_PART_LENGTH;
 
                     // read title size
@@ -385,8 +427,6 @@ public class ExData {
 
                 } else {
 
-                    versiondata = "";
-
                     titleSize = Arrays.copyOfRange(data, position, position + 1)[0];
                     position++;
 
@@ -394,10 +434,10 @@ public class ExData {
 
                 byte[] titleByte = Arrays.copyOfRange(data, position, position + titleSize);
                 position += titleSize;
-                String title = new String(titleByte, StandardCharsets.UTF_8);
+                title = new String(titleByte, StandardCharsets.UTF_8);
 
                 if (onlyTitle) {
-                    return new ExData(versiondata, title, null, null);
+                    return new ExData(version, title, null, null);
                 }
 
                 if (version > 2) {
@@ -406,14 +446,14 @@ public class ExData {
 
                     ///////////// PARS by FLAGS
 
-                    if ((flags[0] & 128) > 0) {
+                    if ((flags[1] & 128) > 0) {
                         /// RESERVED
                     }
 
                     int recipientsSize;
-                    if ((flags[0] & RECIPIENTS_FLAG_MASK) > 0) {
+                    if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {
                         //////// RECIPIENTS
-                        byte recipientsFlags = Arrays.copyOfRange(data, position, position)[0];
+                        recipientsFlags = Arrays.copyOfRange(data, position, position)[0];
                         position++;
                         byte[] sizeBytes = Arrays.copyOfRange(data, position, position + RECIPIENTS_SIZE_LENGTH);
                         recipientsSize = Ints.fromByteArray(sizeBytes);
@@ -426,23 +466,32 @@ public class ExData {
                         position += recipientsSize * Account.ADDRESS_SHORT_LENGTH;
 
                     } else {
-                        recipients = new Account[0];
                         recipientsSize = 0;
+                        recipientsFlags = 0;
+                        recipients = new Account[0];
                     }
 
-                    isEncrypted = (flags[0] & 32) > 0;
+                    isEncrypted = (flags[1] & 32) > 0;
                     if (isEncrypted) {
+                        secretsFlags = Arrays.copyOfRange(data, position, position)[0];
+                        position++;
                         int secretsSize = recipientsSize + 1;
                         secrets = new byte[secretsSize][];
                         for (int i = 0; i < secretsSize; i++) {
                             secrets[i] = Arrays.copyOfRange(data, position, position + SECRET_LENGTH);
                         }
                         position += secretsSize * SECRET_LENGTH;
+                    } else {
+                        secretsFlags = 0;
+                        secrets = null;
                     }
                 } else {
                     isEncrypted = false;
                     flags = null;
+                    recipientsFlags = 0;
                     recipients = null;
+                    secretsFlags = 0;
+                    secrets = null;
                 }
 
                 //READ Length JSON PART
@@ -453,9 +502,16 @@ public class ExData {
                 //READ JSON
                 byte[] jsonData = Arrays.copyOfRange(data, position, position + JSONSize);
                 position += JSONSize;
-                if (!isEncrypted) {
+
+                if (isEncrypted) {
+                    // version 3 - with SECRETS
+                    return new ExData(flags, title, recipientsFlags, recipients, secretsFlags, secrets, jsonData);
+                } else {
                     try {
+
                         JSONObject json = (JSONObject) JSONValue.parseWithException(new String(jsonData, StandardCharsets.UTF_8));
+
+                        HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap;
 
                         if (andFiles) {
                             JSONObject files;
@@ -465,7 +521,7 @@ public class ExData {
                                 // v 2.1
 
                                 files = (JSONObject) json.get("F");
-                                HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap = new HashMap<String, Tuple3<byte[], Boolean, byte[]>>();
+                                filesMap = new HashMap<String, Tuple3<byte[], Boolean, byte[]>>();
 
                                 files_key_Set = files.keySet();
                                 for (int i = 0; i < files_key_Set.size(); i++) {
@@ -490,18 +546,11 @@ public class ExData {
 
                                 }
 
-                                if (version > 2) {
-                                    return new ExData(flags, title, recipients, json, filesMap);
-                                } else {
-                                    // version 2.1
-                                    return new ExData(versiondata, title, json, filesMap);
-                                }
-
                             } else if (json.containsKey("&*&*%$$%_files_#$@%%%")) {
                                 //v2.0
 
                                 files = (JSONObject) json.get("&*&*%$$%_files_#$@%%%");
-                                HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap = new HashMap<String, Tuple3<byte[], Boolean, byte[]>>();
+                                filesMap = new HashMap<String, Tuple3<byte[], Boolean, byte[]>>();
 
                                 files_key_Set = files.keySet();
                                 for (int i = 0; i < files_key_Set.size(); i++) {
@@ -526,23 +575,30 @@ public class ExData {
                                     filesMap.put(name, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
 
                                 }
-                                return new ExData(versiondata, title, json, filesMap);
+                            } else {
+                                filesMap = null;
                             }
+                        } else {
+                            filesMap = null;
                         }
 
-                        return new ExData(versiondata, title, json, null);
+                        if (version > 2) {
+                            return new ExData(flags, title, recipientsFlags, recipients, json, filesMap);
+                        } else {
+                            // version 2.0 - 2.1
+                            return new ExData(version, title, json, filesMap);
+                        }
+
                     } catch (Exception e) {
-                        return new ExData(versiondata, title, null, null);
+                        return new ExData(version, title, null, null);
                     }
-                } else {
-                    return new ExData(versiondata, title, null, null);
                 }
 
         }
     }
 
     public JSONObject getHashes() {
-        return hasHes;
+        return hashes;
     }
 
     public String getMessage() {
@@ -654,8 +710,12 @@ public class ExData {
 
         byte[] flags = new byte[4];
 
+        if (recipients != null && recipients.length > 0) {
+            flags[1] = (byte) (flags[1] | RECIPIENTS_FLAG_MASK);
+        }
+
         if (isEncrypted) {
-            flags[0] = (byte) (flags[0] | ENCRYPT_FLAG_MASK);
+            flags[1] = (byte) (flags[1] | ENCRYPT_FLAG_MASK);
 
             byte[][] secrets = new byte[recipients.length + 1][];
 
@@ -666,10 +726,10 @@ public class ExData {
             ByteArrayOutputStream outStream = new ByteArrayOutputStream();
             byte[] encryptedData = toByteJsonAndFiles(outStream, new JSONObject(out_Map), filesMap);
 
-            return new ExData(flags, title, recipients, secrets, encryptedData).toByte();
+            return new ExData(flags, title, (byte) 0, recipients, (byte) 0, secrets, encryptedData).toByte();
         }
 
-        return new ExData(flags, title, recipients, new JSONObject(out_Map), filesMap).toByte();
+        return new ExData(flags, title, (byte) 0, recipients, new JSONObject(out_Map), filesMap).toByte();
 
     }
 
@@ -695,53 +755,12 @@ public class ExData {
         // parse JSON
         if (json != null) {
 
-            String message = getMessage();
             if (message != null && !message.isEmpty()) {
                 output.put("message", message);
                 output.put("messageHash", Base58.encode(Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8))));
             }
 
-            Long templateKey = null;
-            String paramsStr = null;
-
-            if (json.containsKey("TM")) {
-                // V2.1 Template
-                templateKey = new Long(json.get("TM").toString());
-
-                // Template Params
-                if (json.containsKey("PR")) {
-                    paramsStr = json.get("PR").toString();
-                }
-            } else if (json.containsKey("Template")) {
-                // V2.0 Template
-                templateKey = new Long(json.get("Template").toString());
-
-                // Template Params
-                if (json.containsKey("Statement_Params")) {
-                    paramsStr = json.get("Statement_Params").toString();
-                }
-            }
-
-            if (templateKey != null) {
-                TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, templateKey);
-                if (template != null) {
-                    String description = template.viewDescription();
-
-                    // Template Params
-                    if (paramsStr != null) {
-                        JSONObject params;
-                        try {
-                            params = (JSONObject) JSONValue.parseWithException(paramsStr);
-                            description = templateWithValues(description, params);
-                        } catch (ParseException e) {
-                        }
-
-                    }
-
-                    output.put("body", description);
-
-                }
-            }
+            output.put("body", valuedText);
 
             /////////// FILES
             HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap = files;
@@ -770,7 +789,6 @@ public class ExData {
             }
 
             ///////// NATIVE HASHES
-            JSONObject hashes = getHashes();
             if (hashes == null) {
                 hashes = new JSONObject();
             }
@@ -788,9 +806,7 @@ public class ExData {
 
                 output.put("hashes", hashesHTML);
             }
-
         }
-
     }
 
     /**
@@ -799,8 +815,6 @@ public class ExData {
     public void makeJSONforHTML_1(DCSet dcSet, Map output, Long templateKey) {
 
         output.put("title", title);
-
-        String message = json.get("Message").toString();
 
         if (message != null && !message.isEmpty()) {
             output.put("message", message);

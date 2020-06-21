@@ -1,7 +1,6 @@
 package org.erachain.gui.items.statement;
 
 import org.erachain.core.exdata.ExData;
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
@@ -54,8 +53,9 @@ public class StatementInfo extends javax.swing.JPanel {
             return;
         this.transaction = transaction;
         statement = (RSignNote) transaction;
-        if (statement.getVersion() == 2) {
+        statement.parseData();
 
+        if (statement.getVersion() == 2) {
             view_V2();
             return;
         }
@@ -69,14 +69,17 @@ public class StatementInfo extends javax.swing.JPanel {
         Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap()
                 .get(Transaction.makeDBRef(transaction.getBlockHeight(), transaction.getSeqNo()));
 
+        ExData exData = statement.getExData();
+        exData.resolveValues(DCSet.getInstance());
+        JSONObject jsonObject = exData.getJsonObject();
+
         if (keys != null) {
 
         }
 
         initComponents();
 
-        TemplateCls template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, statement.getKey());
-        // jTextArea_Body.setContentType("text/html");
+        TemplateCls template = exData.getTemplate();
 
         String description = template.viewDescription();
 
@@ -293,12 +296,11 @@ public class StatementInfo extends javax.swing.JPanel {
         String str = "";
         JSONObject params;
         Set<String> kS;
-        ExData exData = null;
+        ExData exData;
 
         initComponents();
 
         try {
-            statement.parseData();
             exData = statement.getExData();
             exData.resolveValues(DCSet.getInstance());
             JSONObject jsonObject = exData.getJsonObject();

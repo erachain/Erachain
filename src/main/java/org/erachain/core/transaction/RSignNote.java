@@ -355,7 +355,7 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     /**
-     * Titlt не может быть Нуль
+     * Title не может быть Нуль
      *
      * @return
      */
@@ -366,39 +366,42 @@ public class RSignNote extends Transaction implements Itemable {
             return "";
         }
 
-        if (getVersion() == 2) {
+        if (extendedData == null) {
+            if (getVersion() > 1) {
 
-            // version 2
-            ExData map_Data;
+                // version +2
+                try {
+                    // парсим только заголовок
+                    ExData exData = parseDataV2WithoutFiles();
+                    return exData.getTitle();
 
-            try {
-                // парсим только заголовок
-                map_Data = parseDataV2WithoutFiles();
-                return extendedData.title;
-
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-                Long error = null;
-                error++;
-            }
-
-        } else {
-
-            // version 1
-            String text = new String(getData(), StandardCharsets.UTF_8);
-
-            try {
-                JSONObject dataJson = (JSONObject) JSONValue.parseWithException(text);
-                if (dataJson.containsKey("Title")) {
-                    return dataJson.get("Title").toString();
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                    Long error = null;
+                    error++;
+                    return "";
                 }
 
-            } catch (ParseException e) {
-                // version 0
-                return text.split("\n")[0];
+            } else {
+
+                // version 1
+                String text = new String(getData(), StandardCharsets.UTF_8);
+
+                try {
+                    JSONObject dataJson = (JSONObject) JSONValue.parseWithException(text);
+                    if (dataJson.containsKey("Title")) {
+                        return dataJson.get("Title").toString();
+                    }
+                    return "";
+
+                } catch (ParseException e) {
+                    // version 0
+                    return text.split("\n")[0];
+                }
             }
+        } else {
+            return extendedData.getTitle();
         }
-        return "";
     }
 
     public byte[] getData() {
@@ -697,7 +700,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         if (extendedData == null) {
 
-            if (getVersion() == 2) {
+            if (true || getVersion() == 2) {
 
                 // version 2
                 try {
@@ -717,14 +720,14 @@ public class RSignNote extends Transaction implements Itemable {
                     JSONObject dataJson = (JSONObject) JSONValue.parseWithException(text);
                     String title = dataJson.get("Title").toString();
 
-                    extendedData = new ExData("1", title, dataJson, null);
+                    extendedData = new ExData(1, title, dataJson, null);
 
                 } catch (ParseException e) {
                     // version 0
                     String[] items = text.split("\n");
                     JSONObject dataJson = new JSONObject();
                     dataJson.put("Message", text.substring(items[0].length()));
-                    extendedData = new ExData("0", items[0], dataJson, null);
+                    extendedData = new ExData(0, items[0], dataJson, null);
                 }
             }
         }

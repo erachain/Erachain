@@ -1,6 +1,7 @@
 package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -8,7 +9,6 @@ import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.ZipBytes;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -78,22 +78,18 @@ public class APIDocuments {
             Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
             if (tx instanceof RSignNote) {
                 RSignNote statement = (RSignNote) tx;
-                Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> map;
-                try {
-                    map = statement.parseData();
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-                }
+                statement.parseData();
+                ExData exData = statement.getExData();
 
-                HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = map.d;
+                HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = exData.getFiles();
                 if (files != null) {
                     Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it_Files = files.entrySet().iterator();
                     int i = 0;
                     while (it_Files.hasNext()) {
                         Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it_Files.next();
                         JSONObject jsonFile = new JSONObject();
-                        jsonFile.put("filename", (String) file.getKey());
+                        jsonFile.put("filename", file.getKey());
+                        jsonFile.put("hash", file.getValue().a);
                         jsonFile.put("ZIP", file.getValue().b);
                         result.put(i++, jsonFile);
                     }
@@ -135,21 +131,16 @@ public class APIDocuments {
            Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
            if (tx instanceof RSignNote) {
                RSignNote statement = (RSignNote) tx;
-               Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> map;
-               try {
-                   map = statement.parseData();
-               } catch (Exception e) {
-                   // TODO Auto-generated catch block
-                   throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-               }
+               statement.parseData();
+               ExData exData = statement.getExData();
 
-               HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = map.d;
+               HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = exData.getFiles();
                if (files != null) {
                    Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it_Files = files.entrySet().iterator();
                    int i = 0;
                    while (it_Files.hasNext()) {
                        Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it_Files.next();
-                       if (name.equals((String) file.getKey())) {
+                       if (name.equals(file.getKey())) {
                            i++;
 
                            // if ZIP
@@ -168,7 +159,7 @@ public class APIDocuments {
                            } else {
                                resultByte = file.getValue().c;
                            }
-                           // ifdownloadParam
+                           // if download Param
 
                            //  mime TYPE
                            InputStream is = new BufferedInputStream(new ByteArrayInputStream(resultByte));
