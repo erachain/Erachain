@@ -1,6 +1,7 @@
 package org.erachain.core.exdata;
 
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
 import org.erachain.gui.library.*;
@@ -27,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -725,7 +725,8 @@ public class ExDataPanel extends javax.swing.JPanel {
 
     public byte[] getExData() throws Exception {
 
-        List<String> recipients = multipleRecipientsPanel.recipientsTableModel.getValues(0);
+        Account[] recipients = multipleRecipientsPanel.recipientsTableModel.getRecipients();
+        boolean isEncrypted = multipleRecipientsPanel.encryptCheckBox.isSelected();
 
         // hashes StandardCharsets.UTF_8
         HashMap<String, String> hashes_Map = new HashMap<String, String>();
@@ -741,7 +742,9 @@ public class ExDataPanel extends javax.swing.JPanel {
                     (Boolean) attached_Files_Model.getValueAt(i, 2), (byte[]) attached_Files_Model.getValueAt(i, 5)));
         }
 
-        return ExData.toByte(jTextField_Title_Message.getText(), (TemplateCls) fill_Template_Panel.sel_Template,
+        return ExData.make(jTextField_Title_Message.getText(),
+                recipients, isEncrypted,
+                (TemplateCls) fill_Template_Panel.sel_Template,
                 this.fill_Template_Panel.get_Params(), hashes_Map, jTextPane_Message.getText(), files_1);
 
     }

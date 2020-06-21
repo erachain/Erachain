@@ -1,7 +1,7 @@
 package org.erachain.gui.library;
 
 
-import org.erachain.core.crypto.Base58;
+import org.erachain.core.account.Account;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -10,8 +10,6 @@ import javax.validation.constraints.Null;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MultipleRecipientsPanel extends JPanel {
     public final Table_Model recipientsTableModel;
@@ -20,8 +18,8 @@ public class MultipleRecipientsPanel extends JPanel {
     private JButton jButtonAddRecipient;
     private JButton jButtonRemoveRecipient;
     private GridBagConstraints gridBagConstraints;
-    private JCheckBox  allCheckBox;
-    private JCheckBox  encryptCheckBox;
+    private JCheckBox allCheckBox;
+    public JCheckBox encryptCheckBox;
 
     public MultipleRecipientsPanel() {
 
@@ -180,14 +178,11 @@ public class MultipleRecipientsPanel extends JPanel {
             }
         }
 
-        public java.util.List<byte[]> getValues(int column) {
-            List<byte[]> values = new ArrayList<>();
+        public Account[] getRecipients() {
+            Account[] values = new Account[this.getRowCount()];
 
             for (int i = 0; i < this.getRowCount(); i++) {
-                String value = String.valueOf(this.getValueAt(i, column));
-
-                values.add(Base58.decode(value));
-
+                values[i] = new Account(this.getValueAt(i, 0).toString());
             }
 
             return values;
