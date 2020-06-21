@@ -1,5 +1,6 @@
 package org.erachain.gui.items.statement;
 
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.RSignNote;
@@ -14,7 +15,6 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
 
 import javax.swing.*;
 import java.math.BigDecimal;
@@ -293,109 +293,47 @@ public class StatementInfo extends javax.swing.JPanel {
         String str = "";
         JSONObject params;
         Set<String> kS;
-        Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> map = null;
+        ExData exData = null;
 
         initComponents();
 
         try {
-            map = statement.parseData();
+            statement.parseData();
+            exData = statement.getExData();
+            exData.resolveValues(DCSet.getInstance());
+            JSONObject jsonObject = exData.getJsonObject();
 
-            JSONObject jSON = map.c;
-
-            HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = map.d;
+            HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = exData.getFiles();
             if (files != null) {
                 Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it_Files = files.entrySet().iterator();
                 while (it_Files.hasNext()) {
                     Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it_Files.next();
                     boolean zip = new Boolean(file.getValue().b);
-                    String name_File = (String) file.getKey();
-                    byte[] file_byte = (byte[]) file.getValue().c;
+                    String name_File = file.getKey();
+                    byte[] file_byte = file.getValue().c;
                     file_Panel.insert_Row(name_File, zip, file_byte);
                 }
             }
-            if (jSON.containsKey("Title"))
-                jLabel_Title.setText(Lang.getInstance().translate("Title") + ": " + jSON.get("Title").toString());
+
+            jLabel_Title.setText(Lang.getInstance().translate("Title") + ": " + exData.getTitle());
 
             // v2.0
-            if (jSON.containsKey("Template")) {
-
-                TemplateCls template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE,
-                        new Long((String) jSON.get("Template")));
-                if (template != null) {
-                    description = template.viewDescription();
-
-                    if (jSON.containsKey("Statement_Params")) {
-                        str = jSON.get("Statement_Params").toString();
-
-                        params = (JSONObject) JSONValue.parseWithException(str);
-
-                        kS = params.keySet();
-                        for (String s : kS) {
-                            description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
-                        }
-
-                    }
-                }
-            }
-            // v 2.1
-            if (jSON.containsKey("TM")) {
-
-                TemplateCls template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE,
-                        new Long((String) jSON.get("TM")));
-                if (template != null) {
-                    description = template.viewDescription();
-                    jLabel_Title.setText(Lang.getInstance().translate("Title") + ": " + map.b);
-
-                    if (jSON.containsKey("PR")) {
-                        str = jSON.get("PR").toString();
-
-                        params = (JSONObject) JSONValue.parseWithException(str);
-
-                        kS = params.keySet();
-                        for (String s : kS) {
-                            description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
-                        }
-
-                    }
-                }
-            }
+            description = exData.getValuedText();
 
             // hashes
             String hasHes = "";
-            // v2.0
-            if (jSON.containsKey("Hashes")) {
-                str = jSON.get("Hashes").toString();
+            str = exData.getHashes().toString();
 
-                params = (JSONObject) JSONValue.parseWithException(str);
+            params = (JSONObject) JSONValue.parseWithException(str);
 
-                kS = params.keySet();
+            kS = params.keySet();
 
-                int i = 1;
-                for (String s : kS) {
-                    hasHes += i + " " + s + " " + params.get(s) + "<br>";
-                }
-            }
-            // 2.1
-            if (jSON.containsKey("HS")) {
-                str = jSON.get("HS").toString();
-
-                params = (JSONObject) JSONValue.parseWithException(str);
-
-                kS = params.keySet();
-
-                int i = 1;
-                for (String s : kS) {
-                    hasHes += i + " " + s + " " + params.get(s) + "<br>";
-                }
+            int i = 1;
+            for (String s : kS) {
+                hasHes += i + " " + s + " " + params.get(s) + "<br>";
             }
 
-            String message = "";
-            // v 2.0
-            if (jSON.containsKey("Message"))
-                message = (String) jSON.get("Message");
-            // v 2.1
-            if (jSON.containsKey("MS"))
-                message = (String) jSON.get("MS");
+            String message = exData.getMessage();
 
             jTextArea_Body.setText(Library.to_HTML(description) + "<br><br>"
                     + Library.to_HTML(message) + "<br><br>" + hasHes + "<br><br>");
@@ -404,5 +342,4 @@ public class StatementInfo extends javax.swing.JPanel {
             e.printStackTrace();
         }
     }
-    // End of variables declaration
 }

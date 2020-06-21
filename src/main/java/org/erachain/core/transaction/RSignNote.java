@@ -17,13 +17,10 @@ import org.erachain.datachain.TransactionFinalMapSigns;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 
 //import java.math.BigDecimal;
@@ -51,7 +48,7 @@ public class RSignNote extends Transaction implements Itemable {
     protected PublicKeyAccount[] signers; // for all it need ecnrypt
     protected byte[][] signatures; // - multi sign
 
-    Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parsedData;
+    ExData extendedData;
 
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 
@@ -372,12 +369,12 @@ public class RSignNote extends Transaction implements Itemable {
         if (getVersion() == 2) {
 
             // version 2
-            Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> map_Data;
+            ExData map_Data;
 
             try {
                 // парсим только заголовок
                 map_Data = parseDataV2WithoutFiles();
-                return map_Data.b;
+                return extendedData.title;
 
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
@@ -404,9 +401,12 @@ public class RSignNote extends Transaction implements Itemable {
         return "";
     }
 
-
     public byte[] getData() {
         return this.data;
+    }
+
+    public ExData getExData() {
+        return this.extendedData;
     }
 
     public boolean isText() {
@@ -534,7 +534,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         try {
             parseData();
-            byte[][] hashes = ExData.getAllHashesAsBytes(parsedData);
+            byte[][] hashes = extendedData.getAllHashesAsBytes();
             Long dbKey = makeDBRef(height, seqNo);
             if (hashes != null) {
                 for (byte[] hash : hashes) {
@@ -559,7 +559,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         try {
             parseData();
-            byte[][] hashes = ExData.getAllHashesAsBytes(parsedData);
+            byte[][] hashes = extendedData.getAllHashesAsBytes();
             if (hashes != null) {
                 for (byte[] hash : hashes) {
                     dcSet.getTransactionFinalMapSigns().delete(hash);
@@ -621,8 +621,12 @@ public class RSignNote extends Transaction implements Itemable {
         if (this.key > 0 && !this.dcSet.getItemTemplateMap().contains(this.key))
             return Transaction.ITEM_DOES_NOT_EXIST;
 
-        Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parsed = parseDataV2WithoutFiles();
-        JSONObject hashes = ExData.getHashes(parsed);
+        if (extendedData == null) {
+            extendedData = parseDataV2WithoutFiles();
+        }
+
+        JSONObject hashes = extendedData.getHashes();
+
         if (hashes != null) {
             for (Object hashObject : hashes.keySet()) {
                 if (Base58.isExtraSymbols(hashObject.toString())) {
@@ -633,7 +637,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         if (height > BlockChain.VERS_4_23_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого
-            byte[][] allHashes = ExData.getAllHashesAsBytes(parsed);
+            byte[][] allHashes = extendedData.getAllHashesAsBytes();
             if (allHashes != null && allHashes.length > 0) {
                 TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
                 for (byte[] hash : allHashes) {
@@ -675,7 +679,7 @@ public class RSignNote extends Transaction implements Itemable {
         return calcCommonFee();
     }
 
-    public Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parseDataV2WithoutFiles() {
+    public ExData parseDataV2WithoutFiles() {
         //Version, Title, JSON, Files
         try {
             // здесь нельзя сохранять в parsedData
@@ -689,15 +693,15 @@ public class RSignNote extends Transaction implements Itemable {
         return null;
     }
 
-    public Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> parseData() {
+    public void parseData() {
 
-        if (parsedData == null) {
+        if (extendedData == null) {
 
             if (getVersion() == 2) {
 
                 // version 2
                 try {
-                    parsedData = ExData.parse(getVersion(), this.data, false, true);
+                    extendedData = ExData.parse(getVersion(), this.data, false, true);
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                     Long error = null;
@@ -713,20 +717,17 @@ public class RSignNote extends Transaction implements Itemable {
                     JSONObject dataJson = (JSONObject) JSONValue.parseWithException(text);
                     String title = dataJson.get("Title").toString();
 
-                    parsedData = new Tuple4("1", title, dataJson, null);
+                    extendedData = new ExData("1", title, dataJson, null);
 
                 } catch (ParseException e) {
                     // version 0
                     String[] items = text.split("\n");
                     JSONObject dataJson = new JSONObject();
                     dataJson.put("Message", text.substring(items[0].length()));
-                    parsedData = new Tuple4("0", items[0], dataJson, null);
+                    extendedData = new ExData("0", items[0], dataJson, null);
                 }
             }
         }
-
-        return parsedData;
-
     }
 
     public boolean isFavorite() {

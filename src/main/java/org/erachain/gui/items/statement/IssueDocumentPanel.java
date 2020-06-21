@@ -201,7 +201,7 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
             parsing = 2;
             feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
             // read byte[] from exData Panel
-            messageBytes = exData_Panel.getExData();
+            messageBytes = exData_Panel.makeExData();
 
             if (messageBytes.length < 10) {
                 JOptionPane.showMessageDialog(new JFrame(),

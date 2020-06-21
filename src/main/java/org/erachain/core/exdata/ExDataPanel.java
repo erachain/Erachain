@@ -723,7 +723,7 @@ public class ExDataPanel extends javax.swing.JPanel {
 
     }
 
-    public byte[] getExData() throws Exception {
+    public byte[] makeExData() throws Exception {
 
         Account[] recipients = multipleRecipientsPanel.recipientsTableModel.getRecipients();
         boolean isEncrypted = multipleRecipientsPanel.encryptCheckBox.isSelected();

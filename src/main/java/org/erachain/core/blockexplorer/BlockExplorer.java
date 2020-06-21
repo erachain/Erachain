@@ -9,7 +9,6 @@ import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
@@ -30,7 +29,6 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.mapdb.Fun;
 import org.mapdb.Fun.*;
 import org.slf4j.Logger;
@@ -40,7 +38,6 @@ import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -3066,32 +3063,8 @@ public class BlockExplorer {
             output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
             output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
 
-            if (trans.getVersion() == 2) {
-                // version 2
-                Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> noteData;
-
-                noteData = trans.parseData();
-
-                ExData.makeJSONforHTML(dcSet, output, noteData, block, seqNo, langObj);
-
-            } else {
-
-                // version 1
-                try {
-                    JSONObject dataJson = (JSONObject) JSONValue
-                            .parseWithException(new String(trans.getData(), StandardCharsets.UTF_8));
-                    ExData.makeJSONforHTML_1(dcSet, output, dataJson, trans.getKey());
-                } catch (Exception e) {
-                    // версия через новую строку разделение
-                    String title = trans.getTitle();
-                    output.put("title", title);
-                    String message = new String(trans.getData(), StandardCharsets.UTF_8).substring(title.length());
-                    if (!message.isEmpty()) {
-                        output.put("message", message);
-                        output.put("messageHash", Base58.encode(Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8))));
-                    }
-                }
-            }
+            trans.parseData();
+            trans.getExData().makeJSONforHTML(dcSet, output, block, seqNo, langObj);
 
         } else {
 

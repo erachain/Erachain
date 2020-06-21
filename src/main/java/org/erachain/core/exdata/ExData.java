@@ -25,6 +25,14 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.zip.DataFormatException;
 
+/**
+ * StandardCharsets.UTF_8 JSON "TM" - template key "PR" - template params
+ * "HS" - Hashes "MS" - message
+ * <p>
+ * PARAMS template:TemplateCls param_keys: [id:text] hashes_Set: [name:hash]
+ * mess: message title: Title file_Set: [file Name, ZIP? , file byte[]]
+ */
+
 public class ExData {
 
     private static final int DATA_TITLE_PART_LENGTH = Transaction.DATA_TITLE_PART_LENGTH; // size title message
@@ -34,25 +42,35 @@ public class ExData {
     private static final int RECIPIENTS_SIZE_LENGTH = 3; // size version part
     private static final int SECRET_LENGTH = Crypto.HASH_LENGTH; // size version part
 
-    private static final byte ENCRYPT_FLAG_MASK = 64;
+    private static final byte RECIPIENTS_FLAG_MASK = 64;
+    private static final byte ENCRYPT_FLAG_MASK = 32;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExData.class);
 
 
-    public byte[] flags;
-    public String title;
-    public JSONObject json;
+    private byte[] flags;
+    private String title;
+    private JSONObject json;
+
+    private String message;
+    private JSONObject hasHes;
+
     /**
      * Name: hash, is ZIP?, file data
      */
-    public HashMap<String, Tuple3<byte[], Boolean, byte[]>> files;
+    private HashMap<String, Tuple3<byte[], Boolean, byte[]>> files;
 
-    public byte recipientsFlags;
-    public Account[] recipients;
 
-    public byte encryptedFlags;
-    public byte[][] secrets;
-    public byte[] encryptedData;
+    private byte recipientsFlags;
+    private Account[] recipients;
+
+    private long templateKey;
+    private TemplateCls template;
+    private String valuedText;
+
+    private byte secretsFlags;
+    private byte[][] secrets;
+    private byte[] encryptedData;
 
     /**
      * OLD version 1-2
@@ -107,42 +125,118 @@ public class ExData {
         this.title = title;
         this.encryptedData = encryptedData;
         this.recipients = recipients;
-        //this.isEncrypted = true;
         this.secrets = secrets;
 
     }
 
-
-
-    /*
-     * StandardCharsets.UTF_8 JSON "TM" - template key "PR" - template params
-     * "HS" - Hashes "MS" - message
-     *
-     * PARAMS template:TemplateCls param_keys: [id:text] hashes_Set: [name:hash]
-     * mess: message title: Title file_Set: [file Name, ZIP? , file byte[]]
-     *
+    /**
+     * for set up all values from JSON etc.
      */
-    // null option Object
+    public void resolveValues(DCSet dcSet) {
+        String str = "";
+        JSONObject params;
+        Set<String> kS;
+
+        try {
+            // v 2.1
+            if (json.containsKey("TM")) {
+
+                templateKey = new Long((String) json.get("TM"));
+                template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, templateKey);
+                if (template != null) {
+                    valuedText = template.viewDescription();
+
+                    if (json.containsKey("PR")) {
+                        str = json.get("PR").toString();
+
+                        params = (JSONObject) JSONValue.parseWithException(str);
+
+                        kS = params.keySet();
+                        for (String s : kS) {
+                            valuedText = valuedText.replace("{{" + s + "}}", (CharSequence) params.get(s));
+                        }
+                    }
+                }
+            } else
+                // v2.0
+                if (json.containsKey("Template")) {
+
+                    templateKey = new Long((String) json.get("Template"));
+                    template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, templateKey);
+                    if (template != null) {
+                        valuedText = template.viewDescription();
+
+                        if (json.containsKey("Statement_Params")) {
+                            str = json.get("Statement_Params").toString();
+
+                            params = (JSONObject) JSONValue.parseWithException(str);
+
+                            kS = params.keySet();
+                            for (String s : kS) {
+                                valuedText = valuedText.replace("{{" + s + "}}", (CharSequence) params.get(s));
+                            }
+                        }
+                    }
+                }
+
+            // hashes
+
+            // 2.1
+            if (json.containsKey("HS")) {
+                hasHes = (JSONObject) json.get("HS");
+            } else
+                // v2.0
+                if (json.containsKey("Hashes")) {
+                    hasHes = (JSONObject) json.get("Hashes");
+                }
+
+            // v 2.1
+            if (json.containsKey("MS"))
+                message = (String) json.get("MS");
+            else
+                // v 2.0
+                if (json.containsKey("Message"))
+                    message = (String) json.get("Message");
+
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getValuedText() {
+        return valuedText;
+    }
+
+    public Account[] getRecipients() {
+        return recipients;
+    }
+
+    public JSONObject getJsonObject() {
+        return json;
+    }
+
+    public HashMap<String, Tuple3<byte[], Boolean, byte[]>> getFiles() {
+        return files;
+    }
+
+    public boolean hasRecipients() {
+        return recipients != null && recipients.length > 0;
+    }
+
+    public boolean hasFiles() {
+        return files != null && !files.isEmpty();
+    }
+
 
     // info to byte[]
     @SuppressWarnings("unchecked")
-    public byte[] toByte() throws Exception {
 
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        if (false) {
-            outStream.write("v 2.00".getBytes(StandardCharsets.UTF_8)); // only 6
-        }
-
-        // simbols!!!
-        byte[] title_Bytes = "".getBytes(StandardCharsets.UTF_8);
-        if (title != null) {
-            title_Bytes = title.getBytes(StandardCharsets.UTF_8);
-        }
-
-        byte[] size_Title = ByteBuffer.allocate(DATA_TITLE_PART_LENGTH).putInt(title_Bytes.length).array();
-
-        outStream.write(size_Title);
-        outStream.write(title_Bytes);
+    public static byte[] toByteJsonAndFiles(ByteArrayOutputStream outStream, JSONObject json,
+                                            HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) throws Exception {
 
         if (json == null || json.isEmpty())
             return outStream.toByteArray();
@@ -184,6 +278,51 @@ public class ExData {
             outStream.write(out_files.get(i));
         }
         return outStream.toByteArray();
+
+    }
+
+    public byte[] toByte() throws Exception {
+
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        if (false) {
+            outStream.write("v 2.00".getBytes(StandardCharsets.UTF_8)); // only 6
+        }
+
+        outStream.write(flags);
+
+        if (title != null && !title.isEmpty()) {
+            byte[] title_Bytes = title.getBytes(StandardCharsets.UTF_8);
+            byte[] size_Title = ByteBuffer.allocate(DATA_TITLE_PART_LENGTH).putInt(title_Bytes.length).array();
+            outStream.write(size_Title);
+            outStream.write(title_Bytes);
+        } else {
+            outStream.write(new byte[DATA_TITLE_PART_LENGTH]);
+        }
+
+        if ((flags[0] & RECIPIENTS_FLAG_MASK) > 0) {
+            outStream.write(recipientsFlags);
+            for (int i = 0; i < recipients.length; i++) {
+                outStream.write(recipients[i].getShortAddressBytes());
+            }
+
+        }
+
+        // IF JSON and FILES ENCRYPTED?
+        if ((flags[0] & ENCRYPT_FLAG_MASK) > 0) {
+            // SECRETS
+            outStream.write(secretsFlags);
+            for (int i = 0; i < secrets.length; i++) {
+                outStream.write(secrets[i]);
+            }
+
+            outStream.write(encryptedData);
+
+            return outStream.toByteArray();
+
+        } else {
+
+            return toByteJsonAndFiles(outStream, json, files);
+        }
 
     }
 
@@ -272,7 +411,7 @@ public class ExData {
                     }
 
                     int recipientsSize;
-                    if ((flags[0] & ENCRYPT_FLAG_MASK) > 0) {
+                    if ((flags[0] & RECIPIENTS_FLAG_MASK) > 0) {
                         //////// RECIPIENTS
                         byte recipientsFlags = Arrays.copyOfRange(data, position, position)[0];
                         position++;
@@ -403,31 +542,11 @@ public class ExData {
     }
 
     public JSONObject getHashes() {
-
-        if (json == null)
-            return null;
-
-        if (json.containsKey("HS")) {
-            return (JSONObject) json.get("HS");
-        }
-        if (json.containsKey("Hashes")) {
-            return (JSONObject) json.get("Hashes");
-        }
-        return null;
+        return hasHes;
     }
 
     public String getMessage() {
-
-        if (json == null)
-            return null;
-
-        if (json.containsKey("MS")) {
-            return json.get("MS").toString();
-        }
-        if (json.containsKey("Message")) {
-            return json.get("Message").toString();
-        }
-        return null;
+        return message;
     }
 
     public byte[][] getAllHashesAsBytes() {
@@ -534,11 +653,23 @@ public class ExData {
         }
 
         byte[] flags = new byte[4];
+
         if (isEncrypted) {
             flags[0] = (byte) (flags[0] | ENCRYPT_FLAG_MASK);
+
+            byte[][] secrets = new byte[recipients.length + 1][];
+
+            for (int i = 0; i < secrets.length; i++) {
+                secrets[i] = new byte[Crypto.HASH_LENGTH];
+            }
+
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            byte[] encryptedData = toByteJsonAndFiles(outStream, new JSONObject(out_Map), filesMap);
+
+            return new ExData(flags, title, recipients, secrets, encryptedData).toByte();
         }
 
-        return new ExData(flags, title, recipients, new JSONObject(out_Map), filesMap, isEncrypted).toByte();
+        return new ExData(flags, title, recipients, new JSONObject(out_Map), filesMap).toByte();
 
     }
 
