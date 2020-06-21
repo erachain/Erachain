@@ -2021,8 +2021,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         validatedForkDB.writeToParent();
     }
 
-    private Account accountFeeFFF = new Account("7RYEVPZg7wbu2bmz3tWnzrhPavjpyQ4tnp");
-
     //PROCESS/ORPHAN
     public void feeProcess(DCSet dcSet, boolean asOrphan) {
         //REMOVE FEE
@@ -2056,7 +2054,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             BigDecimal forgerEarn;
             if (BlockChain.SIDE_MODE) {
                 long blockFeeRoyaltyLong = this.blockHead.totalFee / 20; // 5%
-                accountFeeFFF.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
+                BlockChain.ROYALTY_ACCOUNT.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
                         new BigDecimal(blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE), false, false);
 
                 forgerEarn = new BigDecimal(this.blockHead.totalFee - blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE)
