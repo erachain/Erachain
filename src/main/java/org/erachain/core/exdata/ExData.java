@@ -222,6 +222,10 @@ public class ExData {
         }
     }
 
+    public boolean isParsedWithFiles() {
+        return files != null;
+    }
+
     public String getTitle() {
         //if (parsedLevel > 0)
         //    return title;
@@ -254,10 +258,6 @@ public class ExData {
 
     public boolean hasRecipients() {
         return recipients != null && recipients.length > 0;
-    }
-
-    public boolean hasFiles() {
-        return files != null && !files.isEmpty();
     }
 
     public boolean hasPublicText() {
@@ -534,11 +534,13 @@ public class ExData {
                             JSONObject files;
                             Set files_key_Set;
 
+                            // запомним даже если пустой список - делаем НЕ НУЛЬ тут - это флаг что Файлы Парсили
+                            filesMap = new HashMap<String, Tuple3<byte[], Boolean, byte[]>>();
+
                             if (json.containsKey("F")) {
                                 // v 2.1
 
                                 files = (JSONObject) json.get("F");
-                                filesMap = new HashMap<String, Tuple3<byte[], Boolean, byte[]>>();
 
                                 files_key_Set = files.keySet();
                                 for (int i = 0; i < files_key_Set.size(); i++) {
@@ -567,7 +569,6 @@ public class ExData {
                                 //v2.0
 
                                 files = (JSONObject) json.get("&*&*%$$%_files_#$@%%%");
-                                filesMap = new HashMap<String, Tuple3<byte[], Boolean, byte[]>>();
 
                                 files_key_Set = files.keySet();
                                 for (int i = 0; i < files_key_Set.size(); i++) {

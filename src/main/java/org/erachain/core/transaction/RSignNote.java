@@ -33,25 +33,21 @@ public class RSignNote extends Transaction implements Itemable {
     protected static final byte HAS_DATA_MASK = (byte) (1 << 7);
 
     private static final byte TYPE_ID = (byte) SIGN_NOTE_TRANSACTION;
-    private static final String NAME_ID = "Sign Note";
+    private static final String NAME_ID = "Note";
     /*
     PROPERTIES:
     [0] - type
     [1] - version
-    [2] bits[0] - =1 - has Template
+    [2] bits[0] - =1 - has Template (OLD)
     [2] bits [6,7] - signers: 0 - none; 1..3 = 1..3; 4 = LIST -> 1 byte for LIST.len + 3
     [3] - < 0 - has DATA
      */
     protected long key; // key for Template
-    //protected TemplateCls template;
     protected byte[] data;
-    //protected byte[] encrypted;
-    //protected byte[] isText;
-    protected PublicKeyAccount[] signers; // for all it need ecnrypt
+    protected PublicKeyAccount[] signers; // for all it need encrypt
     protected byte[][] signatures; // - multi sign
 
     ExData extendedData;
-    boolean parsedWithFiles;
 
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, long timestamp, Long reference) {
 
@@ -59,8 +55,6 @@ public class RSignNote extends Transaction implements Itemable {
 
         this.key = templateKey;
         this.data = data;
-        //this.encrypted = encrypted;
-        //this.isText = isText;
     }
 
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, long timestamp, Long reference, byte[] signature) {
@@ -540,7 +534,7 @@ public class RSignNote extends Transaction implements Itemable {
             return;
 
         try {
-            parseData();
+            parseData(); // need for take HASHES from FILES
             byte[][] hashes = extendedData.getAllHashesAsBytes();
             Long dbKey = makeDBRef(height, seqNo);
             if (hashes != null) {
@@ -553,7 +547,6 @@ public class RSignNote extends Transaction implements Itemable {
             Long error = null;
             error++;
         }
-
     }
 
     @Override
@@ -565,7 +558,7 @@ public class RSignNote extends Transaction implements Itemable {
             return;
 
         try {
-            parseData();
+            parseData(); // need for take HASHES from FILES
             byte[][] hashes = extendedData.getAllHashesAsBytes();
             if (hashes != null) {
                 for (byte[] hash : hashes) {
@@ -577,7 +570,6 @@ public class RSignNote extends Transaction implements Itemable {
             Long error = null;
             error++;
         }
-
     }
 
     @Override
@@ -644,6 +636,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         if (height > BlockChain.VERS_4_23_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого
+            parseData(); // need for take HASHES from FILES
             byte[][] allHashes = extendedData.getAllHashesAsBytes();
             if (allHashes != null && allHashes.length > 0) {
                 TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
@@ -656,7 +649,6 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         return Transaction.VALIDATE_OK;
-
     }
 
     @Override
@@ -699,12 +691,11 @@ public class RSignNote extends Transaction implements Itemable {
             }
             extendedData.resolveValues(dcSet);
         }
-
     }
 
     public void parseData() {
 
-        if (extendedData == null || !parsedWithFiles) {
+        if (extendedData == null || !extendedData.isParsedWithFiles()) {
             // если уже парсили или парсили без файлов а надо с файлами
 
             if (true || getVersion() == 2) {
@@ -712,7 +703,6 @@ public class RSignNote extends Transaction implements Itemable {
                 // version 2
                 try {
                     extendedData = ExData.parse(getVersion(), this.data, false, true);
-                    parsedWithFiles = true;
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                     Long error = null;
