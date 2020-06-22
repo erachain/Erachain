@@ -12,7 +12,8 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.templates.TemplateCls;
+import org.erachain.core.item.persons.PersonCls;
+import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapSigns;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -30,6 +31,8 @@ import java.util.HashSet;
 public class RSignNote extends Transaction implements Itemable {
 
     protected static final byte HAS_TEMPLATE_MASK = (byte) (1 << 7);
+    protected static final byte HAS_DATA_MASK = (byte) (1 << 7);
+
     private static final byte TYPE_ID = (byte) SIGN_NOTE_TRANSACTION;
     private static final String NAME_ID = "Sign Note";
     /*
@@ -41,33 +44,34 @@ public class RSignNote extends Transaction implements Itemable {
     [3] - < 0 - has DATA
      */
     protected long key; // key for Template
-    protected TemplateCls template;
+    //protected TemplateCls template;
     protected byte[] data;
-    protected byte[] encrypted;
-    protected byte[] isText;
+    //protected byte[] encrypted;
+    //protected byte[] isText;
     protected PublicKeyAccount[] signers; // for all it need ecnrypt
     protected byte[][] signatures; // - multi sign
 
     ExData extendedData;
+    boolean parsedWithFiles;
 
-    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
+    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, long timestamp, Long reference) {
 
         super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 
         this.key = templateKey;
         this.data = data;
-        this.encrypted = encrypted;
-        this.isText = isText;
+        //this.encrypted = encrypted;
+        //this.isText = isText;
     }
 
-    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
+    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, long timestamp, Long reference, byte[] signature) {
+        this(typeBytes, creator, feePow, templateKey, data, timestamp, reference);
         this.signature = signature;
     }
 
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
-                     byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
+                     long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
+        this(typeBytes, creator, feePow, templateKey, data, timestamp, reference);
         this.signature = signature;
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -75,42 +79,42 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     // asPack
-    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
-        this(typeBytes, creator, (byte) 0, templateKey, data, isText, encrypted, 0l, reference);
+    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data, Long reference, byte[] signature) {
+        this(typeBytes, creator, (byte) 0, templateKey, data, 0l, reference);
         this.signature = signature;
         // not need this.calcFee();
     }
 
-    public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
+    public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, long timestamp, Long reference, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, timestamp, reference, signature);
         // set props
         this.setTypeBytes();
     }
 
-    public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
+    public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, timestamp, reference);
         // set props
         this.setTypeBytes();
     }
 
-    public RSignNote(byte version, byte ptoperty1, byte ptoperty2, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, version, ptoperty1, ptoperty2}, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
+    public RSignNote(byte version, byte ptoperty1, byte ptoperty2, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, version, ptoperty1, ptoperty2}, creator, feePow, templateKey, data, timestamp, reference);
         // set props
         this.setTypeBytes();
     }
 
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
-                     byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
+                     PublicKeyAccount[] signers, byte[][] signatures, long timestamp, Long reference, byte[] signature) {
+        this(typeBytes, creator, feePow, templateKey, data, timestamp, reference, signature);
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
     }
 
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
-                     byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, long timestamp,
+                     PublicKeyAccount[] signers, byte[][] signatures, long timestamp,
                      Long reference, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
+        this(typeBytes, creator, feePow, templateKey, data, timestamp, reference, signature);
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
@@ -121,8 +125,8 @@ public class RSignNote extends Transaction implements Itemable {
 
     // as Pack
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data,
-                     byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, Long reference, byte[] signature) {
-        this(typeBytes, creator, templateKey, data, isText, encrypted, reference, signature);
+                     PublicKeyAccount[] signers, byte[][] signatures, Long reference, byte[] signature) {
+        this(typeBytes, creator, templateKey, data, reference, signature);
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
@@ -131,11 +135,28 @@ public class RSignNote extends Transaction implements Itemable {
     //GETTERS/SETTERS
 
     @Override
-    public ItemCls getItem() {
-        if (template == null) {
-            template = (TemplateCls) dcSet.getItemTemplateMap().get(key);
+    public void setDC(DCSet dcSet, boolean andSetup) {
+        this.dcSet = dcSet;
+
+        if (BlockChain.TEST_DB == 0 && creator != null) {
+            creatorPersonDuration = creator.getPersonDuration(dcSet);
+            if (creatorPersonDuration != null) {
+                creatorPerson = (PersonCls) dcSet.getItemPersonMap().get(creatorPersonDuration.a);
+            }
         }
-        return this.template;
+
+        // LOAD values from EXTERNAL DATA
+        extendedData = parseDataV2WithoutFiles();
+
+        key = extendedData.getTemplateKey();
+
+        if (andSetup && !isWiped())
+            setupFromStateDB();
+    }
+
+    @Override
+    public ItemCls getItem() {
+        return extendedData.getTemplate();
     }
 
     @Override
@@ -166,147 +187,6 @@ public class RSignNote extends Transaction implements Itemable {
         return typeBytes[2] & mask;
     }
 
-    // releaserReference = null - not a pack
-    // releaserReference = reference for releaser account - it is as pack
-    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
-        //boolean asPack = forDeal != null;
-
-        //CHECK IF WE MATCH BLOCK LENGTH
-        int test_len;
-        if (forDeal == Transaction.FOR_MYPACK) {
-            test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (forDeal == Transaction.FOR_PACK) {
-            test_len = BASE_LENGTH_AS_PACK;
-        } else if (forDeal == Transaction.FOR_DB_RECORD) {
-            test_len = BASE_LENGTH_AS_DBRECORD;
-        } else {
-            test_len = BASE_LENGTH;
-        }
-
-        if (data.length < test_len) {
-            throw new Exception("Data does not match block length " + data.length);
-        }
-
-        // READ TYPE
-        byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
-        int position = TYPE_LENGTH;
-
-        long timestamp = 0;
-        if (forDeal > Transaction.FOR_MYPACK) {
-            //READ TIMESTAMP
-            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-            timestamp = Longs.fromByteArray(timestampBytes);
-            position += TIMESTAMP_LENGTH;
-        }
-
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
-
-        //READ CREATOR
-        byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-        PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
-        position += CREATOR_LENGTH;
-
-        byte feePow = 0;
-        if (forDeal > Transaction.FOR_PACK) {
-            //READ FEE POWER
-            byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
-            feePow = feePowBytes[0];
-            position += 1;
-        }
-
-        //READ SIGNATURE
-        byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
-        position += SIGNATURE_LENGTH;
-
-        long feeLong = 0;
-        long seqNo = 0;
-        if (forDeal == FOR_DB_RECORD) {
-            //READ SEQ_NO
-            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-            seqNo = Longs.fromByteArray(seqNoBytes);
-            position += TIMESTAMP_LENGTH;
-
-            // READ FEE
-            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-            feeLong = Longs.fromByteArray(feeBytes);
-            position += FEE_LENGTH;
-        }
-
-        //////// local parameters
-
-        long key = 0l;
-        if (hasTemplate(typeBytes)) {
-            //READ KEY
-            byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
-            key = Longs.fromByteArray(keyBytes);
-            position += KEY_LENGTH;
-        }
-
-        // DATA +++ - from org.erachain.core.transaction.RSend.Parse(byte[], Long)
-        byte[] arbitraryData = null;
-        byte[] encryptedByte = null;
-        byte[] isTextByte = null;
-        if (typeBytes[3] < 0) {
-            // IF here is DATA
-
-            //READ DATA SIZE
-            byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
-            int dataSize = Ints.fromByteArray(dataSizeBytes);
-            position += DATA_SIZE_LENGTH;
-
-            //READ DATA
-            arbitraryData = Arrays.copyOfRange(data, position, position + dataSize);
-            position += dataSize;
-
-            encryptedByte = Arrays.copyOfRange(data, position, position + ENCRYPTED_LENGTH);
-            position += ENCRYPTED_LENGTH;
-
-            isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
-            position += IS_TEXT_LENGTH;
-        }
-
-        int signersLen = getSignersLength(typeBytes);
-        PublicKeyAccount[] signers = null;
-        byte[][] signatures = null;
-        if (signersLen > 0) {
-            if (signersLen == 4) {
-                //READ ONE BITE for len
-                byte[] signersLenBytes = Arrays.copyOfRange(data, position, position + 1);
-                signersLen = Byte.toUnsignedInt(signersLenBytes[0]) + 4;
-                position++;
-            }
-            signers = new PublicKeyAccount[signersLen];
-            signatures = new byte[signersLen][];
-            for (int i = 0; i < signersLen; i++) {
-                signers[i] = new PublicKeyAccount(Arrays.copyOfRange(data, position, position + CREATOR_LENGTH));
-                position += CREATOR_LENGTH;
-                signatures[i] = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
-                position += SIGNATURE_LENGTH;
-            }
-        }
-
-        if (signersLen == 0) {
-            if (forDeal > Transaction.FOR_MYPACK) {
-                return new RSignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte,
-                        timestamp, reference, signatureBytes, seqNo, feeLong);
-            } else {
-                return new RSignNote(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
-            }
-        } else {
-            if (forDeal > Transaction.FOR_MYPACK) {
-                return new RSignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, signers,
-                        signatures, timestamp, reference, signatureBytes, seqNo, feeLong);
-            } else {
-                return new RSignNote(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, reference, signatureBytes);
-            }
-
-        }
-
-    }
-
     //GETTERS/SETTERS
     public void setSidnerSignature(int index, byte[] signature) {
         if (signatures == null)
@@ -334,11 +214,11 @@ public class RSignNote extends Transaction implements Itemable {
             }
         }
         // set has TEMPLATE byte
-        if (this.key > 0) prop1 = (byte) (HAS_TEMPLATE_MASK | prop1);
+        /////if (this.key > 0) prop1 = (byte) (HAS_TEMPLATE_MASK | prop1);
 
         byte prop2 = 0;
         if (data != null && data.length > 0) {
-            prop2 = (byte) (prop2 | (byte) -128);
+            prop2 = (byte) (prop2 | HAS_DATA_MASK);
         }
 
         if (this.typeBytes == null) {
@@ -414,12 +294,11 @@ public class RSignNote extends Transaction implements Itemable {
 
     public boolean isText() {
         if (data == null || data.length == 0) return false;
-        return (Arrays.equals(this.isText, new byte[1])) ? false : true;
+        return true; // || Arrays.equals(this.isText, new byte[1])) ? false : true;
     }
 
     public boolean isEncrypted() {
-        if (data == null || data.length == 0) return false;
-        return (Arrays.equals(this.encrypted, new byte[1])) ? false : true;
+        return extendedData.isEncrypted();
     }
 
     public PublicKeyAccount[] getSigners() {
@@ -452,17 +331,7 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public boolean hasPublicText() {
-        if (false) {
-            // TODO выделить заголовок и остальное тело
-            String title = null;
-            return hasPublicText(title, data, isText(), isEncrypted());
-        } else {
-            if (data == null || data.length == 0)
-                return false;
-            if (!Arrays.equals(this.encrypted, new byte[1]))
-                return false;
-        }
-        return true;
+        return extendedData.hasPublicText();
     }
 
     @SuppressWarnings("unchecked")
@@ -494,19 +363,19 @@ public class RSignNote extends Transaction implements Itemable {
         return transaction;
     }
 
-    //@Override
     @Override
     public byte[] toBytes(int forDeal, boolean withSignature) {
 
         byte[] data = super.toBytes(forDeal, withSignature);
 
-        if (this.key > 0) {
+        if (typeBytes[1] < 3 && this.key > 0) {
             //WRITE KEY
             byte[] keyBytes = Longs.toByteArray(this.key);
             keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
             data = Bytes.concat(data, keyBytes);
 
         }
+
         if (this.data != null) {
 
             //WRITE DATA SIZE
@@ -516,14 +385,157 @@ public class RSignNote extends Transaction implements Itemable {
             //WRITE DATA
             data = Bytes.concat(data, this.data);
 
-            //WRITE ENCRYPTED
-            data = Bytes.concat(data, this.encrypted);
+            if (typeBytes[1] < 3) {
+                //WRITE ENCRYPTED
+                data = Bytes.concat(data, new byte[0]); //this.encrypted);
 
-            //WRITE ISTEXT
-            data = Bytes.concat(data, this.isText);
+                //WRITE ISTEXT
+                data = Bytes.concat(data, new byte[0]); //this.isText);
+            }
         }
 
         return data;
+    }
+
+    // releaserReference = null - not a pack
+    // releaserReference = reference for releaser account - it is as pack
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
+        //boolean asPack = forDeal != null;
+
+        //CHECK IF WE MATCH BLOCK LENGTH
+        int test_len;
+        if (forDeal == Transaction.FOR_MYPACK) {
+            test_len = BASE_LENGTH_AS_MYPACK;
+        } else if (forDeal == Transaction.FOR_PACK) {
+            test_len = BASE_LENGTH_AS_PACK;
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
+            test_len = BASE_LENGTH_AS_DBRECORD;
+        } else {
+            test_len = BASE_LENGTH;
+        }
+
+        if (data.length < test_len) {
+            throw new Exception("Data does not match block length " + data.length);
+        }
+
+        // READ TYPE
+        byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+        int position = TYPE_LENGTH;
+
+        long timestamp = 0;
+        if (forDeal > Transaction.FOR_MYPACK) {
+            //READ TIMESTAMP
+            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            timestamp = Longs.fromByteArray(timestampBytes);
+            position += TIMESTAMP_LENGTH;
+        }
+
+        //READ REFERENCE
+        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+        Long reference = Longs.fromByteArray(referenceBytes);
+        position += REFERENCE_LENGTH;
+
+        //READ CREATOR
+        byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+        PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
+        position += CREATOR_LENGTH;
+
+        byte feePow = 0;
+        if (forDeal > Transaction.FOR_PACK) {
+            //READ FEE POWER
+            byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+            feePow = feePowBytes[0];
+            position += 1;
+        }
+
+        //READ SIGNATURE
+        byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+        position += SIGNATURE_LENGTH;
+
+        long feeLong = 0;
+        long seqNo = 0;
+        if (forDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
+        //////// local parameters
+
+        long key = 0L;
+        if (typeBytes[1] < 3 && hasTemplate(typeBytes)) {
+            //READ KEY
+            byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+            key = Longs.fromByteArray(keyBytes);
+            position += KEY_LENGTH;
+        }
+
+        // DATA +++ - from org.erachain.core.transaction.RSend.Parse(byte[], Long)
+        byte[] externalData = null;
+        byte[] encryptedByte = null;
+        byte[] isTextByte = null;
+        if (typeBytes[3] < 0) {
+            // IF here is DATA
+
+            //READ DATA SIZE
+            byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
+            int dataSize = Ints.fromByteArray(dataSizeBytes);
+            position += DATA_SIZE_LENGTH;
+
+            //READ DATA
+            externalData = Arrays.copyOfRange(data, position, position + dataSize);
+            position += dataSize;
+
+            if (typeBytes[1] < 3) {
+                encryptedByte = Arrays.copyOfRange(data, position, position + ENCRYPTED_LENGTH);
+                position += ENCRYPTED_LENGTH;
+
+                isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
+                position += IS_TEXT_LENGTH;
+            }
+        }
+
+        int signersLen = getSignersLength(typeBytes);
+        PublicKeyAccount[] signers = null;
+        byte[][] signatures = null;
+        if (signersLen > 0) {
+            if (signersLen == 4) {
+                //READ ONE BITE for len
+                byte[] signersLenBytes = Arrays.copyOfRange(data, position, position + 1);
+                signersLen = Byte.toUnsignedInt(signersLenBytes[0]) + 4;
+                position++;
+            }
+            signers = new PublicKeyAccount[signersLen];
+            signatures = new byte[signersLen][];
+            for (int i = 0; i < signersLen; i++) {
+                signers[i] = new PublicKeyAccount(Arrays.copyOfRange(data, position, position + CREATOR_LENGTH));
+                position += CREATOR_LENGTH;
+                signatures[i] = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+                position += SIGNATURE_LENGTH;
+            }
+        }
+
+        if (signersLen == 0) {
+            if (forDeal > Transaction.FOR_MYPACK) {
+                return new RSignNote(typeBytes, creator, feePow, key, externalData,
+                        timestamp, reference, signatureBytes, seqNo, feeLong);
+            } else {
+                return new RSignNote(typeBytes, creator, key, externalData, reference, signatureBytes);
+            }
+        } else {
+            if (forDeal > Transaction.FOR_MYPACK) {
+                return new RSignNote(typeBytes, creator, feePow, key, externalData, signers,
+                        signatures, timestamp, reference, signatureBytes, seqNo, feeLong);
+            } else {
+                return new RSignNote(typeBytes, creator, key, externalData, signers, signatures, reference, signatureBytes);
+            }
+        }
     }
 
     //PROCESS/ORPHAN
@@ -698,13 +710,15 @@ public class RSignNote extends Transaction implements Itemable {
 
     public void parseData() {
 
-        if (extendedData == null) {
+        if (extendedData == null || !parsedWithFiles) {
+            // если уже парсили или парсили без файлов а надо с файлами
 
             if (true || getVersion() == 2) {
 
                 // version 2
                 try {
                     extendedData = ExData.parse(getVersion(), this.data, false, true);
+                    parsedWithFiles = true;
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                     Long error = null;
@@ -712,6 +726,10 @@ public class RSignNote extends Transaction implements Itemable {
                 }
 
             } else {
+
+                // сюда не должно прийти - OLS
+                Long error = null;
+                error++;
 
                 // version 1
                 String text = new String(getData(), StandardCharsets.UTF_8);
@@ -734,9 +752,7 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     public boolean isFavorite() {
-
         return Controller.getInstance().wallet.database.getDocumentFavoritesSet().contains(this.dbRef);
-
     }
 
 }

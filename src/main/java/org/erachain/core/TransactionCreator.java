@@ -765,7 +765,7 @@ public class TransactionCreator {
 
         //CREATE MESSAGE TRANSACTION
         recordNoteTx = new RSignNote(version, property1, property1,
-                creator, (byte) feePow, key, message, isText, encrypted, timestamp, 0l);
+                creator, (byte) feePow, key, message, timestamp, 0l);
         recordNoteTx.sign(creator, forDeal);
         recordNoteTx.setDC(this.fork, forDeal, this.blockHeight, ++this.seqNo, false);
 

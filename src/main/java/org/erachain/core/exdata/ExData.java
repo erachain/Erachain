@@ -256,6 +256,19 @@ public class ExData {
         return files != null && !files.isEmpty();
     }
 
+    public boolean hasPublicText() {
+        if (Transaction.hasPublicText(title, null, false, false)
+                || message != null && !message.isEmpty()
+                || templateKey > 0
+                || !files.isEmpty())
+            return true;
+
+        return false;
+    }
+
+    public boolean isEncrypted() {
+        return (flags[1] & ENCRYPT_FLAG_MASK) > 0;
+    }
 
     // info to byte[]
     @SuppressWarnings("unchecked")
