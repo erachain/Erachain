@@ -12,7 +12,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapSigns;
 import org.json.simple.JSONObject;
@@ -136,19 +135,15 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public void setDC(DCSet dcSet, boolean andSetup) {
-        this.dcSet = dcSet;
-
-        if (BlockChain.TEST_DB == 0 && creator != null) {
-            creatorPersonDuration = creator.getPersonDuration(dcSet);
-            if (creatorPersonDuration != null) {
-                creatorPerson = (PersonCls) dcSet.getItemPersonMap().get(creatorPersonDuration.a);
-            }
-        }
+        super.setDC(dcSet, false);
 
         // LOAD values from EXTERNAL DATA
-        extendedData = parseDataV2WithoutFiles();
+        parseDataV2WithoutFiles();
 
-        key = extendedData.getTemplateKey();
+        if (typeBytes[1] > 2) {
+            // если новый порядок - ключ в Даных
+            key = extendedData.getTemplateKey();
+        }
 
         if (andSetup && !isWiped())
             setupFromStateDB();
@@ -183,6 +178,7 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     public static int getSignersLength(byte[] typeBytes) {
+        // Переверенем - а зачем? - типа 7 бит - это длинна
         byte mask = ~HAS_TEMPLATE_MASK;
         return typeBytes[2] & mask;
     }
@@ -214,7 +210,7 @@ public class RSignNote extends Transaction implements Itemable {
             }
         }
         // set has TEMPLATE byte
-        /////if (this.key > 0) prop1 = (byte) (HAS_TEMPLATE_MASK | prop1);
+        if (this.key > 0 && this.typeBytes[1] < 3) prop1 = (byte) (HAS_TEMPLATE_MASK | prop1);
 
         byte prop2 = 0;
         if (data != null && data.length > 0) {
@@ -242,18 +238,14 @@ public class RSignNote extends Transaction implements Itemable {
     @Override
     public String getTitle() {
 
-        if (isEncrypted()) {
-            return "";
-        }
-
         if (extendedData == null) {
             if (getVersion() > 1) {
 
                 // version +2
                 try {
                     // парсим только заголовок
-                    ExData exData = parseDataV2WithoutFiles();
-                    return exData.getTitle();
+                    parseDataV2WithoutFiles();
+                    return extendedData.getTitle();
 
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
@@ -387,10 +379,10 @@ public class RSignNote extends Transaction implements Itemable {
 
             if (typeBytes[1] < 3) {
                 //WRITE ENCRYPTED
-                data = Bytes.concat(data, new byte[0]); //this.encrypted);
+                data = Bytes.concat(data, new byte[]{0}); //this.encrypted);
 
                 //WRITE ISTEXT
-                data = Bytes.concat(data, new byte[0]); //this.isText);
+                data = Bytes.concat(data, new byte[]{1}); //this.isText);
             }
         }
 
@@ -637,7 +629,7 @@ public class RSignNote extends Transaction implements Itemable {
             return Transaction.ITEM_DOES_NOT_EXIST;
 
         if (extendedData == null) {
-            extendedData = parseDataV2WithoutFiles();
+            parseDataV2WithoutFiles();
         }
 
         JSONObject hashes = extendedData.getHashes();
@@ -694,18 +686,20 @@ public class RSignNote extends Transaction implements Itemable {
         return calcCommonFee();
     }
 
-    public ExData parseDataV2WithoutFiles() {
-        //Version, Title, JSON, Files
-        try {
-            // здесь нельзя сохранять в parsedData
-            return ExData.parse(getVersion(), this.data, false, false);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            Long error = null;
-            error++;
+    public void parseDataV2WithoutFiles() {
+        if (extendedData == null) {
+            //Version, Title, JSON, Files
+            try {
+                // здесь нельзя сохранять в parsedData
+                extendedData = ExData.parse(getVersion(), this.data, false, false);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                Long error = null;
+                error++;
+            }
+            extendedData.resolveValues(dcSet);
         }
 
-        return null;
     }
 
     public void parseData() {
@@ -748,6 +742,7 @@ public class RSignNote extends Transaction implements Itemable {
                     extendedData = new ExData(0, items[0], dataJson, null);
                 }
             }
+            extendedData.resolveValues(dcSet);
         }
     }
 

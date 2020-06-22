@@ -70,7 +70,6 @@ public class StatementInfo extends javax.swing.JPanel {
                 .get(Transaction.makeDBRef(transaction.getBlockHeight(), transaction.getSeqNo()));
 
         ExData exData = statement.getExData();
-        exData.resolveValues(DCSet.getInstance());
         JSONObject jsonObject = exData.getJsonObject();
 
         if (keys != null) {
@@ -302,7 +301,6 @@ public class StatementInfo extends javax.swing.JPanel {
 
         try {
             exData = statement.getExData();
-            exData.resolveValues(DCSet.getInstance());
             JSONObject jsonObject = exData.getJsonObject();
 
             HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = exData.getFiles();

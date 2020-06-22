@@ -157,7 +157,9 @@ public class ExData {
             if (json.containsKey("TM")) {
 
                 templateKey = new Long((String) json.get("TM"));
-                template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, templateKey);
+                if (dcSet != null) {
+                    template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, templateKey);
+                }
                 if (template != null) {
                     valuedText = template.viewDescription();
 
@@ -177,7 +179,9 @@ public class ExData {
                 if (json.containsKey("Template")) {
 
                     templateKey = new Long((String) json.get("Template"));
-                    template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, templateKey);
+                    if (dcSet != null) {
+                        template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, templateKey);
+                    }
                     if (template != null) {
                         valuedText = template.viewDescription();
 
@@ -260,7 +264,7 @@ public class ExData {
         if (Transaction.hasPublicText(title, null, false, false)
                 || message != null && !message.isEmpty()
                 || templateKey > 0
-                || !files.isEmpty())
+                || files != null && !files.isEmpty())
             return true;
 
         return false;
