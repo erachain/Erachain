@@ -261,6 +261,22 @@ public class RVouch extends Transaction {
                 return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
 
+        if (transaction instanceof RSignNote) {
+            HashSet<Account> recipients = transaction.getRecipientAccounts();
+            if (recipients != null && !recipients.isEmpty()) {
+                boolean notFound = true;
+                for (Account recipient : recipients) {
+                    if (recipient.equals(creator)) {
+                        notFound = false;
+                        break;
+                    }
+                }
+                if (notFound) {
+                    return WRONG_SIGNER;
+                }
+            }
+        }
+
         return Transaction.VALIDATE_OK;
 
     }

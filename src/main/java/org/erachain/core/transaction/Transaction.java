@@ -129,6 +129,8 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public static final int HASH_ALREDY_EXIST = 51;
 
+    public static final int WRONG_SIGNER = 55;
+
     public static final int INVALID_CLAIM_DEBT_CREATOR = 61;
 
     public static final int NOT_ENOUGH_ERA_OWN_10 = 101;

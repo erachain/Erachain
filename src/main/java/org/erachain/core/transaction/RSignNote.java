@@ -653,14 +653,21 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public HashSet<Account> getInvolvedAccounts() {
-        HashSet<Account> accounts = new HashSet<Account>(2, 1);
+        HashSet<Account> accounts = new HashSet<Account>(8, 1);
         accounts.add(this.creator);
+        for (Account account : extendedData.getRecipients()) {
+            accounts.add(account);
+        }
         return accounts;
     }
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
-        return new HashSet<>(1, 1);
+        HashSet<Account> accounts = new HashSet<>(8, 1);
+        for (Account account : extendedData.getRecipients()) {
+            accounts.add(account);
+        }
+        return accounts;
     }
 
     @Override
@@ -668,6 +675,11 @@ public class RSignNote extends Transaction implements Itemable {
 
         if (account.equals(this.creator)) {
             return true;
+        }
+
+        for (Account item : extendedData.getRecipients()) {
+            if (account.equals(item))
+                return true;
         }
 
         return false;

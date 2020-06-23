@@ -245,7 +245,7 @@ public class ExData {
     }
 
     public Account[] getRecipients() {
-        return recipients;
+        return recipients == null ? new Account[0] : recipients;
     }
 
     public JSONObject getJsonObject() {
@@ -488,7 +488,7 @@ public class ExData {
                         recipients = new Account[0];
                     }
 
-                    isEncrypted = (flags[1] & 32) > 0;
+                    isEncrypted = (flags[1] & ENCRYPT_FLAG_MASK) > 0;
                     if (isEncrypted) {
                         secretsFlags = Arrays.copyOfRange(data, position, position)[0];
                         position++;
