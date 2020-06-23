@@ -47,11 +47,6 @@ public class ExData {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExData.class);
 
     /**
-     * 0 - not parsed; 1 - not files; 2 - all
-     */
-    private int parsedLevel;
-
-    /**
      * 0 - version; 1 - flag 1;
      */
     private byte[] flags;
@@ -146,8 +141,6 @@ public class ExData {
      */
     public void resolveValues(DCSet dcSet) {
 
-        parsedLevel = 2;
-
         String str = "";
         JSONObject params;
         Set<String> kS;
@@ -227,8 +220,6 @@ public class ExData {
     }
 
     public String getTitle() {
-        //if (parsedLevel > 0)
-        //    return title;
         return title;
     }
 
@@ -334,8 +325,12 @@ public class ExData {
 
         if (title != null && !title.isEmpty()) {
             byte[] title_Bytes = title.getBytes(StandardCharsets.UTF_8);
-            byte[] size_Title = ByteBuffer.allocate(DATA_TITLE_PART_LENGTH).putInt(title_Bytes.length).array();
-            outStream.write(size_Title);
+            if (flags[0] > 2) {
+                outStream.write((byte) title_Bytes.length);
+            } else {
+                byte[] size_Title = ByteBuffer.allocate(DATA_TITLE_PART_LENGTH).putInt(title_Bytes.length).array();
+                outStream.write(size_Title);
+            }
             outStream.write(title_Bytes);
         } else {
             outStream.write(new byte[DATA_TITLE_PART_LENGTH]);
@@ -444,6 +439,9 @@ public class ExData {
 
                 } else {
 
+                    flags = Arrays.copyOfRange(data, position, Integer.BYTES);
+                    position += Integer.BYTES;
+
                     titleSize = Arrays.copyOfRange(data, position, position + 1)[0];
                     position++;
 
@@ -458,8 +456,6 @@ public class ExData {
                 }
 
                 if (version > 2) {
-                    flags = Arrays.copyOfRange(data, position, Integer.BYTES);
-                    position += Integer.BYTES;
 
                     ///////////// PARS by FLAGS
 
@@ -670,7 +666,7 @@ public class ExData {
         return hashes;
     }
 
-    public static byte[] make(String title, Account[] recipients, boolean isEncrypted, TemplateCls template, HashMap<String, String> params_Template,
+    public static byte[] make(int version, String title, Account[] recipients, boolean isEncrypted, TemplateCls template, HashMap<String, String> params_Template,
                               HashMap<String, String> hashes_Map, String message, Set<Tuple3<String, Boolean, byte[]>> files_Set)
             throws Exception {
 

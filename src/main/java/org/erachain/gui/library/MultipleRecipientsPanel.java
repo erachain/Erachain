@@ -1,7 +1,7 @@
 package org.erachain.gui.library;
 
 
-import org.erachain.core.account.Account;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -29,7 +29,7 @@ public class MultipleRecipientsPanel extends JPanel {
         jScrollPaneRecipients = new JScrollPane();
         jButtonRemoveRecipient = new JButton();
         allCheckBox = new JCheckBox();
-        allCheckBox.setText(Lang.getInstance().translate("Everything"));
+        allCheckBox.setText(Lang.getInstance().translate("Everybody"));
         allCheckBox.setSelected(true);
         encryptCheckBox = new JCheckBox();
         encryptCheckBox.setText(Lang.getInstance().translate("Encrypt"));
@@ -178,11 +178,19 @@ public class MultipleRecipientsPanel extends JPanel {
             }
         }
 
-        public Account[] getRecipients() {
-            Account[] values = new Account[this.getRowCount()];
+        public PublicKeyAccount[] getRecipients() {
+            if (allCheckBox.isSelected())
+                return new PublicKeyAccount[0];
 
-            for (int i = 0; i < this.getRowCount(); i++) {
-                values[i] = new Account(this.getValueAt(i, 0).toString());
+            // without LAST empty
+            PublicKeyAccount[] values = new PublicKeyAccount[this.getRowCount() - 1];
+
+            for (int i = 0; i < values.length; i++) {
+                try {
+                    values[i] = new PublicKeyAccount(this.getValueAt(i, 0).toString());
+                } catch (Exception e) {
+                    break;
+                }
             }
 
             return values;

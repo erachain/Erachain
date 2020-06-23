@@ -200,25 +200,6 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
             // READ FEE
             parsing = 2;
             feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
-            // read byte[] from exData Panel
-            messageBytes = exData_Panel.makeExData();
-
-            if (messageBytes.length < 10) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Message is so short"),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-
-                return null;
-            } else if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Message size exceeded %1 kB")
-                                .replace("%1", "" + (BlockChain.MAX_REC_DATA_BYTES >> 10)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-
-                return null;
-            }
-
-            parsing = 5;
 
         } catch (Exception e) {
             // CHECK WHERE PARSING ERROR HAPPENED
@@ -244,8 +225,43 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
             return null;
         }
 
+        Account[] recipients = exData_Panel.multipleRecipientsPanel.recipientsTableModel.getRecipients();
+        for (int i = 0; i < recipients.length; i++) {
+            Account recipient = recipients[i];
+            if (recipient == null) {
+                JOptionPane.showMessageDialog(new JFrame(), "Recipient[" + (i + 1) + "] is wrong",
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                return null;
+            }
+        }
+
+        try {
+            messageBytes = exData_Panel.makeExData();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(new JFrame(), e.getMessage(),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
+        if (messageBytes.length < 10) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate("Message is so short"),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+            return null;
+        } else if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate("Message size exceeded %1 kB")
+                            .replace("%1", "" + (BlockChain.MAX_REC_DATA_BYTES >> 10)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+            return null;
+        }
+
+        parsing = 5;
+
         // CREATE TX MESSAGE
-        byte version = (byte) 2;
+        byte version = (byte) 3;
         byte property1 = (byte) 0;
         byte property2 = (byte) 0;
 
@@ -258,8 +274,8 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         }
 
         RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2, forDeal,
-                creator, feePow, key, messageBytes,
-                new byte[]{1}, new byte[]{0});
+                creator, feePow, key, messageBytes
+        );
 
         // Issue_Asset_Confirm_Dialog cont = new
         // Issue_Asset_Confirm_Dialog(issueAssetTransaction);

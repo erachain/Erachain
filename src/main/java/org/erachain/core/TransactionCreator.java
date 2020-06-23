@@ -755,7 +755,7 @@ public class TransactionCreator {
 
     public Transaction r_SignNote(byte version, byte property1, byte property2,
                                   int forDeal, PrivateKeyAccount creator,
-                                  int feePow, long key, byte[] message, byte[] isText, byte[] encrypted) {
+                                  int feePow, long key, byte[] message) {
 
         this.checkUpdate();
 
@@ -765,7 +765,7 @@ public class TransactionCreator {
 
         //CREATE MESSAGE TRANSACTION
         recordNoteTx = new RSignNote(version, property1, property1,
-                creator, (byte) feePow, key, message, timestamp, 0l);
+                creator, (byte) feePow, key, message, timestamp, 0L);
         recordNoteTx.sign(creator, forDeal);
         recordNoteTx.setDC(this.fork, forDeal, this.blockHeight, ++this.seqNo, false);
 

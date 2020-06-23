@@ -742,7 +742,8 @@ public class ExDataPanel extends javax.swing.JPanel {
                     (Boolean) attached_Files_Model.getValueAt(i, 2), (byte[]) attached_Files_Model.getValueAt(i, 5)));
         }
 
-        return ExData.make(jTextField_Title_Message.getText(),
+        int version = 3;
+        return ExData.make(version, jTextField_Title_Message.getText(),
                 recipients, isEncrypted,
                 (TemplateCls) fill_Template_Panel.sel_Template,
                 this.fill_Template_Panel.get_Params(), hashes_Map, jTextPane_Message.getText(), files_1);

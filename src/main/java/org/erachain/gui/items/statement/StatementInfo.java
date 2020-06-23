@@ -1,5 +1,6 @@
 package org.erachain.gui.items.statement;
 
+import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.RSignNote;
@@ -84,6 +85,17 @@ public class StatementInfo extends javax.swing.JPanel {
 
         file_Panel.setVisible(false);
 
+        // recipients
+        String recipientsList = "";
+        HashSet<Account> recipients = statement.getRecipientAccounts();
+        if (recipients != null && !recipients.isEmpty()) {
+            int i = 1;
+            for (Account recipient : recipients) {
+                recipientsList += i + " " + recipient.getAddress() + "<br>";
+            }
+            recipientsList += "<br>";
+        }
+
         // if (statement.isText() && !statement.isEncrypted()) {
         if (!statement.isEncrypted()) {
             Set<String> kS;
@@ -121,7 +133,7 @@ public class StatementInfo extends javax.swing.JPanel {
                     jLabel_Title.setText(Lang.getInstance().translate("Title") + ": " + data.get("Title").toString());
 
                 if (data.containsKey("Message"))
-                    jTextArea_Body.setText(Library.to_HTML(description) + "<br><br>"
+                    jTextArea_Body.setText(recipientsList + Library.to_HTML(description) + "<br><br>"
                                     + Library.to_HTML(data.get("Message").toString()) + "<br><br>" + hasHes + "<br><br>"
                             // + files +"\n"
 
@@ -301,6 +313,18 @@ public class StatementInfo extends javax.swing.JPanel {
 
         try {
             exData = statement.getExData();
+
+            // recipients
+            String recipientsList = "";
+            HashSet<Account> recipients = statement.getRecipientAccounts();
+            if (recipients != null && !recipients.isEmpty()) {
+                int i = 1;
+                for (Account recipient : recipients) {
+                    recipientsList += i + " " + recipient.getAddress() + "<br>";
+                }
+                recipientsList += "<br>";
+            }
+
             JSONObject jsonObject = exData.getJsonObject();
 
             HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = exData.getFiles();
@@ -335,7 +359,7 @@ public class StatementInfo extends javax.swing.JPanel {
 
             String message = exData.getMessage();
 
-            jTextArea_Body.setText(Library.to_HTML(description) + "<br><br>"
+            jTextArea_Body.setText(recipientsList + Library.to_HTML(description) + "<br><br>"
                     + Library.to_HTML(message) + "<br><br>" + hasHes + "<br><br>");
         } catch (Exception e) {
             // TODO Auto-generated catch block
