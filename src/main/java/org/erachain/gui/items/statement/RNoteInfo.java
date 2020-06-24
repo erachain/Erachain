@@ -212,8 +212,9 @@ public class RNoteInfo extends javax.swing.JPanel {
             resultStr += "<h2>" + template.getName() + "</h2>";
             String valuedText = exData.getValuedText();
             if (valuedText != null) {
-                resultStr += Library.to_HTML(valuedText) + "<br><br>";
+                resultStr += Library.to_HTML(valuedText);
             }
+            resultStr += "<hr><br>";
         }
 
         String message = exData.getMessage();

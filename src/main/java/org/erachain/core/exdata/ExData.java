@@ -494,7 +494,7 @@ public class ExData {
                     int recipientsSize;
                     if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {
                         //////// RECIPIENTS
-                        recipientsFlags = Arrays.copyOfRange(data, position, position)[0];
+                        recipientsFlags = Arrays.copyOfRange(data, position, position + 1)[0];
                         position++;
                         byte[] sizeBytes = Arrays.copyOfRange(data, position, position + RECIPIENTS_SIZE_LENGTH);
                         recipientsSize = Ints.fromByteArray(sizeBytes);
@@ -514,7 +514,7 @@ public class ExData {
 
                     isEncrypted = (flags[1] & ENCRYPT_FLAG_MASK) > 0;
                     if (isEncrypted) {
-                        secretsFlags = Arrays.copyOfRange(data, position, position)[0];
+                        secretsFlags = Arrays.copyOfRange(data, position, position + 1)[0];
                         position++;
                         int secretsSize = recipientsSize + 1;
                         secrets = new byte[secretsSize][];
