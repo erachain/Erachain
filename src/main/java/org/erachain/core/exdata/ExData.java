@@ -144,6 +144,8 @@ public class ExData {
         String str = "";
         JSONObject params;
         Set<String> kS;
+        if (json == null || json.isEmpty())
+            return;
 
         try {
             // v 2.1
@@ -239,6 +241,10 @@ public class ExData {
         return recipients == null ? new Account[0] : recipients;
     }
 
+    public byte[][] getSecrets() {
+        return secrets == null ? new byte[0][] : secrets;
+    }
+
     public JSONObject getJsonObject() {
         return json;
     }
@@ -321,7 +327,9 @@ public class ExData {
             outStream.write("v 2.00".getBytes(StandardCharsets.UTF_8)); // only 6
         }
 
-        outStream.write(flags);
+        if (flags[0] > 2) {
+            outStream.write(flags);
+        }
 
         if (title != null && !title.isEmpty()) {
             byte[] title_Bytes = title.getBytes(StandardCharsets.UTF_8);
@@ -333,7 +341,11 @@ public class ExData {
             }
             outStream.write(title_Bytes);
         } else {
-            outStream.write(new byte[DATA_TITLE_PART_LENGTH]);
+            if (flags[0] > 2) {
+                outStream.write((byte) 0);
+            } else {
+                outStream.write(new byte[DATA_TITLE_PART_LENGTH]);
+            }
         }
 
         if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {
@@ -507,104 +519,113 @@ public class ExData {
                     secrets = null;
                 }
 
-                //READ Length JSON PART
-                byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_JSON_PART_LENGTH);
-                int JSONSize = Ints.fromByteArray(dataSizeBytes);
-
-                position += Transaction.DATA_JSON_PART_LENGTH;
-                //READ JSON
-                byte[] jsonData = Arrays.copyOfRange(data, position, position + JSONSize);
-                position += JSONSize;
-
-                if (isEncrypted) {
-                    // version 3 - with SECRETS
-                    return new ExData(flags, title, recipientsFlags, recipients, secretsFlags, secrets, jsonData);
+                if (data.length == position) {
+                    if (version > 2) {
+                        return new ExData(flags, title, recipientsFlags, recipients, null, null);
+                    } else {
+                        // version 2.0 - 2.1
+                        return new ExData(version, title, null, null);
+                    }
                 } else {
-                    try {
+                    //READ Length JSON PART
+                    byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_JSON_PART_LENGTH);
+                    int JSONSize = Ints.fromByteArray(dataSizeBytes);
+                    position += Transaction.DATA_JSON_PART_LENGTH;
 
-                        JSONObject json = (JSONObject) JSONValue.parseWithException(new String(jsonData, StandardCharsets.UTF_8));
+                    //READ JSON
+                    byte[] jsonData = Arrays.copyOfRange(data, position, position + JSONSize);
+                    position += JSONSize;
 
-                        HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap;
+                    if (isEncrypted) {
+                        // version 3 - with SECRETS
+                        return new ExData(flags, title, recipientsFlags, recipients, secretsFlags, secrets, jsonData);
+                    } else {
+                        try {
 
-                        if (andFiles) {
-                            JSONObject files;
-                            Set files_key_Set;
+                            JSONObject json = (JSONObject) JSONValue.parseWithException(new String(jsonData, StandardCharsets.UTF_8));
 
-                            // запомним даже если пустой список - делаем НЕ НУЛЬ тут - это флаг что Файлы Парсили
-                            filesMap = new HashMap<String, Tuple3<byte[], Boolean, byte[]>>();
+                            HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap;
 
-                            if (json.containsKey("F")) {
-                                // v 2.1
+                            if (andFiles) {
+                                JSONObject files;
+                                Set files_key_Set;
 
-                                files = (JSONObject) json.get("F");
+                                // запомним даже если пустой список - делаем НЕ НУЛЬ тут - это флаг что Файлы Парсили
+                                filesMap = new HashMap<String, Tuple3<byte[], Boolean, byte[]>>();
 
-                                files_key_Set = files.keySet();
-                                for (int i = 0; i < files_key_Set.size(); i++) {
-                                    JSONObject file = (JSONObject) files.get(i + "");
+                                if (json.containsKey("F")) {
+                                    // v 2.1
 
-                                    String name = (String) file.get("FN"); // File_Name
-                                    Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
-                                    int size = new Integer((String) file.get("SZ"));
-                                    byte[] fileBytes = Arrays.copyOfRange(data, position, position + size);
-                                    position = position + size;
-                                    byte[] fileBytesOrig = null;
-                                    if (zip) {
-                                        try {
-                                            fileBytesOrig = ZipBytes.decompress(fileBytes);
-                                        } catch (DataFormatException e1) {
-                                            LOGGER.error(e1.getMessage(), e1);
+                                    files = (JSONObject) json.get("F");
+
+                                    files_key_Set = files.keySet();
+                                    for (int i = 0; i < files_key_Set.size(); i++) {
+                                        JSONObject file = (JSONObject) files.get(i + "");
+
+                                        String name = (String) file.get("FN"); // File_Name
+                                        Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
+                                        int size = new Integer((String) file.get("SZ"));
+                                        byte[] fileBytes = Arrays.copyOfRange(data, position, position + size);
+                                        position = position + size;
+                                        byte[] fileBytesOrig = null;
+                                        if (zip) {
+                                            try {
+                                                fileBytesOrig = ZipBytes.decompress(fileBytes);
+                                            } catch (DataFormatException e1) {
+                                                LOGGER.error(e1.getMessage(), e1);
+                                            }
+                                        } else {
+                                            fileBytesOrig = fileBytes;
                                         }
-                                    } else {
-                                        fileBytesOrig = fileBytes;
+                                        filesMap.put(name, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
+
                                     }
-                                    filesMap.put(name, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
 
-                                }
+                                } else if (json.containsKey("&*&*%$$%_files_#$@%%%")) {
+                                    //v2.0
 
-                            } else if (json.containsKey("&*&*%$$%_files_#$@%%%")) {
-                                //v2.0
+                                    files = (JSONObject) json.get("&*&*%$$%_files_#$@%%%");
 
-                                files = (JSONObject) json.get("&*&*%$$%_files_#$@%%%");
+                                    files_key_Set = files.keySet();
+                                    for (int i = 0; i < files_key_Set.size(); i++) {
+                                        JSONObject file = (JSONObject) files.get(i + "");
 
-                                files_key_Set = files.keySet();
-                                for (int i = 0; i < files_key_Set.size(); i++) {
-                                    JSONObject file = (JSONObject) files.get(i + "");
+                                        String name = (String) file.get("File_Name"); // File_Name
+                                        Boolean zip = new Boolean((String) file.get("ZIP")); // ZIP
+                                        int size = new Integer((String) file.get("Size"));
+                                        byte[] fileBytes = Arrays.copyOfRange(data, position, position + size);
+                                        position = position + size;
 
-                                    String name = (String) file.get("File_Name"); // File_Name
-                                    Boolean zip = new Boolean((String) file.get("ZIP")); // ZIP
-                                    int size = new Integer((String) file.get("Size"));
-                                    byte[] fileBytes = Arrays.copyOfRange(data, position, position + size);
-                                    position = position + size;
-
-                                    byte[] fileBytesOrig = null;
-                                    if (zip) {
-                                        try {
-                                            fileBytesOrig = ZipBytes.decompress(fileBytes);
-                                        } catch (DataFormatException e1) {
-                                            LOGGER.error(e1.getMessage(), e1);
+                                        byte[] fileBytesOrig = null;
+                                        if (zip) {
+                                            try {
+                                                fileBytesOrig = ZipBytes.decompress(fileBytes);
+                                            } catch (DataFormatException e1) {
+                                                LOGGER.error(e1.getMessage(), e1);
+                                            }
+                                        } else {
+                                            fileBytesOrig = fileBytes;
                                         }
-                                    } else {
-                                        fileBytesOrig = fileBytes;
-                                    }
-                                    filesMap.put(name, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
+                                        filesMap.put(name, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
 
+                                    }
+                                } else {
+                                    filesMap = null;
                                 }
                             } else {
                                 filesMap = null;
                             }
-                        } else {
-                            filesMap = null;
-                        }
 
-                        if (version > 2) {
-                            return new ExData(flags, title, recipientsFlags, recipients, json, filesMap);
-                        } else {
-                            // version 2.0 - 2.1
-                            return new ExData(version, title, json, filesMap);
-                        }
+                            if (version > 2) {
+                                return new ExData(flags, title, recipientsFlags, recipients, json, filesMap);
+                            } else {
+                                // version 2.0 - 2.1
+                                return new ExData(version, title, json, filesMap);
+                            }
 
-                    } catch (Exception e) {
-                        return new ExData(version, title, null, null);
+                        } catch (Exception e) {
+                            return new ExData(version, title, null, null);
+                        }
                     }
                 }
 
@@ -666,7 +687,7 @@ public class ExData {
         return hashes;
     }
 
-    public static byte[] make(int version, String title, Account[] recipients, boolean isEncrypted, TemplateCls template, HashMap<String, String> params_Template,
+    public static byte[] make(String title, Account[] recipients, boolean isEncrypted, TemplateCls template, HashMap<String, String> params_Template,
                               HashMap<String, String> hashes_Map, String message, Set<Tuple3<String, Boolean, byte[]>> files_Set)
             throws Exception {
 
@@ -722,7 +743,7 @@ public class ExData {
             filesMap.put(file.a, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
         }
 
-        byte[] flags = new byte[4];
+        byte[] flags = new byte[]{3, 0, 0, 0};
 
         if (recipients != null && recipients.length > 0) {
             flags[1] = (byte) (flags[1] | RECIPIENTS_FLAG_MASK);

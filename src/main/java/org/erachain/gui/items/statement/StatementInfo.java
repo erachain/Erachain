@@ -56,7 +56,7 @@ public class StatementInfo extends javax.swing.JPanel {
         statement = (RSignNote) transaction;
         statement.parseData();
 
-        if (statement.getVersion() == 2) {
+        if (statement.getVersion() > 1) {
             view_V2();
             return;
         }
@@ -79,11 +79,8 @@ public class StatementInfo extends javax.swing.JPanel {
 
         initComponents();
 
-        TemplateCls template = exData.getTemplate();
-
-        String description = template.viewDescription();
-
         file_Panel.setVisible(false);
+
 
         // recipients
         String recipientsList = "";
@@ -96,81 +93,91 @@ public class StatementInfo extends javax.swing.JPanel {
             recipientsList += "<br>";
         }
 
-        // if (statement.isText() && !statement.isEncrypted()) {
-        if (!statement.isEncrypted()) {
-            Set<String> kS;
-            JSONObject params;
-            String str;
+        TemplateCls template = exData.getTemplate();
+        if (template != null) {
 
-            try {
-                JSONObject data = (JSONObject) JSONValue
-                        .parseWithException(new String(statement.getData(), StandardCharsets.UTF_8));
-                // params
+            String description = template.viewDescription();
 
-                if (data.containsKey("Statement_Params")) {
-                    str = data.get("Statement_Params").toString();
-                    params = (JSONObject) JSONValue.parseWithException(str);
-                    kS = params.keySet();
-                    for (String s : kS) {
-                        description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
+            // if (statement.isText() && !statement.isEncrypted()) {
+            if (!statement.isEncrypted()) {
+                Set<String> kS;
+                JSONObject params;
+                String str;
+
+
+                try {
+                    JSONObject data = (JSONObject) JSONValue
+                            .parseWithException(new String(statement.getData(), StandardCharsets.UTF_8));
+                    // params
+
+                    if (data.containsKey("Statement_Params")) {
+                        str = data.get("Statement_Params").toString();
+                        params = (JSONObject) JSONValue.parseWithException(str);
+                        kS = params.keySet();
+                        for (String s : kS) {
+                            description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
+                        }
                     }
-                }
-                // hashes
-                String hasHes = "";
+                    // hashes
+                    String hasHes = "";
 
-                if (data.containsKey("Hashes")) {
-                    str = data.get("Hashes").toString();
-                    params = (JSONObject) JSONValue.parseWithException(str);
-                    kS = params.keySet();
+                    if (data.containsKey("Hashes")) {
+                        str = data.get("Hashes").toString();
+                        params = (JSONObject) JSONValue.parseWithException(str);
+                        kS = params.keySet();
 
-                    int i = 1;
-                    for (String s : kS) {
-                        hasHes += i + " " + s + " " + params.get(s) + "<br>";
+                        int i = 1;
+                        for (String s : kS) {
+                            hasHes += i + " " + s + " " + params.get(s) + "<br>";
+                        }
                     }
-                }
 
-                if (data.containsKey("Title"))
-                    jLabel_Title.setText(Lang.getInstance().translate("Title") + ": " + data.get("Title").toString());
+                    if (data.containsKey("Title"))
+                        jLabel_Title.setText(Lang.getInstance().translate("Title") + ": " + data.get("Title").toString());
 
-                if (data.containsKey("Message"))
-                    jTextArea_Body.setText(recipientsList + Library.to_HTML(description) + "<br><br>"
-                                    + Library.to_HTML(data.get("Message").toString()) + "<br><br>" + hasHes + "<br><br>"
-                            // + files +"\n"
+                    if (data.containsKey("Message"))
+                        jTextArea_Body.setText(recipientsList + Library.to_HTML(description) + "<br><br>"
+                                        + Library.to_HTML(data.get("Message").toString()) + "<br><br>" + hasHes + "<br><br>"
+                                // + files +"\n"
 
-                    );
+                        );
 
-            } catch (ParseException e) {
+                } catch (ParseException e) {
 
-                // e.printStackTrace();
-                List<String> vars = template.getVarNames();
-                if (vars != null && !vars.isEmpty()) {
-                    // try replace variables
-                    String dataVars = new String(statement.getData(), StandardCharsets.UTF_8);
-                    String[] rows = dataVars.split("\n");
-                    Map<String, String> varsArray = new HashMap<String, String>();
-                    for (String row : rows) {
-                        String[] var_Name_Value = row.split("=");
-                        if (var_Name_Value.length == 2) {
-                            varsArray.put(var_Name_Value[0].trim(), var_Name_Value[1].trim());
+                    // e.printStackTrace();
+                    List<String> vars = template.getVarNames();
+                    if (vars != null && !vars.isEmpty()) {
+                        // try replace variables
+                        String dataVars = new String(statement.getData(), StandardCharsets.UTF_8);
+                        String[] rows = dataVars.split("\n");
+                        Map<String, String> varsArray = new HashMap<String, String>();
+                        for (String row : rows) {
+                            String[] var_Name_Value = row.split("=");
+                            if (var_Name_Value.length == 2) {
+                                varsArray.put(var_Name_Value[0].trim(), var_Name_Value[1].trim());
+                            }
+
                         }
 
+                        for (Map.Entry<String, String> item : varsArray.entrySet()) {
+                            // description.replaceAll("{{" + item.getKey() + "}}",
+                            // (String)item.getValue());
+                            description = description.replace("{{" + item.getKey() + "}}", (String) item.getValue());
+                        }
                     }
 
-                    for (Map.Entry<String, String> item : varsArray.entrySet()) {
-                        // description.replaceAll("{{" + item.getKey() + "}}",
-                        // (String)item.getValue());
-                        description = description.replace("{{" + item.getKey() + "}}", (String) item.getValue());
-                    }
+                    jTextArea_Body.setText(template.viewName() + "<br><br>"
+                            + Library.to_HTML(description) + "<br><br>"
+                            + new String(statement.getData(), StandardCharsets.UTF_8));
+
                 }
 
-                jTextArea_Body.setText(template.viewName() + "<br><br>"
-                        + Library.to_HTML(description) + "<br><br>"
-                        + new String(statement.getData(), StandardCharsets.UTF_8));
-
+            } else {
+                jTextArea_Body.setText(template.viewName() + "<br>" + Lang.getInstance().translate("Encrypted"));
             }
 
-        } else {
-            jTextArea_Body.setText(template.viewName() + "<br>" + Lang.getInstance().translate("Encrypted"));
+            jTextArea_Body.setText(Library.to_HTML(description) + "<br><br>"
+                    + new String(statement.getData(), StandardCharsets.UTF_8));
         }
 
         jSplitPane1.setDividerLocation(350);// .setDividerLocation((int)(jSplitPane1.getSize().getHeight()/0.5));//.setLastDividerLocation(0);
