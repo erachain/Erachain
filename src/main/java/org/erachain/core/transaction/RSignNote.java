@@ -10,7 +10,6 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
@@ -592,15 +591,9 @@ public class RSignNote extends Transaction implements Itemable {
         int add_len = 0;
         if (this.data != null && this.data.length > 0)
             if (getVersion() > 2) {
-                add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH + this.data.length;
-            } else {
                 add_len += DATA_SIZE_LENGTH + this.data.length;
-                if (extendedData.hasRecipients()) {
-                    add_len += 1 + extendedData.getRecipients().length * Account.ADDRESS_SHORT_LENGTH;
-                }
-                if (extendedData.isEncrypted()) {
-                    add_len += 1 + extendedData.getSecrets().length * Crypto.HASH_LENGTH;
-                }
+            } else {
+                add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH + this.data.length;
             }
 
         if (this.key > 0 && getVersion() < 3)

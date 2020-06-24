@@ -312,7 +312,7 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation transaction issue document"));
 
-        StatementInfo ww = new StatementInfo(issueDoc);
+        RNoteInfo ww = new RNoteInfo(issueDoc);
         ww.jPanel2.setVisible(false);
         dd.jScrollPane1.setViewportView(ww);
         dd.setLocationRelativeTo(th);

@@ -5,7 +5,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
-import org.erachain.gui.items.statement.StatementInfo;
+import org.erachain.gui.items.statement.RNoteInfo;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -163,7 +163,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel  {
         // get component from right panel
         Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
-        if (c1 instanceof StatementInfo) ((StatementInfo) c1).delay_on_Close();
+        if (c1 instanceof RNoteInfo) ((RNoteInfo) c1).delay_on_Close();
 
     }
 

@@ -257,6 +257,10 @@ public class ExData {
         return recipients != null && recipients.length > 0;
     }
 
+    public boolean hasFiles() {
+        return files != null && !files.isEmpty();
+    }
+
     public boolean hasPublicText() {
         if (Transaction.hasPublicText(title, null, false, false)
                 || message != null && !message.isEmpty()
@@ -265,6 +269,18 @@ public class ExData {
             return true;
 
         return false;
+    }
+
+    public boolean hasHashes() {
+        return hashes != null && !hashes.isEmpty();
+    }
+
+    public JSONObject getHashes() {
+        return hashes;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     public boolean isEncrypted() {
@@ -630,14 +646,6 @@ public class ExData {
                 }
 
         }
-    }
-
-    public JSONObject getHashes() {
-        return hashes;
-    }
-
-    public String getMessage() {
-        return message;
     }
 
     public byte[][] getAllHashesAsBytes() {
