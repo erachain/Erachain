@@ -366,6 +366,9 @@ public class ExData {
 
         if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {
             outStream.write(recipientsFlags);
+            byte[] recipientsSize = ByteBuffer.allocate(RECIPIENTS_SIZE_LENGTH).putInt(recipients.length).array();
+            outStream.write(recipientsSize);
+
             for (int i = 0; i < recipients.length; i++) {
                 outStream.write(recipients[i].getShortAddressBytes());
             }
