@@ -457,9 +457,6 @@ public class ExDataPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         jPanel_Attached_Files.add(jPanel_Other_Attached_Files_Work, gridBagConstraints);
 
-        // if (BlockChain.DEVELOP_USE == true)
-        jTabbedPane_Message.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
-
         jPanel_Other_Hashes.setLayout(new java.awt.GridBagLayout());
 
         jScrollPane_Hashes_Files_Tale.setOpaque(false);
@@ -508,6 +505,9 @@ public class ExDataPanel extends javax.swing.JPanel {
         jPanel_Other_Hashes.add(jButton_Remove_Other_Hashes, gridBagConstraints);
 
         jTabbedPane_Message.addTab(Lang.getInstance().translate("Hashes"), jPanel_Other_Hashes);
+
+        // if (BlockChain.DEVELOP_USE == true)
+        jTabbedPane_Message.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
