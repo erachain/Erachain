@@ -87,6 +87,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public static final int ACTION_HOLD = 3;
     public static final int ACTION_SPEND = 4;
     public static final int ACTION_PLEDGE = 5;
+    public static final int ACTION_RESERCED_6 = 6;
 
     /*
      * public static final String NAME_ACTION_TYPE_BACKWARD_PROPERTY =
