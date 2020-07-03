@@ -87,6 +87,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public static final int ACTION_HOLD = 3;
     public static final int ACTION_SPEND = 4;
     public static final int ACTION_PLEDGE = 5;
+    public static final int ACTION_RESERCED_6 = 6;
 
     /*
      * public static final String NAME_ACTION_TYPE_BACKWARD_PROPERTY =
@@ -1065,7 +1066,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     for (Account recipient : recipients) {
                         if (!recipient.isPerson(dcSet, height)
                                 && !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
-                            return RECEIVER_NOT_PERSONALIZED;
+
+                            boolean recipient_admin = false;
+                            for (String admin : BlockChain.GENESIS_ADMINS) {
+                                if (this.recipient.equals(admin)) {
+                                    recipient_admin = true;
+                                    break;
+                                }
+                            }
+                            if (!recipient_admin)
+                                return RECEIVER_NOT_PERSONALIZED;
                         }
                     }
                 }
