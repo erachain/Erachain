@@ -1066,7 +1066,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     for (Account recipient : recipients) {
                         if (!recipient.isPerson(dcSet, height)
                                 && !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
-                            return RECEIVER_NOT_PERSONALIZED;
+
+                            boolean recipient_admin = false;
+                            for (String admin : BlockChain.GENESIS_ADMINS) {
+                                if (this.recipient.equals(admin)) {
+                                    recipient_admin = true;
+                                    break;
+                                }
+                            }
+                            if (!recipient_admin)
+                                return RECEIVER_NOT_PERSONALIZED;
                         }
                     }
                 }

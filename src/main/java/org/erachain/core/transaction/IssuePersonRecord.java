@@ -289,13 +289,11 @@ public class IssuePersonRecord extends IssueItemRecord {
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
         if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
                 && !creatorIsPerson) {
-            if (height < 20000) {
-                // FIRST Persons only by ADMINS
-                for (String admin : BlockChain.GENESIS_ADMINS) {
-                    if (creator.equals(admin)) {
-                        creatorAdmin = true;
-                        break;
-                    }
+            // ALL Persons by ADMINS
+            for (String admin : BlockChain.GENESIS_ADMINS) {
+                if (creator.equals(admin)) {
+                    creatorAdmin = true;
+                    break;
                 }
             }
             if (!creatorAdmin) {

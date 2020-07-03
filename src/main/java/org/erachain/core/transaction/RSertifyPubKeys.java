@@ -502,17 +502,15 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
                 && !this.creator.isPerson(dcSet, height, creatorPersonDuration)) {
             boolean creator_admin = false;
-            if (height < 20000) {
-                // FIRST Persons only by ADMINS
-                for (String admin : BlockChain.GENESIS_ADMINS) {
-                    if (this.creator.equals(admin)) {
-                        creator_admin = true;
-                        break;
-                    }
+            // ALL Persons by ADMINS
+            for (String admin : BlockChain.GENESIS_ADMINS) {
+                if (this.creator.equals(admin)) {
+                    creator_admin = true;
+                    break;
                 }
             }
             if (!creator_admin
-                    && this.height != 176085) // TODO: wrong transaction
+                    && !BlockChain.MAIN_MODE && this.height != 176085) // TODO: wrong transaction
                 return CREATOR_NOT_PERSONALIZED;
         }
 
