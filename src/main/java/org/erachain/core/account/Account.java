@@ -148,7 +148,7 @@ public class Account {
                 type = isBackward ? TransactionAmount.ACTION_PLEDGE : TransactionAmount.ACTION_SEND;
             } else {
                 // HOLD in STOCK or PLEDGE
-                type = isBackward ? TransactionAmount.ACTION_HOLD : TransactionAmount.ACTION_PLEDGE;
+                type = isBackward ? TransactionAmount.ACTION_HOLD : TransactionAmount.ACTION_RESERCED_6;
             }
         } else {
             if (amount_sign > 0) {
@@ -442,6 +442,8 @@ public class Account {
                 return this.getBalance(dcSet, key).d;
             case TransactionAmount.ACTION_PLEDGE:
                 return this.getBalance(dcSet, key).e;
+            case TransactionAmount.ACTION_RESERCED_6:
+                return new Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO);
         }
 
         return null;
