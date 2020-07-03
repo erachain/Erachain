@@ -365,8 +365,8 @@ public class ExData {
         }
 
         if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {
-            outStream.write(recipientsFlags);
-            byte[] recipientsSize = ByteBuffer.allocate(RECIPIENTS_SIZE_LENGTH).putInt(recipients.length).array();
+            byte[] recipientsSize = Ints.toByteArray(recipients.length);
+            recipientsSize[0] = recipientsFlags;
             outStream.write(recipientsSize);
 
             for (int i = 0; i < recipients.length; i++) {
@@ -497,11 +497,11 @@ public class ExData {
                     int recipientsSize;
                     if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {
                         //////// RECIPIENTS
-                        recipientsFlags = Arrays.copyOfRange(data, position, position + 1)[0];
-                        position++;
-                        byte[] sizeBytes = Arrays.copyOfRange(data, position, position + RECIPIENTS_SIZE_LENGTH);
+                        byte[] sizeBytes = Arrays.copyOfRange(data, position, position + RECIPIENTS_SIZE_LENGTH + 1);
+                        recipientsFlags = sizeBytes[0];
+                        sizeBytes[0] = 0;
                         recipientsSize = Ints.fromByteArray(sizeBytes);
-                        position += RECIPIENTS_SIZE_LENGTH;
+                        position += RECIPIENTS_SIZE_LENGTH + 1;
 
                         recipients = new Account[recipientsSize];
                         for (int i = 0; i < recipientsSize; i++) {

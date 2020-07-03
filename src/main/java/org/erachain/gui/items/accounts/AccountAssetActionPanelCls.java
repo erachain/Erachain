@@ -459,7 +459,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
             if (encryptMessage) {
                 //sender
-                PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress().toString());
+                PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
                 byte[] privateKey = account.getPrivateKey();
 
                 //recipient

@@ -1,8 +1,12 @@
 package org.erachain.gui.library;
 
 
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.lang.Lang;
+import org.erachain.utils.NameUtils;
+import org.erachain.utils.Pair;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -178,16 +182,31 @@ public class MultipleRecipientsPanel extends JPanel {
             }
         }
 
-        public PublicKeyAccount[] getRecipients() {
+        public Account[] getRecipients() {
             if (allCheckBox.isSelected())
-                return new PublicKeyAccount[0];
+                return new Account[0];
 
             // without LAST empty
-            PublicKeyAccount[] values = new PublicKeyAccount[this.getRowCount() - 1];
+            Account[] values = new Account[this.getRowCount() - 1];
 
             for (int i = 0; i < values.length; i++) {
                 try {
-                    values[i] = new PublicKeyAccount(this.getValueAt(i, 0).toString());
+                    //ORDINARY RECIPIENT
+                    String recipientAddress = this.getValueAt(i, 0).toString();
+                    if (Crypto.getInstance().isValidAddress(recipientAddress)) {
+                        values[i] = new Account(recipientAddress);
+                    } else {
+                        if (PublicKeyAccount.isValidPublicKey(recipientAddress)) {
+                            values[i] = new PublicKeyAccount(recipientAddress);
+                        } else {
+                            //IS IS NAME of RECIPIENT - resolve ADDRESS
+                            Pair<Account, NameUtils.NameResult> result = NameUtils.nameToAdress(recipientAddress);
+
+                            if (result.getB() == NameUtils.NameResult.OK) {
+                                values[i] = result.getA();
+                            }
+                        }
+                    }
                 } catch (Exception e) {
                     break;
                 }
