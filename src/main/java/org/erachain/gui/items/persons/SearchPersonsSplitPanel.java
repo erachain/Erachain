@@ -69,7 +69,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
         });
         this.menuTable.add(set_Status_Item);
 
-        JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Attest public key for person"));
+        JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Certify Public Key for Person"));
 
         attestPubKey_Item.addActionListener(new ActionListener() {
             @Override

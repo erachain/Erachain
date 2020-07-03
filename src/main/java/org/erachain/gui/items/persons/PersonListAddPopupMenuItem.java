@@ -52,7 +52,7 @@ public class PersonListAddPopupMenuItem {
         });
         menu.add(set_Status_Item);
 
-        JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Attest Public Key for Person"));
+        JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Certify Public Key for Person"));
 
         attestPubKey_Item.addActionListener(new ActionListener() {
             @Override

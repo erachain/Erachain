@@ -67,7 +67,7 @@ public class PersonWorkDialog extends JDialog {
             }
         });
 
-        jButton2 = new MButton(Lang.getInstance().translate("Attest Public Key for Person"), 3);
+        jButton2 = new MButton(Lang.getInstance().translate("Certify Public Key for Person"), 3);
         getContentPane().add(jButton2);
         jButton2.addActionListener(new ActionListener() {
             @Override
