@@ -112,6 +112,14 @@ function statement(data) {
         output += '<br><b>' + data.Label_title + '</b>:' + escapeHtml(data.title) + "<hr>";
     }
 
+    if (data.hasOwnProperty('recipients')) {
+        output += '<br><b>' + data.Label_recipients + '</b>:';
+        for (key in data.recipients) {
+            output += '<br><a href=?address=' + data.recipients[key][0] + get_lang() + '><b>' + data.recipients[key][1] + '</b></a>';
+        }
+        output += '<hr>';
+    }
+
     if (data.hasOwnProperty('body')) {
         output += fformat(data.body);
     }

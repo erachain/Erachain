@@ -3059,6 +3059,7 @@ public class BlockExplorer {
         if (!trans.isEncrypted()) {
 
             output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
+            output.put("Label_recipients", Lang.getInstance().translateFromLangObj("Recipients", langObj));
             output.put("Label_mess_hash", Lang.getInstance().translateFromLangObj("Message hash", langObj));
             output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
             output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));

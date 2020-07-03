@@ -126,9 +126,6 @@ public class WebTransactionsHTML {
             case Transaction.VOUCH_TRANSACTION:
                 output.put("body", vouch_HTML(transaction));
                 break;
-            case Transaction.SIGN_NOTE_TRANSACTION:
-                output.put("body", sign_Note_HTML(transaction));
-                break;
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
                 output.put("body", sertify_Pub_Key_HTML(transaction));
                 break;
@@ -474,24 +471,6 @@ public class WebTransactionsHTML {
         int i = 0;
         for (String address : record.getSertifiedPublicKeysB58()) {
             out += "<b>   " + Lang.getInstance().translateFromLangObj("Key", langObj) + " " + ++i + ":</b> " + address + "<br>";
-        }
-        return out;
-    }
-
-    private String sign_Note_HTML(Transaction transaction) {
-        // TODO Auto-generated method stub
-        String out = "";
-        RSignNote r_Statement = (RSignNote) transaction;
-        if (r_Statement.getKey() > 0) {
-            out += Lang.getInstance().translateFromLangObj("Key", langObj) + ": <b>"
-                    + itemNameHTML(Controller.getInstance().getTemplate(r_Statement.getKey())) + "</b><br>";
-        }
-        if (r_Statement.getData() != null) {
-            String ss = ((r_Statement.isText()) ? new String(r_Statement.getData(), StandardCharsets.UTF_8) :
-                    Base58.encode(r_Statement.getData())); //Converter.toHex(r_Statement.getData()));
-            ss = "<div  style='word-wrap: break-word;'>" + ss;
-            out += "<b>" + Lang.getInstance().translateFromLangObj("Message", langObj) + ":</b> "
-                    + ss + "<br>";
         }
         return out;
     }

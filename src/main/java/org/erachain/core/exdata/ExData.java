@@ -506,8 +506,8 @@ public class ExData {
                         recipients = new Account[recipientsSize];
                         for (int i = 0; i < recipientsSize; i++) {
                             recipients[i] = new Account(Arrays.copyOfRange(data, position, position + Account.ADDRESS_SHORT_LENGTH));
+                            position += Account.ADDRESS_SHORT_LENGTH;
                         }
-                        position += recipientsSize * Account.ADDRESS_SHORT_LENGTH;
 
                     } else {
                         recipientsSize = 0;
@@ -523,8 +523,8 @@ public class ExData {
                         secrets = new byte[secretsSize][];
                         for (int i = 0; i < secretsSize; i++) {
                             secrets[i] = Arrays.copyOfRange(data, position, position + SECRET_LENGTH);
+                            position += SECRET_LENGTH;
                         }
-                        position += secretsSize * SECRET_LENGTH;
                     } else {
                         secretsFlags = 0;
                         secrets = null;
@@ -796,6 +796,14 @@ public class ExData {
 
         if (title != null) {
             output.put("title", title);
+        }
+
+        if (recipients != null && recipients.length > 0) {
+            List<List<String>> recipientsOut = new ArrayList<>();
+            for (Account recipient : recipients) {
+                recipientsOut.add(Arrays.asList(recipient.getAddress(), recipient.getPersonAsString()));
+            }
+            output.put("recipients", recipientsOut);
         }
 
         // parse JSON
