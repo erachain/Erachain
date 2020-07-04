@@ -384,9 +384,12 @@ public class ExData {
             // SECRETS
             outStream.write(secretsFlags);
             for (int i = 0; i < secrets.length; i++) {
+                outStream.write((byte) secrets[i].length);
                 outStream.write(secrets[i]);
             }
 
+            byte[] encryptedDataSize = ByteBuffer.allocate(DATA_JSON_PART_LENGTH).putInt(encryptedData.length).array();
+            outStream.write(encryptedDataSize);
             outStream.write(encryptedData);
 
             return outStream.toByteArray();
@@ -526,9 +529,12 @@ public class ExData {
                         position++;
                         int secretsSize = recipientsSize + 1;
                         secrets = new byte[secretsSize][];
+                        int passwordLen;
                         for (int i = 0; i < secretsSize; i++) {
-                            secrets[i] = Arrays.copyOfRange(data, position, position + SECRET_LENGTH);
-                            position += SECRET_LENGTH;
+                            passwordLen = Arrays.copyOfRange(data, position, position + 1)[0];
+                            position++;
+                            secrets[i] = Arrays.copyOfRange(data, position, position + passwordLen);
+                            position += passwordLen;
                         }
                     } else {
                         secretsFlags = 0;

@@ -23,7 +23,6 @@ public class MultipleRecipientsPanel extends JPanel {
     private JButton jButtonRemoveRecipient;
     private GridBagConstraints gridBagConstraints;
     private JCheckBox allCheckBox;
-    public JCheckBox encryptCheckBox;
 
     public MultipleRecipientsPanel() {
 
@@ -35,11 +34,7 @@ public class MultipleRecipientsPanel extends JPanel {
         allCheckBox = new JCheckBox();
         allCheckBox.setText(Lang.getInstance().translate("Everybody"));
         allCheckBox.setSelected(true);
-        encryptCheckBox = new JCheckBox();
-        encryptCheckBox.setText(Lang.getInstance().translate("Encrypt"));
-        encryptCheckBox.setSelected(false);
         jButtonAddRecipient.setVisible(false);
-        encryptCheckBox.setVisible(false);
         jButtonRemoveRecipient.setVisible(false);
 
 
@@ -48,7 +43,6 @@ public class MultipleRecipientsPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 jButtonRemoveRecipient.setVisible(!allCheckBox.isSelected());
                 jTableRecipients.setVisible(!allCheckBox.isSelected());
-                encryptCheckBox.setVisible(!allCheckBox.isSelected());
             }
         });
 
@@ -89,13 +83,7 @@ public class MultipleRecipientsPanel extends JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
         this.add(allCheckBox, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(8, 8, 8, 8);
-        this.add(encryptCheckBox, gridBagConstraints);
-
+        
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;

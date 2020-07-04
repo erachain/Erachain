@@ -724,10 +724,9 @@ public class ExDataPanel extends javax.swing.JPanel {
 
     }
 
-    public byte[] makeExData(PrivateKeyAccount creator) throws Exception {
+    public byte[] makeExData(PrivateKeyAccount creator, boolean isEncrypted) throws Exception {
 
         Account[] recipients = multipleRecipientsPanel.recipientsTableModel.getRecipients();
-        boolean isEncrypted = multipleRecipientsPanel.encryptCheckBox.isSelected();
 
         // hashes StandardCharsets.UTF_8
         HashMap<String, String> hashes_Map = new HashMap<String, String>();

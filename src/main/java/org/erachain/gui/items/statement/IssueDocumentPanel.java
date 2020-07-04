@@ -33,6 +33,7 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
     private MButton jButton_Work_OK;
     private MButton jButton_Work_OK1;
     private javax.swing.JComboBox jComboBox_Account_Work;
+    public JCheckBox encryptCheckBox;
     private javax.swing.JLabel jLabel_Account_Work;
     private javax.swing.JLabel jLabel_Fee_Work;
     private javax.swing.JPanel jPanel_Work;
@@ -69,9 +70,12 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jPanel_Work = new javax.swing.JPanel();
-        jLabel_Account_Work = new javax.swing.JLabel();
+        jLabel_Account_Work = new javax.swing.JLabel(Lang.getInstance().translate("Account") + ": ");
         jComboBox_Account_Work = new JComboBox<Account>(new AccountsComboBoxModel());
-        jLabel_Fee_Work = new javax.swing.JLabel();
+        encryptCheckBox = new JCheckBox(Lang.getInstance().translate("Encrypt"));
+        encryptCheckBox.setSelected(true);
+
+        jLabel_Fee_Work = new javax.swing.JLabel(Lang.getInstance().translate("FeePow") + ": ");
         txtFeePow = new javax.swing.JComboBox();
         jButton_Work_Cancel = new MButton();
         jButton_Work_OK = new MButton();
@@ -96,7 +100,6 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
 
         jPanel_Work.setLayout(new java.awt.GridBagLayout());
 
-        jLabel_Account_Work.setText("Account: ");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
@@ -112,16 +115,22 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel_Work.add(jComboBox_Account_Work, gridBagConstraints);
 
-        jLabel_Fee_Work.setText("Fee: ");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
+        jPanel_Work.add(encryptCheckBox, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         jPanel_Work.add(jLabel_Fee_Work, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
@@ -244,7 +253,7 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         }
 
         try {
-            messageBytes = exData_Panel.makeExData(creator);
+            messageBytes = exData_Panel.makeExData(creator, encryptCheckBox.isSelected());
         } catch (Exception e) {
             JOptionPane.showMessageDialog(new JFrame(), e.getMessage(),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
