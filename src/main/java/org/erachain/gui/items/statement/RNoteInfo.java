@@ -6,6 +6,7 @@ import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.*;
 import org.erachain.gui.transaction.RecDetailsFrame;
@@ -41,6 +42,7 @@ public class RNoteInfo extends javax.swing.JPanel {
      * @param statement
      */
     RSignNote statement;
+    RSignNote statementEncrypted;
     Transaction transaction;
     private MAttachedFilesPanel file_Panel;
     private VouchLibraryPanel voush_Library_Panel;
@@ -159,6 +161,8 @@ public class RNoteInfo extends javax.swing.JPanel {
                             }
                         }
 
+                        statementEncrypted = statement;
+
                         Account account = Controller.getInstance().getInvolvedAccount(statement);
                         Fun.Tuple3<Integer, String, RSignNote> result = statement.decrypt(account);
                         if (result.a < 0) {
@@ -185,8 +189,7 @@ public class RNoteInfo extends javax.swing.JPanel {
 
                     } else {
                         // закроем доступ
-                        statement = (RSignNote) statement.copy();
-                        statement.parseData();
+                        statement = statementEncrypted;
                         viewInfo();
                     }
                 }
@@ -241,6 +244,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         ExData exData;
 
         exData = statement.getExData();
+        exData.resolveValues(DCSet.getInstance());
 
         String title = exData.getTitle();
         if (title != null)
@@ -259,6 +263,7 @@ public class RNoteInfo extends javax.swing.JPanel {
 
         if (exData.isEncrypted()) {
             resultStr += "<h3>Encrypted</h3><br>";
+            file_Panel.clear();
         }
 
         long templateKey = exData.getTemplateKey();

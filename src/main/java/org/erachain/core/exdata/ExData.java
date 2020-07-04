@@ -294,6 +294,18 @@ public class ExData {
         return (flags[1] & ENCRYPT_FLAG_MASK) > 0;
     }
 
+    public static byte[] setEncryptedFlag(byte[] flags, boolean value) {
+        byte[] newFlags = new byte[flags.length];
+        System.arraycopy(flags, 0, newFlags, 0, flags.length);
+
+        if (value) {
+            newFlags[1] |= ENCRYPT_FLAG_MASK;
+        } else {
+            newFlags[1] &= ~ENCRYPT_FLAG_MASK;
+        }
+        return newFlags;
+    }
+
     // info to byte[]
     @SuppressWarnings("unchecked")
 
@@ -968,7 +980,9 @@ public class ExData {
             decryptedData = AEScrypto.aesDecrypt(encryptedData, password);
             Fun.Tuple2<JSONObject, HashMap> jsonAndFiles = parseJsonAndFiles(decryptedData, true);
 
-            return new Tuple3<>(pos, null, new ExData(flags, title, recipientsFlags, recipients, jsonAndFiles.a,
+            // это уже не зашифрованный - сбросим
+            byte[] decryptedFlags = setEncryptedFlag(flags, false);
+            return new Tuple3<>(pos, null, new ExData(decryptedFlags, title, recipientsFlags, recipients, jsonAndFiles.a,
                     jsonAndFiles.b));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

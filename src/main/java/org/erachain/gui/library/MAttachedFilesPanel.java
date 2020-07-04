@@ -185,6 +185,11 @@ public class MAttachedFilesPanel extends JPanel {
 
     }
 
+    public void clear() {
+        model = new Attache_Files_Model();
+        model.fireTableDataChanged();
+    }
+
     private byte[] zip_un(byte[] compressedData) throws Exception {
         //    byte[] compressedData = null;
         Inflater decompressor = new Inflater();
