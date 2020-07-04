@@ -390,8 +390,7 @@ public class ExData {
                 outStream.write(secrets[i]);
             }
 
-            byte[] encryptedDataSize = ByteBuffer.allocate(DATA_JSON_PART_LENGTH).putInt(encryptedData.length).array();
-            outStream.write(encryptedDataSize);
+            // тут длину для JSON не нужно записывать
             outStream.write(encryptedData);
 
             return outStream.toByteArray();
