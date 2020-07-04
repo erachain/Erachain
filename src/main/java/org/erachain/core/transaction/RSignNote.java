@@ -17,6 +17,7 @@ import org.erachain.datachain.TransactionFinalMapSigns;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -761,7 +762,24 @@ public class RSignNote extends Transaction implements Itemable {
         return Controller.getInstance().wallet.database.getDocumentFavoritesSet().contains(this.dbRef);
     }
 
-    public boolean decrypt(Account recipient) {
-        return extendedData.decrypt(creator, recipient);
+    public Fun.Tuple3<Integer, String, RSignNote> decrypt(Account recipient) {
+
+        Fun.Tuple3<Integer, String, ExData> decryptedExData = extendedData.decrypt(creator, recipient);
+        if (decryptedExData.c == null) {
+            return new Fun.Tuple3<>(decryptedExData.a, decryptedExData.b, null);
+        }
+
+        byte[] exData;
+        try {
+            exData = decryptedExData.c.toByte();
+        } catch (Exception e) {
+            return new Fun.Tuple3<>(decryptedExData.a, e.getMessage(), null);
+        }
+
+        RSignNote decryptedNote = new RSignNote(typeBytes, creator, feePow, key, exData,
+                signers, signatures, timestamp, reference, signature,
+                seqNo, fee.longValue());
+        return new Fun.Tuple3<>(decryptedExData.a, decryptedExData.b, decryptedNote);
+
     }
 }

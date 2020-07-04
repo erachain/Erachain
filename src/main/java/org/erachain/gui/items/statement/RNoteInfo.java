@@ -12,6 +12,7 @@ import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 
 import javax.swing.*;
@@ -54,6 +55,8 @@ public class RNoteInfo extends javax.swing.JPanel {
         this.transaction = transaction;
         statement = (RSignNote) transaction;
         statement.parseData();
+
+        initComponents();
 
         viewInfo();
     }
@@ -157,11 +160,34 @@ public class RNoteInfo extends javax.swing.JPanel {
                         }
 
                         Account account = Controller.getInstance().getInvolvedAccount(statement);
-                        statement.decrypt(account);
+                        Fun.Tuple3<Integer, String, RSignNote> result = statement.decrypt(account);
+                        if (result.a < 0) {
+                            JOptionPane.showMessageDialog(null,
+                                    Lang.getInstance().translate(result.b == null ? "Not exists Account access" : result.b),
+                                    Lang.getInstance().translate("Not decrypted"), JOptionPane.ERROR_MESSAGE);
+                            encrypted.setSelected(!encrypted.isSelected());
+
+                            return;
+
+                        } else if (result.b != null) {
+                            JOptionPane.showMessageDialog(null,
+                                    Lang.getInstance().translate(" In pos: " + result.a + " - " + result.b),
+                                    Lang.getInstance().translate("Not decrypted"), JOptionPane.ERROR_MESSAGE);
+                            encrypted.setSelected(!encrypted.isSelected());
+
+                            return;
+
+                        }
+
+                        statement = result.c;
+                        statement.parseData();
                         viewInfo();
 
                     } else {
-                        //r_Statement
+                        // закроем доступ
+                        statement = (RSignNote) statement.copy();
+                        statement.parseData();
+                        viewInfo();
                     }
                 }
             });
@@ -213,8 +239,6 @@ public class RNoteInfo extends javax.swing.JPanel {
     private void viewInfo() {
         String resultStr = "";
         ExData exData;
-
-        initComponents();
 
         exData = statement.getExData();
 
