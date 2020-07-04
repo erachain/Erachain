@@ -2,6 +2,7 @@ package org.erachain.core.exdata;
 
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
 import org.erachain.gui.library.*;
@@ -723,7 +724,7 @@ public class ExDataPanel extends javax.swing.JPanel {
 
     }
 
-    public byte[] makeExData() throws Exception {
+    public byte[] makeExData(PrivateKeyAccount creator) throws Exception {
 
         Account[] recipients = multipleRecipientsPanel.recipientsTableModel.getRecipients();
         boolean isEncrypted = multipleRecipientsPanel.encryptCheckBox.isSelected();
@@ -742,7 +743,7 @@ public class ExDataPanel extends javax.swing.JPanel {
                     (Boolean) attached_Files_Model.getValueAt(i, 2), (byte[]) attached_Files_Model.getValueAt(i, 5)));
         }
 
-        return ExData.make(jTextField_Title_Message.getText(),
+        return ExData.make(creator, jTextField_Title_Message.getText(),
                 recipients, isEncrypted,
                 (TemplateCls) fill_Template_Panel.sel_Template,
                 this.fill_Template_Panel.get_Params(), hashes_Map, jTextPane_Message.getText(), files_1);

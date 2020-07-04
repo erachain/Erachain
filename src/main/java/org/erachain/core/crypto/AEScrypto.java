@@ -1,7 +1,5 @@
 package org.erachain.core.crypto;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.engines.AESEngine;
@@ -9,6 +7,8 @@ import org.bouncycastle.crypto.modes.CBCBlockCipher;
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AEScrypto {
 
@@ -88,6 +88,12 @@ public class AEScrypto {
         return cipherData(aes, cipher);
     }
 
+    public static byte[] aesDecrypt(byte[] cipher, byte[] key)
+            throws Exception {
+
+        return aesDecrypt(cipher, key, ivconst);
+    }
+
     public static byte[] aesEncrypt(byte[] plain, byte[] key, byte[] iv) throws Exception {
         PaddedBufferedBlockCipher aes = new PaddedBufferedBlockCipher(
                 new CBCBlockCipher(
@@ -98,4 +104,9 @@ public class AEScrypto {
 
         return cipherData(aes, plain);
     }
+
+    public static byte[] aesEncrypt(byte[] plain, byte[] key) throws Exception {
+        return aesEncrypt(plain, key, ivconst);
+    }
+
 }

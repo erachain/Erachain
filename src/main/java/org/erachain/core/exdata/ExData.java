@@ -1,8 +1,12 @@
 package org.erachain.core.exdata;
 
 import com.google.common.primitives.Ints;
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.blockexplorer.BlockExplorer;
+import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
@@ -17,6 +21,7 @@ import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -698,7 +703,8 @@ public class ExData {
         return hashes;
     }
 
-    public static byte[] make(String title, Account[] recipients, boolean isEncrypted, TemplateCls template, HashMap<String, String> params_Template,
+    public static byte[] make(PrivateKeyAccount creator, String title, Account[] recipients, boolean isEncrypted,
+                              TemplateCls template, HashMap<String, String> params_Template,
                               HashMap<String, String> hashes_Map, String message, Set<Tuple3<String, Boolean, byte[]>> files_Set)
             throws Exception {
 
@@ -761,16 +767,48 @@ public class ExData {
         }
 
         if (isEncrypted) {
+            // случайный пароль и его для всех шифруем
             flags[1] = (byte) (flags[1] | ENCRYPT_FLAG_MASK);
 
             byte[][] secrets = new byte[recipients.length + 1][];
 
-            for (int i = 0; i < secrets.length; i++) {
-                secrets[i] = new byte[Crypto.HASH_LENGTH];
-            }
+            byte[] password = Crypto.getInstance().createSeed(Crypto.HASH_LENGTH);
 
             ByteArrayOutputStream outStream = new ByteArrayOutputStream();
             byte[] encryptedData = toByteJsonAndFiles(outStream, new JSONObject(out_Map), filesMap);
+
+            try {
+                encryptedData = AEScrypto.aesEncrypt(encryptedData, password);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                return null;
+            }
+
+            byte[] privateKey = creator.getPrivateKey();
+            for (int i = 0; i < recipients.length; i++) {
+
+                //recipient
+                Account recipient = recipients[i];
+                byte[] publicKey;
+                if (recipient instanceof PublicKeyAccount) {
+                    publicKey = ((PublicKeyAccount) recipient).getPublicKey();
+                } else {
+                    publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
+                }
+
+                if (publicKey == null) {
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(recipient.toString() + " : " +
+                                    "The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."),
+                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+                    return null;
+                }
+
+                secrets[i] = AEScrypto.dataEncrypt(password, privateKey, publicKey);
+
+            }
+
+            secrets[recipients.length] = AEScrypto.dataEncrypt(password, privateKey, creator.getPublicKey());
 
             return new ExData(flags, title, (byte) 0, recipients, (byte) 0, secrets, encryptedData).toByte();
         }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Arrays;
 
 public class Crypto {
@@ -20,7 +21,12 @@ public class Crypto {
     static Logger LOGGER = LoggerFactory.getLogger(Crypto.class.getName());
     private static Crypto instance;
 
+    private SecureRandom random;
+
     private Crypto() {
+
+        //RANDOM
+        this.random = new SecureRandom();
 
     }
 
@@ -229,6 +235,17 @@ public class Crypto {
             LOGGER.error(e.getMessage(), e);
             return false;
         }
+    }
+
+    // make SEEd with length without empty symbols in Base58
+    public byte[] createSeed(int length) {
+        byte[] seed = new byte[length];
+        // нужно быть уверенным что длинна при обратном преобразовании даст 32 байта
+        do {
+            this.random.nextBytes(seed);
+        } while (Base58.decode(Base58.encode(seed)).length != length);
+        return seed;
+
     }
 
 }

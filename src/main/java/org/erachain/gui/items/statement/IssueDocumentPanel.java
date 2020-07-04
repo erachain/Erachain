@@ -235,15 +235,24 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
             }
         }
 
+        PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
         try {
-            messageBytes = exData_Panel.makeExData();
+            messageBytes = exData_Panel.makeExData(creator);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(new JFrame(), e.getMessage(),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             return null;
         }
-
-        if (messageBytes.length < 10) {
+        if (messageBytes == null) {
+            return null;
+        } else if (messageBytes.length < 10) {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.getInstance().translate("Message is so short"),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
@@ -264,14 +273,6 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         byte version = (byte) 3;
         byte property1 = (byte) 0;
         byte property2 = (byte) 0;
-
-        PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
-        if (creator == null) {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            return null;
-        }
 
         RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2, forDeal,
                 creator, feePow, key, messageBytes
