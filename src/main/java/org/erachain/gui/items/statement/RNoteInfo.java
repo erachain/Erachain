@@ -1,10 +1,12 @@
 package org.erachain.gui.items.statement;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.*;
 import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.lang.Lang;
@@ -13,6 +15,8 @@ import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -126,15 +130,42 @@ public class RNoteInfo extends javax.swing.JPanel {
         jPanel1.add(scrol1, gridBagConstraints);
 
         if (statement.isEncrypted()) {
-            JCheckBox encrip = new JCheckBox(Lang.getInstance().translate("Encrypted"));
-            encrip.setSelected(true);
+            JCheckBox encrypted = new JCheckBox(Lang.getInstance().translate("Encrypted"));
+            encrypted.setSelected(true);
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
             gridBagConstraints.gridy = ++y;
             gridBagConstraints.weightx = 0.1;
             gridBagConstraints.insets = new java.awt.Insets(11, 11, 11, 11);
-            jPanel1.add(encrip, gridBagConstraints);
+            jPanel1.add(encrypted, gridBagConstraints);
+
+            encrypted.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (!encrypted.isSelected()) {
+                        if (!Controller.getInstance().isWalletUnlocked()) {
+                            //ASK FOR PASSWORD
+                            String password = PasswordPane.showUnlockWalletDialog(null);
+                            if (!Controller.getInstance().unlockWallet(password)) {
+                                //WRONG PASSWORD
+                                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+
+                                encrypted.setSelected(!encrypted.isSelected());
+
+                                return;
+                            }
+                        }
+
+                        Account account = Controller.getInstance().getInvolvedAccount(statement);
+                        statement.decrypt(account);
+                        viewInfo();
+
+                    } else {
+                        //r_Statement
+                    }
+                }
+            });
+
         }
 
         gridBagConstraints = new java.awt.GridBagConstraints();

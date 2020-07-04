@@ -77,6 +77,7 @@ public class ExData {
     private byte secretsFlags;
     private byte[][] secrets;
     private byte[] encryptedData;
+    private byte[] decryptedData;
 
     /**
      * OLD version 1-2
@@ -952,5 +953,36 @@ public class ExData {
         } catch (Exception e) {
         }
 
+    }
+
+    public boolean decrypt(PublicKeyAccount account, Account recipient) {
+
+        byte[] password;
+        int pos = -1;
+        if (secrets.equals((recipient))) {
+            pos = secrets.length - 1;
+        } else {
+            for (int i = 0; i < recipients.length - 1; i++) {
+                if (recipients[i].equals(recipient)) {
+                    pos = i;
+                    break;
+                }
+            }
+        }
+
+        if (pos < 0) {
+            return false;
+        }
+
+        try {
+            password = Controller.getInstance().decrypt(account, recipient, secrets[pos]);
+            decryptedData = AEScrypto.aesDecrypt(encryptedData, password);
+            parse(flags[0], decryptedData, false, true);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return false;
+        }
+
+        return true;
     }
 }

@@ -26,42 +26,11 @@ public class RecStatementDetailsFrame extends RecDetailsFrame {
     public RecStatementDetailsFrame(final RSignNote r_Statement) {
         super(r_Statement, true);
         th = this;
-        if (r_Statement.getKey() > 0) {
-            ++labelGBC.gridy;
-            ++detailGBC.gridy;
-            detailGBC.gridx = 1;
-            detailGBC.gridwidth = 3;
-            JTextField template = new JTextField(Controller.getInstance().getTemplate(r_Statement.getKey()).toString());
-            template.setEditable(false);
-            MenuPopupUtil.installContextMenu(template);
-            this.add(template, detailGBC);
-        }
+        viewData();
 
         if (r_Statement.getData() != null) {
-            //LABEL MESSAGE
-            ++labelGBC.gridy;
-            JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
-            this.add(serviceLabel, labelGBC);
-
-            // ISTEXT
-            ++detailGBC.gridy;
-            detailGBC.gridwidth = 2;
-            messageText = new JTextPane();
-            messageText.setContentType("text/html");
-            String ss = ((r_Statement.isText()) ? Library.viewDescriptionHTML(new String(r_Statement.getData(), StandardCharsets.UTF_8)) :
-                    Base58.encode(r_Statement.getData())); //Converter.toHex(r_Statement.getData()));
-            messageText.setEditable(false);
-            //messageText.setSize(200, 300);
-            //messageText.setPreferredSize(new Dimension(800,200));
-            MenuPopupUtil.installContextMenu(messageText);
-
-
-            ss = "<div  style='word-wrap: break-word;'>" + ss;
-
-            messageText.setText(ss);
 
             JScrollPane scrol = new JScrollPane();
-
 
             //	scrol.setPreferredSize(new Dimension(800,300));
             int rr = (int) (getFontMetrics(UIManager.getFont("Table.font")).stringWidth(this.signature.getText()));
@@ -108,21 +77,13 @@ public class RecStatementDetailsFrame extends RecDetailsFrame {
                             }
                         }
 
-                        byte[] decryptedData = Controller.getInstance().decrypt(r_Statement.getCreator(),
-                                (Account) r_Statement.getRecipientAccounts().toArray()[0], r_Statement.getData());
+                        Account account = Controller.getInstance().getInvolvedAccount(r_Statement);
+                        r_Statement.decrypt(account);
+                        viewData();
 
-                        if (decryptedData == null) {
-                            messageText.setText(Lang.getInstance().translate("Decrypt Error!"));
-                        } else {
-                            messageText.setText(r_Statement.isText() ?
-                                    new String(decryptedData, StandardCharsets.UTF_8)
-                                    : Base58.encode(decryptedData)); //Converter.toHex(decryptedData));
-
-                        }
-
+                    } else {
+                        //r_Statement
                     }
-                    //encrypted.isSelected();
-
                 }
             });
         }
@@ -132,5 +93,47 @@ public class RecStatementDetailsFrame extends RecDetailsFrame {
         //    this.setResizable(false);
         //    this.setLocationRelativeTo(null);
         this.setVisible(true);
+    }
+
+    private void viewData() {
+        RSignNote r_Statement = (RSignNote) record;
+        labelGBC.gridy = 0;
+        detailGBC.gridy = 0;
+
+        if (r_Statement.getKey() > 0) {
+            ++labelGBC.gridy;
+            ++detailGBC.gridy;
+            detailGBC.gridx = 1;
+            detailGBC.gridwidth = 3;
+            JTextField template = new JTextField(Controller.getInstance().getTemplate(r_Statement.getKey()).toString());
+            template.setEditable(false);
+            MenuPopupUtil.installContextMenu(template);
+            this.add(template, detailGBC);
+        }
+
+        if (r_Statement.getData() != null) {
+            //LABEL MESSAGE
+            ++labelGBC.gridy;
+            JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
+            this.add(serviceLabel, labelGBC);
+
+            // ISTEXT
+            ++detailGBC.gridy;
+            detailGBC.gridwidth = 2;
+            messageText = new JTextPane();
+            messageText.setContentType("text/html");
+            String ss = ((r_Statement.isText()) ? Library.viewDescriptionHTML(new String(r_Statement.getData(), StandardCharsets.UTF_8)) :
+                    Base58.encode(r_Statement.getData())); //Converter.toHex(r_Statement.getData()));
+            messageText.setEditable(false);
+            //messageText.setSize(200, 300);
+            //messageText.setPreferredSize(new Dimension(800,200));
+            MenuPopupUtil.installContextMenu(messageText);
+
+
+            ss = "<div  style='word-wrap: break-word;'>" + ss;
+
+            messageText.setText(ss);
+
+        }
     }
 }

@@ -1792,6 +1792,9 @@ public class Controller extends Observable {
     // https://127.0.0.1/7pay_in/tools/block_proc/ERA
     public void NotifyWalletIncoming(List<Transaction> transactions) {
 
+        if (!doesWalletExists())
+            return;
+
         List<Account> accounts = this.wallet.getAccounts();
         List<Integer> seqs = new ArrayList<Integer>();
 
@@ -1842,10 +1845,23 @@ public class Controller extends Observable {
         return !Settings.getInstance().updateNameStorage();
     }
 
+    public Account[] getInvolvedAccounts(Transaction transaction) {
+        if (!doesWalletExists())
+            return null;
+
+        return wallet.getInvolvedAccounts(transaction);
+    }
+
+    public Account getInvolvedAccount(Transaction transaction) {
+        if (!doesWalletExists())
+            return null;
+
+        return wallet.getInvolvedAccount(transaction);
+    }
 
     /**
      * вызывается только из синхронизатора в момент синхронизации цепочки.
-     *  Поэтому можно сипользовать внутренню переменную
+     * Поэтому можно сипользовать внутренню переменную
      *
      * @param currentBetterPeer
      * @throws Exception
