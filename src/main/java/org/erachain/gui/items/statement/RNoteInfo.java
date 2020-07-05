@@ -250,9 +250,13 @@ public class RNoteInfo extends javax.swing.JPanel {
         if (title != null)
             jLabel_Title.setText(Lang.getInstance().translate("Title") + ": " + title);
 
+        if (exData.isCanSignOnlyRecipients()) {
+            resultStr += "<br><b>" + Lang.getInstance().translate("To sign can only Recipients") + "<b><br>";
+        }
+
         // recipients
         if (exData.hasRecipients()) {
-            resultStr += "<h2>Recipients</h2>";
+            resultStr += "<h2>" + Lang.getInstance().translate("Recipients") + "</h2>";
             Account[] recipients = exData.getRecipients();
             int i = 1;
             for (Account recipient : recipients) {
@@ -262,7 +266,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         }
 
         if (exData.isEncrypted()) {
-            resultStr += "<h3>Encrypted</h3><br>";
+            resultStr += "<h3>" + Lang.getInstance().translate("Encrypted") + "</h3><br>";
         }
 
         long templateKey = exData.getTemplateKey();
@@ -284,7 +288,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         if (exData.hasHashes()) {
             // hashes
             JSONObject hashes = exData.getHashes();
-            resultStr += "<h3>Hashes</h3>";
+            resultStr += "<h3>" + Lang.getInstance().translate("Hashes") + "</h3>";
             int i = 1;
             for (Object s : hashes.keySet()) {
                 resultStr += i + " " + s + " " + hashes.get(s) + "<br>";

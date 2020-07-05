@@ -267,7 +267,7 @@ public class ExData {
     }
 
     public boolean isCanSignOnlyRecipients() {
-        return (recipientsFlags & RECIPIENTS_FLAG_SING_ONLY_MASK) > 0;
+        return (recipientsFlags & RECIPIENTS_FLAG_SING_ONLY_MASK) != 0;
     }
 
     public boolean hasFiles() {
@@ -774,10 +774,12 @@ public class ExData {
         byte[] flags = new byte[]{3, 0, 0, 0};
 
         byte recipientsFlag = 0;
+        if (signCanOnlyRecipients) {
+            recipientsFlag |= RECIPIENTS_FLAG_SING_ONLY_MASK;
+        }
+
         if (recipients != null && recipients.length > 0) {
             flags[1] = (byte) (flags[1] | RECIPIENTS_FLAG_MASK);
-            if (signCanOnlyRecipients)
-                recipientsFlag |= RECIPIENTS_FLAG_SING_ONLY_MASK;
         }
 
         if (isEncrypted) {
