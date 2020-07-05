@@ -268,7 +268,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         long templateKey = exData.getTemplateKey();
         if (templateKey > 0) {
             TemplateCls template = exData.getTemplate();
-            resultStr += "<h2>" + template.getName() + "</h2>";
+            resultStr += "<h2>" + template.toString(DCSet.getInstance()) + "</h2>";
             String valuedText = exData.getValuedText();
             if (valuedText != null) {
                 resultStr += Library.to_HTML(valuedText);

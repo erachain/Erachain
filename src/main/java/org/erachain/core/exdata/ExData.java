@@ -312,9 +312,6 @@ public class ExData {
     public static byte[] toByteJsonAndFiles(ByteArrayOutputStream outStream, JSONObject json,
                                             HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) throws Exception {
 
-        if (json == null || json.isEmpty())
-            return outStream.toByteArray();
-
         byte[] JSON_Bytes;
         byte[] size_Json;
 
