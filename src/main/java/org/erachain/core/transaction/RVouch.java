@@ -262,8 +262,9 @@ public class RVouch extends Transaction {
         }
 
         if (transaction instanceof RSignNote) {
-            HashSet<Account> recipients = transaction.getRecipientAccounts();
-            if (recipients != null && !recipients.isEmpty()) {
+            RSignNote note = (RSignNote) transaction;
+            HashSet<Account> recipients = note.getRecipientAccounts();
+            if (note.isCanSignOnlyRecipients()) {
                 boolean notFound = true;
                 for (Account recipient : recipients) {
                     if (recipient.equals(creator)) {

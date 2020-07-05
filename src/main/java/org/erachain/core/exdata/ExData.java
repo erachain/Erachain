@@ -48,6 +48,8 @@ public class ExData {
     private static final int SECRET_LENGTH = Crypto.HASH_LENGTH; // size version part
 
     private static final byte RECIPIENTS_FLAG_MASK = 64;
+    private static final byte RECIPIENTS_FLAG_SING_ONLY_MASK = -128;
+
     private static final byte ENCRYPT_FLAG_MASK = 32;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExData.class);
@@ -262,6 +264,10 @@ public class ExData {
 
     public boolean hasRecipients() {
         return recipients != null && recipients.length > 0;
+    }
+
+    public boolean isCanSignOnlyRecipients() {
+        return (recipientsFlags & RECIPIENTS_FLAG_SING_ONLY_MASK) > 0;
     }
 
     public boolean hasFiles() {
@@ -708,7 +714,7 @@ public class ExData {
         return hashes;
     }
 
-    public static byte[] make(PrivateKeyAccount creator, String title, Account[] recipients, boolean isEncrypted,
+    public static byte[] make(PrivateKeyAccount creator, String title, boolean signCanOnlyRecipients, Account[] recipients, boolean isEncrypted,
                               TemplateCls template, HashMap<String, String> params_Template,
                               HashMap<String, String> hashes_Map, String message, Set<Tuple3<String, Boolean, byte[]>> files_Set)
             throws Exception {
@@ -767,8 +773,11 @@ public class ExData {
 
         byte[] flags = new byte[]{3, 0, 0, 0};
 
+        byte recipientsFlag = 0;
         if (recipients != null && recipients.length > 0) {
             flags[1] = (byte) (flags[1] | RECIPIENTS_FLAG_MASK);
+            if (signCanOnlyRecipients)
+                recipientsFlag |= RECIPIENTS_FLAG_SING_ONLY_MASK;
         }
 
         if (isEncrypted) {
@@ -815,10 +824,10 @@ public class ExData {
 
             secrets[recipients.length] = AEScrypto.dataEncrypt(password, privateKey, creator.getPublicKey());
 
-            return new ExData(flags, title, (byte) 0, recipients, (byte) 0, secrets, encryptedData).toByte();
+            return new ExData(flags, title, recipientsFlag, recipients, (byte) 0, secrets, encryptedData).toByte();
         }
 
-        return new ExData(flags, title, (byte) 0, recipients, new JSONObject(out_Map), filesMap).toByte();
+        return new ExData(flags, title, recipientsFlag, recipients, new JSONObject(out_Map), filesMap).toByte();
 
     }
 

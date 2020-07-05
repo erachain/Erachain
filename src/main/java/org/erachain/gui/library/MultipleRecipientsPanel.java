@@ -23,6 +23,7 @@ public class MultipleRecipientsPanel extends JPanel {
     private JButton jButtonRemoveRecipient;
     private GridBagConstraints gridBagConstraints;
     private JCheckBox allCheckBox;
+    public JCheckBox signCanRecipientsCheckBox;
 
     public MultipleRecipientsPanel() {
 
@@ -34,15 +35,20 @@ public class MultipleRecipientsPanel extends JPanel {
         allCheckBox = new JCheckBox();
         allCheckBox.setText(Lang.getInstance().translate("Everybody"));
         allCheckBox.setSelected(true);
+        signCanRecipientsCheckBox = new JCheckBox(Lang.getInstance().translate("To sign can only Recipients"));
+        signCanRecipientsCheckBox.setSelected(true);
+        signCanRecipientsCheckBox.setVisible(false);
+
         jButtonAddRecipient.setVisible(false);
         jButtonRemoveRecipient.setVisible(false);
 
 
-        allCheckBox.addActionListener(new ActionListener(){
+        allCheckBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jButtonRemoveRecipient.setVisible(!allCheckBox.isSelected());
                 jTableRecipients.setVisible(!allCheckBox.isSelected());
+                signCanRecipientsCheckBox.setVisible(!allCheckBox.isSelected());
             }
         });
 
@@ -83,7 +89,13 @@ public class MultipleRecipientsPanel extends JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
         this.add(allCheckBox, gridBagConstraints);
-        
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new Insets(8, 8, 8, 8);
+        this.add(signCanRecipientsCheckBox, gridBagConstraints);
+
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;

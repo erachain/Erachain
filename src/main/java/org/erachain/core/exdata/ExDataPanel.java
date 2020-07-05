@@ -727,6 +727,7 @@ public class ExDataPanel extends javax.swing.JPanel {
     public byte[] makeExData(PrivateKeyAccount creator, boolean isEncrypted) throws Exception {
 
         Account[] recipients = multipleRecipientsPanel.recipientsTableModel.getRecipients();
+        boolean signCanOnlyRecipients = multipleRecipientsPanel.signCanRecipientsCheckBox.isSelected();
 
         // hashes StandardCharsets.UTF_8
         HashMap<String, String> hashes_Map = new HashMap<String, String>();
@@ -743,7 +744,7 @@ public class ExDataPanel extends javax.swing.JPanel {
         }
 
         return ExData.make(creator, jTextField_Title_Message.getText(),
-                recipients, isEncrypted,
+                signCanOnlyRecipients, recipients, isEncrypted,
                 (TemplateCls) fill_Template_Panel.sel_Template,
                 this.fill_Template_Panel.get_Params(), hashes_Map, jTextPane_Message.getText(), files_1);
 

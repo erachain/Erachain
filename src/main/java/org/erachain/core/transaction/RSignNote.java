@@ -321,6 +321,10 @@ public class RSignNote extends Transaction implements Itemable {
         return extendedData.hasPublicText();
     }
 
+    public boolean isCanSignOnlyRecipients() {
+        return extendedData.isCanSignOnlyRecipients();
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public JSONObject toJson() {

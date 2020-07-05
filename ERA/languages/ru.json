@@ -1075,6 +1075,7 @@
   "Timestamp": "Дата",
   "Timestamp creation block": "Дата и время сборки блока",
   "To": "Для",
+  "To sign can only Recipients": "Подписать могут только Получатели",
   "To Vote": "Проголосовать",
   "To #date": "По",
   "To: (Account or name)": "Кому: (Счёт или имя)",
