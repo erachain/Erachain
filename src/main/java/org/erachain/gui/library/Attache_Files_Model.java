@@ -28,10 +28,10 @@ class Attache_Files_Model extends DefaultTableModel {
 
     public Object getValueAt(int row, int col) {
 
+        if (this.getRowCount() < row || this.getRowCount() == 0 || col < 0 || row < 0)
+            return null;
 
-        if (this.getRowCount() < row || this.getRowCount() == 0 || col < 0 || row < 0) return null;
         return super.getValueAt(row, col);
-
 
     }
 }

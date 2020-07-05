@@ -187,7 +187,7 @@ public class RNoteInfo extends javax.swing.JPanel {
                         statement.parseData();
                         viewInfo();
 
-                    } else {
+                    } else if (statementEncrypted != null) {
                         // закроем доступ
                         statement = statementEncrypted;
                         viewInfo();
@@ -263,7 +263,6 @@ public class RNoteInfo extends javax.swing.JPanel {
 
         if (exData.isEncrypted()) {
             resultStr += "<h3>Encrypted</h3><br>";
-            file_Panel.clear();
         }
 
         long templateKey = exData.getTemplateKey();
@@ -301,8 +300,12 @@ public class RNoteInfo extends javax.swing.JPanel {
                 boolean zip = new Boolean(file.getValue().b);
                 String name_File = file.getKey();
                 byte[] file_byte = file.getValue().c;
-                file_Panel.insert_Row(name_File, zip, file_byte);
+                file_Panel.addRow(name_File, zip, file_byte);
             }
+            file_Panel.fireTableDataChanged();
+
+        } else if (statementEncrypted != null) {
+            file_Panel.clear();
         }
 
         jTextArea_Body.setText(resultStr);
