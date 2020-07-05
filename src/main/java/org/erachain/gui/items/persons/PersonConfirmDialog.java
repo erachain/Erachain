@@ -76,7 +76,7 @@ public class PersonConfirmDialog extends JDialog {
 
         initComponents(person, publicKey);
 
-        this.setTitle(Lang.getInstance().translate("Person confirm"));
+        this.setTitle(Lang.getInstance().translate("Certification of Account"));
         this.setResizable(true);
         this.setModal(true);
 
@@ -118,7 +118,7 @@ public class PersonConfirmDialog extends JDialog {
         Tuple4<Long, Integer, Integer, Integer> addressDuration = account.getPersonDuration(DCSet.getInstance());
 
         if (addressDuration == null) {
-            personDetails += "<b>" + Lang.getInstance().translate("Ready for personalize") + "</b>";
+            personDetails += "<b>" + Lang.getInstance().translate("Account is valid for certification") + "</b>";
         } else {
             // TEST TIME and EXPIRE TIME
             long current_time = NTP.getTime();
@@ -223,7 +223,7 @@ public class PersonConfirmDialog extends JDialog {
 
         String Status_text = "";
         IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
-                Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2),
+                Lang.getInstance().translate("Certification of Account"), (int) (this.getWidth() / 1.2),
                 (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         SertifyPubKeysDetailsFrame ww = new SertifyPubKeysDetailsFrame((RSertifyPubKeys) transaction);
         dd.jScrollPane1.setViewportView(ww);

@@ -1,5 +1,6 @@
 package org.erachain.gui2;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.gui.Wallets.WalletsManagerSplitPanel;
 import org.erachain.gui.bank.IssueSendPaymentOrder;
@@ -57,6 +58,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.TreeMap;
 
 /**
@@ -76,8 +78,10 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         // -------------------------------------------
         String pathIcons = Settings.getInstance().getPatnIcons();
 
-        ASMutableTreeNode root = new ASMutableTreeNode("root", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Erachain"), getIcon(pathIcons + "ErachainRootNode.png"));
-        ASMutableTreeNode account_Node = new ASMutableTreeNode("account_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Accounts") + "</b></html>", getIcon(pathIcons+ "account_Node.png"));
+        ASMutableTreeNode root = new ASMutableTreeNode("root", "<html><span style='font-size:1.1em;'><b>"
+                + Controller.getInstance().APP_NAME, getIcon(
+                Settings.getInstance().getUserPath() + "images" + File.separator + "icons" + File.separator + "favicon.png"));
+        ASMutableTreeNode account_Node = new ASMutableTreeNode("account_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Accounts") + "</b></html>", getIcon(pathIcons + "account_Node.png"));
         ASMutableTreeNode person_Node = new ASMutableTreeNode("person_Node", "<html><span style='font-size:1.1em;'><b> " + Lang.getInstance().translate("Persons") + "</b></html>", getIcon(pathIcons + "person_Node.png"));
         ASMutableTreeNode document_Node = new ASMutableTreeNode("document_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Documents") + "</b></html>", getIcon(pathIcons + "document_Node.png"));
         ASMutableTreeNode mails_Node = new ASMutableTreeNode("mails_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Mails") + "</b></html>", getIcon(pathIcons + "mails_Node.png"));

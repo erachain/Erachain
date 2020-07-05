@@ -251,12 +251,14 @@ public class BlockChain {
 
     public HashSet<String> trustedPeers = new HashSet<>();
 
+    public static Account ROYALTY_ACCOUNT = new Account("7RYEVPZg7wbu2bmz3tWnzrhPavjpyQ4tnp");
+
     public static final HashSet<Integer> validBlocks = new HashSet<>();
 
     /**
      * Записи которые удалены
      */
-    public static final HashSet<Long> WIPED_RECORDS =  new HashSet<>();
+    public static final HashSet<Long> WIPED_RECORDS = new HashSet<>();
 
     /*
      *  SEE in concrete TRANSACTIONS
