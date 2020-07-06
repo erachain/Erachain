@@ -877,6 +877,14 @@ public class ExData {
 
         }
 
+        if (template != null) {
+            output.put("templateKey", templateKey);
+            output.put("templateName", template.viewName());
+            if (valuedText != null) {
+                output.put("body", valuedText);
+            }
+        }
+
         // parse JSON
         if (json != null) {
 
@@ -884,8 +892,6 @@ public class ExData {
                 output.put("message", message);
                 output.put("messageHash", Base58.encode(Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8))));
             }
-
-            output.put("body", valuedText);
 
             ///////// NATIVE HASHES
             if (hashes == null) {

@@ -126,9 +126,18 @@ function statement(data) {
         output += '<hr>';
     }
 
-    if (data.hasOwnProperty('body')) {
-        output += fformat(data.body);
+    if (data.hasOwnProperty('templateKey')) {
+        output += '<a href="?template=' + data.templateKey + get_lang() + '"><b>['
+         + data.templateKey + '] ' + data.templateName + '</b></a><br>';
+
+        if (data.hasOwnProperty('body')) {
+            output += fformat(data.body);
+        }
+        output += '<hr>';
+
     }
+
+
 
     if (data.hasOwnProperty('messageHash')) {
         output += '<br>' + data.Label_mess_hash + ': <a href=?q=' + data.messageHash + get_lang() + '&search=transactions><b>' + data.messageHash + '</b></a>';
