@@ -66,7 +66,7 @@ public class MultipleRecipientsPanel extends JPanel {
                     }
                 }
                 if (recipientsTableModel.getRowCount()<1) {
-                    recipientsTableModel.addRow(new Object[]{"", ""});
+                    recipientsTableModel.addRow(new Object[]{"", "0"});
                     interval = 0;
                 }
 
@@ -131,8 +131,10 @@ public class MultipleRecipientsPanel extends JPanel {
 
         public Table_Model(int rows) {
             super(new Object[]{Lang.getInstance().translate("Address"),
-                    Lang.getInstance().translate("Description")}, rows);
-            this.addRow(new Object[]{"", ""});
+                            //Lang.getInstance().translate("Description")
+                    },
+                    rows);
+            this.addRow(new Object[]{"", "0"});
         }
 
         @Override
@@ -167,7 +169,7 @@ public class MultipleRecipientsPanel extends JPanel {
                 if (((String) aValue).length() > 0) {
                     //CHECK IF LAST ROW
                     if (row == this.getRowCount() - 1) {
-                        this.addRow(new Object[]{"", ""});
+                        this.addRow(new Object[]{"", "0"});
                     }
 
                     super.setValueAt(aValue, row, column);
@@ -177,7 +179,7 @@ public class MultipleRecipientsPanel extends JPanel {
 
                 //CHECK IF LAST ROW
                 if (row == this.getRowCount() - 1) {
-                    this.addRow(new Object[]{"", ""});
+                    this.addRow(new Object[]{"", "0"});
                 }
             }
         }
