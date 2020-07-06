@@ -1,5 +1,6 @@
 package org.erachain.gui.library;
 
+import org.erachain.core.exdata.AttacheFilesModel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -22,7 +23,7 @@ public class MAttachedFilesPanel extends JPanel {
 
     protected Logger logger;
 
-    private Attache_Files_Model model;
+    private AttacheFilesModel model;
     private MTable table;
     private JScrollPane scrollPane;
     private FileChooser chooser;
@@ -32,8 +33,15 @@ public class MAttachedFilesPanel extends JPanel {
         logger = LoggerFactory.getLogger(getClass());
 
         setLayout(new java.awt.GridBagLayout());
-        model = new Attache_Files_Model();
+        model = new AttacheFilesModel(); //Attache_Files_Model();
         table = new MTable(model);
+        table.removeColumn(table.getColumnModel().getColumn(5));
+        table.removeColumn(table.getColumnModel().getColumn(4));
+        table.removeColumn(table.getColumnModel().getColumn(1));
+
+        table.setAlignmentX(0.0F);
+        table.setAlignmentY(0.0F);
+
         JPopupMenu menu = new JPopupMenu();
         java.awt.GridBagConstraints gridBagConstraints;
 
@@ -72,9 +80,9 @@ public class MAttachedFilesPanel extends JPanel {
                     }
 
                     try (FileOutputStream fos = new FileOutputStream(pp)) {
-                        byte[] buffer = (byte[]) model.getValueAt(row, 2);
+                        byte[] buffer = (byte[]) model.getValueAt(row, AttacheFilesModel.BYTES_COL);
                         // if ZIP
-                        if ((boolean) model.getValueAt(row, 1)) {
+                        if ((boolean) model.getValueAt(row, AttacheFilesModel.ZIP_COL)) {
                             byte[] buffer1 = null;
                             try {
                                 buffer1 = ZipBytes.decompress(buffer);
@@ -119,31 +127,26 @@ public class MAttachedFilesPanel extends JPanel {
                 }
 
                 try (FileOutputStream fos = new FileOutputStream(pp)) {
-                    byte[] buffer = (byte[]) model.getValueAt(row, 2);
+                    byte[] buffer = (byte[]) model.getValueAt(row, AttacheFilesModel.BYTES_COL);
                     // if ZIP
-                    if ((boolean) model.getValueAt(row, 1)) {
-                        byte[] buffer1 = null;
+                    if ((boolean) model.getValueAt(row, AttacheFilesModel.ZIP_COL)) {
                         try {
-                            buffer1 = ZipBytes.decompress(buffer);
+                            buffer = ZipBytes.decompress(buffer);
                         } catch (DataFormatException e1) {
                             logger.error(e1.getMessage(), e1);
+                            return;
                         }
-                        fos.write(buffer1, 0, buffer1.length);
-                    } else {
-                        fos.write(buffer, 0, buffer.length);
                     }
-
+                    fos.write(buffer, 0, buffer.length);
 
                 } catch (IOException ex) {
                 }
 
                 try {
-
                     Desktop.getDesktop().open(ff);
                 } catch (IOException e1) {
                     logger.error(e1.getMessage(), e1);
                 }
-
             }
         });
 
@@ -169,7 +172,7 @@ public class MAttachedFilesPanel extends JPanel {
     }
 
     public void addRow(String name, boolean zip, byte[] data) {
-        model.addRow(new Object[]{name, zip, data});
+        model.addRow(new Object[]{name, "", zip, data.length, data});
     }
 
     public void clear() {

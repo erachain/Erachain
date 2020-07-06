@@ -43,7 +43,7 @@ public class ExDataPanel extends javax.swing.JPanel {
     public MTable jTable_Params_Message_Public;
     protected TemplateCls sel_Template;
     private TableModelIssueHashes hashes_Table_Model;
-    private DefaultTableModel attached_Files_Model;
+    private AttacheFilesModel attached_Files_Model;
     private ParamsTemplateModel params_Template_Model;
     private ExDataPanel th;
     // Variables declaration - do not modify
