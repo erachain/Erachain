@@ -435,6 +435,8 @@ public class ExData {
             HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap;
 
             if (andFiles) {
+                position += JSONSize;
+
                 JSONObject files;
                 Set files_key_Set;
 
@@ -866,7 +868,7 @@ public class ExData {
         }
 
         if (isEncrypted()) {
-            output.put("isEncrypted", Lang.getInstance().translateFromLangObj("Encrypted", langObj));
+            output.put("encrypted", Lang.getInstance().translateFromLangObj("Encrypted", langObj));
             return;
 
         } else {

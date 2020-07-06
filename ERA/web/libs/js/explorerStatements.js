@@ -126,33 +126,41 @@ function statement(data) {
         output += '<hr>';
     }
 
-    if (data.hasOwnProperty('templateKey')) {
-        output += '<a href="?template=' + data.templateKey + get_lang() + '"><b>['
-         + data.templateKey + '] ' + data.templateName + '</b></a><br>';
+    if (data.hasOwnProperty('encrypted')) {
 
-        if (data.hasOwnProperty('body')) {
-            output += fformat(data.body);
+        output += '<b>' + data.encrypted + '</b><br>';
+
+    } else {
+
+        if (data.hasOwnProperty('templateKey')) {
+            output += '<a href="?template=' + data.templateKey + get_lang() + '"><b>['
+             + data.templateKey + '] ' + data.templateName + '</b></a><br>';
+
+            if (data.hasOwnProperty('body')) {
+                output += fformat(data.body);
+            }
+            output += '<hr>';
+
         }
-        output += '<hr>';
-
-    }
 
 
 
-    if (data.hasOwnProperty('messageHash')) {
-        output += '<br>' + data.Label_mess_hash + ': <a href=?q=' + data.messageHash + get_lang() + '&search=transactions><b>' + data.messageHash + '</b></a>';
-    }
+        if (data.hasOwnProperty('messageHash')) {
+            output += '<br>' + data.Label_mess_hash + ': <a href=?q=' + data.messageHash + get_lang() + '&search=transactions><b>' + data.messageHash + '</b></a>';
+        }
 
-    if (data.hasOwnProperty('message')) {
-        output += '<br>' + fformat(data.message);
-    }
+        if (data.hasOwnProperty('message')) {
+            output += '<br>' + fformat(data.message);
+        }
 
-    if (data.hasOwnProperty('hashes')) {
-        output += '<br><hr><b>' + data.Label_hashes + '</b>:<br>' + data.hashes;
-    }
+        if (data.hasOwnProperty('hashes')) {
+            output += '<br><hr><b>' + data.Label_hashes + '</b>:<br>' + data.hashes;
+        }
 
-    if (data.hasOwnProperty('files')) {
-        output += '<br><hr><b>' + data.Label_files + '</b>:<br>' + data.files;
+        if (data.hasOwnProperty('files')) {
+            output += '<br><hr><b>' + data.Label_files + '</b>:<br>' + data.files;
+        }
+
     }
 
     output += '</div>';

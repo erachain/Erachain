@@ -291,7 +291,7 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         // Issue_Asset_Confirm_Dialog(issueAssetTransaction);
         String text = "<HTML><body>";
         text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
-                + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
+                + Lang.getInstance().translate("Issue Note") + "<br><br><br>";
         text += Lang.getInstance().translate("Creator") + ":&nbsp;" + issueDoc.getCreator() + "<br>";
         // text += Lang.getInstance().translate("Name") +":&nbsp;"+
         // issueDoc.getItem().viewName() +"<br>";

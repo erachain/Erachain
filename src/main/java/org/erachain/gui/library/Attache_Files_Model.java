@@ -8,12 +8,13 @@ import javax.validation.constraints.Null;
 class Attache_Files_Model extends DefaultTableModel {
 
     public Attache_Files_Model() {
-        super(new Object[]{Lang.getInstance().translate("Name"), "Zip?", Lang.getInstance().translate("Data")}, 0);
+        super(new Object[]{Lang.getInstance().translate("Name"), Lang.getInstance().translate("Path"),
+                "Zip?", Lang.getInstance().translate("Size/Zip size")}, 0);
 
     }
 
     public int getColumnCount() {
-        return 3;
+        return 4;
     }
 
     @Override
