@@ -720,8 +720,9 @@ public class WebTransactionsHTML {
     }
 
 
-    public static String getVouchesNew(Fun.Tuple2<Integer, PersonCls> creatorPersonItem,
-                                       Transaction transaction, JSONObject langObj) {
+    public static String getVouchesNew(Transaction transaction, JSONObject langObj) {
+
+        Fun.Tuple2<Integer, PersonCls> creatorPersonItem = transaction.getCreator().getPerson();
 
         String personSign;
         if (creatorPersonItem != null) {

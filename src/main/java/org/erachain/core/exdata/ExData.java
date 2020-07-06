@@ -844,19 +844,37 @@ public class ExData {
     /**
      * Version 2 maker for BlockExplorer
      */
-    public void makeJSONforHTML(DCSet dcSet, Map output,
+    public void makeJSONforHTML(Map output,
                                 int blockNo, int seqNo, JSONObject langObj) {
 
-        if (title != null) {
+        if (title != null && !title.isEmpty()) {
+            output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
             output.put("title", title);
         }
 
+        if (isCanSignOnlyRecipients()) {
+            output.put("Label_CanSignOnlyRecipients", Lang.getInstance().translateFromLangObj("To sign can only Recipients", langObj));
+        }
+
         if (recipients != null && recipients.length > 0) {
+            output.put("Label_recipients", Lang.getInstance().translateFromLangObj("Recipients", langObj));
             List<List<String>> recipientsOut = new ArrayList<>();
             for (Account recipient : recipients) {
                 recipientsOut.add(Arrays.asList(recipient.getAddress(), recipient.getPersonAsString()));
             }
             output.put("recipients", recipientsOut);
+        }
+
+        if (isEncrypted()) {
+            output.put("isEncrypted", Lang.getInstance().translateFromLangObj("Encrypted", langObj));
+            return;
+
+        } else {
+
+            output.put("Label_mess_hash", Lang.getInstance().translateFromLangObj("Message hash", langObj));
+            output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
+            output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
+
         }
 
         // parse JSON
@@ -868,32 +886,6 @@ public class ExData {
             }
 
             output.put("body", valuedText);
-
-            /////////// FILES
-            HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap = files;
-
-            if (filesMap != null && !filesMap.isEmpty()) {
-                String files = "";
-                Set<String> fileNames = filesMap.keySet();
-
-                int filesCount = 1;
-                for (String fileName : fileNames) {
-
-                    Tuple3<byte[], Boolean, byte[]> fileValue = filesMap.get(fileName);
-                    String hash = Base58.encode(fileValue.a);
-
-                    files += filesCount + " " + fileName
-                            + " <a href=?q=" + hash + BlockExplorer.get_Lang(langObj) + "&search=transactions>[" + hash + "]</a>";
-                    files += " - <a href ='../apidocuments/getFile?download=true&block="
-                            + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'><b>"
-                            + Lang.getInstance().translateFromLangObj("Download", langObj) + "</b></a><br>";
-
-                    filesCount++;
-
-                }
-
-                output.put("files", files);
-            }
 
             ///////// NATIVE HASHES
             if (hashes == null) {
@@ -912,6 +904,31 @@ public class ExData {
                 }
 
                 output.put("hashes", hashesHTML);
+            }
+
+            /////////// FILES
+
+            if (files != null && !files.isEmpty()) {
+                String filesStr = "";
+                Set<String> fileNames = files.keySet();
+
+                int filesCount = 1;
+                for (String fileName : fileNames) {
+
+                    Tuple3<byte[], Boolean, byte[]> fileValue = files.get(fileName);
+                    String hash = Base58.encode(fileValue.a);
+
+                    filesStr += filesCount + " " + fileName
+                            + " <a href=?q=" + hash + BlockExplorer.get_Lang(langObj) + "&search=transactions>[" + hash + "]</a>";
+                    filesStr += " - <a href ='../apidocuments/getFile?download=true&block="
+                            + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'><b>"
+                            + Lang.getInstance().translateFromLangObj("Download", langObj) + "</b></a><br>";
+
+                    filesCount++;
+
+                }
+
+                output.put("files", filesStr);
             }
         }
     }

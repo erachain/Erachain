@@ -3057,43 +3057,14 @@ public class BlockExplorer {
         output.put("pubKey", Base58.encode(rNote.getCreator().getPublicKey()));
         output.put("sign", Base58.encode(rNote.getSignature()));
 
-        //TemplateCls statement = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
-
-        if (!rNote.isEncrypted()) {
-
-            output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
-            output.put("Label_recipients", Lang.getInstance().translateFromLangObj("Recipients", langObj));
-            output.put("Label_mess_hash", Lang.getInstance().translateFromLangObj("Message hash", langObj));
-            output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
-            output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
-
-            rNote.getExData().makeJSONforHTML(dcSet, output, block, seqNo, langObj);
-
-        } else {
-
-            output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
-            output.put("title", rNote.getTitle());
-
-            TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, rNote.getKey());
-            output.put("statement",
-                    template.viewName() + "<br>" + Lang.getInstance().translateFromLangObj("Encrypted", langObj));
-        }
-
         output.put("creator", rNote.getCreator().getAddress());
-
-        Tuple2<Integer, PersonCls> personItem = rNote.getCreator().getPerson();
         output.put("creator_name", rNote.getCreator().getPersonAsString());
 
-        if (personItem != null) {
-            output.put("creator_key", personItem.b.getKey());
-        } else {
-            output.put("creator_key", "");
-        }
-
-        //output.put("date", df.format(new Date(trans.getTimestamp())).toString());
         output.put("timestamp", rNote.getTimestamp());
 
-        output.put("vouches_table", WebTransactionsHTML.getVouchesNew(personItem, rNote, langObj));
+        rNote.getExData().makeJSONforHTML(output, block, seqNo, langObj);
+
+        output.put("vouches_table", WebTransactionsHTML.getVouchesNew(rNote, langObj));
 
 
         return output;

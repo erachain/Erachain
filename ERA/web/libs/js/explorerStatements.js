@@ -106,14 +106,20 @@ function statement(data) {
     output += ' &nbsp&nbsp' + data.Label_seqNo + ': <a href=?tx=' + data.block + '-' + data.seqNo + get_lang() + '><b>' + data.block + '-' + data.seqNo + '</b></a>';
     output += ' &nbsp&nbsp' + data.Label_date + ': <b>' + convertTimestamp(data.timestamp, true) + '</b>';
 
-    output += '<br>' + data.Label_creator + ':&nbsp&nbsp <a href=?address=' + data.creator + get_lang() + '><b>' + data.creator_name + '</b></a>';
+    output += '<br>' + data.Label_creator + ': <a href=?address=' + data.creator + get_lang() + '><b>' + data.creator_name + '</b></a>';
 
     if (data.hasOwnProperty('title')) {
-        output += '<br><b>' + data.Label_title + '</b>:' + escapeHtml(data.title) + "<hr>";
+        output += '<br>' + data.Label_title + ': <b>' + escapeHtml(data.title) + '</b>';
+    }
+
+    output += '<hr>';
+
+    if (data.hasOwnProperty('Label_CanSignOnlyRecipients')) {
+        output += '<b>' + data.Label_CanSignOnlyRecipients + '</b><br>';
     }
 
     if (data.hasOwnProperty('recipients')) {
-        output += '<br><b>' + data.Label_recipients + '</b>:';
+        output += '<b>' + data.Label_recipients + '</b>:';
         for (key in data.recipients) {
             output += '<br><a href=?address=' + data.recipients[key][0] + get_lang() + '><b>' + data.recipients[key][1] + '</b></a>';
         }

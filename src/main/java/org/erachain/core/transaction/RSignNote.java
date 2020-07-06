@@ -172,6 +172,18 @@ public class RSignNote extends Transaction implements Itemable {
         return false;
     }
 
+    protected boolean hasTemplate() {
+        return hasTemplate(this.typeBytes);
+    }
+
+    public boolean hasRecipients() {
+        return extendedData.hasRecipients();
+    }
+
+    public Account[] getRecipients() {
+        return extendedData.getRecipients();
+    }
+
     public static int getSignersLength(byte[] typeBytes) {
         // Переверенем - а зачем? - типа 7 бит - это длинна
         byte mask = ~HAS_TEMPLATE_MASK;
@@ -185,10 +197,6 @@ public class RSignNote extends Transaction implements Itemable {
 
         signatures[index] = signature;
 
-    }
-
-    protected boolean hasTemplate() {
-        return hasTemplate(this.typeBytes);
     }
 
     protected void setTypeBytes() {
