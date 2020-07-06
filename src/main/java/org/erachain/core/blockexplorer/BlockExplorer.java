@@ -3028,10 +3028,13 @@ public class BlockExplorer {
 
     /**
      * не использыется как отдельный запрос - поэтому в ней нельзя output.put("search", "statements"); и ТИП задавать
-     * @param trans
+     *
+     * @param rNote
      * @return
      */
-    private Map jsonStatement(RSignNote trans) {
+    private Map jsonStatement(RSignNote rNote) {
+
+        rNote.parseData();
 
         Map output = new LinkedHashMap();
 
@@ -3045,18 +3048,18 @@ public class BlockExplorer {
         output.put("Label_pubKey", Lang.getInstance().translateFromLangObj("Public Key", langObj));
         output.put("Label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
 
-        int block = trans.getBlockHeight();
-        int seqNo = trans.getSeqNo();
+        int block = rNote.getBlockHeight();
+        int seqNo = rNote.getSeqNo();
 
         output.put("block", block);
         output.put("seqNo", seqNo);
 
-        output.put("pubKey", Base58.encode(trans.getCreator().getPublicKey()));
-        output.put("sign", Base58.encode(trans.getSignature()));
+        output.put("pubKey", Base58.encode(rNote.getCreator().getPublicKey()));
+        output.put("sign", Base58.encode(rNote.getSignature()));
 
         //TemplateCls statement = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
 
-        if (!trans.isEncrypted()) {
+        if (!rNote.isEncrypted()) {
 
             output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
             output.put("Label_recipients", Lang.getInstance().translateFromLangObj("Recipients", langObj));
@@ -3064,23 +3067,22 @@ public class BlockExplorer {
             output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
             output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
 
-            trans.parseData();
-            trans.getExData().makeJSONforHTML(dcSet, output, block, seqNo, langObj);
+            rNote.getExData().makeJSONforHTML(dcSet, output, block, seqNo, langObj);
 
         } else {
 
             output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
-            output.put("title", trans.getTitle());
+            output.put("title", rNote.getTitle());
 
-            TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, trans.getKey());
+            TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, rNote.getKey());
             output.put("statement",
                     template.viewName() + "<br>" + Lang.getInstance().translateFromLangObj("Encrypted", langObj));
         }
 
-        output.put("creator", trans.getCreator().getAddress());
+        output.put("creator", rNote.getCreator().getAddress());
 
-        Tuple2<Integer, PersonCls> personItem = trans.getCreator().getPerson();
-        output.put("creator_name", trans.getCreator().getPersonAsString());
+        Tuple2<Integer, PersonCls> personItem = rNote.getCreator().getPerson();
+        output.put("creator_name", rNote.getCreator().getPersonAsString());
 
         if (personItem != null) {
             output.put("creator_key", personItem.b.getKey());
@@ -3089,9 +3091,9 @@ public class BlockExplorer {
         }
 
         //output.put("date", df.format(new Date(trans.getTimestamp())).toString());
-        output.put("timestamp", trans.getTimestamp());
+        output.put("timestamp", rNote.getTimestamp());
 
-        output.put("vouches_table", WebTransactionsHTML.getInstance().getVouchesNew(personItem, trans, langObj));
+        output.put("vouches_table", WebTransactionsHTML.getVouchesNew(personItem, rNote, langObj));
 
 
         return output;

@@ -560,9 +560,8 @@ public class ExData {
                 // версия тут нафиг не нужна в строковом виде
                 if (version == 2) {
 
-                    flags = null;
-
                     position += Transaction.DATA_VERSION_PART_LENGTH;
+                    flags = null; // здесь чтобы ошибки синтаксиса не было задаем - ниже переопределим
 
                     // read title size
                     byte[] titleSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_TITLE_PART_LENGTH);
@@ -635,7 +634,7 @@ public class ExData {
                     }
                 } else {
                     isEncrypted = false;
-                    flags = null;
+                    flags = new byte[]{(byte) version, 0, 0, 0};
                     recipientsFlags = 0;
                     recipients = null;
                     secretsFlags = 0;

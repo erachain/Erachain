@@ -687,49 +687,49 @@ public class WebTransactionsHTML {
         return out;
     }
 
-    public String htmlSignifier(long timestamp, Long personKey, String personName, PublicKeyAccount publicKey, byte[] signature) {
+    public static String htmlSignifier(long timestamp, Long personKey, String personName, PublicKeyAccount publicKey, byte[] signature, JSONObject langObj) {
 
         String out = DateTimeFormat.timestamptoString(timestamp) + " ";
         if (personKey != null) {
-            out += "<a href=?person=" + personKey + get_Lang() + "><b>"
+            out += "<a href=?person=" + personKey + BlockExplorer.get_Lang(langObj) + "><b>"
                     + personName + "</b></a> ("
                     + Lang.getInstance().translateFromLangObj("Public key", langObj) + ": "
                     + Base58.encode(publicKey.getPublicKey()) + ")<br>";
         } else {
-            out += "<a href=?address=" + publicKey.getAddress() + get_Lang() + ">" + publicKey.getAddress()
+            out += "<a href=?address=" + publicKey.getAddress() + BlockExplorer.get_Lang(langObj) + ">" + publicKey.getAddress()
                     + "</a> ("
                     + Lang.getInstance().translateFromLangObj("Public key", langObj) + ": "
                     + Base58.encode(publicKey.getPublicKey()) + ")<br>";
         }
 
         out += Lang.getInstance().translateFromLangObj("Signature", langObj) + ": "
-                + "<a href=?tx=" + Base58.encode(signature) + ">" + Base58.encode(signature) + "</a><br>";
+                + "<a href=?tx=" + Base58.encode(signature) + ">" + Base58.encode(signature) + BlockExplorer.get_Lang(langObj) + "</a><br>";
 
         return out;
     }
 
-    public String htmlSignifier(Transaction transaction) {
+    public static String htmlSignifier(Transaction transaction, JSONObject langObj) {
 
         Fun.Tuple2<Integer, PersonCls> itemPerson = transaction.getCreator().getPerson();
         if (itemPerson == null) {
-            return htmlSignifier(0, null, null, transaction.getCreator(), transaction.getSignature());
+            return htmlSignifier(0, null, null, transaction.getCreator(), transaction.getSignature(), langObj);
         }
 
         return htmlSignifier(transaction.getTimestamp(), itemPerson.b.getKey(), itemPerson.b.viewName(),
-                transaction.getCreator(), transaction.getSignature());
+                transaction.getCreator(), transaction.getSignature(), langObj);
     }
 
 
-    public String getVouchesNew(Fun.Tuple2<Integer, PersonCls> creatorPersonItem,
-                                Transaction transaction, JSONObject langObj) {
+    public static String getVouchesNew(Fun.Tuple2<Integer, PersonCls> creatorPersonItem,
+                                       Transaction transaction, JSONObject langObj) {
 
         String personSign;
         if (creatorPersonItem != null) {
             personSign = htmlSignifier(transaction.getTimestamp(), creatorPersonItem.b.getKey(),
-                    creatorPersonItem.b.viewName(), transaction.getCreator(), transaction.getSignature());
+                    creatorPersonItem.b.viewName(), transaction.getCreator(), transaction.getSignature(), langObj);
             ;
         } else {
-            personSign = htmlSignifier(0, null, null, transaction.getCreator(), transaction.getSignature());
+            personSign = htmlSignifier(0, null, null, transaction.getCreator(), transaction.getSignature(), langObj);
             ;
         }
 
@@ -751,7 +751,7 @@ public class WebTransactionsHTML {
 
             Transaction signTransaction = map.get(vouchesItem.b.get(0));
             out += "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " 2:<br>"
-                    + htmlSignifier(signTransaction);
+                    + htmlSignifier(signTransaction, langObj);
 
         } else {
             out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signatories", langObj) + "</center></b> "
@@ -762,7 +762,7 @@ public class WebTransactionsHTML {
 
                 Transaction signTransaction = map.get(txKey);
                 out += "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " " + ++count
-                        + ":<br>" + htmlSignifier(signTransaction);
+                        + ":<br>" + htmlSignifier(signTransaction, langObj);
 
             }
         }
