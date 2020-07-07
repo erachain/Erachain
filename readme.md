@@ -34,6 +34,15 @@ ERA\z_START_EXAMPLES\readme.txt
 -nodatawallet -pass=[PASSWORD]  
 Описание ключей запуска в z_START_EXAMPLES\readme.txt
 
+### Start on Mac OS
+Run terminal, then run java if not found install Java JRE 8  
+Then take path for Erachain:  
+https://yablyk.com/348512-kak-skopirovat-polnyj-put-k-fajlu-ili-papke-v-mac-os-x-el-capitan/
+
+In Terminal type:  
+ cd PATH
+ java -jar erachain.jar
+
 ## Локальная сеть
 Если после включения в настройках поиска узлов в локальной сети и перезапуска ноды локальные узлы не находятся,
  то нужно их прописать явно в файл peers.json (или peer-test.json или peers-demo.json или peers-side.json)
@@ -71,3 +80,4 @@ WARNING: All illegal access operations will be denied in a future release
 Настройка версии - в Структура Проекта - там модули Тест и Майн - для них выбрать в зависмотях версию Явы 1.8
 
 Не,, чот-то не помогло. Нужно JUnit настривать отдельно - создать тест не как Градле а как JUnit его запускать
+

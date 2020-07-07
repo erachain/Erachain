@@ -106,30 +106,61 @@ function statement(data) {
     output += ' &nbsp&nbsp' + data.Label_seqNo + ': <a href=?tx=' + data.block + '-' + data.seqNo + get_lang() + '><b>' + data.block + '-' + data.seqNo + '</b></a>';
     output += ' &nbsp&nbsp' + data.Label_date + ': <b>' + convertTimestamp(data.timestamp, true) + '</b>';
 
-    output += '<br>' + data.Label_creator + ':&nbsp&nbsp <a href=?address=' + data.creator + get_lang() + '><b>' + data.creator_name + '</b></a>';
+    output += '<br>' + data.Label_creator + ': <a href=?address=' + data.creator + get_lang() + '><b>' + data.creator_name + '</b></a>';
 
     if (data.hasOwnProperty('title')) {
-        output += '<br><b>' + data.Label_title + '</b>:' + escapeHtml(data.title) + "<hr>";
+        output += '<br>' + data.Label_title + ': <b>' + escapeHtml(data.title) + '</b>';
     }
 
-    if (data.hasOwnProperty('body')) {
-        output += fformat(data.body);
+    output += '<hr>';
+
+    if (data.hasOwnProperty('Label_CanSignOnlyRecipients')) {
+        output += '<b>' + data.Label_CanSignOnlyRecipients + '</b><br>';
     }
 
-    if (data.hasOwnProperty('messageHash')) {
-        output += '<br>' + data.Label_mess_hash + ': <a href=?q=' + data.messageHash + get_lang() + '&search=transactions><b>' + data.messageHash + '</b></a>';
+    if (data.hasOwnProperty('recipients')) {
+        output += '<b>' + data.Label_recipients + '</b>:';
+        for (key in data.recipients) {
+            output += '<br><a href=?address=' + data.recipients[key][0] + get_lang() + '><b>' + data.recipients[key][1] + '</b></a>';
+        }
+        output += '<hr>';
     }
 
-    if (data.hasOwnProperty('message')) {
-        output += '<br>' + fformat(data.message);
-    }
+    if (data.hasOwnProperty('encrypted')) {
 
-    if (data.hasOwnProperty('hashes')) {
-        output += '<br><hr><b>' + data.Label_hashes + '</b>:<br>' + data.hashes;
-    }
+        output += '<b>' + data.encrypted + '</b><br>';
 
-    if (data.hasOwnProperty('files')) {
-        output += '<br><hr><b>' + data.Label_files + '</b>:<br>' + data.files;
+    } else {
+
+        if (data.hasOwnProperty('templateKey')) {
+            output += '<a href="?template=' + data.templateKey + get_lang() + '"><b>['
+             + data.templateKey + '] ' + data.templateName + '</b></a><br>';
+
+            if (data.hasOwnProperty('body')) {
+                output += fformat(data.body);
+            }
+            output += '<hr>';
+
+        }
+
+
+
+        if (data.hasOwnProperty('messageHash')) {
+            output += '<br>' + data.Label_mess_hash + ': <a href=?q=' + data.messageHash + get_lang() + '&search=transactions><b>' + data.messageHash + '</b></a>';
+        }
+
+        if (data.hasOwnProperty('message')) {
+            output += '<br>' + fformat(data.message);
+        }
+
+        if (data.hasOwnProperty('hashes')) {
+            output += '<br><hr><b>' + data.Label_hashes + '</b>:<br>' + data.hashes;
+        }
+
+        if (data.hasOwnProperty('files')) {
+            output += '<br><hr><b>' + data.Label_files + '</b>:<br>' + data.files;
+        }
+
     }
 
     output += '</div>';

@@ -7,8 +7,11 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RendererBigDecimals;
+import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
@@ -17,6 +20,8 @@ import javax.swing.table.TableRowSorter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -180,6 +185,54 @@ public class AccountsRightPanel extends JPanel {
 
         });
          mainMenu.add(viewInfo);
+
+         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
+         vouch_menu.addActionListener(new ActionListener() {
+             public void actionPerformed(ActionEvent e) {
+
+                 AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
+                 new VouchRecordDialog(transaction.transaction.getBlockHeight(), transaction.transaction.getSeqNo());
+
+             }
+         });
+
+         mainMenu.add(vouch_menu);
+
+         // save jsot transactions
+         JMenuItem item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
+         item_Save.addActionListener(new ActionListener() {
+             @Override
+             public void actionPerformed(ActionEvent e) {
+
+                 AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
+                 // save
+                 Library.saveTransactionJSONtoFileSystem(getParent(), transaction.transaction);
+             }
+
+
+         });
+
+         mainMenu.add(item_Save);
+
+         mainMenu.addSeparator();
+         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+         setSeeInBlockexplorer.addActionListener(new ActionListener() {
+             @Override
+             public void actionPerformed(ActionEvent e) {
+
+                 AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
+
+                 try {
+                     URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                             + "/index/blockexplorer.html"
+                             + "?tx=" + transaction.transaction.viewHeightSeq()));
+                 } catch (MalformedURLException e1) {
+                 }
+             }
+         });
+         mainMenu.add(setSeeInBlockexplorer);
+
          //   jTable1.setComponentPopupMenu(mainMenu);
          TableMenuPopupUtil.installContextMenu(jTable1, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
      }// </editor-fold>

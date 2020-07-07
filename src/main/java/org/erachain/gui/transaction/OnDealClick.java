@@ -180,6 +180,9 @@ public class OnDealClick {
             case Transaction.HASH_ALREDY_EXIST:
                 mess = "Hash already exist";
                 break;
+            case Transaction.WRONG_SIGNER:
+                mess = "Wrong Signer";
+                break;
 
             case Transaction.NAME_NOT_LOWER_CASE:
                 mess = "Name not lower case";

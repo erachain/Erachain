@@ -3,14 +3,13 @@ package org.erachain.gui.library;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 import org.erachain.controller.Controller;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ZipBytes;
-import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -223,38 +222,32 @@ public class MPDFView extends javax.swing.JPanel {
             if (record.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
 
                 RSignNote note = (RSignNote) record;
-                Tuple4<String, String, JSONObject, HashMap<String, Tuple3<byte[], Boolean, byte[]>>> map;
-                try {
-                    map = note.parseData();
-                } catch (Exception e) {
-                    map = null;
-                }
+                note.parseData();
+                ExData exData = note.getExData();
 
-                if (map != null) {
-                    HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = map.d;
-                    if (files != null) {
-                        Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it_Files = files.entrySet().iterator();
-                        while (it_Files.hasNext()) {
-                            Entry<String, Tuple3<byte[], Boolean, byte[]>> fileData = it_Files.next();
-                            boolean zip = new Boolean(fileData.getValue().b);
-                            // String name_File = (String) fileData.getKey();
-                            // setTitle(getTitle() + " - " + name_File);
+                HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = exData.getFiles();
+                if (files != null && !files.isEmpty()) {
+                    Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it_Files = files.entrySet().iterator();
+                    while (it_Files.hasNext()) {
+                        Entry<String, Tuple3<byte[], Boolean, byte[]>> fileData = it_Files.next();
+                        boolean zip = new Boolean(fileData.getValue().b);
+                        // String name_File = (String) fileData.getKey();
+                        // setTitle(getTitle() + " - " + name_File);
 
-                            byte[] file_byte = (byte[]) fileData.getValue().c;
-                            if (zip) {
+                        byte[] file_byte = (byte[]) fileData.getValue().c;
+                        if (zip) {
+                            try {
                                 try {
-                                    try {
-                                        file_byte = ZipBytes.decompress(file_byte);
-                                    } catch (IOException e) {
-                                        logger.error(e.getMessage(), e);
-                                    }
-                                } catch (DataFormatException e1) {
-                                    logger.error(e1.getMessage(), e1);
+                                    file_byte = ZipBytes.decompress(file_byte);
+                                } catch (IOException e) {
+                                    logger.error(e.getMessage(), e);
                                 }
+                            } catch (DataFormatException e1) {
+                                logger.error(e1.getMessage(), e1);
                             }
-
-                            buf = ByteBuffer.wrap(file_byte);
                         }
+
+                        buf = ByteBuffer.wrap(file_byte);
                     }
                 }
             }

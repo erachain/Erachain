@@ -4,9 +4,6 @@ import org.erachain.core.crypto.Base32;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 
-import java.math.BigInteger;
-import java.util.Arrays;
-
 //import org.erachain.core.crypto.Base64;
 
 //import java.math.BigDecimal;
@@ -26,7 +23,7 @@ public class PublicKeyAccount extends Account {
     }
 
     public PublicKeyAccount(String publicKey) {
-        this(Base58.decode(publicKey));
+        this(Base58.decode(publicKey, PUBLIC_KEY_LENGTH));
     }
 
     //CHECK IF IS VALID PUBLIC KEY and MAKE NEW
@@ -44,14 +41,14 @@ public class PublicKeyAccount extends Account {
             // BASE.32 from  BANK
             publicKey = publicKey.substring(1);
             try {
-                pk = Base32.decode(publicKey);
+                pk = Base32.decode(publicKey, PUBLIC_KEY_LENGTH);
             } catch (Exception e) {
                 return false;
             }
             return isValidPublicKey(pk);
         } else {
             try {
-                pk = Base58.decode(publicKey);
+                pk = Base58.decode(publicKey, PUBLIC_KEY_LENGTH);
             } catch (Exception e) {
                 return false;
             }

@@ -167,7 +167,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         // get component from right panel
         Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
-        if (c1 instanceof StatementInfo) ((StatementInfo) c1).delay_on_Close();
+        if (c1 instanceof RNoteInfo) ((RNoteInfo) c1).delay_on_Close();
 
     }
 

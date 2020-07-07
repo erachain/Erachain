@@ -662,13 +662,14 @@ public class Synchronizer extends Thread {
                                     throw new Exception("on stopping");
                                 }
 
-                                LOGGER.debug(e.getMessage(), e);
                                 errorMess = "invalid PARSE! " + e.getMessage();
+                                LOGGER.debug(errorMess, e);
                                 banTime = BAN_BLOCK_TIMES << 1;
+                                ctrl.stopAll(339);
                                 break;
                             } catch (Throwable e) {
-                                LOGGER.debug(e.getMessage(), e);
                                 errorMess = "invalid PARSE! " + e.getMessage();
+                                LOGGER.debug(errorMess, e);
                                 banTime = BAN_BLOCK_TIMES << 1;
                                 ctrl.stopAll(339);
                                 break;
@@ -681,20 +682,26 @@ public class Synchronizer extends Thread {
                                     banTime = BAN_BLOCK_TIMES;
                                     break;
                                 }
+                            } catch (java.lang.OutOfMemoryError e) {
+                                errorMess = "error io isValid! [" + blockFromPeer.heightBlock + "] " + e.getMessage();
+                                LOGGER.debug(errorMess, e);
+                                banTime = BAN_BLOCK_TIMES;
+                                ctrl.stopAll(340);
+                                break;
                             } catch (Exception e) {
 
                                 if (ctrl.isOnStopping()) {
                                     throw new Exception("on stopping");
                                 }
 
-                                LOGGER.debug(e.getMessage(), e);
-                                errorMess = "error io isValid! " + e.getMessage();
+                                errorMess = "error io isValid! [" + blockFromPeer.heightBlock + "] " + e.getMessage();
+                                LOGGER.debug(errorMess, e);
                                 banTime = BAN_BLOCK_TIMES;
                                 ctrl.stopAll(340);
                                 break;
                             } catch (Throwable e) {
-                                LOGGER.debug(e.getMessage(), e);
-                                errorMess = "error io isValid! " + e.getMessage();
+                                errorMess = "error io isValid! [" + blockFromPeer.heightBlock + "] " + e.getMessage();
+                                LOGGER.debug(errorMess, e);
                                 banTime = BAN_BLOCK_TIMES;
                                 ctrl.stopAll(341);
                                 break;

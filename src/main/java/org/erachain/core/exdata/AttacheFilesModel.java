@@ -5,7 +5,14 @@ import org.erachain.lang.Lang;
 import javax.swing.table.DefaultTableModel;
 import javax.validation.constraints.Null;
 
-class AttacheFilesModel extends DefaultTableModel {
+public class AttacheFilesModel extends DefaultTableModel {
+
+    public static final int NAME_COL = 0;
+    public static final int PATH_COL = 1;
+    public static final int ZIP_COL = 2;
+    public static final int SIZE_COL = 3;
+    public static final int BYTES_COL = 4;
+    public static final int ZIP_BYTES_COL = 5;
 
     public AttacheFilesModel() {
         super(new Object[]{Lang.getInstance().translate("Name"), Lang.getInstance().translate("Path"), "Zip?",
@@ -13,6 +20,12 @@ class AttacheFilesModel extends DefaultTableModel {
 
     }
 
+    /**
+     * Тут в колонке 4 хранится незашифрованный байтМассив, а в 5-й - запакованный
+     *
+     * @return
+     */
+    @Override
     public int getColumnCount() {
         return 6;
     }

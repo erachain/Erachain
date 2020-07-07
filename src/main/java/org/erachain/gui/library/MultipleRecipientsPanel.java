@@ -1,25 +1,29 @@
 package org.erachain.gui.library;
 
 
+import org.erachain.core.account.Account;
+import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.lang.Lang;
+import org.erachain.utils.NameUtils;
+import org.erachain.utils.Pair;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.validation.constraints.Null;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MultipleRecipientsPanel extends JPanel {
-    private final Table_Model recipientsTableModel;
+    public final Table_Model recipientsTableModel;
     private final MTable jTableRecipients;
     private JScrollPane jScrollPaneRecipients;
     private JButton jButtonAddRecipient;
     private JButton jButtonRemoveRecipient;
     private GridBagConstraints gridBagConstraints;
-    private JCheckBox  allCheckBox;
-    private JCheckBox  encryptCheckBox;
+    private JCheckBox allCheckBox;
+    public JCheckBox signCanRecipientsCheckBox;
 
     public MultipleRecipientsPanel() {
 
@@ -29,22 +33,22 @@ public class MultipleRecipientsPanel extends JPanel {
         jScrollPaneRecipients = new JScrollPane();
         jButtonRemoveRecipient = new JButton();
         allCheckBox = new JCheckBox();
-        allCheckBox.setText(Lang.getInstance().translate("Everything"));
+        allCheckBox.setText(Lang.getInstance().translate("Everybody"));
         allCheckBox.setSelected(true);
-        encryptCheckBox = new JCheckBox();
-        encryptCheckBox.setText(Lang.getInstance().translate("Encrypt"));
-        encryptCheckBox.setSelected(false);
+        signCanRecipientsCheckBox = new JCheckBox(Lang.getInstance().translate("To sign can only Recipients"));
+        signCanRecipientsCheckBox.setSelected(true);
+        signCanRecipientsCheckBox.setVisible(false);
+
         jButtonAddRecipient.setVisible(false);
-        encryptCheckBox.setVisible(false);
         jButtonRemoveRecipient.setVisible(false);
 
 
-        allCheckBox.addActionListener(new ActionListener(){
+        allCheckBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jButtonRemoveRecipient.setVisible(!allCheckBox.isSelected());
                 jTableRecipients.setVisible(!allCheckBox.isSelected());
-                encryptCheckBox.setVisible(!allCheckBox.isSelected());
+                signCanRecipientsCheckBox.setVisible(!allCheckBox.isSelected());
             }
         });
 
@@ -62,7 +66,7 @@ public class MultipleRecipientsPanel extends JPanel {
                     }
                 }
                 if (recipientsTableModel.getRowCount()<1) {
-                    recipientsTableModel.addRow(new Object[]{"", ""});
+                    recipientsTableModel.addRow(new Object[]{"", "0"});
                     interval = 0;
                 }
 
@@ -87,10 +91,10 @@ public class MultipleRecipientsPanel extends JPanel {
         this.add(allCheckBox, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
-        this.add(encryptCheckBox, gridBagConstraints);
+        this.add(signCanRecipientsCheckBox, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -122,12 +126,15 @@ public class MultipleRecipientsPanel extends JPanel {
     // table model class
 
     @SuppressWarnings("serial")
+    public
     class Table_Model extends DefaultTableModel {
 
         public Table_Model(int rows) {
             super(new Object[]{Lang.getInstance().translate("Address"),
-                    Lang.getInstance().translate("Description")}, rows);
-            this.addRow(new Object[]{"", ""});
+                            //Lang.getInstance().translate("Description")
+                    },
+                    rows);
+            this.addRow(new Object[]{"", "0"});
         }
 
         @Override
@@ -162,7 +169,7 @@ public class MultipleRecipientsPanel extends JPanel {
                 if (((String) aValue).length() > 0) {
                     //CHECK IF LAST ROW
                     if (row == this.getRowCount() - 1) {
-                        this.addRow(new Object[]{"", ""});
+                        this.addRow(new Object[]{"", "0"});
                     }
 
                     super.setValueAt(aValue, row, column);
@@ -172,19 +179,39 @@ public class MultipleRecipientsPanel extends JPanel {
 
                 //CHECK IF LAST ROW
                 if (row == this.getRowCount() - 1) {
-                    this.addRow(new Object[]{"", ""});
+                    this.addRow(new Object[]{"", "0"});
                 }
             }
         }
 
-        public java.util.List<String> getValues(int column) {
-            List<String> values = new ArrayList<String>();
+        public Account[] getRecipients() {
+            if (allCheckBox.isSelected())
+                return new Account[0];
 
-            for (int i = 0; i < this.getRowCount(); i++) {
-                String value = String.valueOf(this.getValueAt(i, column));
+            // without LAST empty
+            Account[] values = new Account[this.getRowCount() - 1];
 
-                if (value.length() > 24) values.add(value);
+            for (int i = 0; i < values.length; i++) {
+                try {
+                    //ORDINARY RECIPIENT
+                    String recipientAddress = this.getValueAt(i, 0).toString();
+                    if (Crypto.getInstance().isValidAddress(recipientAddress)) {
+                        values[i] = new Account(recipientAddress);
+                    } else {
+                        if (PublicKeyAccount.isValidPublicKey(recipientAddress)) {
+                            values[i] = new PublicKeyAccount(recipientAddress);
+                        } else {
+                            //IS IS NAME of RECIPIENT - resolve ADDRESS
+                            Pair<Account, NameUtils.NameResult> result = NameUtils.nameToAdress(recipientAddress);
 
+                            if (result.getB() == NameUtils.NameResult.OK) {
+                                values[i] = result.getA();
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    break;
+                }
             }
 
             return values;

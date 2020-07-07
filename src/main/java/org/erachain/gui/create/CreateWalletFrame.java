@@ -2,6 +2,7 @@ package org.erachain.gui.create;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 
@@ -14,7 +15,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,13 +25,9 @@ public class CreateWalletFrame extends JFrame {
 
     private byte[] seed;
     private NoWalletFrame parent;
-    private SecureRandom random;
 
     public CreateWalletFrame(NoWalletFrame parent) {
         super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Create Wallet"));
-
-        //RANDOM
-        this.random = new SecureRandom();
 
         //ICON
         List<Image> icons = new ArrayList<Image>();
@@ -74,7 +70,7 @@ public class CreateWalletFrame extends JFrame {
 
         //ADD TEXTBOX
         labelGBC.gridy = 1;
-        this.seed = this.generateSeed();
+        this.seed = Crypto.getInstance().createSeed(Crypto.HASH_LENGTH);
         final JTextField seedTxt = new JTextField();
         seedTxt.setText(Base58.encode(seed));
         seedTxt.setEditable(false);
@@ -194,14 +190,4 @@ public class CreateWalletFrame extends JFrame {
 
     }
 
-    //GENERATE
-
-    private byte[] generateSeed() {
-        byte[] seed = new byte[32];
-        // нужно быть уверенным что длинна при обратном преобразовании даст 32 байта
-        do {
-            this.random.nextBytes(seed);
-        } while (Base58.decode(Base58.encode(seed)).length != seed.length);
-        return seed;
-    }
 }

@@ -1,7 +1,7 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.*;
-import org.erachain.gui.items.statement.StatementInfo;
+import org.erachain.gui.items.statement.RNoteInfo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,7 +56,7 @@ public class TransactionDetailsFactory {
             case Transaction.SIGN_NOTE_TRANSACTION:
 
                 RSignNote statement = (RSignNote) transaction;
-                return new StatementInfo(statement);
+                return new RNoteInfo(statement);
 
             case Transaction.REGISTER_NAME_TRANSACTION:
 
