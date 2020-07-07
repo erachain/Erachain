@@ -156,7 +156,7 @@ task CopyResourse {
     copy {
         from 'ERA'
         into 'build/libs/Erachain'
-        include 'Erachain Licence*'
+        include '*Licence*'
         include 'peers*'
         include 'start*'
     }
