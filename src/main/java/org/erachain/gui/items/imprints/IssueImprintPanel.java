@@ -6,6 +6,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.transaction.IssueImprintRecord;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -219,6 +220,7 @@ public class IssueImprintPanel extends JPanel {
         //LABEL FEE POW
         labelGBC.gridy = gridy;
         JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        feeLabel.setVisible(Gui.SHOW_FEE_POWER);
         this.add(feeLabel, labelGBC);
 
         //TXT FEE
@@ -226,6 +228,7 @@ public class IssueImprintPanel extends JPanel {
         txtFeePow = new JComboBox<String>();
         txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
         txtFeePow.setSelectedIndex(0);
+        txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
         this.add(this.txtFeePow, txtGBC);
 
         //BUTTON Register

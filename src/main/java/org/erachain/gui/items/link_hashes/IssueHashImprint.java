@@ -9,6 +9,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.Gui;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.AuxiliaryToolTip;
 import org.erachain.gui.models.AccountsComboBoxModel;
@@ -313,8 +314,9 @@ public class IssueHashImprint extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.insets = new java.awt.Insets(0, 13, 0, 0);
-        this.add(new JLabel(Lang.getInstance().translate("Fee Power") + ":"), gridBagConstraints);
-
+        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        feeLabel.setVisible(Gui.SHOW_FEE_POWER);
+        this.add(feeLabel, gridBagConstraints);
 
         //TXT FEE
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -328,7 +330,7 @@ public class IssueHashImprint extends javax.swing.JPanel {
         txtFeePow = new JComboBox<String>();
         txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFeePow.setSelectedIndex(0);
-
+        txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
 
         this.add(this.txtFeePow, gridBagConstraints);
 

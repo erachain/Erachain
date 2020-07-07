@@ -7,6 +7,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExDataPanel;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -46,8 +47,10 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         th = this;
         initComponents();
 
-        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFeePow.setSelectedIndex(0);
+        txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
+
         jLabel_Account_Work.setText(Lang.getInstance().translate("Select account") + ":");
         jButton_Work_OK.setText(Lang.getInstance().translate("Sign and Send"));
         jButton_Work_OK.addActionListener(new ActionListener() {
@@ -76,6 +79,8 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         encryptCheckBox.setSelected(true);
 
         jLabel_Fee_Work = new javax.swing.JLabel(Lang.getInstance().translate("FeePow") + ": ");
+        jLabel_Fee_Work.setVisible(Gui.SHOW_FEE_POWER);
+
         txtFeePow = new javax.swing.JComboBox();
         jButton_Work_Cancel = new MButton();
         jButton_Work_OK = new MButton();

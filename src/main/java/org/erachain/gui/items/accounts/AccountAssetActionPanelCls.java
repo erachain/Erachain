@@ -13,6 +13,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.Gui;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.assets.AssetInfo;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
@@ -160,6 +161,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         }
 
         this.jComboBox_Fee.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
+        jComboBox_Fee.setVisible(Gui.SHOW_FEE_POWER);
 
         //ON FAVORITES CHANGE
 
@@ -264,7 +266,8 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                     + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
         }
 
-        this.jLabel_Fee.setText(Lang.getInstance().translate("Fee level") + ":");
+        this.jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
+        jLabel_Fee.setVisible(Gui.SHOW_FEE_POWER);
 
         // CONTEXT MENU
         MenuPopupUtil.installContextMenu(this.jTextField_To);

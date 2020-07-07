@@ -11,6 +11,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.accounts.AccountRenderer;
@@ -380,7 +381,8 @@ public class MailSendPanel extends JPanel {
         feelabelGBC.fill = GridBagConstraints.BOTH;
         feelabelGBC.weightx = 0;
         feelabelGBC.gridx = 2;
-        final JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
+        final JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        feeLabel.setVisible(Gui.SHOW_FEE_POWER);
         feeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         feeLabel.setVerticalAlignment(SwingConstants.TOP);
         this.add(feeLabel, feelabelGBC);
@@ -397,6 +399,7 @@ public class MailSendPanel extends JPanel {
         txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
         txtFeePow.setSelectedIndex(0);
         txtFeePow.setPreferredSize(new Dimension(130, 22));
+        txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
         this.add(txtFeePow, feetxtGBC);
 
         // BUTTON DECRYPTALL

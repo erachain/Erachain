@@ -8,6 +8,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.accounts.AccountRenderer;
@@ -306,7 +307,8 @@ public class CreateOrderPanel extends JPanel {
 
         // LABEL FEE
         labelGBC.gridy++;
-        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ": ");
+        feeLabel.setVisible(Gui.SHOW_FEE_POWER);
         this.add(feeLabel, labelGBC);
 
         // FEE
@@ -314,6 +316,7 @@ public class CreateOrderPanel extends JPanel {
         txtFeePow = new JComboBox<String>();
         txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFeePow.setSelectedIndex(0);
+        txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
         this.add(txtFeePow, detailGBC);
 
         // ASSET HINT

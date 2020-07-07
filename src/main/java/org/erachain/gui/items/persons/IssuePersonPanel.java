@@ -10,6 +10,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
@@ -127,8 +128,10 @@ public class IssuePersonPanel extends JPanel  {
         GridBagConstraints gridBagConstraints;
         setLayout(new BorderLayout());
 
+        jLabelFee.setVisible(Gui.SHOW_FEE_POWER);
         txtFeePow.setModel(new DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFeePow.setSelectedIndex(0);
+        txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
 
         copyButton = new MButton(Lang.getInstance().translate("Create Person and copy to clipboard"), 2);
         copyButton.addActionListener(e -> onIssueClick(false));

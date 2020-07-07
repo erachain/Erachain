@@ -9,6 +9,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.Gui;
 import org.erachain.gui.items.statuses.ComboBoxStatusesModel;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -239,7 +240,8 @@ public class UnionSetStatusDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         getContentPane().add(jFormattedTextField_ToDo, gridBagConstraints);
 
-        jLabel_Fee.setText(Lang.getInstance().translate("fee :"));
+        jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
+        jLabel_Fee.setVisible(Gui.SHOW_FEE_POWER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 16;
@@ -248,6 +250,7 @@ public class UnionSetStatusDialog extends JDialog {
         getContentPane().add(jLabel_Fee, gridBagConstraints);
 
         jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("####,###.00"))));
+        jFormattedTextField_Fee.setVisible(Gui.SHOW_FEE_POWER);
         jFormattedTextField_Fee.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         jFormattedTextField_Fee.setMinimumSize(new java.awt.Dimension(100, 20));
         jFormattedTextField_Fee.setPreferredSize(new java.awt.Dimension(100, 20));

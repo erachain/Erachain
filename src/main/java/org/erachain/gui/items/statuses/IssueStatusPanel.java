@@ -7,6 +7,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.IssueStatusRecord;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
@@ -105,7 +106,8 @@ public class IssueStatusPanel extends JPanel  {
         gbcDescriptionLabel.anchor = GridBagConstraints.NORTHEAST;
         add(descriptionLabel, gbcDescriptionLabel);
 
-        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + " (0..6)" + ":");
+        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        feeLabel.setVisible(Gui.SHOW_FEE_POWER);
         GridBagConstraints gbcFeeLabel = new GridBagConstraints();
         gbcFeeLabel.gridx = 1;
         gbcFeeLabel.gridy = 6;
@@ -154,6 +156,7 @@ public class IssueStatusPanel extends JPanel  {
 
         txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFeePow.setSelectedIndex(0);
+        txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
         GridBagConstraints gbcTxtFeePow = new GridBagConstraints();
         gbcTxtFeePow.gridx = 2;
         gbcTxtFeePow.gridy = 6;
