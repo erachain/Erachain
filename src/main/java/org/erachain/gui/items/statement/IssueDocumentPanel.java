@@ -60,7 +60,7 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         });
         jButton_Work_OK1.setText(Lang.getInstance().translate("Sign and Pack"));
 
-        jLabel_Fee_Work.setText(Lang.getInstance().translate("Fee") + ":");
+        jLabel_Fee_Work.setText(Lang.getInstance().translate("Fee Power") + ":");
         this.jButton_Work_Cancel.setVisible(false);
     }
 
