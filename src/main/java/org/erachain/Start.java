@@ -81,7 +81,6 @@ public class Start {
                 Settings.simpleTestNet = true;
                 Settings.genesisStamp = genesisStamp;
                 Settings.NET_MODE = Settings.NET_MODE_TEST;
-                break;
             } else if (arg.startsWith("-testnet=") && arg.length() > 9) {
                 try {
                     genesisStamp = Long.parseLong(arg.substring(9));
@@ -92,14 +91,20 @@ public class Start {
                     Settings.NET_MODE = Settings.NET_MODE_DEMO;
                 }
                 Settings.genesisStamp = genesisStamp;
-                break;
             } else if (arg.startsWith("-testdb=") && arg.length() > 8) {
                 try {
                     Settings.TEST_DB_MODE = Integer.parseInt(arg.substring(8));
-                    break;
+                } catch (Exception e) {
+                }
+            } else if (arg.startsWith("-bugs=") && arg.length() > 6) {
+                try {
+                    String value = arg.substring(6);
+                    Settings.CHECK_BUGS = Integer.parseInt(value);
+                    LOGGER.info("-bugs = " + Settings.CHECK_BUGS);
                 } catch (Exception e) {
                 }
             }
+
         }
 
         ///////////////////  SIDECHAINS ///////////

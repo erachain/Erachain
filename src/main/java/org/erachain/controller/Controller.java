@@ -170,6 +170,7 @@ public class Controller extends Observable {
     public boolean onlyProtocolIndexing;
     public boolean compactDConStart;
     public boolean inMemoryDC;
+
     /**
      * see org.erachain.datachain.DCSet#BLOCKS_MAP
      */
@@ -215,7 +216,6 @@ public class Controller extends Observable {
                 dbs = "M";
 
         }
-
 
         if (withTimestamp)
             return version + (BlockChain.DEMO_MODE ? " DEMO Net"
@@ -3743,6 +3743,7 @@ public class Controller extends Observable {
                 useNet = false;
                 continue;
             }
+
         }
 
         if (Settings.genesisStamp <= 0) {
