@@ -1307,7 +1307,10 @@ public class BlockChain {
             );
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            Controller.getInstance().stopAll(1104);
+            if (BlockChain.CHECK_BUGS > 7) {
+                // тут нельзя выходить так как просто битым блоком смогут все ноды убить при атаке
+                Controller.getInstance().stopAll(1104);
+            }
         } catch (Throwable e) {
             LOGGER.error(e.getMessage(), e);
             Controller.getInstance().stopAll(1105);
