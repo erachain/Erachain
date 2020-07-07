@@ -6,6 +6,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.Gui;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -134,10 +135,13 @@ public class RIPPersonFrame extends JInternalFrame {
 
         // FEE POWER
         ++label.gridy;
-        this.add(new JLabel(Lang.getInstance().translate("Fee Power") + ":"), label);
+        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        feeLabel.setVisible(Gui.SHOW_FEE_POWER);
+        this.add(feeLabel, label);
 
         ++input.gridy;
         feePow.setText("0");
+        feePow.setVisible(Gui.SHOW_FEE_POWER);
         this.add(feePow, input);
 
         // BUTTONS

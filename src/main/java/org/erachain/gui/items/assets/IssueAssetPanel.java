@@ -8,6 +8,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetType;
 import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
@@ -66,6 +67,10 @@ public class IssueAssetPanel extends JPanel  {
         textQuantity.setMaskType(textQuantity.maskLong);
         textQuantity.setText("0");
         textFeePow.setSelectedItem("0");
+
+        feeJLabel.setVisible(Gui.SHOW_FEE_POWER);
+        textFeePow.setVisible(Gui.SHOW_FEE_POWER);
+
         issueJButton.addActionListener(arg0 -> onIssueClick());
         // select combobox Asset type
         assetTypeJComboBox.addActionListener(e -> {

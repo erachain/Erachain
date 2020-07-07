@@ -1134,7 +1134,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_ACCOUNTING:
         }
 
-        return viewAssetTypeAction(backward, actionType);
+        return viewAssetTypeAction(backward, actionType) + " # to";
 
     }
 
