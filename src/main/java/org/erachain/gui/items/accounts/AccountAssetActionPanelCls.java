@@ -95,7 +95,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         }
 
         if (panelName == null) {
-            setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition) + " [" + asset.getKey() + " ]"));
+            setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition)) + " [" + asset.getKey() + " ]");
         } else {
             setName(Lang.getInstance().translate(panelName));
         }
