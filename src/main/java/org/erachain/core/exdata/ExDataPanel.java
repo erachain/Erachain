@@ -1,6 +1,5 @@
 package org.erachain.core.exdata;
 
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.item.templates.TemplateCls;
@@ -355,14 +354,8 @@ public class ExDataPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        // jPanel_Message_Public.add(jCheckBox_Message_Public,
-        // gridBagConstraints);
 
-        if (BlockChain.TEST_MODE) {
-            jTabbedPane_Message.addTab(Lang.getInstance().translate("Recipients"), multipleRecipientsPanel);
-            // jTabbedPane_Message.addTab(Lang.getInstance().translate("Public
-            // Part"), jPanel_Message_Public);
-        }
+        jTabbedPane_Message.addTab(Lang.getInstance().translate("Recipients"), multipleRecipientsPanel);
 
         fill_Template_Panel = new MFillTemplatePanel();
         jTabbedPane_Message.addTab(Lang.getInstance().translate("Template"), fill_Template_Panel);
@@ -507,7 +500,6 @@ public class ExDataPanel extends javax.swing.JPanel {
 
         jTabbedPane_Message.addTab(Lang.getInstance().translate("Hashes"), jPanel_Other_Hashes);
 
-        // if (BlockChain.DEVELOP_USE == true)
         jTabbedPane_Message.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
