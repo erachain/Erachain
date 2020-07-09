@@ -134,11 +134,8 @@ public class WinBlockSelector extends MonitoredThread {
                 processMessage(message);
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                if (BlockChain.CHECK_BUGS > 7) {
-                    // тут нельзя выходить так как просто битым блоком смогут все ноды убить при атаке
-                    Controller.getInstance().stopAll(566);
-                    break;
-                }
+                Controller.getInstance().stopAll(566);
+                break;
             } catch (java.lang.IllegalMonitorStateException e) {
                 blockingQueue = null;
                 Controller.getInstance().stopAll(567);

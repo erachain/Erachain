@@ -665,7 +665,9 @@ public class Synchronizer extends Thread {
                                 errorMess = "invalid PARSE! " + e.getMessage();
                                 LOGGER.debug(errorMess, e);
                                 banTime = BAN_BLOCK_TIMES << 1;
-                                ctrl.stopAll(339);
+                                if (BlockChain.CHECK_BUGS > 9) {
+                                    ctrl.stopAll(339);
+                                }
                                 break;
                             } catch (Throwable e) {
                                 errorMess = "invalid PARSE! " + e.getMessage();
