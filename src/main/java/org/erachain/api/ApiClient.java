@@ -30,6 +30,11 @@ public class ApiClient {
     String[][] helpStrings =
             {
                     {
+                            "GET core",
+                            "Returns info of the application.",
+                            "JSON"
+                    },
+                    {
                             "GET core/stop",
                             "Will stop the application. This command might not be able to return a http OK message.",
                             ""
