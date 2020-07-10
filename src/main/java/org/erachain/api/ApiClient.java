@@ -27,8 +27,13 @@ public class ApiClient {
     private static final String ERA_ABBREV = AssetCls.ERA_ABBREV;
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiClient.class);
     private static List<String> allowedcalls = new CopyOnWriteArrayList<>();
-    String[][] helpStrings =
+    static String[][] helpStrings =
             {
+                    {
+                            "GET core",
+                            "Returns info of the application.",
+                            "JSON"
+                    },
                     {
                             "GET core/stop",
                             "Will stop the application. This command might not be able to return a http OK message.",
