@@ -5,6 +5,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.transaction.OnDealClick;
@@ -147,13 +148,15 @@ public class CancelOrderFrame extends JDialog {
 
         //LABEL FEE
         labelGBC.gridy = 7;
-        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
+        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        feeLabel.setVisible(Gui.SHOW_FEE_POWER);
         this.add(feeLabel, labelGBC);
 
         //TXT FEE
         txtGBC.gridy = 7;
         txtFeePow = new JTextField();
         this.txtFeePow.setText("0");
+        txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
         this.add(txtFeePow, txtGBC);
 
         //BUTTON CANCEL SALE

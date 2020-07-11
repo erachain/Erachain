@@ -8,6 +8,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.RVouch;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
@@ -317,6 +318,7 @@ public class VouchRecordDialog extends JDialog {
 
 
         jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
+        jLabel_Fee.setVisible(Gui.SHOW_FEE_POWER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 17;
@@ -328,6 +330,7 @@ public class VouchRecordDialog extends JDialog {
         //   jFormattedTextField_Fee.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         //    jFormattedTextField_Fee.setMinimumSize(new java.awt.Dimension(100, 20));
         jFormattedTextField_Fee.setText("0");
+        jFormattedTextField_Fee.setVisible(Gui.SHOW_FEE_POWER);
         //    jFormattedTextField_Fee.setPreferredSize(new java.awt.Dimension(100, 20));
 
         gridBagConstraints = new java.awt.GridBagConstraints();

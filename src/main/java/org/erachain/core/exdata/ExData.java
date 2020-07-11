@@ -993,9 +993,9 @@ public class ExData {
         byte[] password;
         int pos = -1;
         if (account.equals((recipient))) {
-            pos = secrets.length - 1;
+            pos = recipients.length; // последлний в Секретах
         } else {
-            for (int i = 0; i < recipients.length - 1; i++) {
+            for (int i = 0; i < recipients.length; i++) {
                 if (recipients[i].equals(recipient)) {
                     pos = i;
                     break;

@@ -13,6 +13,7 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.statuses.ComboBoxStatusesModel;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -95,8 +96,9 @@ public class PersonSetStatusDialog extends JDialog {
         jLabel_Status.setText(Lang.getInstance().translate("Status") + ":");
         jLabel_Title.setText(Lang.getInstance().translate("Information about the person") + ":");
         jLabel__Description.setText("%D (" + Lang.getInstance().translate("text") + ") :");
-        ;
-        jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + " (0..6):");
+
+        jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
+        jLabel_Fee.setVisible(Gui.SHOW_FEE_POWER);
         jComboBox_Status.setModel(new ComboBoxStatusesModel());
         jComboBox_YourAddress.setModel(new AccountsComboBoxModel());
         jLabel_PersonInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -111,6 +113,7 @@ public class PersonSetStatusDialog extends JDialog {
         jAData1Txt.setText("");
         jAData2Txt.setText("");
         jFeeTxt.setText("0");
+        jFeeTxt.setVisible(Gui.SHOW_FEE_POWER);
         jParentRecTxt.setText("0");
         this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         this.setPreferredSize(MainFrame.getInstance().getPreferredSize());

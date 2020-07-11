@@ -6,6 +6,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
@@ -121,7 +122,8 @@ public class IssuePollPanel extends JPanel {
         gbcOptionsLabel.anchor = GridBagConstraints.NORTHEAST;
         add(optionsLabel, gbcOptionsLabel);
 
-        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
+        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        feeLabel.setVisible(Gui.SHOW_FEE_POWER);
         GridBagConstraints gbcFeeLabel = new GridBagConstraints();
         gbcFeeLabel.gridx = 1;
         gbcFeeLabel.gridy = 6;
@@ -184,6 +186,7 @@ public class IssuePollPanel extends JPanel {
 
         txtFee.setModel(new DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFee.setSelectedIndex(0);
+        txtFee.setVisible(Gui.SHOW_FEE_POWER);
 
         GridBagConstraints gbcTxtFee = new GridBagConstraints();
         gbcTxtFee.gridx = 2;

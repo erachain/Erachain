@@ -8,6 +8,7 @@ import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.IssueUnionRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
@@ -266,6 +267,7 @@ public class IssueUnionPanel extends JPanel {
         add(birthdayJLabel, gridBagConstraints);
 
         feeJLabel.setText(Lang.getInstance().translate("Fee Power") + ":");
+        feeJLabel.setVisible(Gui.SHOW_FEE_POWER);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
@@ -323,6 +325,7 @@ public class IssueUnionPanel extends JPanel {
 
         txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFeePow.setSelectedIndex(0);
+        txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 7;

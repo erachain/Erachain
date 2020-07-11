@@ -90,8 +90,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.0.01 DEV 01";
-    public static String buildTime = "2020-05-06 12:00:00 UTC";
+    public static String version = "5.0.01";
+    public static String buildTime = "2020-07-07 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -170,6 +170,7 @@ public class Controller extends Observable {
     public boolean onlyProtocolIndexing;
     public boolean compactDConStart;
     public boolean inMemoryDC;
+
     /**
      * see org.erachain.datachain.DCSet#BLOCKS_MAP
      */
@@ -215,7 +216,6 @@ public class Controller extends Observable {
                 dbs = "M";
 
         }
-
 
         if (withTimestamp)
             return version + (BlockChain.DEMO_MODE ? " DEMO Net"
@@ -3743,6 +3743,7 @@ public class Controller extends Observable {
                 useNet = false;
                 continue;
             }
+
         }
 
         if (Settings.genesisStamp <= 0) {

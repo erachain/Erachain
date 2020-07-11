@@ -21,6 +21,7 @@ public class ApiService extends Observable {
     public ApiService() {
         //CREATE CONFIG
         Set<Class<?>> s = new HashSet<Class<?>>();
+        s.add(RPCResource.class);
         s.add(CoreResource.class);
         s.add(SeedResource.class);
         s.add(PeersResource.class);

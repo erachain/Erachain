@@ -116,6 +116,7 @@ public class Settings {
     public static int NET_MODE;
 
     public static int TEST_DB_MODE;
+    public static int CHECK_BUGS;
 
     private static Settings instance;
 

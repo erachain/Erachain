@@ -24,6 +24,7 @@ import org.erachain.database.wallet.SecureWalletDatabase;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.ObserverWaiter;
+import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -1829,30 +1830,58 @@ public class Wallet extends Observable /*implements Observer*/ {
 			pathOld = "." + File.separator;
 		fileopen.setCurrentDirectory(new File(pathOld));
 		int ret = fileopen.showDialog(null, Lang.getInstance().translate("Open Wallet Dir"));
-		if (ret == JFileChooser.APPROVE_OPTION) {
-			String selectedDir = fileopen.getSelectedFile().toString();
+		if (ret != JFileChooser.APPROVE_OPTION) {
+			//is abort
+			return 3;
 
-			// set wallet dir
-			Settings.getInstance().setWalletKeysPath(selectedDir);
-			// open wallet
-			Controller.getInstance().wallet = new Wallet(withObserver, dynamicGUI);
-			// not wallet return 0;
-			if (!Controller.getInstance().wallet.exists()) return 2;
-            // accounts
-            List<Account> aa = Controller.getInstance().wallet.getAccounts();
-			if (Controller.getInstance().wallet.getAccounts().size() < 1) return 5;
-			if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
-				Controller.getInstance().wallet.initiateItemsFavorites();
-				// save path from setting json
-				Settings.getInstance().updateSettingsValue();
-				// is ok
-				return 1;
-			} else {
-				Settings.getInstance().setWalletKeysPath(pathOld);
+		}
+
+		String selectedDir = fileopen.getSelectedFile().toString();
+
+		// set wallet dir
+		Settings.getInstance().setWalletKeysPath(selectedDir);
+		// open wallet
+		Controller.getInstance().wallet = new Wallet(withObserver, dynamicGUI);
+		// not wallet return 0;
+		if (!Controller.getInstance().wallet.exists()) {
+			Settings.getInstance().setWalletKeysPath(pathOld);
+			return 2;
+		}
+
+		// LOAD accounts
+		Controller.getInstance().wallet.database.getAccountMap().clear();
+
+		if (!Controller.getInstance().isWalletUnlocked()) {
+			// ASK FOR PASSWORD
+			String password = PasswordPane.showUnlockWalletDialog(null);
+			if (!Controller.getInstance().unlockWallet(password)) {
+				// WRONG PASSWORD
+				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
+						Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+				return 5;
 			}
 		}
 
-		//is abort
-		return 3;
+		int number = 0;
+		/// deadlock org.erachain.database.wallet.AccountMap
+		AccountMap mapAccs = Controller.getInstance().wallet.database.getAccountMap();
+		synchronized (mapAccs) {
+			for (PrivateKeyAccount privateAccount : Controller.getInstance().getWalletPrivateKeyAccounts()) {
+				mapAccs.add(privateAccount, ++number);
+			}
+		}
+
+		Controller.getInstance().wallet.database.hardFlush();
+
+		if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
+			Controller.getInstance().wallet.initiateItemsFavorites();
+			// save path from setting json
+			Settings.getInstance().updateSettingsValue();
+			// is ok
+			return 1;
+		} else {
+			Settings.getInstance().setWalletKeysPath(pathOld);
+			return 3;
+		}
 	}
 }
