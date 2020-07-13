@@ -1197,7 +1197,6 @@ public class BlockExplorer {
             tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
             tradeJSON.put("amountWant", trade.getAmountHave().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
 
-
         } else {
             tradeJSON.put("type", "buy");
 
