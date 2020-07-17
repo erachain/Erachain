@@ -70,7 +70,10 @@ public class RCalculated extends TransactionAmount {
         if (this.timestamp > 0) {
             return this.timestamp;
         }
-        return (this.timestamp = Controller.getInstance().blockChain.getTimestamp(this.height) + seqNo);
+        if (this.height > 0) {
+            return (this.timestamp = Controller.getInstance().blockChain.getTimestamp(this.height) + seqNo);
+        } else
+            return 0l;
     }
 
     @Override
