@@ -34,18 +34,21 @@ public class RCalculated extends TransactionAmount {
     protected String message;
 
     public RCalculated(byte[] typeBytes, Account recipient, long key,
-                       BigDecimal amount, String message, long txReference) {
-        super(typeBytes, NAME_ID, null, (byte)0, recipient, amount, key, 0l, txReference);
+                       BigDecimal amount, String message, long txReference, long seqNo) {
+        super(typeBytes, NAME_ID, null, (byte) 0, recipient, amount, key, 0l, txReference);
 
         this.message = message;
         if (message == null)
             this.message = "";
 
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
+
     }
 
     public RCalculated(Account recipient, long key,
-                       BigDecimal amount, String message, long txReference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, recipient, key, amount, message, txReference);
+                       BigDecimal amount, String message, long txReference, long seqNo) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, recipient, key, amount, message, txReference, seqNo);
     }
 
     // GETTERS/SETTERS
@@ -60,6 +63,14 @@ public class RCalculated extends TransactionAmount {
         if (transaction instanceof RCalculated)
             return dbRef == ((Transaction) transaction).getDBRef();
         return false;
+    }
+
+    @Override
+    public Long getTimestamp() {
+        if (this.timestamp > 0) {
+            return this.timestamp;
+        }
+        return (this.timestamp = Controller.getInstance().blockChain.getTimestamp(this.height) + seqNo);
     }
 
     @Override
@@ -103,6 +114,12 @@ public class RCalculated extends TransactionAmount {
         byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
         long txReference = Longs.fromByteArray(referenceBytes);
         position += REFERENCE_LENGTH;
+
+        long seqNo = 0;
+        //READ SEQ_NO
+        byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+        seqNo = Longs.fromByteArray(seqNoBytes);
+        position += TIMESTAMP_LENGTH;
 
         ///////////////// LOAD
 
@@ -150,7 +167,7 @@ public class RCalculated extends TransactionAmount {
         String message = new String(messageBytes, StandardCharsets.UTF_8);
         position += messageLen;
 
-        return new RCalculated(typeBytes, recipient, key, amount, message, txReference);
+        return new RCalculated(typeBytes, recipient, key, amount, message, txReference, seqNo);
 
     }
 
@@ -184,6 +201,12 @@ public class RCalculated extends TransactionAmount {
         byte[] referenceBytes = Longs.toByteArray(this.reference);
         referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
         data = Bytes.concat(data, referenceBytes);
+
+        byte[] dbRefBytes = Longs.toByteArray(this.dbRef);
+        dbRefBytes = Bytes.ensureCapacity(dbRefBytes, TIMESTAMP_LENGTH, 0);
+        data = Bytes.concat(data, dbRefBytes);
+
+        ////////// LOAD
 
         // WRITE RECIPIENT
         data = Bytes.concat(data, this.recipient.getAddressBytes());
@@ -246,7 +269,9 @@ public class RCalculated extends TransactionAmount {
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
 
-        return TYPE_LENGTH + REFERENCE_LENGTH + RECIPIENT_LENGTH
+        return TYPE_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH
+                /// LOAD
+                + RECIPIENT_LENGTH
                 + (this.amount == null ? 0 : AMOUNT_LENGTH + KEY_LENGTH)
                 + 1 + message.getBytes(StandardCharsets.UTF_8).length;
     }

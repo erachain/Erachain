@@ -1116,7 +1116,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         if (block != null && block.txCalculated != null) {
             block.txCalculated.add(new RCalculated(creator, assetKey, amount,
-                    message, this.dbRef));
+                    message, this.dbRef, seqNo));
             return true;
         }
         return false;
@@ -1596,7 +1596,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " top level";
                 txCalculated.add(new RCalculated(invitedAccount, FEE_KEY, giftBG,
-                        messageLevel, this.dbRef));
+                        messageLevel, this.dbRef, seqNo));
 
             }
             return;
@@ -1624,7 +1624,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
                 txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
-                        messageLevel, this.dbRef));
+                        messageLevel, this.dbRef, seqNo));
             }
 
             if (fee_gift_next > 0) {
@@ -1644,7 +1644,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
                 txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
-                        messageLevel, this.dbRef));
+                        messageLevel, this.dbRef, seqNo));
             }
         }
     }
