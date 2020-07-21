@@ -120,7 +120,7 @@ public class Account {
             } else if (PublicKeyAccount.isValidPublicKey(address)) {
                 return new Tuple2<Account, String>(new PublicKeyAccount(address), null);
             } else {
-                return new Tuple2<Account, String>(null, "Wrong Address or PublickKey");
+                return new Tuple2<Account, String>(null, "Wrong Address or PublicKey");
             }
         } else {
             // IT IS NAME - resolve ADDRESS
@@ -164,11 +164,33 @@ public class Account {
 
     }
 
-    public static String getDetails(String toValue, AssetCls asset) {
+    public static String getDetailsForEncrypt(String address) {
+
+        if (address.isEmpty()) {
+            return "";
+        }
+
+        // CHECK IF RECIPIENT IS VALID ADDRESS
+        if (Crypto.getInstance().isValidAddress(address)) {
+            if (null == Controller.getInstance().getPublicKeyByAddress(address)) {
+                return "address is unknown - cant't encrypt for it, please use public key instead";
+            }
+            return "address is OK";
+        } else {
+            if (PublicKeyAccount.isValidPublicKey(address)) {
+                return "public key is OK";
+            } else {
+                return "address or public key is invalid";
+            }
+        }
+
+    }
+
+    public static String getDetails(String address, long assetKey) {
 
         String out = "";
 
-        if (toValue.isEmpty()) {
+        if (address.isEmpty()) {
             return out;
         }
 
@@ -177,33 +199,38 @@ public class Account {
         Account account = null;
 
         // CHECK IF RECIPIENT IS VALID ADDRESS
-        if (Crypto.getInstance().isValidAddress(toValue)) {
-            account = new Account(toValue);
+        if (Crypto.getInstance().isValidAddress(address)) {
+            account = new Account(address);
         } else {
-            if (PublicKeyAccount.isValidPublicKey(toValue)) {
-                account = new PublicKeyAccount(toValue);
+            if (PublicKeyAccount.isValidPublicKey(address)) {
+                account = new PublicKeyAccount(address);
             } else {
 
-                Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(toValue);
+                Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(address);
 
                 if (nameToAdress.getB() == NameResult.OK) {
                     account = nameToAdress.getA();
-                    return (statusBad ? "??? " : "") + account.toString(asset.getKey());
+                    return (statusBad ? "??? " : "") + account.toString(assetKey);
                 } else {
                     return (statusBad ? "??? " : "") + nameToAdress.getB().getShortStatusMessage();
                 }
             }
         }
 
-        if (account.getBalanceUSE(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
+        if (account.getBalanceUSE(assetKey).compareTo(BigDecimal.ZERO) == 0
                 && account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0) {
             return Lang.getInstance().translate("Warning!") + " " + (statusBad ? "???" : "")
-                    + account.toString(asset.getKey());
+                    + account.toString(assetKey);
         } else {
-            return (statusBad ? "???" : "") + account.toString(asset.getKey());
+            return (statusBad ? "???" : "") + account.toString(assetKey);
         }
 
     }
+
+    public static String getDetails(String address, AssetCls asset) {
+        return getDetails(address, asset.getKey());
+    }
+
 
     public static Map<byte[], BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key,
                                                                   Map<byte[], BigDecimal> values) {
@@ -213,7 +240,7 @@ public class Account {
 
         if (true) {
             // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX
-            for (byte[] mapKey: map.keySet()) {
+            for (byte[] mapKey : map.keySet()) {
                 if (ItemAssetBalanceMap.getAssetKeyFromKey(mapKey) == key) {
                     ballance = map.get(mapKey);
                     values.put(ItemAssetBalanceMap.getShortAccountFromKey(mapKey), ballance.a.b);

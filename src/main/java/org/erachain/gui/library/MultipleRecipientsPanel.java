@@ -7,6 +7,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NameUtils;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -81,7 +82,7 @@ public class MultipleRecipientsPanel extends JPanel {
         jScrollPaneRecipients.setOpaque(false);
         jScrollPaneRecipients.setPreferredSize(new Dimension(0, 0));
 
-        recipientsTableModel = new Table_Model(1);
+        recipientsTableModel = new Table_Model(0);
         jTableRecipients = new MTable(recipientsTableModel);
         jTableRecipients.setVisible(true);
         jScrollPaneRecipients.setViewportView(jTableRecipients);
@@ -136,16 +137,15 @@ public class MultipleRecipientsPanel extends JPanel {
                             Lang.getInstance().translate("Description")
                     },
                     rows);
-            //this.addRow(new Object[]{"", ""});
+            this.addRow(new Object[]{"", ""});
 
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            //	if (column == 0) {
-            return true;
-            //	}
-            //       return false;
+            if (column == 0)
+                return true;
+            return false;
         }
 
         public Class<? extends Object> getColumnClass(int c) {     // set column type
@@ -169,10 +169,20 @@ public class MultipleRecipientsPanel extends JPanel {
             //IF STRING
             if (aValue instanceof String) {
                 //CHECK IF NOT EMPTY
-                if (((String) aValue).length() > 0) {
+                String address = (String) aValue;
+                if (!address.isEmpty()) {
                     //CHECK IF LAST ROW
                     if (row == this.getRowCount() - 1) {
-                        this.addRow(new Object[]{"", "0"});
+                        this.addRow(new Object[]{"", ""});
+                    }
+
+                    Fun.Tuple2<Account, String> result = Account.tryMakeAccount(address);
+                    if (result.a == null) {
+                        super.setValueAt(Lang.getInstance().translate(result.b), row, column + 1);
+                    } else {
+                        super.setValueAt(
+                                Lang.getInstance().translate(Account.getDetailsForEncrypt(address)),
+                                row, column + 1);
                     }
 
                     super.setValueAt(aValue, row, column);
@@ -182,7 +192,7 @@ public class MultipleRecipientsPanel extends JPanel {
 
                 //CHECK IF LAST ROW
                 if (row == this.getRowCount() - 1) {
-                    this.addRow(new Object[]{"", "0"});
+                    this.addRow(new Object[]{"", ""});
                 }
             }
         }
