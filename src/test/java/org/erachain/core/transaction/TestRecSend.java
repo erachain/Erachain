@@ -923,8 +923,8 @@ public class TestRecSend {
 
         /// MESSAGE + AMOUNT
         RCalculated txCalculated = new RCalculated(recipient, ERA_KEY, amount,
-                head, timestamp
-        );
+                head, timestamp,
+                seqNo);
 
         byte[] rawCalculated = txCalculated.toBytes(Transaction.FOR_NETWORK, true);
         int length = txCalculated.getDataLength(Transaction.FOR_NETWORK, true);
@@ -943,8 +943,8 @@ public class TestRecSend {
         assertEquals(txCalculated.getMessage(), txCalculated_2.getMessage());
 
         txCalculated = new RCalculated(recipient, ERA_KEY, null,
-                head, timestamp
-        );
+                head, timestamp,
+                seqNo);
 
         rawCalculated = txCalculated.toBytes(Transaction.FOR_NETWORK, true);
         length = txCalculated.getDataLength(Transaction.FOR_NETWORK, true);
