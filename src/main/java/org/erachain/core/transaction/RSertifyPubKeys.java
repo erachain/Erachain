@@ -652,7 +652,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             pkAccount.changeCOMPUBonusBalances(dcSet, false, personBonus, Transaction.BALANCE_SIDE_DEBIT);
             if (makeCalculates) {
                 block.txCalculated.add(new RCalculated(pkAccount, FEE_KEY, personBonus,
-                        "enter bonus", this.dbRef));
+                        "enter bonus", this.dbRef, seqNo));
             }
             BigDecimal issued_FEE_BD_total = personBonus;
 
@@ -662,7 +662,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             issuer.changeCOMPUBonusBalances(dcSet, false, issued_FEE_BD, Transaction.BALANCE_SIDE_DEBIT);
             if (makeCalculates) {
                 block.txCalculated.add(new RCalculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
-                        "register reward @P:" + this.key, this.dbRef));
+                        "register reward @P:" + this.key, this.dbRef, seqNo));
             }
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 
