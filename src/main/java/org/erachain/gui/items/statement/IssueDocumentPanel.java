@@ -18,6 +18,7 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,8 +47,17 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
 
         th = this;
         initComponents();
+        setvariables();
 
-        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
+        encryptCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setvariables();
+
+            }
+        });
+
+        txtFeePow.setModel(new DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFeePow.setSelectedIndex(0);
         txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
 
@@ -373,5 +383,11 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
                 return null;
             }
         }
+    }
+    public void setvariables(){
+        exData_Panel.checkBoxMakeHashAndCheckUniqueAttachedFiles.setEnabled(!encryptCheckBox.isSelected());
+        exData_Panel.checkBoxMakeHashAndCheckUniqueHashes.setEnabled(!encryptCheckBox.isSelected());
+        exData_Panel.checkBoxMakeHashAndCheckUniqueText.setEnabled(!encryptCheckBox.isSelected());
+        exData_Panel.fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.setEnabled(!encryptCheckBox.isSelected());
     }
 }

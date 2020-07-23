@@ -70,9 +70,9 @@ public class ExDataPanel extends javax.swing.JPanel {
     private MTable jTable_Other_Hashes;
     private javax.swing.JTextPane jTextPane_Message;
     private MImprintEDITPane jTextPane_Message_Public;
-    private JCheckBox checkBoxMakeHashAndCheckUniqueText;
-    private JCheckBox checkBoxMakeHashAndCheckUniqueHashes;
-    private JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
+    public JCheckBox checkBoxMakeHashAndCheckUniqueText;
+    public JCheckBox checkBoxMakeHashAndCheckUniqueHashes;
+    public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
 
 
     /**
