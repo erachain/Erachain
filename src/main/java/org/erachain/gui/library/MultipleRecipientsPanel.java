@@ -7,6 +7,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NameUtils;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -22,7 +23,7 @@ public class MultipleRecipientsPanel extends JPanel {
     private JButton jButtonAddRecipient;
     private JButton jButtonRemoveRecipient;
     private GridBagConstraints gridBagConstraints;
-    private JCheckBox allCheckBox;
+    private JCheckBox withoutCheckBox;
     public JCheckBox signCanRecipientsCheckBox;
 
     public MultipleRecipientsPanel() {
@@ -32,23 +33,24 @@ public class MultipleRecipientsPanel extends JPanel {
         jButtonAddRecipient = new JButton();
         jScrollPaneRecipients = new JScrollPane();
         jButtonRemoveRecipient = new JButton();
-        allCheckBox = new JCheckBox();
-        allCheckBox.setText(Lang.getInstance().translate("Everybody"));
-        allCheckBox.setSelected(true);
+        withoutCheckBox = new JCheckBox();
+        withoutCheckBox.setText(Lang.getInstance().translate("Without Recipients"));
+        withoutCheckBox.setSelected(false);
         signCanRecipientsCheckBox = new JCheckBox(Lang.getInstance().translate("To sign can only Recipients"));
         signCanRecipientsCheckBox.setSelected(true);
-        signCanRecipientsCheckBox.setVisible(false);
+        signCanRecipientsCheckBox.setVisible(true);
 
         jButtonAddRecipient.setVisible(false);
-        jButtonRemoveRecipient.setVisible(false);
+        jButtonRemoveRecipient.setVisible(true);
 
 
-        allCheckBox.addActionListener(new ActionListener() {
+        withoutCheckBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                jButtonRemoveRecipient.setVisible(!allCheckBox.isSelected());
-                jTableRecipients.setVisible(!allCheckBox.isSelected());
-                signCanRecipientsCheckBox.setVisible(!allCheckBox.isSelected());
+                jButtonRemoveRecipient.setVisible(!withoutCheckBox.isSelected());
+                jTableRecipients.setVisible(!withoutCheckBox.isSelected());
+                signCanRecipientsCheckBox.setVisible(!withoutCheckBox.isSelected());
+                jButtonRemoveRecipient.setVisible(!withoutCheckBox.isSelected());
             }
         });
 
@@ -56,17 +58,18 @@ public class MultipleRecipientsPanel extends JPanel {
             // delete row
             @Override
             public void actionPerformed(ActionEvent e) {
-                int interval=0;
+                int interval = 0;
                 if (recipientsTableModel.getRowCount() > 0) {
                     int selRow = jTableRecipients.getSelectedRow();
                     if (selRow != -1 && recipientsTableModel.getRowCount() >= selRow) {
                         ((DefaultTableModel) recipientsTableModel).removeRow(selRow);
-                        interval = selRow-1;
-                        if (interval<0) interval =0;
+                        interval = selRow - 1;
+                        if (interval < 0) interval = 0;
                     }
                 }
-                if (recipientsTableModel.getRowCount()<1) {
-                    recipientsTableModel.addRow(new Object[]{"", "0"});
+
+                if (recipientsTableModel.getRowCount() < 1) {
+                    recipientsTableModel.addRow(new Object[]{"", ""});
                     interval = 0;
                 }
 
@@ -81,14 +84,14 @@ public class MultipleRecipientsPanel extends JPanel {
 
         recipientsTableModel = new Table_Model(0);
         jTableRecipients = new MTable(recipientsTableModel);
-        jTableRecipients.setVisible(false);
+        jTableRecipients.setVisible(true);
         jScrollPaneRecipients.setViewportView(jTableRecipients);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
-        this.add(allCheckBox, gridBagConstraints);
+        this.add(withoutCheckBox, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
@@ -131,18 +134,18 @@ public class MultipleRecipientsPanel extends JPanel {
 
         public Table_Model(int rows) {
             super(new Object[]{Lang.getInstance().translate("Address"),
-                            //Lang.getInstance().translate("Description")
+                            Lang.getInstance().translate("Description")
                     },
                     rows);
-            this.addRow(new Object[]{"", "0"});
+            this.addRow(new Object[]{"", ""});
+
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            //	if (column == 0) {
-            return true;
-            //	}
-            //       return false;
+            if (column == 0)
+                return true;
+            return false;
         }
 
         public Class<? extends Object> getColumnClass(int c) {     // set column type
@@ -166,10 +169,20 @@ public class MultipleRecipientsPanel extends JPanel {
             //IF STRING
             if (aValue instanceof String) {
                 //CHECK IF NOT EMPTY
-                if (((String) aValue).length() > 0) {
+                String address = (String) aValue;
+                if (!address.isEmpty()) {
                     //CHECK IF LAST ROW
                     if (row == this.getRowCount() - 1) {
-                        this.addRow(new Object[]{"", "0"});
+                        this.addRow(new Object[]{"", ""});
+                    }
+
+                    Fun.Tuple2<Account, String> result = Account.tryMakeAccount(address);
+                    if (result.a == null) {
+                        super.setValueAt(Lang.getInstance().translate(result.b), row, column + 1);
+                    } else {
+                        super.setValueAt(
+                                Lang.getInstance().translate(Account.getDetailsForEncrypt(address)),
+                                row, column + 1);
                     }
 
                     super.setValueAt(aValue, row, column);
@@ -179,13 +192,13 @@ public class MultipleRecipientsPanel extends JPanel {
 
                 //CHECK IF LAST ROW
                 if (row == this.getRowCount() - 1) {
-                    this.addRow(new Object[]{"", "0"});
+                    this.addRow(new Object[]{"", ""});
                 }
             }
         }
 
         public Account[] getRecipients() {
-            if (allCheckBox.isSelected())
+            if (withoutCheckBox.isSelected())
                 return new Account[0];
 
             // without LAST empty
