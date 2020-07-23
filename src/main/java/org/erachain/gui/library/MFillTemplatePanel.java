@@ -40,6 +40,7 @@ public class MFillTemplatePanel extends JPanel {
     private JScrollPane jScrollPane_Params_Template_Public_TextPane;
     private MTable jTable_Params_Message_Public;
     private MImprintEDITPane jTextPane_Message_Public;
+    public JCheckBox checkBoxMakeHashAndCheckUniqueTemplate;
 
     public MFillTemplatePanel() {
         jTextPane_Message_Public = new MImprintEDITPane();
@@ -137,6 +138,18 @@ public class MFillTemplatePanel extends JPanel {
 
         setLayout(new GridBagLayout());
 
+        // Make hash and check unique
+        checkBoxMakeHashAndCheckUniqueTemplate = new JCheckBox(Lang.getInstance().translate("Make hash and check unique"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(8, 8, 8, 8);
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        add(checkBoxMakeHashAndCheckUniqueTemplate, gridBagConstraints);
+
+
         add_Tamplate.setText(Lang.getInstance().translate("Insert template") + "?");
         add_Tamplate.addActionListener(new ActionListener() {
 
@@ -159,22 +172,24 @@ public class MFillTemplatePanel extends JPanel {
         );
 
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(8, 8, 8, 0);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         add(add_Tamplate, gridBagConstraints);
 
         jLabel_Template1.setText(Lang.getInstance().translate("Select template") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(8, 8, 8, 0);
         add(jLabel_Template1, gridBagConstraints);
 
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
@@ -185,7 +200,7 @@ public class MFillTemplatePanel extends JPanel {
         jCheckBox_Is_Text.setText("jCheckBox1");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(0, 8, 8, 0);
         //	add(jCheckBox_Is_Text, gridBagConstraints);
@@ -193,7 +208,7 @@ public class MFillTemplatePanel extends JPanel {
         jCheckBox_Is_Encripted.setText(Lang.getInstance().translate("Encrypt message"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(0, 0, 8, 0);
 //		add(jCheckBox_Is_Encripted, gridBagConstraints);
@@ -210,7 +225,7 @@ public class MFillTemplatePanel extends JPanel {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 7;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
