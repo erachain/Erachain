@@ -321,10 +321,9 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         String recipient = jTextField_To.getText();
         AssetCls asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
 
-        /// this.jTextField_Recive_Detail.setText(Account.getDetails(recipient, asset));
-        this.jTextField_Recive_Detail.setText(Account.getDetailsForEncrypt(recipient, asset.getKey()));
+        this.jTextField_Recive_Detail.setText(Account.getDetailsForEncrypt(recipient, asset.getKey(),
+                this.jCheckBox_Enscript.isSelected()));
 
-        //this.jCheckBox_Enscript.setEnabled(true);
     }
 
     public boolean cheskError() {

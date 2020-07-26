@@ -516,7 +516,8 @@ public class MailSendPanel extends JPanel {
         }
 
         if (true) {
-            this.txtRecDetails.setText(Account.getDetailsForEncrypt(recipient, asset.getKey()));
+            this.txtRecDetails.setText(Account.getDetailsForEncrypt(recipient, asset.getKey(),
+                    encrypted.isSelected()));
         } else {
 
             if (txtTo.getText().equals("has no Addresses")) {

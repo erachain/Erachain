@@ -181,7 +181,7 @@ public class MultipleRecipientsPanel extends JPanel {
                         super.setValueAt(Lang.getInstance().translate(result.b), row, column + 1);
                     } else {
                         super.setValueAt(
-                                Lang.getInstance().translate(Account.getDetailsForEncrypt(address, AssetCls.FEE_KEY)),
+                                Lang.getInstance().translate(Account.getDetailsForEncrypt(address, AssetCls.FEE_KEY, true)),
                                 row, column + 1);
                     }
 

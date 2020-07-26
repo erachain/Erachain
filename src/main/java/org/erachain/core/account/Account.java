@@ -164,7 +164,7 @@ public class Account {
 
     }
 
-    public static String getDetailsForEncrypt(String address, long itemKey) {
+    public static String getDetailsForEncrypt(String address, long itemKey, boolean forEncrypt) {
 
         if (address.isEmpty()) {
             return "";
@@ -172,13 +172,13 @@ public class Account {
 
         // CHECK IF RECIPIENT IS VALID ADDRESS
         if (Crypto.getInstance().isValidAddress(address)) {
-            if (null == Controller.getInstance().getPublicKeyByAddress(address)) {
+            if (forEncrypt && null == Controller.getInstance().getPublicKeyByAddress(address)) {
                 return "address is unknown - cant't encrypt for it, please use public key instead";
             }
             if (itemKey > 0) {
                 Account account = new Account(address);
                 if (account.isPerson()) {
-                    return account.getPerson().b.toString() + " + " + account.getBalance(itemKey).a.b.toPlainString();
+                    return account.getPerson().b.toString() + " " + account.getBalance(itemKey).a.b.toPlainString();
                 }
                 return " + " + account.getBalance(itemKey).a.b.toPlainString();
             }
@@ -190,7 +190,7 @@ public class Account {
                 if (itemKey > 0) {
                     Account account = new PublicKeyAccount(address);
                     if (account.isPerson()) {
-                        return account.getPerson().b.toString() + " + " + account.getBalance(itemKey).a.b.toPlainString();
+                        return account.getPerson().b.toString() + " " + account.getBalance(itemKey).a.b.toPlainString();
                     }
                     return " + " + account.getBalance(itemKey).a.b.toPlainString();
                 }
