@@ -4,6 +4,7 @@ package org.erachain.gui.library;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NameUtils;
 import org.erachain.utils.Pair;
@@ -158,7 +159,6 @@ public class MultipleRecipientsPanel extends JPanel {
 
             if (this.getRowCount() < row || this.getRowCount() == 0) return null;
 
-
             return super.getValueAt(row, col);
 
 
@@ -181,7 +181,7 @@ public class MultipleRecipientsPanel extends JPanel {
                         super.setValueAt(Lang.getInstance().translate(result.b), row, column + 1);
                     } else {
                         super.setValueAt(
-                                Lang.getInstance().translate(Account.getDetailsForEncrypt(address)),
+                                Lang.getInstance().translate(Account.getDetailsForEncrypt(address, AssetCls.FEE_KEY)),
                                 row, column + 1);
                     }
 

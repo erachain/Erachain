@@ -164,7 +164,7 @@ public class Account {
 
     }
 
-    public static String getDetailsForEncrypt(String address) {
+    public static String getDetailsForEncrypt(String address, long itemKey) {
 
         if (address.isEmpty()) {
             return "";
@@ -175,11 +175,25 @@ public class Account {
             if (null == Controller.getInstance().getPublicKeyByAddress(address)) {
                 return "address is unknown - cant't encrypt for it, please use public key instead";
             }
+            if (itemKey > 0) {
+                Account account = new Account(address);
+                if (account.isPerson()) {
+                    return account.getPerson().b.toString() + " + " + account.getBalance(itemKey).a.b.toPlainString();
+                }
+                return " + " + account.getBalance(itemKey).a.b.toPlainString();
+            }
             return "address is OK";
         } else {
             // Base58 string len = 33-34 for ADDRESS and 40-44 for PubKey
             if (address.length() > PublicKeyAccount.PUBLIC_KEY_LENGTH + (PublicKeyAccount.PUBLIC_KEY_LENGTH >> 3)
                     && PublicKeyAccount.isValidPublicKey(address)) {
+                if (itemKey > 0) {
+                    Account account = new PublicKeyAccount(address);
+                    if (account.isPerson()) {
+                        return account.getPerson().b.toString() + " + " + account.getBalance(itemKey).a.b.toPlainString();
+                    }
+                    return " + " + account.getBalance(itemKey).a.b.toPlainString();
+                }
                 return "public key is OK";
             } else {
                 return "address or public key is invalid";
