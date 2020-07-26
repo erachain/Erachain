@@ -709,7 +709,7 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public long calcBaseFee() {
-        return calcCommonFee();
+        return calcCommonFee() + extendedData.getAllHashesAsBytes(true).length * 100;
     }
 
     public void parseDataV2WithoutFiles() {

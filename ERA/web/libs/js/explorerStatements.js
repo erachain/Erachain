@@ -102,11 +102,15 @@ function statement(data) {
     output += '<table><tr><td>';
     output += '<div style="word-wrap: break-word;  width: 1000px;">';
     output += data.Label_type + ':<b>' + data.type + '</b>';
-    output += ' &nbsp&nbsp' + data.Label_block + ': <a href=?block=' + data.block + get_lang() + '><b>' + data.block + '</b></a>';
-    output += ' &nbsp&nbsp' + data.Label_seqNo + ': <a href=?tx=' + data.block + '-' + data.seqNo + get_lang() + '><b>' + data.block + '-' + data.seqNo + '</b></a>';
-    output += ' &nbsp&nbsp' + data.Label_date + ': <b>' + convertTimestamp(data.timestamp, true) + '</b>';
-
+    output += ' &nbsp&nbsp' + data.Label_block + ': <a href=?block=' + data.tx.height + get_lang() + '><b>' + data.tx.height + '</b></a>';
+    output += ' &nbsp&nbsp' + data.Label_seqNo + ': <a href=?tx=' + data.tx.seqNo + get_lang() + '><b>' + data.tx.seqNo + '</b></a>';
+    output += ' &nbsp&nbsp' + data.Label_date + ': <b>' + convertTimestamp(data.tx.timestamp, true) + '</b>';
+    output += ' &nbsp&nbsp' + data.Label_size + ': <b>' + data.tx.size + '</b>';
+    output += ' &nbsp&nbsp' + data.Label_fee + ': <b>' + data.tx.fee + '</b>';
     output += '<br>' + data.Label_creator + ': <a href=?address=' + data.creator + get_lang() + '><b>' + data.creator_name + '</b></a>';
+    output += '<br>' + data.Label_pubKey + ': <b>' + data.tx.publickey + '</b>';
+
+    output += '<br>' + data.Label_signature + ': <b>' + data.tx.signature + '</b>';
 
     if (data.hasOwnProperty('title')) {
         output += '<br>' + data.Label_title + ': <b>' + escapeHtml(data.title) + '</b>';
