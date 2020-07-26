@@ -921,6 +921,7 @@ public class ExData {
 
         } else {
 
+            output.put("Label_template_hash", Lang.getInstance().translateFromLangObj("Template hash", langObj));
             output.put("Label_mess_hash", Lang.getInstance().translateFromLangObj("Message hash", langObj));
             output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
             output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
@@ -933,9 +934,9 @@ public class ExData {
             if (valuedText != null) {
                 output.put("body", valuedText);
             }
-            output.put("templateHash", getMessageHash());
+            output.put("templateHash", Base58.encode(getTemplateHash()));
             if (isTemplateUnique()) {
-                output.put("templateUnique", isTemplateUnique());
+                output.put("templateUnique", 1);
             }
         }
 
@@ -944,8 +945,10 @@ public class ExData {
 
             if (message != null && !message.isEmpty()) {
                 output.put("message", message);
-                output.put("messageUnique", isMessageUnique());
-                output.put("messageHash", getMessageHash());
+                if (isMessageUnique()) {
+                    output.put("messageUnique", 1);
+                }
+                output.put("messageHash", Base58.encode(getMessageHash()));
             }
 
             ///////// NATIVE HASHES

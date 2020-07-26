@@ -136,6 +136,14 @@ function statement(data) {
             output += '<a href="?template=' + data.templateKey + get_lang() + '"><b>['
              + data.templateKey + '] ' + data.templateName + '</b></a><br>';
 
+            output += '<br>' + data.Label_template_hash + ': ';
+            if (data.hasOwnProperty('templateUnique')) {
+                output += '<a href="?tx=' + data.templateHash + get_lang() + '"><b>'
+                 + data.templateHash + '</b></a><br>';
+            } else {
+                output += data.templateHash + '<br>';
+            }
+
             if (data.hasOwnProperty('body')) {
                 output += fformat(data.body);
             }
@@ -143,14 +151,15 @@ function statement(data) {
 
         }
 
-
-
-        if (data.hasOwnProperty('messageHash')) {
-            output += '<br>' + data.Label_mess_hash + ': <a href=?q=' + data.messageHash + get_lang() + '&search=transactions><b>' + data.messageHash + '</b></a>';
-        }
-
         if (data.hasOwnProperty('message')) {
-            output += '<br>' + fformat(data.message);
+            output += '<br>' + data.Label_mess_hash + ': ';
+            if (data.hasOwnProperty('messageUnique')) {
+                output += '<a href="?tx=' + data.messageHash + get_lang() + '"><b>'
+                 + data.messageHash + '</b></a><br>';
+            } else {
+                output += data.messageHash + '<br>';
+            }
+            output += fformat(data.message);
         }
 
         if (data.hasOwnProperty('hashes')) {
