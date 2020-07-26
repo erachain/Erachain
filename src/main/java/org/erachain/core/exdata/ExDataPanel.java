@@ -484,7 +484,7 @@ public class ExDataPanel extends javax.swing.JPanel {
 
 
         // Make hash and check unique
-        checkBoxMakeHashAndCheckUniqueHashes = new JCheckBox(Lang.getInstance().translate("Make hash and check unique"));
+        checkBoxMakeHashAndCheckUniqueHashes = new JCheckBox(Lang.getInstance().translate("Check unique"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
@@ -779,8 +779,11 @@ public class ExDataPanel extends javax.swing.JPanel {
 
         return ExData.make(creator, jTextField_Title_Message.getText(),
                 signCanOnlyRecipients, recipients, isEncrypted,
-                (TemplateCls) fill_Template_Panel.sel_Template,
-                this.fill_Template_Panel.get_Params(), hashes_Map, jTextPane_Message.getText(), files_1);
+                (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),
+                fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
+                jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),
+                hashes_Map, checkBoxMakeHashAndCheckUniqueHashes.isSelected(),
+                files_1, checkBoxMakeHashAndCheckUniqueAttachedFiles.isSelected());
 
     }
     // End of variables declaration

@@ -75,6 +75,7 @@ public class ExData {
 
     private long templateKey;
     private TemplateCls template;
+    private JSONObject params;
     private String valuedText;
 
     private byte secretsFlags;
@@ -151,7 +152,6 @@ public class ExData {
     public void resolveValues(DCSet dcSet) {
 
         String str = "";
-        JSONObject params;
         Set<String> kS;
         if (json == null || json.isEmpty())
             return;
@@ -168,9 +168,7 @@ public class ExData {
                     valuedText = template.viewDescription();
 
                     if (json.containsKey("PR")) {
-                        str = json.get("PR").toString();
-
-                        params = (JSONObject) JSONValue.parseWithException(str);
+                        params = (JSONObject) json.get("PR");
 
                         kS = params.keySet();
                         for (String s : kS) {
@@ -190,9 +188,9 @@ public class ExData {
                         valuedText = template.viewDescription();
 
                         if (json.containsKey("Statement_Params")) {
-                            str = json.get("Statement_Params").toString();
-
-                            params = (JSONObject) JSONValue.parseWithException(str);
+                            /// str = json.get("Statement_Params").toString();
+                            /// params = (JSONObject) JSONValue.parseWithException(str);
+                            params = (JSONObject) json.get("Statement_Params");
 
                             kS = params.keySet();
                             for (String s : kS) {
@@ -310,6 +308,22 @@ public class ExData {
             newFlags[1] &= ~ENCRYPT_FLAG_MASK;
         }
         return newFlags;
+    }
+
+    public boolean isTemplateUnique() {
+        return !isEncrypted() && json.containsKey("TMU");
+    }
+
+    public boolean isMessageUnique() {
+        return !isEncrypted() && json.containsKey("MSU");
+    }
+
+    public boolean isHashesUnique() {
+        return !isEncrypted() && json.containsKey("HSU");
+    }
+
+    public boolean isFilesUnique() {
+        return !isEncrypted() && json.containsKey("FU");
     }
 
     // info to byte[]
@@ -668,56 +682,74 @@ public class ExData {
         }
     }
 
-    public byte[][] getAllHashesAsBytes() {
+    public byte[] getTemplateHash() {
+        return Crypto.getInstance().digest(("" + templateKey
+                + params.toJSONString()).getBytes(StandardCharsets.UTF_8));
+    }
 
-        JSONObject hashesJson = getHashes();
+    public byte[] getMessageHash() {
+        return Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public byte[][] getAllHashesAsBytes(boolean onlyUnique) {
 
         int count = 0;
-        if (hashesJson != null) {
-            count = hashesJson.size();
+        if (hashes != null && (!onlyUnique || isHashesUnique())) {
+            count = hashes.size();
         }
 
-        String message = getMessage();
-        if (message != null && !message.isEmpty()) {
+        if (templateKey > 0 && (!onlyUnique || isTemplateUnique())) {
             count++;
         }
 
-        if (files != null && !files.isEmpty()) {
+        if (message != null && !message.isEmpty() && (!onlyUnique || isMessageUnique())) {
+            count++;
+        }
+
+        if (files != null && !files.isEmpty() && (!onlyUnique || isFilesUnique())) {
             count += files.size();
         }
 
         if (count == 0)
             return null;
 
-        byte[][] hashes = new byte[count][];
+        byte[][] allHashes = new byte[count][];
 
         count = 0;
 
-        // ADD message first
-        if (message != null && !message.isEmpty()) {
-            hashes[count++] = Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8));
+        // ADD template first
+        if (templateKey != 0 && (!onlyUnique || isTemplateUnique())) {
+            allHashes[count++] = getTemplateHash();
+
+        }
+
+        // ADD message
+        if (message != null && !message.isEmpty() && (!onlyUnique || isMessageUnique())) {
+            allHashes[count++] = getMessageHash();
         }
 
         // ADD native hashes
-        if (hashesJson != null && !hashesJson.isEmpty()) {
-            for (Object hash : hashesJson.keySet()) {
-                hashes[count++] = Base58.decode(hash.toString());
+        if (hashes != null && !hashes.isEmpty() && (!onlyUnique || isHashesUnique())) {
+            for (Object hash : hashes.keySet()) {
+                allHashes[count++] = Base58.decode(hash.toString());
             }
         }
 
         // ADD hashes of files
-        if (files != null && !files.isEmpty()) {
+        if (files != null && !files.isEmpty() && (!onlyUnique || isFilesUnique())) {
             for (Tuple3<byte[], Boolean, byte[]> fileItem : files.values()) {
-                hashes[count++] = fileItem.a;
+                allHashes[count++] = fileItem.a;
             }
         }
 
-        return hashes;
+        return allHashes;
     }
 
     public static byte[] make(PrivateKeyAccount creator, String title, boolean signCanOnlyRecipients, Account[] recipients, boolean isEncrypted,
-                              TemplateCls template, HashMap<String, String> params_Template,
-                              HashMap<String, String> hashes_Map, String message, Set<Tuple3<String, Boolean, byte[]>> files_Set)
+                              TemplateCls template, HashMap<String, String> params_Template, boolean uniqueTemplate,
+                              String message, boolean uniqueMessage,
+                              HashMap<String, String> hashes_Map, boolean uniqueHashes,
+                              Set<Tuple3<String, Boolean, byte[]>> files_Set, boolean uniqueFiles)
             throws Exception {
 
         JSONObject out_Map = new JSONObject();
@@ -736,6 +768,17 @@ public class ExData {
             if (!params_Map.isEmpty())
                 out_Map.put("PR", params_Map);
 
+            if (!isEncrypted && uniqueTemplate) {
+                out_Map.put("TMU", true);
+            }
+        }
+
+        // add Message
+        if (message != null && !message.isEmpty()) {
+            out_Map.put("MS", message);
+            if (!isEncrypted && uniqueMessage) {
+                out_Map.put("MSU", true);
+            }
         }
 
         // add hashes
@@ -744,12 +787,13 @@ public class ExData {
             Entry<String, String> hash = it_Hash.next();
             hashes_JSON.put(hash.getKey(), hash.getValue());
         }
-        if (!hashes_JSON.isEmpty())
+        if (!hashes_JSON.isEmpty()) {
             out_Map.put("HS", hashes_JSON);
 
-        // add Message
-        if (message != null && !message.isEmpty())
-            out_Map.put("MS", message);
+            if (!isEncrypted && uniqueHashes) {
+                out_Map.put("HSU", true);
+            }
+        }
 
         // add files
         HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap = new HashMap<>();
@@ -770,6 +814,10 @@ public class ExData {
                 fileBytesOrig = fileBytes;
             }
             filesMap.put(file.a, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
+        }
+
+        if (!isEncrypted && uniqueFiles) {
+            out_Map.put("FU", true);
         }
 
         byte[] flags = new byte[]{3, 0, 0, 0};
@@ -885,6 +933,10 @@ public class ExData {
             if (valuedText != null) {
                 output.put("body", valuedText);
             }
+            output.put("templateHash", getMessageHash());
+            if (isTemplateUnique()) {
+                output.put("templateUnique", isTemplateUnique());
+            }
         }
 
         // parse JSON
@@ -892,7 +944,8 @@ public class ExData {
 
             if (message != null && !message.isEmpty()) {
                 output.put("message", message);
-                output.put("messageHash", Base58.encode(Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8))));
+                output.put("messageUnique", isMessageUnique());
+                output.put("messageHash", getMessageHash());
             }
 
             ///////// NATIVE HASHES
@@ -903,11 +956,16 @@ public class ExData {
             if (!hashes.isEmpty()) {
                 String hashesHTML = "";
                 int hashesCount = 1;
+                boolean isUnique = isHashesUnique();
 
                 for (Object hash : hashes.keySet()) {
-                    hashesHTML += hashesCount
-                            + " <a href=?q=" + hash + BlockExplorer.get_Lang(langObj) + "&search=transactions>" + hash + "</a> - "
-                            + hashes.get(hash) + "<br>";
+                    hashesHTML += hashesCount;
+                    if (isUnique) {
+                        hashesHTML += " <a href=?q=" + hash + BlockExplorer.get_Lang(langObj) + "&search=transactions>" + hash + "</a>";
+                    } else {
+                        hashesHTML += " " + hash;
+                    }
+                    hashesHTML += " - " + hashes.get(hash) + "<br>";
                     hashesCount++;
                 }
 
@@ -920,14 +978,21 @@ public class ExData {
                 String filesStr = "";
                 Set<String> fileNames = files.keySet();
 
+                boolean isUnique = isFilesUnique();
                 int filesCount = 1;
                 for (String fileName : fileNames) {
 
                     Tuple3<byte[], Boolean, byte[]> fileValue = files.get(fileName);
                     String hash = Base58.encode(fileValue.a);
 
-                    filesStr += filesCount + " " + fileName
-                            + " <a href=?q=" + hash + BlockExplorer.get_Lang(langObj) + "&search=transactions>[" + hash + "]</a>";
+                    filesStr += filesCount + " " + fileName;
+
+                    if (isUnique) {
+                        filesStr += " <a href=?q=" + hash + BlockExplorer.get_Lang(langObj) + "&search=transactions>[" + hash + "]</a>";
+                    } else {
+                        filesStr += " [" + hash + "]";
+
+                    }
                     filesStr += " - <a href ='../apidocuments/getFile?download=true&block="
                             + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'><b>"
                             + Lang.getInstance().translateFromLangObj("Download", langObj) + "</b></a><br>";
@@ -939,53 +1004,6 @@ public class ExData {
                 output.put("files", filesStr);
             }
         }
-    }
-
-    /**
-     * Version 1 maker for BlockExplorer
-     */
-    public void makeJSONforHTML_1(DCSet dcSet, Map output, Long templateKey) {
-
-        output.put("title", title);
-
-        if (message != null && !message.isEmpty()) {
-            output.put("message", message);
-            output.put("messageHash", Base58.encode(Crypto.getInstance().digest(message.getBytes(StandardCharsets.UTF_8))));
-        }
-
-        Set<String> kS;
-        String description;
-        String paramsStr;
-        JSONObject params;
-        TemplateCls template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, templateKey);
-        if (template != null) {
-            description = template.viewDescription();
-            paramsStr = json.get("Statement_Params").toString();
-
-            try {
-                params = (JSONObject) JSONValue.parseWithException(paramsStr);
-                description = templateWithValues(description, params);
-            } catch (Exception e) {
-            }
-
-            output.put("body", description);
-
-        }
-
-        try {
-            String hashes = "";
-            paramsStr = json.get("Hashes").toString();
-            params = (JSONObject) JSONValue.parseWithException(paramsStr);
-            kS = params.keySet();
-
-            int i = 1;
-            for (String s : kS) {
-                hashes += i + " " + s + " " + params.get(s) + "<br>";
-            }
-            output.put("hashes", hashes);
-        } catch (Exception e) {
-        }
-
     }
 
     public Fun.Tuple3<Integer, String, ExData> decrypt(PublicKeyAccount account, Account recipient) {

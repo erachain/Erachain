@@ -548,7 +548,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         try {
             parseData(); // need for take HASHES from FILES
-            byte[][] hashes = extendedData.getAllHashesAsBytes();
+            byte[][] hashes = extendedData.getAllHashesAsBytes(true);
             Long dbKey = makeDBRef(height, seqNo);
             if (hashes != null) {
                 for (byte[] hash : hashes) {
@@ -572,7 +572,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         try {
             parseData(); // need for take HASHES from FILES
-            byte[][] hashes = extendedData.getAllHashesAsBytes();
+            byte[][] hashes = extendedData.getAllHashesAsBytes(true);
             if (hashes != null) {
                 for (byte[] hash : hashes) {
                     dcSet.getTransactionFinalMapSigns().delete(hash);
@@ -655,7 +655,7 @@ public class RSignNote extends Transaction implements Itemable {
         if (height > BlockChain.VERS_4_23_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого
             parseData(); // need for take HASHES from FILES
-            byte[][] allHashes = extendedData.getAllHashesAsBytes();
+            byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
             if (allHashes != null && allHashes.length > 0) {
                 TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
                 for (byte[] hash : allHashes) {
