@@ -928,9 +928,9 @@ public class ExData {
 
         }
 
-        if (template != null) {
+        if (templateKey > 0) {
             output.put("templateKey", templateKey);
-            output.put("templateName", template.viewName());
+            output.put("templateName", template == null ? templateKey : template.viewName());
             if (valuedText != null) {
                 output.put("body", valuedText);
             }

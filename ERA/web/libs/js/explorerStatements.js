@@ -102,14 +102,14 @@ function statement(data) {
     output += '<table><tr><td>';
     output += '<div style="word-wrap: break-word;  width: 1000px;">';
     output += data.Label_type + ':<b>' + data.type + '</b>';
-    if (data.tx.hasOwnProperty("height"))
+    if (data.tx.hasOwnProperty("height")) {
         output += ' &nbsp&nbsp' + data.Label_block + ': <a href=?block=' + data.tx.height + get_lang() + '><b>' + data.tx.height + '</b></a>';
         output += ' &nbsp&nbsp' + data.Label_seqNo + ': <a href=?tx=' + data.tx.seqNo + get_lang() + '><b>' + data.tx.seqNo + '</b></a>';
     }
     output += ' &nbsp&nbsp' + data.Label_date + ': <b>' + convertTimestamp(data.tx.timestamp, true) + '</b>';
     output += ' &nbsp&nbsp' + data.Label_size + ': <b>' + data.tx.size + '</b>';
     output += ' &nbsp&nbsp' + data.Label_fee + ': <b>' + data.tx.fee + '</b>';
-    output += '<br>' + data.Label_creator + ': <a href=?address=' + data.creator + get_lang() + '><b>' + data.creator_name + '</b></a>';
+    output += '<br>' + data.Label_creator + ': <a href=?address=' + data.tx.creator + get_lang() + '><b>' + data.creator_name + '</b></a>';
     output += '<br>' + data.Label_pubKey + ': <b>' + data.tx.publickey + '</b>';
 
     output += '<br>' + data.Label_signature + ': <b>' + data.tx.signature + '</b>';
@@ -144,7 +144,7 @@ function statement(data) {
 
             output += '<br>' + data.Label_template_hash + ': ';
             if (data.hasOwnProperty('templateUnique')) {
-                output += '<a href="?tx=' + data.templateHash + get_lang() + '"><b>'
+                output += '<a href="?search=transactions&q=' + data.templateHash + get_lang() + '"><b>'
                  + data.templateHash + '</b></a><br>';
             } else {
                 output += data.templateHash + '<br>';
@@ -160,7 +160,7 @@ function statement(data) {
         if (data.hasOwnProperty('message')) {
             output += '<br>' + data.Label_mess_hash + ': ';
             if (data.hasOwnProperty('messageUnique')) {
-                output += '<a href="?tx=' + data.messageHash + get_lang() + '"><b>'
+                output += '<a href="?search=transactions&q=' + data.messageHash + get_lang() + '"><b>'
                  + data.messageHash + '</b></a><br>';
             } else {
                 output += data.messageHash + '<br>';

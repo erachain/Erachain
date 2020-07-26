@@ -3091,6 +3091,7 @@ public class BlockExplorer {
                 continue;
 
             if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {//.ISSUE_STATEMENT_TRANSACTION){
+                transaction.setDC(dcSet, false);
                 output.putAll(jsonStatement((RSignNote) transaction));
                 output.put("type", "statement");
 
