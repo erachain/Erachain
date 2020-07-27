@@ -549,8 +549,8 @@ public class RSignNote extends Transaction implements Itemable {
         try {
             parseData(); // need for take HASHES from FILES
             byte[][] hashes = extendedData.getAllHashesAsBytes(true);
-            Long dbKey = makeDBRef(height, seqNo);
             if (hashes != null) {
+                Long dbKey = makeDBRef(height, seqNo);
                 for (byte[] hash : hashes) {
                     dcSet.getTransactionFinalMapSigns().put(hash, dbKey);
                 }
