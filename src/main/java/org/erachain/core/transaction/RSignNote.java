@@ -136,7 +136,7 @@ public class RSignNote extends Transaction implements Itemable {
         parseDataV2WithoutFiles();
 
         if (typeBytes[1] > 2) {
-            // если новый порядок - ключ в Даных
+            // если новый порядок - ключ в Данных
             key = extendedData.getTemplateKey();
         }
 
@@ -709,7 +709,12 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public long calcBaseFee() {
-        return calcCommonFee() + extendedData.getAllHashesAsBytes(true).length * 100;
+        byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
+
+        if (allHashes == null) {
+            return calcCommonFee();
+        }
+        return calcCommonFee() + allHashes.length * 100;
     }
 
     public void parseDataV2WithoutFiles() {
