@@ -18,7 +18,6 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,12 +46,12 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
 
         th = this;
         initComponents();
-        setvariables();
+        setChecks();
 
         encryptCheckBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setvariables();
+                setChecks();
 
             }
         });
@@ -384,10 +383,19 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
             }
         }
     }
-    public void setvariables(){
-        exData_Panel.checkBoxMakeHashAndCheckUniqueAttachedFiles.setEnabled(!encryptCheckBox.isSelected());
-        exData_Panel.checkBoxMakeHashAndCheckUniqueHashes.setEnabled(!encryptCheckBox.isSelected());
-        exData_Panel.checkBoxMakeHashAndCheckUniqueText.setEnabled(!encryptCheckBox.isSelected());
-        exData_Panel.fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.setEnabled(!encryptCheckBox.isSelected());
+
+    public void setChecks() {
+
+        boolean selected = !encryptCheckBox.isSelected();
+        exData_Panel.checkBoxMakeHashAndCheckUniqueAttachedFiles.setEnabled(selected);
+        exData_Panel.checkBoxMakeHashAndCheckUniqueHashes.setEnabled(selected);
+        exData_Panel.checkBoxMakeHashAndCheckUniqueText.setEnabled(selected);
+        exData_Panel.fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.setEnabled(selected);
+
+        exData_Panel.checkBoxMakeHashAndCheckUniqueAttachedFiles.setSelected(selected);
+        exData_Panel.checkBoxMakeHashAndCheckUniqueHashes.setSelected(selected);
+        exData_Panel.checkBoxMakeHashAndCheckUniqueText.setSelected(selected);
+        exData_Panel.fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.setSelected(selected);
+
     }
 }
