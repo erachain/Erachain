@@ -3046,6 +3046,8 @@ public class BlockExplorer {
         output.put("Label_date", Lang.getInstance().translateFromLangObj("Date", langObj));
         output.put("Label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
         output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
+        output.put("Label_fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
+        output.put("Label_size", Lang.getInstance().translateFromLangObj("Size", langObj));
         output.put("Label_No", Lang.getInstance().translateFromLangObj("No.", langObj));
         output.put("Label_pubKey", Lang.getInstance().translateFromLangObj("Public Key", langObj));
         output.put("Label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
@@ -3053,16 +3055,9 @@ public class BlockExplorer {
         int block = rNote.getBlockHeight();
         int seqNo = rNote.getSeqNo();
 
-        output.put("block", block);
-        output.put("seqNo", seqNo);
+        output.put("tx", rNote.toJson());
 
-        output.put("pubKey", Base58.encode(rNote.getCreator().getPublicKey()));
-        output.put("sign", Base58.encode(rNote.getSignature()));
-
-        output.put("creator", rNote.getCreator().getAddress());
         output.put("creator_name", rNote.getCreator().getPersonAsString());
-
-        output.put("timestamp", rNote.getTimestamp());
 
         rNote.getExData().makeJSONforHTML(output, block, seqNo, langObj);
 
@@ -3096,6 +3091,7 @@ public class BlockExplorer {
                 continue;
 
             if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {//.ISSUE_STATEMENT_TRANSACTION){
+                transaction.setDC(dcSet, false);
                 output.putAll(jsonStatement((RSignNote) transaction));
                 output.put("type", "statement");
 

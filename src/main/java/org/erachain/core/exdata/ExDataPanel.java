@@ -70,6 +70,11 @@ public class ExDataPanel extends javax.swing.JPanel {
     private MTable jTable_Other_Hashes;
     private javax.swing.JTextPane jTextPane_Message;
     private MImprintEDITPane jTextPane_Message_Public;
+    public JCheckBox checkBoxMakeHashAndCheckUniqueText;
+    public JCheckBox checkBoxMakeHashAndCheckUniqueHashes;
+    public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
+
+
     /**
      * Creates new form IssueDocumentPanel
      */
@@ -368,9 +373,21 @@ public class ExDataPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         jPanel_Message.add(jScrollPane_Message_TextPane, gridBagConstraints);
+
+        checkBoxMakeHashAndCheckUniqueText = new JCheckBox(Lang.getInstance().translate("Make hash and check unique"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(8, 8, 8, 8);
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        jPanel_Message.add(checkBoxMakeHashAndCheckUniqueText, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -395,6 +412,18 @@ public class ExDataPanel extends javax.swing.JPanel {
         jPanel_Attached_Files.setPreferredSize(new java.awt.Dimension(0, 64));
         jPanel_Attached_Files.setLayout(new java.awt.GridBagLayout());
 
+        // Make hash and check unique
+        checkBoxMakeHashAndCheckUniqueAttachedFiles = new JCheckBox(Lang.getInstance().translate("Make hash and check unique"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(8, 8, 8, 8);
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        jPanel_Attached_Files.add(checkBoxMakeHashAndCheckUniqueAttachedFiles, gridBagConstraints);
+
+
         attached_Files_Model = new AttacheFilesModel(); // new
         // javax.swing.table.DefaultTableModel(new
         // Object [][][][][]
@@ -417,7 +446,7 @@ public class ExDataPanel extends javax.swing.JPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -446,12 +475,25 @@ public class ExDataPanel extends javax.swing.JPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         jPanel_Attached_Files.add(jPanel_Other_Attached_Files_Work, gridBagConstraints);
 
         jPanel_Other_Hashes.setLayout(new java.awt.GridBagLayout());
+
+
+        // Make hash and check unique
+        checkBoxMakeHashAndCheckUniqueHashes = new JCheckBox(Lang.getInstance().translate("Check unique"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(8, 8, 8, 8);
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        jPanel_Other_Hashes.add(checkBoxMakeHashAndCheckUniqueHashes, gridBagConstraints);
+        
 
         jScrollPane_Hashes_Files_Tale.setOpaque(false);
         jScrollPane_Hashes_Files_Tale.setPreferredSize(new java.awt.Dimension(0, 0));
@@ -462,7 +504,7 @@ public class ExDataPanel extends javax.swing.JPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 9;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
@@ -472,28 +514,28 @@ public class ExDataPanel extends javax.swing.JPanel {
         jButton_Input_Hashes_From_File_Other_Hashes.setText("Import Hashs");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel_Other_Hashes.add(jButton_Input_Hashes_From_File_Other_Hashes, gridBagConstraints);
 
         jButton_Add_From_File_Other_Hashes.setText("Add From File");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel_Other_Hashes.add(jButton_Add_From_File_Other_Hashes, gridBagConstraints);
 
         jButton_Add_Other_Hashes.setText("Add");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel_Other_Hashes.add(jButton_Add_Other_Hashes, gridBagConstraints);
 
         jButton_Remove_Other_Hashes.setText("Remove");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel_Other_Hashes.add(jButton_Remove_Other_Hashes, gridBagConstraints);
@@ -737,8 +779,11 @@ public class ExDataPanel extends javax.swing.JPanel {
 
         return ExData.make(creator, jTextField_Title_Message.getText(),
                 signCanOnlyRecipients, recipients, isEncrypted,
-                (TemplateCls) fill_Template_Panel.sel_Template,
-                this.fill_Template_Panel.get_Params(), hashes_Map, jTextPane_Message.getText(), files_1);
+                (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),
+                fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
+                jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),
+                hashes_Map, checkBoxMakeHashAndCheckUniqueHashes.isSelected(),
+                files_1, checkBoxMakeHashAndCheckUniqueAttachedFiles.isSelected());
 
     }
     // End of variables declaration

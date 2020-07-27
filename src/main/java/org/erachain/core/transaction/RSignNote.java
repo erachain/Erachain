@@ -136,7 +136,7 @@ public class RSignNote extends Transaction implements Itemable {
         parseDataV2WithoutFiles();
 
         if (typeBytes[1] > 2) {
-            // если новый порядок - ключ в Даных
+            // если новый порядок - ключ в Данных
             key = extendedData.getTemplateKey();
         }
 
@@ -548,9 +548,9 @@ public class RSignNote extends Transaction implements Itemable {
 
         try {
             parseData(); // need for take HASHES from FILES
-            byte[][] hashes = extendedData.getAllHashesAsBytes();
-            Long dbKey = makeDBRef(height, seqNo);
+            byte[][] hashes = extendedData.getAllHashesAsBytes(true);
             if (hashes != null) {
+                Long dbKey = makeDBRef(height, seqNo);
                 for (byte[] hash : hashes) {
                     dcSet.getTransactionFinalMapSigns().put(hash, dbKey);
                 }
@@ -572,7 +572,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         try {
             parseData(); // need for take HASHES from FILES
-            byte[][] hashes = extendedData.getAllHashesAsBytes();
+            byte[][] hashes = extendedData.getAllHashesAsBytes(true);
             if (hashes != null) {
                 for (byte[] hash : hashes) {
                     dcSet.getTransactionFinalMapSigns().delete(hash);
@@ -655,7 +655,7 @@ public class RSignNote extends Transaction implements Itemable {
         if (height > BlockChain.VERS_4_23_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого
             parseData(); // need for take HASHES from FILES
-            byte[][] allHashes = extendedData.getAllHashesAsBytes();
+            byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
             if (allHashes != null && allHashes.length > 0) {
                 TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
                 for (byte[] hash : allHashes) {
@@ -709,7 +709,12 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public long calcBaseFee() {
-        return calcCommonFee();
+        byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
+
+        if (allHashes == null) {
+            return calcCommonFee();
+        }
+        return calcCommonFee() + allHashes.length * 100;
     }
 
     public void parseDataV2WithoutFiles() {

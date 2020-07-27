@@ -505,36 +505,42 @@ public class MailSendPanel extends JPanel {
     }
 
     private void refreshReceiverDetails() {
-        String toValue = txtTo.getText();
+        String recipient = txtTo.getText();
 
         AssetCls asset = Controller.getInstance().getAsset(Transaction.FEE_KEY);
         sendButton.setEnabled(false);
 
-        if (toValue.isEmpty()) {
+        if (recipient.isEmpty()) {
             txtRecDetails.setText("");
             return;
         }
 
-        if (txtTo.getText().equals("has no Addresses")) {
-            txtRecDetails.setText(person.viewName() + " " + Lang.getInstance().translate("has no Accounts"));
-            return;
-        }
-
-        Account account = null;
-        Tuple2<Account, String> accountRes = Account.tryMakeAccount(toValue);
-
-        // CHECK IF RECIPIENT IS VALID ADDRESS
-        if (accountRes.a == null) {
-            txtRecDetails.setText(accountRes.b);
-            return;
+        if (true) {
+            this.txtRecDetails.setText(Account.getDetailsForEncrypt(recipient, asset.getKey(),
+                    encrypted.isSelected()));
         } else {
-            account = accountRes.a;
 
-            txtRecDetails.setText(account.toString(asset.getKey()));
+            if (txtTo.getText().equals("has no Addresses")) {
+                txtRecDetails.setText(person.viewName() + " " + Lang.getInstance().translate("has no Accounts"));
+                return;
+            }
 
-            if (account.getBalanceUSE(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
-                    && account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0) {
-                txtRecDetails.setText(Lang.getInstance().translate("Warning!") + " " + txtRecDetails.getText());
+            Account account = null;
+            Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipient);
+
+            // CHECK IF RECIPIENT IS VALID ADDRESS
+            if (accountRes.a == null) {
+                txtRecDetails.setText(accountRes.b);
+                return;
+            } else {
+                account = accountRes.a;
+
+                txtRecDetails.setText(account.toString(asset.getKey()));
+
+                if (account.getBalanceUSE(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
+                        && account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0) {
+                    txtRecDetails.setText(Lang.getInstance().translate("Warning!") + " " + txtRecDetails.getText());
+                }
             }
         }
 

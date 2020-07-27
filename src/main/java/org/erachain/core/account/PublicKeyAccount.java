@@ -45,15 +45,18 @@ public class PublicKeyAccount extends Account {
             } catch (Exception e) {
                 return false;
             }
-            return isValidPublicKey(pk);
         } else {
             try {
-                pk = Base58.decode(publicKey, PUBLIC_KEY_LENGTH);
+                // Base58 string len = 33-34 for ADDRESS and 40-44 for PubKey
+                if (true || publicKey.length() > PUBLIC_KEY_LENGTH + (PUBLIC_KEY_LENGTH >> 3)) {
+                    pk = Base58.decode(publicKey, PUBLIC_KEY_LENGTH);
+                } else
+                    return false;
             } catch (Exception e) {
                 return false;
             }
-            return isValidPublicKey(pk);
         }
+        return isValidPublicKey(pk);
     }
 
     public byte[] getPublicKey() {
