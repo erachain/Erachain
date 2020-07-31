@@ -206,13 +206,13 @@ public abstract class ItemSplitPanel extends SplitPanel {
         Object item = tableModel.getItem(crow);
         ItemCls itemCls;
         if (item instanceof Fun.Tuple2) {
-            itemCls = (ItemCls) ((Fun.Tuple2)item).b;
+            itemCls = (ItemCls) ((Fun.Tuple2) item).b;
         } else {
-            itemCls =(ItemCls)item;
+            itemCls = (ItemCls) item;
         }
 
         itemCls.getKey(DCSet.getInstance());
-        return  itemCls;
+        return itemCls;
 
     }
 
