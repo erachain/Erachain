@@ -7,6 +7,7 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
@@ -14,12 +15,11 @@ import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class TableModelMails extends AbstractTableModel implements Observer {
+public class TableModelMails extends TimerTableModelCls {
 
     static Logger LOGGER = LoggerFactory.getLogger(TableModelMails.class.getName());
 
@@ -231,6 +231,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
                     continue;
 
                 // это исходящее письмо?
+                /// тут надо по Создателю
                 outcome = key.equals(Longs.fromByteArray(rsend.getCreator().getShortAddressBytes()));
 
                 if (incoming ^ outcome) {
