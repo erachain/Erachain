@@ -3,10 +3,13 @@ package org.erachain.gui.items;
 import org.erachain.controller.Controller;
 import org.erachain.database.wallet.FavoriteItemMap;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.ObserverMessage;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -24,7 +27,7 @@ public abstract class FavoriteItemModelTable extends TimerTableModelCls implemen
                                   int resetObserver, int addObserver, int deleteObserver, int listObserver, int favorite) {
         super(columnNames, columnAutoHeight, false);
 
-        // в головной гласс нельзя таблицу передавать - чтобы там лишний раз не запускалась иницализация наблюдения
+        // в головной класс нельзя таблицу передавать - чтобы там лишний раз не запускалась иницализация наблюдения
         // оно еще ен готово так как таблица вторая не присвоена - ниже привяжемся к наблюдениям
         this.map = map;
         this.favoriteMap = favoriteMap;
@@ -68,6 +71,38 @@ public abstract class FavoriteItemModelTable extends TimerTableModelCls implemen
             getInterval();
             fireTableDataChanged();
             needUpdate = false;
+        }
+    }
+
+    @Override
+    public void getInterval() {
+        Object key;
+        int count = 0;
+        list = new ArrayList<>();
+        if (startKey == null) {
+            try (IteratorCloseable iterator = favoriteMap.getIterator()) {
+                while (iterator.hasNext() && count++ < step) {
+                    key = iterator.next();
+                    Object item = map.get(key);
+                    if (item == null)
+                        // это может бюыть так как пока еще не вся цепочка засосалась но Избранные уже заданы
+                        continue;
+                    list.add(item);
+                }
+            } catch (IOException e) {
+            }
+        } else {
+            try (IteratorCloseable iterator = favoriteMap.getIterator()) {
+                while (iterator.hasNext() && count++ < step) {
+                    key = iterator.next();
+                    Object item = map.get(key);
+                    if (item == null)
+                        // это может бюыть так как пока еще не вся цепочка засосалась но Избранные уже заданы
+                        continue;
+                    list.add(item);
+                }
+            } catch (IOException e) {
+            }
         }
     }
 

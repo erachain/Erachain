@@ -115,7 +115,7 @@ public class RendererBoolean extends JCheckBox   implements TableCellRenderer, S
      */
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus, int row, int column) {
-        if (table == null) {
+        if (table == null || value == null) {
             return this;
         }
 
