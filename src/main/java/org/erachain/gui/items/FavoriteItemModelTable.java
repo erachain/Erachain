@@ -81,13 +81,14 @@ public abstract class FavoriteItemModelTable extends TimerTableModelCls implemen
         list = new ArrayList<>();
         if (startKey == null) {
             try (IteratorCloseable iterator = favoriteMap.getIterator()) {
-                while (iterator.hasNext() && count++ < step) {
+                while (iterator.hasNext() && count < step) {
                     key = iterator.next();
                     Object item = map.get(key);
                     if (item == null)
                         // это может бюыть так как пока еще не вся цепочка засосалась но Избранные уже заданы
                         continue;
                     list.add(item);
+                    count++; // только теперь счетчик увеличим - иначе пустые сбивают счет
                 }
             } catch (IOException e) {
             }

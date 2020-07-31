@@ -238,6 +238,10 @@ public class WalletUpdater extends MonitoredThread {
             Integer walletHeight = dcSet.getBlockSignsMap().get(lastWalletBlockSign);
             if (walletHeight != null) {
                 for (int i = walletHeight - 100; i <= walletHeight; i++) {
+
+                    if (i < 1)
+                        continue;
+
                     Block block = dcSet.getBlockMap().get(i);
                     block.loadHeadMind(dcSet);
                     lastBlocks.put(i, block);
