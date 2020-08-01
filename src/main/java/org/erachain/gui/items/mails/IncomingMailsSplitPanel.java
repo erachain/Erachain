@@ -66,7 +66,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 StringSelection value = new StringSelection(
-                        ((RSend) incoming_Mails_Model.getTransaction(row)).getCreator().getAddress());
+                        (incoming_Mails_Model.getItem(row)).getCreator().getAddress());
                 clipboard.setContents(value, null);
             }
         });
@@ -81,7 +81,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 StringSelection value = new StringSelection(
-                        ((RSend) incoming_Mails_Model.getTransaction(row)).getRecipient().getAddress());
+                        ((RSend) incoming_Mails_Model.getItem(row)).getRecipient().getAddress());
                 clipboard.setContents(value, null);
             }
         });
@@ -94,7 +94,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
                 int row = inciming_Mail_Table.getSelectedRow();
                 row = inciming_Mail_Table.convertRowIndexToModel(row);
-                Account account = incoming_Mails_Model.getTransaction(row).getCreator();
+                Account account = incoming_Mails_Model.getItem(row).getCreator();
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, account, null), MailSendPanel.getIcon());
 
@@ -108,7 +108,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
                 int row = inciming_Mail_Table.getSelectedRow();
                 row = inciming_Mail_Table.convertRowIndexToModel(row);
-                Transaction trans = incoming_Mails_Model.getTransaction(row);
+                Transaction trans = incoming_Mails_Model.getItem(row);
                 int blockNo = trans.getBlockHeight();
                 int recNo = trans.getSeqNo();
                 new VouchRecordDialog(blockNo, recNo, ((RSend) trans).getRecipient());
@@ -128,7 +128,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
                     return;
                 }
 
-                Transaction transaction = incoming_Mails_Model.getTransaction(jTableJScrollPanelLeftPanel
+                Transaction transaction = incoming_Mails_Model.getItem(jTableJScrollPanelLeftPanel
                         .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
                 if (transaction == null) {
                     return;
@@ -193,7 +193,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
     @Override
     public void onClose() {
         // delete observer left panel
-        incoming_Mails_Model.removeObservers();
+        incoming_Mails_Model.deleteObservers();
         // get component from right panel
         Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
@@ -209,7 +209,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
             RSend mail = null;
             if (inciming_Mail_Table.getSelectedRow() >= 0)
-                mail = (RSend) incoming_Mails_Model.getTransaction(
+                mail = (RSend) incoming_Mails_Model.getItem(
                         inciming_Mail_Table.convertRowIndexToModel(inciming_Mail_Table.getSelectedRow()));
             // info1.show_001(person);
             if (mail == null)
