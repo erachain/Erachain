@@ -4,8 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.items.persons.ItemsPersonsTableModel;
-import org.erachain.gui.items.records.FavoriteTransactionTableModel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -37,9 +35,9 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
     int alpha = 255;
     int alpha_int;
     // private StatementsTableModelFavorite search_Table_Model;
-    private FavoriteTransactionTableModel favotitesTable;
+    private FavoriteStatementsTableModel favotitesTable;
     //	private MTable search_Table;
-    private RowSorter<ItemsPersonsTableModel> search_Sorter;
+    private RowSorter<FavoriteStatementsTableModel> search_Sorter;
 
     public FavoriteStatementsSplitPanel() {
         super("FavoriteStatementsSplitPanel");
@@ -55,7 +53,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
 
         //CREATE TABLE
         //search_Table_Model = new StatementsTableModelFavorite();
-        favotitesTable = new FavoriteTransactionTableModel();
+        favotitesTable = new FavoriteStatementsTableModel();
 
         // UPDATE FILTER ON TEXT CHANGE
         searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new search_tab_filter());
