@@ -25,9 +25,9 @@ public class TableModelMails extends WalletTableModel<Transaction> {
 
     public static final int COLUMN_CONFIRMATION = 0;
     public static final int COLUMN_DATA = 1;
+    public static final int COLUMN_HEAD = 2;
     public static final int COLUMN_SENDER = 3;
     public static final int COLUMN_RECIEVER = 4;
-    public static final int COLUMN_HEAD = 2;
     //	public static final int COLUMN_CONFIRM = 5;
     boolean incoming;
     DCSet dcSet;
@@ -159,7 +159,7 @@ public class TableModelMails extends WalletTableModel<Transaction> {
 
                 // это исходящее письмо?
                 // смотрим по совпадению ключа к котроому трнзакци прилипла и стоит ли он как создатель
-                outcome = !key.b.equals(rsend.getCreator().hashCode());
+                outcome = key.b.equals(rsend.getCreator().hashCode());
 
                 if (incoming ^ outcome) {
                     rsend.setDC(dcSet, false);
