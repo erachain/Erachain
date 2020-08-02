@@ -47,6 +47,7 @@ public class Settings {
     public static final int DEFAULT_ACCOUNTS = 1;
     //DATA
     public static final String DEFAULT_DATA_CHAIN_DIR = "datachain";
+
     private static final String DEFAULT_DATA_LOCAL_DIR = "datalocal";
     private static final String DEFAULT_DATA_TEMP_DIR = "datatemp";
     private static final String DEFAULT_DATA_WALLET_DIR = "dataWallet";
@@ -78,6 +79,12 @@ public class Settings {
     //WEB
     private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
     private static final boolean DEFAULT_WEB_ENABLED = true;
+    private static final String DEFAULT_WEB_KEYSTORE_FILE_PATH = "SSL" + File.separator +"WEBkeystore";
+    private String webKeyStorePassword ="";
+    private String webStoreSourcePassword ="";
+    private String webKeyStorePath ="";
+    private boolean webUseSSL = false;
+
     // 19 03
     //GUI
     private static final boolean DEFAULT_GUI_ENABLED = true;
@@ -814,6 +821,24 @@ public class Settings {
 
         return BlockChain.DEFAULT_WEB_PORT;
     }
+    // SSL settings
+    public String getWebKeyStorePassword() {
+        return webKeyStorePassword;
+    }
+
+    public String getWebStoreSourcePassword() {
+        return webStoreSourcePassword;
+    }
+
+    public String getWebKeyStorePath() {
+        if (webKeyStorePath.equals("")) return DEFAULT_WEB_KEYSTORE_FILE_PATH;
+        return webKeyStorePath;
+    }
+
+    public boolean isWebUseSSL() {
+        return webUseSSL;
+    }
+
 
     public String explorerURL;
 
@@ -1222,6 +1247,20 @@ public class Settings {
                 if (!file.exists()) {
                     file.createNewFile();
                 }
+                // read web ssl settings
+               try {
+                    JSONObject webSSLSettings = (JSONObject)this.settingsJSON.get("WEB_SSL");
+                        webKeyStorePassword = (String) webSSLSettings.get("KeyStorePassword");
+                        webKeyStorePath = (String) webSSLSettings.get("KeyStorePath");
+                        webStoreSourcePassword = (String) webSSLSettings.get("KeyStoreSourcePassword");
+                        webUseSSL = (boolean) webSSLSettings.get("Enable");
+              } catch (Exception e) {
+                    webKeyStorePassword = "";
+                    webKeyStorePath="";
+                    webStoreSourcePassword = "";
+                    webUseSSL = false;
+                }
+
             }
 
         } catch (Exception e) {
@@ -1255,5 +1294,6 @@ public class Settings {
             LOGGER.error(e.getMessage(), e);
         }
     }
+
 
 }
