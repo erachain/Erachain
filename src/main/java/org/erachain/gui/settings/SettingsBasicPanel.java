@@ -163,15 +163,9 @@ public class SettingsBasicPanel extends JPanel {
         chckbxWebUseSSL.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (Controller.getInstance().wallet.isUnlocked()) {
-                    setEnableSslSettingOption(true);
-                } else {
-                    JOptionPane.showMessageDialog(
-                            new JFrame(),   Lang.getInstance().translate("You need to unlock the wallet"),
-                            Lang.getInstance().translate("Error!"),
-                            JOptionPane.ERROR_MESSAGE);
 
-                }
+                    setEnableSslSettingOption();
+
             }
         }
        );
@@ -512,19 +506,18 @@ public class SettingsBasicPanel extends JPanel {
         gbc_chckbxLocalPeersScannerEnabled.gridy = ++panelRow;//13;
         add(chckbxLocalPeersScannerEnabled, gbc_chckbxLocalPeersScannerEnabled);
 
-        setEnableSslSettingOption(Controller.getInstance().wallet.isUnlocked());
+        setEnableSslSettingOption();
 
     }
-    private void setEnableSslSettingOption(boolean unlockWallet){
-        boolean lockParamentr =  unlockWallet & chckbxWebUseSSL.isSelected();
-        labelTextWebKeystoreFilePath.setEnabled(lockParamentr);
-        buttonBrowseWebKeystoreFilePath.setEnabled(lockParamentr);
-        buttonResetWebKeystoreFilePath.setEnabled(lockParamentr);
-        textWebKeyStoreFilePath.setEnabled(lockParamentr);
-        labelTextWebKeystorePass.setEnabled(lockParamentr);
-        textWebKeystorePass.setEnabled(lockParamentr);
-        labelTextwebCertificatePass.setEnabled(lockParamentr);
-        textWebCertificatePass.setEnabled(lockParamentr);
-        chckbxWebUseSSL.setEnabled(unlockWallet);
+    private void setEnableSslSettingOption(){
+        labelTextWebKeystoreFilePath.setEnabled(chckbxWebUseSSL.isSelected());
+        buttonBrowseWebKeystoreFilePath.setEnabled(chckbxWebUseSSL.isSelected());
+        buttonResetWebKeystoreFilePath.setEnabled(chckbxWebUseSSL.isSelected());
+        textWebKeyStoreFilePath.setEnabled(chckbxWebUseSSL.isSelected());
+        labelTextWebKeystorePass.setEnabled(chckbxWebUseSSL.isSelected());
+        textWebKeystorePass.setEnabled(chckbxWebUseSSL.isSelected());
+        labelTextwebCertificatePass.setEnabled(chckbxWebUseSSL.isSelected());
+        textWebCertificatePass.setEnabled(chckbxWebUseSSL.isSelected());
+
     }
 }
