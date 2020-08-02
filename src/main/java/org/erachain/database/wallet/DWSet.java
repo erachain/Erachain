@@ -334,17 +334,34 @@ public class DWSet extends DBASet {
         } else {
             return null;
         }
-        
-          
+
+
     }
 
     //////////////// FAVORITES ///////////
+    public void addDocumentToFavorite(Transaction transaction) {
+        getDocumentFavoritesSet().add(transaction.getDBRef());
+    }
+
+    public void removeDocumentFromFavorite(Transaction transaction) {
+        getDocumentFavoritesSet().delete(transaction.getDBRef());
+    }
+
+    public boolean isDocumentFavorite(Transaction transaction) {
+        if (transaction.getDBRef() > 0) {
+            return getDocumentFavoritesSet().contains(transaction.getDBRef());
+        }
+        return false;
+    }
+
     public void addTransactionToFavorite(Transaction transaction) {
         getTransactionFavoritesSet().add(transaction.getDBRef());
     }
+
     public void removeTransactionFromFavorite(Transaction transaction) {
         getTransactionFavoritesSet().delete(transaction.getDBRef());
     }
+
     public boolean isTransactionFavorite(Transaction transaction) {
         if (transaction.getDBRef() > 0) {
             return getTransactionFavoritesSet().contains(transaction.getDBRef());

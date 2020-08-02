@@ -395,7 +395,7 @@ public class ExDataPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         // jPanel_Message.add(jCheckBox_Message_Private, gridBagConstraints);
 
-        jTabbedPane_Message.addTab(Lang.getInstance().translate("Message"), jPanel_Message);
+        jTabbedPane_Message.addTab(Lang.getInstance().translate("Text"), jPanel_Message);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

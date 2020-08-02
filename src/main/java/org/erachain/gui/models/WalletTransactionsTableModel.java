@@ -155,6 +155,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
 
     }
 
+    @Override
     public void getInterval() {
 
         Object key;

@@ -922,7 +922,7 @@ public class ExData {
         } else {
 
             output.put("Label_template_hash", Lang.getInstance().translateFromLangObj("Template hash", langObj));
-            output.put("Label_mess_hash", Lang.getInstance().translateFromLangObj("Message hash", langObj));
+            output.put("Label_mess_hash", Lang.getInstance().translateFromLangObj("Text hash", langObj));
             output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
             output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
 

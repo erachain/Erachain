@@ -85,7 +85,7 @@ public class MainPanel extends javax.swing.JPanel {
 
     private MainPanel() {
         initComponents();
- //       jSplitPane1.M_setDividerSize(40);
+        //       jSplitPane1.M_setDividerSize(40);
     }
 
     // Variables declaration - do not modify
@@ -153,8 +153,8 @@ public class MainPanel extends javax.swing.JPanel {
                     if (index >= 0) {
                         Component aa;
                         DefaultMutableTreeNode ss = getNodeByName(jTabbedPane1.getComponentAt(mt.getSelectedIndex()).getClass().getSimpleName(),
-                                                       (DefaultMutableTreeNode) mlp.tree.tree.getModel().getRoot());
-                         // set select from tree
+                                (DefaultMutableTreeNode) mlp.tree.tree.getModel().getRoot());
+                        // set select from tree
                         if (ss != null)
                             mlp.tree.tree.setSelectionPath(new TreePath(ss.getPath()));
                     }
@@ -298,15 +298,15 @@ public class MainPanel extends javax.swing.JPanel {
 
             if (str.equals(Lang.getInstance().translate("My Payments Orders"))
                     || str.equals("MyOrderPaimentsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("My Payments Orders"), new MyOrderPaimentsSplitPanel(),MyOrderPaimentsSplitPanel.getIcon());
+                insertTab(Lang.getInstance().translate("My Payments Orders"), new MyOrderPaimentsSplitPanel(), MyOrderPaimentsSplitPanel.getIcon());
                 return;
             }
 
+            /////////// PERSONS
             if (str.equals(Lang.getInstance().translate("Favorite Persons")) || str.equals("PersonsFavoriteSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Favorite Persons"), new PersonsFavoriteSplitPanel(),PersonsFavoriteSplitPanel.getIcon());
+                insertTab(Lang.getInstance().translate("Favorite Persons"), new PersonsFavoriteSplitPanel(), PersonsFavoriteSplitPanel.getIcon());
                 return;
             }
-
             if (str.equals(Lang.getInstance().translate("My Persons")) || str.equals("PersonsMySplitPanel")) {
                 insertTab(Lang.getInstance().translate("My Persons"), new PersonsMySplitPanel(), PersonsMySplitPanel.getIcon());
                 return;
@@ -320,12 +320,11 @@ public class MainPanel extends javax.swing.JPanel {
                 return;
 
             }
+            if (str.equals(Lang.getInstance().translate("Insert Person")) || str.equals("InsertPersonPanel")) {
+                insertTab(Lang.getInstance().translate("Insert Person"), new InsertPersonPanel(), InsertPersonPanel.getIcon());
+                return;
 
-          if (str.equals(Lang.getInstance().translate("Insert Person")) || str.equals("InsertPersonPanel")) {
-              insertTab(Lang.getInstance().translate("Insert Person"), new InsertPersonPanel(),InsertPersonPanel.getIcon());
-               return;
-
-           }
+            }
 
             if (str.equals(Lang.getInstance().translate("My Accounts")) || str.equals("MyAccountsSplitPanel")) {
                 insertTab(Lang.getInstance().translate("My Accounts"), new MyAccountsSplitPanel(), MyAccountsSplitPanel.getIcon());
@@ -346,6 +345,7 @@ public class MainPanel extends javax.swing.JPanel {
 
             }
 
+            // STATEMENTS
             if (str.equals(Lang.getInstance().translate("Favorite Documents"))
                     || str.equals("FavoriteStatementsSplitPanel")) {
                 insertTab(Lang.getInstance().translate("Favorite Documents"), new FavoriteStatementsSplitPanel(), FavoriteStatementsSplitPanel.getIcon());
@@ -367,6 +367,8 @@ public class MainPanel extends javax.swing.JPanel {
                 return;
 
             }
+
+            /// MAILS
             if (str.equals(Lang.getInstance().translate("Incoming Mails")) || str.equals("IncomingMailsSplitPanel")) {
                 insertTab(Lang.getInstance().translate("Incoming Mails"), new IncomingMailsSplitPanel(), IncomingMailsSplitPanel.getIcon());
                 return;
@@ -464,7 +466,11 @@ public class MainPanel extends javax.swing.JPanel {
                 }
             }
 
-
+            /////// POLLS
+            if (str.equals(Lang.getInstance().translate("Favorite Polls")) || str.equals("PollsFavoriteSplitPanel")) {
+                insertTab(Lang.getInstance().translate("Favorite Polls"), new PollsFavoriteSplitPanel(), PollsFavoriteSplitPanel.getIcon());
+                return;
+            }
             if (str.equals(Lang.getInstance().translate("My Polls")) || str.equals("Polls_My_SplitPanel")) {
                 insertTab(Lang.getInstance().translate("My Polls"), new Polls_My_SplitPanel(), Polls_My_SplitPanel.getIcon());
                 return;
@@ -477,18 +483,15 @@ public class MainPanel extends javax.swing.JPanel {
                 insertTab(Lang.getInstance().translate("Issue Poll"), new IssuePollPanel(), IssuePollPanel.getIcon());
                 return;
             }
-            if (str.equals(Lang.getInstance().translate("Favorite Polls")) || str.equals("PollsFavoriteSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Favorite Polls"), new PollsFavoriteSplitPanel(), PollsFavoriteSplitPanel.getIcon());
-                return;
-            }
 
 
-            if (str.equals(Lang.getInstance().translate("My Records")) || str.equals("MyTransactionsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("My Records"), MyTransactionsSplitPanel.getInstance(), MyTransactionsSplitPanel.getIcon());
-                return;
-            }
+            //////// TRANSACTIONS
             if (str.equals(Lang.getInstance().translate("Favorite Records")) || str.equals("FavoriteTransactionsSplitPanel")) {
                 insertTab(Lang.getInstance().translate("Favorite Records"), new FavoriteTransactionsSplitPanel(), FavoriteTransactionsSplitPanel.getIcon());
+                return;
+            }
+            if (str.equals(Lang.getInstance().translate("My Records")) || str.equals("MyTransactionsSplitPanel")) {
+                insertTab(Lang.getInstance().translate("My Records"), MyTransactionsSplitPanel.getInstance(), MyTransactionsSplitPanel.getIcon());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Search Records")) || str.equals("SearchTransactionsSplitPanel")) {
@@ -518,26 +521,24 @@ public class MainPanel extends javax.swing.JPanel {
                 return;
             }
 
-            if (str.equals(Lang.getInstance().translate("My Unique Hashes")) || str.equals("MyImprintsTab")) {
-                insertTab(Lang.getInstance().translate("My Unique Hashes"), new MyImprintsTab(), MyImprintsTab.getIcon());
-
-                return;
-            }
-
-            if (str.equals(Lang.getInstance().translate("Search Unique Hashes"))
-                    || str.equals("ImprintsSearchSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Search Unique Hashes"), new ImprintsSearchSplitPanel(), ImprintsSearchSplitPanel.getIcon());
-
-                return;
-            }
-
+            /// UNIQUE HASHES
             if (str.equals(Lang.getInstance().translate("Favorite Unique Hashes"))
                     || str.equals("ImprintsFavoriteSplitPanel")) {
                 insertTab(Lang.getInstance().translate("Favorite Unique Hashes"), new ImprintsFavoriteSplitPanel(), ImprintsFavoriteSplitPanel.getIcon());
 
                 return;
             }
+            if (str.equals(Lang.getInstance().translate("My Unique Hashes")) || str.equals("MyImprintsTab")) {
+                insertTab(Lang.getInstance().translate("My Unique Hashes"), new MyImprintsTab(), MyImprintsTab.getIcon());
 
+                return;
+            }
+            if (str.equals(Lang.getInstance().translate("Search Unique Hashes"))
+                    || str.equals("ImprintsSearchSplitPanel")) {
+                insertTab(Lang.getInstance().translate("Search Unique Hashes"), new ImprintsSearchSplitPanel(), ImprintsSearchSplitPanel.getIcon());
+
+                return;
+            }
             if (str.equals(Lang.getInstance().translate("Issue Unique Hash")) || str.equals("IssueImprintPanel")) {
                 insertTab(Lang.getInstance().translate("Issue Unique Hash"), new IssueImprintPanel(), IssueImprintPanel.getIcon());
 
@@ -639,7 +640,8 @@ public class MainPanel extends javax.swing.JPanel {
             jTabbedPane1.remove(index);
         }
     }
-        // get node by name
+
+    // get node by name
     private DefaultMutableTreeNode getNodeByName(String sNodeName, DefaultMutableTreeNode parent) {
         if (parent != null)
             for (Enumeration e = parent.breadthFirstEnumeration(); e.hasMoreElements(); ) {

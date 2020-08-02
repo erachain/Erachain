@@ -1,11 +1,7 @@
 package org.erachain.gui.items.statement;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.items.persons.ItemsPersonsTableModel;
-import org.erachain.gui.items.records.FavoriteTransactionTableModel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -37,9 +33,9 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
     int alpha = 255;
     int alpha_int;
     // private StatementsTableModelFavorite search_Table_Model;
-    private FavoriteTransactionTableModel favotitesTable;
+    private FavoriteStatementsTableModel favotitesTable;
     //	private MTable search_Table;
-    private RowSorter<ItemsPersonsTableModel> search_Sorter;
+    private RowSorter<FavoriteStatementsTableModel> search_Sorter;
 
     public FavoriteStatementsSplitPanel() {
         super("FavoriteStatementsSplitPanel");
@@ -55,7 +51,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
 
         //CREATE TABLE
         //search_Table_Model = new StatementsTableModelFavorite();
-        favotitesTable = new FavoriteTransactionTableModel();
+        favotitesTable = new FavoriteStatementsTableModel();
 
         // UPDATE FILTER ON TEXT CHANGE
         searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new search_tab_filter());
@@ -75,6 +71,21 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 
         JPopupMenu menu = new JPopupMenu();
+
+        // favorite menu
+        JMenuItem favoriteMenuItems = new JMenuItem(Lang.getInstance().translate("Remove Favorite"));
+        favoriteMenuItems.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Transaction statement = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel
+                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                if (statement == null) return;
+                favotitesTable.wallet.removeDocumentFavorite(statement);
+            }
+        });
+
+        menu.add(favoriteMenuItems);
+
+        menu.addSeparator();
 
         JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
 
@@ -130,13 +141,13 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
                 int row = jTableJScrollPanelLeftPanel.rowAtPoint(p);
                 jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
 
-                if (e.getClickCount() == 1 & e.getButton() == e.BUTTON1) {
+                if (e.getClickCount() == 2 & e.getButton() == e.BUTTON1) {
 
                     if (jTableJScrollPanelLeftPanel.getSelectedColumn() == favotitesTable.COLUMN_FAVORITE) {
 
                         row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                         Transaction transaction = (Transaction) favotitesTable.getItem(row);
-                        favorite_set(transaction);
+                        favotitesTable.wallet.removeDocumentFavorite(transaction);
 
                     }
                 }
@@ -168,21 +179,6 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
         if (c1 instanceof RNoteInfo) ((RNoteInfo) c1).delay_on_Close();
-
-    }
-
-    public void favorite_set(Transaction transaction) {
-
-        // CHECK IF FAVORITES
-        if (Controller.getInstance().isTransactionFavorite(transaction)) {
-            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
-
-            if (dd == 0) Controller.getInstance().removeTransactionFavorite(transaction);
-        } else {
-
-            Controller.getInstance().addTransactionFavorite(transaction);
-        }
-        jTableJScrollPanelLeftPanel.repaint();
 
     }
 
