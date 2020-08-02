@@ -330,9 +330,9 @@ public class SettingsFrame extends JDialog {
         // save use SSL
         settingsWebSSLJSONbuf.put("Enable", settingsTabPane.settingsBasicPanel.chckbxWebUseSSL.isSelected());
        // save keystore fale path
-        settingsWebSSLJSONbuf.put("KeyStorePassword", settingsTabPane.settingsBasicPanel.textWebKeystorePass.getText());
+        settingsWebSSLJSONbuf.put("KeyStorePassword", new String(settingsTabPane.settingsBasicPanel.textWebKeystorePass.getPassword()));
         // save keystore pass
-        settingsWebSSLJSONbuf.put("KeyStoreSourcePassword", settingsTabPane.settingsBasicPanel.textWebCertificatePass.getText());
+        settingsWebSSLJSONbuf.put("KeyStoreSourcePassword", new String(settingsTabPane.settingsBasicPanel.textWebCertificatePass.getPassword()));
         // save certificate pass
         settingsWebSSLJSONbuf.put("KeyStorePath", settingsTabPane.settingsBasicPanel.textWebKeyStoreFilePath.getText());
         settingsJSONbuf.put("WEB_SSL",settingsWebSSLJSONbuf);
