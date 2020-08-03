@@ -1,4 +1,4 @@
-package org.erachain.core.exdata;
+package org.erachain.gui.exdata;
 
 import org.erachain.lang.Lang;
 
