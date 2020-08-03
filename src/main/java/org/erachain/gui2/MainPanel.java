@@ -363,7 +363,7 @@ public class MainPanel extends javax.swing.JPanel {
 
             }
             if (str.equals(Lang.getInstance().translate("Issue Document")) || str.equals("IssueDocumentPanel")) {
-                insertTab(Lang.getInstance().translate("Issue Document"), new IssueDocumentPanel(), IssueDocumentPanel.getIcon());
+                insertTab(Lang.getInstance().translate("Issue Document"), IssueDocumentPanel.getInstance(true), IssueDocumentPanel.getIcon());
                 return;
 
             }
