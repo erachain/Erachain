@@ -181,7 +181,7 @@ public class ExData {
                 // v2.0
                 if (json.containsKey("Template")) {
 
-                    templateKey = new Long((String) json.get("Template"));
+                    templateKey = new Long(json.get("Template").toString());
                     if (dcSet != null) {
                         template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, templateKey);
                     }
