@@ -342,14 +342,18 @@ public class RSignNote extends Transaction implements Itemable {
         //ADD CREATOR/SERVICE/DATA
         if (data != null && data.length > 0) {
 
+            // parse DATA - may it for webserver.API.recordParse
+            parseDataV2WithoutFiles();
+
             if (getVersion() == 0 && this.isText() && !this.isEncrypted()) {
                 transaction.put("data", new String(this.data, StandardCharsets.UTF_8));
             } else {
-                transaction.put("data", Base64.encode(this.data));
+                transaction.put("data64", Base64.encode(this.data));
             }
 
             transaction.put("encrypted", this.isEncrypted());
             transaction.put("isText", this.isText());
+            transaction.put("json", extendedData.getJsonObject());
         }
 
         if (this.key > 0)
