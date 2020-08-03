@@ -161,7 +161,7 @@ public class ExData {
             // v 2.1
             if (json.containsKey("TM")) {
 
-                templateKey = new Long((String) json.get("TM"));
+                templateKey = new Long(json.get("TM").toString());
                 if (dcSet != null) {
                     template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, templateKey);
                 }
@@ -759,7 +759,7 @@ public class ExData {
 
         // add template AND params
         if (template != null) {
-            out_Map.put("TM", template.getKey() + "");
+            out_Map.put("TM", template.getKey());
 
             Iterator<Entry<String, String>> it_templ = params_Template.entrySet().iterator();
             while (it_templ.hasNext()) {
