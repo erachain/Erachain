@@ -15,6 +15,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ZipBytes;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun;
@@ -1042,5 +1043,32 @@ public class ExData {
             return new Fun.Tuple3<>(pos, e.getMessage(), null);
         }
 
+    }
+
+    public JSONObject toJson() {
+
+        JSONObject toJson = new JSONObject();
+
+        if (hasRecipients()) {
+            JSONArray recipients = new JSONArray();
+            for (Account recipient : getRecipients()) {
+                recipients.add(recipient.getAddress());
+            }
+            toJson.put("recipientsFlag", recipientsFlags);
+            toJson.put("recipients", recipients);
+
+        }
+
+        toJson.put("title", title);
+
+
+        if (isEncrypted()) {
+            toJson.put("secretsFlags", secretsFlags);
+            toJson.put("encrypted", true);
+        } else {
+            toJson.put("json", json);
+        }
+
+        return toJson;
     }
 }
