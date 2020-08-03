@@ -399,6 +399,30 @@ public class Wallet extends Observable /*implements Observer*/ {
 		return database.isItemFavorite(item);
 	}
 
+	public void addDocumentFavorite(Transaction transaction) {
+		if (!this.exists()) {
+			return;
+		}
+
+		this.database.addDocumentToFavorite(transaction);
+	}
+
+	public void removeDocumentFavorite(Transaction transaction) {
+		if (!this.exists()) {
+			return;
+		}
+
+		this.database.removeDocumentFromFavorite(transaction);
+	}
+
+	public boolean isDocumentFavorite(Transaction transaction) {
+		if (!this.exists()) {
+			return false;
+		}
+
+		return this.database.isDocumentFavorite(transaction);
+	}
+
 	public void addTransactionFavorite(Transaction transaction) {
 		if (!this.exists()) {
 			return;
@@ -1031,7 +1055,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 		if (!asOrphan && transaction instanceof RSend) {
 			// ADD to FAVORITES
-			if (!this.database.getAssetFavoritesSet().contains(transaction.getAbsKey()))
+			if (transaction.getAbsKey() > 0 && !this.database.getAssetFavoritesSet().contains(transaction.getAbsKey()))
 				this.database.getAssetFavoritesSet().add(transaction.getAbsKey());
 
 		}

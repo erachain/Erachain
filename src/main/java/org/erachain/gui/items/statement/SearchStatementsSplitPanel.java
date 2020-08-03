@@ -2,6 +2,7 @@ package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.wallet.Wallet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
@@ -38,6 +39,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
     private RowSorter<ItemsPersonsTableModel> search_Sorter;
     private int selected_Item;
     private JTextField key_Item;
+    Wallet wallet = Controller.getInstance().wallet;
 
     public SearchStatementsSplitPanel() {
         super("SearchStatementsSplitPanel");
@@ -246,7 +248,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                     if (jTableJScrollPanelLeftPanel
                             .getSelectedColumn() == search_Table_Model.COLUMN_FAVORITE) {
                         row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                        Transaction transaction = (Transaction) search_Table_Model.getItem(row);
+                        Transaction transaction = search_Table_Model.getItem(row);
                         favorite_set(transaction);
                     }
                 }
@@ -289,13 +291,12 @@ public class SearchStatementsSplitPanel extends SplitPanel {
     public void favorite_set(Transaction transaction) {
 
         // CHECK IF FAVORITES
-        if (Controller.getInstance().isTransactionFavorite(transaction)) {
+        if (wallet.isDocumentFavorite(transaction)) {
             int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
 
-            if (dd == 0) Controller.getInstance().removeTransactionFavorite(transaction);
+            if (dd == 0) wallet.removeDocumentFavorite(transaction);
         } else {
-
-            Controller.getInstance().addTransactionFavorite(transaction);
+            wallet.addDocumentFavorite(transaction);
         }
         jTableJScrollPanelLeftPanel.repaint();
 

@@ -85,7 +85,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
                 row = inciming_Mail_Table.convertRowIndexToModel(row);
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(((RSend) incoming_Mails_Model.getTransaction(row)).getCreator().getAddress());
+                StringSelection value = new StringSelection(((RSend) incoming_Mails_Model.getItem(row)).getCreator().getAddress());
                 clipboard.setContents(value, null);
             }
         });
@@ -99,7 +99,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
                 row = inciming_Mail_Table.convertRowIndexToModel(row);
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(((RSend) incoming_Mails_Model.getTransaction(row)).getRecipient().getAddress());
+                StringSelection value = new StringSelection(((RSend) incoming_Mails_Model.getItem(row)).getRecipient().getAddress());
                 clipboard.setContents(value, null);
             }
         });
@@ -117,7 +117,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
                     return;
                 }
 
-                Transaction transaction = incoming_Mails_Model.getTransaction(jTableJScrollPanelLeftPanel
+                Transaction transaction = incoming_Mails_Model.getItem(jTableJScrollPanelLeftPanel
                         .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
                 if (transaction == null) {
                     return;
@@ -167,7 +167,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
     @Override
     public void onClose() {
         // delete observer left panel
-        incoming_Mails_Model.removeObservers();
+        incoming_Mails_Model.deleteObservers();
         // get component from right panel
         Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
         // if PersonInfo 002 delay on close
@@ -185,7 +185,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
             if (inciming_Mail_Table.getSelectedRow() < 0)
                 return;
 
-            RSend mail = (RSend) incoming_Mails_Model.getTransaction(inciming_Mail_Table.convertRowIndexToModel(inciming_Mail_Table.getSelectedRow()));
+            RSend mail = (RSend) incoming_Mails_Model.getItem(inciming_Mail_Table.convertRowIndexToModel(inciming_Mail_Table.getSelectedRow()));
             if (mail == null) return;
             MailInfo info_panel = new MailInfo(mail);
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);

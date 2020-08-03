@@ -60,11 +60,12 @@ public abstract class FavoriteItemModelTable extends TimerTableModelCls implemen
             needUpdate = false;
 
         } else if (type == ADD_EVENT) {
-            list.add(Controller.getInstance().getAsset((long) message.getValue()));
+            list.add(map.get(message.getValue()));
             needUpdate = true;
 
         } else if (type == DELETE_EVENT) {
-            list.remove(Controller.getInstance().getAsset((long) message.getValue()));
+            //list.remove(Controller.getInstance().getAsset((long) message.getValue()));
+            list.remove(map.get(message.getValue()));
             needUpdate = true;
 
         } else if (type == RESET_EVENT) {
