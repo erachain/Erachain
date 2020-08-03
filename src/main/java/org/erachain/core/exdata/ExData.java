@@ -1065,7 +1065,7 @@ public class ExData {
         if (isEncrypted()) {
             toJson.put("secretsFlags", secretsFlags);
             toJson.put("encrypted", true);
-        } else {
+        } else if (json != null) {
             toJson.put("json", json);
         }
 
