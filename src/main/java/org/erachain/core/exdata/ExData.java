@@ -15,6 +15,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ZipBytes;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun;
@@ -160,7 +161,7 @@ public class ExData {
             // v 2.1
             if (json.containsKey("TM")) {
 
-                templateKey = new Long((String) json.get("TM"));
+                templateKey = new Long(json.get("TM").toString());
                 if (dcSet != null) {
                     template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, templateKey);
                 }
@@ -180,7 +181,7 @@ public class ExData {
                 // v2.0
                 if (json.containsKey("Template")) {
 
-                    templateKey = new Long((String) json.get("Template"));
+                    templateKey = new Long(json.get("Template").toString());
                     if (dcSet != null) {
                         template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, templateKey);
                     }
@@ -758,7 +759,7 @@ public class ExData {
 
         // add template AND params
         if (template != null) {
-            out_Map.put("TM", template.getKey() + "");
+            out_Map.put("TM", template.getKey());
 
             Iterator<Entry<String, String>> it_templ = params_Template.entrySet().iterator();
             while (it_templ.hasNext()) {
@@ -1042,5 +1043,32 @@ public class ExData {
             return new Fun.Tuple3<>(pos, e.getMessage(), null);
         }
 
+    }
+
+    public JSONObject toJson() {
+
+        JSONObject toJson = new JSONObject();
+
+        if (hasRecipients()) {
+            JSONArray recipients = new JSONArray();
+            for (Account recipient : getRecipients()) {
+                recipients.add(recipient.getAddress());
+            }
+            toJson.put("recipientsFlag", recipientsFlags);
+            toJson.put("recipients", recipients);
+
+        }
+
+        toJson.put("title", title);
+
+
+        if (isEncrypted()) {
+            toJson.put("secretsFlags", secretsFlags);
+            toJson.put("encrypted", true);
+        } else if (json != null) {
+            toJson.put("json", json);
+        }
+
+        return toJson;
     }
 }
