@@ -45,4 +45,16 @@ public class FavoriteAccountsMap extends DCUMapImpl<String, Tuple2<String, Strin
         map = new TreeMap<String, Tuple2<String, String>>(Fun.COMPARATOR);
     }
 
+    @Override
+    public void put(String key, Tuple2<String, String> value) {
+        super.put(key, value);
+        ((DWSet) databaseSet).hardFlush();
+    }
+
+    @Override
+    public void delete(String key) {
+        super.delete(key);
+        ((DWSet) databaseSet).hardFlush();
+    }
+
 }
