@@ -10,6 +10,7 @@ import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Observer;
 
@@ -53,8 +54,11 @@ public class WalletTelegramsFilterTableModel extends TimerTableModelCls<Transact
 
     }
 
-    private void filter() {
-        list.clear();
+    @Override
+    public void getInterval() {
+
+        list = new ArrayList<>();
+
         for (Transaction transaction : ((TelegramsMap) map).values()) {
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             if (reciever != null) {
@@ -77,9 +81,7 @@ public class WalletTelegramsFilterTableModel extends TimerTableModelCls<Transact
                                 //list.add(tt);
                                 continue;
                         }
-
                     }
-
                }
 
                 
@@ -98,12 +100,10 @@ public class WalletTelegramsFilterTableModel extends TimerTableModelCls<Transact
                             //ttt.add(new Tuple3(transaction.getCreator().getAddress(), sender, transaction));
                             continue;
                         }
-
                     }
                 }
             }
         }
-
     }
 
     /**
@@ -112,7 +112,7 @@ public class WalletTelegramsFilterTableModel extends TimerTableModelCls<Transact
      */
     public void setSender(String sender) {
         this.sender = sender;
-        filter();
+        getInterval();
         this.fireTableDataChanged();
     }
 
@@ -122,7 +122,7 @@ public class WalletTelegramsFilterTableModel extends TimerTableModelCls<Transact
      */
     public void setReciever(String reciever) {
         this.reciever = reciever;
-        filter();
+        getInterval();
         this.fireTableDataChanged();
     }
 

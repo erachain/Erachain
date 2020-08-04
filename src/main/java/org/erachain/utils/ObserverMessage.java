@@ -306,14 +306,15 @@ public class ObserverMessage {
     public static final int WALLET_ACCOUNT_PROPERTIES_ADD = 12017;
     public static final int WALLET_ACCOUNT_PROPERTIES_DELETE = 12018;
     public static final int WALLET_ACCOUNT_PROPERTIES_LIST = 12019;
-   
+    public static final int WALLET_ACCOUNT_PROPERTIES_RESET = 12020;
+
     public static final int WALLET_ADD_TELEGRAM_TYPE = 1000003;
     public static final int WALLET_REMOVE_TELEGRAM_TYPE = 1000001;
     public static final int WALLET_LIST_TELEGRAM_TYPE = 1000002;
     public static final int WALLET_RESET_TELEGRAM_TYPE = 1000004;
-    
+
     // all telegramm observer meggase
-    public static final int ALL_TELEGRAM_RESET_TYPE =-1003;
+    public static final int ALL_TELEGRAM_RESET_TYPE = -1003;
     public static final int ALL_TELEGRAMT_ADD_TYPE = -1001;
     public static final int ALL_TELEGRAMT_REMOVE_TYPE = -1002;
     public static final int ALL_TELEGRAMT_LIST_TYPE = -1000;

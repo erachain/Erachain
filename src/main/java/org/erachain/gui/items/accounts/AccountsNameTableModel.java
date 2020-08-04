@@ -3,8 +3,7 @@ package org.erachain.gui.items.accounts;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.gui.ObserverWaiter;
-import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.utils.ObserverMessage;
+import org.erachain.gui.models.WalletTableModel;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
@@ -12,15 +11,15 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
-import java.util.Observable;
 
 @SuppressWarnings("serial")
-public class AccountsNameTableModel extends TimerTableModelCls<Tuple2<String, Tuple2<String, String>>> implements ObserverWaiter {
+public class AccountsNameTableModel extends WalletTableModel<Tuple2<String, Tuple2<String, String>>> implements ObserverWaiter {
+
+    public static final int COLUMN_NO = 0;
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_NAME = 2;
     public static final int COLUMN_DESCRIPTION = 3;
     public static final int COLUMN_PERSON = 4;
-    public final int COLUMN_NO = 0;
 
     private Tuple2<String, Tuple2<String, String>> account;
 
@@ -29,15 +28,6 @@ public class AccountsNameTableModel extends TimerTableModelCls<Tuple2<String, Tu
                 new String[]{"No.", "Account", "Name", "Description", "Person"},
                 new Boolean[]{true, false, false, false}, false);
 
-        addObservers();
-
-    }
-
-    public AccountsNameTableModel(String[] columnNames) {
-        super(new String[]{"No.", "Account", "Name", "Description", "Person"},
-                new Boolean[]{true, false, false, false}, false);
-
-        addObservers();
     }
 
     @Override
@@ -68,6 +58,9 @@ public class AccountsNameTableModel extends TimerTableModelCls<Tuple2<String, Tu
                 return row + 1;
             case COLUMN_DESCRIPTION:
 
+                if (true)
+                    return account.toString();
+
                 answer = (JSONObject) JSONValue.parse(account.b.b);
                 answer = answer == null ? new JSONObject() : answer;
                 // set papams
@@ -80,6 +73,7 @@ public class AccountsNameTableModel extends TimerTableModelCls<Tuple2<String, Tu
         return null;
     }
 
+    /*
     @SuppressWarnings("unchecked")
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -105,19 +99,5 @@ public class AccountsNameTableModel extends TimerTableModelCls<Tuple2<String, Tu
 
     }
 
-
-    public void addObservers() {
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            map.addObserver(this);
-        } else {
-            // ожидаем открытия кошелька
-            Controller.getInstance().wallet.addWaitingObserver(this);
-        }
-    }
-
-    public void deleteObservers() {
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-            map.deleteObserver(this);
-        }
-    }
+     */
 }
