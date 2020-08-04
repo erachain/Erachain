@@ -4,7 +4,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.gui.Wallets.WalletsManagerSplitPanel;
 import org.erachain.gui.bank.IssueSendPaymentOrder;
 import org.erachain.gui.bank.MyOrderPaimentsSplitPanel;
-import org.erachain.gui.items.accounts.AccountsNameSearchSplitPanel;
+import org.erachain.gui.items.accounts.FavoriteAccountsSplitPanel;
 import org.erachain.gui.items.accounts.MyAccountsSplitPanel;
 import org.erachain.gui.items.accounts.MyLoansSplitPanel;
 import org.erachain.gui.items.assets.*;
@@ -339,8 +339,8 @@ public class MainPanel extends javax.swing.JPanel {
             }
 
             if (str.equals(Lang.getInstance().translate("Favorite Accounts"))
-                    || str.equals("AccountsNameSearchSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Favorite Accounts"), new AccountsNameSearchSplitPanel(), AccountsNameSearchSplitPanel.getIcon());
+                    || str.equals("FavoriteAccountsSplitPanel")) {
+                insertTab(Lang.getInstance().translate("Favorite Accounts"), new FavoriteAccountsSplitPanel(), FavoriteAccountsSplitPanel.getIcon());
                 return;
 
             }

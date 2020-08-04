@@ -58,7 +58,7 @@ public class TelegramSplitPanel extends SplitPanel {
     //   private RightTelegramPanel rightPanel;
     private AccountsComboBoxModel accountsModel;
     static TelegramSplitPanel th;
-    private AccountsNameTableModel accountModel;
+    private FavoriteAccountsTableModel accountModel;
     private MTable tableFavoriteAccounts;
     protected int row;
     private Account recipient;
@@ -91,7 +91,7 @@ public class TelegramSplitPanel extends SplitPanel {
         // EVENTS on CURSOR
         // accountPanel.table.getSelectionModel().addListSelectionListener(new Account_Tab_Listener());
 
-        accountModel = new AccountsNameTableModel();
+        accountModel = new FavoriteAccountsTableModel();
         tableFavoriteAccounts = new MTable(this.accountModel);
 
 

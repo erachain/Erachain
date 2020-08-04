@@ -2,6 +2,7 @@ package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.models.WalletTableModel;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -9,10 +10,12 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 @SuppressWarnings("serial")
-public class AccountsNameTableModel extends WalletTableModel<Tuple2<String, Tuple2<String, String>>> {
+public class FavoriteAccountsTableModel extends WalletTableModel<Tuple2<String, Tuple2<String, String>>> {
 
     public static final int COLUMN_NO = 0;
     public static final int COLUMN_ADDRESS = 1;
@@ -22,7 +25,7 @@ public class AccountsNameTableModel extends WalletTableModel<Tuple2<String, Tupl
 
     //private Tuple2<String, Tuple2<String, String>> account;
 
-    public AccountsNameTableModel() {
+    public FavoriteAccountsTableModel() {
         super(Controller.getInstance().wallet.database.getFavoriteAccountsMap(),
                 new String[]{"No.", "Account", "Name", "Description", "Person"},
                 new Boolean[]{true, false, false, false}, false);
@@ -69,31 +72,26 @@ public class AccountsNameTableModel extends WalletTableModel<Tuple2<String, Tupl
         return null;
     }
 
-    /*
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        if (message.getType() == ObserverMessage.WALLET_ACCOUNT_PROPERTIES_LIST) {
-
-            needUpdate = false;
-            getInterval();
-            this.fireTableDataChanged();
-
-        } else if (message.getType() == ObserverMessage.WALLET_ACCOUNT_PROPERTIES_ADD) {
-
-            needUpdate = false;
-            getInterval();
-            this.fireTableDataChanged();
-
-        } else if (message.getType() == ObserverMessage.WALLET_ACCOUNT_PROPERTIES_DELETE) {
-
-            needUpdate = false;
-            getInterval();
-            this.fireTableDataChanged();
+    public void getInterval() {
+        Object key;
+        int count = 0;
+        list = new ArrayList<>();
+        if (startKey == null) {
+            try (IteratorCloseable iterator = map.getIterator()) {
+                while (iterator.hasNext() && count++ < step) {
+                    key = iterator.next();
+                    list.add(new Tuple2<String, Tuple2<String, String>>((String) key, (Tuple2) map.get(key)));
+                }
+            } catch (IOException e) {
+            }
+        } else {
+            try (IteratorCloseable iterator = map.getIterator()) {
+                while (iterator.hasNext() && count++ < step) {
+                    key = iterator.next();
+                    list.add(new Tuple2<String, Tuple2<String, String>>((String) key, (Tuple2) map.get(key)));
+                }
+            } catch (IOException e) {
+            }
         }
-
     }
-
-     */
 }

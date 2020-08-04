@@ -43,21 +43,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class AccountsNameSearchSplitPanel extends SplitPanel  {
+public class FavoriteAccountsSplitPanel extends SplitPanel {
 
     /**
      *
      */
     private static String iconFile = Settings.getInstance().getPatnIcons() + "AccountsNameSearchSplitPanel.png";
     private static final long serialVersionUID = 1L;
-    static Logger LOGGER = LoggerFactory.getLogger(AccountsNameSearchSplitPanel.class);
+    static Logger LOGGER = LoggerFactory.getLogger(FavoriteAccountsSplitPanel.class);
     protected FileChooser chooser;
     protected int row;
-    private AccountsNameTableModel accountsTableModel;
+    private FavoriteAccountsTableModel accountsTableModel;
     private JButton button3_ToolBar_LeftPanel;
     private FavoriteAccountsMap accountsMap;
 
-    public AccountsNameSearchSplitPanel() {
+    public FavoriteAccountsSplitPanel() {
         super("AccountsNameSearchSplitPanel");
         GridBagLayout gridBagLayout = (GridBagLayout) leftPanel.getLayout();
         gridBagLayout.rowWeights = new double[]{0.0, 0.0};
@@ -83,7 +83,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
         jButton2_jToolBar_RightPanel.setVisible(false);
 
         // CREATE TABLE
-        this.accountsTableModel = new AccountsNameTableModel();
+        this.accountsTableModel = new FavoriteAccountsTableModel();
         final MTable imprintsTable = new MTable(this.accountsTableModel);
 
         // CHECKBOX FOR FAVORITE

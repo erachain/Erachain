@@ -5,7 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.gui.Wallets.WalletsManagerSplitPanel;
 import org.erachain.gui.bank.IssueSendPaymentOrder;
 import org.erachain.gui.bank.MyOrderPaimentsSplitPanel;
-import org.erachain.gui.items.accounts.AccountsNameSearchSplitPanel;
+import org.erachain.gui.items.accounts.FavoriteAccountsSplitPanel;
 import org.erachain.gui.items.accounts.MyAccountsSplitPanel;
 import org.erachain.gui.items.accounts.MyLoansSplitPanel;
 import org.erachain.gui.items.assets.*;
@@ -165,7 +165,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
 
         account_Node.add(new ASMutableTreeNode("MyAccountsSplitPanel", Lang.getInstance().translate("My Accounts"), MyAccountsSplitPanel.getIcon()));
         account_Node.add(new ASMutableTreeNode("MyLoansSplitPanel", Lang.getInstance().translate("My Loans"), MyLoansSplitPanel.getIcon()));
-        account_Node.add(new ASMutableTreeNode("AccountsNameSearchSplitPanel", Lang.getInstance().translate("Favorite Accounts"), AccountsNameSearchSplitPanel.getIcon()));
+        account_Node.add(new ASMutableTreeNode("FavoriteAccountsSplitPanel", Lang.getInstance().translate("Favorite Accounts"), FavoriteAccountsSplitPanel.getIcon()));
 
         // account_Node.add(new
         // DefaultMutableTreeNode(Lang.getInstance().translate("Search
