@@ -1,6 +1,8 @@
 package org.erachain.gui.telegrams;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
@@ -11,11 +13,16 @@ import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 /**
  * @author Саша
@@ -229,6 +236,59 @@ public class RightTelegramPanel extends javax.swing.JPanel {
                 row = jTableMessages.convertRowIndexToModel(row1);
             }
         });
+
+        JMenuItem copyText = new JMenuItem(Lang.getInstance().translate("Copy Text"));
+        copyText.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                RSend rSend = (RSend) walletTelegramsFilterTableModel.getItem(row);
+                byte[] dataMess;
+                String message;
+
+                if (rSend.isEncrypted()) {
+
+                    if (checkWalletUnlock(null)) {
+                        return;
+                    }
+                    dataMess = Controller.getInstance().decrypt(rSend.getCreator(), rSend.getRecipient(), rSend.getData());
+
+                } else {
+                    dataMess = rSend.getData();
+                }
+
+                if (dataMess != null) {
+                    if (rSend.isText()) {
+                        try {
+                            message = new String(dataMess, "UTF-8");
+                        } catch (UnsupportedEncodingException e1) {
+                            message = "error UTF-8";
+                            JOptionPane.showMessageDialog(new JFrame(),
+                                    Lang.getInstance().translate(message),
+                                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else {
+                        message = Base58.encode(dataMess);
+                    }
+
+                } else {
+                    message = "decode error";
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.getInstance().translate(message),
+                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+                }
+
+                StringSelection stringSelection = new StringSelection(message);
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.getInstance().translate("Text has been copy to buffer") + "!",
+                        Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+            }
+        });
+        menu.add(copyText);
+
+        menu.addSeparator();
 
         JMenuItem deleteTelegram = new JMenuItem(Lang.getInstance().translate("Delete Telegram"));
         deleteTelegram.addActionListener(new ActionListener() {
