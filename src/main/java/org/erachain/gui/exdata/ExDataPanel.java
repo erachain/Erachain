@@ -74,6 +74,7 @@ public class ExDataPanel extends JPanel {
     public JCheckBox checkBoxMakeHashAndCheckUniqueText;
     public JCheckBox checkBoxMakeHashAndCheckUniqueHashes;
     public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
+    public DocTypeAppendixPanel docTypeAppendixPanel;
 
 
 
@@ -310,6 +311,7 @@ public class ExDataPanel extends JPanel {
 
         params_Template_Model = new ParamsTemplateModel();
         jTable_Params_Message_Public = new MTable(params_Template_Model);
+        docTypeAppendixPanel = new DocTypeAppendixPanel();
         params_Template_Model.addTableModelListener(new TableModelListener() {
 
             @Override
@@ -357,6 +359,7 @@ public class ExDataPanel extends JPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
 
+        jTabbedPane_Message.addTab(Lang.getInstance().translate("Doc type"), docTypeAppendixPanel);
         jTabbedPane_Message.addTab(Lang.getInstance().translate("Recipients"), multipleRecipientsPanel);
 
         fill_Template_Panel = new MFillTemplatePanel();
