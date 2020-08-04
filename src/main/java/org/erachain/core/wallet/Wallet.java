@@ -1049,20 +1049,19 @@ public class Wallet extends Observable /*implements Observer*/ {
 	private void deal_transaction(Account account, Transaction transaction, boolean asOrphan) {
 		// UPDATE UNCONFIRMED BALANCE for ASSET
 		// TODO: fee doubled?
-		long key = transaction.getAssetKey();
-		long absKey = key < 0 ? -key : key;
+		long absKey = transaction.getAbsKey();
 		String address = account.getAddress();
 
 		if (!asOrphan && transaction instanceof RSend) {
 			// ADD to FAVORITES
-			if (transaction.getAbsKey() > 0 && !this.database.getAssetFavoritesSet().contains(transaction.getAbsKey()))
+			if (absKey > 0 && !this.database.getAssetFavoritesSet().contains(transaction.getAbsKey()))
 				this.database.getAssetFavoritesSet().add(transaction.getAbsKey());
 
 		}
 
 		BigDecimal fee = transaction.getFee(account);
 		boolean isBackward = false;
-		if (absKey != 0) {
+		if (absKey > 0) {
 			// ASSET TRANSFERED + FEE
 			BigDecimal amount = transaction.getAmount(account);
 			if (transaction instanceof RSend) {
@@ -1074,7 +1073,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 					amount = amount.subtract(fee);
 				}
 			}
-			this.database.getAccountMap().changeBalance(address, !asOrphan, key, amount, isBackward);
+			this.database.getAccountMap().changeBalance(address, !asOrphan, transaction.getKey(), amount, isBackward);
 		} else {
 			// ONLY FEE
 			if (fee.compareTo(BigDecimal.ZERO) != 0) {
@@ -1158,26 +1157,36 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 	}
 
-	public void processTransaction(Transaction transaction) {
+	/**
+	 * Внимание! Здесь нельзя делать выход если один раз счет совпал - так как иначе не правильно обработаются балансы
+	 * и Входящая / Исходящая транзакции, например по АПИ. Поэтому если в одном кошельке
+	 * несколько счетов к которым эта транзакция подходит - то она добавится в кошелек длля каждого из них
+	 * Это правильно и так и должно быть!
+	 *
+	 * @param transaction
+	 */
+	public boolean processTransaction(Transaction transaction) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
-			return;
+			return false;
 		}
 
 		// FOR ALL ACCOUNTS
 		List<Account> accounts = this.getAccounts();
-		synchronized (accounts) {
-			for (Account account : accounts) {
-				// CHECK IF INVOLVED
-				if (transaction.isInvolved(account)) {
-					// ADD TO ACCOUNT TRANSACTIONS
-					if (!this.database.getTransactionMap().set(account, transaction)) {
-						// UPDATE UNCONFIRMED BALANCE for ASSET
-						deal_transaction(account, transaction, false);
-					}
+		boolean isInvolved = false;
+		for (Account account : accounts) {
+			// CHECK IF INVOLVED
+			if (transaction.isInvolved(account)) {
+				isInvolved = true;
+				// ADD TO ACCOUNT TRANSACTIONS
+				if (!this.database.getTransactionMap().set(account, transaction)) {
+					// UPDATE UNCONFIRMED BALANCE for ASSET
+					deal_transaction(account, transaction, false);
 				}
 			}
 		}
+
+		return isInvolved;
 	}
 
 	private void processATTransaction(Tuple2<Tuple2<Integer, Integer>, ATTransaction> atTx) {
@@ -1335,7 +1344,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 		int seqNo = 0;
 		for (Transaction transaction : block.getTransactions()) {
 
-            // TODO нужно сделать при закрытии базы чтобы ожидала окончания проходя всего блока тут - пока ОТКАТ
+			// TODO нужно сделать при закрытии базы чтобы ожидала окончания проходя всего блока тут - пока ОТКАТ
 
 
 			if (transaction.isWiped()) {
@@ -1343,9 +1352,10 @@ public class Wallet extends Observable /*implements Observer*/ {
 			}
 
 			if (transaction.noDCSet())
-                transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+				transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
 
-			this.processTransaction(transaction);
+			if (!processTransaction(transaction))
+				continue;
 
 			// SKIP PAYMENT TRANSACTIONS
 			if (transaction instanceof RSend) {
@@ -1474,18 +1484,13 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 		// CHECK IF WE ARE OWNER
 		ItemCls item = issueItem.getItem();
-		Account owner = item.getOwner();
-
-		if (this.accountExists(issueItem.getCreator().getAddress())
-				|| owner != null && this.accountExists(owner.getAddress())) {
-			// ADD ASSET
-			this.database.getItemMap(item).put(item.getKey(), item);
-			// ADD to FAVORITES
-			this.database.getItemFavoritesSet(item).add(item.getKey());
-
+		if (item == null)
 			return;
 
-		}
+		// ADD ASSET
+		this.database.putItem(item);
+		// ADD to FAVORITES
+		this.database.addItemFavorite(item);
 
 	}
 
@@ -1497,13 +1502,12 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 		// CHECK IF WE ARE OWNER
 		ItemCls item = issueItem.getItem();
-		Account owner = item.getOwner();
 
-		if (this.accountExists(issueItem.getCreator().getAddress())
-				|| owner != null && this.accountExists(owner.getAddress())) {
-			// DELETE ASSET
-			this.database.getItemMap(item).delete(item.getKey());
-		}
+		// DELETE ASSET
+		this.database.deleteItem(item);
+		// DELETE FAVORITE
+		this.database.deleteItemFavorite(item);
+
 	}
 
 	private void processSertifyPerson(RSertifyPubKeys sertifyPubKeys, int height) {

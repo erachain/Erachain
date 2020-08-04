@@ -255,6 +255,14 @@ public class DWSet extends DBASet {
         }
     }
 
+    public void putItem(ItemCls item) {
+        getItemMap(item).put(item.getKey(), item);
+    }
+
+    public void deleteItem(ItemCls item) {
+        getItemMap(item).delete(item.getKey());
+    }
+
     public WItemMap getItemMap(int type) {
         switch (type) {
             case ItemCls.ASSET_TYPE:
@@ -334,8 +342,14 @@ public class DWSet extends DBASet {
         } else {
             return null;
         }
+    }
 
+    public void addItemFavorite(ItemCls item) {
+        getItemFavoritesSet(item).add(item.getKey());
+    }
 
+    public void deleteItemFavorite(ItemCls item) {
+        getItemFavoritesSet(item).delete(item.getKey());
     }
 
     //////////////// FAVORITES ///////////

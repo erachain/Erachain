@@ -1,8 +1,10 @@
 package org.erachain.gui.items.statement;
 
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -141,14 +143,10 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
                 int row = jTableJScrollPanelLeftPanel.rowAtPoint(p);
                 jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
 
-                if (e.getClickCount() == 2 & e.getButton() == e.BUTTON1) {
+                if (e.getClickCount() == 1 & e.getButton() == e.BUTTON1) {
 
                     if (jTableJScrollPanelLeftPanel.getSelectedColumn() == favotitesTable.COLUMN_FAVORITE) {
-
-                        row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                        Transaction transaction = (Transaction) favotitesTable.getItem(row);
-                        favotitesTable.wallet.removeDocumentFavorite(transaction);
-
+                        favoriteSet((Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(row)));
                     }
                 }
             }
@@ -222,13 +220,27 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
                 return;
 
-            Transaction transaction = (Transaction)favotitesTable.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            Transaction transaction = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
 
             JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
             info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             //	jSplitPanel.setRightComponent(info_panel);
         }
+    }
+
+    private void favoriteSet(Transaction transaction) {
+        // CHECK IF FAVORITES
+        if (favotitesTable.wallet.isDocumentFavorite(transaction)) {
+            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+            if (showConfirmDialog == 0) {
+                favotitesTable.wallet.removeDocumentFavorite(transaction);
+            }
+        } else {
+            favotitesTable.wallet.addDocumentFavorite(transaction);
+        }
+        ((TimerTableModelCls) jTableJScrollPanelLeftPanel.getModel()).fireTableDataChanged();
+
     }
 
     public static Image getIcon() {
