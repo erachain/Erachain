@@ -752,7 +752,7 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Start WEB Service")));
             LOGGER.info(Lang.getInstance().translate("Start WEB Service"));
-            this.webService = new WebService();
+            this.webService = WebService.getInstance();
             this.webService.start();
         }
 
@@ -1013,7 +1013,7 @@ public class Controller extends Observable {
 
         // START API SERVICE
         if (Settings.getInstance().isWebEnabled()) {
-            this.webService = new WebService();
+            this.webService = WebService.getInstance();
             this.webService.start();
         }
     }

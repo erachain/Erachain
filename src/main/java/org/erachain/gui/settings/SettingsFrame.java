@@ -325,6 +325,19 @@ public class SettingsFrame extends JDialog {
                 return false;
             }
         }
+        // { save SSL settings
+        JSONObject settingsWebSSLJSONbuf = new JSONObject();
+        // save use SSL
+        settingsWebSSLJSONbuf.put("Enable", settingsTabPane.settingsBasicPanel.chckbxWebUseSSL.isSelected());
+       // save keystore fale path
+        settingsWebSSLJSONbuf.put("KeyStorePassword", new String(settingsTabPane.settingsBasicPanel.textWebKeystorePass.getPassword()));
+        // save keystore pass
+        settingsWebSSLJSONbuf.put("KeyStoreSourcePassword", new String(settingsTabPane.settingsBasicPanel.textWebCertificatePass.getPassword()));
+        // save certificate pass
+        settingsWebSSLJSONbuf.put("KeyStorePath", settingsTabPane.settingsBasicPanel.textWebKeyStoreFilePath.getText());
+        settingsJSONbuf.put("WEB_SSL",settingsWebSSLJSONbuf);
+        // save SSL settings }
+
 
         int MinConnections = Integer.parseInt(settingsTabPane.settingsBasicPanel.textMinConnections.getText());
         if (Settings.getInstance().getMinConnections() != MinConnections) {

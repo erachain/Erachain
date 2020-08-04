@@ -274,13 +274,22 @@ public class MenuFiles extends JMenu {
 
         //WEB SERVER
         blockExplorerItem = new JMenuItem(Lang.getInstance().translate("Built-in BlockExplorer"));
-        blockExplorerItem.getAccessibleContext().setAccessibleDescription("http://127.0.0.1:" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html");
+        String blockExplorerProtocol = "Http";
+        if (Settings.getInstance().isWebUseSSL()){
+            blockExplorerProtocol = "Https";
+        }
+        String blockExplorerUrl = blockExplorerProtocol + "://127.0.0.1:" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html";
+        blockExplorerItem.getAccessibleContext().setAccessibleDescription(blockExplorerUrl);
         blockExplorerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.ALT_MASK));
         blockExplorerItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
                 try {
-                    URLViewer.openWebpage(new URL("http://127.0.0.1:" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"));
+                    String blockExplorerProtocol = "Http";
+                    if (Settings.getInstance().isWebUseSSL()){
+                        blockExplorerProtocol = "Https";
+                    }
+                    URLViewer.openWebpage(new URL(blockExplorerUrl));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }
