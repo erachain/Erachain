@@ -3,7 +3,6 @@ package org.erachain.database.wallet;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -13,15 +12,14 @@ import org.slf4j.LoggerFactory;
 import java.util.TreeMap;
 
 /**
+ * Мои избранные счета - для телеграмм например
+ * <p>
  * key: address -> value: name + description
  */
-public class AccountsPropertisMap extends DCUMapImpl<String, Tuple2<String, String>> {
-    public static final int NAME_INDEX = 1;
-    public static final int OWNER_INDEX = 2;
-    static Logger LOGGER = LoggerFactory.getLogger(AccountsPropertisMap.class.getName());
-    BTreeMap<String, String> titleIndex;
+public class FavoriteAccountsMap extends DCUMapImpl<String, Tuple2<String, String>> {
+    static Logger LOGGER = LoggerFactory.getLogger(FavoriteAccountsMap.class.getName());
 
-    public AccountsPropertisMap(DWSet dWSet, DB database) {
+    public FavoriteAccountsMap(DWSet dWSet, DB database) {
         super(dWSet, database);
 
         if (databaseSet.isWithObserver()) {
@@ -36,9 +34,7 @@ public class AccountsPropertisMap extends DCUMapImpl<String, Tuple2<String, Stri
     @Override
     public void openMap() {
         // OPEN MAP
-        map = database.createTreeMap("accounts_propertis_map")
-                //.keySerializer(BTreeKeySerializer.STRING)
-                //.valueSerializer(new NameSerializer())
+        map = database.createTreeMap("favorite_accounts_map")
                 .counterEnable()
                 .makeOrGet();
     }

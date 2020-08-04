@@ -2,12 +2,12 @@ package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.database.wallet.AccountsPropertisMap;
+import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.gui.PasswordPane;
 import org.erachain.lang.Lang;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.StrJSonFine;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class AccountNameAdd extends javax.swing.JDialog {
 
-    AccountsPropertisMap db = Controller.getInstance().wallet.database.getAccountsPropertisMap();
+    FavoriteAccountsMap favoriteAccountsMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
     private AccountNameAdd th;
     // Variables declaration - do not modify
     private javax.swing.ButtonGroup buttonGroupSelectType;
@@ -89,22 +89,23 @@ public class AccountNameAdd extends javax.swing.JDialog {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                String name = th.jTextFieldName.getText();
+                String accountName = th.jTextFieldName.getText();
                 String description = th.jTextAreaDescription.getText();
-                if (name.trim().length() == 0 || description.trim().length() == 0) {
+                if (accountName.trim().length() == 0 || description.trim().length() == 0) {
                     JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Empty name or description"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 try {
-                    JSONObject ans = new JSONObject();
-                    ans.put("description", description);
-                    String acc = th.jTextFieldAccount.getText();
-                    if (acc.length() == 34) {
-                        new Account(acc);
-                        db.put(acc, new Tuple2(name, StrJSonFine.convert(ans)));
-                        setVisible(false);
+                    JSONObject json = new JSONObject();
+                    json.put("description", description);
+                    String address = th.jTextFieldAccount.getText();
+                    Tuple2<Account, String> result = Account.tryMakeAccount(address);
+                    if (result.a == null) {
+                        JOptionPane.showMessageDialog(null, Lang.getInstance().translate(result.b),
+                                Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(null, Lang.getInstance().translate("invalid name length"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        favoriteAccountsMap.put(address, new Tuple2(accountName, StrJSonFine.convert(json)));
+                        setVisible(false);
                     }
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid Account!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

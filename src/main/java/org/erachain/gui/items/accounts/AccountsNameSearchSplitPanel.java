@@ -5,7 +5,7 @@ import com.google.common.io.Files;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.database.wallet.AccountsPropertisMap;
+import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.SplitPanel;
@@ -55,7 +55,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
     protected int row;
     private AccountsNameTableModel accountsTableModel;
     private JButton button3_ToolBar_LeftPanel;
-    private AccountsPropertisMap accountsMap;
+    private FavoriteAccountsMap accountsMap;
 
     public AccountsNameSearchSplitPanel() {
         super("AccountsNameSearchSplitPanel");
@@ -64,7 +64,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
         gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0};
 
         if (Controller.getInstance().doesWalletDatabaseExists())
-            accountsMap = Controller.getInstance().wallet.database.getAccountsPropertisMap();
+            accountsMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
 
         setName(Lang.getInstance().translate("Favorite Accounts"));
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");

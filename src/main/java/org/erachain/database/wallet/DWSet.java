@@ -27,7 +27,7 @@ public class DWSet extends DBASet {
     private Long licenseKey;
 
     private AccountMap accountMap;
-    private AccountsPropertisMap accountsPropertisMap;
+    private FavoriteAccountsMap favoriteAccountsMap;
     private WTransactionMap transactionMap;
     private BlocksHeadMap blocksHeadMap;
     private NameMap nameMap;
@@ -64,7 +64,7 @@ public class DWSet extends DBASet {
         licenseKey = licenseKeyVar.get();
 
         this.accountMap = new AccountMap(this, this.database);
-        this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
+        this.favoriteAccountsMap = new FavoriteAccountsMap(this, this.database);
         this.transactionMap = new WTransactionMap(this, this.database);
         this.blocksHeadMap = new BlocksHeadMap(this, this.database);
         this.nameMap = new NameMap(this, this.database);
@@ -171,8 +171,8 @@ public class DWSet extends DBASet {
         return this.accountMap;
     }
 
-    public AccountsPropertisMap getAccountsPropertisMap() {
-        return this.accountsPropertisMap;
+    public FavoriteAccountsMap getFavoriteAccountsMap() {
+        return this.favoriteAccountsMap;
     }
 
     /**

@@ -1391,7 +1391,7 @@ public class Account {
 
     public Tuple2<String, String> getName() {
 
-        return Controller.getInstance().wallet.database.getAccountsPropertisMap().get(getAddress());
+        return Controller.getInstance().wallet.database.getFavoriteAccountsMap().get(getAddress());
 
     }
 

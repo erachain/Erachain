@@ -5,17 +5,16 @@ import org.erachain.core.account.Account;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.TelegramsMap;
-import org.erachain.gui.models.TimerTableModelCls;
+import org.erachain.gui.models.WalletTableModel;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletTelegramsFilterTableModel extends TimerTableModelCls<Transaction> implements Observer {
+public class WalletTelegramsFilterTableModel extends WalletTableModel<Transaction> {
 
     private boolean needUpdate = false;
     private long timeUpdate = 0;
@@ -27,8 +26,6 @@ public class WalletTelegramsFilterTableModel extends TimerTableModelCls<Transact
     public WalletTelegramsFilterTableModel() {
         super(Controller.getInstance().getWallet().database.getTelegramsMap(), new String[]{"Message"},
                 new Boolean[]{true, true, true, true, true, true, true, false, false}, false);
-
-        addObservers();
 
     }
 

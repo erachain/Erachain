@@ -2,7 +2,6 @@ package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.WalletTableModel;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -13,7 +12,7 @@ import org.mapdb.Fun.Tuple5;
 import java.math.BigDecimal;
 
 @SuppressWarnings("serial")
-public class AccountsNameTableModel extends WalletTableModel<Tuple2<String, Tuple2<String, String>>> implements ObserverWaiter {
+public class AccountsNameTableModel extends WalletTableModel<Tuple2<String, Tuple2<String, String>>> {
 
     public static final int COLUMN_NO = 0;
     public static final int COLUMN_ADDRESS = 1;
@@ -21,10 +20,10 @@ public class AccountsNameTableModel extends WalletTableModel<Tuple2<String, Tupl
     public static final int COLUMN_DESCRIPTION = 3;
     public static final int COLUMN_PERSON = 4;
 
-    private Tuple2<String, Tuple2<String, String>> account;
+    //private Tuple2<String, Tuple2<String, String>> account;
 
     public AccountsNameTableModel() {
-        super(Controller.getInstance().wallet.database.getAccountsPropertisMap(),
+        super(Controller.getInstance().wallet.database.getFavoriteAccountsMap(),
                 new String[]{"No.", "Account", "Name", "Description", "Person"},
                 new Boolean[]{true, false, false, false}, false);
 
@@ -36,8 +35,8 @@ public class AccountsNameTableModel extends WalletTableModel<Tuple2<String, Tupl
             return null;
         }
 
-        account = this.list.get(row);
-        if (account == null) {
+        Tuple2<String, Tuple2<String, String>> item = this.list.get(row);
+        if (item == null) {
             return null;
         }
 
@@ -46,26 +45,23 @@ public class AccountsNameTableModel extends WalletTableModel<Tuple2<String, Tupl
         Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;
         String str;
 
-        JSONObject answer;
+        JSONObject json;
         switch (column) {
-            case COLUMN_ADDRESS:
-                return account.b;
-            case COLUMN_NAME:
-                return account.a;
-            case COLUMN_PERSON:
-                return new Account(account.a).viewPerson();
             case COLUMN_NO:
                 return row + 1;
+            case COLUMN_ADDRESS:
+                return item.a;
+            case COLUMN_NAME:
+                return item.b.a;
+            case COLUMN_PERSON:
+                return new Account(item.a).viewPerson();
             case COLUMN_DESCRIPTION:
 
-                if (true)
-                    return account.toString();
-
-                answer = (JSONObject) JSONValue.parse(account.b.b);
-                answer = answer == null ? new JSONObject() : answer;
+                json = (JSONObject) JSONValue.parse(item.b.b);
+                json = json == null ? new JSONObject() : json;
                 // set papams
-                if (answer.containsKey("description")) {
-                    return answer.get("description");
+                if (json.containsKey("description")) {
+                    return json.get("description");
                 }
                 return "";
         }

@@ -557,7 +557,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 			this.database.getAccountMap().add(account, -1);
 			// set name
 			ob.put("description", Lang.getInstance().translate("Created by default Account") + " " + (nonce + 1));
-			this.database.getAccountsPropertisMap().put(account.getAddress(), new Tuple2<String, String>(
+			this.database.getFavoriteAccountsMap().put(account.getAddress(), new Tuple2<String, String>(
 					Lang.getInstance().translate("My Account") + " " + (nonce + 1), StrJSonFine.convert(ob)));
 			LOGGER.info("Added account #" + nonce);
 
