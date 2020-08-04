@@ -113,25 +113,8 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         nodeList.put("linked_hashes_Node",linked_hashes_Node);
         nodeList.put("records_Node",records_Node);
         nodeList.put("other_Node",other_Node);
-        nodeList.put("other_Node",other_Node);
         nodeList.put("bank_Tree",bank_Tree);
         nodeList.put("telegrams_Tree",telegrams_Tree);
-        nodeList.put("account_Node", account_Node);
-        nodeList.put("person_Node", person_Node);
-        nodeList.put("document_Node", document_Node);
-        nodeList.put("mails_Node", mails_Node);
-        nodeList.put("assets_Node", assets_Node);
-        nodeList.put("templates_Node", templates_Node);
-        nodeList.put("statuses_Node", statuses_Node);
-        nodeList.put("unions_Node", unions_Node);
-        nodeList.put("polls_Node", polls_Node);
-        nodeList.put("hashes_Node", hashes_Node);
-        nodeList.put("linked_hashes_Node", linked_hashes_Node);
-        nodeList.put("records_Node", records_Node);
-        nodeList.put("other_Node", other_Node);
-        nodeList.put("other_Node", other_Node);
-        nodeList.put("bank_Tree", bank_Tree);
-        nodeList.put("telegrams_Tree", telegrams_Tree);
 
 
         if (BlockChain.TEST_MODE)
@@ -154,7 +137,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         root.add(hashes_Node);
         root.add(linked_hashes_Node);
 
-        if (BlockChain.TEST_MODE)
+        if (true || BlockChain.TEST_MODE)
             root.add(telegrams_Tree);
 
         root.add(records_Node);
@@ -240,7 +223,8 @@ public class tt extends JPanel { // implements TreeSelectionListener {
 
         //telegram
         telegrams_Tree.add(new ASMutableTreeNode("TelegramSplitPanel", Lang.getInstance().translate("Telegrams Panel"), TelegramSplitPanel.getIcon()));
-        telegrams_Tree.add(new ASMutableTreeNode("ALLTelegramPanel", Lang.getInstance().translate("All Telegrams Panel"), ALLTelegramPanel.getIcon()));
+        if (BlockChain.TEST_MODE)
+            telegrams_Tree.add(new ASMutableTreeNode("ALLTelegramPanel", Lang.getInstance().translate("All Telegrams Panel"), ALLTelegramPanel.getIcon()));
 
         tree = new JTree(root);
         tree.setCellRenderer(new AS_tt_Render());
