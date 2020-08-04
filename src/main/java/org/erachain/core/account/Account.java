@@ -102,6 +102,9 @@ public class Account {
 
     public static Tuple2<Account, String> tryMakeAccount(String address) {
 
+        if (address == null || address.length() < ADDRESS_LENGTH)
+            return new Tuple2<Account, String>(null, "Wrong Address or PublicKey");
+
         if (address.startsWith("+")) {
             if (PublicKeyAccount.isValidPublicKey(address)) {
                 // MAY BE IT BASE.32 +

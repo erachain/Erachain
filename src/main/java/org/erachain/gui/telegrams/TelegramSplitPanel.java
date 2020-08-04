@@ -7,7 +7,6 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
@@ -21,9 +20,6 @@ import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Converter;
-import org.erachain.utils.NameUtils;
-import org.erachain.utils.NameUtils.NameResult;
-import org.erachain.utils.Pair;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.mapdb.Fun.Tuple2;
 
@@ -166,7 +162,7 @@ public class TelegramSplitPanel extends SplitPanel {
         // set position from table recievers
         if (Settings.getInstance().getTelegramDefaultReciever() != null) {
             rightTelegramPanel.jLabelRaght.setText(Settings.getInstance().getTelegramDefaultReciever());
-            rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(Settings.getInstance().getTelegramDefaultReciever());
+            rightTelegramPanel.walletTelegramsFilterTableModel.setReceiver(Settings.getInstance().getTelegramDefaultReciever());
             int k = accountModel.getRowCount();
             for (int i = 0; i < k; i++) {
                 if (accountModel.getItem(i).a.equals(Settings.getInstance().getTelegramDefaultReciever())) {
@@ -190,7 +186,7 @@ public class TelegramSplitPanel extends SplitPanel {
                 }
                 String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())), accountModel.COLUMN_ADDRESS);
                 rightTelegramPanel.jLabelRaght.setText(account);
-                rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
+                rightTelegramPanel.walletTelegramsFilterTableModel.setReceiver(account);
                 // set settings
                 Settings.getInstance().setTelegramDefaultReciever(account);
             }
@@ -206,7 +202,7 @@ public class TelegramSplitPanel extends SplitPanel {
             this.leftTelegram.jCxbAllmessages.setSelected(true);
             tableFavoriteAccounts.setVisible(false);
             rightTelegramPanel.jLabelRaght.setText(Lang.getInstance().translate("All"));
-            rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(null);
+            rightTelegramPanel.walletTelegramsFilterTableModel.setReceiver(null);
             rightTelegramPanel.jPanelBottom.setVisible(false);
             leftTelegram.jButtonAddAccount.setVisible(false);
         } else {
@@ -217,7 +213,7 @@ public class TelegramSplitPanel extends SplitPanel {
             if (tableFavoriteAccounts.getSelectedRow() >= 0) {
                 String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())), accountModel.COLUMN_ADDRESS);
                 rightTelegramPanel.jLabelRaght.setText(account);
-                rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
+                rightTelegramPanel.walletTelegramsFilterTableModel.setReceiver(account);
             } else {
                 rightTelegramPanel.jLabelRaght.setText("");
             }
@@ -231,7 +227,7 @@ public class TelegramSplitPanel extends SplitPanel {
                 tableFavoriteAccounts.setVisible(false);
                 Settings.getInstance().setTelegramRatioReciever("all");
                 rightTelegramPanel.jLabelRaght.setText(Lang.getInstance().translate("All"));
-                rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(null);
+                rightTelegramPanel.walletTelegramsFilterTableModel.setReceiver(null);
                 rightTelegramPanel.jPanelBottom.setVisible(false);
                 leftTelegram.jButtonAddAccount.setVisible(false);
             }
@@ -254,7 +250,7 @@ public class TelegramSplitPanel extends SplitPanel {
                 }
                 String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())), accountModel.COLUMN_ADDRESS);
                 rightTelegramPanel.jLabelRaght.setText(account);
-                rightTelegramPanel.walletTelegramsFilterTableModel.setReciever(account);
+                rightTelegramPanel.walletTelegramsFilterTableModel.setReceiver(account);
 
             }
 
@@ -464,22 +460,16 @@ public class TelegramSplitPanel extends SplitPanel {
         //READ RECIPIENT
         String recipientAddress = rightTelegramPanel.jLabelRaght.getText();
 
+        Tuple2<Account, String> result = Account.tryMakeAccount(recipientAddress);
         //ORDINARY RECIPIENT
-        if (Crypto.getInstance().isValidAddress(recipientAddress)) {
-            this.recipient = new Account(recipientAddress);
+        if (result.b == null) {
+            this.recipient = result.a;
         } else {
-            //IS IS NAME of RECIPIENT - resolve ADDRESS
-            Pair<Account, NameResult> result = NameUtils.nameToAdress(recipientAddress);
+            JOptionPane.showMessageDialog(null, Lang.getInstance().translate(result.b), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
-            if (result.getB() == NameResult.OK) {
-                recipient = result.getA();
-            } else {
-                JOptionPane.showMessageDialog(null, result.getB().getShortStatusMessage(), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-
-                //ENABLE
-                this.rightTelegramPanel.jButtonSendTelegram.setEnabled(true);
-                return;
-            }
+            //ENABLE
+            this.rightTelegramPanel.jButtonSendTelegram.setEnabled(true);
+            return;
         }
 
         BigDecimal amount = null;

@@ -15,7 +15,7 @@ public class TelegramsTableModel extends TimerTableModelCls<Transaction> impleme
 
     public static final int COLUMN_DATE = 0;
     public static final int COLUMN_SENDER = 1;
-    public static final int COLUMN_RECIEVER = 2;
+    public static final int COLUMN_RECEIVER = 2;
     public static final int COLUMN_MESSAGE = 3;
     public static final int COLUMN_SIGNATURE = 4;
 
@@ -40,17 +40,17 @@ public class TelegramsTableModel extends TimerTableModelCls<Transaction> impleme
             return null;
 
         switch (column) {
-        case COLUMN_DATE:
-            return transaction.viewTimestamp();
-        case COLUMN_SENDER:
-            return transaction.viewCreator();
-        case COLUMN_RECIEVER:
-            return transaction.viewRecipient();
-        case COLUMN_MESSAGE:
-            return transaction.viewData();
-        case COLUMN_SIGNATURE:
-            return transaction.viewSignature();
-       
+            case COLUMN_DATE:
+                return transaction.viewTimestamp();
+            case COLUMN_SENDER:
+                return transaction.viewCreator();
+            case COLUMN_RECEIVER:
+                return transaction.viewRecipient();
+            case COLUMN_MESSAGE:
+                return transaction.viewData();
+            case COLUMN_SIGNATURE:
+                return transaction.viewSignature();
+
         }
 
         return null;
