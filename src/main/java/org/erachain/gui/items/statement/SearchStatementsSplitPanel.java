@@ -7,6 +7,7 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.models.RendererBoolean;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -96,9 +97,9 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         // CHECKBOX FOR FAVORITE
         TableColumn favoriteColumn = jTableJScrollPanelLeftPanel.getColumnModel()
                 .getColumn(search_Table_Model.COLUMN_FAVORITE);
-        // favoriteColumn.setCellRenderer(new RendererBoolean());
-        favoriteColumn.setMinWidth(150);
-        favoriteColumn.setMaxWidth(300);
+        favoriteColumn.setCellRenderer(new RendererBoolean());
+        favoriteColumn.setMinWidth(100);
+        favoriteColumn.setMaxWidth(150);
         favoriteColumn.setPreferredWidth(100);
 
         // hand cursor for Favorite column
