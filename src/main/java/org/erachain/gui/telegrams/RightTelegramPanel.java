@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -17,10 +18,12 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Timer;
+import java.util.*;
 
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
@@ -42,6 +45,32 @@ public class RightTelegramPanel extends javax.swing.JPanel {
 
         walletTelegramsFilterTableModel = new WalletTelegramsFilterTableModel();
         jTableMessages = new MTable(walletTelegramsFilterTableModel);
+
+        // mouse from favorine column
+        jTableMessages.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+                Point point = e.getPoint();
+                java.util.Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+
+                        int row = jTableMessages.rowAtPoint(point);
+                        jTableMessages.setRowSelectionInterval(row, row);
+
+                        int crow = jTableMessages.convertRowIndexToModel(row);
+                        Transaction transaction = walletTelegramsFilterTableModel.getItem(crow);
+
+                        if (e.getClickCount() == 2) {
+                            tableMouse2Click(crow, transaction);
+                        }
+
+                    }
+                }, 10);
+            }
+        });
 
 
         jTableMessages.setAutoCreateRowSorter(false);
@@ -302,6 +331,52 @@ public class RightTelegramPanel extends javax.swing.JPanel {
         });
         menu.add(deleteTelegram);
 
+
+    }
+
+    protected void tableMouse2Click(int row, Transaction transaction) {
+
+        RSend rSend = (RSend) transaction;
+        if (rSend.isEncrypted()) {
+
+            if (!Controller.getInstance().isWalletUnlocked()) {
+                //ASK FOR PASSWORD
+                String password = PasswordPane.showUnlockWalletDialog(this);
+                if (!Controller.getInstance().unlockWallet(password)) {
+                    //WRONG PASSWORD
+                    JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+
+                    //		encrypted =!encrypted;
+
+                    return;
+                }
+            }
+
+            if (false) {
+                byte[] dataMess = Controller.getInstance().decrypt(rSend.getCreator(), rSend.getRecipient(), rSend.getData());
+
+                String message;
+
+                if (dataMess != null) {
+                    if (rSend.isText()) {
+                        try {
+                            message = new String(dataMess, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            message = "error UTF-8";
+                        }
+                    } else {
+                        message = Base58.encode(dataMess);
+                    }
+                } else {
+                    message = "decode error";
+                }
+
+                walletTelegramsFilterTableModel.setValueAt(message, row, walletTelegramsFilterTableModel.COLUMN_MESSAGE);
+                walletTelegramsFilterTableModel.fireTableCellUpdated(row, walletTelegramsFilterTableModel.COLUMN_MESSAGE);
+            } else {
+                walletTelegramsFilterTableModel.fireTableDataChanged();
+            }
+        }
 
     }
 

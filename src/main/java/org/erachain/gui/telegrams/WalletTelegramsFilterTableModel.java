@@ -2,6 +2,7 @@ package org.erachain.gui.telegrams;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.TelegramsMap;
@@ -9,6 +10,7 @@ import org.erachain.gui.models.WalletTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -42,21 +44,41 @@ public class WalletTelegramsFilterTableModel extends WalletTableModel<Transactio
             return null;
         }
 
-        RSend transaction = (RSend) list.get(row);
-        if (transaction == null)
+        RSend rSend = (RSend) list.get(row);
+        if (rSend == null)
             return null;
 
         switch (column) {
             case COLUMN_DATE:
-                return transaction.viewTimestamp();
+                return rSend.viewTimestamp();
             case COLUMN_SENDER:
-                return transaction.viewCreator();
+                return rSend.viewCreator();
             case COLUMN_RECEIVER:
-                return transaction.viewRecipient();
+                return rSend.viewRecipient();
             case COLUMN_MESSAGE:
-                return transaction.viewData();
+                if (rSend.isEncrypted() && Controller.getInstance().isWalletUnlocked()) {
+                    byte[] dataMess = Controller.getInstance().decrypt(rSend.getCreator(), rSend.getRecipient(), rSend.getData());
+
+                    String message;
+
+                    if (dataMess != null) {
+                        if (rSend.isText()) {
+                            try {
+                                message = new String(dataMess, "UTF-8");
+                            } catch (UnsupportedEncodingException e) {
+                                message = "error UTF-8";
+                            }
+                        } else {
+                            message = Base58.encode(dataMess);
+                        }
+                    } else {
+                        message = "decode error";
+                    }
+                } else {
+                    return rSend.viewData();
+                }
             case COLUMN_SIGNATURE:
-                return transaction.viewSignature();
+                return rSend.viewSignature();
 
         }
 
