@@ -16,17 +16,14 @@ import java.awt.event.MouseEvent;
 
 
 public class MyOrderPaymentsSplitPanel extends SplitPanel {
+
+    private static String NAME = "MyOrderPaymentsSplitPanel";
+    public static String TITLE = "My Payments Orders";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    // для прозрачности
-    int alpha = 255;
-    int alpha_int;
     private PaymentOrdersTableModel payment_Orders_model;
     private MTable payment_Orders_table;
     private TableRowSorter my_Sorter;
-
-    public static String TITLE = "My Payments Orders";
-    private static String NAME = "MyOrderPaymentsSplitPanel";
-
 
     public MyOrderPaymentsSplitPanel() {
         super(NAME, TITLE);
@@ -181,21 +178,4 @@ public class MyOrderPaymentsSplitPanel extends SplitPanel {
 
         }
     }
-
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
-
-
 }
-
-
-
-

@@ -35,6 +35,7 @@ import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.items.statement.SearchStatementsSplitPanel;
 import org.erachain.gui.items.statement.StatementsMySplitPanel;
 import org.erachain.gui.items.statuses.IssueStatusPanel;
+import org.erachain.gui.items.statuses.MyStatusesTab;
 import org.erachain.gui.items.statuses.SearchStatusesSplitPanel;
 import org.erachain.gui.items.statuses.StatusesFavoriteSplitPanel;
 import org.erachain.gui.items.templates.IssueTemplatePanel;
@@ -192,6 +193,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
 
 
         statuses_Node.add(new ASMutableTreeNode("StatusesFavoriteSplitPanel", StatusesFavoriteSplitPanel.TITLE));
+        statuses_Node.add(new ASMutableTreeNode("MyStatusesTab", MyStatusesTab.TITLE));
         statuses_Node.add(new ASMutableTreeNode("SearchStatusesSplitPanel", SearchStatusesSplitPanel.TITLE));
         statuses_Node.add(new ASMutableTreeNode("IssueStatusPanel", IssueStatusPanel.TITLE));
 

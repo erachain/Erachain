@@ -9,7 +9,6 @@ import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
@@ -20,18 +19,19 @@ import java.util.*;
 public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple2<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> implements Observer {
-    public static final int COLUMN_C = 4;
-    public static final int COLUMN_B = 3;
-    public static final int COLUMN_A = 2;
-    public static final int COLUMN_ASSET_NAME = 1;
     public static final int COLUMN_ASSET_KEY = 0;
+    public static final int COLUMN_ASSET_NAME = 1;
+    public static final int COLUMN_B1 = 2;
+    public static final int COLUMN_B2 = 3;
+    public static final int COLUMN_B3 = 4;
+    public static final int COLUMN_B4 = 5;
 
     public static final int COLUMN_FOR_ICON = 1;
 
     Account account;
-    private List<Tuple2<Account, Tuple5<
+    private List<Tuple2<Account, Tuple2<Long, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> tableBalance;
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> tableBalance;
     private List<Tuple2<Account, Tuple2<Long, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> tableBalance1;
@@ -39,7 +39,7 @@ public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple2<byte
     @SuppressWarnings({"unchecked", "rawtypes"})
     public BalanceFromAddressTableModel() {
         super((DBTabImpl) DCSet.getInstance().getAssetBalanceMap(),
-                new String[]{"key Asset", "Asset", "Balance A", "Balance B", "Balance C"}, false);
+                new String[]{"key Asset", "Asset", "Balance 1", "Balance 2", "Balance 3", "Balance 4"}, false);
         Controller.getInstance().addObserver(this);
         List<Account> accounts = Controller.getInstance().getWalletAccounts();
         tableBalance = new ArrayList<>();
@@ -60,7 +60,7 @@ public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple2<byte
                 }
 
                 Long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(balance.a);
-                tableBalance1.add(new Tuple2(account, new Pair(assetKey, balance.b)));
+                tableBalance1.add(new Tuple2(account, new Tuple2(assetKey, balance.b)));
                 assetKeys.add(assetKey);
             }
         }
@@ -120,19 +120,21 @@ public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple2<byte
             return null;
         }
 
-        AssetCls asset = Controller.getInstance().getAsset(tableBalance1.get(row).b.a);
-
         switch (column) {
             case COLUMN_ASSET_KEY:
+                AssetCls asset = Controller.getInstance().getAsset(tableBalance1.get(row).b.a);
                 return asset.getKey();
-            case COLUMN_A:
-                return NumberAsString.formatAsString(tableBalance.get(row).b.a.b);
-            case COLUMN_B:
-                return NumberAsString.formatAsString(tableBalance.get(row).b.b.b);
-            case COLUMN_C:
-                return NumberAsString.formatAsString(tableBalance.get(row).b.c.b);
             case COLUMN_ASSET_NAME:
+                asset = Controller.getInstance().getAsset(tableBalance1.get(row).b.a);
                 return asset;
+            case COLUMN_B1:
+                return NumberAsString.formatAsString(tableBalance.get(row).b.b.a.b);
+            case COLUMN_B2:
+                return NumberAsString.formatAsString(tableBalance.get(row).b.b.b.b);
+            case COLUMN_B3:
+                return NumberAsString.formatAsString(tableBalance.get(row).b.b.c.b);
+            case COLUMN_B4:
+                return NumberAsString.formatAsString(tableBalance.get(row).b.b.d.b);
         }
         return null;
     }

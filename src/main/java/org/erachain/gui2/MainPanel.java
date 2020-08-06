@@ -34,6 +34,7 @@ import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.items.statement.SearchStatementsSplitPanel;
 import org.erachain.gui.items.statement.StatementsMySplitPanel;
 import org.erachain.gui.items.statuses.IssueStatusPanel;
+import org.erachain.gui.items.statuses.MyStatusesTab;
 import org.erachain.gui.items.statuses.SearchStatusesSplitPanel;
 import org.erachain.gui.items.statuses.StatusesFavoriteSplitPanel;
 import org.erachain.gui.items.templates.IssueTemplatePanel;
@@ -446,6 +447,11 @@ public class MainPanel extends javax.swing.JPanel {
             if (str.equals(Lang.getInstance().translate("Favorite Statuses"))
                     || str.equals("StatusesFavoriteSplitPanel")) {
                 insertTab(new StatusesFavoriteSplitPanel());
+                return;
+            }
+            if (str.equals(Lang.getInstance().translate(MyStatusesTab.TITLE))
+                    || str.equals("MyStatusesTab")) {
+                insertTab(new MyStatusesTab());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Search Statuses")) || str.equals("SearchStatusesSplitPanel")) {

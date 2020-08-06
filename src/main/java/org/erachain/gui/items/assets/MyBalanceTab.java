@@ -69,7 +69,13 @@ public class MyBalanceTab extends SplitPanel {
 //	favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 
 
-// column #1
+        // column #1
+        TableColumn column0 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_ASSET_NAME);//.COLUMN_CONFIRMED);
+        column0.setMinWidth(50);
+        column0.setMaxWidth(1000);
+        column0.setPreferredWidth(150);
+
+        // column #1
         TableColumn column1 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_ASSET_KEY);//.COLUMN_CONFIRMED);
         column1.setMinWidth(1);
         column1.setMaxWidth(1000);
@@ -78,38 +84,29 @@ public class MyBalanceTab extends SplitPanel {
 
 
         // column #1
-        TableColumn column2 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_A);//.COLUMN_CONFIRMED);
+        TableColumn column2 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_B1);//.COLUMN_CONFIRMED);
         column2.setMinWidth(50);
         column2.setMaxWidth(1000);
         column2.setPreferredWidth(50);
 
 
         // column #1
-        TableColumn column3 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_B);//.COLUMN_CONFIRMED);
+        TableColumn column3 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_B2);//.COLUMN_CONFIRMED);
         column3.setMinWidth(50);
         column3.setMaxWidth(1000);
         column3.setPreferredWidth(50);
 
         // column #1
-        TableColumn column4 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_C);//.COLUMN_CONFIRMED);
+        TableColumn column4 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_B3);//.COLUMN_CONFIRMED);
         column4.setMinWidth(50);
         column4.setMaxWidth(1000);
         column4.setPreferredWidth(50);
 
-
         // column #1
-        TableColumn column5 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_ASSET_NAME);//.COLUMN_CONFIRMED);
+        TableColumn column5 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_B4);//.COLUMN_CONFIRMED);
         column5.setMinWidth(50);
         column5.setMaxWidth(1000);
-        column5.setPreferredWidth(150);
-	
-/*		// column #1
-		TableColumn column4 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_ACCOUNT);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
-		column4.setMinWidth(50);
-		column4.setMaxWidth(1000);
-		column4.setPreferredWidth(50);
-		column4.setCellRenderer(new RendererRight());
-*/
+        column5.setPreferredWidth(50);
 
         // иконку будем рисовать
         table.getColumnModel().getColumn(balancesModel.COLUMN_FOR_ICON)

@@ -21,7 +21,7 @@ public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls 
         super(null, null, true, assetIn,
                 TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
-        iconName = "AccountAssetConfiscateDebtPanel;"
+        iconName = "AccountAssetConfiscateDebtPanel";
 
     }
 

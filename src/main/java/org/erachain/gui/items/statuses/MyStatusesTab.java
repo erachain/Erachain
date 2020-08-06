@@ -21,19 +21,23 @@ import java.util.ArrayList;
 
 public class MyStatusesTab extends SplitPanel {
 
+    public static String NAME = "MyStatusesTab";
+    public static String TITLE = "My Statuses";
+
     public ItemCls itemAll;
     public ItemCls itemMy;
     private WalletItemStatusesTableModel statusesModel;
     private MTable table;
     private TableColumn favoriteColumn;
     private MyStatusesTab tSP;
+
     //	private  StatusesItemsTableModel tableModelItemStatuses;
     private StatusInfo info1;
-    // My statuses
+
     public MyStatusesTab() {
-        super("MyStatusesTab", title);
+        super(NAME, TITLE);
+
         tSP = this;
-        setName(Lang.getInstance().translate("My Statuses"));
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
@@ -190,7 +194,7 @@ public class MyStatusesTab extends SplitPanel {
                                                     }
 
         );
-   //     jTableJScrollPanelLeftPanel.setComponentPopupMenu(my_Statuses_Table_menu);
+        //     jTableJScrollPanelLeftPanel.setComponentPopupMenu(my_Statuses_Table_menu);
         TableMenuPopupUtil.installContextMenu(this.jTableJScrollPanelLeftPanel, my_Statuses_Table_menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
 

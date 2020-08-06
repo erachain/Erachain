@@ -22,7 +22,7 @@ import java.net.URL;
 public class PersonsMySplitPanel extends ItemSplitPanel {
 
     public static String NAME = "PersonsMySplitPanel";
-    public static String TITLE = "Favorite Persons";
+    public static String TITLE = "My Persons";
 
     private static final long serialVersionUID = 2717571093561259483L;
 

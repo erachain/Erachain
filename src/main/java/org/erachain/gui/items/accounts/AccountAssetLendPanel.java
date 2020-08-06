@@ -22,7 +22,7 @@ public class AccountAssetLendPanel extends AccountAssetActionPanelCls {
         super(null, null, false, assetIn,
                 TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
-        iconName = "AccountAssetLendPanel"
+        iconName = "AccountAssetLendPanel";
 
     }
 
