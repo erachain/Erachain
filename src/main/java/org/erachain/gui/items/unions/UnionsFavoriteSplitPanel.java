@@ -1,7 +1,7 @@
-package org.erachain.gui.items.statuses;
+package org.erachain.gui.items.unions;
 
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.statuses.StatusCls;
+import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
@@ -17,15 +17,15 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
+public class UnionsFavoriteSplitPanel extends ItemSplitPanel {
 
-    public static String NAME = "StatusesFavoriteSplitPanel";
-    public static String TITLE = "Favorite Statuses";
+    public static String NAME = "UnionsFavoriteSplitPanel";
+    public static String TITLE = "Favorite Unions";
 
     private static final long serialVersionUID = 2717571093561259483L;
 
-    public StatusesFavoriteSplitPanel() {
-        super(new FavoriteStatusesTableModel(), NAME, TITLE);
+    public UnionsFavoriteSplitPanel() {
+        super(new FavoriteUnionsTableModel(), NAME, TITLE);
         iconName = "favorite.png";
 
         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
@@ -50,7 +50,7 @@ public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
                 try {
                     URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
                             + "/index/blockexplorer.html"
-                            + "?status=" + itemTableSelected.getKey()));
+                            + "?template=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }
@@ -63,8 +63,8 @@ public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
     // show details
     @Override
     public Component getShow(ItemCls item) {
-        StatusInfo info = new StatusInfo();
-        info.show_001((StatusCls) item);
-        return info;
+        UnionInfo unionInfo = new UnionInfo();
+        unionInfo.Get_HTML_Union_Info_001((UnionCls) item);
+        return unionInfo;
     }
 }

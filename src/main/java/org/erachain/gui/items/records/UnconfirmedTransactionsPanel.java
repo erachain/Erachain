@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
@@ -32,15 +33,19 @@ import java.text.SimpleDateFormat;
 
 
 @SuppressWarnings("serial")
-public class UnconfirmedTransactionsPanel extends JPanel {
+public class UnconfirmedTransactionsPanel extends IconPanel {
+
+    public static String NAME = "UnconfirmedTransactionsPanel";
+    public static String TITLE = "Unconfirmed Records";
+
     protected Logger logger;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "UnconfirmedTransactionsPanel.png";
     private static UnconfirmedTransactionsPanel instance;
     private UnconfirmedTransactionsTableModel transactionsModel;
     private MTable transactionsTable;
 
     public UnconfirmedTransactionsPanel() {
-        setName(Lang.getInstance().translate("Unconfirmed Records"));
+        super(NAME, TITLE);
+
         // this.parent = parent;
         this.setLayout(new GridBagLayout());
         // this.setLayout(new ScrollPaneLayout());
@@ -89,7 +94,7 @@ public class UnconfirmedTransactionsPanel extends JPanel {
             }
         });
 
-        SplitPanel record_stpit = new SplitPanel("");
+        SplitPanel record_stpit = new SplitPanel("", title);
         record_stpit.toolBarLeftPanel.setVisible(false);
         record_stpit.jToolBarRightPanel.setVisible(false);
         record_stpit.searchToolBar_LeftPanel.setVisible(false);
@@ -274,13 +279,4 @@ public class UnconfirmedTransactionsPanel extends JPanel {
 
     }
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

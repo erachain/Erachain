@@ -7,6 +7,7 @@ import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.transaction.IssueImprintRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -14,7 +15,6 @@ import org.erachain.gui.library.Library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,13 +23,12 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-//import java.math.BigDecimal;
-//import org.erachain.settings.Settings;
 
 @SuppressWarnings("serial")
-public class IssueImprintPanel extends JPanel {
+public class IssueImprintPanel extends IconPanel {
 
-    private static String iconFile = Settings.getInstance().getPatnIcons()+ "IssueImprintPanel.png";
+    public static String NAME = "IssueImprintPanel";
+    public static String TITLE = "Issue Unique Hash";
 
     private JComboBox<Account> cbxFrom;
     private JComboBox<String> txtFeePow;
@@ -39,14 +38,10 @@ public class IssueImprintPanel extends JPanel {
     private JTextField txtCreditor;
     private JTextField txtAmount;
     private JButton issueButton;
-    //private IssueImprintPanel th;
     private JTextArea txtDescription;
 
     public IssueImprintPanel() {
-        //	super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Issue Imprint"));
-//		this.setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Issue Imprint"));
-        //CLOSE
-//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        super(NAME, TITLE);
 
         //ICON
         List<Image> icons = new ArrayList<Image>();
@@ -54,8 +49,7 @@ public class IssueImprintPanel extends JPanel {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-//		this.setIconImages(icons);
-        //th = this;
+
         //LAYOUT
         this.setLayout(new GridBagLayout());
 
@@ -169,8 +163,8 @@ public class IssueImprintPanel extends JPanel {
         txtGBC.gridy = gridy++;
         this.txtCreditor = new JTextField();
         this.add(this.txtCreditor, txtGBC);
-        
-      //LABEL CREDITOR
+
+        //LABEL CREDITOR
         labelGBC.gridy = gridy;
         JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
         this.add(descriptionLabel, labelGBC);
@@ -226,7 +220,7 @@ public class IssueImprintPanel extends JPanel {
         //TXT FEE
         txtGBC.gridy = gridy++;
         txtFeePow = new JComboBox<String>();
-        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFeePow.setSelectedIndex(0);
         txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
         this.add(this.txtFeePow, txtGBC);
@@ -300,7 +294,7 @@ public class IssueImprintPanel extends JPanel {
         try {
 
             //READ FEE POW
-            int feePow =  Integer.parseInt((String)this.txtFeePow.getSelectedItem());
+            int feePow = Integer.parseInt((String) this.txtFeePow.getSelectedItem());
             // READ AMOUNT
             //float amount = Float.parseFloat(this.txtAmount.getText());
 
@@ -387,15 +381,5 @@ public class IssueImprintPanel extends JPanel {
 
         //ENABLE
         this.issueButton.setEnabled(true);
-    }
-
-    public static  Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 }

@@ -14,7 +14,7 @@ public class WalletVotesTableModel extends WalletTableModel<Poll> {
 
     public WalletVotesTableModel() {
         super(Controller.getInstance().wallet.database.getPollMap(),
-                new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, null, true);
+                new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, null, true, -1);
     }
 
     @Override

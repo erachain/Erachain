@@ -215,7 +215,7 @@ public class MenuFiles extends JMenu {
                     AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey),
                             ct.getWalletAccountByAddress(creator), ct.getWalletAccountByAddress(recipient), null, null);
                     MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Read Transaction"),
-                            panel, AccountAssetSendPanel.getIcon());
+                            panel);
 
                     AssetCls asset = ct.getAsset(assetKey);
                     panel.jTextField_To.setText(recipient);
@@ -246,7 +246,7 @@ public class MenuFiles extends JMenu {
                 //AccountSendDialog dd = new AccountSendDialog(null, null, null, null, false);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Write Transaction"),
                         new AccountAssetSendPanel(null,
-                                null, null, null, null), AccountAssetSendPanel.getIcon());
+                                null, null, null, null));
 
 
             }

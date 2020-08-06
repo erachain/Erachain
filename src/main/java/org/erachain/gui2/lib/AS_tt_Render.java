@@ -18,7 +18,7 @@ public class AS_tt_Render extends DefaultTreeCellRenderer {
         try {
             if ( selected || expanded || hasFocus || tree.isCollapsed(row) || tree.isExpanded(row) || tree.isRowSelected(row) || tree.isSelectionEmpty()) {
                 ASMutableTreeNode vv = (ASMutableTreeNode) value;
-                String name = vv.getViewName();
+                String name = vv.getTitle();
                 boolean i = tree.isCollapsed(row);
                 if(tree.isCollapsed(row)){
                    name = name.replace("<html><b>", "<html><b><i>");

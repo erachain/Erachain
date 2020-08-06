@@ -5,27 +5,25 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.SplitPanel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 
 
-public class MyAccountsSplitPanel extends SplitPanel  {
+public class MyAccountsSplitPanel extends SplitPanel {
 
-    /**
-     * 
-     */
-    private static String iconFile = Settings.getInstance().getPatnIcons()+ "MyAccountsSplitPanel.png"; //MyAccountsSplitPanel.png";
     private static final long serialVersionUID = 1L;
     public AccountsPanel accountPanel;
     public AssetCls assetSelect;
-    private Account selecArg;
+    private Account selectArg;
     private AccountsRightPanel rightPanel;
 
+    public static String NAME = "MyAccountsSplitPanel";
+    public static String TITLE = "My Accounts";
+
     public MyAccountsSplitPanel() {
-        super("MyAccountsSplitPanel");
+        super(NAME, TITLE);
 
         this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
@@ -68,27 +66,16 @@ public class MyAccountsSplitPanel extends SplitPanel  {
             if (accountPanel.table.getSelectedRow() >= 0)
                 account = accountPanel.tableModel.getItem(accountPanel.table.convertRowIndexToModel(accountPanel.table.getSelectedRow()));
 
-            if (account != null && account.equals(selecArg) && asset != null && asset.equals(assetSelect)) return;
-            selecArg = account;
+            if (account != null && account.equals(selectArg) && asset != null && asset.equals(assetSelect)) return;
+            selectArg = account;
             assetSelect = asset;
             rightPanel.table_Model.setAccount(account);
             rightPanel.table_Model.fireTableDataChanged();
             rightPanel.setAsset(asset);
             jScrollPaneJPanelRightPanel.setViewportView(rightPanel);
-            
+
         }
 
     }
-
-    public static  Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
-
 
 }

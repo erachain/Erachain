@@ -20,6 +20,7 @@ import org.mapdb.Fun.Tuple2;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
@@ -33,7 +34,9 @@ import java.util.List;
  */
 public class SearchTransactionsSplitPanel extends SplitPanel {
 
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchTransactionsSplitPanel.png";
+    public static String NAME = "SearchTransactionsSplitPanel";
+    public static String TITLE = "Search Records";
+
     public JPanel info_Panel;
     public VouchLibraryPanel voush_Library_Panel;
     MButton makeHashButton;
@@ -42,12 +45,10 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
     private JTextField searchString;
 
     public SearchTransactionsSplitPanel() {
-        super("SearchTransactionsSplitPanel");
+        super(NAME, TITLE);
 
         this.searchToolBar_LeftPanel.setVisible(true);
         jScrollPane4 = new JScrollPane();
-
-        this.setName(Lang.getInstance().translate("Search Records"));
 
         this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Height or seqNo") + ": ");
         this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Search") + ": "));
@@ -108,6 +109,9 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         //TRANSACTIONS TABLE MODEL
         this.transactionsTableModel = new SearchTransactionsTableModel();
         this.jTableJScrollPanelLeftPanel = new MTable(this.transactionsTableModel);
+        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
+        columnModel.getColumn(transactionsTableModel.COLUMN_FAVORITE).setMaxWidth((100));
+
 
         this.jTableJScrollPanelLeftPanel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
@@ -128,7 +132,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         });
 
         mainMenu.add(vouch_menu);
-        
+
         // save jsot transactions
         JMenuItem item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
         item_Save.addActionListener(new ActionListener() {
@@ -143,7 +147,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                 Library.saveTransactionJSONtoFileSystem(getParent(), trans);
             }
 
-            
+
         });
 
         mainMenu.add(item_Save);
@@ -326,15 +330,5 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         }
         jTableJScrollPanelLeftPanel.repaint();
 
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 }

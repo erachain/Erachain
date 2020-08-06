@@ -65,7 +65,6 @@ public class MessagesProcessor extends MonitoredThread {
                 ArrayList<String> addressFilter = new ArrayList<String>();
                 Set keys = address.keySet();
                 for (int i = 0; i < keys.size(); i++) {
-
                     addressFilter.add((String) address.get(i));
                 }
                 Message answer = MessageFactory.getInstance().createTelegramGetAnswerMessage(addressFilter);

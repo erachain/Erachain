@@ -102,16 +102,19 @@ public class Account {
 
     public static Tuple2<Account, String> tryMakeAccount(String address) {
 
-        boolean isBase58 = false;
-        try {
-            Base58.decode(address);
-            isBase58 = true;
-        } catch (Exception e) {
+        if (address == null || address.length() < ADDRESS_LENGTH)
+            return new Tuple2<Account, String>(null, "Wrong Address or PublicKey");
+
+        if (address.startsWith("+")) {
             if (PublicKeyAccount.isValidPublicKey(address)) {
                 // MAY BE IT BASE.32 +
                 return new Tuple2<Account, String>(new PublicKeyAccount(address), null);
+            } else {
+                return new Tuple2<Account, String>(null, "Wrong Address or PublicKey");
             }
         }
+
+        boolean isBase58 = !Base58.isExtraSymbols(address);
 
         if (isBase58) {
             // ORDINARY RECIPIENT
@@ -1391,7 +1394,7 @@ public class Account {
 
     public Tuple2<String, String> getName() {
 
-        return Controller.getInstance().wallet.database.getAccountsPropertisMap().get(getAddress());
+        return Controller.getInstance().wallet.database.getFavoriteAccountsMap().get(getAddress());
 
     }
 

@@ -7,6 +7,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
@@ -17,7 +18,6 @@ import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.CreateOptionsTableModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
@@ -27,9 +27,11 @@ import java.util.List;
 import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
-public class IssuePollPanel extends JPanel {
+public class IssuePollPanel extends IconPanel {
 
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssuePollPanel.png";
+    public static String NAME = "IssuePollPanel";
+    public static String TITLE = "Issue Poll";
+
     private JComboBox<Account> cbxFrom;
     private JComboBox<String> txtFee = new JComboBox<>();
     private JTextField txtName = new JTextField();
@@ -42,6 +44,8 @@ public class IssuePollPanel extends JPanel {
     private JLabel titleJLabel = new JLabel();
 
     public IssuePollPanel() {
+        super(NAME, TITLE);
+
         setLayout(new GridBagLayout());
         optionsTableModel = new CreateOptionsTableModel(new Object[]{Lang.getInstance().translate("Name")}, 0);
         addImageLabel = new AddImageLabel(
@@ -298,22 +302,11 @@ public class IssuePollPanel extends JPanel {
         createButton.setEnabled(true);
     }
 
-
     private void deleteRow() {
         if (optionsTableModel.getRowCount() > 1) {
             int selRow = table.getSelectedRow();
             if (selRow != -1) {
                 optionsTableModel.removeRow(selRow);
-            }
-        }
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
             }
         }
     }

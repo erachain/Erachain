@@ -27,18 +27,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class IncomingMailsSplitPanel extends SplitPanel {
+
+    public static String NAME = "IncomingMailsSplitPanel";
+    public static String TITLE = "Incoming Mails";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    // для прозрачности
-    int alpha = 255;
-    int alpha_int;
     private TableModelMails incoming_Mails_Model;
     private MTable inciming_Mail_Table;
     private TableRowSorter my_Sorter;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "IncomingMailsSplitPanel.png";
 
     public IncomingMailsSplitPanel() {
-        super("IncomingMailsSplitPanel");
-        this.setName(Lang.getInstance().translate("Incoming Mails"));
+        super(NAME, TITLE);
         this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
@@ -94,9 +93,11 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
                 int row = inciming_Mail_Table.getSelectedRow();
                 row = inciming_Mail_Table.convertRowIndexToModel(row);
-                Account account = incoming_Mails_Model.getItem(row).getCreator();
+                RSend rSend = (RSend) incoming_Mails_Model.getItem(row);
+                Account account = new Account(rSend.getCreator().getAddress());
+                Account recipient = rSend.getRecipient();
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(recipient, account, null));
 
             }
         });
@@ -245,16 +246,6 @@ public class IncomingMailsSplitPanel extends SplitPanel {
             ((DefaultRowSorter) my_Sorter).setRowFilter(filter);
             incoming_Mails_Model.fireTableDataChanged();
 
-        }
-    }
-
-    public static  Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
         }
     }
 

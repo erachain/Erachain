@@ -16,7 +16,7 @@ public class WalletItemUnionsTableModel extends WalletTableModel<UnionCls> {
     public WalletItemUnionsTableModel() {
         super(Controller.getInstance().wallet.database.getUnionMap(),
                 new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false}, true);
+                new Boolean[]{false, true, true, false, false}, true, COLUMN_FAVORITE);
 
     }
 
@@ -30,23 +30,18 @@ public class WalletItemUnionsTableModel extends WalletTableModel<UnionCls> {
 
         switch (column) {
             case COLUMN_KEY:
-
                 return union.getKey(DCSet.getInstance());
 
             case COLUMN_NAME:
-
-                return union.viewName();
+                return union;
 
             case COLUMN_ADDRESS:
-
                 return union.getOwner().getPersonAsString();
 
             case COLUMN_CONFIRMED:
-
                 return union.isConfirmed();
 
             case COLUMN_FAVORITE:
-
                 return union.isFavorite();
 
         }

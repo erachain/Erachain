@@ -1056,15 +1056,19 @@ public class ExData {
             }
             toJson.put("recipientsFlag", recipientsFlags);
             toJson.put("recipients", recipients);
-
         }
 
         toJson.put("title", title);
 
-
         if (isEncrypted()) {
+            JSONArray secretsArray = new JSONArray();
+            for (byte[] secret : getSecrets()) {
+                secretsArray.add(Base58.encode(secret));
+            }
             toJson.put("secretsFlags", secretsFlags);
-            toJson.put("encrypted", true);
+            toJson.put("secrets", secretsArray);
+            toJson.put("encryptedData64", Base64.getEncoder().encodeToString(encryptedData));
+
         } else if (json != null) {
             toJson.put("json", json);
         }

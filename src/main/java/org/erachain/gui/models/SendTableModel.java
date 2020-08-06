@@ -10,6 +10,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
@@ -692,7 +693,7 @@ public class SendTableModel extends JTable implements Observer {
                     + "<table border='0' cellpadding='3' cellspacing='0'>\n<tr bgcolor='" + colorTextBackground + "'><td width='25'>" + imginout
                     + "<td width='" + width + "'>\n"
                     + "<font size='2.5' color='" + colorTextMessage + "'>\n"
-                    + decrMessage
+                    + Library.to_HTML(decrMessage)
                     + "\n</font>"
                     + "<td width='30'>" + imgLock
                     + "</td></tr>\n</table>\n"

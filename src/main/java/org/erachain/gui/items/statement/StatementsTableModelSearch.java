@@ -2,6 +2,7 @@ package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.wallet.Wallet;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SearchTableModelCls;
@@ -18,11 +19,13 @@ public class StatementsTableModelSearch extends SearchTableModelCls<Transaction>
     public static final int COLUMN_FAVORITE = 4;
     private static final long serialVersionUID = 1L;
 
+    Wallet wallet = Controller.getInstance().wallet;
+
     public StatementsTableModelSearch() {
 
         super(DCSet.getInstance().getTransactionFinalMap(),
                 new String[]{"Timestamp", "Type",
-                "Creator", "Statement", "Favorite"}, new Boolean[]{true, true, true, true, false},
+                        "Creator", "Statement", "Favorite"}, new Boolean[]{true, true, true, true, false},
                 false);
 
         logger = LoggerFactory.getLogger(this.getClass());
@@ -47,7 +50,7 @@ public class StatementsTableModelSearch extends SearchTableModelCls<Transaction>
             case COLUMN_TITLE:
                 return transaction.getTitle();
             case COLUMN_FAVORITE:
-                return Controller.getInstance().isTransactionFavorite(transaction);
+                return wallet.isDocumentFavorite(transaction);
         }
 
         return null;
@@ -88,7 +91,7 @@ public class StatementsTableModelSearch extends SearchTableModelCls<Transaction>
     }
 
     public void clear() {
-        list = new ArrayList<Transaction>();
+        list = new ArrayList<>();
         fireTableDataChanged();
     }
 

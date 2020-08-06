@@ -18,18 +18,16 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class PollsFavoriteSplitPanel extends ItemSplitPanel  {
+public class PollsFavoriteSplitPanel extends ItemSplitPanel {
+
+    public static String NAME = "PollsFavoriteSplitPanel";
+    public static String TITLE = "Favorite Polls";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "PollsFavoriteSplitPanel.png";
 
     public PollsFavoriteSplitPanel() {
-        super(new FavoritePollsTableModel(), "PollsFavoriteSplitPanel");
-        this.setName(Lang.getInstance().translate("Favorite Polls"));
-
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setMaxWidth(200);
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(100);
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setMaxWidth(200);
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setPreferredWidth(100);
+        super(new FavoritePollsTableModel(), NAME, TITLE);
+        iconName = "favorite.png";
 
         JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("To Vote"));
         setVote_Menu.addActionListener(new ActionListener() {
@@ -91,13 +89,4 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel  {
         return pollInfo;
     }
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

@@ -4,12 +4,12 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.URLViewer;
 import org.json.simple.JSONObject;
@@ -33,10 +33,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
-public class WithdrawExchange extends JPanel {
+public class WithdrawExchange extends IconPanel {
 
-    // private JComboBox<Account> accountLBox;
-    private static String iconFile = Settings.getInstance().getPatnIcons()+ "WithdrawExchange.png";
+    public static String NAME = "WithdrawExchange";
+    public static String TITLE = "Withdraw Exchange";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(WithdrawExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
@@ -54,7 +55,7 @@ public class WithdrawExchange extends JPanel {
     private AssetCls asset;
 
     public WithdrawExchange(AssetCls asset, Account account) {
-
+        super(NAME, TITLE);
         initComponents(asset, account);
         this.setVisible(true);
     }
@@ -178,7 +179,7 @@ public class WithdrawExchange extends JPanel {
             panel.setName(Lang.getInstance().translate("Withdraw"));
 
             MainPanel.getInstance().removeTab(panel.getName());
-            MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), panel, AccountAssetSendPanel.getIcon());
+            MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), panel);
 
         }
 
@@ -237,14 +238,14 @@ public class WithdrawExchange extends JPanel {
         add(jText_Help, gridBagConstraints);
         jText_Help.setText("<html><h2>1. " + Lang.getInstance().translate("Select the Asset that you want to withdraw") + "</h2>"
                 + "<h3>2. " + Lang.getInstance().translate("Set the address for bitcoins where you want to withdraw")
-                        + ". " + Lang.getInstance().translate("And click button '%1' to open the panel for payment").replace("%1",
-                        Lang.getInstance().translate("Withdraw"))
-                        + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
-                        + ".</h3>"
-                + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0025") + "<br>"
+                + ". " + Lang.getInstance().translate("And click button '%1' to open the panel for payment").replace("%1",
+                Lang.getInstance().translate("Withdraw"))
+                + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
+                + ".</h3>"
+                + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1", "0.0025") + "<br>"
                 //+ Lang.getInstance().translate("Service will take commission fee approx - %1%").replace("%1","2.75")
                 + Lang.getInstance().translate("Service will have some commission")
-                +"</html>");
+                + "</html>");
 
         /////////////// ASSET
         jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
@@ -276,10 +277,10 @@ public class WithdrawExchange extends JPanel {
 
                     jText_Help.setText("<html><h3>2. " + Lang.getInstance().translate("Set the address for bitcoins where you want to withdraw")
                             + ". " + Lang.getInstance().translate("And click button '%1' to open the panel for payment").replace("%1",
-                                Lang.getInstance().translate("Next"))
+                            Lang.getInstance().translate("Next"))
                             + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
                             + ".</h3>"
-                            + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0025") + "<br>"
+                            + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1", "0.0025") + "<br>"
                             //+ Lang.getInstance().translate("Service will take commission fee approx - %1%").replace("%1","2.75")
                             + Lang.getInstance().translate("Service will have some commission")
                     );
@@ -287,7 +288,7 @@ public class WithdrawExchange extends JPanel {
             }
         });
 
-        gridy +=3;
+        gridy += 3;
 
         ////////////////
         jLabel_Address.setText(Lang.getInstance().translate("Address to Withdraw") + ":");
@@ -396,16 +397,6 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_History, gridBagConstraints);
 
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 
 }

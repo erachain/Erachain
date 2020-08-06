@@ -1,44 +1,40 @@
 package org.erachain.gui.telegrams;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JRadioButton;
-
 import org.erachain.core.account.Account;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.lang.Lang;
 
+import javax.swing.*;
+
 /**
-*
-* @author Саша
-*/
+ * @author Саша
+ */
 public class LeftTelegram extends javax.swing.JPanel {
 
-   private AccountsComboBoxModel accountsModel;
-private ButtonGroup group;
-public JButton jButtonGetTelegrams;
+    private AccountsComboBoxModel accountsModel;
+    private ButtonGroup group;
+    public JButton jButtonGetTelegrams;
   
 /**
     * Creates new form leftTekegram
     */
    public LeftTelegram() {
        initComponents();
-       this.jLabelAccount.setText(Lang.getInstance().translate("Select Account") + ":");
+       this.jLabelAccount.setText(Lang.getInstance().translate("Filter by My Account") + ":");
        this.accountsModel = new AccountsComboBoxModel();
        this.jComboAccount.setModel(accountsModel);
        this.jLabel_AddAccount.setText(Lang.getInstance().translate("Add Recipient"));
-       this.jButtonAddAccount.setText(Lang.getInstance().translate("Add"));
+       this.jButtonAddAccount.setText(Lang.getInstance().translate("Add Recipient"));
        this.jTextField_AddAccount.setText("");
-       this.jCxbAllmessages.setText(Lang.getInstance().translate("All"));
-       this.jCxbRecipientmessages.setText(Lang.getInstance().translate("From List Recipients"));
-       this.jButtonGetTelegrams.setText(Lang.getInstance().translate("Get telegrams"));
-      
-       
+       this.jCxbAllmessages.setText(Lang.getInstance().translate("All Recipients"));
+       this.jCxbRecipientmessages.setText(Lang.getInstance().translate("Filter by Recipients List"));
+       this.jButtonGetTelegrams.setText(Lang.getInstance().translate("Get Telegrams from Network"));
+
+
        //  this.jComboBox_Account.setRenderer(new AccountRenderer(0));
-     //  ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(((AssetCls) jComboBox_Account.getSelectedItem()).getKey());
-    //   if (account != null) jComboAccount.setSelectedItem(account);
+       //  ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(((AssetCls) jComboBox_Account.getSelectedItem()).getKey());
+       //   if (account != null) jComboAccount.setSelectedItem(account);
    }
 
    /**
@@ -55,7 +51,6 @@ public JButton jButtonGetTelegrams;
        jComboAccount = new javax.swing.JComboBox<>();
        jLabelAccount = new javax.swing.JLabel();
        jScrollPaneCenter = new javax.swing.JScrollPane();
-       //jTableFavoriteAccounts = new javax.swing.JTable();
        jPanelBottom = new javax.swing.JPanel();
        jLabel_AddAccount = new javax.swing.JLabel();
        jTextField_AddAccount = new javax.swing.JTextField();
@@ -80,7 +75,6 @@ public JButton jButtonGetTelegrams;
        gridBagConstraints.weightx = 0.3;
        jPanelTop.add(jComboAccount, gridBagConstraints);
 
-       jLabelAccount.setText("jLabel1");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 0;
        gridBagConstraints.gridy = 0;
@@ -95,8 +89,7 @@ public JButton jButtonGetTelegrams;
        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
        gridBagConstraints.weightx = 0.3;
        gridBagConstraints.insets = new java.awt.Insets(4, 11, 0, 0);
-       jPanelTop.add(new JLabel("Recipients"), gridBagConstraints);
-       
+       jPanelTop.add(new JLabel(Lang.getInstance().translate("Recipients")), gridBagConstraints);
        
        group = new ButtonGroup();
        group.add(jCxbAllmessages);
@@ -122,7 +115,6 @@ public JButton jButtonGetTelegrams;
        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
       // gridBagConstraints.insets = new java.awt.Insets(4, 11, 0, 0);
        jPanelTop.add(jButtonGetTelegrams, gridBagConstraints);
-       
 
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 0;
@@ -158,7 +150,6 @@ public JButton jButtonGetTelegrams;
        jPanel2Layout.rowHeights = new int[] {0};
        jPanelBottom.setLayout(jPanel2Layout);
 
-       jLabel_AddAccount.setText("jLabel2");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 0;
        gridBagConstraints.gridy = 0;
@@ -166,7 +157,6 @@ public JButton jButtonGetTelegrams;
        gridBagConstraints.insets = new java.awt.Insets(4, 10, 0, 0);
    //    jPanelBottom.add(jLabel_AddAccount, gridBagConstraints);
 
-       jTextField_AddAccount.setText("jTextField1");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 2;
        gridBagConstraints.gridy = 0;
@@ -175,9 +165,7 @@ public JButton jButtonGetTelegrams;
        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
        gridBagConstraints.weightx = 0.3;
        gridBagConstraints.insets = new java.awt.Insets(0, 1, 0, 0);
-   //    jPanelBottom.add(jTextField_AddAccount, gridBagConstraints);
 
-       jButtonAddAccount.setText("jButton1");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 4;
        gridBagConstraints.gridy = 0;

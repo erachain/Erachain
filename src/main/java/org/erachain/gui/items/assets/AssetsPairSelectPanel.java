@@ -6,10 +6,6 @@ public class AssetsPairSelectPanel extends SplitPanel {
 
 
     AssetsPairSelectPanel() {
-        super("AssetsPairSelectPanel");
-
-
+        super("AssetsPairSelectPanel", "PAIR");
     }
-
-
 }
