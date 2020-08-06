@@ -28,6 +28,9 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 @SuppressWarnings("serial")
 public class IssueTemplatePanel extends IconPanel {
 
+    public static String NAME = "IssueTemplatePanel";
+    public static String TITLE = "Issue Template";
+
     private JComboBox<Account> jComboBoxAccountCreator = new JComboBox<>(new AccountsComboBoxModel());
     private JButton jButtonCreate = new JButton();
     private JLabel jLabelAccountCreator = new JLabel();
@@ -43,7 +46,8 @@ public class IssueTemplatePanel extends IconPanel {
     private AddImageLabel addLogoIconPanel;
 
     public IssueTemplatePanel() {
-        super("IssueTemplatePanel");
+        super(NAME, TITLE);
+
         initComponents();
         setVisible(true);
     }

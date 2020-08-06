@@ -34,14 +34,18 @@ import java.text.SimpleDateFormat;
 
 @SuppressWarnings("serial")
 public class UnconfirmedTransactionsPanel extends IconPanel {
+
+    public static String NAME = "UnconfirmedTransactionsPanel";
+    public static String TITLE = "Unconfirmed Records";
+
     protected Logger logger;
     private static UnconfirmedTransactionsPanel instance;
     private UnconfirmedTransactionsTableModel transactionsModel;
     private MTable transactionsTable;
 
     public UnconfirmedTransactionsPanel() {
-        super("UnconfirmedTransactionsPanel");
-        setName(Lang.getInstance().translate("Unconfirmed Records"));
+        super(NAME, TITLE);
+
         // this.parent = parent;
         this.setLayout(new GridBagLayout());
         // this.setLayout(new ScrollPaneLayout());

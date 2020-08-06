@@ -18,14 +18,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
+
+    public static String NAME = "StatusesFavoriteSplitPanel";
+    public static String TITLE = "Favorite Statuses";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "StatusesFavoriteSplitPanel.png";
-    //private StatusesFavoriteSplitPanel th;
 
     public StatusesFavoriteSplitPanel() {
-        super(new FavoriteStatusesTableModel(), "StatusesFavoriteSplitPanel", title);
-        this.setName(Lang.getInstance().translate("Favorite Statuses"));
-        //th = this;
+        super(new FavoriteStatusesTableModel(), NAME, TITLE);
+        iconName = "favorite.png";
 
         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
@@ -65,15 +66,5 @@ public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
         StatusInfo info = new StatusInfo();
         info.show_001((StatusCls) item);
         return info;
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 }

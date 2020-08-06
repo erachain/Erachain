@@ -5,7 +5,6 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletItemUnionsTableModel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -20,16 +19,18 @@ import java.text.SimpleDateFormat;
 
 public class MyUnionsTab extends SplitPanel {
 
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyUnionsTab.png";
+    public static String NAME = "MyUnionsTab";
+    public static String TITLE = "My Unions";
+
     final WalletItemUnionsTableModel unionsModel;
     private TableColumnModel columnModel;
     private TableColumn favoriteColumn;
 
     public MyUnionsTab() {
-        super("MyUnionsTab", title);
+        super(NAME, TITLE);
+
         // My unions
 
-        setName(Lang.getInstance().translate("My Unions"));
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
@@ -127,13 +128,4 @@ public class MyUnionsTab extends SplitPanel {
 
     }
 
-    public static  Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

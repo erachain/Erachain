@@ -5,7 +5,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
@@ -19,23 +18,22 @@ import java.awt.event.ActionListener;
  */
 public class ALLTelegramPanel extends IconPanel {
 
+    public static String NAME = "ALLTelegramPanel";
+    public static String TITLE = "All Telegrams";
+
     /**
      * Creates new form rightTelegramPanel
      */
     JPopupMenu menu;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + ".png";
 
     public TelegramsTableModel walletTelegramsFilterTableModel;
     protected int row;
 
-    public static String NAME = "ALLTelegramPanel";
-    public static String TITLE = "";
-
     public ALLTelegramPanel() {
         super(NAME, TITLE);
+
         walletTelegramsFilterTableModel = new TelegramsTableModel();
         jTableMessages = new MTable(walletTelegramsFilterTableModel);
-
 
         jTableMessages.setAutoCreateRowSorter(true);
 

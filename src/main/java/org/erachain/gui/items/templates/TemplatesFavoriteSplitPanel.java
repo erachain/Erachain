@@ -18,11 +18,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
+
+    public static String NAME = "TemplatesFavoriteSplitPanel";
+    public static String TITLE = "Favorite Templates";
+
     private static final long serialVersionUID = 2717571093561259483L;
 
     public TemplatesFavoriteSplitPanel() {
-        super(new FavoriteTemplatesTableModel(), "TemplatesFavoriteSplitPanel", title);
-        this.setName(Lang.getInstance().translate("Favorite Templates"));
+        super(new FavoriteTemplatesTableModel(), NAME, TITLE);
         iconName = "favorite.png";
 
         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));

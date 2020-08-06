@@ -26,6 +26,9 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 public class IssueStatusPanel extends IconPanel {
 
+    public static String NAME = "IssueStatusPanel";
+    public static String TITLE = "Issue Status";
+
     private JComboBox<Account> cbxFrom;
     private JComboBox<String> txtFeePow = new JComboBox<String>();
     private JTextField txtName = new JTextField();
@@ -37,7 +40,8 @@ public class IssueStatusPanel extends IconPanel {
 
 
     public IssueStatusPanel() {
-        super("IssueStatusPanel");
+        super(NAME, TITLE);
+
         setLayout(new GridBagLayout());
         String colorText = "FF0000";
 

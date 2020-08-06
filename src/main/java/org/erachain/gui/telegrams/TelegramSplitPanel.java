@@ -41,10 +41,12 @@ import java.nio.charset.StandardCharsets;
  */
 public class TelegramSplitPanel extends SplitPanel {
 
+    public static String NAME = "TelegramSplitPanel";
+    public static String TITLE = "Telegrams";
+
     /**
      * Creates new form TelegramSplitPanel
      */
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "TelegramSplitPanel.png";
     LeftTelegram leftTelegram;
     RightTelegramPanel rightTelegramPanel;
     private static final long serialVersionUID = 1L;
@@ -63,8 +65,8 @@ public class TelegramSplitPanel extends SplitPanel {
 
     @SuppressWarnings("rawtypes")
     public TelegramSplitPanel() {
-        super("TelegramSplitPanel", title);
-        //th = this;
+        super(NAME, TITLE);
+
         this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
         this.toolBarLeftPanel.setVisible(false);
@@ -563,16 +565,6 @@ public class TelegramSplitPanel extends SplitPanel {
     public boolean checkError() {
 
         return true;
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 
 }

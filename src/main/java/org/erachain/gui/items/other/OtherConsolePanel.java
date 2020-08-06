@@ -10,16 +10,13 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class OtherConsolePanel extends IconPanel {
 
+    public static String NAME = "OtherConsolePanel";
+    public static String TITLE = "Console";
+
     private ConsolePanel debugTabPane;
 
     public OtherConsolePanel() {
-        super("OtherConsolePanel");
-        //CREATE FRAME
-        //	setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Debug"));
-        //	setModal(true);
-
-
-        //DEBUG TABPANE
+        super(NAME, TITLE);
 
         //ADD TABS
         if (Settings.getInstance().isGuiConsoleEnabled()) {

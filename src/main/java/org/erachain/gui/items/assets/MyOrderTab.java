@@ -27,6 +27,9 @@ import java.awt.event.MouseEvent;
 
 public class MyOrderTab extends SplitPanel {
 
+    public static String NAME = "MyOrderTab";
+    public static String TITLE = "My Orders";
+
     private static final long serialVersionUID = 1L;
     protected int row;
     /**
@@ -37,7 +40,7 @@ public class MyOrderTab extends SplitPanel {
 
     @SuppressWarnings("rawtypes")
     public MyOrderTab() {
-        super("MyOrderTab", "My Orders");
+        super(NAME, TITLE);
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);

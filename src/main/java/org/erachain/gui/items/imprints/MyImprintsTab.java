@@ -6,7 +6,6 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletItemImprintsTableModel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
@@ -16,9 +15,11 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
 
-public class MyImprintsTab extends SplitPanel  {
+public class MyImprintsTab extends SplitPanel {
 
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyImprintsTab.png";
+    public static String NAME = "MyImprintsTab";
+    public static String TITLE = "My Unique Hashes";
+
     private static final long serialVersionUID = 1L;
     final MTable table;
     protected int row;
@@ -29,9 +30,8 @@ public class MyImprintsTab extends SplitPanel  {
     RowSorter<WalletItemImprintsTableModel> sorter;
 
     public MyImprintsTab() {
-        super("MyImprintsTab", title);
+        super(NAME, TITLE);
 
-        this.setName("My Hashes");
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
@@ -262,7 +262,7 @@ public class MyImprintsTab extends SplitPanel  {
             }
         });
 
-       // table.setComponentPopupMenu(assetsMenu);
+        // table.setComponentPopupMenu(assetsMenu);
         TableMenuPopupUtil.installContextMenu(table, assetsMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
 
@@ -343,16 +343,6 @@ public class MyImprintsTab extends SplitPanel  {
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
         }
 
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 
 }

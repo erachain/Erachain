@@ -18,13 +18,16 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class PollsFavoriteSplitPanel extends ItemSplitPanel  {
+public class PollsFavoriteSplitPanel extends ItemSplitPanel {
+
+    public static String NAME = "PollsFavoriteSplitPanel";
+    public static String TITLE = "Favorite Polls";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "PollsFavoriteSplitPanel.png";
 
     public PollsFavoriteSplitPanel() {
-        super(new FavoritePollsTableModel(), "PollsFavoriteSplitPanel", title);
-        this.setName(Lang.getInstance().translate("Favorite Polls"));
+        super(new FavoritePollsTableModel(), NAME, TITLE);
+        iconName = "favorite.png";
 
         jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setMaxWidth(200);
         jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(100);
@@ -91,13 +94,4 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel  {
         return pollInfo;
     }
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

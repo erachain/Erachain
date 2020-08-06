@@ -38,6 +38,9 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 @SuppressWarnings("serial")
 public class IssueUnionPanel extends IconPanel {
 
+    public static String NAME = "IssueUnionPanel";
+    public static String TITLE = "Issue Union";
+
     private static Logger logger = LoggerFactory.getLogger(IssueUnionPanel.class);
 
     private JComboBox<Account> cbxFrom;
@@ -62,12 +65,11 @@ public class IssueUnionPanel extends IconPanel {
     private JLabel parentJLabel = new JLabel();
 
     public IssueUnionPanel() {
-        super("IssueUnionPanel");
+        super(NAME, TITLE);
+
         initComponents();
 
-
         //BUTTON Register
-
 
         this.issueButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -351,5 +353,4 @@ public class IssueUnionPanel extends IconPanel {
 
 
     }
-
 }

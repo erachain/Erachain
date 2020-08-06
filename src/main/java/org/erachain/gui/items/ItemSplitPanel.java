@@ -38,6 +38,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
     @SuppressWarnings("rawtypes")
     public ItemSplitPanel(TimerTableModelCls tableModel, String guiName, String title) {
         super(guiName, title);
+
         this.tableModel = tableModel;
         // not show buttons
         jToolBarRightPanel.setVisible(false);

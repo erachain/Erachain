@@ -13,6 +13,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ExchangePanel extends IconPanel {
+
+    public static String NAME = "ExchangePanel";
+    public static String TITLE = "Exchange";
+
     private static final long serialVersionUID = -7052380905136603354L;
     //public CreateOrderPanel buyOrderPanel;
     //EchangeSellBuyPanel tt;
@@ -30,7 +34,7 @@ public class ExchangePanel extends IconPanel {
     private JScrollPane jScrollPane_jPanel_RightPanel;
 
     public ExchangePanel(AssetCls have, AssetCls want, String action, String account) {
-        super("ExchangePanel");
+        super(NAME, TITLE);
 
         this.account = account;
         this.action = action;
@@ -84,7 +88,7 @@ public class ExchangePanel extends IconPanel {
 
                 if (!getName().equals(Lang.getInstance().translate("Exchange"))) {
                     MainPanel.getInstance().renameTab(getName(),
-                        have.getTickerName() + "/" + want.getTickerName());
+                            have.getTickerName() + "/" + want.getTickerName());
                 }
 
                 jTextField_Asset_1.setText(have.viewName());

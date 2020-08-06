@@ -23,7 +23,7 @@ import org.erachain.gui.items.other.OtherSplitPanel;
 import org.erachain.gui.items.persons.*;
 import org.erachain.gui.items.polls.IssuePollPanel;
 import org.erachain.gui.items.polls.PollsFavoriteSplitPanel;
-import org.erachain.gui.items.polls.Polls_My_SplitPanel;
+import org.erachain.gui.items.polls.PollsMySplitPanel;
 import org.erachain.gui.items.polls.SearchPollsSplitPanel;
 import org.erachain.gui.items.records.FavoriteTransactionsSplitPanel;
 import org.erachain.gui.items.records.MyTransactionsSplitPanel;
@@ -473,7 +473,7 @@ public class MainPanel extends javax.swing.JPanel {
                 return;
             }
             if (str.equals(Lang.getInstance().translate("My Polls")) || str.equals("Polls_My_SplitPanel")) {
-                insertTab(new Polls_My_SplitPanel());
+                insertTab(new PollsMySplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Search Polls")) || str.equals("SearchPollsSplitPanel")) {

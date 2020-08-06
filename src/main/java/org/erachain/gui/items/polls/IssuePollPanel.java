@@ -29,6 +29,9 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 public class IssuePollPanel extends IconPanel {
 
+    public static String NAME = "IssuePollPanel";
+    public static String TITLE = "Issue Poll";
+
     private JComboBox<Account> cbxFrom;
     private JComboBox<String> txtFee = new JComboBox<>();
     private JTextField txtName = new JTextField();
@@ -41,7 +44,8 @@ public class IssuePollPanel extends IconPanel {
     private JLabel titleJLabel = new JLabel();
 
     public IssuePollPanel() {
-        super("IssuePollPanel");
+        super(NAME, TITLE);
+
         setLayout(new GridBagLayout());
         optionsTableModel = new CreateOptionsTableModel(new Object[]{Lang.getInstance().translate("Name")}, 0);
         addImageLabel = new AddImageLabel(
@@ -298,7 +302,6 @@ public class IssuePollPanel extends IconPanel {
         createButton.setEnabled(true);
     }
 
-
     private void deleteRow() {
         if (optionsTableModel.getRowCount() > 1) {
             int selRow = table.getSelectedRow();
@@ -307,5 +310,4 @@ public class IssuePollPanel extends IconPanel {
             }
         }
     }
-
 }

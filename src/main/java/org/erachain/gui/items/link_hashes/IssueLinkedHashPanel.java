@@ -11,7 +11,6 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 
 import javax.swing.*;
@@ -30,7 +29,9 @@ import java.util.List;
 //import java.awt.GridBagConstraints;
 
 public class IssueLinkedHashPanel extends SplitPanel {
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssueLinkedHashPanel.png";
+
+    public static String NAME = "IssueLinkedHashPanel";
+    public static String TITLE = "Issue Linked Hash";
 
     TableModelIssueHashes table_Model;
     IssueHashImprint issue_Hash_Imprint;
@@ -38,7 +39,8 @@ public class IssueLinkedHashPanel extends SplitPanel {
     private JButton jButton3_jToolBar_RightPanel;
 
     public IssueLinkedHashPanel() {
-        super("IssueLinkedHashPanel", title);
+        super(NAME, TITLE);
+
         jButton1_jToolBar_RightPanel.setVisible(false);
         jButton2_jToolBar_RightPanel.setVisible(false);
         GridBagLayout gridBagLayout = (GridBagLayout) rightPanel1.getLayout();
@@ -175,7 +177,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
         try {
 
             // READ FEE POW
-            feePow = Integer.parseInt((String)issue_Hash_Imprint.txtFeePow.getSelectedItem());
+            feePow = Integer.parseInt((String) issue_Hash_Imprint.txtFeePow.getSelectedItem());
             // READ AMOUNT
             // float amount = Float.parseFloat(this.txtAmount.getText());
 
@@ -334,16 +336,6 @@ public class IssueLinkedHashPanel extends SplitPanel {
             table_Model.addRow(new Object[]{"", ""});
             table_Model.fireTableDataChanged();
             Table_Hash.setRowSelectionInterval(table_Model.getRowCount() - 1, table_Model.getRowCount() - 1);
-        }
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
         }
     }
 }
