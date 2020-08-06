@@ -28,8 +28,6 @@ import java.util.HashMap;
 public class SplitPanel extends IconPanel {
 
     protected Logger logger;
-    protected static String panelName;
-    protected static String iconName;
 
     /**
      *
@@ -65,8 +63,8 @@ public class SplitPanel extends IconPanel {
 
     protected Controller cnt;
 
-    public SplitPanel(String panelName) {
-        super(panelName);
+    public SplitPanel(String panelName, String title) {
+        super(panelName, title);
 
         logger = LoggerFactory.getLogger(getClass());
 

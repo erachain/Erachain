@@ -22,7 +22,7 @@ public class TemplateMySplitPanel extends ItemSplitPanel {
     //private TemplateMySplitPanel th;
 
     public TemplateMySplitPanel() {
-        super(new WalletItemTemplatesTableModel(), "TemplateMySplitPanel");
+        super(new WalletItemTemplatesTableModel(), "TemplateMySplitPanel", title);
 
         this.setName(Lang.getInstance().translate("My Templates"));
 

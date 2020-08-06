@@ -9,7 +9,6 @@ import org.erachain.gui.models.BalanceFromAddressTableModel;
 import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
@@ -24,10 +23,6 @@ import java.awt.event.MouseEvent;
 
 public class MyBalanceTab extends SplitPanel  {
 
-    /**
-     *
-     */
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyBalanceTab.png";
     private static final long serialVersionUID = 1L;
     final MTable table;
     protected int row;
@@ -35,9 +30,8 @@ public class MyBalanceTab extends SplitPanel  {
 
     @SuppressWarnings({"null", "unchecked", "rawtypes"})
     public MyBalanceTab() {
-        super("MyBalanceTab");
-        //th = this;
-        this.setName(Lang.getInstance().translate("My Balance"));
+        super("MyBalanceTab", "My Balance");
+
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
@@ -213,7 +207,7 @@ public class MyBalanceTab extends SplitPanel  {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = balancesModel.getAsset(row);
                 String account = balancesModel.getAccount(row);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                MainPanel.getInstance().insertTab(
                         new ExchangePanel(asset, null, "To sell", account));
 
 
@@ -225,7 +219,7 @@ public class MyBalanceTab extends SplitPanel  {
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = balancesModel.getAsset(row);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                MainPanel.getInstance().insertTab(
                         new ExchangePanel(asset, null, "", ""));
 
             }
@@ -237,7 +231,7 @@ public class MyBalanceTab extends SplitPanel  {
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = balancesModel.getAsset(row);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                MainPanel.getInstance().insertTab(
                         new ExchangePanel(asset, null, "Buy", ""));
 
             }
@@ -441,17 +435,8 @@ if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
         String action = null;
         ExchangePanel panel = new ExchangePanel(asset, compu, action, "");
         panel.setName(asset.getTickerName() + "/" + compu.getTickerName());
-        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+        MainPanel.getInstance().insertTab(
                 panel);
     }
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

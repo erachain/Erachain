@@ -25,7 +25,7 @@ public class MyAccountsSplitPanel extends SplitPanel  {
     private AccountsRightPanel rightPanel;
 
     public MyAccountsSplitPanel() {
-        super("MyAccountsSplitPanel");
+        super("MyAccountsSplitPanel", title);
 
         this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);

@@ -30,7 +30,7 @@ public class OtherSearchBlocks extends SplitPanel {
     private int end;
 
     public OtherSearchBlocks() {
-        super("OtherSearchBlocks");
+        super("OtherSearchBlocks", title);
 
         this.jButton2_jToolBar_RightPanel.setVisible(false);
         this.jButton1_jToolBar_RightPanel.setVisible(false);

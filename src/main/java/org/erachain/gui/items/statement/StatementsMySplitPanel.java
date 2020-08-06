@@ -43,7 +43,7 @@ public class StatementsMySplitPanel extends SplitPanel {
 
 
     public StatementsMySplitPanel() {
-        super("StatementsMySplitPanel");
+        super("StatementsMySplitPanel", title);
 
         this.setName(Lang.getInstance().translate("My Statements"));
         this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");

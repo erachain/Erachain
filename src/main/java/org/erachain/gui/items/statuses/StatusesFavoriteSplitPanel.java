@@ -23,7 +23,7 @@ public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
     //private StatusesFavoriteSplitPanel th;
 
     public StatusesFavoriteSplitPanel() {
-        super(new FavoriteStatusesTableModel(), "StatusesFavoriteSplitPanel");
+        super(new FavoriteStatusesTableModel(), "StatusesFavoriteSplitPanel", title);
         this.setName(Lang.getInstance().translate("Favorite Statuses"));
         //th = this;
 

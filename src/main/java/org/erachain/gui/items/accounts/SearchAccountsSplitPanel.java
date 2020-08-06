@@ -6,7 +6,7 @@ import org.erachain.lang.Lang;
 public class SearchAccountsSplitPanel extends SplitPanel {
 
     public SearchAccountsSplitPanel() {
-        super("SearchAccountsSplitPanel");
+        super("SearchAccountsSplitPanel", title);
 
 //		LayoutManager favoritesGBC = this.getLayout();
 

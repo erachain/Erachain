@@ -7,6 +7,7 @@ import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.transaction.IssueImprintRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -14,7 +15,6 @@ import org.erachain.gui.library.Library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,9 +27,7 @@ import java.util.List;
 //import org.erachain.settings.Settings;
 
 @SuppressWarnings("serial")
-public class IssueImprintPanel extends JPanel {
-
-    private static String iconFile = Settings.getInstance().getPatnIcons()+ "IssueImprintPanel.png";
+public class IssueImprintPanel extends IconPanel {
 
     private JComboBox<Account> cbxFrom;
     private JComboBox<String> txtFeePow;
@@ -43,6 +41,7 @@ public class IssueImprintPanel extends JPanel {
     private JTextArea txtDescription;
 
     public IssueImprintPanel() {
+        super("IssueImprintPanel");
         //	super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Issue Imprint"));
 //		this.setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Issue Imprint"));
         //CLOSE
@@ -389,13 +388,4 @@ public class IssueImprintPanel extends JPanel {
         this.issueButton.setEnabled(true);
     }
 
-    public static  Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

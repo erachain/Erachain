@@ -18,7 +18,7 @@ public class MyLoansSplitPanel extends SplitPanel  {
     private static String iconFile = Settings.getInstance().getPatnIcons() + "MyLoansSplitPanel.png";
 
     public MyLoansSplitPanel() {
-        super("MyLoansSplitPanel");
+        super("MyLoansSplitPanel", title);
          //	LayoutManager favoritesGBC = this.getLayout();
         this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);

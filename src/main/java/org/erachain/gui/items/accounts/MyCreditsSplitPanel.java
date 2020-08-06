@@ -16,7 +16,7 @@ public class MyCreditsSplitPanel extends SplitPanel {
     public AccountsRightPanel rightPanel;
 
     public MyCreditsSplitPanel() {
-        super("MyCreditsSplitPanel");
+        super("MyCreditsSplitPanel", title);
 
         //	LayoutManager favoritesGBC = this.getLayout();
         this.jScrollPanelLeftPanel.setVisible(false);

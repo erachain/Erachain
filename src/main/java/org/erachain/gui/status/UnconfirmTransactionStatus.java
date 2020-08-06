@@ -76,7 +76,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
                 // Lang.getInstance().translate("My Records"),
                 // MyTransactionsSplitPanel.getInstance());
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Unconfirmed Records"),
+                MainPanel.getInstance().insertTab(
                         UnconfirmedTransactionsPanel.getInstance());
             }
 

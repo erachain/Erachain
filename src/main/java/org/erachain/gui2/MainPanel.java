@@ -4,7 +4,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.Wallets.WalletsManagerSplitPanel;
 import org.erachain.gui.bank.IssueSendPaymentOrder;
-import org.erachain.gui.bank.MyOrderPaimentsSplitPanel;
+import org.erachain.gui.bank.MyOrderPaymentsSplitPanel;
 import org.erachain.gui.items.accounts.FavoriteAccountsSplitPanel;
 import org.erachain.gui.items.accounts.MyAccountsSplitPanel;
 import org.erachain.gui.items.accounts.MyLoansSplitPanel;
@@ -222,10 +222,10 @@ public class MainPanel extends javax.swing.JPanel {
                         JTree tr = ((JTree) aa);
                         if (tr.getLastSelectedPathComponent() == null)
                             return;
+
                         addTab(tr.getLastSelectedPathComponent().toString());
 
                     }
-                    ;
                 }
             }
 
@@ -293,55 +293,55 @@ public class MainPanel extends javax.swing.JPanel {
 
         try {
             if (str.equals(Lang.getInstance().translate("Send payment order")) || str.equals("IssueSendPaymentOrder")) {
-                insertTab(Lang.getInstance().translate("Send Payment Order"), new IssueSendPaymentOrder());
+                insertTab(new IssueSendPaymentOrder());
                 return;
             }
 
             if (str.equals(Lang.getInstance().translate("My Payments Orders"))
                     || str.equals("MyOrderPaimentsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("My Payments Orders"), new MyOrderPaimentsSplitPanel());
+                insertTab(new MyOrderPaymentsSplitPanel());
                 return;
             }
 
             /////////// PERSONS
             if (str.equals(Lang.getInstance().translate("Favorite Persons")) || str.equals("PersonsFavoriteSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Favorite Persons"), new PersonsFavoriteSplitPanel());
+                insertTab(new PersonsFavoriteSplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("My Persons")) || str.equals("PersonsMySplitPanel")) {
-                insertTab(Lang.getInstance().translate("My Persons"), new PersonsMySplitPanel());
+                insertTab(new PersonsMySplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Search Persons")) || str.equals("SearchPersonsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Search Persons"), new SearchPersonsSplitPanel());
+                insertTab(new SearchPersonsSplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Issue Person")) || str.equals("IssuePersonPanel")) {
-                insertTab(Lang.getInstance().translate("Issue Person"), new IssuePersonPanel());
+                insertTab(new IssuePersonPanel());
                 return;
 
             }
             if (str.equals(Lang.getInstance().translate("Insert Person")) || str.equals("InsertPersonPanel")) {
-                insertTab(Lang.getInstance().translate("Insert Person"), new InsertPersonPanel());
+                insertTab(new InsertPersonPanel());
                 return;
 
             }
 
             if (str.equals(Lang.getInstance().translate("My Accounts")) || str.equals("MyAccountsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("My Accounts"), new MyAccountsSplitPanel());
+                insertTab(new MyAccountsSplitPanel());
                 return;
 
             }
 
             if (str.equals(Lang.getInstance().translate("My Loans")) || str.equals("MyLoansSplitPanel")) {
-                insertTab(Lang.getInstance().translate("My Loans"), new MyLoansSplitPanel());
+                insertTab(new MyLoansSplitPanel());
                 return;
 
             }
 
             if (str.equals(Lang.getInstance().translate("Favorite Accounts"))
                     || str.equals("FavoriteAccountsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Favorite Accounts"), new FavoriteAccountsSplitPanel());
+                insertTab(new FavoriteAccountsSplitPanel());
                 return;
 
             }
@@ -349,175 +349,175 @@ public class MainPanel extends javax.swing.JPanel {
             // STATEMENTS
             if (str.equals(Lang.getInstance().translate("Favorite Documents"))
                     || str.equals("FavoriteStatementsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Favorite Documents"), new FavoriteStatementsSplitPanel());
+                insertTab(new FavoriteStatementsSplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("My Documents")) || str.equals("StatementsMySplitPanel")) {
-                insertTab(Lang.getInstance().translate("My Documents"), new StatementsMySplitPanel());
+                insertTab(new StatementsMySplitPanel());
                 return;
 
             }
             if (str.equals(Lang.getInstance().translate("Search Documents"))
                     || str.equals("SearchStatementsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Search Documents"), new SearchStatementsSplitPanel());
+                insertTab(new SearchStatementsSplitPanel());
                 return;
 
             }
             if (str.equals(Lang.getInstance().translate("Issue Document")) || str.equals("IssueDocumentPanel")) {
-                insertTab(Lang.getInstance().translate("Issue Document"), new IssueDocumentPanel());
+                insertTab(new IssueDocumentPanel());
                 return;
 
             }
 
             /// MAILS
             if (str.equals(Lang.getInstance().translate("Incoming Mails")) || str.equals("IncomingMailsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Incoming Mails"), new IncomingMailsSplitPanel());
+                insertTab(new IncomingMailsSplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Outcoming Mails")) || str.equals("OutcomingMailsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Outcoming Mails"), new OutcomingMailsSplitPanel());
+                insertTab(new OutcomingMailsSplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Send Mail")) || str.equals("MailSendPanel")) {
-                insertTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, null));
+                insertTab(new MailSendPanel(null, null, null));
                 return;
             }
 
             if (str.equals(Lang.getInstance().translate("Favorite Assets")) || str.equals("AssetsFavoriteSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Favorite Assets"), new AssetsFavoriteSplitPanel());
+                insertTab(new AssetsFavoriteSplitPanel());
                 return;
             }
 
             if (str.equals(Lang.getInstance().translate("My Assets")) || str.equals("AssetsMySplitPanel")) {
                 ///insertTab(Lang.getInstance().translate("My Assets"), new MyAssetsTab(), MyAssetsTab.getIcon());
-                insertTab(Lang.getInstance().translate("My Assets"), new AssetsMySplitPanel());
+                insertTab(new AssetsMySplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Search Assets")) || str.equals("SearchAssetsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Search Assets"), new SearchAssetsSplitPanel(true));
+                insertTab(new SearchAssetsSplitPanel(true));
                 return;
             }
             if (str.equals(Lang.getInstance().translate("My Balance")) || str.equals("MyBalanceTab")) {
-                insertTab(Lang.getInstance().translate("My Balance"), new MyBalanceTab());
+                insertTab(new MyBalanceTab());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("My Orders")) || str.equals("MyOrderTab")) {
-                insertTab(Lang.getInstance().translate("My Orders"), new MyOrderTab());
+                insertTab(new MyOrderTab());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Issue Asset")) || str.equals("IssueAssetPanel")) {
-                insertTab(Lang.getInstance().translate("Issue Asset"), new IssueAssetPanel());
+                insertTab(new IssueAssetPanel());
                 return;
             } else if (str.equals(Lang.getInstance().translate("Exchange")) || str.equals("ExchangePanel")) {
-                insertTab(Lang.getInstance().translate("Exchange"), new ExchangePanel(null, null, null, null));
+                insertTab(new ExchangePanel(null, null, null, null));
                 return;
             } else if (str.equals(Lang.getInstance().translate("Withdraw Exchange")) || str.equals(WithdrawExchange.class.getSimpleName())) {
-                insertTab(Lang.getInstance().translate("Withdraw Exchange"), new WithdrawExchange(null, null));
+                insertTab(new WithdrawExchange(null, null));
                 return;
             }
 
             if (str.equals(Lang.getInstance().translate("Deposit Exchange")) || str.equals(DepositExchange.class.getSimpleName())) {
-                insertTab(Lang.getInstance().translate("Deposit Exchange"), new DepositExchange(null, null));
+                insertTab(new DepositExchange(null, null));
                 return;
             }
 
 
             if (str.equals(Lang.getInstance().translate("My Templates")) || str.equals("TemplateMySplitPanel")) {
-                insertTab(Lang.getInstance().translate("My Templates"), new TemplateMySplitPanel());
+                insertTab(new TemplateMySplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Search Templates")) || str.equals("SearchTemplatesSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Search Templates"), new SearchTemplatesSplitPanel());
+                insertTab(new SearchTemplatesSplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Favorite Templates"))
                     || str.equals("TemplatesFavoriteSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Favorite Templates"), new TemplatesFavoriteSplitPanel());
+                insertTab(new TemplatesFavoriteSplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Issue Template")) || str.equals("IssueTemplatePanel")) {
-                insertTab(Lang.getInstance().translate("Issue Template"), new IssueTemplatePanel());
+                insertTab(new IssueTemplatePanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Create Status")) || str.equals("IssueStatusPanel")) {
-                insertTab(Lang.getInstance().translate("Create Status"), new IssueStatusPanel());
+                insertTab(new IssueStatusPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Favorite Statuses"))
                     || str.equals("StatusesFavoriteSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Favorite Statuses"), new StatusesFavoriteSplitPanel());
+                insertTab(new StatusesFavoriteSplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Search Statuses")) || str.equals("SearchStatusesSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Search Statuses"), new SearchStatusesSplitPanel());
+                insertTab(new SearchStatusesSplitPanel());
                 return;
             }
             if (BlockChain.TEST_MODE) {
                 if (str.equals(Lang.getInstance().translate("My Unions")) || str.equals("MyUnionsTab")) {
-                    insertTab(Lang.getInstance().translate("My Unions"), new MyUnionsTab());
+                    insertTab(new MyUnionsTab());
                     return;
                 }
                 if (str.equals(Lang.getInstance().translate("Search Unions")) || str.equals("SearchUnionSplitPanel")) {
-                    insertTab(Lang.getInstance().translate("Search Unions"), new SearchUnionSplitPanel());
+                    insertTab(new SearchUnionSplitPanel());
                     return;
                 }
                 if (str.equals(Lang.getInstance().translate("Issue Union")) || str.equals("IssueUnionPanel")) {
-                    insertTab(Lang.getInstance().translate("Issue Union"), new IssueUnionPanel());
+                    insertTab(new IssueUnionPanel());
                     return;
                 }
             }
 
             /////// POLLS
             if (str.equals(Lang.getInstance().translate("Favorite Polls")) || str.equals("PollsFavoriteSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Favorite Polls"), new PollsFavoriteSplitPanel());
+                insertTab(new PollsFavoriteSplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("My Polls")) || str.equals("Polls_My_SplitPanel")) {
-                insertTab(Lang.getInstance().translate("My Polls"), new Polls_My_SplitPanel());
+                insertTab(new Polls_My_SplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Search Polls")) || str.equals("SearchPollsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Search Polls"), new SearchPollsSplitPanel());
+                insertTab(new SearchPollsSplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Issue Poll")) || str.equals("IssuePollPanel")) {
-                insertTab(Lang.getInstance().translate("Issue Poll"), new IssuePollPanel());
+                insertTab(new IssuePollPanel());
                 return;
             }
 
 
             //////// TRANSACTIONS
             if (str.equals(Lang.getInstance().translate("Favorite Records")) || str.equals("FavoriteTransactionsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Favorite Records"), new FavoriteTransactionsSplitPanel());
+                insertTab(new FavoriteTransactionsSplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("My Records")) || str.equals("MyTransactionsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("My Records"), MyTransactionsSplitPanel.getInstance());
+                insertTab(MyTransactionsSplitPanel.getInstance());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Search Records")) || str.equals("SearchTransactionsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Search Records"), new SearchTransactionsSplitPanel());
+                insertTab(new SearchTransactionsSplitPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Unconfirmed Records"))
                     || str.equals("UnconfirmedTransactionsPanel")) {
-                insertTab(Lang.getInstance().translate("Unconfirmed Records"), new UnconfirmedTransactionsPanel());
+                insertTab(new UnconfirmedTransactionsPanel());
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Other")) || str.equals("OtherSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Other"), new OtherSplitPanel());
+                insertTab(new OtherSplitPanel());
 
                 return;
             }
 
             if (str.equals(Lang.getInstance().translate("Console")) || str.equals("OtherConsolePanel")) {
-                insertTab(Lang.getInstance().translate("Console"), new OtherConsolePanel());
+                insertTab(new OtherConsolePanel());
 
                 return;
             }
 
             if (str.equals(Lang.getInstance().translate("Blocks")) || str.equals("OtherSearchBlocks")) {
-                insertTab(Lang.getInstance().translate("Blocks"), new OtherSearchBlocks());
+                insertTab(new OtherSearchBlocks());
 
                 return;
             }
@@ -525,35 +525,35 @@ public class MainPanel extends javax.swing.JPanel {
             /// UNIQUE HASHES
             if (str.equals(Lang.getInstance().translate("Favorite Unique Hashes"))
                     || str.equals("ImprintsFavoriteSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Favorite Unique Hashes"), new ImprintsFavoriteSplitPanel());
+                insertTab(new ImprintsFavoriteSplitPanel());
 
                 return;
             }
             if (str.equals(Lang.getInstance().translate("My Unique Hashes")) || str.equals("MyImprintsTab")) {
-                insertTab(Lang.getInstance().translate("My Unique Hashes"), new MyImprintsTab());
+                insertTab(new MyImprintsTab());
 
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Search Unique Hashes"))
                     || str.equals("ImprintsSearchSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Search Unique Hashes"), new ImprintsSearchSplitPanel());
+                insertTab(new ImprintsSearchSplitPanel());
 
                 return;
             }
             if (str.equals(Lang.getInstance().translate("Issue Unique Hash")) || str.equals("IssueImprintPanel")) {
-                insertTab(Lang.getInstance().translate("Issue Unique Hash"), new IssueImprintPanel());
+                insertTab(new IssueImprintPanel());
 
                 return;
             }
 
             if (str.equals(Lang.getInstance().translate("Issue Linked Hash")) || str.equals("IssueLinkedHashPanel")) {
-                insertTab(Lang.getInstance().translate("Issue Linked Hash"), new IssueLinkedHashPanel());
+                insertTab(new IssueLinkedHashPanel());
 
                 return;
             }
 
             if (str.equals(Lang.getInstance().translate("Search Linked Hash")) || str.equals("SearchTransactionsSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Search Linked Hash"), new SearchTransactionsSplitPanel());
+                insertTab(new SearchTransactionsSplitPanel());
                 return;
             }
 
@@ -561,7 +561,7 @@ public class MainPanel extends javax.swing.JPanel {
             if (BlockChain.TEST_MODE) {
                 if (str.equals(Lang.getInstance().translate("Wallets Manager"))
                         || str.equals("WalletsManagerSplitPanel")) {
-                    insertTab(Lang.getInstance().translate("Wallets Manager"), new WalletsManagerSplitPanel());
+                    insertTab(new WalletsManagerSplitPanel());
                     return;
                 }
 
@@ -569,13 +569,13 @@ public class MainPanel extends javax.swing.JPanel {
 
             if (str.equals(Lang.getInstance().translate("Telegrams Panel"))
                     || str.equals("TelegramSplitPanel")) {
-                insertTab(Lang.getInstance().translate("Telegrams Panel"), new TelegramSplitPanel());
+                insertTab(new TelegramSplitPanel());
 
                 return;
             }
             if (str.equals(Lang.getInstance().translate("All Telegrams Panel"))
                     || str.equals("ALLTelegramPanel")) {
-                insertTab(Lang.getInstance().translate("All Telegrams Panel"), new ALLTelegramPanel());
+                insertTab(new ALLTelegramPanel());
                 return;
             }
         } catch (Exception e) {
@@ -587,16 +587,15 @@ public class MainPanel extends javax.swing.JPanel {
     /**
      * If already opened - show it
      *
-     * @param str
-     * @param pp
+     * @param iconPanel
      * @return
      */
-    public boolean insertTab(String str, IconPanel pp) {
-        int index = jTabbedPane1.indexOfTab(str);
+    public boolean insertTab(IconPanel iconPanel) {
+        int index = jTabbedPane1.indexOfTab(iconPanel.getTitle());
         boolean inserted = false;
         if (index == -1) {
-            jTabbedPane1.addTabWithCloseButton(str, pp.getIcon(), pp);
-            index = jTabbedPane1.indexOfTab(str);
+            jTabbedPane1.addTabWithCloseButton(iconPanel.getTitle(), iconPanel.getIcon(), iconPanel);
+            index = jTabbedPane1.indexOfTab(iconPanel.getTitle());
             inserted = true;
         }
         jTabbedPane1.setSelectedIndex(index);
@@ -610,14 +609,13 @@ public class MainPanel extends javax.swing.JPanel {
      *
      * @param str
      * @param pp
-     * @param im
      */
-    public void insertNewTab(String str, JPanel pp, Image im) {
+    public void insertNewTab(String str, IconPanel pp) {
         int index = jTabbedPane1.indexOfTab(str);
         if (index >= 0) {
             jTabbedPane1.remove(index);
         }
-        jTabbedPane1.addTabWithCloseButton(str, im, (JPanel) pp);
+        jTabbedPane1.addTabWithCloseButton(str, pp.getIcon(), pp);
         index = jTabbedPane1.indexOfTab(str);
         jTabbedPane1.setSelectedIndex(index);
 

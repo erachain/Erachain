@@ -31,7 +31,7 @@ public class MyStatusesTab extends SplitPanel {
     private StatusInfo info1;
     // My statuses
     public MyStatusesTab() {
-        super("MyStatusesTab");
+        super("MyStatusesTab", title);
         tSP = this;
         setName(Lang.getInstance().translate("My Statuses"));
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");

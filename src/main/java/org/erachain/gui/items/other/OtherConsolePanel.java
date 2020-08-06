@@ -1,19 +1,19 @@
 package org.erachain.gui.items.other;
 
 import org.erachain.gui.ConsolePanel;
+import org.erachain.gui.IconPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 
 import javax.swing.*;
-import java.awt.*;
 
 @SuppressWarnings("serial")
-public class OtherConsolePanel extends JPanel  {
+public class OtherConsolePanel extends IconPanel {
 
     private ConsolePanel debugTabPane;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "OtherConsolePanel.png";
 
     public OtherConsolePanel() {
+        super("OtherConsolePanel");
         //CREATE FRAME
         //	setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Debug"));
         //	setModal(true);
@@ -49,16 +49,5 @@ public class OtherConsolePanel extends JPanel  {
 
         this.setVisible(true);
 
-    }
-
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 }

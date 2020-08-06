@@ -49,7 +49,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
     private final JLabel jLabelAllBlocksSum;
 
     public OtherSplitPanel() {
-        super("OtherSplitPanel");
+        super("OtherSplitPanel", title);
         DCSet.getInstance().getBlockMap().addObserver(this);
         jTableJScrollPanelLeftPanel.setModel(peersTableModel);
         jTableJScrollPanelLeftPanel.setAutoCreateRowSorter(true);

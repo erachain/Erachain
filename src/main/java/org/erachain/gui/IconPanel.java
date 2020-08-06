@@ -5,6 +5,8 @@
  */
 package org.erachain.gui;
 
+import org.erachain.lang.Lang;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -15,15 +17,26 @@ import java.awt.*;
 public class IconPanel extends JPanel {
 
     protected static String panelName;
+    protected String title;
     protected static String iconName;
 
     public IconPanel(String panelName) {
         super();
-        this.panelName = panelName;
+        this.panelName = title = iconName = panelName;
+        setName(title);
         iconName += ".png";
     }
 
-    public Image getIcon() {
+    public IconPanel(String panelName, String panelTitle) {
+        super();
+        this.panelName = iconName = panelName;
+        iconName += ".png";
+        title = Lang.getInstance().translate(panelTitle);
+        setName(title);
+
+    }
+
+    public static Image getIcon(String iconName) {
         {
             try {
                 return Toolkit.getDefaultToolkit().getImage(iconName);
@@ -32,4 +45,13 @@ public class IconPanel extends JPanel {
             }
         }
     }
+
+    public Image getIcon() {
+        return getIcon(iconName);
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
 }

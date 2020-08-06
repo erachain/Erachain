@@ -14,6 +14,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.assets.AssetInfo;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
@@ -37,7 +38,7 @@ import java.nio.charset.StandardCharsets;
 
 //import org.erachain.gui.AccountRenderer;
 
-public class AccountAssetActionPanelCls extends javax.swing.JPanel {
+public class AccountAssetActionPanelCls extends IconPanel {
 
     // TODO - "A" - &
     //static String wrongFirstCharOfAddress = "A";
@@ -81,6 +82,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                                       int balancePosition,
                                       Account accountFrom, Account accountTo, String message) {
 
+        super("AccountAssetActionPanelCls");
         if (assetIn == null)
             this.asset = Controller.getInstance().getAsset(2);
         else

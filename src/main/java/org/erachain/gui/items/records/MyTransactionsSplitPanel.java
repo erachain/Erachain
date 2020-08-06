@@ -49,7 +49,7 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
   
 
     private MyTransactionsSplitPanel() {
-        super("MyTransactionsSplitPanel");
+        super("MyTransactionsSplitPanel", title);
         this.leftPanel.setVisible(true);
        
 

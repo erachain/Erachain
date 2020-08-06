@@ -21,7 +21,7 @@ public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
 
     public TemplatesFavoriteSplitPanel() {
-        super(new FavoriteTemplatesTableModel(), "TemplatesFavoriteSplitPanel");
+        super(new FavoriteTemplatesTableModel(), "TemplatesFavoriteSplitPanel", title);
         this.setName(Lang.getInstance().translate("Favorite Templates"));
         iconName = "favorite.png";
 

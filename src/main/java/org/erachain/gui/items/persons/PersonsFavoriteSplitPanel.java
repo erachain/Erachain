@@ -23,11 +23,9 @@ import java.net.URL;
 public class PersonsFavoriteSplitPanel extends ItemSplitPanel  {
     private static final long serialVersionUID = 2717571093561259483L;
     //private PersonsFavoriteSplitPanel th;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "PersonsFavoriteSplitPanel.png";
-
 
     public PersonsFavoriteSplitPanel() {
-        super(new FavoritePersonsTableModel(), "PersonsFavoriteSplitPanel");
+        super(new FavoritePersonsTableModel(), "PersonsFavoriteSplitPanel", title);
         this.setName(Lang.getInstance().translate("Favorite Persons"));
 
         JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
@@ -36,7 +34,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel  {
             @Override
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
-                        null, null, (PersonCls) itemTableSelected, null), AccountAssetSendPanel.getIcon());
+                        null, null, (PersonCls) itemTableSelected, null));
 
             }
         });
@@ -46,7 +44,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel  {
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, (PersonCls) itemTableSelected), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, (PersonCls) itemTableSelected));
             }
         });
 
@@ -124,14 +122,4 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel  {
         return new PersonInfo002((PersonCls) item, true);
     }
 
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

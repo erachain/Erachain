@@ -40,7 +40,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
     private RowSorter<FavoriteStatementsTableModel> search_Sorter;
 
     public FavoriteStatementsSplitPanel() {
-        super("FavoriteStatementsSplitPanel");
+        super("FavoriteStatementsSplitPanel", title);
         setName(Lang.getInstance().translate("Favorite Documents"));
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 

@@ -26,7 +26,7 @@ public class MyUnionsTab extends SplitPanel {
     private TableColumn favoriteColumn;
 
     public MyUnionsTab() {
-        super("MyUnionsTab");
+        super("MyUnionsTab", title);
         // My unions
 
         setName(Lang.getInstance().translate("My Unions"));

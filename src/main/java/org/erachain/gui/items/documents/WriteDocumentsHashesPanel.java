@@ -32,7 +32,7 @@ public class WriteDocumentsHashesPanel extends SplitPanel {
     private JButton jButton3_jToolBar_RightPanel;
 
     public WriteDocumentsHashesPanel() {
-        super("WriteDocumentsHashesPanel");
+        super("WriteDocumentsHashesPanel", title);
         // left panel
 
         this.toolBarLeftPanel.setVisible(false);

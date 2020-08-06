@@ -22,7 +22,7 @@ public class WalletsManagerSplitPanel extends SplitPanel {
     private int spt = 1;
 
     public WalletsManagerSplitPanel() {
-        super("WalletsManagerSplitPanel");
+        super("WalletsManagerSplitPanel", title);
 //		LayoutManager favoritesGBC = this.getLayout();
         this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);

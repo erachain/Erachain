@@ -41,7 +41,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel  {
     private RowSorter<ItemsPersonsTableModel> search_Sorter;
 
     public FavoriteTransactionsSplitPanel() {
-        super("FavoriteStatementsSplitPanel");
+        super("FavoriteStatementsSplitPanel", title);
         setName(Lang.getInstance().translate("Favorite Transactions"));
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 

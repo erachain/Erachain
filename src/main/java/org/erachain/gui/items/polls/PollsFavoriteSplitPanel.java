@@ -23,7 +23,7 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel  {
     private static String iconFile = Settings.getInstance().getPatnIcons() + "PollsFavoriteSplitPanel.png";
 
     public PollsFavoriteSplitPanel() {
-        super(new FavoritePollsTableModel(), "PollsFavoriteSplitPanel");
+        super(new FavoritePollsTableModel(), "PollsFavoriteSplitPanel", title);
         this.setName(Lang.getInstance().translate("Favorite Polls"));
 
         jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setMaxWidth(200);

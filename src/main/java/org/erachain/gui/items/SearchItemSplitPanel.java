@@ -1,17 +1,11 @@
 package org.erachain.gui.items;
 
-import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.persons.PersonCls;
-import org.erachain.gui.items.persons.PersonInfo002;
+import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
-
-import org.erachain.gui.library.MDecimalFormatedTextField;
-
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -24,9 +18,8 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
     @SuppressWarnings("rawtypes")
     public SearchItemSplitPanel(SearchItemsTableModel search_Table_Model1, String gui_Name, String search_Label_Text) {
 
-        super(search_Table_Model1, gui_Name);
+        super(search_Table_Model1, gui_Name, search_Label_Text);
         this.search_Table_Model = search_Table_Model1;
-        setName(Lang.getInstance().translate(search_Label_Text));
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
         // CHECKBOX FOR FAVORITE

@@ -42,7 +42,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
     private JTextField searchString;
 
     public SearchTransactionsSplitPanel() {
-        super("SearchTransactionsSplitPanel");
+        super("SearchTransactionsSplitPanel", title);
 
         this.searchToolBar_LeftPanel.setVisible(true);
         jScrollPane4 = new JScrollPane();

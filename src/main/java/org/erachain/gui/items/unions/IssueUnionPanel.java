@@ -9,6 +9,7 @@ import org.erachain.core.transaction.IssueUnionRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.Gui;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
@@ -17,7 +18,6 @@ import org.erachain.gui.library.Library;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +36,8 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 //import org.erachain.settings.Settings;
 
 @SuppressWarnings("serial")
-public class IssueUnionPanel extends JPanel {
+public class IssueUnionPanel extends IconPanel {
 
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssueUnionPanel.png";
     private static Logger logger = LoggerFactory.getLogger(IssueUnionPanel.class);
 
     private JComboBox<Account> cbxFrom;
@@ -63,6 +62,7 @@ public class IssueUnionPanel extends JPanel {
     private JLabel parentJLabel = new JLabel();
 
     public IssueUnionPanel() {
+        super("IssueUnionPanel");
         initComponents();
 
 
@@ -352,13 +352,4 @@ public class IssueUnionPanel extends JPanel {
 
     }
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

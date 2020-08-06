@@ -38,7 +38,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
     private JButton jButton3_jToolBar_RightPanel;
 
     public IssueLinkedHashPanel() {
-        super("IssueLinkedHashPanel");
+        super("IssueLinkedHashPanel", title);
         jButton1_jToolBar_RightPanel.setVisible(false);
         jButton2_jToolBar_RightPanel.setVisible(false);
         GridBagLayout gridBagLayout = (GridBagLayout) rightPanel1.getLayout();

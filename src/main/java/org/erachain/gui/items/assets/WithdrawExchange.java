@@ -4,12 +4,12 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.URLViewer;
 import org.json.simple.JSONObject;
@@ -33,10 +33,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
-public class WithdrawExchange extends JPanel {
+public class WithdrawExchange extends IconPanel {
 
-    // private JComboBox<Account> accountLBox;
-    private static String iconFile = Settings.getInstance().getPatnIcons()+ "WithdrawExchange.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(WithdrawExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
@@ -54,7 +52,7 @@ public class WithdrawExchange extends JPanel {
     private AssetCls asset;
 
     public WithdrawExchange(AssetCls asset, Account account) {
-
+        super("WithdrawExchange");
         initComponents(asset, account);
         this.setVisible(true);
     }
@@ -178,7 +176,7 @@ public class WithdrawExchange extends JPanel {
             panel.setName(Lang.getInstance().translate("Withdraw"));
 
             MainPanel.getInstance().removeTab(panel.getName());
-            MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), panel, AccountAssetSendPanel.getIcon());
+            MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), panel);
 
         }
 
@@ -396,16 +394,6 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_History, gridBagConstraints);
 
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 
 }

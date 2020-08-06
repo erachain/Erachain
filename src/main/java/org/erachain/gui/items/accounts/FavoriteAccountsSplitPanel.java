@@ -58,7 +58,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
     private FavoriteAccountsMap accountsMap;
 
     public FavoriteAccountsSplitPanel() {
-        super("AccountsNameSearchSplitPanel");
+        super("AccountsNameSearchSplitPanel", title);
         GridBagLayout gridBagLayout = (GridBagLayout) leftPanel.getLayout();
         gridBagLayout.rowWeights = new double[]{0.0, 0.0};
         gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0};
@@ -226,7 +226,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
                 Account account = new Account(account1.a);
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"),
-                        new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                        new MailSendPanel(null, account, null));
             }
         });
         menu.add(Send_Mail_item_Menu);
@@ -239,7 +239,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
                 Tuple2<String, Tuple2<String, String>> account1 = accountsTableModel.getItem(row);
                 Account accountTo = new Account(account1.a);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send"), new AccountAssetSendPanel(null,
-                        null, accountTo, null, null), AccountAssetSendPanel.getIcon());
+                        null, accountTo, null, null));
 
             }
         });

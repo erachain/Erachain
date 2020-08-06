@@ -43,7 +43,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
     Wallet wallet = Controller.getInstance().wallet;
 
     public SearchStatementsSplitPanel() {
-        super("SearchStatementsSplitPanel");
+        super("SearchStatementsSplitPanel", title);
         setName(Lang.getInstance().translate("Search Statements"));
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         this.searchToolBar_LeftPanel.setVisible(true);

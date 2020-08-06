@@ -26,7 +26,7 @@ public class SearchDocumentHash extends SplitPanel {
     JTable Table_Hash;
 
     public SearchDocumentHash() {
-        super("SearchDocumentHash");
+        super("SearchDocumentHash", title);
         this.searchToolBar_LeftPanel.setVisible(true);
         model_Hashs = new ModelHashesInfo();
         Table_Hash = new JTable(model_Hashs);

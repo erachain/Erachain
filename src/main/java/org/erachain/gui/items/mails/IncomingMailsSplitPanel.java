@@ -37,7 +37,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
     private static String iconFile = Settings.getInstance().getPatnIcons() + "IncomingMailsSplitPanel.png";
 
     public IncomingMailsSplitPanel() {
-        super("IncomingMailsSplitPanel");
+        super("IncomingMailsSplitPanel", title);
         this.setName(Lang.getInstance().translate("Incoming Mails"));
         this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
@@ -96,7 +96,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
                 row = inciming_Mail_Table.convertRowIndexToModel(row);
                 Account account = incoming_Mails_Model.getItem(row).getCreator();
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, account, null));
 
             }
         });

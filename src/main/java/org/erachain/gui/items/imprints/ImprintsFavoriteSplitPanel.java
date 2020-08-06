@@ -19,7 +19,7 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
     //private ImprintsFavoriteSplitPanel th;
     private static String iconFile = Settings.getInstance().getPatnIcons()+ "ImprintsFavoriteSplitPanel.png";
     public ImprintsFavoriteSplitPanel() {
-        super(new FavoriteImprintsTableModel(), "PersonsFavoriteSplitPanel");
+        super(new FavoriteImprintsTableModel(), "PersonsFavoriteSplitPanel", title);
         this.setName(Lang.getInstance().translate("Favorite Persons"));
         //th = this;
         JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
@@ -30,7 +30,7 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
                 //new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"),
                         new AccountAssetSendPanel(null,
-                                null, itemTableSelected.getOwner(), null, null), AccountAssetSendPanel.getIcon());
+                                null, itemTableSelected.getOwner(), null, null));
 
             }
         });
@@ -40,7 +40,7 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, itemTableSelected.getOwner(), null), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, itemTableSelected.getOwner(), null));
             }
         });
 

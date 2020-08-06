@@ -22,20 +22,17 @@ import java.net.URL;
 
 public class AssetsMySplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "AssetsMySplitPanel.png";
 
     public AssetsMySplitPanel() {
-        super(new WalletItemAssetsTableModel(), "AssetsMySplitPanel");
+        super(new WalletItemAssetsTableModel(), "AssetsMySplitPanel", "My Assets");
 
-        this.setName(Lang.getInstance().translate("My Assets"));
-//      add items in menu
-
+        //      add items in menu
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
         sell.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                MainPanel.getInstance().insertTab(
                         new ExchangePanel(asset, null, "To sell", ""));
 
             }
@@ -46,7 +43,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                MainPanel.getInstance().insertTab(
                         new ExchangePanel(asset, null, "", ""));
             }
         });
@@ -56,7 +53,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+                MainPanel.getInstance().insertTab(
                         new ExchangePanel(asset, null, "Buy", ""));
 
             }
@@ -156,18 +153,8 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
         String action = null;
         ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");
         panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
-        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+        MainPanel.getInstance().insertTab(
                 panel);
     }
 
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

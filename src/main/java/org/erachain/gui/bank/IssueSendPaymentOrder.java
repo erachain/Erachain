@@ -28,6 +28,8 @@ import java.nio.charset.StandardCharsets;
 
 public class IssueSendPaymentOrder extends IconPanel {
 
+    public static String ICON = "IssueSendPaymentOrder";
+    public static String TITLE = "Send payment order";
     /**
      *
      */
@@ -41,7 +43,7 @@ public class IssueSendPaymentOrder extends IconPanel {
      * open the template in the editor.
      */
     public IssueSendPaymentOrder() {
-        super("IssueSendPaymentOrder.png");
+        super(ICON, TITLE);
         th = this;
         setLayout(new java.awt.BorderLayout());
         JScrollPane scroll = new JScrollPane();

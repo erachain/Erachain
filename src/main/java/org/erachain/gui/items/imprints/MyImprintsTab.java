@@ -29,7 +29,7 @@ public class MyImprintsTab extends SplitPanel  {
     RowSorter<WalletItemImprintsTableModel> sorter;
 
     public MyImprintsTab() {
-        super("MyImprintsTab");
+        super("MyImprintsTab", title);
 
         this.setName("My Hashes");
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");

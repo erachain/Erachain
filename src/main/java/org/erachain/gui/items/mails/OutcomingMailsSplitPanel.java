@@ -36,7 +36,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 
 
     public OutcomingMailsSplitPanel() {
-        super("OutcomingMailsSplitPanel");
+        super("OutcomingMailsSplitPanel", title);
 
         this.setName(Lang.getInstance().translate("Outcoming Mails"));
         this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");

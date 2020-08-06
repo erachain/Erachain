@@ -63,7 +63,7 @@ public class TelegramSplitPanel extends SplitPanel {
 
     @SuppressWarnings("rawtypes")
     public TelegramSplitPanel() {
-        super("TelegramSplitPanel");
+        super("TelegramSplitPanel", title);
         //th = this;
         this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
@@ -332,7 +332,7 @@ public class TelegramSplitPanel extends SplitPanel {
                 Account account = new Account(account1.a);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"),
                         new AccountAssetSendPanel(null,
-                                null, account, null, null), AccountAssetSendPanel.getIcon());
+                                null, account, null, null));
 
 
             }
@@ -345,7 +345,7 @@ public class TelegramSplitPanel extends SplitPanel {
                 Tuple2<String, Tuple2<String, String>> account1 = accountModel.getItem(row);
                 Account account = new Account(account1.a);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"),
-                        new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                        new MailSendPanel(null, account, null));
 
             }
         });

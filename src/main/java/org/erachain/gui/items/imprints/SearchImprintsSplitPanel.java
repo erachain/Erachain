@@ -20,7 +20,7 @@ public class SearchImprintsSplitPanel extends SplitPanel {
     private TableModelImprints tableModelImprints;
 
     public SearchImprintsSplitPanel() {
-        super("SearchImprintsSplitPanel");
+        super("SearchImprintsSplitPanel", title);
 
         setName(Lang.getInstance().translate("Search Imprints"));
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");

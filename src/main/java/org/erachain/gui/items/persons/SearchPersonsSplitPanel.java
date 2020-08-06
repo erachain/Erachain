@@ -35,7 +35,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
-                        null, null, (PersonCls) itemTableSelected, null), AccountAssetSendPanel.getIcon());
+                        null, null, (PersonCls) itemTableSelected, null));
 
             }
         });
@@ -48,7 +48,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, (PersonCls) itemTableSelected), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, (PersonCls) itemTableSelected));
             }
         });
 
