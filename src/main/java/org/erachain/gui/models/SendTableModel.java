@@ -352,20 +352,22 @@ public class SendTableModel extends JTable implements Observer {
     }
 
     private void addMessage(int pos, RSend transaction) {
-        messageBufs.add(pos, new MessageBuf(
-                // TODO use viewData instead - use transaction instead buffer
-                transaction.getData(),
-                transaction.isEncrypted(),
-                transaction.getCreator(), //.asPerson(),
-                transaction.getRecipient(), //.asPerson(),
-                transaction.getTimestamp(),
-                transaction.getAmount(),
-                transaction.getKey(),
-                transaction.getFee(),
-                transaction.getSignature(),
-                transaction.getCreator().getPublicKey(),
-                transaction.isText()
-        ));
+        if (!transaction.hasAmount()) {
+            messageBufs.add(pos, new MessageBuf(
+                    // TODO use viewData instead - use transaction instead buffer
+                    transaction.getData(),
+                    transaction.isEncrypted(),
+                    transaction.getCreator(), //.asPerson(),
+                    transaction.getRecipient(), //.asPerson(),
+                    transaction.getTimestamp(),
+                    transaction.getAmount(),
+                    transaction.getKey(),
+                    transaction.getFee(),
+                    transaction.getSignature(),
+                    transaction.getCreator().getPublicKey(),
+                    transaction.isText()
+            ));
+        }
     }
 
     public void cryptoCloseAll() {
@@ -676,28 +678,28 @@ public class SendTableModel extends JTable implements Observer {
             }
 
 
-            return "<html>\n"
-                    + "<body width='" + width + "'>\n"
-                    + "<table border='0' cellpadding='3' cellspacing='0'><tr>\n<td bgcolor='" + colorHeader + "' width='" + (width / 2 - 1) + "'>\n"
-                    + "<font size='2' color='" + colorTextHeader + "'>\n" + Lang.getInstance().translate("From") + ":" + this.sender
-                    + "\n<br>\n" + Lang.getInstance().translate("To") + ": "
-                    + this.recipient + "\n</font></td>\n"
-                    + "<td bgcolor='" + colorHeader + "' align='right' width='" + (width / 2 - 1) + "'>\n"
-                    + "<font size='2' color='" + colorTextHeader + "'>\n" + strconfirmations + " . "
+            return "<html>"
+                    + "<body width='" + width + "'>"
+                    + "<table border='0' cellpadding='3' cellspacing='0'><tr><td bgcolor='" + colorHeader + "' width='" + (width / 2 - 1) + "'>"
+                    + "<font size='2' color='" + colorTextHeader + "'>" + Lang.getInstance().translate("From") + ":" + this.sender
+                    + "<br>" + Lang.getInstance().translate("To") + ": "
+                    + this.recipient + "</font></td>"
+                    + "<td bgcolor='" + colorHeader + "' align='right' width='" + (width / 2 - 1) + "'>"
+                    + "<font size='2' color='" + colorTextHeader + "'>" + strconfirmations + " . "
                     + DateTimeFormat.timestamptoString(this.timestamp)
                     + " " + Lang.getInstance().translate("Fee") + ": "
                     + NumberAsString.formatAsString(fee)
-                    + "<br></font>\n"
+                    + "<br></font>"
                     + amountStr
                     + "</td></tr></table>"
-                    + "<table border='0' cellpadding='3' cellspacing='0'>\n<tr bgcolor='" + colorTextBackground + "'><td width='25'>" + imginout
-                    + "<td width='" + width + "'>\n"
-                    + "<font size='2.5' color='" + colorTextMessage + "'>\n"
+                    + "<table border='0' cellpadding='3' cellspacing='0'><tr bgcolor='" + colorTextBackground + "'><td width='25'>" + imginout
+                    + "<td width='" + width + "'>"
+                    + "<font size='2.5' color='" + colorTextMessage + "'>"
                     + Library.to_HTML(decrMessage)
-                    + "\n</font>"
+                    + "</font>"
                     + "<td width='30'>" + imgLock
-                    + "</td></tr>\n</table>\n"
-                    + "</body></html>\n";
+                    + "</td></tr></table>"
+                    + "</body></html>";
         }
 
         public String getDecrMessageTXT() {
