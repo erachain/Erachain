@@ -29,11 +29,6 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel {
         super(new FavoritePollsTableModel(), NAME, TITLE);
         iconName = "favorite.png";
 
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setMaxWidth(200);
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(100);
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setMaxWidth(200);
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setPreferredWidth(100);
-
         JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("To Vote"));
         setVote_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

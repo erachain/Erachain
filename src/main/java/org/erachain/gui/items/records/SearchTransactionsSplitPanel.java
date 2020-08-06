@@ -20,6 +20,7 @@ import org.mapdb.Fun.Tuple2;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
@@ -108,6 +109,9 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         //TRANSACTIONS TABLE MODEL
         this.transactionsTableModel = new SearchTransactionsTableModel();
         this.jTableJScrollPanelLeftPanel = new MTable(this.transactionsTableModel);
+        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
+        columnModel.getColumn(transactionsTableModel.COLUMN_FAVORITE).setMaxWidth((100));
+
 
         this.jTableJScrollPanelLeftPanel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 

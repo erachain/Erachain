@@ -483,7 +483,7 @@ public class MainPanel extends javax.swing.JPanel {
                 insertTab(new PollsFavoriteSplitPanel());
                 return;
             }
-            if (str.equals(Lang.getInstance().translate("My Polls")) || str.equals("Polls_My_SplitPanel")) {
+            if (str.equals(Lang.getInstance().translate(PollsMySplitPanel.NAME)) || str.equals(PollsMySplitPanel.TITLE)) {
                 insertTab(new PollsMySplitPanel());
                 return;
             }

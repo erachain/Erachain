@@ -27,9 +27,6 @@ public class PollsMySplitPanel extends ItemSplitPanel {
     public PollsMySplitPanel() {
         super(new WalletItemPollsTableModel(), NAME, TITLE);
 
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setMaxWidth(200);
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(100);
-
         JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("To Vote"));
         setVote_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

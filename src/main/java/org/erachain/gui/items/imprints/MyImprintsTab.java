@@ -16,9 +16,7 @@ public class MyImprintsTab extends ItemSplitPanel {
 
     public MyImprintsTab() {
         super(new WalletItemImprintsTableModel(), NAME, TITLE);
-
     }
-
 
     // show details
     @Override
