@@ -36,7 +36,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
                 MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
-                        new ExchangePanel(asset, null, "To sell", ""), ExchangePanel.getIcon());
+                        new ExchangePanel(asset, null, "To sell", ""));
 
             }
         });
@@ -47,7 +47,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
                 MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
-                        new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
+                        new ExchangePanel(asset, null, "", ""));
             }
         });
 
@@ -57,7 +57,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
                 MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
-                        new ExchangePanel(asset, null, "Buy", ""), ExchangePanel.getIcon());
+                        new ExchangePanel(asset, null, "Buy", ""));
 
             }
         });
@@ -157,7 +157,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
         ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");
         panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
         MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
-                panel, ExchangePanel.getIcon());
+                panel);
     }
 
 

@@ -9,13 +9,13 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.mails.MailInfo;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -26,7 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.charset.StandardCharsets;
 
-public class IssueSendPaymentOrder extends javax.swing.JPanel  {
+public class IssueSendPaymentOrder extends IconPanel {
 
     /**
      *
@@ -34,8 +34,6 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel  {
     private static final long serialVersionUID = 1L;
     private IssueSendPaymentOrder1 issue_Panel;
     private IssueSendPaymentOrder th;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssueSendPaymentOrder.png";
-
 
     /*
      * To change this license header, choose License Headers in Project
@@ -43,7 +41,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel  {
      * open the template in the editor.
      */
     public IssueSendPaymentOrder() {
-
+        super("IssueSendPaymentOrder.png");
         th = this;
         setLayout(new java.awt.BorderLayout());
         JScrollPane scroll = new JScrollPane();
@@ -312,15 +310,5 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel  {
         return a;
     }
 
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }
 

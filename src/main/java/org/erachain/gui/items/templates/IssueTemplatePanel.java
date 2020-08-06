@@ -8,6 +8,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.IssueTemplateRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
@@ -17,7 +18,6 @@ import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssueTemplateDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,9 +26,8 @@ import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
-public class IssueTemplatePanel extends JPanel {
+public class IssueTemplatePanel extends IconPanel {
 
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssueTemplatePanel.png";
     private JComboBox<Account> jComboBoxAccountCreator = new JComboBox<>(new AccountsComboBoxModel());
     private JButton jButtonCreate = new JButton();
     private JLabel jLabelAccountCreator = new JLabel();
@@ -44,6 +43,7 @@ public class IssueTemplatePanel extends JPanel {
     private AddImageLabel addLogoIconPanel;
 
     public IssueTemplatePanel() {
+        super("IssueTemplatePanel");
         initComponents();
         setVisible(true);
     }
@@ -295,13 +295,4 @@ public class IssueTemplatePanel extends JPanel {
         add(jButtonCreate, gridBagConstraints);
     }
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

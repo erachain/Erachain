@@ -38,6 +38,7 @@ import org.erachain.gui.items.statuses.SearchStatusesSplitPanel;
 import org.erachain.gui.items.statuses.StatusesFavoriteSplitPanel;
 import org.erachain.gui.items.templates.IssueTemplatePanel;
 import org.erachain.gui.items.templates.SearchTemplatesSplitPanel;
+import org.erachain.gui.items.templates.TemplateMySplitPanel;
 import org.erachain.gui.items.templates.TemplatesFavoriteSplitPanel;
 import org.erachain.gui.items.unions.IssueUnionPanel;
 import org.erachain.gui.items.unions.MyUnionsTab;
@@ -184,8 +185,10 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         exchange_Node.add(new ASMutableTreeNode("MyOrderTab", Lang.getInstance().translate("My Orders"), MyOrderTab.getIcon()));
 
         templates_Node.add(new ASMutableTreeNode("TemplatesFavoriteSplitPanel", Lang.getInstance().translate("Favorite Templates"), TemplatesFavoriteSplitPanel.getIcon()));
+        templates_Node.add(new ASMutableTreeNode("TemplateMySplitPanel", Lang.getInstance().translate("My Templates"), TemplateMySplitPanel.getIcon()));
         templates_Node.add(new ASMutableTreeNode("SearchTemplatesSplitPanel", Lang.getInstance().translate("Search Templates"), SearchTemplatesSplitPanel.getIcon()));
         templates_Node.add(new ASMutableTreeNode("IssueTemplatePanel", Lang.getInstance().translate("Issue Template"), IssueTemplatePanel.getIcon()));
+
 
         statuses_Node.add(new ASMutableTreeNode("StatusesFavoriteSplitPanel", Lang.getInstance().translate("Favorite Statuses"), StatusesFavoriteSplitPanel.getIcon()));
         statuses_Node.add(new ASMutableTreeNode("SearchStatusesSplitPanel", Lang.getInstance().translate("Search Statuses"), SearchStatusesSplitPanel.getIcon()));

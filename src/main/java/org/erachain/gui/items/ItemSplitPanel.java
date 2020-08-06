@@ -52,12 +52,15 @@ public abstract class ItemSplitPanel extends SplitPanel {
         // CREATE TABLE
         jTableJScrollPanelLeftPanel = new MTable(this.tableModel);
 
-        // иконку будем рисовать
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(tableModel.COLUMN_FOR_ICON)
-                .setCellRenderer(new RendererIcon());
-
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
         columnModel.getColumn(0).setMaxWidth((100));
+        // иконку будем рисовать
+        try {
+            columnModel.getColumn(tableModel.COLUMN_FOR_ICON)
+                    .setCellRenderer(new RendererIcon());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
 
         // hand cursor for Favorite column
         jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionAdapter() {

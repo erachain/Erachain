@@ -12,6 +12,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.accounts.AccountRenderer;
@@ -21,7 +22,6 @@ import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.SendTableModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
 import org.mapdb.Fun.Tuple2;
@@ -43,9 +43,8 @@ import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("serial")
 
-public class MailSendPanel extends JPanel {
+public class MailSendPanel extends IconPanel {
 
-    private static String iconFile = Settings.getInstance().getPatnIcons()+ "MailSendPanel.png";
     // TODO - "A" - &
     final static String wrongFirstCharOfAddress = "A";
     // private final MessagesTableModel messagesTableModel;
@@ -69,6 +68,7 @@ public class MailSendPanel extends JPanel {
 
     public MailSendPanel(Account accountFrom, Account accountTo, PersonCls person) {
 
+        super("MailSendPanel");
         th = this;
         this.person = person;
         sendButton = new MButton(Lang.getInstance().translate("Send"), 2);
@@ -802,13 +802,4 @@ public class MailSendPanel extends JPanel {
         this.sendButton.setEnabled(true);
     }
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

@@ -3,7 +3,6 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.templates.TemplateCls;
-import org.erachain.datachain.DCSet;
 
 @SuppressWarnings("serial")
 public class WalletItemTemplatesTableModel extends WalletTableModel<TemplateCls> {
@@ -30,11 +29,11 @@ public class WalletItemTemplatesTableModel extends WalletTableModel<TemplateCls>
         switch (column) {
             case COLUMN_KEY:
 
-                return template.getKey(DCSet.getInstance());
+                return template.getKey();
 
             case COLUMN_NAME:
 
-                return template.viewName();
+                return template;
 
             case COLUMN_ADDRESS:
 

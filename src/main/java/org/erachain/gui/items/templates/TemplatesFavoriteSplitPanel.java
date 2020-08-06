@@ -19,11 +19,11 @@ import java.net.URL;
 
 public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "TemplatesFavoriteSplitPanel.png";
 
     public TemplatesFavoriteSplitPanel() {
         super(new FavoriteTemplatesTableModel(), "TemplatesFavoriteSplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Templates"));
+        iconName = "favorite.png";
 
         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
@@ -64,13 +64,4 @@ public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
     }
 
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

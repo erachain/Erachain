@@ -328,7 +328,7 @@ public class MyOrderTab extends SplitPanel {
         ExchangePanel panel = new ExchangePanel(haveAsset, wantAsset, action, "");
         panel.setName(haveAsset.getTickerName() + "/" + wantAsset.getTickerName());
         MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),
-                panel, ExchangePanel.getIcon());
+                panel);
     }
 
     public static Image getIcon() {

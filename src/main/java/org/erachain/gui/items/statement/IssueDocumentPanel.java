@@ -8,6 +8,7 @@ import org.erachain.core.exdata.ExDataPanel;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -15,7 +16,6 @@ import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,9 +25,8 @@ import java.awt.event.ActionListener;
 /**
  * @author Саша
  */
-public class IssueDocumentPanel extends javax.swing.JPanel {
+public class IssueDocumentPanel extends IconPanel {
 
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssueDocumentPanel.png";
     private IssueDocumentPanel th;
     private ExDataPanel exData_Panel;
     private MButton jButton_Work_Cancel;
@@ -43,7 +42,7 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
      * Creates new form IssueDocumentPanel
      */
     public IssueDocumentPanel() {
-
+        super("IssueDocumentPanel");
         th = this;
         initComponents();
         setChecks();
@@ -372,16 +371,6 @@ public class IssueDocumentPanel extends javax.swing.JPanel {
         }
         this.jButton_Work_OK.setEnabled(true);
         this.jButton_Work_OK1.setEnabled(true);
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 
     public void setChecks() {

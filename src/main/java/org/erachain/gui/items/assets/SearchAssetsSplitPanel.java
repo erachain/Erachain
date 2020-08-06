@@ -53,7 +53,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel  {
         sell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //new ExchangeFrame((AssetCls) th.itemMenu, null, "To sell", "");
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel((AssetCls) itemTableSelected, null, "To sell", ""), ExchangePanel.getIcon());
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"), new ExchangePanel((AssetCls) itemTableSelected, null, "To sell", ""));
 
             }
         });
@@ -61,7 +61,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel  {
         JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel((AssetCls) itemTableSelected, null, "", ""), ExchangePanel.getIcon());
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"), new ExchangePanel((AssetCls) itemTableSelected, null, "", ""));
 
             }
         });
@@ -69,7 +69,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel  {
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", ""), ExchangePanel.getIcon());
+                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"), new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", ""));
 
             }
         });
@@ -126,7 +126,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel  {
         String action = null;
         ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");
         panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
-        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"),panel, ExchangePanel.getIcon());
+        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange"), panel);
 
     }
 
