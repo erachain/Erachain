@@ -17,7 +17,7 @@ import java.awt.event.MouseEvent;
 
 public class MyOrderPaymentsSplitPanel extends SplitPanel {
 
-    private static String NAME = "MyOrderPaymentsSplitPanel";
+    public static String NAME = "MyOrderPaymentsSplitPanel";
     public static String TITLE = "My Payments Orders";
 
     private static final long serialVersionUID = 2717571093561259483L;

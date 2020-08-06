@@ -147,92 +147,92 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         root.add(records_Node);
         root.add(other_Node);
 
-        bank_Tree.add(new ASMutableTreeNode("IssueSendPaymentOrder", IssueSendPaymentOrder.TITLE));
-        bank_Tree.add(new ASMutableTreeNode("MyOrderPaymentsSplitPanel", MyOrderPaymentsSplitPanel.TITLE));
+        bank_Tree.add(new ASMutableTreeNode(IssueSendPaymentOrder.NAME, IssueSendPaymentOrder.TITLE));
+        bank_Tree.add(new ASMutableTreeNode(MyOrderPaymentsSplitPanel.NAME, MyOrderPaymentsSplitPanel.TITLE));
 
-        account_Node.add(new ASMutableTreeNode("MyAccountsSplitPanel", MyAccountsSplitPanel.TITLE));
-        account_Node.add(new ASMutableTreeNode("MyLoansSplitPanel", MyLoansSplitPanel.TITLE));
-        account_Node.add(new ASMutableTreeNode("FavoriteAccountsSplitPanel", FavoriteAccountsSplitPanel.TITLE));
+        account_Node.add(new ASMutableTreeNode(MyAccountsSplitPanel.NAME, MyAccountsSplitPanel.TITLE));
+        account_Node.add(new ASMutableTreeNode(MyLoansSplitPanel.NAME, MyLoansSplitPanel.TITLE));
+        account_Node.add(new ASMutableTreeNode(FavoriteAccountsSplitPanel.NAME, FavoriteAccountsSplitPanel.TITLE));
 
         // account_Node.add(new
-        // DefaultMutableTreeNode(Lang.getInstance().translate("Search
+        // DefaultMutableTreeNode(Lang.getInstance().translate(Search
         // Accounts")));
-        // account_Node.add(new DefaultMutableTreeNode("Issue Account"));
+        // account_Node.add(new DefaultMutableTreeNode(Issue Account"));
 
-        person_Node.add(new ASMutableTreeNode("PersonsFavoriteSplitPanel", PersonsFavoriteSplitPanel.TITLE));
-        person_Node.add(new ASMutableTreeNode("PersonsMySplitPanel", PersonsMySplitPanel.TITLE));
-        person_Node.add(new ASMutableTreeNode("SearchPersonsSplitPanel", SearchPersonsSplitPanel.TITLE));
-        person_Node.add(new ASMutableTreeNode("IssuePersonPanel", IssuePersonPanel.TITLE));
-        person_Node.add(new ASMutableTreeNode("InsertPersonPanel", InsertPersonPanel.TITLE));
+        person_Node.add(new ASMutableTreeNode(PersonsFavoriteSplitPanel.NAME, PersonsFavoriteSplitPanel.TITLE));
+        person_Node.add(new ASMutableTreeNode(PersonsMySplitPanel.NAME, PersonsMySplitPanel.TITLE));
+        person_Node.add(new ASMutableTreeNode(SearchPersonsSplitPanel.NAME, SearchPersonsSplitPanel.TITLE));
+        person_Node.add(new ASMutableTreeNode(IssuePersonPanel.NAME, IssuePersonPanel.TITLE));
+        person_Node.add(new ASMutableTreeNode(InsertPersonPanel.NAME, InsertPersonPanel.TITLE));
 
-        document_Node.add(new ASMutableTreeNode("FavoriteStatementsSplitPanel", FavoriteStatementsSplitPanel.TITLE));
-        document_Node.add(new ASMutableTreeNode("StatementsMySplitPanel", StatementsMySplitPanel.TITLE));
-        document_Node.add(new ASMutableTreeNode("SearchStatementsSplitPanel", SearchStatementsSplitPanel.TITLE));
-        document_Node.add(new ASMutableTreeNode("IssueDocumentPanel", IssueDocumentPanel.TITLE));
+        document_Node.add(new ASMutableTreeNode(FavoriteStatementsSplitPanel.NAME, FavoriteStatementsSplitPanel.TITLE));
+        document_Node.add(new ASMutableTreeNode(StatementsMySplitPanel.NAME, StatementsMySplitPanel.TITLE));
+        document_Node.add(new ASMutableTreeNode(SearchStatementsSplitPanel.NAME, SearchStatementsSplitPanel.TITLE));
+        document_Node.add(new ASMutableTreeNode(IssueDocumentPanel.NAME, IssueDocumentPanel.TITLE));
 
-        mails_Node.add(new ASMutableTreeNode("IncomingMailsSplitPanel", IncomingMailsSplitPanel.TITLE));
-        mails_Node.add(new ASMutableTreeNode("OutcomingMailsSplitPanel", OutcomingMailsSplitPanel.TITLE));
-        mails_Node.add(new ASMutableTreeNode("MailSendPanel", MailSendPanel.TITLE));
+        mails_Node.add(new ASMutableTreeNode(IncomingMailsSplitPanel.NAME, IncomingMailsSplitPanel.TITLE));
+        mails_Node.add(new ASMutableTreeNode(OutcomingMailsSplitPanel.NAME, OutcomingMailsSplitPanel.TITLE));
+        mails_Node.add(new ASMutableTreeNode(MailSendPanel.NAME, MailSendPanel.TITLE));
 
-        assets_Node.add(new ASMutableTreeNode("AssetsFavoriteSplitPanel", AssetsFavoriteSplitPanel.TITLE));
-        assets_Node.add(new ASMutableTreeNode("AssetsMySplitPanel", AssetsMySplitPanel.TITLE));
-        assets_Node.add(new ASMutableTreeNode("SearchAssetsSplitPanel", SearchAssetsSplitPanel.TITLE));
-        assets_Node.add(new ASMutableTreeNode("IssueAssetPanel", IssueAssetPanel.TITLE));
-        assets_Node.add(new ASMutableTreeNode("MyBalanceTab", MyBalanceTab.TITLE));
+        assets_Node.add(new ASMutableTreeNode(AssetsFavoriteSplitPanel.NAME, AssetsFavoriteSplitPanel.TITLE));
+        assets_Node.add(new ASMutableTreeNode(AssetsMySplitPanel.NAME, AssetsMySplitPanel.TITLE));
+        assets_Node.add(new ASMutableTreeNode(SearchAssetsSplitPanel.NAME, SearchAssetsSplitPanel.TITLE));
+        assets_Node.add(new ASMutableTreeNode(IssueAssetPanel.NAME, IssueAssetPanel.TITLE));
+        assets_Node.add(new ASMutableTreeNode(MyBalanceTab.NAME, MyBalanceTab.TITLE));
 
         if (Settings.EXCHANGE_IN_OUT) {
-            exchange_Node.add(new ASMutableTreeNode("DepositExchange", DepositExchange.TITLE));
-            exchange_Node.add(new ASMutableTreeNode("WithdrawExchange", WithdrawExchange.TITLE));
+            exchange_Node.add(new ASMutableTreeNode(DepositExchange.NAME, DepositExchange.TITLE));
+            exchange_Node.add(new ASMutableTreeNode(WithdrawExchange.NAME, WithdrawExchange.TITLE));
         }
-        exchange_Node.add(new ASMutableTreeNode("ExchangePanel", ExchangePanel.TITLE));
-        exchange_Node.add(new ASMutableTreeNode("MyOrderTab", MyOrderTab.TITLE));
+        exchange_Node.add(new ASMutableTreeNode(ExchangePanel.NAME, ExchangePanel.TITLE));
+        exchange_Node.add(new ASMutableTreeNode(MyOrderTab.NAME, MyOrderTab.TITLE));
 
         templates_Node.add(new ASMutableTreeNode(TemplatesFavoriteSplitPanel.NAME, TemplatesFavoriteSplitPanel.TITLE));
-        templates_Node.add(new ASMutableTreeNode("TemplateMySplitPanel", TemplateMySplitPanel.TITLE));
-        templates_Node.add(new ASMutableTreeNode("SearchTemplatesSplitPanel", SearchTemplatesSplitPanel.TITLE));
-        templates_Node.add(new ASMutableTreeNode("IssueTemplatePanel", IssueTemplatePanel.TITLE));
+        templates_Node.add(new ASMutableTreeNode(TemplateMySplitPanel.NAME, TemplateMySplitPanel.TITLE));
+        templates_Node.add(new ASMutableTreeNode(SearchTemplatesSplitPanel.NAME, SearchTemplatesSplitPanel.TITLE));
+        templates_Node.add(new ASMutableTreeNode(IssueTemplatePanel.NAME, IssueTemplatePanel.TITLE));
 
 
-        statuses_Node.add(new ASMutableTreeNode("StatusesFavoriteSplitPanel", StatusesFavoriteSplitPanel.TITLE));
-        statuses_Node.add(new ASMutableTreeNode("MyStatusesTab", MyStatusesTab.TITLE));
-        statuses_Node.add(new ASMutableTreeNode("SearchStatusesSplitPanel", SearchStatusesSplitPanel.TITLE));
-        statuses_Node.add(new ASMutableTreeNode("IssueStatusPanel", IssueStatusPanel.TITLE));
+        statuses_Node.add(new ASMutableTreeNode(StatusesFavoriteSplitPanel.NAME, StatusesFavoriteSplitPanel.TITLE));
+        statuses_Node.add(new ASMutableTreeNode(MyStatusesTab.NAME, MyStatusesTab.TITLE));
+        statuses_Node.add(new ASMutableTreeNode(SearchStatusesSplitPanel.NAME, SearchStatusesSplitPanel.TITLE));
+        statuses_Node.add(new ASMutableTreeNode(IssueStatusPanel.NAME, IssueStatusPanel.TITLE));
 
-        unions_Node.add(new ASMutableTreeNode("UnionsFavoriteSplitPanel", UnionsFavoriteSplitPanel.TITLE));
-        unions_Node.add(new ASMutableTreeNode("MyUnionsTab", MyUnionsTab.TITLE));
-        unions_Node.add(new ASMutableTreeNode("SearchUnionSplitPanel", SearchUnionSplitPanel.TITLE));
-        unions_Node.add(new ASMutableTreeNode("IssueUnionPanel", IssueUnionPanel.TITLE));
+        unions_Node.add(new ASMutableTreeNode(UnionsFavoriteSplitPanel.NAME, UnionsFavoriteSplitPanel.TITLE));
+        unions_Node.add(new ASMutableTreeNode(MyUnionsTab.NAME, MyUnionsTab.TITLE));
+        unions_Node.add(new ASMutableTreeNode(SearchUnionSplitPanel.NAME, SearchUnionSplitPanel.TITLE));
+        unions_Node.add(new ASMutableTreeNode(IssueUnionPanel.NAME, IssueUnionPanel.TITLE));
 
-        polls_Node.add(new ASMutableTreeNode("PollsFavoriteSplitPanel", PollsFavoriteSplitPanel.TITLE));
-        polls_Node.add(new ASMutableTreeNode("Polls_My_SplitPanel", PollsMySplitPanel.TITLE));
-        polls_Node.add(new ASMutableTreeNode("SearchPollsSplitPanel", SearchPollsSplitPanel.TITLE));
-        polls_Node.add(new ASMutableTreeNode("IssuePollPanel", IssuePollPanel.TITLE));
+        polls_Node.add(new ASMutableTreeNode(PollsFavoriteSplitPanel.NAME, PollsFavoriteSplitPanel.TITLE));
+        polls_Node.add(new ASMutableTreeNode(PollsMySplitPanel.NAME, PollsMySplitPanel.TITLE));
+        polls_Node.add(new ASMutableTreeNode(SearchPollsSplitPanel.NAME, SearchPollsSplitPanel.TITLE));
+        polls_Node.add(new ASMutableTreeNode(IssuePollPanel.NAME, IssuePollPanel.TITLE));
 
-        records_Node.add(new ASMutableTreeNode("FavoriteTransactionsSplitPanel", FavoriteTransactionsSplitPanel.TITLE));
-        records_Node.add(new ASMutableTreeNode("MyTransactionsSplitPanel", MyTransactionsSplitPanel.TITLE));
-        records_Node.add(new ASMutableTreeNode("SearchTransactionsSplitPanel", SearchTransactionsSplitPanel.TITLE));
-        records_Node.add(new ASMutableTreeNode("UnconfirmedTransactionsPanel", UnconfirmedTransactionsPanel.TITLE));
+        records_Node.add(new ASMutableTreeNode(FavoriteTransactionsSplitPanel.NAME, FavoriteTransactionsSplitPanel.TITLE));
+        records_Node.add(new ASMutableTreeNode(MyTransactionsSplitPanel.NAME, MyTransactionsSplitPanel.TITLE));
+        records_Node.add(new ASMutableTreeNode(SearchTransactionsSplitPanel.NAME, SearchTransactionsSplitPanel.TITLE));
+        records_Node.add(new ASMutableTreeNode(UnconfirmedTransactionsPanel.NAME, UnconfirmedTransactionsPanel.TITLE));
 
-        hashes_Node.add(new ASMutableTreeNode("ImprintsFavoriteSplitPanel", ImprintsFavoriteSplitPanel.TITLE));
-        hashes_Node.add(new ASMutableTreeNode("MyImprintsTab", MyImprintsTab.TITLE));
-        hashes_Node.add(new ASMutableTreeNode("ImprintsSearchSplitPanel", ImprintsSearchSplitPanel.TITLE));
-        hashes_Node.add(new ASMutableTreeNode("IssueImprintPanel", IssueImprintPanel.TITLE));
+        hashes_Node.add(new ASMutableTreeNode(ImprintsFavoriteSplitPanel.NAME, ImprintsFavoriteSplitPanel.TITLE));
+        hashes_Node.add(new ASMutableTreeNode(MyImprintsTab.NAME, MyImprintsTab.TITLE));
+        hashes_Node.add(new ASMutableTreeNode(ImprintsSearchSplitPanel.NAME, ImprintsSearchSplitPanel.TITLE));
+        hashes_Node.add(new ASMutableTreeNode(IssueImprintPanel.NAME, IssueImprintPanel.TITLE));
 
-        linked_hashes_Node.add(new ASMutableTreeNode("IssueLinkedHashPanel", IssueLinkedHashPanel.TITLE));
-        //linked_hashes_Node.add(new ASMutableTreeNode("SearchTransactionsSplitPanel", Lang.getInstance().translate("Search Linked Hash"), SearchTransactionsSplitPanel.TITLE));
+        linked_hashes_Node.add(new ASMutableTreeNode(IssueLinkedHashPanel.NAME, IssueLinkedHashPanel.TITLE));
+        //linked_hashes_Node.add(new ASMutableTreeNode(SearchTransactionsSplitPanel.NAME, Lang.getInstance().translate("Search Linked Hash"), SearchTransactionsSplitPanel.TITLE));
 
         //telegram
-        telegrams_Tree.add(new ASMutableTreeNode("TelegramSplitPanel", TelegramSplitPanel.TITLE));
+        telegrams_Tree.add(new ASMutableTreeNode(TelegramSplitPanel.NAME, TelegramSplitPanel.TITLE));
         if (BlockChain.TEST_MODE)
-            telegrams_Tree.add(new ASMutableTreeNode("ALLTelegramPanel", ALLTelegramPanel.TITLE));
+            telegrams_Tree.add(new ASMutableTreeNode(ALLTelegramPanel.NAME, ALLTelegramPanel.TITLE));
 
         //////// OTHER
-        other_Node.add(new ASMutableTreeNode("OtherSplitPanel", OtherSplitPanel.TITLE));
+        other_Node.add(new ASMutableTreeNode(OtherSplitPanel.NAME, OtherSplitPanel.TITLE));
         if (BlockChain.TEST_MODE)
-            other_Node.add(new ASMutableTreeNode("WalletsManagerSplitPanel", WalletsManagerSplitPanel.TITLE));
+            other_Node.add(new ASMutableTreeNode(WalletsManagerSplitPanel.NAME, WalletsManagerSplitPanel.TITLE));
 
-        other_Node.add(new ASMutableTreeNode("OtherConsolePanel", OtherConsolePanel.TITLE));
-        other_Node.add(new ASMutableTreeNode("OtherSearchBlocks", OtherSearchBlocks.TITLE));
+        other_Node.add(new ASMutableTreeNode(OtherConsolePanel.NAME, OtherConsolePanel.TITLE));
+        other_Node.add(new ASMutableTreeNode(OtherSearchBlocks.NAME, OtherSearchBlocks.TITLE));
 
         tree = new JTree(root);
         tree.setCellRenderer(new AS_tt_Render());
