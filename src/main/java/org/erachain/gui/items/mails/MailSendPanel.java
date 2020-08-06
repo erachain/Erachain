@@ -168,46 +168,6 @@ public class MailSendPanel extends JPanel {
             }
         });
 
-        // if person show selectbox with all adresses for person
-        if (person != null) {
-
-            AccountsComboBoxModel accounts_To_Model = new AccountsComboBoxModel(person.getKey());
-            this.cbx_To = new JComboBox(accounts_To_Model);
-            if (accounts_To_Model.getSize() != 0) {
-                this.add(this.cbx_To, txtToGBC);
-                txtTo.setText(cbx_To.getSelectedItem().toString());
-                Account account1 = new Account(txtTo.getText());
-                txtRecDetails.setText(account1.toString());
-                toLabel.setText(Lang.getInstance().translate("Select Account To") + ": ");
-                cbx_To.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        String str = (String) cbx_To.getSelectedItem();
-                        if (str != null) {
-                            txtTo.setText(cbx_To.getSelectedItem().toString());
-                            refreshReceiverDetails();
-                        }
-
-                    }
-                });
-            } else {
-
-                this.txtTo.setText("has no Accounts");
-                sendButton.setEnabled(false);
-
-            }
-        } else {
-
-            if (accountTo != null) {
-                if (accountTo instanceof PublicKeyAccount) {
-                    txtTo.setText(((PublicKeyAccount)accountTo).getBase58());
-                } else {
-                    txtTo.setText(accountTo.getAddress());
-                }
-            }
-            this.add(txtTo, txtToGBC);
-        }
-
         // LABEL RECEIVER
         GridBagConstraints labelDetailsGBC = new GridBagConstraints();
         labelDetailsGBC.gridy = ++y;
@@ -480,6 +440,46 @@ public class MailSendPanel extends JPanel {
 
             }
         }, 0, 500, TimeUnit.MILLISECONDS);
+
+        // if person show selectbox with all adresses for person
+        if (person != null) {
+
+            AccountsComboBoxModel accounts_To_Model = new AccountsComboBoxModel(person.getKey());
+            this.cbx_To = new JComboBox(accounts_To_Model);
+            if (accounts_To_Model.getSize() != 0) {
+                this.add(this.cbx_To, txtToGBC);
+                txtTo.setText(cbx_To.getSelectedItem().toString());
+                Account account1 = new Account(txtTo.getText());
+                txtRecDetails.setText(account1.toString());
+                toLabel.setText(Lang.getInstance().translate("Select Account To") + ": ");
+                cbx_To.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String str = (String) cbx_To.getSelectedItem();
+                        if (str != null) {
+                            txtTo.setText(cbx_To.getSelectedItem().toString());
+                            refreshReceiverDetails();
+                        }
+
+                    }
+                });
+            } else {
+
+                this.txtTo.setText("has no Accounts");
+                sendButton.setEnabled(false);
+
+            }
+        } else {
+
+            if (accountTo != null) {
+                if (accountTo instanceof PublicKeyAccount) {
+                    txtTo.setText(((PublicKeyAccount) accountTo).getBase58());
+                } else {
+                    txtTo.setText(accountTo.getAddress());
+                }
+            }
+            this.add(txtTo, txtToGBC);
+        }
 
         /*
          * this.pack(); this.setLocationRelativeTo(null);
