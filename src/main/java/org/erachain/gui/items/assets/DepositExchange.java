@@ -37,6 +37,9 @@ import java.net.URL;
 //public class PersonConfirm extends JDialog { // InternalFrame  {
 public class DepositExchange extends IconPanel {
 
+    public static String NAME = "DepositExchange";
+    public static String TITLE = "Deposit Exchange";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DepositExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
@@ -54,7 +57,7 @@ public class DepositExchange extends IconPanel {
     private JTextField jTextField_Address = new JTextField();
 
     public DepositExchange(AssetCls asset, Account account) {
-        super("DepositExchange");
+        super(NAME, TITLE);
 
         initComponents(asset, account);
         this.setVisible(true);

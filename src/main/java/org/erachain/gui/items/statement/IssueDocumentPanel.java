@@ -27,6 +27,9 @@ import java.awt.event.ActionListener;
  */
 public class IssueDocumentPanel extends IconPanel {
 
+    public static String NAME = "IssueDocumentPanel";
+    public static String TITLE = "Issue Document";
+
     private IssueDocumentPanel th;
     private ExDataPanel exData_Panel;
     private MButton jButton_Work_Cancel;
@@ -42,7 +45,7 @@ public class IssueDocumentPanel extends IconPanel {
      * Creates new form IssueDocumentPanel
      */
     public IssueDocumentPanel() {
-        super("IssueDocumentPanel");
+        super(NAME, TITLE);
         th = this;
         initComponents();
         setChecks();

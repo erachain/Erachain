@@ -18,12 +18,15 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SearchAssetsSplitPanel extends SearchItemSplitPanel  {
+public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
+
+    public static String NAME = "SearchAssetsSplitPanel";
+    public static String TITLE = "Search Assets";
+
     private static final long serialVersionUID = 1L;
 
     public SearchAssetsSplitPanel(boolean search_and_exchange) {
-        super(new ItemAssetsTableModel(), "SearchAssetsSplitPanel", "SearchAssetsSplitPanel");
-        setName(Lang.getInstance().translate("Search Assets"));
+        super(new ItemAssetsTableModel(), NAME, TITLE);
 
         // MENU
 

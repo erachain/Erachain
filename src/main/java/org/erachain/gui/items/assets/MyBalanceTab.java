@@ -21,7 +21,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class MyBalanceTab extends SplitPanel  {
+public class MyBalanceTab extends SplitPanel {
+
+    public static String NAME = "MyBalanceTab";
+    public static String TITLE = "My Balance";
 
     private static final long serialVersionUID = 1L;
     final MTable table;
@@ -30,7 +33,7 @@ public class MyBalanceTab extends SplitPanel  {
 
     @SuppressWarnings({"null", "unchecked", "rawtypes"})
     public MyBalanceTab() {
-        super("MyBalanceTab", "My Balance");
+        super(NAME, TITLE);
 
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons

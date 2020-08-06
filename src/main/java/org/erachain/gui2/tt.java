@@ -31,6 +31,7 @@ import org.erachain.gui.items.records.MyTransactionsSplitPanel;
 import org.erachain.gui.items.records.SearchTransactionsSplitPanel;
 import org.erachain.gui.items.records.UnconfirmedTransactionsPanel;
 import org.erachain.gui.items.statement.FavoriteStatementsSplitPanel;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.items.statement.SearchStatementsSplitPanel;
 import org.erachain.gui.items.statement.StatementsMySplitPanel;
 import org.erachain.gui.items.statuses.IssueStatusPanel;
@@ -144,44 +145,42 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         root.add(records_Node);
         root.add(other_Node);
 
-        bank_Tree.add(new ASMutableTreeNode("IssueSendPaymentOrder", IssueSendPaymentOrder.TITLE, ));
-        bank_Tree.add(new ASMutableTreeNode("MyOrderPaymentsSplitPanel", MyOrderPaymentsSplitPanel.TITLE);
+        bank_Tree.add(new ASMutableTreeNode("IssueSendPaymentOrder", IssueSendPaymentOrder.TITLE));
+        bank_Tree.add(new ASMutableTreeNode("MyOrderPaymentsSplitPanel", MyOrderPaymentsSplitPanel.TITLE));
 
-        account_Node.add(new ASMutableTreeNode("MyAccountsSplitPanel", MyAccountsSplitPanel.TITLE);
-        account_Node.add(new ASMutableTreeNode("MyLoansSplitPanel", MyLoansSplitPanel.TITLE);
-        account_Node.add(new ASMutableTreeNode("FavoriteAccountsSplitPanel", FavoriteAccountsSplitPanel.TITLE);
+        account_Node.add(new ASMutableTreeNode("MyAccountsSplitPanel", MyAccountsSplitPanel.TITLE));
+        account_Node.add(new ASMutableTreeNode("MyLoansSplitPanel", MyLoansSplitPanel.TITLE));
+        account_Node.add(new ASMutableTreeNode("FavoriteAccountsSplitPanel", FavoriteAccountsSplitPanel.TITLE));
 
         // account_Node.add(new
         // DefaultMutableTreeNode(Lang.getInstance().translate("Search
         // Accounts")));
         // account_Node.add(new DefaultMutableTreeNode("Issue Account"));
 
-        person_Node.add(new ASMutableTreeNode("PersonsFavoriteSplitPanel", PersonsFavoriteSplitPanel.TITLE);
-        person_Node.add(new ASMutableTreeNode("PersonsMySplitPanel", PersonsMySplitPanel.TITLE);
-        person_Node.add(new ASMutableTreeNode("SearchPersonsSplitPanel", SearchPersonsSplitPanel.TITLE);
+        person_Node.add(new ASMutableTreeNode("PersonsFavoriteSplitPanel", PersonsFavoriteSplitPanel.TITLE));
+        person_Node.add(new ASMutableTreeNode("PersonsMySplitPanel", PersonsMySplitPanel.TITLE));
+        person_Node.add(new ASMutableTreeNode("SearchPersonsSplitPanel", SearchPersonsSplitPanel.TITLE));
         person_Node.add(new ASMutableTreeNode("IssuePersonPanel", IssuePersonPanel.TITLE));
-        person_Node.add(new ASMutableTreeNode("InsertPersonPanel", InsertPersonPanel.TITLE);
+        person_Node.add(new ASMutableTreeNode("InsertPersonPanel", InsertPersonPanel.TITLE));
 
-        document_Node.add(new ASMutableTreeNode("FavoriteStatementsSplitPanel", Lang.getInstance().translate("Favorite Documents"), FavoriteStatementsSplitPanel.getIcon()));
-        document_Node.add(new ASMutableTreeNode("StatementsMySplitPanel", Lang.getInstance().translate("My Documents"), StatementsMySplitPanel.getIcon()));
-        document_Node.add(new ASMutableTreeNode("SearchStatementsSplitPanel", Lang.getInstance().translate("Search Documents"), SearchStatementsSplitPanel.getIcon()));
-        //document_Node.add(new ASMutableTreeNode("IssueDocumentPanel", Lang.getInstance().translate("Issue Document"), IssueDocumentPanel.getIcon()));
-        document_Node.add(new ASMutableTreeNode("IssueDocumentPanel", Lang.getInstance().translate("Issue Document"),
-                IconPanel.getIcon(IssueDocumentPanel)));
+        document_Node.add(new ASMutableTreeNode("FavoriteStatementsSplitPanel", FavoriteStatementsSplitPanel.TITLE));
+        document_Node.add(new ASMutableTreeNode("StatementsMySplitPanel", StatementsMySplitPanel.TITLE));
+        document_Node.add(new ASMutableTreeNode("SearchStatementsSplitPanel", SearchStatementsSplitPanel.TITLE));
+        document_Node.add(new ASMutableTreeNode("IssueDocumentPanel", IssueDocumentPanel.TITLE));
 
-        mails_Node.add(new ASMutableTreeNode("IncomingMailsSplitPanel", Lang.getInstance().translate("Incoming Mails"), IncomingMailsSplitPanel.getIcon()));
-        mails_Node.add(new ASMutableTreeNode("OutcomingMailsSplitPanel", Lang.getInstance().translate("Outcoming Mails"), OutcomingMailsSplitPanel.getIcon()));
-        mails_Node.add(new ASMutableTreeNode("MailSendPanel", Lang.getInstance().translate("Send Mail"), MailSendPanel.getIcon()));
+        mails_Node.add(new ASMutableTreeNode("IncomingMailsSplitPanel", IncomingMailsSplitPanel.TITLE));
+        mails_Node.add(new ASMutableTreeNode("OutcomingMailsSplitPanel", OutcomingMailsSplitPanel.TITLE));
+        mails_Node.add(new ASMutableTreeNode("MailSendPanel", MailSendPanel.TITLE));
 
-        assets_Node.add(new ASMutableTreeNode("AssetsFavoriteSplitPanel", Lang.getInstance().translate("Favorite Assets"), AssetsFavoriteSplitPanel.getIcon()));
-        assets_Node.add(new ASMutableTreeNode("AssetsMySplitPanel", Lang.getInstance().translate("My Assets"), AssetsMySplitPanel.getIcon()));
-        assets_Node.add(new ASMutableTreeNode("SearchAssetsSplitPanel", Lang.getInstance().translate("Search Assets"), SearchAssetsSplitPanel.getIcon()));
-        assets_Node.add(new ASMutableTreeNode("IssueAssetPanel", Lang.getInstance().translate("Issue Asset"), IssueAssetPanel.getIcon()));
-        assets_Node.add(new ASMutableTreeNode("MyBalanceTab", Lang.getInstance().translate("My Balance"), MyBalanceTab.getIcon()));
+        assets_Node.add(new ASMutableTreeNode("AssetsFavoriteSplitPanel", AssetsFavoriteSplitPanel.TITLE));
+        assets_Node.add(new ASMutableTreeNode("AssetsMySplitPanel", AssetsMySplitPanel.TITLE));
+        assets_Node.add(new ASMutableTreeNode("SearchAssetsSplitPanel", SearchAssetsSplitPanel.TITLE));
+        assets_Node.add(new ASMutableTreeNode("IssueAssetPanel", IssueAssetPanel.TITLE));
+        assets_Node.add(new ASMutableTreeNode("MyBalanceTab", MyBalanceTab.TITLE));
 
         if (Settings.EXCHANGE_IN_OUT) {
-            exchange_Node.add(new ASMutableTreeNode("DepositExchange", Lang.getInstance().translate("Deposit Exchange"), DepositExchange.getIcon()));
-            exchange_Node.add(new ASMutableTreeNode("WithdrawExchange", Lang.getInstance().translate("Withdraw Exchange"), WithdrawExchange.getIcon()));
+            exchange_Node.add(new ASMutableTreeNode("DepositExchange", DepositExchange.TITLE));
+            exchange_Node.add(new ASMutableTreeNode("WithdrawExchange", WithdrawExchange.TITLE));
         }
         exchange_Node.add(new ASMutableTreeNode("ExchangePanel", Lang.getInstance().translate("Exchange"), ExchangePanel.getIcon()));
         exchange_Node.add(new ASMutableTreeNode("MyOrderTab", Lang.getInstance().translate("My Orders"), MyOrderTab.getIcon()));

@@ -27,18 +27,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class IncomingMailsSplitPanel extends SplitPanel {
+
+    public static String NAME = "IncomingMailsSplitPanel";
+    public static String TITLE = "Incoming Mails";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    // для прозрачности
-    int alpha = 255;
-    int alpha_int;
     private TableModelMails incoming_Mails_Model;
     private MTable inciming_Mail_Table;
     private TableRowSorter my_Sorter;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "IncomingMailsSplitPanel.png";
 
     public IncomingMailsSplitPanel() {
-        super("IncomingMailsSplitPanel", title);
-        this.setName(Lang.getInstance().translate("Incoming Mails"));
+        super(NAME, TITLE);
         this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
@@ -245,16 +244,6 @@ public class IncomingMailsSplitPanel extends SplitPanel {
             ((DefaultRowSorter) my_Sorter).setRowFilter(filter);
             incoming_Mails_Model.fireTableDataChanged();
 
-        }
-    }
-
-    public static  Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
         }
     }
 

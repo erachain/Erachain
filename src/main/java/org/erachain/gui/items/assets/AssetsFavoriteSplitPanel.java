@@ -18,11 +18,15 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class AssetsFavoriteSplitPanel extends ItemSplitPanel   {
+public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
+
+    public static String NAME = "AssetsFavoriteSplitPanel";
+    public static String TITLE = "Favorite Assets";
+
     private static final long serialVersionUID = 2717571093561259483L;
 
     public AssetsFavoriteSplitPanel() {
-        super(new FavoriteAssetsTableModel(), "AssetsFavoriteSplitPanel", "Favorite Assets");
+        super(new FavoriteAssetsTableModel(), NAME, TITLE);
 
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
 

@@ -30,21 +30,19 @@ import java.util.ArrayList;
 
 public class SearchStatementsSplitPanel extends SplitPanel {
 
+    public static String NAME = "SearchStatementsSplitPanel";
+    public static String TITLE = "Search Documents";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchStatementsSplitPanel.png";
-    // для прозрачности
-    int alpha = 255;
-    int alpha_int;
     private StatementsTableModelSearch search_Table_Model;
-    // private MTable search_Table;
     private RowSorter<ItemsPersonsTableModel> search_Sorter;
     private int selected_Item;
     private JTextField key_Item;
     Wallet wallet = Controller.getInstance().wallet;
 
     public SearchStatementsSplitPanel() {
-        super("SearchStatementsSplitPanel", title);
-        setName(Lang.getInstance().translate("Search Statements"));
+        super(NAME, TITLE);
+
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         this.searchToolBar_LeftPanel.setVisible(true);
         this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
@@ -329,13 +327,4 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         }
     }
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

@@ -28,20 +28,20 @@ import java.util.ArrayList;
 
 public class FavoriteStatementsSplitPanel extends SplitPanel {
 
+    public static String NAME = "FavoriteStatementsSplitPanel";
+    public static String TITLE = "Favorite Documents";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "FavoriteStatementsSplitPanel.png";
 
     // для прозрачности
     int alpha = 255;
     int alpha_int;
-    // private StatementsTableModelFavorite search_Table_Model;
+
     private FavoriteStatementsTableModel favotitesTable;
-    //	private MTable search_Table;
     private RowSorter<FavoriteStatementsTableModel> search_Sorter;
 
     public FavoriteStatementsSplitPanel() {
-        super("FavoriteStatementsSplitPanel", title);
-        setName(Lang.getInstance().translate("Favorite Documents"));
+        super(NAME, TITLE);
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
         // not show buttons
@@ -241,16 +241,6 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         }
         ((TimerTableModelCls) jTableJScrollPanelLeftPanel.getModel()).fireTableDataChanged();
 
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 
 }

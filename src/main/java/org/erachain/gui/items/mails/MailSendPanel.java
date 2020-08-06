@@ -45,6 +45,9 @@ import java.util.concurrent.TimeUnit;
 
 public class MailSendPanel extends IconPanel {
 
+    public static String NAME = "MailSendPanel";
+    public static String TITLE = "Send Mail";
+
     // TODO - "A" - &
     final static String wrongFirstCharOfAddress = "A";
     // private final MessagesTableModel messagesTableModel;
@@ -68,14 +71,11 @@ public class MailSendPanel extends IconPanel {
 
     public MailSendPanel(Account accountFrom, Account accountTo, PersonCls person) {
 
-        super("MailSendPanel");
+        super(NAME, TITLE);
         th = this;
         this.person = person;
         sendButton = new MButton(Lang.getInstance().translate("Send"), 2);
         y = 0;
-
-        this.setName(Lang.getInstance().translate("Send Mail"));
-        //asset = Controller.getInstance().getAsset(2l);
 
         GridBagLayout gridBagLayout = new GridBagLayout();
         // gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
@@ -356,7 +356,7 @@ public class MailSendPanel extends IconPanel {
         feetxtGBC.gridy = y;
 
         txtFeePow = new JComboBox<String>();
-        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         txtFeePow.setSelectedIndex(0);
         txtFeePow.setPreferredSize(new Dimension(130, 22));
         txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
@@ -612,7 +612,7 @@ public class MailSendPanel extends IconPanel {
 
             // READ FEE
             parsing = 2;
-            feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
+            feePow = Integer.parseInt((String) this.txtFeePow.getSelectedItem());
         } catch (Exception e) {
             // CHECK WHERE PARSING ERROR HAPPENED
             switch (parsing) {

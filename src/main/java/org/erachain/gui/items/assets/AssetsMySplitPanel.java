@@ -21,10 +21,14 @@ import java.net.URL;
 
 
 public class AssetsMySplitPanel extends ItemSplitPanel {
+
+    public static String NAME = "AssetsMySplitPanel";
+    public static String TITLE = "My Assets";
+
     private static final long serialVersionUID = 2717571093561259483L;
 
     public AssetsMySplitPanel() {
-        super(new WalletItemAssetsTableModel(), "AssetsMySplitPanel", "My Assets");
+        super(new WalletItemAssetsTableModel(), NAME, TITLE);
 
         //      add items in menu
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));

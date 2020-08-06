@@ -31,6 +31,9 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
  */
 public class IssueAssetPanel extends IconPanel {
 
+    public static String NAME = "IssueAssetPanel";
+    public static String TITLE = "Issue Asset";
+
     private JLabel titleJLabel = new JLabel();
     private JLabel accountJLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
     private JLabel descriptionJLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
@@ -57,12 +60,12 @@ public class IssueAssetPanel extends IconPanel {
     private AssetTypesComboBoxModel assetTypesComboBoxModel;
 
     public IssueAssetPanel() {
-        super("IssueAssetPanel");
+        super(NAME, TITLE);
         initComponents();
         titleJLabel.setFont(FONT_TITLE);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-        titleJLabel.setText(Lang.getInstance().translate("Issue Asset"));
+        titleJLabel.setText(Lang.getInstance().translate(TITLE));
         textAreaDescription.setLineWrap(true);
         textQuantity.setMaskType(textQuantity.maskLong);
         textQuantity.setText("0");

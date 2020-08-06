@@ -28,10 +28,12 @@ import java.util.TimerTask;
 
 
 public class StatementsMySplitPanel extends SplitPanel {
+
+    public static String NAME = "StatementsMySplitPanel";
+    public static String TITLE = "My Documents";
+
     private static final long serialVersionUID = 2717571093561259483L;
 
-
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "StatementsMySplitPanel.png";
     // для прозрачности
     int alpha = 255;
     int alpha_int;
@@ -43,9 +45,8 @@ public class StatementsMySplitPanel extends SplitPanel {
 
 
     public StatementsMySplitPanel() {
-        super("StatementsMySplitPanel", title);
+        super(NAME, TITLE);
 
-        this.setName(Lang.getInstance().translate("My Statements"));
         this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
@@ -249,15 +250,4 @@ public class StatementsMySplitPanel extends SplitPanel {
         ((TimerTableModelCls) jTableJScrollPanelLeftPanel.getModel()).fireTableDataChanged();
 
     }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
-
 }
