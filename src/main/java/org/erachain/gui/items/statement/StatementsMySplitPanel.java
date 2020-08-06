@@ -17,6 +17,7 @@ import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
@@ -105,9 +106,14 @@ public class StatementsMySplitPanel extends SplitPanel {
 			*/        // SET VIDEO
         //this.jTableJScrollPanelLeftPanel.setModel(my_PersonsModel);
         this.jTableJScrollPanelLeftPanel = new MTable(my_Statements_Model); //my_Statements_table;
+
+        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
+        columnModel.getColumn(my_Statements_Model.COLUMN_FAVORITE).setMaxWidth(150);
+
         //this.jTableJScrollPanelLeftPanel.setTableHeader(null);
         // sorter
         search_Sorter = new TableRowSorter(my_Statements_Model);
+
 
         // hand cursor for Favorite column
         jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionAdapter() {

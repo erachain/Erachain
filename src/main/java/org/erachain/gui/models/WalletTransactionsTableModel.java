@@ -143,7 +143,6 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
                 }
 
             case COLUMN_FEE:
-
                 return transaction.getFee();
 
             case COLUMN_SIZE:

@@ -31,6 +31,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -94,9 +95,9 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         // favoriteColumn.setMaxWidth(50);
         // favoriteColumn.setPreferredWidth(50);//.setWidth(30);
         // column #1
-        TableColumn column1 = imprintsTable.getColumnModel().getColumn(WalletItemImprintsTableModel.COLUMN_KEY);// .COLUMN_CONFIRMED);
-        column1.setMinWidth(1);
-        column1.setMaxWidth(1000);
+        TableColumnModel columnModel = imprintsTable.getColumnModel();
+        TableColumn column1 = columnModel.getColumn(WalletItemImprintsTableModel.COLUMN_KEY);// .COLUMN_CONFIRMED);
+        column1.setMaxWidth(100);
         column1.setPreferredWidth(50);
 
         // set showvideo

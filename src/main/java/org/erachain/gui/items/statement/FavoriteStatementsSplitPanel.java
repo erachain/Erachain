@@ -18,6 +18,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
@@ -59,6 +60,10 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new search_tab_filter());
         // SET VIDEO
         jTableJScrollPanelLeftPanel = new MTable(this.favotitesTable);
+
+        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
+        columnModel.getColumn(favotitesTable.COLUMN_FAVORITE).setMaxWidth(150);
+
         //	jTableJScrollPanelLeftPanel = search_Table;
         //sorter from 0 column
         search_Sorter = new TableRowSorter(favotitesTable);

@@ -55,6 +55,8 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
         columnModel.getColumn(0).setMaxWidth((100));
+        columnModel.getColumn(tableModel.COLUMN_FAVORITE).setMaxWidth(100);
+
         // иконку будем рисовать
         try {
             columnModel.getColumn(tableModel.COLUMN_FOR_ICON)

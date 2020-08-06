@@ -51,6 +51,7 @@ public class MyStatusesTab extends SplitPanel {
 
         TableColumnModel columnModel = table.getColumnModel(); // read column model
         columnModel.getColumn(0).setMaxWidth((100));
+        columnModel.getColumn(statusesModel.COLUMN_FAVORITE).setMaxWidth(100);
 
 
         TableRowSorter sorter1 = new TableRowSorter(statusesModel);

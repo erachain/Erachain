@@ -21,6 +21,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -56,6 +57,10 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         this.records_model = new WalletTransactionsTableModel();
         this.jTableJScrollPanelLeftPanel = new MTable(this.records_model);
         this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
+
+        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
+        columnModel.getColumn(0).setMaxWidth((100));
+        columnModel.getColumn(records_model.COLUMN_FAVORITE).setMaxWidth((100));
 
         // not show buttons
         jToolBarRightPanel.setVisible(true);

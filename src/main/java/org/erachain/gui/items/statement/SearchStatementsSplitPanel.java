@@ -7,7 +7,6 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.models.RendererBoolean;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -20,7 +19,7 @@ import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
@@ -87,18 +86,9 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         search_Table_Model = new StatementsTableModelSearch();
         jTableJScrollPanelLeftPanel = new MTable(this.search_Table_Model);
 
-
-        // Custom renderer for the String column;
-        // this.search_Table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION
-        // );
-
         // CHECKBOX FOR FAVORITE
-        TableColumn favoriteColumn = jTableJScrollPanelLeftPanel.getColumnModel()
-                .getColumn(search_Table_Model.COLUMN_FAVORITE);
-        favoriteColumn.setCellRenderer(new RendererBoolean());
-        favoriteColumn.setMinWidth(100);
-        favoriteColumn.setMaxWidth(150);
-        favoriteColumn.setPreferredWidth(100);
+        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
+        columnModel.getColumn(search_Table_Model.COLUMN_FAVORITE).setMaxWidth(150);
 
         // hand cursor for Favorite column
         jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionListener() {
