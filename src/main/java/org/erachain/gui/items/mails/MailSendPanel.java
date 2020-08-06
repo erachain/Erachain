@@ -51,7 +51,7 @@ public class MailSendPanel extends IconPanel {
     // TODO - "A" - &
     final static String wrongFirstCharOfAddress = "A";
     // private final MessagesTableModel messagesTableModel;
-    private final JTable table;
+    private final JTable messagesHistoryTable;
     public JTextArea txtMessage;
     public JTextField txt_Title;
     int y;
@@ -392,14 +392,14 @@ public class MailSendPanel extends IconPanel {
 
         // MESSAGES HISTORY TABLE
 
-        table = new SendTableModel();
+        messagesHistoryTable = new SendTableModel();
 
-        table.setTableHeader(null);
-        table.setEditingColumn(0);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(100, 100));
-        scrollPane.setWheelScrollingEnabled(true);
+        messagesHistoryTable.setTableHeader(null);
+        messagesHistoryTable.setEditingColumn(0);
+        messagesHistoryTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane historyScrollPane = new JScrollPane(messagesHistoryTable);
+        historyScrollPane.setPreferredSize(new Dimension(100, 100));
+        historyScrollPane.setWheelScrollingEnabled(true);
 
         // BOTTOM GBC
         GridBagConstraints messagesGBC = new GridBagConstraints();
@@ -414,13 +414,13 @@ public class MailSendPanel extends IconPanel {
         messagesGBC.weighty = 4;
         messagesGBC.gridwidth = 5;
 
-        // add(scrollPane, messagesGBC);
+        add(historyScrollPane, messagesGBC);
 
         // BUTTON DECRYPTALL
         decryptButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ((SendTableModel) table).CryptoOpenBoxAll();
+                ((SendTableModel) messagesHistoryTable).CryptoOpenBoxAll();
             }
         });
 

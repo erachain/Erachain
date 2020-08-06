@@ -93,9 +93,11 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
                 int row = inciming_Mail_Table.getSelectedRow();
                 row = inciming_Mail_Table.convertRowIndexToModel(row);
-                Account account = incoming_Mails_Model.getItem(row).getCreator();
+                RSend rSend = (RSend) incoming_Mails_Model.getItem(row);
+                Account account = new Account(rSend.getCreator().getAddress());
+                Account recipient = rSend.getRecipient();
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, account, null));
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(recipient, account, null));
 
             }
         });
