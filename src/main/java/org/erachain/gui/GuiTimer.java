@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Observer;
 
 /**
- * только запускает событи - "обновиться"
+ * только запускает событие - "обновиться"
  * Используется в gui.Library.SetIntervalPanel#syncUpdate(java.util.Observable, java.lang.Object) и других
  */
 public class GuiTimer extends Thread {
