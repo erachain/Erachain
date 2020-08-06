@@ -3,7 +3,6 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.statuses.StatusCls;
-import org.erachain.datachain.DCSet;
 
 @SuppressWarnings("serial")
 public class WalletItemStatusesTableModel extends WalletTableModel<StatusCls> {
@@ -30,27 +29,21 @@ public class WalletItemStatusesTableModel extends WalletTableModel<StatusCls> {
 
         switch (column) {
             case COLUMN_KEY:
-
-                return status.getKey(DCSet.getInstance());
+                return status.getKey();
 
             case COLUMN_NAME:
-
-                return status.viewName();
+                return status;
 
             case COLUMN_ADDRESS:
-
                 return status.getOwner().getPersonAsString();
 
             case COLUMN_CONFIRMED:
-
                 return status.isConfirmed();
 
             case COLUMN_FAVORITE:
-
                 return status.isFavorite();
 
             case COLUMN_UNIQUE:
-
                 return status.isUnique();
 
         }

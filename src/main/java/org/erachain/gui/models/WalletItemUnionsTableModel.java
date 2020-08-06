@@ -30,23 +30,18 @@ public class WalletItemUnionsTableModel extends WalletTableModel<UnionCls> {
 
         switch (column) {
             case COLUMN_KEY:
-
                 return union.getKey(DCSet.getInstance());
 
             case COLUMN_NAME:
-
-                return union.viewName();
+                return union;
 
             case COLUMN_ADDRESS:
-
                 return union.getOwner().getPersonAsString();
 
             case COLUMN_CONFIRMED:
-
                 return union.isConfirmed();
 
             case COLUMN_FAVORITE:
-
                 return union.isFavorite();
 
         }

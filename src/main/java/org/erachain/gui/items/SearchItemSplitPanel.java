@@ -25,8 +25,8 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
         // CHECKBOX FOR FAVORITE
         TableColumn favorite_Column = jTableJScrollPanelLeftPanel.getColumnModel()
                 .getColumn(search_Table_Model.COLUMN_FAVORITE);
-        favorite_Column.setMaxWidth(100);
-        favorite_Column.setPreferredWidth(50);
+        favorite_Column.setMaxWidth(150);
+
         // search Panel
         this.searchToolBar_LeftPanel.setVisible(true);
         this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key") + ":"));
