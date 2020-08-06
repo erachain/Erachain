@@ -20,10 +20,14 @@ import java.net.URL;
 
 
 public class PersonsMySplitPanel extends ItemSplitPanel {
+
+    public static String NAME = "PersonsMySplitPanel";
+    public static String TITLE = "Favorite Persons";
+
     private static final long serialVersionUID = 2717571093561259483L;
 
     public PersonsMySplitPanel() {
-        super(new WalletItemPersonsTableModel(), "PersonsMySplitPanel", "My Persons");
+        super(new WalletItemPersonsTableModel(), NAME, TITLE);
 
         // add items in menu
         JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status to Person"));

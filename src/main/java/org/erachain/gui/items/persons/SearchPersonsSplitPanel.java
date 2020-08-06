@@ -22,11 +22,13 @@ import java.net.URL;
 
 public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
+    public static String NAME = "SearchPersonsSplitPanel";
+    public static String TITLE = "Search Persons";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchPersonsSplitPanel.png";
 
     public SearchPersonsSplitPanel() {
-        super(new ItemsPersonsTableModel(), "SearchPersonsSplitPanel", "SearchPersonsSplitPanel");
+        super(new ItemsPersonsTableModel(), NAME, TITLE);
 
         JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
 
@@ -129,14 +131,4 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
     }
 
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

@@ -40,6 +40,10 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
 public class IssuePersonPanel extends IconPanel {
+
+    public static String NAME = "IssuePersonPanel";
+    public static String TITLE = "Issue Person";
+
     private static final Logger logger = LoggerFactory.getLogger(IssuePersonPanel.class);
     protected JLabel titleJLabel = new JLabel();
     protected JComboBox<Account> cbxFrom = new JComboBox<>();
@@ -76,8 +80,8 @@ public class IssuePersonPanel extends IconPanel {
     protected JPanel mainPanel = new JPanel();
     private JScrollPane mainScrollPane1 = new JScrollPane();
 
-    public IssuePersonPanel() {
-        super("IssuePersonPanel");
+    public IssuePersonPanel(String name, String title) {
+        super(name, title);
         initComponents();
         initLabels();
         titleJLabel.setFont(FONT_TITLE);
@@ -105,6 +109,10 @@ public class IssuePersonPanel extends IconPanel {
         comboBoxGender.setModel(new DefaultComboBoxModel<>(items));
         comboBoxGender.setSelectedIndex(2);
         setVisible(true);
+    }
+
+    public IssuePersonPanel() {
+        this(NAME, TITLE);
     }
 
     private void initLabels() {

@@ -157,10 +157,10 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         // account_Node.add(new DefaultMutableTreeNode("Issue Account"));
 
         person_Node.add(new ASMutableTreeNode("PersonsFavoriteSplitPanel", PersonsFavoriteSplitPanel.TITLE);
-        person_Node.add(new ASMutableTreeNode("PersonsMySplitPanel", Lang.getInstance().translate("My Persons"), PersonsMySplitPanel.getIcon()));
-        person_Node.add(new ASMutableTreeNode("SearchPersonsSplitPanel", Lang.getInstance().translate("Search Persons"), SearchPersonsSplitPanel.getIcon()));
-        person_Node.add(new ASMutableTreeNode("IssuePersonPanel", Lang.getInstance().translate("Issue Person"), IssuePersonPanel.getIcon()));
-        person_Node.add(new ASMutableTreeNode("InsertPersonPanel", Lang.getInstance().translate("Insert Person"), InsertPersonPanel.getIcon()));
+        person_Node.add(new ASMutableTreeNode("PersonsMySplitPanel", PersonsMySplitPanel.TITLE);
+        person_Node.add(new ASMutableTreeNode("SearchPersonsSplitPanel", SearchPersonsSplitPanel.TITLE);
+        person_Node.add(new ASMutableTreeNode("IssuePersonPanel", IssuePersonPanel.TITLE));
+        person_Node.add(new ASMutableTreeNode("InsertPersonPanel", InsertPersonPanel.TITLE);
 
         document_Node.add(new ASMutableTreeNode("FavoriteStatementsSplitPanel", Lang.getInstance().translate("Favorite Documents"), FavoriteStatementsSplitPanel.getIcon()));
         document_Node.add(new ASMutableTreeNode("StatementsMySplitPanel", Lang.getInstance().translate("My Documents"), StatementsMySplitPanel.getIcon()));
