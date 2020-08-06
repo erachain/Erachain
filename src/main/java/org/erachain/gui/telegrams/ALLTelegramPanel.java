@@ -28,9 +28,11 @@ public class ALLTelegramPanel extends IconPanel {
     public TelegramsTableModel walletTelegramsFilterTableModel;
     protected int row;
 
+    public static String NAME = "ALLTelegramPanel";
+    public static String TITLE = "";
 
     public ALLTelegramPanel() {
-        super("ALLTelegramPanel");
+        super(NAME, TITLE);
         walletTelegramsFilterTableModel = new TelegramsTableModel();
         jTableMessages = new MTable(walletTelegramsFilterTableModel);
 

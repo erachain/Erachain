@@ -24,7 +24,7 @@ public class AccountAssetSendPanel extends AccountAssetActionPanelCls  {
     public boolean noRecive;
     private static String iconFile = Settings.getInstance().getPatnIcons() + "AccountAssetSendPanel.png";
     public AccountAssetSendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person, String message) {
-        super(false, null, assetIn, null, TransactionAmount.ACTION_SEND, accountFrom, accountTo, message);
+        super(null, null, false, assetIn, TransactionAmount.ACTION_SEND, accountFrom, accountTo, message);
 
         //  icon.setIcon(null);
 

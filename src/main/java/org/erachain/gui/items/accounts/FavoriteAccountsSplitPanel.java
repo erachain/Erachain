@@ -45,10 +45,9 @@ import java.util.Set;
 
 public class FavoriteAccountsSplitPanel extends SplitPanel {
 
-    /**
-     *
-     */
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "AccountsNameSearchSplitPanel.png";
+    public static String NAME = "FavoriteAccountsSplitPanel";
+    public static String TITLE = "Favorite Accounts";
+
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = LoggerFactory.getLogger(FavoriteAccountsSplitPanel.class);
     protected FileChooser chooser;
@@ -58,7 +57,8 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
     private FavoriteAccountsMap accountsMap;
 
     public FavoriteAccountsSplitPanel() {
-        super("AccountsNameSearchSplitPanel", title);
+        super(NAME, TITLE);
+
         GridBagLayout gridBagLayout = (GridBagLayout) leftPanel.getLayout();
         gridBagLayout.rowWeights = new double[]{0.0, 0.0};
         gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0};
@@ -66,7 +66,6 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         if (Controller.getInstance().doesWalletDatabaseExists())
             accountsMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
 
-        setName(Lang.getInstance().translate("Favorite Accounts"));
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         searthLabelSearchToolBarLeftPanel.setVisible(true);
         // this.searchTextFieldSearchToolBarLeftPanelDocument.setVisible(true);
@@ -459,16 +458,6 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         // if (c1 instanceof ImprintsInfoPanel) (
         // (ImprintsInfoPanel)c1).delay_on_Close();
 
-    }
-
-    public static  Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 
 }

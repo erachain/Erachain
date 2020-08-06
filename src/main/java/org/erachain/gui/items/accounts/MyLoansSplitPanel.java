@@ -3,27 +3,26 @@ package org.erachain.gui.items.accounts;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.SplitPanel;
-import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 
 // панель моих адресов
-public class MyLoansSplitPanel extends SplitPanel  {
+public class MyLoansSplitPanel extends SplitPanel {
 
     public AccountsPanel accountPanel;
     public AccountsRightPanel rightPanel;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyLoansSplitPanel.png";
+
+    public static String NAME = "MyLoansSplitPanel";
+    public static String TITLE = "My Loans";
 
     public MyLoansSplitPanel() {
-        super("MyLoansSplitPanel", title);
-         //	LayoutManager favoritesGBC = this.getLayout();
+        super(NAME, TITLE);
+        //	LayoutManager favoritesGBC = this.getLayout();
         this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
         this.toolBarLeftPanel.setVisible(false);
-        this.setName(Lang.getInstance().translate("My Loans"));
         this.jToolBarRightPanel.setVisible(false);
 
         GridBagConstraints PanelGBC = new GridBagConstraints();
@@ -69,16 +68,5 @@ public class MyLoansSplitPanel extends SplitPanel  {
         }
 
     }
-
-    public static  Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
-
 
 }

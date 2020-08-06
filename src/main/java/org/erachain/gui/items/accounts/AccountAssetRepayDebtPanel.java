@@ -21,7 +21,7 @@ public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls  {
     // private final MessagesTableModel messagesTableModel;
     private static String iconFile = Settings.getInstance().getPatnIcons() + "AccountAssetRepayDebtPanel.png";
     public AccountAssetRepayDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super(false, null, assetIn, null,
+        super(null, null, false, assetIn,
                 TransactionAmount.ACTION_REPAY_DEBT, accountFrom, accountTo, null);
 
         // icon.setIcon(null);

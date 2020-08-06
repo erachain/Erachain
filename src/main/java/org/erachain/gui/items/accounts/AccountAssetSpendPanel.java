@@ -23,7 +23,7 @@ public class AccountAssetSpendPanel extends AccountAssetActionPanelCls {
     public boolean noRecive;
     private static String iconFile = Settings.getInstance().getPatnIcons()+ "AccountAssetSpendPanel.png";
     public AccountAssetSpendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person, String message) {
-        super(false, null, assetIn, null, TransactionAmount.ACTION_SPEND, accountFrom, accountTo, message);
+        super(null, null, false, assetIn, TransactionAmount.ACTION_SPEND, accountFrom, accountTo, message);
 
         //  icon.setIcon(null);
 

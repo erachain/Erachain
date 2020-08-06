@@ -23,8 +23,8 @@ public class AccountAssetLendPanel extends AccountAssetActionPanelCls  {
     private static String iconFile = Settings.getInstance().getPatnIcons()+ "AccountAssetLendPanel.png";
     public AccountAssetLendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
         // "If You want to give a loan asset %asset%, fill in this form"
-        super(false, null, assetIn,
-                null, TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
+        super(null, null, false, assetIn,
+                TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         //	icon.setIcon(null);
 

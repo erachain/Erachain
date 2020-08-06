@@ -20,7 +20,7 @@ public class AccountAssetHoldPanel extends AccountAssetActionPanelCls  {
     private static String iconFile = Settings.getInstance().getPatnIcons() + "AccountAssetHoldPanel.png";
 
     public AccountAssetHoldPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super(true, null, assetIn, null, TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
+        super(null, null, true, assetIn, TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
 
         //	icon.setIcon(null);
 

@@ -78,11 +78,11 @@ public class AccountAssetActionPanelCls extends IconPanel {
 
     private AccountsComboBoxModel accountsModel;
 
-    public AccountAssetActionPanelCls(boolean backward, String panelName, AssetCls assetIn, String titleIn,
+    public AccountAssetActionPanelCls(String panelName, String title, boolean backward, AssetCls assetIn,
                                       int balancePosition,
                                       Account accountFrom, Account accountTo, String message) {
 
-        super("AccountAssetActionPanelCls");
+        super(panelName, title);
         if (assetIn == null)
             this.asset = Controller.getInstance().getAsset(2);
         else
@@ -90,16 +90,13 @@ public class AccountAssetActionPanelCls extends IconPanel {
 
         // необходимо входящий параметр отделить так как ниже он по событию изменения актива будет как НУЛь вызваться
         // поэтому тут только приватную переменную юзаем дальше
-        if (titleIn == null) {
+        if (title == null) {
             this.title = asset.viewAssetTypeActionTitle(backward, balancePosition);
-        } else {
-            this.title = titleIn;
         }
 
         if (panelName == null) {
-            setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition)) + " [" + asset.getKey() + " ]");
-        } else {
-            setName(Lang.getInstance().translate(panelName));
+            this.panelName = Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition)) + " [" + asset.getKey() + " ]";
+            setName(this.panelName);
         }
 
         this.account = accountFrom;
@@ -206,8 +203,8 @@ public class AccountAssetActionPanelCls extends IconPanel {
                         jComboBox_Account.repaint();
                     }
 
-                    String titleLocal = Lang.getInstance().translate(title);
-                    jLabel_Title.setText((titleLocal == null ? title : titleLocal).replace("%asset%", asset.viewName()));
+                    String titleLocal = Lang.getInstance().translate(AccountAssetActionPanelCls.this.title);
+                    jLabel_Title.setText((titleLocal == null ? AccountAssetActionPanelCls.this.title : titleLocal).replace("%asset%", asset.viewName()));
 
                     if (panelName == null) {
                         setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition)) + " ]" + asset.getKey() + " ]");

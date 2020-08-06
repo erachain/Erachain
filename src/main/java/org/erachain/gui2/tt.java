@@ -144,20 +144,19 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         root.add(records_Node);
         root.add(other_Node);
 
-        bank_Tree.add(new ASMutableTreeNode("IssueSendPaymentOrder",
-                IssueSendPaymentOrder.TITLE, IconPanel.getIcon(IssueSendPaymentOrder.ICON)));
-        bank_Tree.add(new ASMutableTreeNode("MyOrderPaimentsSplitPanel", MyOrderPaymentsSplitPanel.TI"My Payments Orders", MyOrderPaymentsSplitPanel.getIcon()));
+        bank_Tree.add(new ASMutableTreeNode("IssueSendPaymentOrder", IssueSendPaymentOrder.TITLE, ));
+        bank_Tree.add(new ASMutableTreeNode("MyOrderPaymentsSplitPanel", MyOrderPaymentsSplitPanel.TITLE);
 
-        account_Node.add(new ASMutableTreeNode("MyAccountsSplitPanel", Lang.getInstance().translate("My Accounts"), MyAccountsSplitPanel.getIcon()));
-        account_Node.add(new ASMutableTreeNode("MyLoansSplitPanel", Lang.getInstance().translate("My Loans"), MyLoansSplitPanel.getIcon()));
-        account_Node.add(new ASMutableTreeNode("FavoriteAccountsSplitPanel", Lang.getInstance().translate("Favorite Accounts"), FavoriteAccountsSplitPanel.getIcon()));
+        account_Node.add(new ASMutableTreeNode("MyAccountsSplitPanel", MyAccountsSplitPanel.TITLE);
+        account_Node.add(new ASMutableTreeNode("MyLoansSplitPanel", MyLoansSplitPanel.TITLE);
+        account_Node.add(new ASMutableTreeNode("FavoriteAccountsSplitPanel", FavoriteAccountsSplitPanel.TITLE);
 
         // account_Node.add(new
         // DefaultMutableTreeNode(Lang.getInstance().translate("Search
         // Accounts")));
         // account_Node.add(new DefaultMutableTreeNode("Issue Account"));
 
-        person_Node.add(new ASMutableTreeNode("PersonsFavoriteSplitPanel", Lang.getInstance().translate("Favorite Persons"), PersonsFavoriteSplitPanel.getIcon()));
+        person_Node.add(new ASMutableTreeNode("PersonsFavoriteSplitPanel", PersonsFavoriteSplitPanel.TITLE);
         person_Node.add(new ASMutableTreeNode("PersonsMySplitPanel", Lang.getInstance().translate("My Persons"), PersonsMySplitPanel.getIcon()));
         person_Node.add(new ASMutableTreeNode("SearchPersonsSplitPanel", Lang.getInstance().translate("Search Persons"), SearchPersonsSplitPanel.getIcon()));
         person_Node.add(new ASMutableTreeNode("IssuePersonPanel", Lang.getInstance().translate("Issue Person"), IssuePersonPanel.getIcon()));

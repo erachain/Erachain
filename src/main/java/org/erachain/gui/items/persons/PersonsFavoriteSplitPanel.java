@@ -20,13 +20,16 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class PersonsFavoriteSplitPanel extends ItemSplitPanel  {
+public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
+
+    public static String NAME = "PersonsFavoriteSplitPanel";
+    public static String TITLE = "Favorite Persons";
+
     private static final long serialVersionUID = 2717571093561259483L;
     //private PersonsFavoriteSplitPanel th;
 
     public PersonsFavoriteSplitPanel() {
-        super(new FavoritePersonsTableModel(), "PersonsFavoriteSplitPanel", title);
-        this.setName(Lang.getInstance().translate("Favorite Persons"));
+        super(new FavoritePersonsTableModel(), NAME, TITLE);
 
         JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
 

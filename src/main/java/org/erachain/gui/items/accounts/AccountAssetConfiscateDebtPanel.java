@@ -22,7 +22,7 @@ public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls 
     private static String iconFile = Settings.getInstance().getPatnIcons() + "AccountAssetConfiscateDebtPanel.png";
 
     public AccountAssetConfiscateDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super(true, null, assetIn, null,
+        super(null, null, true, assetIn,
                 TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         // icon.setIcon(null);
