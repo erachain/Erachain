@@ -17,16 +17,16 @@ import java.net.URL;
 
 
 public class TemplateMySplitPanel extends ItemSplitPanel {
+
+    public static String NAME = "TemplateMySplitPanel";
+    public static String TITLE = "My Templates";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "TemplateMySplitPanel.png";
-    //private TemplateMySplitPanel th;
 
     public TemplateMySplitPanel() {
-        super(new WalletItemTemplatesTableModel(), "TemplateMySplitPanel");
+        super(new WalletItemTemplatesTableModel(), NAME, TITLE);
 
-        this.setName(Lang.getInstance().translate("My Templates"));
-
-        //      add items in menu
+        // add items in menu
 
         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
@@ -39,7 +39,8 @@ public class TemplateMySplitPanel extends ItemSplitPanel {
                             + "/index/blockexplorer.html"
                             + "?template=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
-                    logger.error(e1.getMessage(), e1);                }
+                    logger.error(e1.getMessage(), e1);
+                }
             }
         });
 
@@ -53,14 +54,4 @@ public class TemplateMySplitPanel extends ItemSplitPanel {
         return new InfoTemplates((TemplateCls) item);
     }
 
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

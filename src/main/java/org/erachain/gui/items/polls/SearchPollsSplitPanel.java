@@ -17,15 +17,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class SearchPollsSplitPanel extends SearchItemSplitPanel {
-    /**
-     *
-     */
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchPollsSplitPanel.png";
+
+    public static String NAME = "SearchPollsSplitPanel";
+    public static String TITLE = "Search Polls";
+
     private static final long serialVersionUID = 1L;
     private static PollsItemsTableModel tableModelPolls = new PollsItemsTableModel();
 
     public SearchPollsSplitPanel() {
-        super(tableModelPolls, "Search_Poll_Tab", "Search_Poll_Tab");
+        super(tableModelPolls, NAME, TITLE);
 
         jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setMaxWidth(200);
         jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(100);
@@ -112,16 +112,5 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
 
         return pollInfo;
 
-    }
-
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 }

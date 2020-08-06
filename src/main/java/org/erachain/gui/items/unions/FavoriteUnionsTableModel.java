@@ -1,7 +1,7 @@
-package org.erachain.gui.items.templates;
+package org.erachain.gui.items.unions;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.item.templates.TemplateCls;
+import org.erachain.core.item.unions.UnionCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.utils.ObserverMessage;
@@ -9,22 +9,22 @@ import org.erachain.utils.ObserverMessage;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class FavoriteTemplatesTableModel extends FavoriteItemModelTable implements Observer {
+public class FavoriteUnionsTableModel extends FavoriteItemModelTable implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_CONFIRMED = 3;
     public static final int COLUMN_FAVORITE = 4;
 
-    public FavoriteTemplatesTableModel() {
-        super(DCSet.getInstance().getItemTemplateMap(),
-                Controller.getInstance().wallet.database.getTemplateFavoritesSet(),
+    public FavoriteUnionsTableModel() {
+        super(DCSet.getInstance().getItemUnionMap(),
+                Controller.getInstance().wallet.database.getUnionFavoritesSet(),
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false},
-                ObserverMessage.RESET_TEMPLATE_FAVORITES_TYPE,
-                ObserverMessage.ADD_TEMPLATE_FAVORITES_TYPE,
-                ObserverMessage.REMOVE_TEMPLATE_FAVORITES_TYPE,
-                ObserverMessage.LIST_TEMPLATE_FAVORITES_TYPE,
+                ObserverMessage.RESET_UNION_FAVORITES_TYPE,
+                ObserverMessage.ADD_UNION_FAVORITES_TYPE,
+                ObserverMessage.DELETE_UNION_FAVORITES_TYPE,
+                ObserverMessage.LIST_UNION_FAVORITES_TYPE,
                 COLUMN_FAVORITE);
     }
 
@@ -34,31 +34,31 @@ public class FavoriteTemplatesTableModel extends FavoriteItemModelTable implemen
             return null;
         }
 
-        TemplateCls template = (TemplateCls) this.list.get(row);
-        if (template == null)
+        UnionCls union = (UnionCls) this.list.get(row);
+        if (union == null)
             return null;
 
 
         switch (column) {
             case COLUMN_KEY:
 
-                return template.getKey();
+                return union.getKey();
 
             case COLUMN_NAME:
 
-                return template;
+                return union;
 
             case COLUMN_ADDRESS:
 
-                return template.getOwner().getPersonAsString();
+                return union.getOwner().getPersonAsString();
 
             case COLUMN_CONFIRMED:
 
-                return template.isConfirmed();
+                return union.isConfirmed();
 
             case COLUMN_FAVORITE:
 
-                return template.isFavorite();
+                return union.isFavorite();
 
         }
 

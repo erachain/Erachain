@@ -31,7 +31,7 @@ public class StatementsTableModelMy extends WalletTableModel<Transaction> implem
     public StatementsTableModelMy() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
                 new String[]{"Timestamp", "Creator", "Title", "Template", "Favorite"},
-                new Boolean[]{true, true, true, false, false}, true);
+                new Boolean[]{true, true, true, false, false}, true, COLUMN_FAVORITE);
 
         dcSet = DCSet.getInstance();
 

@@ -24,7 +24,7 @@ public class PersonListAddPopupMenuItem {
 
                 //new AccountSendDialog(null, null, null, person);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
-                        null, null, person, null), AccountAssetSendPanel.getIcon());
+                        null, null, person, null));
 
             }
         });
@@ -34,7 +34,7 @@ public class PersonListAddPopupMenuItem {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, (PersonCls) person), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, (PersonCls) person));
             }
         });
 

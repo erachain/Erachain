@@ -2,7 +2,7 @@ package org.erachain.gui.items.accounts;
 
 
 import org.erachain.controller.Controller;
-import org.erachain.database.wallet.AccountsPropertisMap;
+import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.gui.PasswordPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
@@ -29,7 +29,7 @@ import java.util.List;
 public class AccountSetNameDialog extends javax.swing.JDialog {
 
     public JSONObject ansver;
-    AccountsPropertisMap db = Controller.getInstance().wallet.database.getAccountsPropertisMap();
+    FavoriteAccountsMap db = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
     /**
      * Creates new form Account_Show
      */

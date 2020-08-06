@@ -16,15 +16,14 @@ import java.net.URL;
 
 public class SearchStatusesSplitPanel extends SearchItemSplitPanel {
 
-    /**
-     *
-     */
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchStatusesSplitPanel.png";
+    public static String NAME = "SearchStatusesSplitPanel";
+    public static String TITLE = "Search Statuses";
+
     private static final long serialVersionUID = 1L;
     private static StatusesItemsTableModel tableModelUnions = new StatusesItemsTableModel();
 
     public SearchStatusesSplitPanel() {
-        super(tableModelUnions, "Search Statuses", "Search Statuses");
+        super(tableModelUnions, NAME, TITLE);
 
         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
@@ -53,16 +52,6 @@ public class SearchStatusesSplitPanel extends SearchItemSplitPanel {
         info.show_001((StatusCls) item);
         return info;
 
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 
 }

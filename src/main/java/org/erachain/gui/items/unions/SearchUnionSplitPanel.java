@@ -15,16 +15,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class SearchUnionSplitPanel extends SearchItemSplitPanel {
-    /**
-     *
-     */
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "SearchUnionSplitPanel.png";
+
+    public static String NAME = "SearchUnionSplitPanel";
+    public static String TITLE = "Search Unions";
+
     private static final long serialVersionUID = 1L;
     private static TableModelUnionsItemsTableModel tableModelUnions = new TableModelUnionsItemsTableModel();
     private SearchUnionSplitPanel th;
 
     public SearchUnionSplitPanel() {
-        super(tableModelUnions, "SearchUnionSplitPanel", "SearchUnionSplitPanel");
+        super(tableModelUnions, NAME, TITLE);
         th = this;
 
         JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
@@ -77,13 +77,4 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel {
 
     }
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

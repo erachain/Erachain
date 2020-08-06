@@ -19,16 +19,13 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Polls_My_SplitPanel extends ItemSplitPanel {
+public class PollsMySplitPanel extends ItemSplitPanel {
 
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "Polls_My_SplitPanel.png";
+    public static String NAME = "PollsMySplitPanel";
+    public static String TITLE = "My Polls";
 
-    public Polls_My_SplitPanel() {
-        super(new WalletItemPollsTableModel(), "Polls_My_SplitPanel");
-        this.setName(Lang.getInstance().translate("My Polls"));
-
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setMaxWidth(200);
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(100);
+    public PollsMySplitPanel() {
+        super(new WalletItemPollsTableModel(), NAME, TITLE);
 
         JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("To Vote"));
         setVote_Menu.addActionListener(new ActionListener() {
@@ -88,16 +85,6 @@ public class Polls_My_SplitPanel extends ItemSplitPanel {
         PollsDetailPanel pollInfo = new PollsDetailPanel((PollCls) item, AssetCls);
 
         return pollInfo;
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 
 }

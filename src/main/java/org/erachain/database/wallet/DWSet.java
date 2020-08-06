@@ -27,7 +27,7 @@ public class DWSet extends DBASet {
     private Long licenseKey;
 
     private AccountMap accountMap;
-    private AccountsPropertisMap accountsPropertisMap;
+    private FavoriteAccountsMap favoriteAccountsMap;
     private WTransactionMap transactionMap;
     private BlocksHeadMap blocksHeadMap;
     private NameMap nameMap;
@@ -64,7 +64,7 @@ public class DWSet extends DBASet {
         licenseKey = licenseKeyVar.get();
 
         this.accountMap = new AccountMap(this, this.database);
-        this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
+        this.favoriteAccountsMap = new FavoriteAccountsMap(this, this.database);
         this.transactionMap = new WTransactionMap(this, this.database);
         this.blocksHeadMap = new BlocksHeadMap(this, this.database);
         this.nameMap = new NameMap(this, this.database);
@@ -171,8 +171,8 @@ public class DWSet extends DBASet {
         return this.accountMap;
     }
 
-    public AccountsPropertisMap getAccountsPropertisMap() {
-        return this.accountsPropertisMap;
+    public FavoriteAccountsMap getFavoriteAccountsMap() {
+        return this.favoriteAccountsMap;
     }
 
     /**
@@ -255,6 +255,14 @@ public class DWSet extends DBASet {
         }
     }
 
+    public void putItem(ItemCls item) {
+        getItemMap(item).put(item.getKey(), item);
+    }
+
+    public void deleteItem(ItemCls item) {
+        getItemMap(item).delete(item.getKey());
+    }
+
     public WItemMap getItemMap(int type) {
         switch (type) {
             case ItemCls.ASSET_TYPE:
@@ -334,8 +342,14 @@ public class DWSet extends DBASet {
         } else {
             return null;
         }
+    }
 
+    public void addItemFavorite(ItemCls item) {
+        getItemFavoritesSet(item).add(item.getKey());
+    }
 
+    public void deleteItemFavorite(ItemCls item) {
+        getItemFavoritesSet(item).delete(item.getKey());
     }
 
     //////////////// FAVORITES ///////////
@@ -426,7 +440,6 @@ public class DWSet extends DBASet {
         }
 
         this.uses++;
-        this.database.rollback();
         this.database.close();
         this.tables = null;
         this.uses--;

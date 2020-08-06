@@ -25,6 +25,8 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
     public static final int COLUMN_NUMBER = 9;
+    public static final int COLUMN_FAVORITE = 10;
+
 
     /**
      * В динамическом режиме перерисовывается автоматически по событию GUI_REPAINT
@@ -34,8 +36,8 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
      */
     public WalletTransactionsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
-                new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"},
-                new Boolean[]{true, true, true, true, true, true, true, false, false}, true);
+                new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size", "SeqNo", "Favorite"},
+                new Boolean[]{true, true, true, true, true, true, true, false, false, true, true}, true, COLUMN_FAVORITE);
 
     }
 
@@ -141,7 +143,6 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
                 }
 
             case COLUMN_FEE:
-
                 return transaction.getFee();
 
             case COLUMN_SIZE:
@@ -149,6 +150,9 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
 
             case COLUMN_NUMBER:
                 return transaction.viewHeightSeq();
+
+            case COLUMN_FAVORITE:
+                Controller.getInstance().isTransactionFavorite(transaction);
         }
 
         return null;

@@ -15,7 +15,7 @@ public class WalletItemPersonsTableModel extends WalletTableModel<PersonCls> {
     public WalletItemPersonsTableModel() {
         super(Controller.getInstance().getWallet().database.getPersonMap(),
                 new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false}, true);
+                new Boolean[]{false, true, true, false, false}, true, COLUMN_FAVORITE);
 
     }
 

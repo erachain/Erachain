@@ -36,8 +36,9 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
 
     @SuppressWarnings("rawtypes")
-    public ItemSplitPanel(TimerTableModelCls tableModel, String guiName) {
-        super(guiName);
+    public ItemSplitPanel(TimerTableModelCls tableModel, String guiName, String title) {
+        super(guiName, title);
+
         this.tableModel = tableModel;
         // not show buttons
         jToolBarRightPanel.setVisible(false);
@@ -52,12 +53,17 @@ public abstract class ItemSplitPanel extends SplitPanel {
         // CREATE TABLE
         jTableJScrollPanelLeftPanel = new MTable(this.tableModel);
 
-        // иконку будем рисовать
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(tableModel.COLUMN_FOR_ICON)
-                .setCellRenderer(new RendererIcon());
-
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
         columnModel.getColumn(0).setMaxWidth((100));
+        columnModel.getColumn(tableModel.COLUMN_FAVORITE).setMaxWidth(100);
+
+        // иконку будем рисовать
+        try {
+            columnModel.getColumn(tableModel.COLUMN_FOR_ICON)
+                    .setCellRenderer(new RendererIcon());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
 
         // hand cursor for Favorite column
         jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionAdapter() {

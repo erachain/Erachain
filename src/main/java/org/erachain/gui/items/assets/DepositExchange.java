@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.FundTokensComboBoxModel;
@@ -34,10 +35,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
-public class DepositExchange extends JPanel   {
+public class DepositExchange extends IconPanel {
 
-    // private JComboBox<Account> accountLBox;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "DepositExchange.png";
+    public static String NAME = "DepositExchange";
+    public static String TITLE = "Deposit Exchange";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DepositExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
@@ -55,6 +57,7 @@ public class DepositExchange extends JPanel   {
     private JTextField jTextField_Address = new JTextField();
 
     public DepositExchange(AssetCls asset, Account account) {
+        super(NAME, TITLE);
 
         initComponents(asset, account);
         this.setVisible(true);
@@ -762,13 +765,4 @@ public class DepositExchange extends JPanel   {
         }
     }
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

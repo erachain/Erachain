@@ -17,6 +17,7 @@ import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
@@ -28,10 +29,12 @@ import java.util.TimerTask;
 
 
 public class StatementsMySplitPanel extends SplitPanel {
+
+    public static String NAME = "StatementsMySplitPanel";
+    public static String TITLE = "My Documents";
+
     private static final long serialVersionUID = 2717571093561259483L;
 
-
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "StatementsMySplitPanel.png";
     // для прозрачности
     int alpha = 255;
     int alpha_int;
@@ -43,9 +46,8 @@ public class StatementsMySplitPanel extends SplitPanel {
 
 
     public StatementsMySplitPanel() {
-        super("StatementsMySplitPanel");
+        super(NAME, TITLE);
 
-        this.setName(Lang.getInstance().translate("My Statements"));
         this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
@@ -104,9 +106,14 @@ public class StatementsMySplitPanel extends SplitPanel {
 			*/        // SET VIDEO
         //this.jTableJScrollPanelLeftPanel.setModel(my_PersonsModel);
         this.jTableJScrollPanelLeftPanel = new MTable(my_Statements_Model); //my_Statements_table;
+
+        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
+        columnModel.getColumn(my_Statements_Model.COLUMN_FAVORITE).setMaxWidth(150);
+
         //this.jTableJScrollPanelLeftPanel.setTableHeader(null);
         // sorter
         search_Sorter = new TableRowSorter(my_Statements_Model);
+
 
         // hand cursor for Favorite column
         jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionAdapter() {
@@ -249,15 +256,4 @@ public class StatementsMySplitPanel extends SplitPanel {
         ((TimerTableModelCls) jTableJScrollPanelLeftPanel.getModel()).fireTableDataChanged();
 
     }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
-
 }

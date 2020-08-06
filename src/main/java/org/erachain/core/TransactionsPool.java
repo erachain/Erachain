@@ -3,6 +3,7 @@ package org.erachain.core;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionFinalMapSigns;
 import org.erachain.datachain.TransactionMapImpl;
 import org.erachain.network.message.TransactionMessage;
 import org.erachain.utils.MonitoredThread;
@@ -28,6 +29,7 @@ public class TransactionsPool extends MonitoredThread {
     private BlockChain blockChain;
     private DCSet dcSet;
     private TransactionMapImpl utxMap;
+    private TransactionFinalMapSigns txSignsMap;
     private boolean needClearMap;
 
     public long missedTransactions = 0L;
@@ -37,6 +39,7 @@ public class TransactionsPool extends MonitoredThread {
         this.blockChain = blockChain;
         this.dcSet = dcSet;
         this.utxMap = dcSet.getTransactionTab();
+        this.txSignsMap = dcSet.getTransactionFinalMapSigns();
 
         this.setName("Transactions Pool[" + this.getId() + "]");
 
@@ -73,6 +76,10 @@ public class TransactionsPool extends MonitoredThread {
             return;
 
         if (item instanceof Transaction) {
+
+            if (txSignsMap.contains(((Transaction) item).getSignature()))
+                return;
+
             // ADD TO UNCONFIRMED TRANSACTIONS
             // нужно проверять существующие для правильного отображения числа их в статусе ГУИ
             // TODO посмотреть почему сюда двойные записи часто прилетают из sender.network.checkHandledTransactionMessages(data, sender, false)
@@ -92,6 +99,7 @@ public class TransactionsPool extends MonitoredThread {
 
         } else if (item instanceof TransactionMessage) {
 
+
             long timeCheck = System.currentTimeMillis();
             long onMessageProcessTiming = System.nanoTime();
 
@@ -99,6 +107,8 @@ public class TransactionsPool extends MonitoredThread {
 
             // GET TRANSACTION
             Transaction transaction = transactionMessage.getTransaction();
+            if (txSignsMap.contains(transaction.getSignature()))
+                return;
 
             // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
             if (transaction.getCreator() == null

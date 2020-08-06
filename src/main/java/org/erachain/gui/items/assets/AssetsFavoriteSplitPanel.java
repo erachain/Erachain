@@ -18,32 +18,34 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class AssetsFavoriteSplitPanel extends ItemSplitPanel   {
+public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
+
+    public static String NAME = "AssetsFavoriteSplitPanel";
+    public static String TITLE = "Favorite Assets";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "AssetsFavoriteSplitPanel.png";
 
     public AssetsFavoriteSplitPanel() {
-        super(new FavoriteAssetsTableModel(), "AssetsFavoriteSplitPanel");
-        setName(Lang.getInstance().translate("Favorite Assets"));
+        super(new FavoriteAssetsTableModel(), NAME, TITLE);
 
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
 
         sell.addActionListener(e ->
                 //new ExchangeFrame((AssetCls) itemMenu, null, "To sell", "")
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + itemTableSelected.getKey(),
-                        new ExchangePanel((AssetCls) itemTableSelected, null, "To sell", ""), ExchangePanel.getIcon()));
+                MainPanel.getInstance().insertTab(
+                        new ExchangePanel((AssetCls) itemTableSelected, null, "To sell", "")));
 
         JMenuItem exchange = new JMenuItem(Lang.getInstance().translate("Exchange"));
         exchange.addActionListener(e ->
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + itemTableSelected.getKey(),
-                        new ExchangePanel((AssetCls) itemTableSelected, null, "", ""), ExchangePanel.getIcon()));
+                MainPanel.getInstance().insertTab(
+                        new ExchangePanel((AssetCls) itemTableSelected, null, "", "")));
 
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(e ->
                 //new ExchangeFrame((AssetCls) itemMenu, null, "Buy", "")
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + itemTableSelected.getKey(),
-                        new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", ""), ExchangePanel.getIcon()));
+                MainPanel.getInstance().insertTab(
+                        new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", "")));
 
 
         JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status to Asset"));
@@ -112,17 +114,8 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel   {
         String action = null;
         ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");
         panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
-        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
-                panel, ExchangePanel.getIcon());
+        MainPanel.getInstance().insertTab(
+                panel);
     }
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

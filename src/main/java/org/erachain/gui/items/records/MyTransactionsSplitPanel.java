@@ -21,6 +21,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,10 +30,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-public class MyTransactionsSplitPanel extends SplitPanel  {
+public class MyTransactionsSplitPanel extends SplitPanel {
+
+    public static String NAME = "MyTransactionsSplitPanel";
+    public static String TITLE = "My Records";
 
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyTransactionsSplitPanel.png";
     private static MyTransactionsSplitPanel instance;
     public VouchLibraryPanel voush_Library_Panel;
     protected Tuple2<Long, Long> selectedTransactionKey;
@@ -46,19 +49,18 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
 
     private JMenuItem item_Save;
 
-  
-
     private MyTransactionsSplitPanel() {
-        super("MyTransactionsSplitPanel");
+        super(NAME, TITLE);
         this.leftPanel.setVisible(true);
-       
-
-        setName(Lang.getInstance().translate("My Records"));
 
         //CREATE TABLE
         this.records_model = new WalletTransactionsTableModel();
         this.jTableJScrollPanelLeftPanel = new MTable(this.records_model);
         this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
+
+        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
+        columnModel.getColumn(0).setMaxWidth((100));
+        columnModel.getColumn(records_model.COLUMN_FAVORITE).setMaxWidth((100));
 
         // not show buttons
         jToolBarRightPanel.setVisible(true);
@@ -79,8 +81,8 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
         jButton2_jToolBar_RightPanel.setVisible(false);
         this.jToolBarRightPanel.setVisible(false);
         this.toolBarLeftPanel.setVisible(false);
-        
-     // set interval panel
+
+        // set interval panel
         setIntervalPanel = new SetIntervalPanel(Controller.getInstance().wallet.database.getTransactionMap());
         GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -100,9 +102,9 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
             }
         });
 
-     // set interval
+        // set interval
         setInterval();
-        
+
         jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 
         menu = new JPopupMenu();
@@ -171,7 +173,7 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
         });
 
         menu.add(item_Delete);
-        
+
         item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
         item_Save.addActionListener(new ActionListener() {
             @Override
@@ -182,7 +184,7 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
                 Library.saveTransactionJSONtoFileSystem(getParent(), selectedTransaction);
             }
 
-            
+
         });
 
         menu.add(item_Save);
@@ -340,7 +342,7 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
             }
         }
     }
-   
+
     public void setInterval() {
         Integer start = 0;
         try {
@@ -363,13 +365,4 @@ public class MyTransactionsSplitPanel extends SplitPanel  {
         }
     }
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }
