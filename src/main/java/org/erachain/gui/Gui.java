@@ -27,7 +27,7 @@ public class Gui extends JFrame {
 
     private volatile static Gui maingui;
     private MainFrame mainframe;
-    WalletTimer walletTimer;
+    public final WalletTimer walletTimer;
 
     public static boolean SHOW_FEE_POWER = false;
 

@@ -1,8 +1,8 @@
 package org.erachain.utils;
 // 03/03
 
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sound.sampled.*;
 import java.io.File;
@@ -30,7 +30,7 @@ public class PlaySound {
     private long timePoint;
     public void playSound(final String url, byte[] signature) {
 
-        if (System.currentTimeMillis() - timePoint > 10000) {
+        if (System.currentTimeMillis() - timePoint < 10000) {
             return;
         }
 
