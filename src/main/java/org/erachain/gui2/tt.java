@@ -45,6 +45,7 @@ import org.erachain.gui.items.templates.TemplatesFavoriteSplitPanel;
 import org.erachain.gui.items.unions.IssueUnionPanel;
 import org.erachain.gui.items.unions.MyUnionsTab;
 import org.erachain.gui.items.unions.SearchUnionSplitPanel;
+import org.erachain.gui.items.unions.UnionsFavoriteSplitPanel;
 import org.erachain.gui.library.ASMutableTreeNode;
 import org.erachain.gui.telegrams.ALLTelegramPanel;
 import org.erachain.gui.telegrams.TelegramSplitPanel;
@@ -186,7 +187,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         exchange_Node.add(new ASMutableTreeNode("ExchangePanel", ExchangePanel.TITLE));
         exchange_Node.add(new ASMutableTreeNode("MyOrderTab", MyOrderTab.TITLE));
 
-        templates_Node.add(new ASMutableTreeNode("TemplatesFavoriteSplitPanel", TemplatesFavoriteSplitPanel.TITLE));
+        templates_Node.add(new ASMutableTreeNode(TemplatesFavoriteSplitPanel.NAME, TemplatesFavoriteSplitPanel.TITLE));
         templates_Node.add(new ASMutableTreeNode("TemplateMySplitPanel", TemplateMySplitPanel.TITLE));
         templates_Node.add(new ASMutableTreeNode("SearchTemplatesSplitPanel", SearchTemplatesSplitPanel.TITLE));
         templates_Node.add(new ASMutableTreeNode("IssueTemplatePanel", IssueTemplatePanel.TITLE));
@@ -197,6 +198,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         statuses_Node.add(new ASMutableTreeNode("SearchStatusesSplitPanel", SearchStatusesSplitPanel.TITLE));
         statuses_Node.add(new ASMutableTreeNode("IssueStatusPanel", IssueStatusPanel.TITLE));
 
+        unions_Node.add(new ASMutableTreeNode("UnionsFavoriteSplitPanel", UnionsFavoriteSplitPanel.TITLE));
         unions_Node.add(new ASMutableTreeNode("MyUnionsTab", MyUnionsTab.TITLE));
         unions_Node.add(new ASMutableTreeNode("SearchUnionSplitPanel", SearchUnionSplitPanel.TITLE));
         unions_Node.add(new ASMutableTreeNode("IssueUnionPanel", IssueUnionPanel.TITLE));

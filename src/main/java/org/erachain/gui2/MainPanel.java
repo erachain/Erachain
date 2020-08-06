@@ -44,6 +44,7 @@ import org.erachain.gui.items.templates.TemplatesFavoriteSplitPanel;
 import org.erachain.gui.items.unions.IssueUnionPanel;
 import org.erachain.gui.items.unions.MyUnionsTab;
 import org.erachain.gui.items.unions.SearchUnionSplitPanel;
+import org.erachain.gui.items.unions.UnionsFavoriteSplitPanel;
 import org.erachain.gui.library.MSplitPane;
 import org.erachain.gui.telegrams.ALLTelegramPanel;
 import org.erachain.gui.telegrams.TelegramSplitPanel;
@@ -459,6 +460,10 @@ public class MainPanel extends javax.swing.JPanel {
                 return;
             }
             if (BlockChain.TEST_MODE) {
+                if (str.equals(Lang.getInstance().translate(UnionsFavoriteSplitPanel.TITLE)) || str.equals(UnionsFavoriteSplitPanel.NAME)) {
+                    insertTab(new UnionsFavoriteSplitPanel());
+                    return;
+                }
                 if (str.equals(Lang.getInstance().translate("My Unions")) || str.equals("MyUnionsTab")) {
                     insertTab(new MyUnionsTab());
                     return;

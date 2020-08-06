@@ -301,12 +301,15 @@ public class ObserverMessage {
     public static final int WALLET_ADD_UNION_TYPE = 12012;
     public static final int WALLET_REMOVE_UNION_TYPE = 12013;
     public static final int WALLET_LIST_UNION_TYPE = 12014;
-    public static final int LIST_UNION_FAVORITES_TYPE = 12016;
+    public static final int RESET_UNION_FAVORITES_TYPE = 12016;
+    public static final int ADD_UNION_FAVORITES_TYPE = 12017;
+    public static final int DELETE_UNION_FAVORITES_TYPE = 12018;
+    public static final int LIST_UNION_FAVORITES_TYPE = 12019;
 
-    public static final int WALLET_ACCOUNT_PROPERTIES_ADD = 12017;
-    public static final int WALLET_ACCOUNT_PROPERTIES_DELETE = 12018;
-    public static final int WALLET_ACCOUNT_PROPERTIES_LIST = 12019;
-    public static final int WALLET_ACCOUNT_PROPERTIES_RESET = 12020;
+    public static final int WALLET_ACCOUNT_PROPERTIES_ADD = 12117;
+    public static final int WALLET_ACCOUNT_PROPERTIES_DELETE = 12118;
+    public static final int WALLET_ACCOUNT_PROPERTIES_LIST = 12119;
+    public static final int WALLET_ACCOUNT_PROPERTIES_RESET = 12120;
 
     public static final int WALLET_ADD_TELEGRAM_TYPE = 1000003;
     public static final int WALLET_REMOVE_TELEGRAM_TYPE = 1000001;
