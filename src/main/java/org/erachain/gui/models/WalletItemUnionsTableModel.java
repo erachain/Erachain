@@ -16,7 +16,7 @@ public class WalletItemUnionsTableModel extends WalletTableModel<UnionCls> {
     public WalletItemUnionsTableModel() {
         super(Controller.getInstance().wallet.database.getUnionMap(),
                 new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false}, true);
+                new Boolean[]{false, true, true, false, false}, true, COLUMN_FAVORITE);
 
     }
 

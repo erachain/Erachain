@@ -33,7 +33,7 @@ public class WalletTelegramsFilterTableModel extends WalletTableModel<Transactio
     public WalletTelegramsFilterTableModel() {
         super(Controller.getInstance().getWallet().database.getTelegramsMap(),
                 new String[]{"Date", "Sender", "Recipient", "Message", "Signature"},
-                new Boolean[]{true, true, true, true, true, true, true, false, false}, false);
+                new Boolean[]{true, true, true, true, true, true, true, false, false}, false, -1);
 
     }
 

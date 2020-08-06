@@ -29,6 +29,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
     public static final int COLUMN_RECIPIENT = 6;
     public static final int COLUMN_TITLE = 7;
     public static final int COLUMN_CONFIRM = 8;
+    public static final int COLUMN_FAVORITE = 9;
     public static final int COLUMN_ACTION_TYPE = 19;
 
     private Account filterAccount;
@@ -41,7 +42,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
     public AccountsTransactionsTableModel() {
         super(Controller.getInstance().wallet.database.getTransactionMap(),
                 new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation"},
-                new Boolean[]{false, true, true, false, false}, false);
+                new Boolean[]{false, true, true, false, false}, false, COLUMN_FAVORITE);
 
         step = 200;
 
@@ -103,8 +104,10 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
                 return r_Tran.title;
 
             case COLUMN_ACTION_TYPE:
-
                 return r_Tran.transaction.viewFullTypeName();
+
+            case COLUMN_FAVORITE:
+                return Controller.getInstance().isTransactionFavorite(r_Tran.transaction);
 
         }
 

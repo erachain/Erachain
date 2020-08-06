@@ -27,7 +27,7 @@ public class WalletOrdersTableModel extends WalletTableModel<Order> implements O
     public WalletOrdersTableModel() {
         super(Controller.getInstance().wallet.database.getOrderMap(),
                 new String[]{"Timestamp", "Block - transaction", "Amount", "Have", "Price",
-                        "Want", "Total", "Left", "Creator", "Status"}, new Boolean[]{true}, true);
+                        "Want", "Total", "Left", "Creator", "Status"}, new Boolean[]{true}, true, -1);
 
         step = 200;
     }

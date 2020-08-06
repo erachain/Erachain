@@ -28,7 +28,7 @@ public class FavoriteAccountsTableModel extends WalletTableModel<Tuple2<String, 
     public FavoriteAccountsTableModel() {
         super(Controller.getInstance().wallet.database.getFavoriteAccountsMap(),
                 new String[]{"No.", "Account", "Name", "Description", "Person"},
-                new Boolean[]{true, false, false, false}, false);
+                new Boolean[]{true, false, false, false}, false, -1);
 
     }
 

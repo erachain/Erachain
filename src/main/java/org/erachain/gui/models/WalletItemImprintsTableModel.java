@@ -16,7 +16,7 @@ public class WalletItemImprintsTableModel extends WalletTableModel<ImprintCls> {
     public WalletItemImprintsTableModel() {
         super(Controller.getInstance().wallet.database.getImprintMap(),
                 new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false}, true);
+                new Boolean[]{false, true, true, false}, true, COLUMN_FAVORITE);
     }
 
     @Override

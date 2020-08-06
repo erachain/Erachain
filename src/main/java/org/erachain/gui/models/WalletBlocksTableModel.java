@@ -26,7 +26,7 @@ public class WalletBlocksTableModel extends WalletTableModel<Block.BlockHead> {
     public WalletBlocksTableModel() {
         super(Controller.getInstance().wallet.database.getBlocksHeadMap(),
                 new String[]{"Height", "Timestamp", "Creator account", "Gen.Balance", "dtWV", "Transactions", "Fee"},
-                new Boolean[]{false, true, true, false, false, true, false}, true);
+                new Boolean[]{false, true, true, false, false, true, false}, true, -1);
     }
 
     @Override

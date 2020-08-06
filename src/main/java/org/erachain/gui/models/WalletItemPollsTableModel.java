@@ -20,7 +20,7 @@ public class WalletItemPollsTableModel extends WalletTableModel<PollCls> {
     public WalletItemPollsTableModel() {
         super(Controller.getInstance().wallet.database.getPollMap(),
                 new String[]{"Key", "Name", "Creator", "Total Votes", "Favorite"},
-                null, true);
+                null, true, COLUMN_FAVORITE);
     }
 
     @Override

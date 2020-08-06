@@ -15,7 +15,7 @@ public class WalletItemTemplatesTableModel extends WalletTableModel<TemplateCls>
     public WalletItemTemplatesTableModel() {
         super(Controller.getInstance().wallet.database.getTemplateMap(),
                 new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"},
-                new Boolean[]{true, true, true, true, true}, true);
+                new Boolean[]{true, true, true, true, true}, true, COLUMN_FAVORITE);
     }
 
     @Override
