@@ -2,7 +2,6 @@ package org.erachain.gui;
 
 
 import org.erachain.controller.Controller;
-import org.erachain.gui.Wallets.WalletTimer;
 import org.erachain.gui.create.NoWalletFrame;
 import org.erachain.gui.create.SettingLangFrame;
 import org.erachain.gui.library.MTable;

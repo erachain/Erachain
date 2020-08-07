@@ -56,7 +56,7 @@ public class Library {
                 if (account != null) {
                     if (r_Send.hasAmount()) {
                         if (Settings.getInstance().isSoundReceivePaymentEnabled())
-                            PlaySound.getInstance().playSound("receivepayment.wav", transaction.getSignature());
+                            PlaySound.getInstance().playSound("receivepayment.wav");
 
                         SysTray.getInstance().sendMessage("Payment received",
                                 "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
@@ -68,7 +68,7 @@ public class Library {
 
                     } else {
                         if (Settings.getInstance().isSoundReceiveMessageEnabled())
-                            PlaySound.getInstance().playSound("receivemessage.wav", transaction.getSignature());
+                            PlaySound.getInstance().playSound("receivemessage.wav");
 
                         SysTray.getInstance().sendMessage("Message received",
                                 "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
@@ -86,7 +86,7 @@ public class Library {
                     if (r_Send.hasAmount()) {
 
                         if (Settings.getInstance().isSoundNewTransactionEnabled())
-                            PlaySound.getInstance().playSound("newtransaction.wav", transaction.getSignature());
+                            PlaySound.getInstance().playSound("newtransaction.wav");
 
                         SysTray.getInstance().sendMessage("Payment send",
                                 "From: " + transaction.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
@@ -99,7 +99,7 @@ public class Library {
                     } else {
 
                         if (Settings.getInstance().isSoundNewTransactionEnabled())
-                            PlaySound.getInstance().playSound("newtransaction.wav", transaction.getSignature());
+                            PlaySound.getInstance().playSound("newtransaction.wav");
 
                         SysTray.getInstance().sendMessage("Message send",
                                 "From: " + transaction.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
@@ -115,7 +115,7 @@ public class Library {
                 account = Controller.getInstance().getWalletAccountByAddress(transaction.getCreator().getAddress());
                 if (account != null) {
                     if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                        PlaySound.getInstance().playSound("newtransaction.wav", transaction.getSignature());
+                        PlaySound.getInstance().playSound("newtransaction.wav");
                     }
 
                     SysTray.getInstance().sendMessage("Transaction send",
