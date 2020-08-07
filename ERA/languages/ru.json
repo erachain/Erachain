@@ -1581,6 +1581,7 @@
   "Item imprint does not exist": "Отпечаток(хеш) не существует",
   "Item template does not exist": "Шаблон не существует",
   "Item person does not exist": "Персона не существует",
+  "Item poll does not exist": "Голосование не существует",
   "Item union does not exist": "Объединение не существует",
   "Invalid birth latitude": "Неверная широта места рождения",
   "Invalid birth longitude": "Неверная долгота места рождения",

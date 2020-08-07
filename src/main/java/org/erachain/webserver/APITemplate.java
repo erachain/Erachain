@@ -1,16 +1,12 @@
 package org.erachain.webserver;
 
-//import com.google.common.collect.Iterables;
-//import com.google.gson.internal.LinkedHashTreeMap;
-//import com.sun.org.apache.xpath.internal.operations.Or;
-//import javafx.print.Collation;
 
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
-import org.erachain.core.item.statuses.StatusCls;
+import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemStatusMap;
+import org.erachain.datachain.ItemTemplateMap;
 import org.erachain.utils.StrJSonFine;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,12 +22,9 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-//import com.google.gson.Gson;
-//import org.mapdb.Fun;
-
-@Path("apistatus")
+@Path("apitemplate")
 @Produces(MediaType.APPLICATION_JSON)
-public class APIStatus {
+public class APITemplate {
 
     @Context
     HttpServletRequest request;
@@ -43,8 +36,8 @@ public class APIStatus {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
-        help.put("Get apistatus/image/{key}", "GET Status Image");
-        help.put("Get apistatus/icon/{key}", "GET Status Icon");
+        help.put("Get apitemplate/image/{key}", "GET Template Image");
+        help.put("Get apitemplate/icon/{key}", "GET Template Icon");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -53,7 +46,7 @@ public class APIStatus {
     @Path("image/{key}")
     @GET
     @Produces({"image/png", "image/jpg"})
-    public Response statusImage(@PathParam("key") long key) throws IOException {
+    public Response templateImage(@PathParam("key") long key) throws IOException {
 
         int weight = 0;
         if (key <= 0) {
@@ -62,23 +55,23 @@ public class APIStatus {
                     "Error key");
         }
 
-        ItemStatusMap map = DCSet.getInstance().getItemStatusMap();
+        ItemTemplateMap map = DCSet.getInstance().getItemTemplateMap();
         // DOES EXIST
         if (!map.contains(key)) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_STATUS_NOT_EXIST);
+                    Transaction.ITEM_TEMPLATE_NOT_EXIST);
         }
 
-        StatusCls status = (StatusCls) map.get(key);
+        TemplateCls template = (TemplateCls) map.get(key);
 
-        if (status.getImage() != null) {
+        if (template.getImage() != null) {
             // image to byte[] hot scale (param2 =0)
             //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-            ///return Response.ok(new ByteArrayInputStream(status.getImage())).build();
+            ///return Response.ok(new ByteArrayInputStream(template.getImage())).build();
             return Response.status(200)
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ByteArrayInputStream(status.getImage()))
+                    .entity(new ByteArrayInputStream(template.getImage()))
                     .build();
         }
         return Response.status(200)
@@ -91,7 +84,7 @@ public class APIStatus {
     @Path("icon/{key}")
     @GET
     @Produces({"image/png", "image/jpg"})
-    public Response statusIcon(@PathParam("key") long key) throws IOException {
+    public Response templateIcon(@PathParam("key") long key) throws IOException {
 
         if (key <= 0) {
             throw ApiErrorFactory.getInstance().createError(
@@ -99,23 +92,23 @@ public class APIStatus {
                     "Error key");
         }
 
-        ItemStatusMap map = DCSet.getInstance().getItemStatusMap();
+        ItemTemplateMap map = DCSet.getInstance().getItemTemplateMap();
         // DOES EXIST
         if (!map.contains(key)) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_STATUS_NOT_EXIST);
+                    Transaction.ITEM_TEMPLATE_NOT_EXIST);
         }
 
-        StatusCls status = (StatusCls) map.get(key);
+        TemplateCls template = (TemplateCls) map.get(key);
 
-        if (status.getIcon() != null) {
+        if (template.getIcon() != null) {
             // image to byte[] hot scale (param2 =0)
             //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-            //return Response.ok(new ByteArrayInputStream(status.getIcon())).build();
+            //return Response.ok(new ByteArrayInputStream(template.getIcon())).build();
             return Response.status(200)
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ByteArrayInputStream(status.getIcon()))
+                    .entity(new ByteArrayInputStream(template.getIcon()))
                     .build();
         }
         return Response.status(200)

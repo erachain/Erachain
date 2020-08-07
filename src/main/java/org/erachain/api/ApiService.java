@@ -46,8 +46,10 @@ public class ApiService extends Observable {
         s.add(RecHashesResource.class);
 
         s.add(AssetsResource.class);
+        s.add(PersonsResource.class);
         s.add(PollsResource.class);
         s.add(StatusResource.class);
+        s.add(TemplateResource.class);
 
         s.add(RecStatementResource.class);
         s.add(MultiPaymentResource.class);

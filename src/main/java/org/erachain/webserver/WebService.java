@@ -34,6 +34,7 @@ public class WebService {
         s.add(APIPerson.class);
         s.add(APIPoll.class);
         s.add(APIStatus.class);
+        s.add(APITemplate.class);
 
         s.add(APIExchange.class);
         s.add(APITelegramsResource.class);

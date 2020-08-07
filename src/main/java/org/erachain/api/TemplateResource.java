@@ -13,16 +13,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("statuss")
+@Path("templates")
 @Produces(MediaType.APPLICATION_JSON)
 @Slf4j
-public class StatusResource {
+public class TemplateResource {
     /**
-     * Get all status type 1
+     * Get all template type 1
      *
-     * @return ArrayJSON of all status. request key means key status and name status.
+     * @return ArrayJSON of all template. request key means key template and name template.
      * <h2>Example request</h2>
-     * GET statuss
+     * GET templates
      * <h2>Example response</h2>
      * {
      * "1": "ERA",
@@ -37,67 +37,67 @@ public class StatusResource {
      * }
      */
     @GET
-    public String getStatusesLite() {
-        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryStatusesLite());
+    public String getTemplateesLite() {
+        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryTemplatesLite());
     }
 
     /**
-     * Get lite information status by key status
+     * Get lite information template by key template
      *
-     * @param key is number status
-     * @return JSON object. Single status
+     * @param key is number template
+     * @return JSON object. Single template
      */
     @GET
     @Path("/{key}")
-    public String getStatusLite(@PathParam("key") String key) {
-        Long statusAsLong = null;
+    public String getTemplateLite(@PathParam("key") String key) {
+        Long templateAsLong = null;
 
         // HAS ASSET NUMBERFORMAT
         try {
-            statusAsLong = Long.valueOf(key);
+            templateAsLong = Long.valueOf(key);
 
         } catch (NumberFormatException e) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_STATUS_NOT_EXIST);
+                    Transaction.ITEM_TEMPLATE_NOT_EXIST);
 
         }
 
         // DOES ASSETID EXIST
-        if (!DCSet.getInstance().getItemStatusMap().contains(statusAsLong)) {
+        if (!DCSet.getInstance().getItemTemplateMap().contains(templateAsLong)) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_STATUS_NOT_EXIST);
+                    Transaction.ITEM_TEMPLATE_NOT_EXIST);
 
         }
 
-        return Controller.getInstance().getStatus(statusAsLong).toJson().toJSONString();
+        return Controller.getInstance().getTemplate(templateAsLong).toJson().toJSONString();
     }
 
     @GET
     @Path("/{key}/full")
-    public String getStatus(@PathParam("key") String key) {
-        Long statusAsLong = null;
+    public String getTemplate(@PathParam("key") String key) {
+        Long templateAsLong = null;
 
         // HAS ASSET NUMBERFORMAT
         try {
-            statusAsLong = Long.valueOf(key);
+            templateAsLong = Long.valueOf(key);
 
         } catch (NumberFormatException e) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_STATUS_NOT_EXIST);
+                    Transaction.ITEM_TEMPLATE_NOT_EXIST);
 
         }
 
         // DOES ASSETID EXIST
-        if (!DCSet.getInstance().getItemStatusMap().contains(statusAsLong)) {
+        if (!DCSet.getInstance().getItemTemplateMap().contains(templateAsLong)) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_STATUS_NOT_EXIST);
+                    Transaction.ITEM_TEMPLATE_NOT_EXIST);
         }
 
-        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryItemStatus(statusAsLong));
+        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryItemTemplate(templateAsLong));
     }
 
 }
