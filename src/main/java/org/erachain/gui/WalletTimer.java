@@ -96,8 +96,8 @@ public class WalletTimer<U> implements Observer {
                 Block block = (Block) event;
 
                 sound = "blockforge.wav";
-                head = lang.translate("Block %d is forged").replace("%d", "" + block.heightBlock);
-                message = lang.translate("Forged Fee") + ": " + block.viewFeeAsBigDecimal();
+                head = lang.translate("Forging Block %d").replace("%d", "" + block.heightBlock);
+                message = lang.translate("Forging Fee") + ": " + block.viewFeeAsBigDecimal();
 
             } else {
                 head = lang.translate("EVENT");
