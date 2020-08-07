@@ -95,10 +95,6 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
             case COLUMN_ASSET:
 
                 if (r_Tran.key != 0) {
-
-                    if (((WTransactionMap) map).isUnViewed(r_Tran.transaction)) {
-                        return "<html><span style='color:red;font-weight:bold'>" + Controller.getInstance().getAsset(r_Tran.key) + "</span></html>";
-                    }
                     return Controller.getInstance().getAsset(r_Tran.key);
                 }
 

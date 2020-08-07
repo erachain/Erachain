@@ -2,6 +2,7 @@ package org.erachain.gui.items.records;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.Library;
@@ -297,6 +298,8 @@ public class MyTransactionsSplitPanel extends SplitPanel {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0 && jTableJScrollPanelLeftPanel.getSelectedRow() < records_model.getRowCount()) {
                 trans = (Transaction) records_model
                         .getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+
+                ((WTransactionMap) records_model.getMap()).clearUnViewed(trans);
 
                 records_Info_Panel = new JPanel();
                 records_Info_Panel.setLayout(new GridBagLayout());
