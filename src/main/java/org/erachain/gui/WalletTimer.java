@@ -75,17 +75,30 @@ public class WalletTimer<U> implements Observer {
                 if (transaction instanceof RSend) {
                     RSend rSend = (RSend) transaction;
                     if (rSend.hasAmount()) {
-                        sound = "receivepayment.wav";
-                        head = lang.translate("Payment received");
-                        message = rSend.getCreator().getPersonAsString() + "\nTo: " + rSend.getRecipient().getPersonAsString() + "\n"
-                                + "Asset Key" + ": " + rSend.getAbsKey() + ", " + lang.translate("Amount") + ": "
-                                + rSend.getAmount().toPlainString()
-                                + (rSend.getHead() != null ? "\n Title" + ":" + rSend.getHead() : "");
+                        if (contr.wallet.accountExists(rSend.getCreator().getAddress())) {
+                            sound = "receivepayment.wav";
+                            head = lang.translate("Payment received");
+                            message = rSend.getCreator().getPersonAsString() + "\nTo: " + rSend.getRecipient().getPersonAsString() + "\n"
+                                    + "Asset Key" + ": " + rSend.getAbsKey() + ", " + lang.translate("Amount") + ": "
+                                    + rSend.getAmount().toPlainString()
+                                    + (rSend.getHead() != null ? "\n Title" + ":" + rSend.getHead() : "");
+                        } else {
+                            sound = "send.wav";
+                            head = lang.translate("Payment send");
+                            message = rSend.getCreator().getPersonAsString() + "\nTo: " + rSend.getRecipient().getPersonAsString() + "\n"
+                                    + "Asset Key" + ": " + rSend.getAbsKey() + ", " + lang.translate("Amount") + ": "
+                                    + rSend.getAmount().toPlainString()
+                                    + (rSend.getHead() != null ? "\n Title" + ":" + rSend.getHead() : "");
+                        }
                     } else {
-                        sound = "receivemail.wav";
-                        head = lang.translate("Mail received");
-                        message = rSend.getCreator().getPersonAsString() + "\nTo: " + rSend.getRecipient().getPersonAsString() + "\n"
-                                + (rSend.getHead() != null ? "\n Title" + ":" + rSend.getHead() : "");
+                        if (contr.wallet.accountExists(rSend.getCreator().getAddress())) {
+                            sound = "send.wav";
+                            head = lang.translate("Mail send");
+                            message = rSend.getCreator().getPersonAsString() + "\nTo: " + rSend.getRecipient().getPersonAsString() + "\n"
+                                    + (rSend.getHead() != null ? "\n Title" + ":" + rSend.getHead() : "");
+                        } else {
+
+                        }
 
                     }
                 } else {
