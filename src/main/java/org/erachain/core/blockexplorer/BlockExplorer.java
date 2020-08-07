@@ -631,6 +631,19 @@ public class BlockExplorer {
         return output;
     }
 
+    public Map jsonQueryStatusesLite() {
+
+        Map output = new LinkedHashMap();
+
+        Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.STATUS_TYPE);
+
+        for (ItemCls item : items) {
+            output.put(item.getKey(), item.viewName());
+        }
+
+        return output;
+    }
+
     private Tuple2<Map, Transaction> itemBase(ItemCls item) {
         Map map = new LinkedHashMap();
         map.put("key", item.getKey());

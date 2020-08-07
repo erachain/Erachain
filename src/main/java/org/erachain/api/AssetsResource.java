@@ -43,40 +43,8 @@ public class AssetsResource {
      * }
      */
     @GET
-    public String getAseetsLite() {
+    public String getAssetsLite() {
         return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryAssetsLite());
-    }
-
-    /**
-     * Get full information by asset
-     *
-     * @return ArrayJson full information by asset
-     * <h2>Example request</h2>
-     * GET assets/full
-     * <h2>Example response</h2>
-     * {
-     * "1": {
-     * "key": 1,
-     * "name": "ERA",
-     * "description": "Основная учётная единица, мера собственности и управления данной средой - \"правовая\",
-     * \"управляющая\": ERA(ERA). Именно единицы Эра позволяют собирать блоки и получать комиссию с упакованных
-     * в них транзакций. Более чем 100 ЭРА, находящихся в пользовании на счету позволяет собирать блоки (форжить)
-     * с этого счёта, а более чем 1000 позволяет удостоверять других участников среды. Число единиц
-     * 100000 ЭРА дает права создавать новые статусы и другие сущности в среде.",
-     * "owner": "73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS",
-     * "quantity": "9`999`000",
-     * "scale": 8,
-     * "assetType": "Digital Asset",
-     * "img": "",
-     * "icon": "",
-     * "operations": 63
-     * }
-     * }
-     */
-    @GET
-    @Path("/full")
-    public String getAssetsFull() {
-        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryAssets());
     }
 
     /**
