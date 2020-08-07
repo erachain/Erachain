@@ -75,22 +75,24 @@ public class WalletTimer<U> implements Observer {
                 if (transaction instanceof RSend) {
                     RSend rSend = (RSend) transaction;
                     if (rSend.hasAmount()) {
+                        // TRANSFER
                         if (contr.wallet.accountExists(rSend.getCreator().getAddress())) {
                             sound = "send.wav";
                             head = lang.translate("Payment send");
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
-                                    + rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
+                                    + rSend.getAmount().toPlainString() + " [" + rSend.getAbsKey() + "]\n "
                                     + rSend.getRecipient().getPersonAsString() + "\n"
                                     + (rSend.getHead() != null ? "\n" + rSend.getHead() : "");
                         } else {
                             sound = "receivepayment.wav";
                             head = lang.translate("Payment received");
                             message = rSend.getRecipient().getPersonAsString() + " <- \n "
-                                    + rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
+                                    + rSend.getAmount().toPlainString() + " [" + rSend.getAbsKey() + "]\n "
                                     + rSend.getCreator().getPersonAsString() + "\n"
                                     + (rSend.getHead() != null ? "\n" + rSend.getHead() : "");
                         }
                     } else {
+                        // MAIL
                         if (contr.wallet.accountExists(rSend.getCreator().getAddress())) {
                             sound = "send.wav";
                             head = lang.translate("Mail send");
@@ -99,7 +101,7 @@ public class WalletTimer<U> implements Observer {
                                     + rSend.getRecipient().getPersonAsString() + "\n"
                                     + (rSend.getHead() != null ? "\n" + rSend.getHead() : "");
                         } else {
-                            sound = "receivepayment.wav";
+                            sound = "receivemail.wav";
                             head = lang.translate("Mail received");
                             message = rSend.getRecipient().getPersonAsString() + " <- \n "
                                     //+ rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
