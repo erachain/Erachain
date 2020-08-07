@@ -12,7 +12,6 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashSet;
@@ -30,11 +29,15 @@ public class WebService {
         s.add(API.class);
         s.add(WebResource.class);
         s.add(APITransactionsResource.class);
-        s.add(APIAsset.class);
+
+        s.add(APIItemAsset.class);
+        s.add(APIItemPerson.class);
+        s.add(APIItemPoll.class);
+        s.add(APIItemStatus.class);
+        s.add(APIItemTemplate.class);
+
         s.add(APIExchange.class);
         s.add(APITelegramsResource.class);
-        s.add(APIPerson.class);
-        s.add(APIPoll.class);
         s.add(APIDocuments.class);
 
         ResourceConfig config = new ResourceConfig(s);

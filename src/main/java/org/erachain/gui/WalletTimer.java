@@ -39,8 +39,8 @@ public class WalletTimer<U> implements Observer {
 
         logger = LoggerFactory.getLogger(this.getClass());
         Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
-        muteSound = (Boolean) Settings.getInstance().getJSONObject().getOrDefault("muteSound", false);
-        muteTray = (Boolean) Settings.getInstance().getJSONObject().getOrDefault("muteTray", false);
+        muteSound = (Boolean) Settings.getInstance().getJSONObject().getOrDefault("muteTraySound", false);
+        muteTray = (Boolean) Settings.getInstance().getJSONObject().getOrDefault("muteTrayMessage", false);
 
     }
 

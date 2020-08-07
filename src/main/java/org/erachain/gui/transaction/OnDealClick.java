@@ -421,6 +421,9 @@ public class OnDealClick {
             case Transaction.ITEM_PERSON_NOT_EXIST:
                 mess = "Item person does not exist";
                 break;
+            case Transaction.ITEM_POLL_NOT_EXIST:
+                mess = "Item poll does not exist";
+                break;
             case Transaction.ITEM_UNION_NOT_EXIST:
                 mess = "Item union does not exist";
                 break;
