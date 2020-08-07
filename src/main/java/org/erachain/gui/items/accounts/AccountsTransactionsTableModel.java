@@ -72,8 +72,12 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
             case COLUMN_TIMESTAMP:
                 if (r_Tran.transaction.getTimestamp() == 0)
                     return "---";
+
+                if (((WTransactionMap) map).isUnViewed(filterAccount, r_Tran.transaction)) {
+                    return "<b>" + r_Tran.transaction.viewTimestamp() + "</b>";
+                }
                 return r_Tran.transaction.viewTimestamp();
-           
+
             case COLUMN_TRANSACTION:
 
                 if (r_Tran.transaction.getBlockHeight() > 0)
@@ -128,8 +132,10 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
                 int counter = 0;
                 while (keysIterator.hasNext() && counter < step) {
-                    Transaction transaction = (Transaction) map.get(keysIterator.next());
-                    if (trans_Parse(transaction)) {
+
+                    Fun.Tuple2<Long, Integer> key = keysIterator.next();
+                    Transaction transaction = (Transaction) map.get(key);
+                    if (transParse(key, transaction)) {
                         counter++;
                     }
                 }
@@ -140,7 +146,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
     }
 
-    private boolean trans_Parse(Transaction transaction) {
+    private boolean transParse(Fun.Tuple2<Long, Integer> walletKey, Transaction transaction) {
 
 
         //transaction.setDC_HeightSeq(dcSet, true);
@@ -154,7 +160,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
             }
         }
 
-        Trans trr = new Trans();
+        Trans trr = new Trans(walletKey);
         if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend r_send = (RSend) transaction;
             trr.key = r_send.getKey();
@@ -253,12 +259,17 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
     }
 
     class Trans {
+        public Fun.Tuple2<Long, Integer> walletKey;
         public Long key;
         public BigDecimal amount;
         public Account owner;
         public String recipient;
         public String title;
         public Transaction transaction;
+
+        Trans(Fun.Tuple2<Long, Integer> walletKey) {
+            this.walletKey = walletKey;
+        }
     }
 
 }

@@ -107,6 +107,10 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         return columnNames[index];
     }
 
+    public DBTabImpl getMap() {
+        return map;
+    }
+
     public U getItem(int row) {
         if (list == null)
             return null;

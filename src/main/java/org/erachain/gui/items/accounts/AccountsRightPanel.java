@@ -1,6 +1,10 @@
 package org.erachain.gui.items.accounts;
 
+import org.erachain.controller.Controller;
+import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -19,6 +23,8 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableRowSorter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -50,14 +56,18 @@ public class AccountsRightPanel extends JPanel {
     private JMenuItem viewInfo;
     private AccountsRightPanel th;
     protected int row;
+
+    WTransactionMap wTxMap;
+
     /**
      * Creates new form НовыйJPanel
      */
     public AccountsRightPanel() {
+        wTxMap = Controller.getInstance().wallet.database.getTransactionMap();
         initComponents();
     }
 
-     @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
         th = this;
@@ -146,8 +156,6 @@ public class AccountsRightPanel extends JPanel {
         mainMenu = new JPopupMenu();
         mainMenu.addPopupMenuListener(new PopupMenuListener() {
 
-           
-
             @Override
             public void popupMenuCanceled(PopupMenuEvent arg0) {
                 // TODO Auto-generated method stub
@@ -231,11 +239,26 @@ public class AccountsRightPanel extends JPanel {
                  }
              }
          });
-         mainMenu.add(setSeeInBlockexplorer);
+        mainMenu.add(setSeeInBlockexplorer);
 
-         //   jTable1.setComponentPopupMenu(mainMenu);
-         TableMenuPopupUtil.installContextMenu(jTable1, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
-     }// </editor-fold>
+        //   jTable1.setComponentPopupMenu(mainMenu);
+        TableMenuPopupUtil.installContextMenu(jTable1, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+
+
+        // SELECT
+        this.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() > 0) {
+                    Transaction transaction = table_Model.getItem(th.row).transaction;
+                    ((WTransactionMap) table_Model.getMap()).clearUnViewed(transaction.getCreator(), transaction);
+                    for (Account recipient : transaction.getRecipientAccounts()) {
+                        ((WTransactionMap) table_Model.getMap()).clearUnViewed(recipient, transaction);
+                    }
+                }
+            }
+        });
+
+    }// </editor-fold>
 
     public void setAsset(AssetCls asset) {
         table_Model.setAsset(asset);
