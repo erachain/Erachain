@@ -101,6 +101,7 @@ public class WalletTimer<U> implements Observer {
                         }
 
                     }
+
                 } else {
                     sound = "newtransaction.wav";
                     head = lang.translate("New transaction");
