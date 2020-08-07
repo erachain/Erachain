@@ -1,7 +1,6 @@
 package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.WTransactionMap;
@@ -21,6 +20,7 @@ import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableRowSorter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -35,7 +35,7 @@ import java.util.List;
 public class AccountsRightPanel extends JPanel {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     public AccountsTransactionsTableModel table_Model;
@@ -74,52 +74,52 @@ public class AccountsRightPanel extends JPanel {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
-         jMenuBar2 = new javax.swing.JMenuBar();
-         jMenu3 = new javax.swing.JMenu();
-         jMenu4 = new javax.swing.JMenu();
-         jToggleButton1 = new javax.swing.JToggleButton();
-         new javax.swing.JPopupMenu();
-         jMenu5 = new javax.swing.JMenu();
-         jToggleButton2 = new javax.swing.JToggleButton();
-         jScrollPane1 = new javax.swing.JScrollPane();
-         table_Model = new AccountsTransactionsTableModel();
-         jTable1 = new MTable(table_Model);
+        jMenuBar2 = new javax.swing.JMenuBar();
+        jMenu3 = new javax.swing.JMenu();
+        jMenu4 = new javax.swing.JMenu();
+        jToggleButton1 = new javax.swing.JToggleButton();
+        new javax.swing.JPopupMenu();
+        jMenu5 = new javax.swing.JMenu();
+        jToggleButton2 = new javax.swing.JToggleButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        table_Model = new AccountsTransactionsTableModel();
+        jTable1 = new MTable(table_Model);
 
-         if (false) {
-             // не правильная сортировка - по существующим только и не дает неподтвержденные сюда внести
-             // и при этом еще у записей Номера блоков обновляет и присваивает для неподтвержденных как будто они включенв в +1 блок верхний
-             // темболее что сейчас основная сортировка в кошельке - по времени что для не подтвержденных так же правильно
+        if (false) {
+            // не правильная сортировка - по существующим только и не дает неподтвержденные сюда внести
+            // и при этом еще у записей Номера блоков обновляет и присваивает для неподтвержденных как будто они включенв в +1 блок верхний
+            // темболее что сейчас основная сортировка в кошельке - по времени что для не подтвержденных так же правильно
 
-             // sort from column
-             @SuppressWarnings("unchecked")
-             TableRowSorter t = new TableRowSorter(table_Model);
-             // comparator
-             t.setComparator(table_Model.COLUMN_TRANSACTION, new Comparator<String>() {
-                 @Override
-                 public int compare(String o1, String o2) {
-                     BigDecimal transaction1 = Library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o1));
-                     BigDecimal transaction2 = Library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o2));
-                     return transaction1.compareTo(transaction2);
-                 }
-             });
+            // sort from column
+            @SuppressWarnings("unchecked")
+            TableRowSorter t = new TableRowSorter(table_Model);
+            // comparator
+            t.setComparator(table_Model.COLUMN_TRANSACTION, new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    BigDecimal transaction1 = Library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o1));
+                    BigDecimal transaction2 = Library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o2));
+                    return transaction1.compareTo(transaction2);
+                }
+            });
 
-             // sort list  - AUTO sort
-             List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-             sortKeys.add(new RowSorter.SortKey(table_Model.COLUMN_TRANSACTION, SortOrder.DESCENDING));
-             t.setSortKeys(sortKeys);
-             // sort table
-             jTable1.setRowSorter(t);
+            // sort list  - AUTO sort
+            List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+            sortKeys.add(new RowSorter.SortKey(table_Model.COLUMN_TRANSACTION, SortOrder.DESCENDING));
+            t.setSortKeys(sortKeys);
+            // sort table
+            jTable1.setRowSorter(t);
 
-         }
+        }
 
-         jMenu1.setText("File");
-         jMenuBar1.add(jMenu1);
+        jMenu1.setText("File");
+        jMenuBar1.add(jMenu1);
 
-         jMenu2.setText("Edit");
-         jMenuBar1.add(jMenu2);
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
 
-         jMenu3.setText("File");
-         jMenuBar2.add(jMenu3);
+        jMenu3.setText("File");
+        jMenuBar2.add(jMenu3);
 
         jMenu4.setText("Edit");
         jMenuBar2.add(jMenu4);
@@ -144,7 +144,7 @@ public class AccountsRightPanel extends JPanel {
             }
         ));
         */
-       jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(jTable1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -152,7 +152,7 @@ public class AccountsRightPanel extends JPanel {
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         add(jScrollPane1, gridBagConstraints);
-        
+
         mainMenu = new JPopupMenu();
         mainMenu.addPopupMenuListener(new PopupMenuListener() {
 
@@ -180,7 +180,7 @@ public class AccountsRightPanel extends JPanel {
             }
         });
         viewInfo = new JMenuItem(Lang.getInstance().translate("View Transaction"));
-        viewInfo.addActionListener(new ActionListener(){
+        viewInfo.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -192,53 +192,53 @@ public class AccountsRightPanel extends JPanel {
             }
 
         });
-         mainMenu.add(viewInfo);
+        mainMenu.add(viewInfo);
 
-         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
-         vouch_menu.addActionListener(new ActionListener() {
-             public void actionPerformed(ActionEvent e) {
+        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        vouch_menu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
 
-                 AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
-                 new VouchRecordDialog(transaction.transaction.getBlockHeight(), transaction.transaction.getSeqNo());
+                AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
+                new VouchRecordDialog(transaction.transaction.getBlockHeight(), transaction.transaction.getSeqNo());
 
-             }
-         });
+            }
+        });
 
-         mainMenu.add(vouch_menu);
+        mainMenu.add(vouch_menu);
 
-         // save jsot transactions
-         JMenuItem item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
-         item_Save.addActionListener(new ActionListener() {
-             @Override
-             public void actionPerformed(ActionEvent e) {
+        // save jsot transactions
+        JMenuItem item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
+        item_Save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
-                 AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
-                 // save
-                 Library.saveTransactionJSONtoFileSystem(getParent(), transaction.transaction);
-             }
+                AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
+                // save
+                Library.saveTransactionJSONtoFileSystem(getParent(), transaction.transaction);
+            }
 
 
-         });
+        });
 
-         mainMenu.add(item_Save);
+        mainMenu.add(item_Save);
 
-         mainMenu.addSeparator();
-         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        mainMenu.addSeparator();
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
-         setSeeInBlockexplorer.addActionListener(new ActionListener() {
-             @Override
-             public void actionPerformed(ActionEvent e) {
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
-                 AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
+                AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
 
-                 try {
-                     URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
-                             + "/index/blockexplorer.html"
-                             + "?tx=" + transaction.transaction.viewHeightSeq()));
-                 } catch (MalformedURLException e1) {
-                 }
-             }
-         });
+                try {
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
+                            + "?tx=" + transaction.transaction.viewHeightSeq()));
+                } catch (MalformedURLException e1) {
+                }
+            }
+        });
         mainMenu.add(setSeeInBlockexplorer);
 
         //   jTable1.setComponentPopupMenu(mainMenu);
@@ -246,14 +246,19 @@ public class AccountsRightPanel extends JPanel {
 
 
         // SELECT
-        this.addMouseListener(new MouseAdapter() {
+        jTable1.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 0) {
+                    Point p = e.getPoint();
+                    th.row = jTable1.rowAtPoint(p);
+                    //jTable1.setRowSelectionInterval(th.row, th.row);
+                    //if (((WTransactionMap) table_Model.getMap()).isUnViewed(table_Model.getItem(th.row).walletKey)) {
+                    //    jTable1.setSelectionForeground(Color.white);
+                    //    jTable1.setSelectionBackground(Color.red);
+                    //}
+
                     Transaction transaction = table_Model.getItem(th.row).transaction;
-                    ((WTransactionMap) table_Model.getMap()).clearUnViewed(transaction.getCreator(), transaction);
-                    for (Account recipient : transaction.getRecipientAccounts()) {
-                        ((WTransactionMap) table_Model.getMap()).clearUnViewed(recipient, transaction);
-                    }
+                    ((WTransactionMap) table_Model.getMap()).clearUnViewed(transaction);
                 }
             }
         });
@@ -266,6 +271,5 @@ public class AccountsRightPanel extends JPanel {
         table_Model.fireTableDataChanged();
         jTable1.setDefaultRenderer(BigDecimal.class, new RendererBigDecimals(asset.getScale()));
     }
-
 
 }

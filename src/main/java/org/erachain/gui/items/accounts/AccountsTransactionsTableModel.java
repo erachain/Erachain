@@ -30,7 +30,6 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
     public static final int COLUMN_TITLE = 7;
     public static final int COLUMN_CONFIRM = 8;
     public static final int COLUMN_FAVORITE = 9;
-    public static final int COLUMN_ACTION_TYPE = 19;
 
     private Account filterAccount;
 
@@ -73,42 +72,69 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
                 if (r_Tran.transaction.getTimestamp() == 0)
                     return "---";
 
-                if (((WTransactionMap) map).isUnViewed(filterAccount, r_Tran.transaction)) {
-                    return "<b>" + r_Tran.transaction.viewTimestamp() + "</b>";
+                if (((WTransactionMap) map).isUnViewed(r_Tran.transaction)) {
+                    return "<html><span style='color:red;font-weight:bold'>" + r_Tran.transaction.viewTimestamp() + "</span></html>";
                 }
                 return r_Tran.transaction.viewTimestamp();
 
             case COLUMN_TRANSACTION:
 
-                if (r_Tran.transaction.getBlockHeight() > 0)
+                if (r_Tran.transaction.getBlockHeight() > 0) {
+                    if (((WTransactionMap) map).isUnViewed(r_Tran.transaction)) {
+                        return "<html><span style='color:red;font-weight:bold'>" + r_Tran.transaction.viewHeightSeq() + "</span></html>";
+                    }
                     return r_Tran.transaction.viewHeightSeq();
+                }
                 return "-";
 
             case COLUMN_AMOUNT:
-                return r_Tran.amount;
+                if (r_Tran.amount != null) {
+                    return r_Tran.amount;
+                }
 
             case COLUMN_ASSET:
-                return Controller.getInstance().getAsset(r_Tran.key);
+
+                if (r_Tran.key != 0) {
+
+                    if (((WTransactionMap) map).isUnViewed(r_Tran.transaction)) {
+                        return "<html><span style='color:red;font-weight:bold'>" + Controller.getInstance().getAsset(r_Tran.key) + "</span></html>";
+                    }
+                    return Controller.getInstance().getAsset(r_Tran.key);
+                }
 
             case COLUMN_TYPE:
+                if (((WTransactionMap) map).isUnViewed(r_Tran.transaction)) {
+                    return "<html><span style='color:red;font-weight:bold'>" + r_Tran.transaction.viewFullTypeName() + "</span></html>";
+                }
                 return r_Tran.transaction.viewFullTypeName();
 
-            case COLUMN_RECIPIENT:
-                return r_Tran.recipient;
-
             case COLUMN_SENDER:
-                if (r_Tran.owner == null)
-                    return "GENESIS";
-                return r_Tran.transaction.viewCreator();
+                if (r_Tran.owner != null) {
+                    if (((WTransactionMap) map).isUnViewed(r_Tran.transaction)) {
+                        return "<html><span style='color:red;font-weight:bold'>" + r_Tran.transaction.viewCreator() + "</span></html>";
+                    }
+                    return r_Tran.transaction.viewCreator();
+                }
+                return "GENESIS";
+
+            case COLUMN_RECIPIENT:
+                if (r_Tran.recipient != null) {
+                    if (((WTransactionMap) map).isUnViewed(r_Tran.transaction)) {
+                        return "<html><span style='color:red;font-weight:bold'>" + r_Tran.recipient + "</span></html>";
+                    }
+                    return r_Tran.recipient;
+                }
 
             case COLUMN_CONFIRM:
                 return r_Tran.transaction.isConfirmed(DCSet.getInstance());
 
             case COLUMN_TITLE:
-                return r_Tran.title;
-
-            case COLUMN_ACTION_TYPE:
-                return r_Tran.transaction.viewFullTypeName();
+                if (r_Tran.title != null) {
+                    if (((WTransactionMap) map).isUnViewed(r_Tran.transaction)) {
+                        return "<html><span style='color:red;font-weight:bold'>" + r_Tran.title + "</span></html>";
+                    }
+                    return r_Tran.title;
+                }
 
             case COLUMN_FAVORITE:
                 return Controller.getInstance().isTransactionFavorite(r_Tran.transaction);

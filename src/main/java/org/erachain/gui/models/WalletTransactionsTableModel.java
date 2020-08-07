@@ -3,10 +3,10 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.*;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
-import org.erachain.utils.DateTimeFormat;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -111,15 +111,24 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
 
             case COLUMN_TIMESTAMP:
 
+                if (((WTransactionMap) map).isUnViewed(transaction)) {
+                    return "<html><span style='color:red;font-weight:bold'>" + transaction.viewTimestamp() + "</span></html>";
+                }
 
-                return DateTimeFormat.timestamptoString(transaction.getTimestamp());//.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
+                return transaction.viewTimestamp();//.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
 
             case COLUMN_TYPE:
 
+                if (((WTransactionMap) map).isUnViewed(transaction)) {
+                    return "<html><span style='color:red;font-weight:bold'>" + Lang.getInstance().translate(transaction.viewFullTypeName()) + "</span></html>";
+                }
                 return Lang.getInstance().translate(transaction.viewFullTypeName());
 
             case COLUMN_CREATOR:
 
+                if (((WTransactionMap) map).isUnViewed(transaction)) {
+                    return "<html><span style='color:red;font-weight:bold'>" + transaction.viewCreator() + "</span></html>";
+                }
                 return transaction.viewCreator();
 
             case COLUMN_ITEM:

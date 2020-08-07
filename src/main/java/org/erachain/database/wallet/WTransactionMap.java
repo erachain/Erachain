@@ -281,20 +281,21 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
         return transactions;
     }
 
-    public boolean isUnViewed(Tuple2<Long, Integer> key) {
-        return unViewed.contains(key);
+    public boolean isUnViewed(Transaction transaction) {
+        if (transaction.getCreator() == null)
+            return false;
+        return unViewed.contains(new Tuple2<Long, Integer>(transaction.getTimestamp(), transaction.getCreator().hashCode()));
     }
 
-    public boolean isUnViewed(Account account, Transaction transaction) {
-        return unViewed.contains(new Tuple2<Long, Integer>(transaction.getTimestamp(), account.hashCode()));
-    }
-
-    public void clearUnViewed(Account account, Transaction transaction) {
-        unViewed.remove(new Tuple2<Long, Integer>(transaction.getTimestamp(), account.hashCode()));
+    public void clearUnViewed(Transaction transaction) {
+        if (transaction.getCreator() != null)
+            unViewed.remove(new Tuple2<Long, Integer>(transaction.getTimestamp(), transaction.getCreator().hashCode()));
     }
 
     public boolean set(Tuple2<Long, Integer> key, Transaction transaction) {
-        unViewed.add(key);
+        if (transaction.getCreator() != null)
+            unViewed.add(new Tuple2<Long, Integer>(transaction.getTimestamp(), transaction.getCreator().hashCode()));
+
         return super.set(key, transaction);
     }
 
@@ -303,7 +304,6 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
     }
 
     public void put(Tuple2<Long, Integer> key, Transaction transaction) {
-        unViewed.add(key);
         super.put(key, transaction);
     }
 
@@ -312,8 +312,7 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
     }
 
     public void delete(Tuple2<Long, Integer> key) {
-        unViewed.remove(key);
-        super.delete(key);
+        this.remove(key);
     }
 
     public void delete(Account account, Transaction transaction) {
@@ -325,8 +324,10 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
     }
 
     public Transaction remove(Tuple2<Long, Integer> key) {
-        unViewed.remove(key);
-        return super.remove(key);
+        Transaction transaction = super.remove(key);
+        if (transaction.getCreator() != null)
+            unViewed.remove(new Tuple2<Long, Integer>(transaction.getTimestamp(), transaction.getCreator().hashCode()));
+        return transaction;
     }
 
 }
