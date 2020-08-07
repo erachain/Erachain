@@ -124,9 +124,6 @@ public class WalletTimer<U> implements Observer {
                 }
             } else if (event instanceof Block) {
 
-                if (true)
-                    return;
-
                 Block block = (Block) event;
 
                 sound = "blockforge.wav";
