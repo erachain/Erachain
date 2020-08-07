@@ -1452,12 +1452,18 @@ public class API {
 
         AssetCls asset = (AssetCls) map.get(key);
 
-        // image to byte[] hot scale (param2 =0)
-        //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-        ///return Response.ok(new ByteArrayInputStream(asset.getImage())).build();
+        if (asset.getImage() != null) {
+            // image to byte[] hot scale (param2 =0)
+            //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+            ///return Response.ok(new ByteArrayInputStream(asset.getImage())).build();
+            return Response.status(200)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ByteArrayInputStream(asset.getImage()))
+                    .build();
+        }
         return Response.status(200)
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(new ByteArrayInputStream(asset.getImage()))
+                .entity("")
                 .build();
 
     }
@@ -1483,12 +1489,18 @@ public class API {
 
         AssetCls asset = (AssetCls) map.get(key);
 
-        // image to byte[] hot scale (param2 =0)
-        //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-        //return Response.ok(new ByteArrayInputStream(asset.getIcon())).build();
+        if (asset.getIcon() != null) {
+            // image to byte[] hot scale (param2 =0)
+            //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+            //return Response.ok(new ByteArrayInputStream(asset.getIcon())).build();
+            return Response.status(200)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ByteArrayInputStream(asset.getIcon()))
+                    .build();
+        }
         return Response.status(200)
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(new ByteArrayInputStream(asset.getImage()))
+                .entity("")
                 .build();
     }
 
