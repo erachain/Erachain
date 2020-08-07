@@ -25,7 +25,7 @@ import java.util.*;
 
 @Path("apiperson")
 @Produces(MediaType.APPLICATION_JSON)
-public class APIPerson {
+public class APIItemPerson {
 
     @Context
     HttpServletRequest request;

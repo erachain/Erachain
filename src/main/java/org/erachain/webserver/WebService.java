@@ -30,11 +30,11 @@ public class WebService {
         s.add(WebResource.class);
         s.add(APITransactionsResource.class);
 
-        s.add(APIAsset.class);
-        s.add(APIPerson.class);
-        s.add(APIPoll.class);
-        s.add(APIStatus.class);
-        s.add(APITemplate.class);
+        s.add(APIItemAsset.class);
+        s.add(APIItemPerson.class);
+        s.add(APIItemPoll.class);
+        s.add(APIItemStatus.class);
+        s.add(APIItemTemplate.class);
 
         s.add(APIExchange.class);
         s.add(APITelegramsResource.class);

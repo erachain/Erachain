@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 @Path("assets")
 @Produces(MediaType.APPLICATION_JSON)
 @Slf4j
-public class AssetsResource {
+public class ItemAssetsResource {
     /**
      * Get all asset type 1
      *

@@ -24,7 +24,7 @@ import java.util.Map;
 
 @Path("apitemplate")
 @Produces(MediaType.APPLICATION_JSON)
-public class APITemplate {
+public class APIItemTemplate {
 
     @Context
     HttpServletRequest request;

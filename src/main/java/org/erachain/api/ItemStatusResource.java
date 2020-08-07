@@ -16,7 +16,7 @@ import javax.ws.rs.core.MediaType;
 @Path("statuss")
 @Produces(MediaType.APPLICATION_JSON)
 @Slf4j
-public class StatusResource {
+public class ItemStatusResource {
     /**
      * Get all status type 1
      *

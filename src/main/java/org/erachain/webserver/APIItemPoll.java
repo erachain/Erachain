@@ -27,7 +27,7 @@ import java.util.Map;
  */
 @Path("apipoll")
 @Produces(MediaType.APPLICATION_JSON)
-public class APIPoll {
+public class APIItemPoll {
 
     @Context
     HttpServletRequest request;

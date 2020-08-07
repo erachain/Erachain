@@ -21,9 +21,9 @@ import java.util.Collection;
 
 @Path("persons")
 @Produces(MediaType.APPLICATION_JSON)
-public class PersonsResource {
+public class ItemPersonsResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PersonsResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ItemPersonsResource.class);
 
     @Context
     HttpServletRequest request;
