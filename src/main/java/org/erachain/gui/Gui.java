@@ -26,12 +26,11 @@ public class Gui extends JFrame {
 
     private volatile static Gui maingui;
     private MainFrame mainframe;
-    private GuiTimer guiTimer;
+    public final WalletTimer walletTimer;
 
     public static boolean SHOW_FEE_POWER = false;
 
     private Gui() throws Exception {
-
 
         setGuiLookAndFeel("");
 
@@ -54,6 +53,8 @@ public class Gui extends JFrame {
             mainframe = MainFrame.getInstance();
             mainframe.setVisible(true);
         }
+
+        walletTimer = new WalletTimer();
 
     }
 

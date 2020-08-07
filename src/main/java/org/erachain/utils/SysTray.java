@@ -38,7 +38,7 @@ public class SysTray implements Observer {
     private TrayIcon icon = null;
     private PopupMenu createPopupMenu;
 
-    public boolean stopMessages = BlockChain.TEST_MODE;
+    public boolean stopMessages = BlockChain.TEST_DB > 0;
 
     private long timePoint;
 

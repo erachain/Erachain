@@ -91,7 +91,7 @@ import java.util.jar.Manifest;
 public class Controller extends Observable {
 
     public static String version = "5.0.02";
-    public static String buildTime = "2020-07-07 12:00:00 UTC";
+    public static String buildTime = "2020-08-04 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -1182,6 +1182,12 @@ public class Controller extends Observable {
     public void blockchainSyncStatusUpdate(int height) {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.BLOCKCHAIN_SYNC_STATUS, height));
+    }
+
+    public void playWalletEvent(Object object) {
+        if (gui == null || gui.walletTimer == null)
+            return;
+        gui.walletTimer.playEvent(object);
     }
 
     /**
