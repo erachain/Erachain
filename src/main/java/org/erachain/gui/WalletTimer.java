@@ -49,6 +49,9 @@ public class WalletTimer<U> implements Observer {
 
     public void update(Observable o, Object arg) {
 
+        if (!contr.doesWalletExists() || contr.wallet.synchronizeBodyUsed)
+            return;
+
         ObserverMessage messageObs = (ObserverMessage) arg;
 
         if (messageObs.getType() == ObserverMessage.GUI_REPAINT && playEvent != null) {
