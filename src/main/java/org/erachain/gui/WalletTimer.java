@@ -24,6 +24,7 @@ public class WalletTimer<U> implements Observer {
     public Object playEvent;
 
     protected Logger logger;
+    Controller contr = Controller.getInstance();
     SysTray sysTray = SysTray.getInstance();
     PlaySound playSound = PlaySound.getInstance();
     Lang lang = Lang.getInstance();
@@ -65,7 +66,7 @@ public class WalletTimer<U> implements Observer {
             String sound = "newtransaction.wav";
             String head = "";
             String message = "";
-            TrayIcon.MessageType type = TrayIcon.MessageType.INFO;
+            TrayIcon.MessageType type = TrayIcon.MessageType.NONE;
 
             if (event instanceof Transaction) {
 
