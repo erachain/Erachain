@@ -19,6 +19,7 @@ import org.erachain.utils.URLViewer;
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -84,6 +85,9 @@ public class AccountsRightPanel extends JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         table_Model = new AccountsTransactionsTableModel();
         jTable1 = new MTable(table_Model);
+
+        jTable1.setDefaultRenderer(Object.class, new TableInfoRenderer());
+
 
         if (false) {
             // не правильная сортировка - по существующим только и не дает неподтвержденные сюда внести
@@ -272,4 +276,18 @@ public class AccountsRightPanel extends JPanel {
         jTable1.setDefaultRenderer(BigDecimal.class, new RendererBigDecimals(asset.getScale()));
     }
 
+    public class TableInfoRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
+
+            if (column == 1) c.setHorizontalAlignment(CENTER);
+            else c.setHorizontalAlignment(LEFT);
+
+            if (row % 2 == 0) c.setBackground(Color.green);
+            else c.setBackground(new JLabel().getBackground());
+            return c;
+        }
+    }
 }
