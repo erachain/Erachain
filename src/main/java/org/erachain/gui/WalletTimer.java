@@ -104,7 +104,7 @@ public class WalletTimer<U> implements Observer {
                 } else {
                     sound = "newtransaction.wav";
                     head = lang.translate("New transaction");
-                    message = transaction.getTitle();
+                    message = transaction.viewFullTypeName() + ": " + transaction.getTitle();
                 }
             } else if (event instanceof Block) {
                 Block block = (Block) event;
