@@ -1184,6 +1184,12 @@ public class Controller extends Observable {
         this.notifyObservers(new ObserverMessage(ObserverMessage.BLOCKCHAIN_SYNC_STATUS, height));
     }
 
+    public void playWalletEvent(Object object) {
+        if (gui == null || gui.walletTimer == null)
+            return;
+        gui.walletTimer.playEvent(object);
+    }
+
     /**
      * Total time in disconnect
      *
@@ -2295,6 +2301,13 @@ public class Controller extends Observable {
     }
 
     public boolean isMyAccountByAddress(String address) {
+        if (this.doesWalletExists()) {
+            return this.wallet.accountExists(address);
+        }
+        return false;
+    }
+
+    public boolean isMyAccountByAddress(Account address) {
         if (this.doesWalletExists()) {
             return this.wallet.accountExists(address);
         }
@@ -3434,7 +3447,7 @@ public class Controller extends Observable {
     public byte[] getPublicKey(Account account) {
 
         // CHECK ACCOUNT IN OWN WALLET
-        if (isMyAccountByAddress(account.getAddress())) {
+        if (isMyAccountByAddress(account)) {
             if (isWalletUnlocked()) {
                 return getWalletPrivateKeyAccountByAddress(account.getAddress()).getPublicKey();
             }
