@@ -78,36 +78,53 @@ public class WalletTimer<U> implements Observer {
                         if (contr.wallet.accountExists(rSend.getCreator().getAddress())) {
                             sound = "send.wav";
                             head = lang.translate("Payment send");
-                            message = rSend.getCreator().getPersonAsString() + "\nTo: " + rSend.getRecipient().getPersonAsString() + "\n"
-                                    + "Asset Key" + ": " + rSend.getAbsKey() + ", " + lang.translate("Amount") + ": "
-                                    + rSend.getAmount().toPlainString()
-                                    + (rSend.getHead() != null ? "\n Title" + ":" + rSend.getHead() : "");
+                            message = rSend.getCreator().getPersonAsString() + " -> \n "
+                                    + rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
+                                    + rSend.getRecipient().getPersonAsString() + "\n"
+                                    + (rSend.getHead() != null ? "\n" + rSend.getHead() : "");
                         } else {
                             sound = "receivepayment.wav";
                             head = lang.translate("Payment received");
-                            message = rSend.getCreator().getPersonAsString() + "\nTo: " + rSend.getRecipient().getPersonAsString() + "\n"
-                                    + "Asset Key" + ": " + rSend.getAbsKey() + ", " + lang.translate("Amount") + ": "
-                                    + rSend.getAmount().toPlainString()
-                                    + (rSend.getHead() != null ? "\n Title" + ":" + rSend.getHead() : "");
+                            message = rSend.getRecipient().getPersonAsString() + " <- \n "
+                                    + rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
+                                    + rSend.getCreator().getPersonAsString() + "\n"
+                                    + (rSend.getHead() != null ? "\n" + rSend.getHead() : "");
                         }
                     } else {
-                        if (!contr.wallet.accountExists(rSend.getCreator().getAddress())) {
+                        if (contr.wallet.accountExists(rSend.getCreator().getAddress())) {
                             sound = "send.wav";
                             head = lang.translate("Mail send");
-                            message = rSend.getCreator().getPersonAsString() + "\nTo: " + rSend.getRecipient().getPersonAsString() + "\n"
-                                    + (rSend.getHead() != null ? "\n Title" + ":" + rSend.getHead() : "");
+                            message = rSend.getCreator().getPersonAsString() + " -> \n "
+                                    //+ rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
+                                    + rSend.getRecipient().getPersonAsString() + "\n"
+                                    + (rSend.getHead() != null ? "\n" + rSend.getHead() : "");
                         } else {
-
+                            sound = "receivepayment.wav";
+                            head = lang.translate("Mail received");
+                            message = rSend.getRecipient().getPersonAsString() + " <- \n "
+                                    //+ rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
+                                    + rSend.getCreator().getPersonAsString() + "\n"
+                                    + (rSend.getHead() != null ? "\n" + rSend.getHead() : "");
                         }
 
                     }
 
                 } else {
-                    sound = "newtransaction.wav";
-                    head = lang.translate("New transaction");
-                    message = transaction.viewFullTypeName() + ": " + transaction.getTitle();
+                    if (contr.wallet.accountExists(transaction.getCreator().getAddress())) {
+                        sound = "outcometransaction.wav";
+                        head = lang.translate("Outcome transaction") + ": " + transaction.viewFullTypeName();
+                        message = transaction.getTitle();
+                    } else {
+                        sound = "incometransaction.wav";
+                        head = lang.translate("Income transaction") + ": " + transaction.viewFullTypeName();
+                        message = transaction.getTitle();
+                    }
                 }
             } else if (event instanceof Block) {
+
+                if (true)
+                    return;
+
                 Block block = (Block) event;
 
                 sound = "blockforge.wav";
