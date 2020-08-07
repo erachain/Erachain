@@ -12,7 +12,7 @@ import java.util.TreeMap;
 public class NativeMapTreeMapFork<T, U> extends DBMapSuitFork<T, U> implements ForkedMap {
 
     public NativeMapTreeMapFork(DBTab parent, DBASet databaseSet, Comparator comparator, DBTab cover) {
-        super(parent, databaseSet, comparator, logger, cover);
+        super(parent, databaseSet, comparator, cover);
     }
 
     @Override

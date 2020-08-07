@@ -1338,6 +1338,8 @@ public class Wallet extends Observable /*implements Observer*/ {
 			// PROCESS FEE
 			feeProcess(dcSet, block.blockHead.totalFee, blockGenerator, false);
 
+			Controller.getInstance().gui.walletTimer.playEvent(block);
+
 		}
 
 		// CHECK TRANSACTIONS
@@ -1356,6 +1358,8 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 			if (!processTransaction(transaction))
 				continue;
+
+			Controller.getInstance().gui.walletTimer.playEvent(transaction);
 
 			// SKIP PAYMENT TRANSACTIONS
 			if (transaction instanceof RSend) {
