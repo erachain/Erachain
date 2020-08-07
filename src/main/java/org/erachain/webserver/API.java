@@ -66,12 +66,15 @@ public class API {
         Map help = new LinkedHashMap();
 
         help.put("see /apiasset", "Help for assets API");
-        help.put("see /apidocuments", "Help for documents API");
-        help.put("see /apiperson", "Help for person API");
         help.put("see /apipoll", "Help for polls API");
+        help.put("see /apiperson", "Help for persons API");
+        help.put("see /apitemplate", "Help for templates API");
+        help.put("see /apistatus", "Help for statuses API");
+
         help.put("see /apitelegrams", "Help for telegrams API");
         help.put("see /apiexchange", "Help for exchange API");
         help.put("see /apirecords", "Help for transactions API");
+        help.put("see /apidocuments", "Help for documents API");
 
         help.put("*** BALANCE SYSTEM ***", "");
         help.put("bal 1", "Balance Components - {Total_Income, Remaining_Balance]");
