@@ -1184,6 +1184,12 @@ public class Controller extends Observable {
         this.notifyObservers(new ObserverMessage(ObserverMessage.BLOCKCHAIN_SYNC_STATUS, height));
     }
 
+    public void playWalletEvent(Object object) {
+        if (gui == null || gui.walletTimer == null)
+            return;
+        gui.walletTimer.playEvent(object);
+    }
+
     /**
      * Total time in disconnect
      *
