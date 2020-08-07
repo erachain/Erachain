@@ -2307,6 +2307,13 @@ public class Controller extends Observable {
         return false;
     }
 
+    public boolean isMyAccountByAddress(Account address) {
+        if (this.doesWalletExists()) {
+            return this.wallet.accountExists(address);
+        }
+        return false;
+    }
+
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> getWalletUnconfirmedBalance(Account account, long key) {
         return this.wallet.getUnconfirmedBalance(account, key);
     }
@@ -3440,7 +3447,7 @@ public class Controller extends Observable {
     public byte[] getPublicKey(Account account) {
 
         // CHECK ACCOUNT IN OWN WALLET
-        if (isMyAccountByAddress(account.getAddress())) {
+        if (isMyAccountByAddress(account)) {
             if (isWalletUnlocked()) {
                 return getWalletPrivateKeyAccountByAddress(account.getAddress()).getPublicKey();
             }

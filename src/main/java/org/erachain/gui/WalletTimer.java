@@ -81,7 +81,7 @@ public class WalletTimer<U> implements Observer {
                     RSend rSend = (RSend) transaction;
                     if (rSend.hasAmount()) {
                         // TRANSFER
-                        if (creator != null && contr.wallet.accountExists(creator.getAddress())) {
+                        if (contr.wallet.accountExists(creator)) {
                             sound = "send.wav";
                             head = lang.translate("Payment send");
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
@@ -98,7 +98,7 @@ public class WalletTimer<U> implements Observer {
                         }
                     } else {
                         // MAIL
-                        if (creator != null && contr.wallet.accountExists(rSend.getCreator().getAddress())) {
+                        if (contr.wallet.accountExists(rSend.getCreator())) {
                             sound = "send.wav";
                             head = lang.translate("Mail send");
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
@@ -117,7 +117,7 @@ public class WalletTimer<U> implements Observer {
                     }
 
                 } else {
-                    if (creator != null && contr.wallet.accountExists(transaction.getCreator().getAddress())) {
+                    if (contr.wallet.accountExists(transaction.getCreator())) {
                         sound = "outcometransaction.wav";
                         head = lang.translate("Outcome transaction") + ": " + transaction.viewFullTypeName();
                         message = transaction.getTitle();
