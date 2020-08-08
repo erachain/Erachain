@@ -51,6 +51,7 @@ import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.*;
+import org.erachain.webserver.SslUtils;
 import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
 import org.json.simple.JSONObject;
@@ -67,6 +68,7 @@ import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
@@ -75,7 +77,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.KeyStore;
 import java.security.SecureRandom;
+import java.security.cert.Certificate;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -752,6 +756,22 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Start WEB Service")));
             LOGGER.info(Lang.getInstance().translate("Start WEB Service"));
+            // verify SSL certifycate
+            if(Settings.getInstance().isWebUseSSL()){
+                try {
+                    Tuple3<KeyStore, Certificate, String> result = SslUtils.GetWebKeystore(Settings.getInstance().getWebKeyStorePath(), Settings.getInstance().getWebKeyStorePassword(), Settings.getInstance().getWebStoreSourcePassword());
+                    if (result.a == null) {
+                        LOGGER.error(Lang.getInstance().translate("WEB SSL not started: ") + ": " + result.c);
+
+                    } else {
+                        LOGGER.info(Lang.getInstance().translate("Start SSL is OK"));
+                        LOGGER.info("SSL public key: " + result.b.getPublicKey().toString());
+                    }
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+
+                }
+            }
             this.webService = WebService.getInstance();
             this.webService.start();
         }

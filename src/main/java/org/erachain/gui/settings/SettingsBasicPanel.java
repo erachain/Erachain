@@ -2,7 +2,9 @@ package org.erachain.gui.settings;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.wallet.Wallet;
+import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.FileChooser;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.lang.Lang;
 import org.erachain.lang.LangFile;
 import org.erachain.settings.Settings;
@@ -17,6 +19,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.KeyStore;
+import java.security.cert.Certificate;
 
 @SuppressWarnings("serial")
 public class SettingsBasicPanel extends JPanel {
@@ -303,23 +306,30 @@ public class SettingsBasicPanel extends JPanel {
         buttonVeryfytWebKeystoreFilePath.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    Fun.Tuple2<KeyStore, String> result = SslUtils.GetWebKeystore(textWebKeyStoreFilePath.getText(),new String(textWebKeystorePass.getPassword()), new String(textWebCertificatePass.getPassword()));
+                    Fun.Tuple3<KeyStore, Certificate, String> result = SslUtils.GetWebKeystore(textWebKeyStoreFilePath.getText(),new String(textWebKeystorePass.getPassword()), new String(textWebCertificatePass.getPassword()));
                     if(result.a == null){
                         JOptionPane.showMessageDialog(
-                                new JFrame(), Lang.getInstance().translate(result.b),
+                                new JFrame(), Lang.getInstance().translate(result.c),
                                 Lang.getInstance().translate("Error!"),
                                 JOptionPane.ERROR_MESSAGE);
                     }
                     else{
-                        JOptionPane.showMessageDialog(
-                                new JFrame(), Lang.getInstance().translate("KeyStore is OK"),
-                                Lang.getInstance().translate("Ok"),
-                                JOptionPane.PLAIN_MESSAGE);//.INFORMATION_MESSAGE);
+                        Certificate cetrtyficatemy = result.b;
+
+                        IssueConfirmDialog dd = new IssueConfirmDialog(null, true, null,
+                                Lang.getInstance().translate("SSL is OK "), MainFrame.getInstance().getWidth()-100, MainFrame.getInstance().getHeight()-100, Lang.getInstance().translate(""));
+
+                        dd.setTitle(Lang.getInstance().translate("SSL is OK."));
+                        dd.jTextPane1.setText("Certificate: \n " + cetrtyficatemy.toString());
+                        dd.jButton1.setVisible(false);
+                        dd.jButton2.setText(Lang.getInstance().translate("OK"));
+                        dd.setLocationRelativeTo(null);
+                        dd.setVisible(true);
 
                     }
                 } catch (FileNotFoundException e1) {
                     JOptionPane.showMessageDialog(
-                            new JFrame(), Lang.getInstance().translate(e1.getMessage()),
+                            new JFrame(), Lang.getInstance().translate(e1.getLocalizedMessage()),
                             Lang.getInstance().translate("Error!"),
                             JOptionPane.ERROR_MESSAGE);
                 }
