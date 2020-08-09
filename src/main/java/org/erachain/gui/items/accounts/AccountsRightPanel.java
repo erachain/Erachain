@@ -88,6 +88,7 @@ public class AccountsRightPanel extends JPanel {
         jTable1 = new MTable(tableModel);
 
         jTable1.setDefaultRenderer(Object.class, new WalletTableRenderer());
+        jTable1.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
         TableColumnModel columnModel = jTable1.getColumnModel();
         //columnModel.getColumn(0).setMaxWidth((100));
         columnModel.getColumn(tableModel.COLUMN_SEQNO).setPreferredWidth(100);

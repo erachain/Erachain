@@ -55,6 +55,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         incoming_Mails_Model = new TableModelMails(false);
         inciming_Mail_Table = new MTable(incoming_Mails_Model);
         inciming_Mail_Table.setDefaultRenderer(Object.class, new WalletTableRenderer());
+        inciming_Mail_Table.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
 
         inciming_Mail_Table.setAutoCreateRowSorter(true);
 

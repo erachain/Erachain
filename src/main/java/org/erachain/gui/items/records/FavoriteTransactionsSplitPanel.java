@@ -61,6 +61,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
         // SET VIDEO
         jTableJScrollPanelLeftPanel = new MTable(this.favotitesTable);
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
 
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
         columnModel.getColumn(0).setMaxWidth((100));

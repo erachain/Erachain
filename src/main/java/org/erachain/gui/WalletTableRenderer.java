@@ -7,13 +7,28 @@ import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 
 public class WalletTableRenderer extends DefaultTableCellRenderer {
+
+    private final DefaultTableCellRenderer adaptee = new DefaultTableCellRenderer();
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
 
-        //if (column == 1) c.setHorizontalAlignment(CENTER);
-        //else c.setHorizontalAlignment(LEFT);
+        adaptee.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+        if (value instanceof Boolean) {
+            JCheckBox checkbox = new JCheckBox();
+            checkbox.setSelected((Boolean) value);
+            checkbox.setHorizontalAlignment(JLabel.CENTER);
+            checkbox.setBorderPainted(true);
+
+            checkbox.setForeground(adaptee.getForeground());
+            checkbox.setBackground(adaptee.getBackground());
+            checkbox.setFont(adaptee.getFont());
+            return checkbox;
+        }
+
+        JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
 
         Object isUnViewed = table.getValueAt(row, AccountsTransactionsTableModel.COLUMN_UN_VIEWED);
         if (isUnViewed != null && (boolean) isUnViewed) {
@@ -21,9 +36,8 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
             font = new Font(font.getName(), Font.BOLD, font.getSize());
             c.setFont(font);
         } else {
-            JLabel label = new JLabel();
-            c.setForeground(label.getForeground());
-            c.setFont(label.getFont());
+            c.setBackground(adaptee.getBackground());
+            c.setFont(adaptee.getFont());
         }
 
         Object isOutcome = table.getValueAt(row, AccountsTransactionsTableModel.COLUMN_IS_OUTCOME);
@@ -33,7 +47,6 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
             JLabel label = new JLabel();
             c.setForeground(label.getForeground());
         }
-
 
         return c;
     }
