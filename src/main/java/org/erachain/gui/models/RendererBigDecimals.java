@@ -1,19 +1,18 @@
 package org.erachain.gui.models;
 
+import org.erachain.gui.WalletTableRenderer;
+
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import java.math.BigDecimal;
 
 /**
- *
- * @author  Ermolaev Alexander
+ * @author Ermolaev Alexander
  * @see JTable
  */
-public class RendererBigDecimals extends DefaultTableCellRenderer
-
-{
+public class RendererBigDecimals extends WalletTableRenderer {
 
     private int scale;
+
     /**
      * Creates a BigDecimal table cell renderer.
      ** @param scale the scale digits view

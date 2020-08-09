@@ -26,6 +26,9 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
             checkbox.setBackground(adaptee.getBackground());
             checkbox.setFont(adaptee.getFont());
             return checkbox;
+        } else if (value instanceof Number) {
+            JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
+            c.setHorizontalAlignment(SwingConstants.RIGHT);
         }
 
         JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, false, row, column);

@@ -65,6 +65,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         this.jTableJScrollPanelLeftPanel = new MTable(this.recordsModel);
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Number.class, new WalletTableRenderer());
 
         this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
 
