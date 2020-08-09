@@ -37,8 +37,8 @@ public class TableModelMails extends WalletTableModel<Transaction> {
     public TableModelMails(boolean incoming) {
 
         super(Controller.getInstance().wallet.database.getTransactionMap(),
-                new String[]{"Confirmation", "Date", "Title", "Sender", "Reciever"},
-                new Boolean[]{true, false, true, true, false}, true, -1);
+                new String[]{"Confirmation", "Date", "Title", "Sender", "Receiver"},
+                new Boolean[]{true, false, true, true, false}, true, 1000);
         this.incoming = incoming;
         this.dcSet = DCSet.getInstance();
 

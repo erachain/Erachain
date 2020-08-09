@@ -125,26 +125,24 @@ public class tt extends JPanel { // implements TreeSelectionListener {
             root.add(bank_Tree);
 
         root.add(account_Node);
-        root.add(person_Node);
-        root.add(document_Node);
+        root.add(telegrams_Tree);
+        root.add(records_Node);
         root.add(mails_Node);
-        root.add(assets_Node);
+        root.add(document_Node);
         root.add(exchange_Node);
+        root.add(assets_Node);
+        root.add(person_Node);
+        root.add(polls_Node);
         root.add(templates_Node);
         root.add(statuses_Node);
 
         if (BlockChain.TEST_MODE)
             root.add(unions_Node);
 
-        root.add(polls_Node);
 
         root.add(hashes_Node);
         root.add(linked_hashes_Node);
 
-        if (true || BlockChain.TEST_MODE)
-            root.add(telegrams_Tree);
-
-        root.add(records_Node);
         root.add(other_Node);
 
         bank_Tree.add(new ASMutableTreeNode(IssueSendPaymentOrder.NAME, IssueSendPaymentOrder.TITLE));
