@@ -1,10 +1,10 @@
 package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.Iconable;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
@@ -326,11 +326,11 @@ public class AccountsRightPanel extends JPanel {
         @Override
         protected void setValue(Object value) {
 
-            if (value != null && value instanceof ItemCls) {
+            if (value != null && value instanceof Iconable) {
                 // Get icon to use for the list item value
-                ItemCls item = (ItemCls) value;
+                Iconable iconable = (Iconable) value;
 
-                byte[] iconBytes = item.getIcon();
+                byte[] iconBytes = iconable.getIcon();
                 if (iconBytes != null && iconBytes.length > 0) {
                     ImageIcon image = new ImageIcon(iconBytes);
                     setIcon(new ImageIcon(image.getImage().getScaledInstance(20, 20, 1)));
