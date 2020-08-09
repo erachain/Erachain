@@ -3,7 +3,9 @@ package org.erachain.gui.items.mails;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.items.accounts.AccountsRightPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
@@ -51,6 +53,8 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         // TABLE
         incoming_Mails_Model = new TableModelMails(true);
         inciming_Mail_Table = new MTable(incoming_Mails_Model);
+        inciming_Mail_Table.setDefaultRenderer(Object.class, new AccountsRightPanel.TableInfoRenderer());
+
         inciming_Mail_Table.setAutoCreateRowSorter(true);
 
         // MENU
@@ -215,6 +219,8 @@ public class IncomingMailsSplitPanel extends SplitPanel {
             // info1.show_001(person);
             if (mail == null)
                 return;
+
+            ((WTransactionMap) incoming_Mails_Model.getMap()).clearUnViewed(mail);
 
             //((WTransactionMap) TableModelMails.getMap()).clearUnViewed(IncomingMailsSplitPanel.this.notifyAll(););
             MailInfo info_panel = new MailInfo(mail);

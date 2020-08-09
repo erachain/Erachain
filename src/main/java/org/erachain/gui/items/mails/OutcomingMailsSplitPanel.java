@@ -2,7 +2,9 @@ package org.erachain.gui.items.mails;
 
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.items.accounts.AccountsRightPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -52,6 +54,8 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         //TABLE
         incoming_Mails_Model = new TableModelMails(false);
         inciming_Mail_Table = new MTable(incoming_Mails_Model);
+        inciming_Mail_Table.setDefaultRenderer(Object.class, new AccountsRightPanel.TableInfoRenderer());
+
         inciming_Mail_Table.setAutoCreateRowSorter(true);
 
         //		TableColumnModel columnModel = inciming_Mail_Table.getColumnModel(); // read column model
@@ -186,6 +190,9 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 
             RSend mail = (RSend) incoming_Mails_Model.getItem(inciming_Mail_Table.convertRowIndexToModel(inciming_Mail_Table.getSelectedRow()));
             if (mail == null) return;
+
+            ((WTransactionMap) incoming_Mails_Model.getMap()).clearUnViewed(mail);
+
             MailInfo info_panel = new MailInfo(mail);
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
 
