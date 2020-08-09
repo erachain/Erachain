@@ -5,6 +5,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.items.accounts.AccountsRightPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.SetIntervalPanel;
@@ -57,7 +58,10 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         //CREATE TABLE
         this.records_model = new WalletTransactionsTableModel();
         this.jTableJScrollPanelLeftPanel = new MTable(this.records_model);
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new AccountsRightPanel.TableInfoRenderer());
+
         this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
+
 
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
         columnModel.getColumn(0).setMaxWidth((100));
@@ -117,7 +121,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                 int row = jTableJScrollPanelLeftPanel.getSelectedRow();
                 row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 if (row < 0) return;
-                selectedTransaction = records_model.getItem(row);
+                selectedTransaction = records_model.getItem(row).b;
                 //selectedTransactionKey = records_model.getItem(row);
             }
 
@@ -134,7 +138,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                 int row = jTableJScrollPanelLeftPanel.getSelectedRow();
                 row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 if (row < 0) return;
-                selectedTransaction = records_model.getItem(row);
+                selectedTransaction = records_model.getItem(row).b;
                 //selectedTransactionKey = records_model.getPairItem(row).getA();
 
             }
@@ -297,7 +301,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
             Transaction trans = null;
             if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0 && jTableJScrollPanelLeftPanel.getSelectedRow() < records_model.getRowCount()) {
                 trans = (Transaction) records_model
-                        .getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                        .getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow())).b;
 
                 ((WTransactionMap) records_model.getMap()).clearUnViewed(trans);
 

@@ -278,7 +278,7 @@ public class AccountsRightPanel extends JPanel {
         jTable1.setDefaultRenderer(BigDecimal.class, new RendererBigDecimals(asset.getScale()));
     }
 
-    public class TableInfoRenderer extends DefaultTableCellRenderer {
+    public static class TableInfoRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus, int row, int column) {

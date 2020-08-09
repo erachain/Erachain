@@ -7,14 +7,16 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
+import org.mapdb.Fun.Tuple2;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 
 @SuppressWarnings("serial")
-public class WalletTransactionsTableModel extends WalletTableModel<Transaction> {
+public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2<Long, Integer>, Transaction>> {
 
+    public static final int COLUMN_IS_OUTCOME = -2;
+    public static final int COLUMN_UN_VIEWED = -1;
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;
     public static final int COLUMN_TYPE = 2;
@@ -48,98 +50,54 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
             return null;
         }
 
-        Transaction transaction = this.list.get(row);
+        Tuple2<Tuple2<Long, Integer>, Transaction> rowItem = this.list.get(row);
+        Transaction transaction = rowItem.b;
 
-        String itemName = "";
+        ItemCls item = null;
         if (transaction instanceof TransactionAmount && transaction.getAbsKey() > 0) {
             TransactionAmount transAmo = (TransactionAmount) transaction;
-            //recipient = transAmo.getRecipient();
-            ItemCls item = DCSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
-            if (item == null)
-                return null;
-
-            itemName = item.toString();
+            item = DCSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
         } else if (transaction instanceof GenesisTransferAssetTransaction) {
             GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction) transaction;
-            //recipient = transGen.getRecipient();
-            ItemCls item = DCSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
-            if (item == null)
-                return null;
-
-            itemName = item.toString();
-            //creator_address = transGen.getRecipient().getAddress();
+            item = DCSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
         } else if (transaction instanceof IssueItemRecord) {
             IssueItemRecord transIssue = (IssueItemRecord) transaction;
-            ItemCls item = transIssue.getItem();
-            if (item == null)
-                return null;
-
-            itemName = item.getShort();
+            item = transIssue.getItem();
         } else if (transaction instanceof GenesisIssueItemRecord) {
             GenesisIssueItemRecord transIssue = (GenesisIssueItemRecord) transaction;
-            ItemCls item = transIssue.getItem();
-            if (item == null)
-                return null;
-
-            itemName = item.getShort();
+            item = transIssue.getItem();
         } else if (transaction instanceof RSertifyPubKeys) {
             RSertifyPubKeys sertifyPK = (RSertifyPubKeys) transaction;
-            //recipient = transAmo.getRecipient();
-            ItemCls item = DCSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
-            if (item == null)
-                return null;
-
-            itemName = item.toString();
+            item = DCSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
         } else {
-
-            try {
-                if (transaction.viewItemName() != null) {
-                    itemName = transaction.viewItemName();
-                }
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                //e.printStackTrace();
-                itemName = "";
-            }
-
 
         }
         switch (column) {
-            case COLUMN_CONFIRMATIONS:
+            case COLUMN_IS_OUTCOME:
+                if (transaction.getCreator() != null)
+                    return transaction.getCreator().hashCode() == rowItem.a.b;
+                return false;
 
+            case COLUMN_UN_VIEWED:
+                return ((WTransactionMap) map).isUnViewed(transaction);
+
+            case COLUMN_CONFIRMATIONS:
                 return transaction.getConfirmations(DCSet.getInstance());
 
             case COLUMN_TIMESTAMP:
-
-                if (((WTransactionMap) map).isUnViewed(transaction)) {
-                    return "<html><span style='color:red;font-weight:bold'>" + transaction.viewTimestamp() + "</span></html>";
-                }
-
                 return transaction.viewTimestamp();//.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
 
             case COLUMN_TYPE:
-
-                if (((WTransactionMap) map).isUnViewed(transaction)) {
-                    return "<html><span style='color:red;font-weight:bold'>" + Lang.getInstance().translate(transaction.viewFullTypeName()) + "</span></html>";
-                }
                 return Lang.getInstance().translate(transaction.viewFullTypeName());
 
             case COLUMN_CREATOR:
-
-                if (((WTransactionMap) map).isUnViewed(transaction)) {
-                    return "<html><span style='color:red;font-weight:bold'>" + transaction.viewCreator() + "</span></html>";
-                }
                 return transaction.viewCreator();
 
             case COLUMN_ITEM:
-                return itemName;
+                return item;
 
             case COLUMN_AMOUNT:
-
-                BigDecimal amo = transaction.getAmount();
-                if (amo == null)
-                    return BigDecimal.ZERO;
-                return amo;
+                return transaction.getAmount();
 
             case COLUMN_RECIPIENT:
 
@@ -178,7 +136,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
             try (IteratorCloseable iterator = map.getDescendingIterator()) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
-                    list.add((Transaction) map.get(key));
+                    list.add(new Tuple2<>((Tuple2<Long, Integer>) key, (Transaction) map.get(key)));
                 }
             } catch (IOException e) {
             }
@@ -186,17 +144,17 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
             try (IteratorCloseable iterator = map.getDescendingIterator()) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
-                    list.add((Transaction) map.get(key));
+                    list.add(new Tuple2<>((Tuple2<Long, Integer>) key, (Transaction) map.get(key)));
                 }
             } catch (IOException e) {
             }
         }
 
         DCSet dcSet = DCSet.getInstance();
-        for (Transaction item : list) {
+        for (Tuple2<Tuple2<Long, Integer>, Transaction> item : list) {
 
-            item.setDC(dcSet, false);
-            item.calcFee();
+            item.b.setDC(dcSet, false);
+            item.b.calcFee();
         }
 
     }
