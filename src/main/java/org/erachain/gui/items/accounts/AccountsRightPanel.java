@@ -23,6 +23,7 @@ import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
@@ -88,6 +89,16 @@ public class AccountsRightPanel extends JPanel {
         jTable1 = new MTable(tableModel);
 
         jTable1.setDefaultRenderer(Object.class, new TableInfoRenderer());
+        TableColumnModel columnModel = jTable1.getColumnModel();
+        //columnModel.getColumn(0).setMaxWidth((100));
+        columnModel.getColumn(tableModel.COLUMN_SEQNO).setPreferredWidth(100);
+        columnModel.getColumn(tableModel.COLUMN_SEQNO).setMaxWidth(150);
+        columnModel.getColumn(tableModel.COLUMN_AMOUNT).setPreferredWidth(150);
+        columnModel.getColumn(tableModel.COLUMN_AMOUNT).setMaxWidth(200);
+        columnModel.getColumn(tableModel.COLUMN_CONFIRM).setPreferredWidth(70);
+        columnModel.getColumn(tableModel.COLUMN_CONFIRM).setMaxWidth(100);
+        columnModel.getColumn(tableModel.COLUMN_FAVORITE).setPreferredWidth(100);
+        columnModel.getColumn(tableModel.COLUMN_FAVORITE).setMaxWidth(150);
 
 
         if (false) {
