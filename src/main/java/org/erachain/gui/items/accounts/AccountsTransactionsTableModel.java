@@ -9,6 +9,7 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.models.WalletTableModel;
 import org.mapdb.Fun;
 
@@ -21,8 +22,8 @@ import java.util.HashSet;
 
 @SuppressWarnings("serial")
 public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTransactionsTableModel.Trans> implements ObserverWaiter {
-    public static final int COLUMN_IS_OUTCOME = -2;
-    public static final int COLUMN_UN_VIEWED = -1;
+    public static final int COLUMN_IS_OUTCOME = WalletTableRenderer.COLUMN_IS_OUTCOME;
+    public static final int COLUMN_UN_VIEWED = WalletTableRenderer.COLUMN_UN_VIEWED;
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_SEQNO = 1;
     public static final int COLUMN_AMOUNT = 2;

@@ -2,21 +2,24 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun.Tuple2;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 @SuppressWarnings("serial")
 public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2<Long, Integer>, Transaction>> {
 
-    public static final int COLUMN_IS_OUTCOME = -2;
-    public static final int COLUMN_UN_VIEWED = -1;
+    public static final int COLUMN_IS_OUTCOME = WalletTableRenderer.COLUMN_IS_OUTCOME;
+    public static final int COLUMN_UN_VIEWED = WalletTableRenderer.COLUMN_UN_VIEWED;
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;
     public static final int COLUMN_TYPE = 2;
@@ -98,7 +101,12 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
                 return item;
 
             case COLUMN_AMOUNT:
-                return transaction.getAmount();
+                BigDecimal amount = transaction.getAmount();
+                if (amount != null && item != null && item instanceof AssetCls) {
+                    amount = amount.setScale(((AssetCls) item).getScale());
+                }
+
+                return amount;
 
             case COLUMN_RECIPIENT:
 
