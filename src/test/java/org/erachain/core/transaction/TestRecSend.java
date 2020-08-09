@@ -57,6 +57,7 @@ public class TestRecSend {
     private DCSet db;
     private GenesisBlock gb;
     Block block;
+    private long seqNo =0;
 
     // INIT ASSETS
     private void init() {

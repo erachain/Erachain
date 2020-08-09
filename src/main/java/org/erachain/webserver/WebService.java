@@ -140,7 +140,8 @@ public class WebService {
                     LOGGER.info("SSL public key: " + result.b.getPublicKey().toString());
                 }
             } catch (FileNotFoundException e1) {
-                e1.printStackTrace();
+               // e1.printStackTrace();
+                LOGGER.error(e1.getLocalizedMessage());
                 certificateSslIsOk = false;
 
             }
@@ -157,16 +158,16 @@ public class WebService {
                         Settings.getInstance().getWebStoreSourcePassword());
 
             } catch (IOException e) {
-                e.printStackTrace();
-                LOGGER.error("Web server start SSL. Error IO");
+                //e.printStackTrace();
+                LOGGER.error(e.getLocalizedMessage());
             } catch (URISyntaxException e) {
-                LOGGER.error("Web server start SSL. Error URL");
+                LOGGER.error(e.getLocalizedMessage());
             }
         } else {
             try {
                 addHttpConnector(this.server, Settings.getInstance().getWebPort());
             } catch (URISyntaxException e) {
-                LOGGER.error("Web server start. Error URL");
+                LOGGER.error(e.getLocalizedMessage());
             }
         }
     }
