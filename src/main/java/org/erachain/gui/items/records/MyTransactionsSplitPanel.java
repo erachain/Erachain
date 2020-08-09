@@ -28,10 +28,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -42,7 +39,7 @@ import java.util.TimerTask;
 public class MyTransactionsSplitPanel extends SplitPanel {
 
     public static String NAME = "MyTransactionsSplitPanel";
-    public static String TITLE = "My Records";
+    public static String TITLE = "My Transactions";
 
     private static final long serialVersionUID = 2717571093561259483L;
     private static MyTransactionsSplitPanel instance;
@@ -288,6 +285,21 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
             }
 
+        });
+
+        jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionListener() {
+            public void mouseMoved(MouseEvent e) {
+
+                if (jTableJScrollPanelLeftPanel.columnAtPoint(e.getPoint()) == recordsModel.COLUMN_FAVORITE) {
+                    jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+                } else {
+                    jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+
+            public void mouseDragged(MouseEvent e) {
+            }
         });
 
     }
