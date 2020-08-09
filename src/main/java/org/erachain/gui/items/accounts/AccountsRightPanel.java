@@ -2,7 +2,6 @@ package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
@@ -261,8 +260,10 @@ public class AccountsRightPanel extends JPanel {
                     //    jTable1.setSelectionBackground(Color.red);
                     //}
 
-                    Transaction transaction = table_Model.getItem(th.row).transaction;
-                    ((WTransactionMap) table_Model.getMap()).clearUnViewed(transaction);
+                    AccountsTransactionsTableModel.Trans rowItem = table_Model.getItem(th.row);
+                    rowItem.isUnViewed = false;
+                    ((WTransactionMap) table_Model.getMap()).clearUnViewed(rowItem.transaction);
+                    //table_Model.fireTableCellUpdated(th.row);
                 }
             }
         });
@@ -282,11 +283,27 @@ public class AccountsRightPanel extends JPanel {
                                                        boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
 
-            if (column == 1) c.setHorizontalAlignment(CENTER);
-            else c.setHorizontalAlignment(LEFT);
+            //if (column == 1) c.setHorizontalAlignment(CENTER);
+            //else c.setHorizontalAlignment(LEFT);
 
-            if (row % 2 == 0) c.setBackground(Color.green);
-            else c.setBackground(new JLabel().getBackground());
+            if ((boolean) table.getValueAt(row, AccountsTransactionsTableModel.COLUMN_UN_VIEWED)) {
+                Font font = c.getFont();
+                font = new Font(font.getName(), Font.BOLD, font.getSize());
+                c.setFont(font);
+            } else {
+                JLabel label = new JLabel();
+                c.setForeground(label.getForeground());
+                c.setFont(label.getFont());
+            }
+
+            if ((boolean) table.getValueAt(row, AccountsTransactionsTableModel.COLUMN_IS_OUTCOME)) {
+                c.setForeground(Color.RED);
+            } else {
+                JLabel label = new JLabel();
+                c.setForeground(label.getForeground());
+            }
+
+
             return c;
         }
     }

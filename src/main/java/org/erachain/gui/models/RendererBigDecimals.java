@@ -38,7 +38,8 @@ public class RendererBigDecimals extends DefaultTableCellRenderer
     protected void setValue(Object value) {
 
         try {
-            setText((value == null) ? "" :  ((BigDecimal)value).setScale(scale).toString());
+            setText((value == null) ? "" :
+                    value instanceof BigDecimal ? ((BigDecimal) value).setScale(scale).toString() : value.toString());
         } catch (Exception e) {
             e.printStackTrace();
             setText("");
