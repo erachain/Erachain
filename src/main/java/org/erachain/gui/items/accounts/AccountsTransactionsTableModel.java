@@ -23,9 +23,9 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
     public static final int COLUMN_IS_OUTCOME = -2;
     public static final int COLUMN_UN_VIEWED = -1;
     public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_TRANSACTION = 1;
+    public static final int COLUMN_SEQNO = 1;
     public static final int COLUMN_AMOUNT = 2;
-    public static final int COLUMN_ASSET = 3;
+    public static final int COLUMN_ITEM_CLS = 3;
     public static final int COLUMN_TYPE = 4;
     public static final int COLUMN_SENDER = 5;
     public static final int COLUMN_RECIPIENT = 6;
@@ -82,7 +82,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
                 return itemTran.transaction.viewTimestamp();
 
-            case COLUMN_TRANSACTION:
+            case COLUMN_SEQNO:
 
                 if (itemTran.transaction.getBlockHeight() > 0) {
                     return itemTran.transaction.viewHeightSeq();
@@ -92,11 +92,11 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
             case COLUMN_AMOUNT:
                 return itemTran.amount;
 
-            case COLUMN_ASSET:
-
-                if (false && itemTran.isUnViewed) {
+            case COLUMN_ITEM_CLS:
+                if (itemTran.key != 0)
                     return Controller.getInstance().getAsset(itemTran.key);
-                }
+                else
+                    return null;
 
             case COLUMN_TYPE:
                 return itemTran.transaction.viewFullTypeName();
@@ -108,24 +108,20 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
                 return "GENESIS";
 
             case COLUMN_RECIPIENT:
-                if (itemTran.recipient != null) {
-                    return itemTran.recipient;
-                }
+                return itemTran.recipient;
 
             case COLUMN_CONFIRM:
                 return itemTran.transaction.isConfirmed(DCSet.getInstance());
 
             case COLUMN_TITLE:
-                if (itemTran.title != null) {
-                    return itemTran.title;
-                }
+                return itemTran.title;
 
             case COLUMN_FAVORITE:
                 return Controller.getInstance().isTransactionFavorite(itemTran.transaction);
 
         }
 
-        return null;
+        return "";
     }
 
     @Override

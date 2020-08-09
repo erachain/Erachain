@@ -86,6 +86,7 @@ public class AccountsRightPanel extends JPanel {
         jTable1 = new MTable(table_Model);
 
         jTable1.setDefaultRenderer(Object.class, new TableInfoRenderer());
+        //jTable1.setDefaultRenderer(Boolean.class, new RendererBoolean());
 
 
         if (false) {
@@ -97,7 +98,7 @@ public class AccountsRightPanel extends JPanel {
             @SuppressWarnings("unchecked")
             TableRowSorter t = new TableRowSorter(table_Model);
             // comparator
-            t.setComparator(table_Model.COLUMN_TRANSACTION, new Comparator<String>() {
+            t.setComparator(table_Model.COLUMN_SEQNO, new Comparator<String>() {
                 @Override
                 public int compare(String o1, String o2) {
                     BigDecimal transaction1 = Library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o1));
@@ -108,7 +109,7 @@ public class AccountsRightPanel extends JPanel {
 
             // sort list  - AUTO sort
             List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-            sortKeys.add(new RowSorter.SortKey(table_Model.COLUMN_TRANSACTION, SortOrder.DESCENDING));
+            sortKeys.add(new RowSorter.SortKey(table_Model.COLUMN_SEQNO, SortOrder.DESCENDING));
             t.setSortKeys(sortKeys);
             // sort table
             jTable1.setRowSorter(t);
