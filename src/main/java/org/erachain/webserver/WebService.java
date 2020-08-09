@@ -5,16 +5,21 @@ import org.eclipse.jetty.server.handler.IPAccessHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -122,8 +127,26 @@ public class WebService {
         server.addConnector(connector);
     }
     private void conectorAdd(){
+        boolean certificateSslIsOk = true;
+        // verify SSL certifycate
+        if(Settings.getInstance().isWebUseSSL()){
+            try {
+                Fun.Tuple3<KeyStore, Certificate, String> result = SslUtils.GetWebKeystore(Settings.getInstance().getWebKeyStorePath(), Settings.getInstance().getWebKeyStorePassword(), Settings.getInstance().getWebStoreSourcePassword());
+                if (result.a == null) {
+                    LOGGER.error(Lang.getInstance().translate("WEB SSL not started: ") + ": " + result.c);
+                    certificateSslIsOk = false;
+                } else {
+                    LOGGER.info(Lang.getInstance().translate("Start SSL is OK"));
+                    LOGGER.info("SSL public key: " + result.b.getPublicKey().toString());
+                }
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+                certificateSslIsOk = false;
 
-        if (Settings.getInstance().isWebUseSSL()) {
+            }
+        }
+
+        if (Settings.getInstance().isWebUseSSL() && certificateSslIsOk) {
             // HTTPS WEB SERVER
             try {
                 addHttpsConnector(
@@ -139,8 +162,7 @@ public class WebService {
             } catch (URISyntaxException e) {
                 LOGGER.error("Web server start SSL. Error URL");
             }
-        } else
-        {
+        } else {
             try {
                 addHttpConnector(this.server, Settings.getInstance().getWebPort());
             } catch (URISyntaxException e) {

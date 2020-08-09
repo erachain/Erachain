@@ -756,22 +756,6 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Start WEB Service")));
             LOGGER.info(Lang.getInstance().translate("Start WEB Service"));
-            // verify SSL certifycate
-            if(Settings.getInstance().isWebUseSSL()){
-                try {
-                    Tuple3<KeyStore, Certificate, String> result = SslUtils.GetWebKeystore(Settings.getInstance().getWebKeyStorePath(), Settings.getInstance().getWebKeyStorePassword(), Settings.getInstance().getWebStoreSourcePassword());
-                    if (result.a == null) {
-                        LOGGER.error(Lang.getInstance().translate("WEB SSL not started: ") + ": " + result.c);
-
-                    } else {
-                        LOGGER.info(Lang.getInstance().translate("Start SSL is OK"));
-                        LOGGER.info("SSL public key: " + result.b.getPublicKey().toString());
-                    }
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
-
-                }
-            }
             this.webService = WebService.getInstance();
             this.webService.start();
         }
