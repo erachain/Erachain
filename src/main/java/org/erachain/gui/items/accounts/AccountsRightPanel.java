@@ -302,7 +302,8 @@ public class AccountsRightPanel extends JPanel {
             //if (column == 1) c.setHorizontalAlignment(CENTER);
             //else c.setHorizontalAlignment(LEFT);
 
-            if ((boolean) table.getValueAt(row, AccountsTransactionsTableModel.COLUMN_UN_VIEWED)) {
+            Object isUnViewed = table.getValueAt(row, AccountsTransactionsTableModel.COLUMN_UN_VIEWED);
+            if (isUnViewed != null && (boolean) isUnViewed) {
                 Font font = c.getFont();
                 font = new Font(font.getName(), Font.BOLD, font.getSize());
                 c.setFont(font);
@@ -312,7 +313,8 @@ public class AccountsRightPanel extends JPanel {
                 c.setFont(label.getFont());
             }
 
-            if ((boolean) table.getValueAt(row, AccountsTransactionsTableModel.COLUMN_IS_OUTCOME)) {
+            Object isOutcome = table.getValueAt(row, AccountsTransactionsTableModel.COLUMN_IS_OUTCOME);
+            if (isOutcome != null && (boolean) isOutcome) {
                 c.setForeground(Color.RED);
             } else {
                 JLabel label = new JLabel();
