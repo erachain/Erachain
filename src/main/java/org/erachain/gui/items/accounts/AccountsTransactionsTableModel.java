@@ -43,8 +43,8 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
     public AccountsTransactionsTableModel() {
         super(Controller.getInstance().wallet.database.getTransactionMap(),
-                new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation"},
-                new Boolean[]{false, true, true, false, false}, false, COLUMN_FAVORITE);
+                new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Favorite"},
+                new Boolean[]{false, true, true, false, false, true, true, true, true, true}, false, COLUMN_FAVORITE);
 
         COLUMN_FOR_ICON = COLUMN_ITEM_CLS;
         step = 200;
@@ -109,11 +109,11 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
             case COLUMN_RECIPIENT:
                 return itemTran.recipient;
 
-            case COLUMN_CONFIRM:
-                return itemTran.transaction.isConfirmed(DCSet.getInstance());
-
             case COLUMN_TITLE:
                 return itemTran.title;
+
+            case COLUMN_CONFIRM:
+                return itemTran.transaction.isConfirmed(DCSet.getInstance());
 
             case COLUMN_FAVORITE:
                 return Controller.getInstance().isTransactionFavorite(itemTran.transaction);

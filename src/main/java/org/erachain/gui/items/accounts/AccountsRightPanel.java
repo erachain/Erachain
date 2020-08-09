@@ -2,6 +2,8 @@ package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.core.wallet.Wallet;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.Iconable;
@@ -10,8 +12,7 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RendererBigDecimals;
-import org.erachain.gui.models.RendererBoolean;
-import org.erachain.gui.models.RendererIcon;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -22,13 +23,9 @@ import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -62,6 +59,7 @@ public class AccountsRightPanel extends JPanel {
     protected int row;
 
     WTransactionMap wTxMap;
+    Wallet wallet = Controller.getInstance().wallet;
 
     /**
      * Creates new form НовыйJPanel
@@ -90,18 +88,6 @@ public class AccountsRightPanel extends JPanel {
         jTable1 = new MTable(tableModel);
 
         jTable1.setDefaultRenderer(Object.class, new TableInfoRenderer());
-
-        if (false) {
-            jTable1.setDefaultRenderer(Boolean.class, new RendererBoolean());
-            TableColumnModel columnModel = jTable1.getColumnModel();
-            try {
-                columnModel.getColumn(tableModel.COLUMN_FOR_ICON)
-                        .setCellRenderer(new RendererIcon());
-            } catch (Exception e) {
-                //.error(e.getMessage(), e);
-
-            }
-        }
 
 
         if (false) {
@@ -277,10 +263,33 @@ public class AccountsRightPanel extends JPanel {
                     //}
 
                     AccountsTransactionsTableModel.Trans rowItem = tableModel.getItem(th.row);
+                    Transaction transaction = rowItem.transaction;
                     rowItem.isUnViewed = false;
-                    ((WTransactionMap) tableModel.getMap()).clearUnViewed(rowItem.transaction);
+                    ((WTransactionMap) tableModel.getMap()).clearUnViewed(transaction);
                     //table_Model.fireTableCellUpdated(th.row);
+
+                    if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
+                        if (jTable1.getSelectedColumn() == AccountsTransactionsTableModel.COLUMN_FAVORITE) {
+                            favoriteSet(rowItem.transaction);
+                        }
+                    }
+
                 }
+            }
+        });
+
+        jTable1.addMouseMotionListener(new MouseMotionListener() {
+            public void mouseMoved(MouseEvent e) {
+
+                if (jTable1.columnAtPoint(e.getPoint()) == tableModel.COLUMN_FAVORITE) {
+                    jTable1.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+                } else {
+                    jTable1.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+
+            public void mouseDragged(MouseEvent e) {
             }
         });
 
@@ -344,4 +353,19 @@ public class AccountsRightPanel extends JPanel {
         }
 
     }
+
+    private void favoriteSet(Transaction transaction) {
+        // CHECK IF FAVORITES
+        if (wallet.isTransactionFavorite(transaction)) {
+            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+            if (showConfirmDialog == 0) {
+                wallet.removeDocumentFavorite(transaction);
+            }
+        } else {
+            wallet.addTransactionFavorite(transaction);
+        }
+        ((TimerTableModelCls) jTable1.getModel()).fireTableDataChanged();
+
+    }
+
 }
