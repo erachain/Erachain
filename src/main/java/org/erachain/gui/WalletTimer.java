@@ -5,11 +5,13 @@ import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.PlaySound;
 import org.erachain.utils.SysTray;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,20 +131,37 @@ public class WalletTimer<U> implements Observer {
                 }
             } else if (event instanceof Block) {
 
-                Block block = (Block) event;
+                Block.BlockHead blockHead = ((Block) event).blockHead;
+                if (blockHead.heightBlock == 1) {
+                    return;
+                }
+                Fun.Tuple3<Integer, Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), blockHead.heightBlock);
+                if (forgingPoint == null)
+                    return;
 
                 sound = "blockforge.wav";
-                head = lang.translate("Forging Block %d").replace("%d", "" + block.heightBlock);
-                message = lang.translate("Forging Fee") + ": " + block.viewFeeAsBigDecimal();
+
+                head = lang.translate("Forging Block %d").replace("%d", "" + blockHead.heightBlock);
+                message = lang.translate("Forging Fee") + ": " + blockHead.viewFeeAsBigDecimal();
+
+                int diff = forgingPoint.b;
+                if (diff < 300) {
+                    sound = null;
+                } else if (diff < 1000) {
+                    head = null;
+                }
 
             } else {
                 head = lang.translate("EVENT");
                 message = event.toString();
             }
 
-            playSound.playSound(sound);
+            if (sound != null)
+                playSound.playSound(sound);
 
-            sysTray.sendMessage(head, message, type);
+            if (head != null) {
+                sysTray.sendMessage(head, message, type);
+            }
 
         }
     }
