@@ -2,6 +2,7 @@ package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.wallet.WTransactionMap;
@@ -45,6 +46,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
                 new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation"},
                 new Boolean[]{false, true, true, false, false}, false, COLUMN_FAVORITE);
 
+        COLUMN_FOR_ICON = COLUMN_ITEM_CLS;
         step = 200;
 
     }
@@ -93,10 +95,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
                 return itemTran.amount;
 
             case COLUMN_ITEM_CLS:
-                if (itemTran.key != 0)
-                    return Controller.getInstance().getAsset(itemTran.key);
-                else
-                    return null;
+                return itemTran.itemCls;
 
             case COLUMN_TYPE:
                 return itemTran.transaction.viewFullTypeName();
@@ -247,7 +246,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
         public boolean isOutCome;
         public Fun.Tuple2<Long, Integer> walletKey;
         public Transaction transaction;
-        public Long key;
+        public ItemCls itemCls;
         public BigDecimal amount;
         public Account owner;
         public String recipient;
@@ -257,7 +256,9 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
             this.transaction = transaction;
             this.walletKey = walletKey;
             isUnViewed = ((WTransactionMap) map).isUnViewed(transaction);
-            key = transaction.getKey();
+            if (transaction instanceof Itemable) {
+                itemCls = ((Itemable) transaction).getItem();
+            }
             owner = transaction.getCreator();
             if (owner != null)
                 isOutCome = owner.hashCode() == walletKey.b;

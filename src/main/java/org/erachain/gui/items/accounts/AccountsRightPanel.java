@@ -1,6 +1,7 @@
 package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
@@ -9,6 +10,8 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RendererBigDecimals;
+import org.erachain.gui.models.RendererBoolean;
+import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -19,6 +22,7 @@ import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -38,7 +42,7 @@ public class AccountsRightPanel extends JPanel {
      *
      */
     private static final long serialVersionUID = 1L;
-    public AccountsTransactionsTableModel table_Model;
+    public AccountsTransactionsTableModel tableModel;
     @SuppressWarnings("rawtypes")
     public MTable jTable1;
     // Variables declaration - do not modify
@@ -82,11 +86,22 @@ public class AccountsRightPanel extends JPanel {
         jMenu5 = new javax.swing.JMenu();
         jToggleButton2 = new javax.swing.JToggleButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        table_Model = new AccountsTransactionsTableModel();
-        jTable1 = new MTable(table_Model);
+        tableModel = new AccountsTransactionsTableModel();
+        jTable1 = new MTable(tableModel);
 
         jTable1.setDefaultRenderer(Object.class, new TableInfoRenderer());
-        //jTable1.setDefaultRenderer(Boolean.class, new RendererBoolean());
+
+        if (false) {
+            jTable1.setDefaultRenderer(Boolean.class, new RendererBoolean());
+            TableColumnModel columnModel = jTable1.getColumnModel();
+            try {
+                columnModel.getColumn(tableModel.COLUMN_FOR_ICON)
+                        .setCellRenderer(new RendererIcon());
+            } catch (Exception e) {
+                //.error(e.getMessage(), e);
+
+            }
+        }
 
 
         if (false) {
@@ -96,9 +111,9 @@ public class AccountsRightPanel extends JPanel {
 
             // sort from column
             @SuppressWarnings("unchecked")
-            TableRowSorter t = new TableRowSorter(table_Model);
+            TableRowSorter t = new TableRowSorter(tableModel);
             // comparator
-            t.setComparator(table_Model.COLUMN_SEQNO, new Comparator<String>() {
+            t.setComparator(tableModel.COLUMN_SEQNO, new Comparator<String>() {
                 @Override
                 public int compare(String o1, String o2) {
                     BigDecimal transaction1 = Library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o1));
@@ -109,7 +124,7 @@ public class AccountsRightPanel extends JPanel {
 
             // sort list  - AUTO sort
             List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-            sortKeys.add(new RowSorter.SortKey(table_Model.COLUMN_SEQNO, SortOrder.DESCENDING));
+            sortKeys.add(new RowSorter.SortKey(tableModel.COLUMN_SEQNO, SortOrder.DESCENDING));
             t.setSortKeys(sortKeys);
             // sort table
             jTable1.setRowSorter(t);
@@ -189,7 +204,7 @@ public class AccountsRightPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
+                AccountsTransactionsTableModel.Trans transaction = tableModel.getItem(th.row);
                 IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction.transaction, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Lang.getInstance().translate("Transaction"));
                 dd.setLocationRelativeTo(th);
                 dd.setVisible(true);
@@ -202,7 +217,7 @@ public class AccountsRightPanel extends JPanel {
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
+                AccountsTransactionsTableModel.Trans transaction = tableModel.getItem(th.row);
                 new VouchRecordDialog(transaction.transaction.getBlockHeight(), transaction.transaction.getSeqNo());
 
             }
@@ -216,7 +231,7 @@ public class AccountsRightPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
+                AccountsTransactionsTableModel.Trans transaction = tableModel.getItem(th.row);
                 // save
                 Library.saveTransactionJSONtoFileSystem(getParent(), transaction.transaction);
             }
@@ -233,7 +248,7 @@ public class AccountsRightPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                AccountsTransactionsTableModel.Trans transaction = table_Model.getItem(th.row);
+                AccountsTransactionsTableModel.Trans transaction = tableModel.getItem(th.row);
 
                 try {
                     URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
@@ -261,9 +276,9 @@ public class AccountsRightPanel extends JPanel {
                     //    jTable1.setSelectionBackground(Color.red);
                     //}
 
-                    AccountsTransactionsTableModel.Trans rowItem = table_Model.getItem(th.row);
+                    AccountsTransactionsTableModel.Trans rowItem = tableModel.getItem(th.row);
                     rowItem.isUnViewed = false;
-                    ((WTransactionMap) table_Model.getMap()).clearUnViewed(rowItem.transaction);
+                    ((WTransactionMap) tableModel.getMap()).clearUnViewed(rowItem.transaction);
                     //table_Model.fireTableCellUpdated(th.row);
                 }
             }
@@ -272,9 +287,9 @@ public class AccountsRightPanel extends JPanel {
     }// </editor-fold>
 
     public void setAsset(AssetCls asset) {
-        table_Model.setAsset(asset);
-        table_Model.getInterval();
-        table_Model.fireTableDataChanged();
+        tableModel.setAsset(asset);
+        tableModel.getInterval();
+        tableModel.fireTableDataChanged();
         jTable1.setDefaultRenderer(BigDecimal.class, new RendererBigDecimals(asset.getScale()));
     }
 
@@ -307,5 +322,24 @@ public class AccountsRightPanel extends JPanel {
 
             return c;
         }
+
+        @Override
+        protected void setValue(Object value) {
+
+            if (value != null && value instanceof ItemCls) {
+                // Get icon to use for the list item value
+                ItemCls item = (ItemCls) value;
+
+                byte[] iconBytes = item.getIcon();
+                if (iconBytes != null && iconBytes.length > 0) {
+                    ImageIcon image = new ImageIcon(iconBytes);
+                    setIcon(new ImageIcon(image.getImage().getScaledInstance(20, 20, 1)));
+                }
+            } else {
+                setIcon(null);
+            }
+            super.setValue(value);
+        }
+
     }
 }
