@@ -51,7 +51,6 @@ import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.*;
-import org.erachain.webserver.SslUtils;
 import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
 import org.json.simple.JSONObject;
@@ -68,7 +67,6 @@ import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
@@ -77,9 +75,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.KeyStore;
 import java.security.SecureRandom;
-import java.security.cert.Certificate;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -94,7 +90,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.0.02";
+    public static String version = "5.0.03";
     public static String buildTime = "2020-08-04 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
