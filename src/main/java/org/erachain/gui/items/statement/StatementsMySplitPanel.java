@@ -6,7 +6,7 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.items.accounts.AccountsRightPanel;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -108,7 +108,7 @@ public class StatementsMySplitPanel extends SplitPanel {
 			*/        // SET VIDEO
         //this.jTableJScrollPanelLeftPanel.setModel(my_PersonsModel);
         this.jTableJScrollPanelLeftPanel = new MTable(my_Statements_Model); //my_Statements_table;
-        jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new AccountsRightPanel.TableInfoRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
 
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
         columnModel.getColumn(my_Statements_Model.COLUMN_FAVORITE).setMaxWidth(150);

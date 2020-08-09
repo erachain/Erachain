@@ -7,7 +7,7 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.items.accounts.AccountsRightPanel;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.SetIntervalPanel;
@@ -63,7 +63,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         //CREATE TABLE
         this.recordsModel = new WalletTransactionsTableModel();
         this.jTableJScrollPanelLeftPanel = new MTable(this.recordsModel);
-        jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new AccountsRightPanel.TableInfoRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
 
         this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
 
@@ -143,9 +143,6 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                 setInterval();
             }
         });
-
-        // set interval
-        setInterval();
 
         jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 

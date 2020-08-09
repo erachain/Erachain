@@ -5,7 +5,7 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.items.accounts.AccountsRightPanel;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
@@ -53,7 +53,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         // TABLE
         incoming_Mails_Model = new TableModelMails(true);
         inciming_Mail_Table = new MTable(incoming_Mails_Model);
-        inciming_Mail_Table.setDefaultRenderer(Object.class, new AccountsRightPanel.TableInfoRenderer());
+        inciming_Mail_Table.setDefaultRenderer(Object.class, new WalletTableRenderer());
 
         inciming_Mail_Table.setAutoCreateRowSorter(true);
 

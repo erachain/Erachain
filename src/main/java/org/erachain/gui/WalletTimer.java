@@ -79,6 +79,10 @@ public class WalletTimer<U> implements Observer {
                 Transaction transaction = (Transaction) event;
                 Account creator = transaction.getCreator();
 
+                Settings.getInstance().isSoundReceivePaymentEnabled();
+                Settings.getInstance().isSoundReceiveMessageEnabled();
+
+
                 if (transaction instanceof RSend) {
                     RSend rSend = (RSend) transaction;
                     if (rSend.hasAmount()) {
@@ -119,6 +123,9 @@ public class WalletTimer<U> implements Observer {
                     }
 
                 } else {
+                    if (Settings.getInstance().isSoundNewTransactionEnabled()) {
+                    }
+
                     if (contr.wallet.accountExists(transaction.getCreator())) {
                         sound = "outcometransaction.wav";
                         head = lang.translate("Outcome transaction") + ": " + transaction.viewFullTypeName();
@@ -146,9 +153,10 @@ public class WalletTimer<U> implements Observer {
 
                 int diff = forgingPoint.b;
                 if (diff < 300) {
+                    head = null;
                     sound = null;
                 } else if (diff < 1000) {
-                    head = null;
+                    sound = null;
                 }
 
             } else {
