@@ -151,7 +151,7 @@ public class WalletTimer<U> implements Observer {
                 head = lang.translate("Forging Block %d").replace("%d", "" + blockHead.heightBlock);
                 message = lang.translate("Forging Fee") + ": " + blockHead.viewFeeAsBigDecimal();
 
-                int diff = forgingPoint.b;
+                int diff = blockHead.heightBlock - forgingPoint.a;
                 if (diff < 300) {
                     head = null;
                     sound = null;
