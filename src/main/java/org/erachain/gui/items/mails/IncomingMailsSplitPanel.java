@@ -215,6 +215,8 @@ public class IncomingMailsSplitPanel extends SplitPanel {
             // info1.show_001(person);
             if (mail == null)
                 return;
+
+            //((WTransactionMap) TableModelMails.getMap()).clearUnViewed(IncomingMailsSplitPanel.this.notifyAll(););
             MailInfo info_panel = new MailInfo(mail);
 
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);

@@ -39,7 +39,8 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
     public WalletTransactionsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
                 new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size", "SeqNo", "Favorite"},
-                new Boolean[]{true, true, true, true, true, true, true, false, false, true, true}, true, COLUMN_FAVORITE);
+                new Boolean[]{true, true, true, true, true, true, true, false, false, true, true},
+                true, COLUMN_FAVORITE);
 
     }
 
@@ -119,7 +120,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
                 return transaction.viewHeightSeq();
 
             case COLUMN_FAVORITE:
-                Controller.getInstance().isTransactionFavorite(transaction);
+                return Controller.getInstance().isTransactionFavorite(transaction);
         }
 
         return null;
