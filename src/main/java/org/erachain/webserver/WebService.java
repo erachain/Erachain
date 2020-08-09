@@ -83,6 +83,13 @@ public class WebService {
         }
     }
 
+    public boolean isStoped (){
+        if(instance == null) return true;
+      return server.isStopped() ;
+    }
+    public void clearInstance(){
+        instance=null;
+    }
 
     /* HTTPS connect
     add SSL

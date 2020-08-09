@@ -1030,8 +1030,11 @@ public class Controller extends Observable {
 
         if (this.webService != null)
             this.webService.stop();
+        while( !this.webService.isStoped()){}
+        this.webService = null;
 
         // START API SERVICE
+        WebService.getInstance().clearInstance();
         if (Settings.getInstance().isWebEnabled()) {
             this.webService = WebService.getInstance();
             this.webService.start();

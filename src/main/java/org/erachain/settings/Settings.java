@@ -826,17 +826,31 @@ public class Settings {
         return webKeyStorePassword;
     }
 
+    public void setWebKeyStorePassword(String keyStorePassword) {
+        webKeyStorePassword= keyStorePassword;
+    }
+
     public String getWebStoreSourcePassword() {
         return webStoreSourcePassword;
+    }
+    public void setWebStoreSourcePassword(String storeSourcePassword) {
+        webStoreSourcePassword= storeSourcePassword;
     }
 
     public String getWebKeyStorePath() {
         if (webKeyStorePath.equals("")) return DEFAULT_WEB_KEYSTORE_FILE_PATH;
         return webKeyStorePath;
     }
+    public void setWebKeyStorePath(String webKeyStorePath) {
+        webStoreSourcePassword= webKeyStorePath;
+    }
 
     public boolean isWebUseSSL() {
         return webUseSSL;
+    }
+
+    public void setWebUseSSL(boolean webUseSSL1) {
+        webUseSSL= webUseSSL1;
     }
 
 
