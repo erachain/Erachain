@@ -77,7 +77,6 @@ public class MyOrderPaymentsSplitPanel extends SplitPanel {
 
         //CHECKBOX FOR CONFIRMED
         TableColumn confirmedColumn = payment_Orders_table.getColumnModel().getColumn(PaymentOrdersTableModel.COLUMN_CONFIRMATIONS);
-        // confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 
         confirmedColumn.setMinWidth(270);
         confirmedColumn.setMaxWidth(350);
