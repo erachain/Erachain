@@ -25,7 +25,7 @@ public class TableModelMails extends WalletTableModel<Transaction> {
 
     public static final int COLUMN_IS_OUTCOME = -2;
     public static final int COLUMN_UN_VIEWED = -1;
-    public static final int COLUMN_CONFIRMATION = 0;
+    public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_DATA = 1;
     public static final int COLUMN_HEAD = 2;
     public static final int COLUMN_SENDER = 3;
@@ -59,7 +59,7 @@ public class TableModelMails extends WalletTableModel<Transaction> {
             case COLUMN_UN_VIEWED:
                 return ((WTransactionMap) map).isUnViewed(transaction);
 
-            case COLUMN_CONFIRMATION:
+            case COLUMN_CONFIRMATIONS:
                 return transaction.getConfirmations(dcSet);
 
             case COLUMN_DATA:

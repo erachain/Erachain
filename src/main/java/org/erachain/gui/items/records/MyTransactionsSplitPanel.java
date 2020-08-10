@@ -70,10 +70,10 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
         this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
 
-
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
-        columnModel.getColumn(0).setMaxWidth((100));
         columnModel.getColumn(recordsModel.COLUMN_FAVORITE).setMaxWidth((100));
+        columnModel.getColumn(recordsModel.COLUMN_FAVORITE).setMaxWidth((100));
+        columnModel.getColumn(recordsModel.COLUMN_CONFIRMATIONS).setMaxWidth((100));
         columnModel.getColumn(recordsModel.COLUMN_CONFIRMATIONS).setCellRenderer(new WalletConfirmsRenderer());
 
         // not show buttons

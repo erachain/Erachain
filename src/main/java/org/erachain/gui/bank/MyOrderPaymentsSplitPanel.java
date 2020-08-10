@@ -2,6 +2,7 @@ package org.erachain.gui.bank;
 
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.WalletConfirmsRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 
@@ -45,7 +46,12 @@ public class MyOrderPaymentsSplitPanel extends SplitPanel {
         payment_Orders_table = new MTable<Object, Object>(payment_Orders_model);
 
         TableColumnModel columnModel = payment_Orders_table.getColumnModel(); // read column model
-        columnModel.getColumn(0).setMaxWidth((100));
+        //CHECKBOX FOR CONFIRMED
+        TableColumn confirmedColumn = columnModel.getColumn(PaymentOrdersTableModel.COLUMN_CONFIRMATIONS);
+        confirmedColumn.setMinWidth(50);
+        confirmedColumn.setMaxWidth(100);
+        confirmedColumn.setPreferredWidth(50);
+        confirmedColumn.setCellRenderer(new WalletConfirmsRenderer());
 
         this.addAncestorListener(new AncestorListener() {
 
@@ -74,13 +80,6 @@ public class MyOrderPaymentsSplitPanel extends SplitPanel {
         //		my_Person_table.setRowSorter(my_Sorter);
         //		my_Person_table.getRowSorter();
         //		if (my_PersonsModel.getRowCount() > 0) my_PersonsModel.fireTableDataChanged();
-
-        //CHECKBOX FOR CONFIRMED
-        TableColumn confirmedColumn = payment_Orders_table.getColumnModel().getColumn(PaymentOrdersTableModel.COLUMN_CONFIRMATIONS);
-
-        confirmedColumn.setMinWidth(270);
-        confirmedColumn.setMaxWidth(350);
-        confirmedColumn.setPreferredWidth(50);//.setWidth(30);
 
         // UPDATE FILTER ON TEXT CHANGE
         this.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new My_Search());
