@@ -14,7 +14,7 @@ import java.util.Enumeration;
 
 public class SslUtils {
     // get web keystore
-    public static Fun.Tuple3<KeyStore, Certificate, String> GetWebKeystore(String keyStorePath, String keyStorePassword, String AliasPassword) throws FileNotFoundException {
+    public static Fun.Tuple3<KeyStore, Certificate, String> getWebKeyStore(String keyStorePath, String keyStorePassword, String AliasPassword) throws FileNotFoundException {
         Certificate certifycateMy = null;
         KeyStore keyStore = null;
         try {

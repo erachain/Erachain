@@ -297,7 +297,7 @@ public class SettingsBasicPanel extends JPanel {
         add(textWebCertificatePass, gridBagConstraints);
 
         // verifi button
-        buttonVeryfytWebKeystoreFilePath = new JButton(Lang.getInstance().translate("Check"));
+        buttonVeryfytWebKeystoreFilePath = new JButton(Lang.getInstance().translate("Check") + " SSL");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 0, 5, 5);
@@ -306,7 +306,7 @@ public class SettingsBasicPanel extends JPanel {
         buttonVeryfytWebKeystoreFilePath.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    Fun.Tuple3<KeyStore, Certificate, String> result = SslUtils.GetWebKeystore(textWebKeyStoreFilePath.getText(),new String(textWebKeystorePass.getPassword()), new String(textWebCertificatePass.getPassword()));
+                    Fun.Tuple3<KeyStore, Certificate, String> result = SslUtils.getWebKeyStore(textWebKeyStoreFilePath.getText(),new String(textWebKeystorePass.getPassword()), new String(textWebCertificatePass.getPassword()));
                     if(result.a == null){
                         JOptionPane.showMessageDialog(
                                 new JFrame(), Lang.getInstance().translate(result.c),
