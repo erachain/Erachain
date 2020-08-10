@@ -14,7 +14,7 @@ public class MIcon extends JCheckBox {
     MIcon(Color color) {
         super();
         this.color = color;
-        imageIcon = GUIUtils.createIcon(color, this.getBackground());
+        imageIcon = GUIUtils.createIcon(getFont().getSize(), color, this.getBackground());
     }
 
     @Override

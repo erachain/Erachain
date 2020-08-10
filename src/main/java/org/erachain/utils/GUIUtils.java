@@ -6,9 +6,9 @@ import java.awt.image.BufferedImage;
 
 public class GUIUtils {
 
-    public static ImageIcon createIcon(Color colorOfIcon, Color backgroundColor) {
+    public static ImageIcon createIcon(int size, Color colorOfIcon, Color backgroundColor) {
         //CREATE IMAGE
-        BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
 
         //AA
@@ -18,7 +18,7 @@ public class GUIUtils {
         g.setColor(colorOfIcon);
 
         //CREATE CIRCLE
-        g.fillOval(0, 0, 16, 16);
+        g.fillOval(0, 0, size - 1, size - 1);
 
         //SET BACKGROUND
         g.setBackground(backgroundColor);
@@ -39,8 +39,8 @@ public class GUIUtils {
         g.setColor(colorOfIcon);
 
         //CREATE CIRCLE
-        g.drawOval(0, 0, size, size);
-        g.fillArc(0, 0, size, size, 90, -120 * sector);
+        g.drawOval(0, 0, size - 2, size - 2);
+        g.fillArc(0, 0, size - 2, size - 2, 90, -120 * sector);
 
         //CONVERT TO ICON
         return new ImageIcon(image);

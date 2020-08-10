@@ -30,20 +30,18 @@ public class WalletConfirmsRenderer extends DefaultTableCellRenderer {
             color = WalletTableRenderer.FORE_COLOR;
         }
 
-        int size = table.getRowHeight() - 2;
         if (value != null) {
+            int sizeRow = table.getRowHeight();
             setHorizontalAlignment(JLabel.CENTER);
             Integer intValue = (Integer) value;
             if (intValue == 0) {
-                setIcon(GUIUtils.createIconArc(size, 0, color));
+                setIcon(GUIUtils.createIconArc(sizeRow, 0, color));
             } else if (intValue < 2) {
-                setIcon(GUIUtils.createIconArc(size, 1, color));
+                setIcon(GUIUtils.createIconArc(sizeRow, 1, color));
             } else if (intValue < 6) {
-                setIcon(GUIUtils.createIconArc(size, 2, color));
+                setIcon(GUIUtils.createIconArc(sizeRow, 2, color));
             } else {
-                //setIcon(GUIUtils.createIconArc(3, Color.DARK_GRAY, null));
-                //setIcon(GUIUtils.createIcon(getForeground(), getBackground()));
-                setIcon(GUIUtils.createIconArc(size, 2, color));
+                setIcon(GUIUtils.createIcon(sizeRow, color, null));
             }
 
         }

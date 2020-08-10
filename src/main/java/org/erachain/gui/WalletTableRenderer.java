@@ -30,7 +30,9 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
         if (value instanceof Boolean) {
             Boolean selected = (Boolean) value;
 
-            cell = new JCheckBox(null, GUIUtils.createIcon(selected ?
+            int sizeRow = table.getRowHeight();
+
+            cell = new JCheckBox(null, GUIUtils.createIcon(sizeRow, selected ?
                     //new Color(38, 90, 30, 255)
                     Color.PINK
                     : Color.GRAY, null), selected);
