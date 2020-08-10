@@ -1,16 +1,17 @@
 package org.erachain.gui.items.records;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.FavoriteItemModelTable;
-import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
 public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
+    public static final int COLUMN_IS_OUTCOME = -2;
+    public static final int COLUMN_UN_VIEWED = -1;
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_SEQNO = 1;
     public static final int COLUMN_TYPE = 2;
@@ -18,6 +19,8 @@ public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_TITLE = 4;
     public static final int COLUMN_FAVORITE = 5;
     private static final long serialVersionUID = 1L;
+
+    Wallet wallet = Controller.getInstance().wallet;
 
     public FavoriteTransactionTableModel() {
         super(DCSet.getInstance().getTransactionFinalMap(),
@@ -43,6 +46,14 @@ public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
         Transaction transaction = (Transaction)this.list.get(row);
 
         switch (column) {
+            case COLUMN_IS_OUTCOME:
+                if (transaction.getCreator() != null)
+                    return wallet.accountExists(transaction.getCreator());
+                return false;
+
+            case COLUMN_UN_VIEWED:
+                return false;
+
             case COLUMN_TIMESTAMP:
                 return transaction.viewTimestamp();
             case COLUMN_SEQNO:

@@ -2,19 +2,24 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.*;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.lang.Lang;
-import org.erachain.utils.DateTimeFormat;
+import org.mapdb.Fun.Tuple2;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
 @SuppressWarnings("serial")
-public class WalletTransactionsTableModel extends WalletTableModel<Transaction> {
+public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2<Long, Integer>, Transaction>> {
 
+    public static final int COLUMN_IS_OUTCOME = WalletTableRenderer.COLUMN_IS_OUTCOME;
+    public static final int COLUMN_UN_VIEWED = WalletTableRenderer.COLUMN_UN_VIEWED;
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;
     public static final int COLUMN_TYPE = 2;
@@ -37,7 +42,8 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
     public WalletTransactionsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
                 new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size", "SeqNo", "Favorite"},
-                new Boolean[]{true, true, true, true, true, true, true, false, false, true, true}, true, COLUMN_FAVORITE);
+                new Boolean[]{true, true, true, true, true, true, true, false, false, true, true},
+                true, COLUMN_FAVORITE);
 
     }
 
@@ -48,89 +54,59 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
             return null;
         }
 
-        Transaction transaction = this.list.get(row);
+        Tuple2<Tuple2<Long, Integer>, Transaction> rowItem = this.list.get(row);
+        Transaction transaction = rowItem.b;
 
-        String itemName = "";
+        ItemCls item = null;
         if (transaction instanceof TransactionAmount && transaction.getAbsKey() > 0) {
             TransactionAmount transAmo = (TransactionAmount) transaction;
-            //recipient = transAmo.getRecipient();
-            ItemCls item = DCSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
-            if (item == null)
-                return null;
-
-            itemName = item.toString();
+            item = DCSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
         } else if (transaction instanceof GenesisTransferAssetTransaction) {
             GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction) transaction;
-            //recipient = transGen.getRecipient();
-            ItemCls item = DCSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
-            if (item == null)
-                return null;
-
-            itemName = item.toString();
-            //creator_address = transGen.getRecipient().getAddress();
+            item = DCSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
         } else if (transaction instanceof IssueItemRecord) {
             IssueItemRecord transIssue = (IssueItemRecord) transaction;
-            ItemCls item = transIssue.getItem();
-            if (item == null)
-                return null;
-
-            itemName = item.getShort();
+            item = transIssue.getItem();
         } else if (transaction instanceof GenesisIssueItemRecord) {
             GenesisIssueItemRecord transIssue = (GenesisIssueItemRecord) transaction;
-            ItemCls item = transIssue.getItem();
-            if (item == null)
-                return null;
-
-            itemName = item.getShort();
+            item = transIssue.getItem();
         } else if (transaction instanceof RSertifyPubKeys) {
             RSertifyPubKeys sertifyPK = (RSertifyPubKeys) transaction;
-            //recipient = transAmo.getRecipient();
-            ItemCls item = DCSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
-            if (item == null)
-                return null;
-
-            itemName = item.toString();
+            item = DCSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
         } else {
-
-            try {
-                if (transaction.viewItemName() != null) {
-                    itemName = transaction.viewItemName();
-                }
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                //e.printStackTrace();
-                itemName = "";
-            }
-
 
         }
         switch (column) {
-            case COLUMN_CONFIRMATIONS:
+            case COLUMN_IS_OUTCOME:
+                if (transaction.getCreator() != null)
+                    return transaction.getCreator().hashCode() == rowItem.a.b;
+                return false;
 
+            case COLUMN_UN_VIEWED:
+                return ((WTransactionMap) map).isUnViewed(transaction);
+
+            case COLUMN_CONFIRMATIONS:
                 return transaction.getConfirmations(DCSet.getInstance());
 
             case COLUMN_TIMESTAMP:
-
-
-                return DateTimeFormat.timestamptoString(transaction.getTimestamp());//.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
+                return transaction.viewTimestamp();//.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
 
             case COLUMN_TYPE:
-
                 return Lang.getInstance().translate(transaction.viewFullTypeName());
 
             case COLUMN_CREATOR:
-
                 return transaction.viewCreator();
 
             case COLUMN_ITEM:
-                return itemName;
+                return item;
 
             case COLUMN_AMOUNT:
+                BigDecimal amount = transaction.getAmount();
+                if (amount != null && item != null && item instanceof AssetCls) {
+                    amount = amount.setScale(((AssetCls) item).getScale());
+                }
 
-                BigDecimal amo = transaction.getAmount();
-                if (amo == null)
-                    return BigDecimal.ZERO;
-                return amo;
+                return amount;
 
             case COLUMN_RECIPIENT:
 
@@ -152,7 +128,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
                 return transaction.viewHeightSeq();
 
             case COLUMN_FAVORITE:
-                Controller.getInstance().isTransactionFavorite(transaction);
+                return Controller.getInstance().isTransactionFavorite(transaction);
         }
 
         return null;
@@ -169,7 +145,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
             try (IteratorCloseable iterator = map.getDescendingIterator()) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
-                    list.add((Transaction) map.get(key));
+                    list.add(new Tuple2<>((Tuple2<Long, Integer>) key, (Transaction) map.get(key)));
                 }
             } catch (IOException e) {
             }
@@ -177,17 +153,17 @@ public class WalletTransactionsTableModel extends WalletTableModel<Transaction> 
             try (IteratorCloseable iterator = map.getDescendingIterator()) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
-                    list.add((Transaction) map.get(key));
+                    list.add(new Tuple2<>((Tuple2<Long, Integer>) key, (Transaction) map.get(key)));
                 }
             } catch (IOException e) {
             }
         }
 
         DCSet dcSet = DCSet.getInstance();
-        for (Transaction item : list) {
+        for (Tuple2<Tuple2<Long, Integer>, Transaction> item : list) {
 
-            item.setDC(dcSet, false);
-            item.calcFee();
+            item.b.setDC(dcSet, false);
+            item.b.calcFee();
         }
 
     }

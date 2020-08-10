@@ -7,19 +7,20 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.Assert;
 import org.junit.Test;
-//import org.erachain.test.CallRemoteApi;
-//import org.erachain.test.SettingTests;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
+
+//import org.erachain.test.CallRemoteApi;
+//import org.erachain.test.SettingTests;
 
 /**
  * Testing RPC Asset
  */
-public class AssetsResourceTest extends SettingTests {
+public class ItemAssetsResourceTest extends SettingTests {
 
     @Test
     public void getAseetsLite() throws Exception {

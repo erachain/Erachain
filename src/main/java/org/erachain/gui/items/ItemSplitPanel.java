@@ -5,6 +5,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui.models.TimerTableModelCls;
@@ -52,6 +53,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         // CREATE TABLE
         jTableJScrollPanelLeftPanel = new MTable(this.tableModel);
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
 
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
         columnModel.getColumn(0).setMaxWidth((100));

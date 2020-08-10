@@ -30,9 +30,13 @@ public class IconPanel extends JPanel {
     public IconPanel(String panelName, String panelTitle) {
         super();
         this.panelName = iconName = panelName;
-        iconName += ".png";
-        title = Lang.getInstance().translate(panelTitle);
-        setName(title);
+        if (panelTitle != null) {
+            title = Lang.getInstance().translate(panelTitle);
+            setName(title);
+        }
+        if (iconName != null) {
+            iconName += ".png";
+        }
 
     }
 
