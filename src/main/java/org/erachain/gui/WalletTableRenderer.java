@@ -79,8 +79,9 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
 
                 byte[] iconBytes = iconable.getIcon();
                 if (iconBytes != null && iconBytes.length > 0) {
+                    int rowSize = getFont().getSize() + 4;
                     ImageIcon image = new ImageIcon(iconBytes);
-                    setIcon(new ImageIcon(image.getImage().getScaledInstance(20, 20, 1)));
+                    setIcon(new ImageIcon(image.getImage().getScaledInstance(rowSize, rowSize, 1)));
                 }
 
             } else {
