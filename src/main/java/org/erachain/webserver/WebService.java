@@ -135,7 +135,7 @@ public class WebService {
         // verify SSL certifycate
         if(Settings.getInstance().isWebUseSSL()){
             try {
-                Fun.Tuple3<KeyStore, Certificate, String> result = SslUtils.GetWebKeystore(Settings.getInstance().getWebKeyStorePath(), Settings.getInstance().getWebKeyStorePassword(), Settings.getInstance().getWebStoreSourcePassword());
+                Fun.Tuple3<KeyStore, Certificate, String> result = SslUtils.getWebKeyStore(Settings.getInstance().getWebKeyStorePath(), Settings.getInstance().getWebKeyStorePassword(), Settings.getInstance().getWebStoreSourcePassword());
                 if (result.a == null) {
                     LOGGER.error(Lang.getInstance().translate("WEB SSL not started: ") + ": " + result.c);
                     certificateSslIsOk = false;
