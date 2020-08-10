@@ -122,9 +122,30 @@ public class MyTransactionsSplitPanel extends SplitPanel {
             }
         });
 
-        jButton2_jToolBar_RightPanel.setVisible(false);
+
         this.jToolBarRightPanel.setVisible(false);
-        this.toolBarLeftPanel.setVisible(false);
+
+        //  left panel tool bat visivle
+        jButton2_jToolBar_RightPanel.setVisible(false);
+
+        // button 1 in left tool bar
+        toolBarLeftPanel.setVisible(true);
+        button1ToolBarLeftPanel.setText(Lang.getInstance().translate("Read"));
+        button1ToolBarLeftPanel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        // button 2 in left tool bar
+        button2ToolBarLeftPanel.setText(Lang.getInstance().translate("No Read"));
+        button2ToolBarLeftPanel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
 
         // set interval panel
         setIntervalPanel = new SetIntervalPanel(Controller.getInstance().wallet.database.getTransactionMap());
