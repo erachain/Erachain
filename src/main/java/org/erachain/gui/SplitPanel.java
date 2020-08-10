@@ -36,8 +36,8 @@ public class SplitPanel extends IconPanel {
     public JPanel search_Info_Panel;
     public JLabel Label_search_Info_Panel;
     // Variables declaration - do not modify
-    public JCheckBox button1ToolBarLeftPanel;
-    public JButton button2ToolBarLeftPanel;
+    public JButton button1ToolBarLeftPanel;
+    public JToggleButton button2ToolBarLeftPanel;
     public JButton jButton1_jToolBar_RightPanel;
     public JButton jButton2_jToolBar_RightPanel;
     public JLabel jLabel2;
@@ -99,9 +99,9 @@ public class SplitPanel extends IconPanel {
         //      jSplitPanel.M_setDividerSize(20);
         leftPanel = new JPanel();
         toolBarLeftPanel = new JPanel();
-        button1ToolBarLeftPanel = new JCheckBox();
-        button2ToolBarLeftPanel = new JButton();
-        searchToolBar_LeftPanel = new JMenuBar ();
+        button1ToolBarLeftPanel = new JButton();
+        button2ToolBarLeftPanel = new JToggleButton();
+        searchToolBar_LeftPanel = new JMenuBar();
         searchToolBar_LeftPanel.setBorderPainted(false);
         searthLabelSearchToolBarLeftPanel = new JLabel();
         searchTextFieldSearchToolBarLeftPanelDocument = new JTextField();

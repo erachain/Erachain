@@ -143,6 +143,11 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
         fireTableDataChanged();
     }
 
+    public void clearAllOnlyUndead() {
+        ((WTransactionMap) map).clearUnViewed();
+        fireTableDataChanged();
+    }
+
     @Override
     public void getInterval() {
 

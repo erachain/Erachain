@@ -302,6 +302,10 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
             unViewed.remove(new Tuple2<Long, Integer>(transaction.getTimestamp(), transaction.getCreator().hashCode()));
     }
 
+    public void clearUnViewed() {
+        unViewed.clear();
+    }
+
     public boolean set(Tuple2<Long, Integer> key, Transaction transaction) {
         if (transaction.getCreator() != null)
             unViewed.add(new Tuple2<Long, Integer>(transaction.getTimestamp(), transaction.getCreator().hashCode()));
