@@ -1,5 +1,6 @@
 package org.erachain.gui;
 
+import org.erachain.utils.GUIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,43 +23,44 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
 
         adaptee.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
+        Component cell;
+
         if (value instanceof Boolean) {
-            JCheckBox checkbox = new JCheckBox();
-            checkbox.setSelected((Boolean) value);
-            checkbox.setHorizontalAlignment(JLabel.CENTER);
-            checkbox.setBorderPainted(true);
+            Boolean selected = (Boolean) value;
+            cell = new JCheckBox(null, GUIUtils.createIcon(selected ?
+                    //new Color(38, 90, 30, 255)
+                    Color.PINK
+                    : Color.GRAY, null), selected);
+            //((JCheckBox)cell).setSelected((Boolean) value);
+            ((JCheckBox) cell).setHorizontalAlignment(JLabel.CENTER);
+            ((JCheckBox) cell).setBorderPainted(true);
 
-            checkbox.setForeground(adaptee.getForeground());
-            checkbox.setBackground(adaptee.getBackground());
-            checkbox.setFont(adaptee.getFont());
-            return checkbox;
-
+        } else {
+            cell = super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
         }
 
-        JLabel cell = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
         cell.setBackground(adaptee.getBackground());
-        cell.setFont(adaptee.getFont());
 
         if (value instanceof Number) {
-            cell.setHorizontalAlignment(SwingConstants.RIGHT);
+            ((JLabel) cell).setHorizontalAlignment(SwingConstants.RIGHT);
         }
 
         Object isUnViewed = table.getValueAt(row, COLUMN_UN_VIEWED);
         if (isUnViewed != null && (boolean) isUnViewed) {
-            Font font = cell.getFont();
+            Font font = adaptee.getFont();
             font = new Font(font.getName(), Font.BOLD, font.getSize());
             cell.setFont(font);
         } else {
-            cell.setBackground(adaptee.getBackground());
             cell.setFont(adaptee.getFont());
         }
 
         Object isOutcome = table.getValueAt(row, COLUMN_IS_OUTCOME);
         if (isOutcome != null && (boolean) isOutcome) {
-            cell.setForeground(Color.RED);
+            //cell.setForeground(Color.RED);
+            cell.setForeground(adaptee.getForeground());
         } else {
-            JLabel label = new JLabel();
-            cell.setForeground(label.getForeground());
+            cell.setForeground(new Color(0, 120, 0, 255));
+            //cell.setForeground(new Color(12, 109, 0, 255));
         }
 
         return cell;

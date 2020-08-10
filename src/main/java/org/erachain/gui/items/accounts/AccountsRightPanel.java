@@ -318,7 +318,7 @@ public class AccountsRightPanel extends JPanel {
         if (wallet.isTransactionFavorite(transaction)) {
             int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
             if (showConfirmDialog == 0) {
-                wallet.removeDocumentFavorite(transaction);
+                wallet.removeTransactionFavorite(transaction);
             }
         } else {
             wallet.addTransactionFavorite(transaction);
