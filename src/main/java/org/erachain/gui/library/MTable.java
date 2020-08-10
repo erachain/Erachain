@@ -41,7 +41,7 @@ public class MTable<U, T> extends JTable {
         if (this.model != null) {
             setModel(this.model);
         }
-        setRowHeight(getFontMetrics(getFont()).getHeight());
+        setRowHeight(getFontMetrics(getFont()).getHeight() + 2);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         mouseListener = new MouseAdapter() {
             @Override

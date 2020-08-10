@@ -7,6 +7,7 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.WalletConfirmsRenderer;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
@@ -73,6 +74,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
         columnModel.getColumn(0).setMaxWidth((100));
         columnModel.getColumn(recordsModel.COLUMN_FAVORITE).setMaxWidth((100));
+        columnModel.getColumn(recordsModel.COLUMN_CONFIRMATIONS).setCellRenderer(new WalletConfirmsRenderer());
 
         // not show buttons
         jToolBarRightPanel.setVisible(true);

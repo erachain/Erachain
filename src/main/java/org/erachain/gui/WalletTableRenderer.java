@@ -13,6 +13,8 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
     private final DefaultTableCellRenderer adaptee = new DefaultTableCellRenderer();
     static Logger LOGGER = LoggerFactory.getLogger(WalletTableRenderer.class.getName());
 
+
+    public final static Color FORE_COLOR = new Color(0, 120, 0, 255);
     public static final int COLUMN_NUMBER_SCALE = -3;
     public static final int COLUMN_IS_OUTCOME = -2;
     public static final int COLUMN_UN_VIEWED = -1;
@@ -27,6 +29,7 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
 
         if (value instanceof Boolean) {
             Boolean selected = (Boolean) value;
+
             cell = new JCheckBox(null, GUIUtils.createIcon(selected ?
                     //new Color(38, 90, 30, 255)
                     Color.PINK
@@ -56,11 +59,9 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
 
         Object isOutcome = table.getValueAt(row, COLUMN_IS_OUTCOME);
         if (isOutcome != null && (boolean) isOutcome) {
-            //cell.setForeground(Color.RED);
             cell.setForeground(adaptee.getForeground());
         } else {
-            cell.setForeground(new Color(0, 120, 0, 255));
-            //cell.setForeground(new Color(12, 109, 0, 255));
+            cell.setForeground(FORE_COLOR);
         }
 
         return cell;
