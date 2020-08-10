@@ -209,6 +209,16 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
+    public Iterator<Tuple2<Long, Integer>> getUndeadIterator(boolean descending) {
+
+        if (descending) {
+            return unViewed.descendingSet().iterator();
+        } else {
+            return unViewed.iterator();
+        }
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Tuple2<Long, Integer>> getTypeIterator(Byte type, boolean descending) {
 
         if (descending) {

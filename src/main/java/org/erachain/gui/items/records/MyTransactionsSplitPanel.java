@@ -130,16 +130,16 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
         // button 1 in left tool bar
         toolBarLeftPanel.setVisible(true);
-        button1ToolBarLeftPanel.setText(Lang.getInstance().translate("Read"));
+        button1ToolBarLeftPanel.setText(Lang.getInstance().translate("Unread Only"));
         button1ToolBarLeftPanel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                recordsModel.setOnlyUndead();
             }
         });
 
         // button 2 in left tool bar
-        button2ToolBarLeftPanel.setText(Lang.getInstance().translate("No Read"));
+        button2ToolBarLeftPanel.setText(Lang.getInstance().translate("Clear Unread"));
         button2ToolBarLeftPanel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

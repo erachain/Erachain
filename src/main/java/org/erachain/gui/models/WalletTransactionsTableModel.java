@@ -7,6 +7,7 @@ import org.erachain.core.transaction.*;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun.Tuple2;
@@ -32,6 +33,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
     public static final int COLUMN_NUMBER = 9;
     public static final int COLUMN_FAVORITE = 10;
 
+    private boolean onlyUnread = false;
 
     /**
      * В динамическом режиме перерисовывается автоматически по событию GUI_REPAINT
@@ -135,27 +137,53 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
 
     }
 
+    public void setOnlyUndead() {
+        onlyUnread = !onlyUnread;
+        getInterval();
+        fireTableDataChanged();
+    }
+
     @Override
     public void getInterval() {
 
         Object key;
         int count = 0;
         list = new ArrayList<>();
-        if (startKey == null) {
-            try (IteratorCloseable iterator = map.getDescendingIterator()) {
+        if (onlyUnread) {
+            try (IteratorCloseable iterator = IteratorCloseableImpl.make(((WTransactionMap) map).getUndeadIterator(false))) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
-                    list.add(new Tuple2<>((Tuple2<Long, Integer>) key, (Transaction) map.get(key)));
+                    Transaction item = (Transaction) map.get(key);
+                    if (item == null)
+                        continue;
+                    list.add(new Tuple2<>((Tuple2<Long, Integer>) key, item));
                 }
             } catch (IOException e) {
             }
+
         } else {
-            try (IteratorCloseable iterator = map.getDescendingIterator()) {
-                while (iterator.hasNext() && count++ < step) {
-                    key = iterator.next();
-                    list.add(new Tuple2<>((Tuple2<Long, Integer>) key, (Transaction) map.get(key)));
+            if (startKey == null) {
+                try (IteratorCloseable iterator = map.getDescendingIterator()) {
+                    while (iterator.hasNext() && count++ < step) {
+                        key = iterator.next();
+                        Transaction item = (Transaction) map.get(key);
+                        if (item == null)
+                            continue;
+                        list.add(new Tuple2<>((Tuple2<Long, Integer>) key, item));
+                    }
+                } catch (IOException e) {
                 }
-            } catch (IOException e) {
+            } else {
+                try (IteratorCloseable iterator = map.getDescendingIterator()) {
+                    while (iterator.hasNext() && count++ < step) {
+                        key = iterator.next();
+                        Transaction item = (Transaction) map.get(key);
+                        if (item == null)
+                            continue;
+                        list.add(new Tuple2<>((Tuple2<Long, Integer>) key, item));
+                    }
+                } catch (IOException e) {
+                }
             }
         }
 
