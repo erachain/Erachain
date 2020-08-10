@@ -78,7 +78,7 @@ public class HyperLinkAccount {
         Send_Coins_Crator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
-                        null, account, null, null), AccountAssetSendPanel.getIcon());
+                        null, account, null, null));
 
             }
         });
@@ -88,7 +88,7 @@ public class HyperLinkAccount {
         Send_Mail_Creator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, account, null));
                 //new MailSendDialog(null, null, account, null);
             }
         });

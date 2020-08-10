@@ -9,7 +9,6 @@ import org.erachain.gui.models.BalanceFromAddressTableModel;
 import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
@@ -22,12 +21,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class MyBalanceTab extends SplitPanel  {
+public class MyBalanceTab extends SplitPanel {
 
-    /**
-     *
-     */
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyBalanceTab.png";
+    public static String NAME = "MyBalanceTab";
+    public static String TITLE = "My Balance";
+
     private static final long serialVersionUID = 1L;
     final MTable table;
     protected int row;
@@ -35,9 +33,8 @@ public class MyBalanceTab extends SplitPanel  {
 
     @SuppressWarnings({"null", "unchecked", "rawtypes"})
     public MyBalanceTab() {
-        super("MyBalanceTab");
-        //th = this;
-        this.setName(Lang.getInstance().translate("My Balance"));
+        super(NAME, TITLE);
+
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
@@ -72,7 +69,13 @@ public class MyBalanceTab extends SplitPanel  {
 //	favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 
 
-// column #1
+        // column #1
+        TableColumn column0 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_ASSET_NAME);//.COLUMN_CONFIRMED);
+        column0.setMinWidth(50);
+        column0.setMaxWidth(1000);
+        column0.setPreferredWidth(150);
+
+        // column #1
         TableColumn column1 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_ASSET_KEY);//.COLUMN_CONFIRMED);
         column1.setMinWidth(1);
         column1.setMaxWidth(1000);
@@ -81,38 +84,29 @@ public class MyBalanceTab extends SplitPanel  {
 
 
         // column #1
-        TableColumn column2 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_A);//.COLUMN_CONFIRMED);
+        TableColumn column2 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_B1);//.COLUMN_CONFIRMED);
         column2.setMinWidth(50);
         column2.setMaxWidth(1000);
         column2.setPreferredWidth(50);
 
 
         // column #1
-        TableColumn column3 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_B);//.COLUMN_CONFIRMED);
+        TableColumn column3 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_B2);//.COLUMN_CONFIRMED);
         column3.setMinWidth(50);
         column3.setMaxWidth(1000);
         column3.setPreferredWidth(50);
 
         // column #1
-        TableColumn column4 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_C);//.COLUMN_CONFIRMED);
+        TableColumn column4 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_B3);//.COLUMN_CONFIRMED);
         column4.setMinWidth(50);
         column4.setMaxWidth(1000);
         column4.setPreferredWidth(50);
 
-
         // column #1
-        TableColumn column5 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_ASSET_NAME);//.COLUMN_CONFIRMED);
+        TableColumn column5 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_B4);//.COLUMN_CONFIRMED);
         column5.setMinWidth(50);
         column5.setMaxWidth(1000);
-        column5.setPreferredWidth(150);
-	
-/*		// column #1
-		TableColumn column4 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_ACCOUNT);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
-		column4.setMinWidth(50);
-		column4.setMaxWidth(1000);
-		column4.setPreferredWidth(50);
-		column4.setCellRenderer(new RendererRight());
-*/
+        column5.setPreferredWidth(50);
 
         // иконку будем рисовать
         table.getColumnModel().getColumn(balancesModel.COLUMN_FOR_ICON)
@@ -213,8 +207,8 @@ public class MyBalanceTab extends SplitPanel  {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = balancesModel.getAsset(row);
                 String account = balancesModel.getAccount(row);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
-                        new ExchangePanel(asset, null, "To sell", account), ExchangePanel.getIcon());
+                MainPanel.getInstance().insertTab(
+                        new ExchangePanel(asset, null, "To sell", account));
 
 
             }
@@ -225,8 +219,8 @@ public class MyBalanceTab extends SplitPanel  {
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = balancesModel.getAsset(row);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
-                        new ExchangePanel(asset, null, "", ""), ExchangePanel.getIcon());
+                MainPanel.getInstance().insertTab(
+                        new ExchangePanel(asset, null, "", ""));
 
             }
         });
@@ -237,8 +231,8 @@ public class MyBalanceTab extends SplitPanel  {
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = balancesModel.getAsset(row);
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
-                        new ExchangePanel(asset, null, "Buy", ""), ExchangePanel.getIcon());
+                MainPanel.getInstance().insertTab(
+                        new ExchangePanel(asset, null, "Buy", ""));
 
             }
         });
@@ -441,17 +435,8 @@ if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
         String action = null;
         ExchangePanel panel = new ExchangePanel(asset, compu, action, "");
         panel.setName(asset.getTickerName() + "/" + compu.getTickerName());
-        MainPanel.getInstance().insertTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
-                panel, ExchangePanel.getIcon());
+        MainPanel.getInstance().insertTab(
+                panel);
     }
 
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

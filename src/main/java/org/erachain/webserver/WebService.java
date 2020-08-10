@@ -35,11 +35,15 @@ public class WebService {
         s.add(API.class);
         s.add(WebResource.class);
         s.add(APITransactionsResource.class);
-        s.add(APIAsset.class);
+
+        s.add(APIItemAsset.class);
+        s.add(APIItemPerson.class);
+        s.add(APIItemPoll.class);
+        s.add(APIItemStatus.class);
+        s.add(APIItemTemplate.class);
+
         s.add(APIExchange.class);
         s.add(APITelegramsResource.class);
-        s.add(APIPerson.class);
-        s.add(APIPoll.class);
         s.add(APIDocuments.class);
 
         ResourceConfig config = new ResourceConfig(s);

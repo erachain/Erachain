@@ -18,7 +18,7 @@ public class WalletItemAssetsTableModel extends WalletTableModel<AssetCls> {
     public WalletItemAssetsTableModel() {
         super(Controller.getInstance().wallet.database.getAssetMap(),
                 new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false, false, false, false}, true);
+                new Boolean[]{false, true, true, false, false, false, false, false}, true, COLUMN_FAVORITE);
 
     }
 

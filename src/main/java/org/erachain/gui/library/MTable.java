@@ -1,7 +1,6 @@
 package org.erachain.gui.library;
 
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.models.RendererBoolean;
 import org.erachain.gui.models.RendererRight;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun.Tuple2;
@@ -50,7 +49,7 @@ public class MTable<U, T> extends JTable {
                 mousePreset(arg0);
             }
         };
-        setDefaultRenderer(Boolean.class, new RendererBoolean());
+        ///setDefaultRenderer(Boolean.class, new RendererBoolean());
         showSearch(true);
         addselectSelectedRow();
     }

@@ -107,6 +107,10 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         return columnNames[index];
     }
 
+    public DBTabImpl getMap() {
+        return map;
+    }
+
     public U getItem(int row) {
         if (list == null)
             return null;
@@ -125,8 +129,13 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     public abstract Object getValueAt(int row, int column);
 
     public Class<? extends Object> getColumnClass(int c) {
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
+        try {
+            Object o = getValueAt(0, c);
+            return o == null ? Null.class : o.getClass();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Null.class;
+        }
     }
 
     public void update(Observable o, Object arg) {

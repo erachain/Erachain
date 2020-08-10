@@ -38,7 +38,7 @@ public class SysTray implements Observer {
     private TrayIcon icon = null;
     private PopupMenu createPopupMenu;
 
-    public boolean stopMessages = BlockChain.TEST_MODE;
+    public boolean stopMessages = BlockChain.TEST_DB > 0;
 
     private long timePoint;
 
@@ -205,7 +205,7 @@ public class SysTray implements Observer {
                             row = transactionsTable.convertRowIndexToModel(row);
 
                             //GET TRANSACTION
-                            Transaction transaction = transactionsModel.getItem(row);
+                            Transaction transaction = transactionsModel.getItem(row).b;
 
                             //SHOW DETAIL SCREEN OF TRANSACTION
                             TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);

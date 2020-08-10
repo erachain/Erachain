@@ -122,6 +122,19 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
     }
 
     public boolean exists(String address) {
+        if (address == null)
+            return false;
+
+        for (Account account : this.accounts) {
+            if (account.equals(address)) return true;
+        }
+        return false;
+    }
+
+    public boolean exists(Account address) {
+        if (address == null)
+            return false;
+
         for (Account account : this.accounts) {
             if (account.equals(address)) return true;
         }

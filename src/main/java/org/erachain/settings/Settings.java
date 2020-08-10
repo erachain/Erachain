@@ -113,7 +113,14 @@ public class Settings {
     private static final int NOTIFY_INCOMING_CONFIRMATIONS = 0;
     public static String DEFAULT_LANGUAGE = "en";
 
-    public static final boolean USE_TELEGRAM_STORE = false;
+    /**
+     * Если отключить то локально не будут сохраняться телеграммы для своих счетов
+     * и соотвественно в кошельке не будет прилетать никаких весточек к моим счетам.
+     * !!! Отключать для НОД которые только форжат - надо настройки потом делать
+     *
+     * @return
+     */
+    public static final boolean USE_TELEGRAM_STORE = true;
     public static final int TELEGRAM_STORE_PERIOD = 5; // in days
 
     public final static int NET_MODE_MAIN = 0;
@@ -210,6 +217,13 @@ public class Settings {
         this.defaultPeers = peers;
     }
 
+    /**
+     * Если отключить то локально не будут сохраняться телеграммы для своих счетов
+     * и соотвественно в кошельке не будет прилетать никаких весточек к моим счетам.
+     * !!! Отключать для НОД которые только форжат - надо настройки потом делать
+     *
+     * @return
+     */
     public boolean getTelegramStoreUse() {
         return USE_TELEGRAM_STORE;
     }

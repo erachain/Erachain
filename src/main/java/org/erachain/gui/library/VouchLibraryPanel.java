@@ -198,7 +198,7 @@ public class VouchLibraryPanel extends JPanel {
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Asset to Creator"),
                         new AccountAssetSendPanel(null,
-                                null, account, null, null), AccountAssetSendPanel.getIcon());
+                                null, account, null, null));
 
 
             }
@@ -213,7 +213,7 @@ public class VouchLibraryPanel extends JPanel {
                 Account account = (Account) model.getCreator(row);
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"),
-                        new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                        new MailSendPanel(null, account, null));
 
             }
         });

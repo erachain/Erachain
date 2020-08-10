@@ -4,7 +4,6 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -16,19 +15,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 
-public class MyOrderPaimentsSplitPanel extends SplitPanel  {
+public class MyOrderPaymentsSplitPanel extends SplitPanel {
+
+    public static String NAME = "MyOrderPaymentsSplitPanel";
+    public static String TITLE = "My Payments Orders";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    // для прозрачности
-    int alpha = 255;
-    int alpha_int;
     private PaymentOrdersTableModel payment_Orders_model;
     private MTable payment_Orders_table;
     private TableRowSorter my_Sorter;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "MyOrderPaimentsSplitPanel.png";
 
-
-    public MyOrderPaimentsSplitPanel() {
-        super("PersonsMySplitPanel");
+    public MyOrderPaymentsSplitPanel() {
+        super(NAME, TITLE);
 
         //	this.setName(Lang.getInstance().translate("My Persons"));
         this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
@@ -79,7 +77,6 @@ public class MyOrderPaimentsSplitPanel extends SplitPanel  {
 
         //CHECKBOX FOR CONFIRMED
         TableColumn confirmedColumn = payment_Orders_table.getColumnModel().getColumn(PaymentOrdersTableModel.COLUMN_CONFIRMATIONS);
-        // confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 
         confirmedColumn.setMinWidth(270);
         confirmedColumn.setMaxWidth(350);
@@ -180,21 +177,4 @@ public class MyOrderPaimentsSplitPanel extends SplitPanel  {
 
         }
     }
-
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
-
-
 }
-
-
-
-

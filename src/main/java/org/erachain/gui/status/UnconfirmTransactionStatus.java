@@ -26,9 +26,10 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
     private int counter;
     private boolean needUpdate;
 
+    static final String label = "Unconfirmed # many";
 
     public UnconfirmTransactionStatus() {
-        super("| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0 0/usec");
+        super("| " + Lang.getInstance().translate(label) + ": 0 0/usec");
 
         map = DCSet.getInstance().getTransactionTab();
         counter = map.size();
@@ -76,8 +77,8 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
                 // Lang.getInstance().translate("My Records"),
                 // MyTransactionsSplitPanel.getInstance());
 
-                MainPanel.getInstance().insertTab(Lang.getInstance().translate("Unconfirmed Records"),
-                        UnconfirmedTransactionsPanel.getInstance(), UnconfirmedTransactionsPanel.getIcon());
+                MainPanel.getInstance().insertTab(
+                        UnconfirmedTransactionsPanel.getInstance());
             }
 
         });
@@ -129,12 +130,12 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
         if (counter > 0) {
             this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            mess = "<HTML>| <A href = ' '>" + Lang.getInstance().translate("Unconfirmed Records") + ": " + counter
+            mess = "<HTML>| <A href = ' '>" + Lang.getInstance().translate(label) + ": " + counter
                     + "</a>";
         } else {
 
             this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            mess = "| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0";
+            mess = "| " + Lang.getInstance().translate(label) + ": 0";
         }
 
         if (BlockChain.TEST_MODE) {

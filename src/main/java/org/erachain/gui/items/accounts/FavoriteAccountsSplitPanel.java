@@ -5,7 +5,7 @@ import com.google.common.io.Files;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.database.wallet.AccountsPropertisMap;
+import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.SplitPanel;
@@ -31,6 +31,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -43,30 +44,29 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class AccountsNameSearchSplitPanel extends SplitPanel  {
+public class FavoriteAccountsSplitPanel extends SplitPanel {
 
-    /**
-     *
-     */
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "AccountsNameSearchSplitPanel.png";
+    public static String NAME = "FavoriteAccountsSplitPanel";
+    public static String TITLE = "Favorite Accounts";
+
     private static final long serialVersionUID = 1L;
-    static Logger LOGGER = LoggerFactory.getLogger(AccountsNameSearchSplitPanel.class);
+    static Logger LOGGER = LoggerFactory.getLogger(FavoriteAccountsSplitPanel.class);
     protected FileChooser chooser;
     protected int row;
-    private AccountsNameTableModel accountsTableModel;
+    private FavoriteAccountsTableModel accountsTableModel;
     private JButton button3_ToolBar_LeftPanel;
-    private AccountsPropertisMap accountsMap;
+    private FavoriteAccountsMap accountsMap;
 
-    public AccountsNameSearchSplitPanel() {
-        super("AccountsNameSearchSplitPanel");
+    public FavoriteAccountsSplitPanel() {
+        super(NAME, TITLE);
+
         GridBagLayout gridBagLayout = (GridBagLayout) leftPanel.getLayout();
         gridBagLayout.rowWeights = new double[]{0.0, 0.0};
         gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0};
 
         if (Controller.getInstance().doesWalletDatabaseExists())
-            accountsMap = Controller.getInstance().wallet.database.getAccountsPropertisMap();
+            accountsMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
 
-        setName(Lang.getInstance().translate("Favorite Accounts"));
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         searthLabelSearchToolBarLeftPanel.setVisible(true);
         // this.searchTextFieldSearchToolBarLeftPanelDocument.setVisible(true);
@@ -83,7 +83,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
         jButton2_jToolBar_RightPanel.setVisible(false);
 
         // CREATE TABLE
-        this.accountsTableModel = new AccountsNameTableModel();
+        this.accountsTableModel = new FavoriteAccountsTableModel();
         final MTable imprintsTable = new MTable(this.accountsTableModel);
 
         // CHECKBOX FOR FAVORITE
@@ -95,9 +95,9 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
         // favoriteColumn.setMaxWidth(50);
         // favoriteColumn.setPreferredWidth(50);//.setWidth(30);
         // column #1
-        TableColumn column1 = imprintsTable.getColumnModel().getColumn(WalletItemImprintsTableModel.COLUMN_KEY);// .COLUMN_CONFIRMED);
-        column1.setMinWidth(1);
-        column1.setMaxWidth(1000);
+        TableColumnModel columnModel = imprintsTable.getColumnModel();
+        TableColumn column1 = columnModel.getColumn(WalletItemImprintsTableModel.COLUMN_KEY);// .COLUMN_CONFIRMED);
+        column1.setMaxWidth(100);
         column1.setPreferredWidth(50);
 
         // set showvideo
@@ -226,7 +226,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
                 Account account = new Account(account1.a);
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"),
-                        new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                        new MailSendPanel(null, account, null));
             }
         });
         menu.add(Send_Mail_item_Menu);
@@ -239,7 +239,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
                 Tuple2<String, Tuple2<String, String>> account1 = accountsTableModel.getItem(row);
                 Account accountTo = new Account(account1.a);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send"), new AccountAssetSendPanel(null,
-                        null, accountTo, null, null), AccountAssetSendPanel.getIcon());
+                        null, accountTo, null, null));
 
             }
         });
@@ -459,16 +459,6 @@ public class AccountsNameSearchSplitPanel extends SplitPanel  {
         // if (c1 instanceof ImprintsInfoPanel) (
         // (ImprintsInfoPanel)c1).delay_on_Close();
 
-    }
-
-    public static  Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 
 }

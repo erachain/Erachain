@@ -2,7 +2,9 @@ package org.erachain.gui.items.mails;
 
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -25,20 +27,19 @@ import java.net.URL;
 
 
 public class OutcomingMailsSplitPanel extends SplitPanel {
+
+    public static String NAME = "OutcomingMailsSplitPanel";
+    public static String TITLE = "Outcoming Mails";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "OutcomingMailsSplitPanel.png";
-    // для прозрачности
-    int alpha = 255;
-    int alpha_int;
     private TableModelMails incoming_Mails_Model;
     private MTable inciming_Mail_Table;
     private TableRowSorter my_Sorter;
 
 
     public OutcomingMailsSplitPanel() {
-        super("OutcomingMailsSplitPanel");
+        super(NAME, TITLE);
 
-        this.setName(Lang.getInstance().translate("Outcoming Mails"));
         this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
@@ -53,6 +54,9 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         //TABLE
         incoming_Mails_Model = new TableModelMails(false);
         inciming_Mail_Table = new MTable(incoming_Mails_Model);
+        inciming_Mail_Table.setDefaultRenderer(Object.class, new WalletTableRenderer());
+        inciming_Mail_Table.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
+
         inciming_Mail_Table.setAutoCreateRowSorter(true);
 
         //		TableColumnModel columnModel = inciming_Mail_Table.getColumnModel(); // read column model
@@ -187,6 +191,9 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 
             RSend mail = (RSend) incoming_Mails_Model.getItem(inciming_Mail_Table.convertRowIndexToModel(inciming_Mail_Table.getSelectedRow()));
             if (mail == null) return;
+
+            ((WTransactionMap) incoming_Mails_Model.getMap()).clearUnViewed(mail);
+
             MailInfo info_panel = new MailInfo(mail);
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
 
@@ -218,16 +225,6 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 
             incoming_Mails_Model.fireTableDataChanged();
 
-        }
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
         }
     }
 

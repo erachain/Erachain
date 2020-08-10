@@ -10,8 +10,8 @@ import org.erachain.gui.ObserverWaiter;
  */
 public abstract class WalletTableModel<T> extends TimerTableModelCls<T> implements ObserverWaiter {
 
-    public WalletTableModel(DBTabImpl map, String[] columnNames, Boolean[] column_AutoHeight, boolean descending) {
-        super(map, columnNames, column_AutoHeight, descending);
+    public WalletTableModel(DBTabImpl map, String[] columnNames, Boolean[] column_AutoHeight, boolean descending, int columnFavorite) {
+        super(map, columnNames, column_AutoHeight, columnFavorite, descending);
 
         addObservers();
     }

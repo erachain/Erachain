@@ -20,15 +20,16 @@ import java.net.URL;
 
 
 public class PersonsMySplitPanel extends ItemSplitPanel {
+
+    public static String NAME = "PersonsMySplitPanel";
+    public static String TITLE = "My Persons";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "PersonsMySplitPanel.png";
 
     public PersonsMySplitPanel() {
-        super(new WalletItemPersonsTableModel(), "PersonsMySplitPanel");
+        super(new WalletItemPersonsTableModel(), NAME, TITLE);
 
-        this.setName(Lang.getInstance().translate("My Persons"));
-//      add items in menu
-
+        // add items in menu
         JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status to Person"));
 
         set_Status_Item.addActionListener(new ActionListener() {
@@ -100,14 +101,4 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
         return new PersonInfo002((PersonCls) item, true);
     }
 
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }

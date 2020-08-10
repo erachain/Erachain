@@ -6,7 +6,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.utils.ObserverMessage;
 
-import java.util.*;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class FavoriteTemplatesTableModel extends FavoriteItemModelTable implements Observer {
@@ -42,7 +42,7 @@ public class FavoriteTemplatesTableModel extends FavoriteItemModelTable implemen
         switch (column) {
             case COLUMN_KEY:
 
-                return template.getKey(DCSet.getInstance());
+                return template.getKey();
 
             case COLUMN_NAME:
 

@@ -58,7 +58,7 @@ public class DealsPopupMenu extends JPopupMenu {
         sendMail.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send mail"),
-                        new MailSendPanel(pubKey, null, null), MailSendPanel.getIcon());
+                        new MailSendPanel(pubKey, null, null));
             }
         });
         this.add(sendMail);
@@ -70,7 +70,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
                 // AccountAssetLendPanel
                 MainPanel.getInstance().insertNewTab(sendAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetSendPanel(asset, pubKey, null, null, null), AccountAssetSendPanel.getIcon());
+                        new AccountAssetSendPanel(asset, pubKey, null, null, null));
 
             }
         });
@@ -83,7 +83,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
                 //new AccountLendDialog(asset, pubKey);
                 MainPanel.getInstance().insertNewTab(debtAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetLendPanel(asset, pubKey, null, null), AccountAssetLendPanel.getIcon());
+                        new AccountAssetLendPanel(asset, pubKey, null, null));
 
             }
         });
@@ -94,7 +94,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(debtAssetReturn.getText() + ":" + asset.getKey(),
-                        new AccountAssetRepayDebtPanel(asset, pubKey, null, null), AccountAssetRepayDebtPanel.getIcon());
+                        new AccountAssetRepayDebtPanel(asset, pubKey, null, null));
 
             }
         });
@@ -106,7 +106,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(debtAssetBackward.getText() + ":" + asset.getKey(),
-                        new AccountAssetConfiscateDebtPanel(asset, pubKey, null, null), AccountAssetConfiscateDebtPanel.getIcon());
+                        new AccountAssetConfiscateDebtPanel(asset, pubKey, null, null));
 
             }
         });
@@ -119,7 +119,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(holdAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetHoldPanel(asset, pubKey, null, null), AccountAssetHoldPanel.getIcon());
+                        new AccountAssetHoldPanel(asset, pubKey, null, null));
 
             }
         });
@@ -132,7 +132,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(spendAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetSpendPanel(asset, pubKey, null, null, null), AccountAssetSpendPanel.getIcon());
+                        new AccountAssetSpendPanel(asset, pubKey, null, null, null));
 
             }
         });

@@ -10,28 +10,24 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 
-import java.awt.*;
 import java.math.BigDecimal;
 
-public class AccountAssetHoldPanel extends AccountAssetActionPanelCls  {
-
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "AccountAssetHoldPanel.png";
+public class AccountAssetHoldPanel extends AccountAssetActionPanelCls {
 
     public AccountAssetHoldPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super(true, null, assetIn, null, TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
+        super(null, null, true, assetIn, TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
 
-        //	icon.setIcon(null);
+        iconName = "AccountAssetHoldPanel";
 
     }
 
     @Override
     public void onSendClick() {
-       
+
         // confirm params
-       if (!cheskError()) return;
-       
+        if (!cheskError()) return;
+
         //CREATE TX MESSAGE
         // HOLD on STOCK - with BACKWARD flag
         Transaction transaction = Controller.getInstance().r_Send(
@@ -62,16 +58,4 @@ public class AccountAssetHoldPanel extends AccountAssetActionPanelCls  {
         //ENABLE
         this.jButton_ok.setEnabled(true);
     }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 }
-
-
