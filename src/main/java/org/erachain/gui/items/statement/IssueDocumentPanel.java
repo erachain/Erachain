@@ -4,13 +4,13 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.exdata.ExDataPanel;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.exdata.ExDataPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
@@ -41,7 +41,8 @@ public class IssueDocumentPanel extends IconPanel {
     private javax.swing.JLabel jLabel_Fee_Work;
     private javax.swing.JPanel jPanel_Work;
     private javax.swing.JComboBox<String> txtFeePow;
-    private static IssueDocumentPanel instance;
+    //private static IssueDocumentPanel instance;
+
     /**
      * Creates new form IssueDocumentPanel
      */
@@ -75,18 +76,6 @@ public class IssueDocumentPanel extends IconPanel {
         jLabel_Fee_Work.setText(Lang.getInstance().translate("Fee Power") + ":");
         this.jButton_Work_Cancel.setVisible(false);
     }
-
-    public static IssueDocumentPanel getInstance(boolean clear){
-
-    if (clear){
-       instance = null;
-    }
-    if (instance == null)  {
-        instance = new IssueDocumentPanel();
-    }
-    return instance;
-    }
-
 
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
@@ -232,7 +221,7 @@ public class IssueDocumentPanel extends IconPanel {
 
             // READ FEE
             parsing = 2;
-            feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
+            feePow = Integer.parseInt((String) this.txtFeePow.getSelectedItem());
 
         } catch (Exception e) {
             // CHECK WHERE PARSING ERROR HAPPENED
