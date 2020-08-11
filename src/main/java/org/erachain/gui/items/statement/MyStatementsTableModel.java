@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Observer;
 
-public class StatementsTableModelMy extends WalletTableModel<Tuple2<Tuple2<Long, Integer>, Transaction>> implements Observer {
+public class MyStatementsTableModel extends WalletTableModel<Tuple2<Tuple2<Long, Integer>, Transaction>> implements Observer {
 
     public static final int COLUMN_SEQNO = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -28,7 +28,7 @@ public class StatementsTableModelMy extends WalletTableModel<Tuple2<Tuple2<Long,
     DCSet dcSet;
     Wallet wallet = Controller.getInstance().wallet;
 
-    public StatementsTableModelMy() {
+    public MyStatementsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
                 new String[]{"№", "Timestamp", "Creator", "Title", "Template", "Favorite"},
                 new Boolean[]{false, true, true, true, false, false}, true, COLUMN_FAVORITE);
@@ -61,6 +61,9 @@ public class StatementsTableModelMy extends WalletTableModel<Tuple2<Tuple2<Long,
 
                 case COLUMN_UN_VIEWED:
                     return ((WTransactionMap) map).isUnViewed(rNote);
+
+                case COLUMN_CONFIRMATIONS:
+                    return rNote.getConfirmations(dcSet);
 
                 case COLUMN_SEQNO:
                     return rNote.viewHeightSeq();

@@ -40,7 +40,7 @@ public class StatementsMySplitPanel extends SplitPanel {
     // для прозрачности
     int alpha = 255;
     int alpha_int;
-    StatementsTableModelMy my_Statements_Model;
+    MyStatementsTableModel my_Statements_Model;
     Wallet wallet = Controller.getInstance().wallet;
 
 
@@ -64,7 +64,7 @@ public class StatementsMySplitPanel extends SplitPanel {
         //TABLE
 
 
-        my_Statements_Model = new StatementsTableModelMy();
+        my_Statements_Model = new MyStatementsTableModel();
         //	my_Statements_table = new JTable(my_Statements_Model);// new Statements_Table_Model();
 
         //	my_Statements_table.setTableHeader(null);

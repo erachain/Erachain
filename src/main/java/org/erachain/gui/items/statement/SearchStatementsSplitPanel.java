@@ -33,7 +33,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
     public static String TITLE = "Search Documents";
 
     private static final long serialVersionUID = 2717571093561259483L;
-    private StatementsTableModelSearch search_Table_Model;
+    private SearchStatementsTableModel search_Table_Model;
     private RowSorter<ItemsPersonsTableModel> search_Sorter;
     private int selected_Item;
     private JTextField key_Item;
@@ -83,7 +83,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         searchMyJCheckBoxLeftPanel.setVisible(false);
 
         // CREATE TABLE
-        search_Table_Model = new StatementsTableModelSearch();
+        search_Table_Model = new SearchStatementsTableModel();
         jTableJScrollPanelLeftPanel = new MTable(this.search_Table_Model);
 
         // CHECKBOX FOR FAVORITE
