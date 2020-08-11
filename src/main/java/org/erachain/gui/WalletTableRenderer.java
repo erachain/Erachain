@@ -68,20 +68,18 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
         cell.setForeground(color);
 
         if (column == 0) {
-            if (table.getValueAt(row, TimerTableModelCls.COLUMN_CONFIRMATIONS) instanceof Integer) {
-                Integer confirmations = (Integer) table.getValueAt(row, TimerTableModelCls.COLUMN_CONFIRMATIONS);
-                if (confirmations != null) {
-                    int sizeRow = ((MTable) table).iconSize;
-                    // ● ⚫ ◆ █ ▇ ■ ◢ ◤ ◔ ◑ ◕ ⬛ ⬜ ⬤ ⛃
-                    if (confirmations == 0) {
-                        setIcon(GUIUtils.createIconArc(sizeRow, 0, color));
-                    } else if (confirmations < 2) {
-                        setIcon(GUIUtils.createIconArc(sizeRow, 1, color));
-                    } else if (confirmations < 6) {
-                        setIcon(GUIUtils.createIconArc(sizeRow, 2, color));
-                    } else {
-                        setIcon(GUIUtils.createIcon(sizeRow, color, null));
-                    }
+            Integer confirmations = (Integer) table.getValueAt(row, TimerTableModelCls.COLUMN_CONFIRMATIONS);
+            if (confirmations != null) {
+                int sizeRow = ((MTable) table).iconSize;
+                // ● ⚫ ◆ █ ▇ ■ ◢ ◤ ◔ ◑ ◕ ⬛ ⬜ ⬤ ⛃
+                if (confirmations == 0) {
+                    setIcon(GUIUtils.createIconArc(sizeRow, 0, color));
+                } else if (confirmations < 2) {
+                    setIcon(GUIUtils.createIconArc(sizeRow, 1, color));
+                } else if (confirmations < 6) {
+                    setIcon(GUIUtils.createIconArc(sizeRow, 2, color));
+                } else {
+                    setIcon(GUIUtils.createIcon(sizeRow, color, null));
                 }
             }
         }

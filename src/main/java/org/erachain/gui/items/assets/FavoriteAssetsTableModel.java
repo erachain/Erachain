@@ -40,7 +40,7 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
         }
         switch (column) {
             case COLUMN_CONFIRMATIONS:
-                asset.getConfirmations(dcSet);
+                return asset.getConfirmations(dcSet);
 
             case COLUMN_KEY:
                 return asset.getKey();

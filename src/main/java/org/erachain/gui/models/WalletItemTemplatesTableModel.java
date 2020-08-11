@@ -27,24 +27,22 @@ public class WalletItemTemplatesTableModel extends WalletTableModel<TemplateCls>
         TemplateCls template = this.list.get(row);
 
         switch (column) {
-            case COLUMN_KEY:
+            case COLUMN_CONFIRMATIONS:
+                return template.getConfirmations(dcSet);
 
+            case COLUMN_KEY:
                 return template.getKey();
 
             case COLUMN_NAME:
-
                 return template;
 
             case COLUMN_ADDRESS:
-
                 return template.getOwner().getPersonAsString();
 
             case COLUMN_CONFIRMED:
-
                 return template.isConfirmed();
 
             case COLUMN_FAVORITE:
-
                 return template.isFavorite();
 
         }

@@ -38,7 +38,7 @@ public class FavoriteImprintsTableModel extends FavoriteItemModelTable implement
 
         switch (column) {
             case COLUMN_CONFIRMATIONS:
-                item.getConfirmations(dcSet);
+                return item.getConfirmations(dcSet);
 
             case COLUMN_KEY:
                 return item.getKey(DCSet.getInstance());
