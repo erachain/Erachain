@@ -951,7 +951,7 @@ public class ExData {
                                 int blockNo, int seqNo, JSONObject langObj) {
 
         if (parentRef > 0) {
-            output.put("Label_Parent", Lang.getInstance().translateFromLangObj("Parent", langObj));
+            output.put("Label_Parent", Lang.getInstance().translateFromLangObj("Parent Document", langObj));
             output.put("parent", Transaction.viewDBRef(parentRef));
         }
 

@@ -16,16 +16,17 @@ public class DocTypeAppendixPanel extends JPanel {
          */
         public DocTypeAppendixPanel() {
             initComponents();
-            labelTitle.setText(Lang.getInstance().translate("Set Parent if it is Appendix to another Document"));
+            labelTitle.setText(Lang.getInstance().translate("Set Parent Document if it is Appendix to that Document"));
             labelDocType.setText(Lang.getInstance().translate("Parent Document SeqNo or Signature"));
-            parentReference.setText(Lang.getInstance().translate("Example: 1234-12 or r6fas657w12Y65da.."));
+            parentReference.setText(Lang.getInstance().translate("Example") + ": 1234-12 or r6fas657w12Y65da..");
         }
 
         private void initComponents() {
             java.awt.GridBagConstraints gridBagConstraints;
 
             labelDocType = new JLabel();
-            filler1 = new Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
+            filler1 = new Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0),
+                    new java.awt.Dimension(0, 32767));
             labelTitle = new JLabel();
             parentDetails = new JLabel();
 
