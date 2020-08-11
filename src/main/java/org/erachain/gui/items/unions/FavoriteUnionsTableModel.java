@@ -6,14 +6,12 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.utils.ObserverMessage;
 
-import java.util.Observer;
-
 @SuppressWarnings("serial")
-public class FavoriteUnionsTableModel extends FavoriteItemModelTable implements Observer {
+public class FavoriteUnionsTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
-    public static final int COLUMN_FAVORITE = 4;
+    public static final int COLUMN_FAVORITE = 3;
 
     public FavoriteUnionsTableModel() {
         super(DCSet.getInstance().getItemUnionMap(),

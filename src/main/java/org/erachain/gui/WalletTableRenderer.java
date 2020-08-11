@@ -78,8 +78,10 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
                     setIcon(GUIUtils.createIconArc(sizeRow, 1, color));
                 } else if (confirmations < 6) {
                     setIcon(GUIUtils.createIconArc(sizeRow, 2, color));
-                } else {
+                } else if (confirmations < 33) {
                     setIcon(GUIUtils.createIcon(sizeRow, color, null));
+                } else {
+                    setIcon(null);
                 }
             }
         }

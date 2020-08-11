@@ -41,8 +41,10 @@ public class WalletConfirmsRenderer extends DefaultTableCellRenderer {
                 setIcon(GUIUtils.createIconArc(sizeRow, 1, color));
             } else if (intValue < 6) {
                 setIcon(GUIUtils.createIconArc(sizeRow, 2, color));
-            } else {
+            } else if (intValue < 33) {
                 setIcon(GUIUtils.createIcon(sizeRow, color, null));
+            } else {
+                setIcon(null);
             }
 
         }
