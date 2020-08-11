@@ -30,9 +30,9 @@ import java.util.List;
 
 @Path("polls")
 @Produces(MediaType.APPLICATION_JSON)
-public class PollsResource {
+public class ItemPollsResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PollsResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ItemPollsResource.class);
 
     @Context
     HttpServletRequest request;

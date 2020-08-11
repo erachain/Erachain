@@ -1,9 +1,12 @@
 package org.erachain.webserver;
 
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSetStatusToItem;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemPersonMap;
 import org.erachain.datachain.KKPersonStatusMap;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
@@ -15,12 +18,14 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
 @Path("apiperson")
 @Produces(MediaType.APPLICATION_JSON)
-public class APIPerson {
+public class APIItemPerson {
 
     @Context
     HttpServletRequest request;
@@ -36,6 +41,9 @@ public class APIPerson {
                 "Get Asset Key balance in Position [1..5] for Person Key. Balance Side =0 - total debit; =1 - left; =2 - total credit");
         help.put("apiperson/status/{personKey}/{statusKey}?history=true",
                 "Get Status data for Person Key. JSON ARRAY format: [timeFrom, timeTo, [par1, par2, str1, str2, reference, description], block, txNo]");
+
+        help.put("Get apiperson/image/{key}", "GET Person Image");
+        help.put("Get apiperson/icon/{key}", "GET Person Icon");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -129,6 +137,80 @@ public class APIPerson {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(out.toJSONString()).build();
+    }
+
+    @Path("image/{key}")
+    @GET
+    @Produces({"image/png", "image/jpg"})
+    public Response personImage(@PathParam("key") long key) throws IOException {
+
+        int weight = 0;
+        if (key <= 0) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+                    "Error key");
+        }
+
+        ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
+        // DOES EXIST
+        if (!map.contains(key)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+                    Transaction.ITEM_PERSON_NOT_EXIST);
+        }
+
+        PersonCls person = (PersonCls) map.get(key);
+
+        if (person.getImage() != null) {
+            // image to byte[] hot scale (param2 =0)
+            //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+            ///return Response.ok(new ByteArrayInputStream(person.getImage())).build();
+            return Response.status(200)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ByteArrayInputStream(person.getImage()))
+                    .build();
+        }
+        return Response.status(200)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity("")
+                .build();
+
+    }
+
+    @Path("icon/{key}")
+    @GET
+    @Produces({"image/png", "image/jpg"})
+    public Response personIcon(@PathParam("key") long key) throws IOException {
+
+        if (key <= 0) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+                    "Error key");
+        }
+
+        ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
+        // DOES EXIST
+        if (!map.contains(key)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+                    Transaction.ITEM_PERSON_NOT_EXIST);
+        }
+
+        PersonCls person = (PersonCls) map.get(key);
+
+        if (person.getIcon() != null) {
+            // image to byte[] hot scale (param2 =0)
+            //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+            //return Response.ok(new ByteArrayInputStream(person.getIcon())).build();
+            return Response.status(200)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ByteArrayInputStream(person.getIcon()))
+                    .build();
+        }
+        return Response.status(200)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity("")
+                .build();
     }
 
 

@@ -174,7 +174,7 @@ public class Wallet extends Observable /*implements Observer*/ {
         AccountMap mapAccs = this.database.getAccountMap();
         synchronized (mapAccs) { // else deadlock in org.erachain.database.wallet.AccountMap.add
             return mapAccs.getPublicKeyAccounts();
-        }
+		}
 	}
 
 	public List<Tuple2<Account, Long>> getAccountsAssets() {
@@ -182,6 +182,10 @@ public class Wallet extends Observable /*implements Observer*/ {
 	}
 
 	public boolean accountExists(String address) {
+		return this.database.getAccountMap().exists(address);
+	}
+
+	public boolean accountExists(Account address) {
 		return this.database.getAccountMap().exists(address);
 	}
 
@@ -551,7 +555,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 		PrivateKeyAccount account = new PrivateKeyAccount(accountSeed);
 		JSONObject ob = new JSONObject();
 		// CHECK IF ACCOUNT ALREADY EXISTS
-		if (!this.accountExists(account.getAddress())) {
+		if (!this.accountExists(account)) {
 			// ADD TO DATABASE
 			this.secureDatabase.getAccountSeedMap().add(account);
 			this.database.getAccountMap().add(account, -1);
@@ -872,7 +876,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 		PrivateKeyAccount account = new PrivateKeyAccount(accountSeed);
 
 		// CHECK IF ACCOUNT ALREADY EXISTS
-		if (!this.accountExists(account.getAddress())) {
+		if (!this.accountExists(account)) {
 			// ADD TO DATABASE
 			this.secureDatabase.getAccountSeedMap().add(account);
 			this.database.getAccountMap().add(account, -1);
@@ -909,7 +913,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 		PrivateKeyAccount account = new PrivateKeyAccount(privateKey64);
 
 		// CHECK IF ACCOUNT ALREADY EXISTS
-		if (!this.accountExists(account.getAddress())) {
+		if (!this.accountExists(account)) {
 			// ADD TO DATABASE
 			this.secureDatabase.getAccountSeedMap().add(account);
 			this.database.getAccountMap().add(account, -1);
@@ -1319,7 +1323,6 @@ public class Wallet extends Observable /*implements Observer*/ {
 		this.database.setLastBlockSignature(block.blockHead.signature);
 
 		Account blockGenerator = block.blockHead.creator;
-		String blockGeneratorStr = blockGenerator.getAddress();
 
 		int height = block.blockHead.heightBlock;
 
@@ -1330,7 +1333,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 		}
 
 		// CHECK IF WE ARE GENERATOR
-		if (this.accountExists(blockGeneratorStr)) {
+		if (this.accountExists(blockGenerator)) {
 			// ADD BLOCK
 			this.database.getBlocksHeadMap().add(block.blockHead);
 
@@ -1338,7 +1341,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 			// PROCESS FEE
 			feeProcess(dcSet, block.blockHead.totalFee, blockGenerator, false);
 
-			Controller.getInstance().gui.walletTimer.playEvent(block);
+			Controller.getInstance().playWalletEvent(block);
 
 		}
 
@@ -1359,7 +1362,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 			if (!processTransaction(transaction))
 				continue;
 
-			Controller.getInstance().gui.walletTimer.playEvent(transaction);
+			Controller.getInstance().playWalletEvent(transaction);
 
 			// SKIP PAYMENT TRANSACTIONS
 			if (transaction instanceof RSend) {
@@ -1453,19 +1456,18 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 		}
 
-        Account blockGenerator = block.blockHead.creator;
-		String blockGeneratorStr = blockGenerator.getAddress();
+		Account blockGenerator = block.blockHead.creator;
 
 		// CHECK IF WE ARE GENERATOR
-		if (this.accountExists(blockGeneratorStr)) {
+		if (this.accountExists(blockGenerator)) {
 			// DELETE BLOCK
-            this.database.getBlocksHeadMap().delete(block.blockHead);
+			this.database.getBlocksHeadMap().delete(block.blockHead);
 
 			// SET AS LAST BLOCK
 			// this.database.setLastBlockSignature(block.getReference());
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
-            feeProcess(dcSet, block.blockHead.totalFee, blockGenerator, true);
+			feeProcess(dcSet, block.blockHead.totalFee, blockGenerator, true);
 
 		}
 
@@ -1550,18 +1552,18 @@ public class Wallet extends Observable /*implements Observer*/ {
 				BigDecimal issued_FEE_BD = BlockChain.BONUS_FOR_PERSON(height);
 
 				// GIFTs
-				if (this.accountExists(transPersonIssue.getCreator().getAddress())) {
+				if (this.accountExists(transPersonIssue.getCreator())) {
 					this.database.getAccountMap().changeBalance(transPersonIssue.getCreator().getAddress(),
 							false, FEE_KEY, issued_FEE_BD, false);
 				}
 
 				// GIFTs
-				if (this.accountExists(creator.getAddress())) {
+				if (this.accountExists(creator)) {
 					this.database.getAccountMap().changeBalance(creator.getAddress(), false, FEE_KEY, issued_FEE_BD, false);
 				}
 
 				PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
-				if (this.accountExists(pkAccount.getAddress())) {
+				if (this.accountExists(pkAccount)) {
 					this.database.getAccountMap().changeBalance(pkAccount.getAddress(), false, FEE_KEY, issued_FEE_BD, false);
 				}
 			}
@@ -1572,11 +1574,11 @@ public class Wallet extends Observable /*implements Observer*/ {
         List<PublicKeyAccount> sertifiedPublicKeys = sertifyPubKeys.getSertifiedPublicKeys();
 
         for (PublicKeyAccount key : sertifiedPublicKeys) {
-            if (this.accountExists(key.getAddress())) {
-                long personKey = sertifyPubKeys.getKey();
-                this.database.getPersonFavoritesSet().add(personKey);
-                break;
-            }
+			if (this.accountExists(key)) {
+				long personKey = sertifyPubKeys.getKey();
+				this.database.getPersonFavoritesSet().add(personKey);
+				break;
+			}
         }
     }
 
@@ -1616,18 +1618,18 @@ public class Wallet extends Observable /*implements Observer*/ {
 			BigDecimal issued_FEE_BD = BlockChain.BONUS_FOR_PERSON(height);
 
 			// GIFTs
-			if (this.accountExists(transPersonIssue.getCreator().getAddress())) {
+			if (this.accountExists(transPersonIssue.getCreator())) {
 				this.database.getAccountMap().changeBalance(transPersonIssue.getCreator().getAddress(),
 						true, FEE_KEY, issued_FEE_BD, false);
 			}
 
 			// GIFTs
-			if (this.accountExists(creator.getAddress())) {
+			if (this.accountExists(creator)) {
 				this.database.getAccountMap().changeBalance(creator.getAddress(), true, FEE_KEY, issued_FEE_BD, false);
 			}
 
 			PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
-			if (this.accountExists(creator.getAddress())) {
+			if (this.accountExists(creator)) {
 				this.database.getAccountMap().changeBalance(pkAccount.getAddress(), true, FEE_KEY, issued_FEE_BD, false);
 			}
 		}
@@ -1648,7 +1650,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 	private void addOrder(CreateOrderTransaction orderCreation) {
 		// CHECK IF WE ARE CREATOR
-		if (this.accountExists(orderCreation.getCreator().getAddress())) {
+		if (this.accountExists(orderCreation.getCreator())) {
 
 			// ADD ORDER
 			Order orderNew = orderCreation.makeOrder();
@@ -1665,11 +1667,11 @@ public class Wallet extends Observable /*implements Observer*/ {
 			return;
 		}
 
-		if(orderCreation.getOrderId() == null)
+		if (orderCreation.getOrderId() == null)
 			return;
 
 		// CHECK IF WE ARE CREATOR
-		if (this.accountExists(orderCreation.getCreator().getAddress())) {
+		if (this.accountExists(orderCreation.getCreator())) {
 			// DELETE ORDER
 			if (false) {
 				// order STATUS is ORPHANED
@@ -1688,7 +1690,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 			return;
 
 		// CHECK IF WE ARE CREATOR
-		if (this.accountExists(orderCancel.getCreator().getAddress())) {
+		if (this.accountExists(orderCancel.getCreator())) {
 			if (false) {
 				// DELETE ORDER
 				this.database.getOrderMap().delete(orderCancel.getDBRef());
@@ -1706,7 +1708,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 			return;
 
 		// CHECK IF WE ARE CREATOR
-		if (this.accountExists(orderCancel.getCreator().getAddress())) {
+		if (this.accountExists(orderCancel.getCreator())) {
 			if (false) {
 				// DELETE ORDER
 				Order order = DCSet.getInstance().getOrderMap().get(orderCancel.getOrderID());
@@ -1786,8 +1788,8 @@ public class Wallet extends Observable /*implements Observer*/ {
 				|| type == ObserverMessage.ADD_COMPL_ORDER_TYPE) {
             // UPDATE FULFILLED
             Order order = (Order) message.getValue();
-            if (!this.accountExists(order.getCreator().getAddress()))
-                return;
+			if (!this.accountExists(order.getCreator()))
+				return;
 
 			Long key = order.getId();
             if (this.database.getOrderMap().contains(key)) {
