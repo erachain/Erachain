@@ -114,6 +114,11 @@ function statement(data) {
 
     output += '<br>' + data.Label_signature + ': <b>' + data.tx.signature + '</b>';
 
+    if (data.hasOwnProperty('parent')) {
+        output += '<br>' + data.Label_Parent + ': <a href=?tx=' + data.parent + get_lang() + '><b>' + data.parent + '</b></a><br>';
+    }
+
+
     if (data.hasOwnProperty('title')) {
         output += '<br>' + data.Label_title + ': <b>' + escapeHtml(data.title) + '</b>';
     }

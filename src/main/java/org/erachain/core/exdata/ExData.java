@@ -952,7 +952,7 @@ public class ExData {
 
         if (parentRef > 0) {
             output.put("Label_Parent", Lang.getInstance().translateFromLangObj("Parent", langObj));
-            output.put("parent", parentRef);
+            output.put("parent", Transaction.viewDBRef(parentRef));
         }
 
         if (title != null && !title.isEmpty()) {
