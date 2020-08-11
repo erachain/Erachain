@@ -4,6 +4,8 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.templates.TemplateCls;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
 import org.erachain.gui.library.*;
 import org.erachain.lang.Lang;
@@ -65,7 +67,7 @@ public class ExDataPanel extends JPanel {
     private JScrollPane jScrollPane_Message_TextPane;
     private JScrollPane jScrollPane_Message_Public_TextPane;
     private JScrollPane jScrollPane_Params_Template_Public_TextPane;
-    private JTabbedPane jTabbedPane_Message;
+    private JTabbedPane jTabbedPane_Type;
     private JTabbedPane jTabbedPane_Other;
     private MTable jTable_Attached_Files;
     private MTable jTable_Other_Hashes;
@@ -285,7 +287,7 @@ public class ExDataPanel extends JPanel {
         GridBagConstraints gridBagConstraints;
 
         multipleRecipientsPanel = new MultipleRecipientsPanel();
-        jTabbedPane_Message = new JTabbedPane();
+        jTabbedPane_Type = new JTabbedPane();
         jPanel_Message_Public = new JPanel();
         jScrollPane_Message_Public_TextPane = new JScrollPane();
         jScrollPane_Params_Template_Public_TextPane = new JScrollPane();
@@ -359,11 +361,11 @@ public class ExDataPanel extends JPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
 
-        jTabbedPane_Message.addTab(Lang.getInstance().translate("Doc type"), docTypeAppendixPanel);
-        jTabbedPane_Message.addTab(Lang.getInstance().translate("Recipients"), multipleRecipientsPanel);
+        jTabbedPane_Type.addTab(Lang.getInstance().translate("Type"), docTypeAppendixPanel);
+        jTabbedPane_Type.addTab(Lang.getInstance().translate("Recipients"), multipleRecipientsPanel);
 
         fill_Template_Panel = new MFillTemplatePanel();
-        jTabbedPane_Message.addTab(Lang.getInstance().translate("Template"), fill_Template_Panel);
+        jTabbedPane_Type.addTab(Lang.getInstance().translate("Template"), fill_Template_Panel);
 
         jPanel_Message.setLayout(new GridBagLayout());
 
@@ -395,7 +397,7 @@ public class ExDataPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         // jPanel_Message.add(jCheckBox_Message_Private, gridBagConstraints);
 
-        jTabbedPane_Message.addTab(Lang.getInstance().translate("Text"), jPanel_Message);
+        jTabbedPane_Type.addTab(Lang.getInstance().translate("Text"), jPanel_Message);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -406,7 +408,7 @@ public class ExDataPanel extends JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.4;
         gridBagConstraints.insets = new Insets(16, 8, 0, 8);
-        add(jTabbedPane_Message, gridBagConstraints);
+        add(jTabbedPane_Type, gridBagConstraints);
 
         jPanel_Attached_Files.setMinimumSize(new Dimension(0, 0));
         jPanel_Attached_Files.setPreferredSize(new Dimension(0, 64));
@@ -540,9 +542,9 @@ public class ExDataPanel extends JPanel {
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
         jPanel_Other_Hashes.add(jButton_Remove_Other_Hashes, gridBagConstraints);
 
-        jTabbedPane_Message.addTab(Lang.getInstance().translate("Hashes"), jPanel_Other_Hashes);
+        jTabbedPane_Type.addTab(Lang.getInstance().translate("Hashes"), jPanel_Other_Hashes);
 
-        jTabbedPane_Message.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
+        jTabbedPane_Type.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -759,6 +761,8 @@ public class ExDataPanel extends JPanel {
     }
 
     public byte[] makeExData(PrivateKeyAccount creator, boolean isEncrypted) throws Exception {
+
+        Transaction parent = DCSet.getInstance().getTransactionFinalMap().getRecord(docTypeAppendixPanel.parentReference.getText());
 
         Account[] recipients = multipleRecipientsPanel.recipientsTableModel.getRecipients();
         boolean signCanOnlyRecipients = multipleRecipientsPanel.signCanRecipientsCheckBox.isSelected();
