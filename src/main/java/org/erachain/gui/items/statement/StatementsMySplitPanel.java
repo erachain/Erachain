@@ -111,8 +111,12 @@ public class StatementsMySplitPanel extends SplitPanel {
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
 
+
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
-        columnModel.getColumn(my_Statements_Model.COLUMN_FAVORITE).setMaxWidth(150);
+        columnModel.getColumn(my_Statements_Model.COLUMN_SEQNO).setPreferredWidth(100);
+        columnModel.getColumn(my_Statements_Model.COLUMN_SEQNO).setMaxWidth(150);
+        columnModel.getColumn(my_Statements_Model.COLUMN_FAVORITE).setPreferredWidth(70);
+        columnModel.getColumn(my_Statements_Model.COLUMN_FAVORITE).setMaxWidth(100);
 
         //this.jTableJScrollPanelLeftPanel.setTableHeader(null);
         // sorter

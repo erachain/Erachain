@@ -19,7 +19,6 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
     public static final int COLUMN_SEQNO = 0;
     public static final int COLUMN_TIMESTAMP = 1;
     public static final int COLUMN_CREATOR = 2;
-    public static final int COLUMN_HEIGHT = 3;
     public static final int COLUMN_CREATOR_NAME = 30;
     private static final long serialVersionUID = 1L;
 
@@ -31,7 +30,7 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
     public StatementsVouchTableModel(Transaction transaction) {
 
         super(DCSet.getInstance().getVouchRecordMap(),
-                new String[]{"№", "Timestamp", "Voucher / Signatory", "Height"}, null, false);
+                new String[]{"№", "Timestamp", "Voucher / Signatory"}, null, false);
 
         if (transaction != null) {
             blockNo = transaction.getBlockHeight();
@@ -90,10 +89,6 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
             case COLUMN_CREATOR:
 
                 return transaction.getCreator().getPersonAsString();
-
-            case COLUMN_HEIGHT:
-
-                return transaction.getBlockHeight();
 
             case COLUMN_CREATOR_NAME:
                 return transaction.getCreator().getPerson().b.getName();

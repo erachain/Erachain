@@ -88,7 +88,10 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
         // CHECKBOX FOR FAVORITE
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
-        columnModel.getColumn(search_Table_Model.COLUMN_FAVORITE).setMaxWidth(150);
+        columnModel.getColumn(search_Table_Model.COLUMN_SEQNO).setPreferredWidth(150);
+        columnModel.getColumn(search_Table_Model.COLUMN_SEQNO).setMaxWidth(150);
+        columnModel.getColumn(search_Table_Model.COLUMN_FAVORITE).setPreferredWidth(70);
+        columnModel.getColumn(search_Table_Model.COLUMN_FAVORITE).setMaxWidth(100);
 
         // hand cursor for Favorite column
         jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionListener() {
