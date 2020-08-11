@@ -40,7 +40,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
     public AccountsTransactionsTableModel() {
         super(Controller.getInstance().wallet.database.getTransactionMap(),
-                new String[]{"RecNo", "Date", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Favorite"},
+                new String[]{"№", "Date", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Favorite"},
                 new Boolean[]{false, true, true, false, false, true, true, true, true, true}, false, COLUMN_FAVORITE);
 
         step = 200;

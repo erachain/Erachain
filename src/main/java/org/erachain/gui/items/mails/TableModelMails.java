@@ -28,15 +28,15 @@ public class TableModelMails extends WalletTableModel<Transaction> {
     public static final int COLUMN_HEAD = 2;
     public static final int COLUMN_SENDER = 3;
     public static final int COLUMN_RECIEVER = 4;
-    //	public static final int COLUMN_CONFIRM = 5;
+
     boolean incoming;
     DCSet dcSet;
 
     public TableModelMails(boolean incoming) {
 
         super(Controller.getInstance().wallet.database.getTransactionMap(),
-                new String[]{"Number", "Date", "Title", "Sender", "Receiver"},
-                new Boolean[]{true, false, true, true, false}, true, 1000);
+                new String[]{"№", "Date", "Title", "Sender", "Receiver"},
+                new Boolean[]{false, true, true, true, false}, true, 1000);
         this.incoming = incoming;
         this.dcSet = DCSet.getInstance();
 
@@ -61,7 +61,7 @@ public class TableModelMails extends WalletTableModel<Transaction> {
                 return transaction.getConfirmations(dcSet);
 
             case COLUMN_SEQNO:
-                transaction.viewHeightSeq();
+                return transaction.viewHeightSeq();
 
             case COLUMN_DATA:
                 return DateTimeFormat.timestamptoString(transaction.getTimestamp());

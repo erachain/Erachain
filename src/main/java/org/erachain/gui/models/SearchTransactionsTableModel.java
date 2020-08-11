@@ -34,7 +34,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
     public SearchTransactionsTableModel() {
         super(DCSet.getInstance().getTransactionFinalMap(),
-                new String[]{"SeqNo", "Timestamp", "Type", "Creator", "Title", "Key", "Amount", "Favorite"},
+                new String[]{"№", "Timestamp", "Type", "Creator", "Title", "Key", "Amount", "Favorite"},
                 new Boolean[]{false, true, true, true, true, true, true, true},
                 false);
 
@@ -135,7 +135,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
             switch (column) {
 
                 case COLUMN_SEQNO:
-                    return transaction.getSeqNo();
+                    return transaction.viewHeightSeq();
 
                 case COLUMN_TIMESTAMP:
 

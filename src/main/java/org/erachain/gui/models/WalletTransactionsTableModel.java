@@ -39,7 +39,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
      */
     public WalletTransactionsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
-                new String[]{"SeqNo", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size", "Favorite"},
+                new String[]{"№", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size", "Favorite"},
                 new Boolean[]{true, true, true, true, true, true, true, false, false, true, true},
                 true, COLUMN_FAVORITE);
 

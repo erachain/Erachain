@@ -71,6 +71,7 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
             Integer confirmations = (Integer) table.getValueAt(row, TimerTableModelCls.COLUMN_CONFIRMATIONS);
             if (confirmations != null) {
                 int sizeRow = ((MTable) table).iconSize;
+                // ● ⚫ ◆ █ ▇ ■ ◢ ◤ ◔ ◑ ◕ ⬛ ⬜ ⬤ ⛃
                 if (confirmations == 0) {
                     setIcon(GUIUtils.createIconArc(sizeRow, 0, color));
                 } else if (confirmations < 2) {

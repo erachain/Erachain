@@ -16,6 +16,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -57,11 +58,11 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
 
-        jTableJScrollPanelLeftPanel.setAutoCreateRowSorter(true);
+        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel(); // read column model
+        columnModel.getColumn(TableModelMails.COLUMN_SEQNO).setPreferredWidth(150);
+        columnModel.getColumn(TableModelMails.COLUMN_SEQNO).setMaxWidth(200);
 
-        //		TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel(); // read column model
-        //		columnModel.getColumn(0).setMaxWidth((100));
-        //		columnModel.getColumn(1).setMaxWidth((100));
+        jTableJScrollPanelLeftPanel.setAutoCreateRowSorter(true);
 
 
         //	my_Sorter = new TableRowSorter(incoming_Mails_Model);
