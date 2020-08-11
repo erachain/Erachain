@@ -59,10 +59,10 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
 
         Object isOutcome = table.getValueAt(row, TimerTableModelCls.COLUMN_IS_OUTCOME);
         Color color;
-        if (isOutcome != null && (boolean) isOutcome) {
-            color = adaptee.getForeground();
-        } else {
+        if (isOutcome != null && !(boolean) isOutcome) {
             color = FORE_COLOR;
+        } else {
+            color = adaptee.getForeground();
         }
 
         cell.setForeground(color);

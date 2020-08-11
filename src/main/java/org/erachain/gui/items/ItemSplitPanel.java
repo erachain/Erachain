@@ -53,11 +53,14 @@ public abstract class ItemSplitPanel extends SplitPanel {
         // CREATE TABLE
         jTableJScrollPanelLeftPanel = new MTable(this.tableModel);
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Number.class, new WalletTableRenderer());
 
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
-        columnModel.getColumn(0).setMaxWidth((100));
+        columnModel.getColumn(0).setPreferredWidth((100));
+        columnModel.getColumn(0).setMaxWidth((150));
+        columnModel.getColumn(tableModel.COLUMN_FAVORITE).setPreferredWidth(70);
         columnModel.getColumn(tableModel.COLUMN_FAVORITE).setMaxWidth(100);
-        columnModel.getColumn(((WalletItemTableModel) tableModel).COLUMN_CONFIRMED).setMaxWidth(100);
 
         // hand cursor for Favorite column
         jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionAdapter() {

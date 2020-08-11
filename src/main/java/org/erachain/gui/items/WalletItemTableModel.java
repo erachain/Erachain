@@ -4,7 +4,6 @@ import org.erachain.dbs.DBTabImpl;
 import org.erachain.gui.models.WalletTableModel;
 
 abstract public class WalletItemTableModel<T> extends WalletTableModel<T> {
-    public static final int COLUMN_CONFIRMED = 0;
 
     public WalletItemTableModel(DBTabImpl map, String[] columnNames, Boolean[] column_AutoHeight, int columnFavorite, boolean descending) {
         super(map, columnNames, column_AutoHeight, descending, columnFavorite);
