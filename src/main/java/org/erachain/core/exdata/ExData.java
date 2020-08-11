@@ -636,12 +636,12 @@ public class ExData {
                     flags = Arrays.copyOfRange(data, position, Integer.BYTES);
                     position += Integer.BYTES;
 
-                    if (version > 2 && (flags[1] & HAS_PARENT_MASK) > 0) {
+                    if (version > 2 && flags[1] < 0) {
                         /// IT IS APPENDIX - GOT PARENT
                         parentRefFlags = data[position++];
-                        byte[] parentRefBytes = Arrays.copyOfRange(data, position, position + Long.SIZE);
+                        byte[] parentRefBytes = Arrays.copyOfRange(data, position, position + Long.BYTES);
                         parentRef = Longs.fromByteArray(parentRefBytes);
-                        position += Long.SIZE;
+                        position += Long.BYTES;
                     }
 
                     titleSize = Arrays.copyOfRange(data, position, position + 1)[0];

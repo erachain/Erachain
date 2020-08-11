@@ -246,6 +246,14 @@ public class RNoteInfo extends javax.swing.JPanel {
         exData = statement.getExData();
         exData.resolveValues(DCSet.getInstance());
 
+        long parentRef = exData.getParentRef();
+        if (parentRef > 0) {
+            Transaction transaction = DCSet.getInstance().getTransactionFinalMap().get(parentRef);
+            resultStr += "<br>" + Lang.getInstance().translate("Parent Reference") + " : " + Transaction.viewDBRef(parentRef)
+                    + " " + transaction.getCreator().getPersonAsString() + " : " + transaction.getTitle() + "</b><br>";
+
+        }
+
         String title = exData.getTitle();
         if (title != null)
             jLabel_Title.setText(Lang.getInstance().translate("Title") + ": " + title);
