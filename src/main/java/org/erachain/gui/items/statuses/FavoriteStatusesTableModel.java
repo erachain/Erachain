@@ -6,21 +6,18 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.utils.ObserverMessage;
 
-import java.util.*;
-
 @SuppressWarnings("serial")
 public class FavoriteStatusesTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
-    public static final int COLUMN_CONFIRMED = 3;
-    public static final int COLUMN_FAVORITE = 4;
+    public static final int COLUMN_FAVORITE = 3;
 
     public FavoriteStatusesTableModel() {
         super(DCSet.getInstance().getItemStatusMap(),
                 Controller.getInstance().wallet.database.getStatusFavoritesSet(),
-                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false},
+                new String[]{"Key", "Name", "Publisher", "Favorite"},
+                new Boolean[]{false, true, true, false},
                 ObserverMessage.RESET_STATUS_FAVORITES_TYPE,
                 ObserverMessage.ADD_STATUS_FAVORITES_TYPE,
                 ObserverMessage.DELETE_STATUS_FAVORITES_TYPE,
@@ -40,24 +37,19 @@ public class FavoriteStatusesTableModel extends FavoriteItemModelTable {
 
 
         switch (column) {
-            case COLUMN_KEY:
+            case COLUMN_CONFIRMATIONS:
+                return status.getConfirmations(dcSet);
 
+            case COLUMN_KEY:
                 return status.getKey(DCSet.getInstance());
 
             case COLUMN_NAME:
-
                 return status;
 
             case COLUMN_ADDRESS:
-
                 return status.getOwner().getPersonAsString();
 
-            case COLUMN_CONFIRMED:
-
-                return status.isConfirmed();
-
             case COLUMN_FAVORITE:
-
                 return status.isFavorite();
 
         }

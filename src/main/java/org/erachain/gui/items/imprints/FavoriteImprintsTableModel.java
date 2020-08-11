@@ -6,21 +6,19 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.utils.ObserverMessage;
 
-import java.util.*;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class FavoriteImprintsTableModel extends FavoriteItemModelTable implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
-    public static final int COLUMN_CONFIRMED = 3;
-    public static final int COLUMN_FAVORITE = 4;
-
+    public static final int COLUMN_FAVORITE = 3;
     public FavoriteImprintsTableModel() {
         super(DCSet.getInstance().getItemImprintMap(),
                 Controller.getInstance().wallet.database.getImprintFavoritesSet(),
-                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false},
+                new String[]{"Key", "Name", "Publisher", "Favorite"},
+                new Boolean[]{false, true, true, false},
                 ObserverMessage.RESET_IMPRINT_FAVORITES_TYPE,
                 ObserverMessage.ADD_IMPRINT_FAVORITES_TYPE,
                 ObserverMessage.REMOVE_IMPRINT_FAVORITES_TYPE,
@@ -39,24 +37,19 @@ public class FavoriteImprintsTableModel extends FavoriteItemModelTable implement
             return null;
 
         switch (column) {
-            case COLUMN_KEY:
+            case COLUMN_CONFIRMATIONS:
+                item.getConfirmations(dcSet);
 
+            case COLUMN_KEY:
                 return item.getKey(DCSet.getInstance());
 
             case COLUMN_NAME:
-
                 return item;
 
             case COLUMN_ADDRESS:
-
                 return item.getOwner().getPersonAsString();
 
-            case COLUMN_CONFIRMED:
-
-                return item.isConfirmed();
-
             case COLUMN_FAVORITE:
-
                 return item.isFavorite();
 
         }

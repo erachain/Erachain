@@ -1,6 +1,7 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
+import org.erachain.datachain.DCSet;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -44,6 +45,8 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     protected Object startKey;
     protected int step = 50;
     protected Object lastPageKey;
+
+    protected DCSet dcSet = DCSet.getInstance();
 
     protected DBTabImpl map;
     protected Logger logger;

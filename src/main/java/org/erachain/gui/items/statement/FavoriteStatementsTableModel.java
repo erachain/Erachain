@@ -17,7 +17,6 @@ public class FavoriteStatementsTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_TEMPLATE = 4;
     public static final int COLUMN_FAVORITE = 5;
 
-    DCSet dcSet = DCSet.getInstance();
     Wallet wallet = Controller.getInstance().wallet;
 
     public FavoriteStatementsTableModel() {

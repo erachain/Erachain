@@ -39,10 +39,13 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
             return null;
         }
         switch (column) {
+            case COLUMN_CONFIRMATIONS:
+                asset.getConfirmations(dcSet);
+
             case COLUMN_KEY:
                 return asset.getKey();
             case COLUMN_NAME:
-                return asset; // use renderer with ICON .viewName();
+                return asset;
             case COLUMN_ADDRESS:
                 return asset.getOwner().getPersonAsString();
             case COLUMN_ASSET_TYPE:
@@ -53,8 +56,6 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
                 return asset.isFavorite();
             case COLUMN_I_OWNER:
                 return Controller.getInstance().isAddressIsMine(asset.getOwner().getAddress());
-            //case COLUMN_ITEM_VALUE:
-            //    return asset;
         }
         return null;
     }
