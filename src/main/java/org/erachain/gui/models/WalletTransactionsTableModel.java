@@ -86,6 +86,9 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
             case COLUMN_CONFIRMATIONS:
                 return transaction.getConfirmations(DCSet.getInstance());
 
+            case COLUMN_NUMBER:
+                return transaction.viewHeightSeq();
+
             case COLUMN_TIMESTAMP:
                 return transaction.viewTimestamp();//.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
 
@@ -121,9 +124,6 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
 
             case COLUMN_SIZE:
                 return transaction.viewSize(Transaction.FOR_NETWORK);
-
-            case COLUMN_NUMBER:
-                return transaction.viewHeightSeq();
 
             case COLUMN_FAVORITE:
                 return Controller.getInstance().isTransactionFavorite(transaction);

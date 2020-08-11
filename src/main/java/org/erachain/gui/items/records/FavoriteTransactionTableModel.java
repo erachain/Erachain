@@ -24,7 +24,7 @@ public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
     public FavoriteTransactionTableModel() {
         super(DCSet.getInstance().getTransactionFinalMap(),
                 Controller.getInstance().wallet.database.getTransactionFavoritesSet(),
-                new String[]{"Timestamp", "SeqNo", "Type", "Creator", "Statement", "Favorite"},
+                new String[]{"SeqNo", "Timestamp", "Type", "Creator", "Statement", "Favorite"},
                 new Boolean[]{true, true, true, true, true, false},
                 ObserverMessage.RESET_TRANSACTION_FAVORITES_TYPE,
                 ObserverMessage.ADD_TRANSACTION_FAVORITES_TYPE,
@@ -55,11 +55,11 @@ public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
 
             case COLUMN_CONFIRMATIONS:
                 return transaction.getConfirmations(dcSet);
+            case COLUMN_SEQNO:
+                return transaction.viewHeightSeq();
 
             case COLUMN_TIMESTAMP:
                 return transaction.viewTimestamp();
-            case COLUMN_SEQNO:
-                return transaction.viewHeightSeq();
             case COLUMN_TYPE:
                 return transaction.viewFullTypeName();
             case COLUMN_CREATOR:
