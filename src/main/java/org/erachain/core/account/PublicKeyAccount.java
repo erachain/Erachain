@@ -48,7 +48,7 @@ public class PublicKeyAccount extends Account {
         } else {
             try {
                 // Base58 string len = 33-34 for ADDRESS and 40-44 for PubKey
-                if (true || publicKey.length() > PUBLIC_KEY_LENGTH + (PUBLIC_KEY_LENGTH >> 3)) {
+                if (publicKey.length() > ADDRESS_LENGTH) {
                     pk = Base58.decode(publicKey, PUBLIC_KEY_LENGTH);
                 } else
                     return false;

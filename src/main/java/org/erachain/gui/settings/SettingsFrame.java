@@ -325,6 +325,39 @@ public class SettingsFrame extends JDialog {
                 return false;
             }
         }
+        // { save SSL settings
+        JSONObject settingsWebSSLJSONbuf = new JSONObject();
+        // save use SSL
+        if(settingsTabPane.settingsBasicPanel.chckbxWebUseSSL.isSelected() != Settings.getInstance().isWebUseSSL()) {
+            settingsTabPane.settingsAllowedPanel.webServiceRestart = true;
+            Settings.getInstance().setWebUseSSL(settingsTabPane.settingsBasicPanel.chckbxWebUseSSL.isSelected());
+        }
+        settingsWebSSLJSONbuf.put("Enable", settingsTabPane.settingsBasicPanel.chckbxWebUseSSL.isSelected());
+
+        // save keystore pass
+        if(!(new String(settingsTabPane.settingsBasicPanel.textWebKeystorePass.getPassword()).equals(Settings.getInstance().getWebKeyStorePassword()))){
+            settingsTabPane.settingsAllowedPanel.webServiceRestart = true;
+            Settings.getInstance().setWebKeyStorePassword(new String(settingsTabPane.settingsBasicPanel.textWebKeystorePass.getPassword()));
+        }
+        settingsWebSSLJSONbuf.put("KeyStorePassword", new String(settingsTabPane.settingsBasicPanel.textWebKeystorePass.getPassword()));
+
+        // save certificate pass
+        if(!(new String(settingsTabPane.settingsBasicPanel.textWebCertificatePass.getPassword()).equals(Settings.getInstance().getWebStoreSourcePassword()))){
+            settingsTabPane.settingsAllowedPanel.webServiceRestart = true;
+            Settings.getInstance().setWebStoreSourcePassword(new String(settingsTabPane.settingsBasicPanel.textWebCertificatePass.getPassword()));
+        }
+        settingsWebSSLJSONbuf.put("KeyStoreSourcePassword", new String(settingsTabPane.settingsBasicPanel.textWebCertificatePass.getPassword()));
+
+        // save keystore fale path
+        if(!(settingsTabPane.settingsBasicPanel.textWebKeyStoreFilePath.getText().equals(Settings.getInstance().getWebKeyStorePath()))) {
+            settingsTabPane.settingsAllowedPanel.webServiceRestart = true;
+            Settings.getInstance().setWebKeyStorePath(settingsTabPane.settingsBasicPanel.textWebKeyStoreFilePath.getText());
+        }
+        settingsWebSSLJSONbuf.put("KeyStorePath", settingsTabPane.settingsBasicPanel.textWebKeyStoreFilePath.getText());
+
+        settingsJSONbuf.put("WEB_SSL",settingsWebSSLJSONbuf);
+        // save SSL settings }
+
 
         int MinConnections = Integer.parseInt(settingsTabPane.settingsBasicPanel.textMinConnections.getText());
         if (Settings.getInstance().getMinConnections() != MinConnections) {

@@ -25,7 +25,7 @@ import java.util.HashMap;
 /**
  * @author Саша
  */
-public class SplitPanel extends JPanel {
+public class SplitPanel extends IconPanel {
 
     protected Logger logger;
 
@@ -37,7 +37,7 @@ public class SplitPanel extends JPanel {
     public JLabel Label_search_Info_Panel;
     // Variables declaration - do not modify
     public JButton button1ToolBarLeftPanel;
-    public JButton button2ToolBarLeftPanel;
+    public JToggleButton button2ToolBarLeftPanel;
     public JButton jButton1_jToolBar_RightPanel;
     public JButton jButton2_jToolBar_RightPanel;
     public JLabel jLabel2;
@@ -63,8 +63,8 @@ public class SplitPanel extends JPanel {
 
     protected Controller cnt;
 
-    public SplitPanel(String str) {
-        super();
+    public SplitPanel(String panelName, String title) {
+        super(panelName, title);
 
         logger = LoggerFactory.getLogger(getClass());
 
@@ -77,7 +77,7 @@ public class SplitPanel extends JPanel {
         Label_search_Info_Panel.setHorizontalAlignment(SwingConstants.CENTER);
         search_Info_Panel.add(Label_search_Info_Panel, BorderLayout.CENTER);
 
-        set_Divider_Parameters(str);
+        setDividerParameters();
     }
 
     /**
@@ -100,8 +100,8 @@ public class SplitPanel extends JPanel {
         leftPanel = new JPanel();
         toolBarLeftPanel = new JPanel();
         button1ToolBarLeftPanel = new JButton();
-        button2ToolBarLeftPanel = new JButton();
-        searchToolBar_LeftPanel = new JMenuBar ();
+        button2ToolBarLeftPanel = new JToggleButton();
+        searchToolBar_LeftPanel = new JMenuBar();
         searchToolBar_LeftPanel.setBorderPainted(false);
         searthLabelSearchToolBarLeftPanel = new JLabel();
         searchTextFieldSearchToolBarLeftPanelDocument = new JTextField();
@@ -299,16 +299,16 @@ public class SplitPanel extends JPanel {
         // TODO add your handling code here:
     }
 
-    private void set_Divider_Parameters(String str) {
+    private void setDividerParameters() {
         settingsJSONbuf = Settings.getInstance().getJSONObject();
-    //    settingsJSONbuf = Settings.getInstance().read_setting_JSON();
+        //    settingsJSONbuf = Settings.getInstance().read_setting_JSON();
         JSONObject params;
         params = new JSONObject();
         if (!settingsJSONbuf.containsKey("Main_Frame_Setting")) return;
         params = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
-        if (!params.containsKey(str)) return;
-       // преобразуем все в ыекштп т.к. JSONObject в методе GET  преобразует <String>"2" -> <int>2
-        HashMap param = (HashMap) params.get(str);
+        if (!params.containsKey(panelName)) return;
+        // преобразуем все в ыекштп т.к. JSONObject в методе GET  преобразует <String>"2" -> <int>2
+        HashMap param = (HashMap) params.get(panelName);
         if (param.containsKey("Div_Last_Loc"))
             jSplitPanel.setLastDividerLocation(new Integer(param.get("Div_Last_Loc")+""));
         if (param.containsKey("Div_Loc")) jSplitPanel.setDividerLocation(new Integer(param.get("Div_Loc")+""));

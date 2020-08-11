@@ -215,7 +215,7 @@ public class MenuFiles extends JMenu {
                     AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey),
                             ct.getWalletAccountByAddress(creator), ct.getWalletAccountByAddress(recipient), null, null);
                     MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Read Transaction"),
-                            panel, AccountAssetSendPanel.getIcon());
+                            panel);
 
                     AssetCls asset = ct.getAsset(assetKey);
                     panel.jTextField_To.setText(recipient);
@@ -246,7 +246,7 @@ public class MenuFiles extends JMenu {
                 //AccountSendDialog dd = new AccountSendDialog(null, null, null, null, false);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Write Transaction"),
                         new AccountAssetSendPanel(null,
-                                null, null, null, null), AccountAssetSendPanel.getIcon());
+                                null, null, null, null));
 
 
             }
@@ -274,13 +274,17 @@ public class MenuFiles extends JMenu {
 
         //WEB SERVER
         blockExplorerItem = new JMenuItem(Lang.getInstance().translate("Built-in BlockExplorer"));
-        blockExplorerItem.getAccessibleContext().setAccessibleDescription("http://127.0.0.1:" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html");
         blockExplorerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.ALT_MASK));
         blockExplorerItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
                 try {
-                    URLViewer.openWebpage(new URL("http://127.0.0.1:" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"));
+                    String blockExplorerProtocol = "Http";
+                    if (Settings.getInstance().isWebUseSSL()){
+                        blockExplorerProtocol = "Https";
+                    }
+                    String blockExplorerUrl = blockExplorerProtocol + "://127.0.0.1:" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html";
+                    URLViewer.openWebpage(new URL(blockExplorerUrl));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }

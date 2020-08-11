@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class NativeMapHashMapFork<T, U> extends DBMapSuitFork<T, U> implements ForkedMap {
 
     public NativeMapHashMapFork(DBTab parent, DBASet databaseSet, DBTab cover) {
-        super(parent, databaseSet, null, logger, cover);
+        super(parent, databaseSet, null, cover);
     }
 
     @Override

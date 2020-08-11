@@ -90,8 +90,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.0.02";
-    public static String buildTime = "2020-07-07 12:00:00 UTC";
+    public static String version = "5.0.03";
+    public static String buildTime = "2020-08-04 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -752,7 +752,7 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Start WEB Service")));
             LOGGER.info(Lang.getInstance().translate("Start WEB Service"));
-            this.webService = new WebService();
+            this.webService = WebService.getInstance();
             this.webService.start();
         }
 
@@ -1010,10 +1010,13 @@ public class Controller extends Observable {
 
         if (this.webService != null)
             this.webService.stop();
+        while( !this.webService.isStoped()){}
+        this.webService = null;
 
         // START API SERVICE
+        WebService.getInstance().clearInstance();
         if (Settings.getInstance().isWebEnabled()) {
-            this.webService = new WebService();
+            this.webService = WebService.getInstance();
             this.webService.start();
         }
     }
@@ -1182,6 +1185,12 @@ public class Controller extends Observable {
     public void blockchainSyncStatusUpdate(int height) {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.BLOCKCHAIN_SYNC_STATUS, height));
+    }
+
+    public void playWalletEvent(Object object) {
+        if (gui == null || gui.walletTimer == null)
+            return;
+        gui.walletTimer.playEvent(object);
     }
 
     /**
@@ -2295,6 +2304,13 @@ public class Controller extends Observable {
     }
 
     public boolean isMyAccountByAddress(String address) {
+        if (this.doesWalletExists()) {
+            return this.wallet.accountExists(address);
+        }
+        return false;
+    }
+
+    public boolean isMyAccountByAddress(Account address) {
         if (this.doesWalletExists()) {
             return this.wallet.accountExists(address);
         }
@@ -3434,7 +3450,7 @@ public class Controller extends Observable {
     public byte[] getPublicKey(Account account) {
 
         // CHECK ACCOUNT IN OWN WALLET
-        if (isMyAccountByAddress(account.getAddress())) {
+        if (isMyAccountByAddress(account)) {
             if (isWalletUnlocked()) {
                 return getWalletPrivateKeyAccountByAddress(account.getAddress()).getPublicKey();
             }

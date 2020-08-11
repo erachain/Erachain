@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.items.statement.RNoteInfo;
 import org.erachain.gui.library.MTable;
@@ -20,6 +21,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
@@ -28,21 +30,19 @@ import java.net.URL;
 import java.util.ArrayList;
 
 
-public class FavoriteTransactionsSplitPanel extends SplitPanel  {
+public class FavoriteTransactionsSplitPanel extends SplitPanel {
+
+    public static String NAME = "FavoriteTransactionsSplitPanel";
+    public static String TITLE = "Favorite Transactions";
 
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "FavoriteTransactionsSplitPanel.png";
-    // для прозрачности
-    int alpha = 255;
-    int alpha_int;
-    // private StatementsTableModelFavorite search_Table_Model;
     private FavoriteTransactionTableModel favotitesTable;
-    //	private MTable search_Table;
     private RowSorter<ItemsPersonsTableModel> search_Sorter;
 
     public FavoriteTransactionsSplitPanel() {
-        super("FavoriteStatementsSplitPanel");
-        setName(Lang.getInstance().translate("Favorite Transactions"));
+        super(NAME, TITLE);
+        iconName = "favorite.png";
+
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
         // not show buttons
@@ -60,6 +60,15 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel  {
         searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new search_tab_filter());
         // SET VIDEO
         jTableJScrollPanelLeftPanel = new MTable(this.favotitesTable);
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
+
+        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
+        columnModel.getColumn(favotitesTable.COLUMN_SEQNO).setPreferredWidth((150));
+        columnModel.getColumn(favotitesTable.COLUMN_SEQNO).setMaxWidth((150));
+        columnModel.getColumn(favotitesTable.COLUMN_FAVORITE).setPreferredWidth((70));
+        columnModel.getColumn(favotitesTable.COLUMN_FAVORITE).setMaxWidth((100));
+
         //	jTableJScrollPanelLeftPanel = search_Table;
         //sorter from 0 column
         search_Sorter = new TableRowSorter(favotitesTable);
@@ -222,23 +231,13 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel  {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
                 return;
 
-            Transaction transaction = (Transaction)favotitesTable.getItem(
+            Transaction transaction = (Transaction) favotitesTable.getItem(
                     jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
 
             JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
             info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             //	jSplitPanel.setRightComponent(info_panel);
-        }
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
         }
     }
 }

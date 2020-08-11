@@ -29,8 +29,10 @@ import java.util.Observer;
 
 public class OtherSplitPanel extends SplitPanel implements Observer {
 
+    public static String NAME = "OtherSplitPanel";
+    public static String TITLE = "Other";
+
     private PeersTableModel peersTableModel = new PeersTableModel();
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "OtherSplitPanel.png";
     private JPanel jPanel2 = new JPanel();
     private GridBagConstraints gridBagConstraints;
     private JLabel jLabelPeerTitle = new JLabel();
@@ -49,7 +51,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
     private final JLabel jLabelAllBlocksSum;
 
     public OtherSplitPanel() {
-        super("OtherSplitPanel");
+        super(NAME, TITLE);
         DCSet.getInstance().getBlockMap().addObserver(this);
         jTableJScrollPanelLeftPanel.setModel(peersTableModel);
         jTableJScrollPanelLeftPanel.setAutoCreateRowSorter(true);
@@ -283,17 +285,6 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
     public void update(Observable o, Object arg) {
         if (jLabelAllBlocksSum != null)
             jLabelAllBlocksSum.setText(String.valueOf(Controller.getInstance().getBlockChain().
-                 getFullWeight(DCSet.getInstance())));
-    }
-
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
+                    getFullWeight(DCSet.getInstance())));
     }
 }

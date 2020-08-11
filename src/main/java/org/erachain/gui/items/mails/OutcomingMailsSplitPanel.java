@@ -2,7 +2,9 @@ package org.erachain.gui.items.mails;
 
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -14,6 +16,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -25,20 +28,19 @@ import java.net.URL;
 
 
 public class OutcomingMailsSplitPanel extends SplitPanel {
+
+    public static String NAME = "OutcomingMailsSplitPanel";
+    public static String TITLE = "Outcoming Mails";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "OutcomingMailsSplitPanel.png";
-    // для прозрачности
-    int alpha = 255;
-    int alpha_int;
     private TableModelMails incoming_Mails_Model;
-    private MTable inciming_Mail_Table;
+    //private MTable jTableJScrollPanelLeftPanel;
     private TableRowSorter my_Sorter;
 
 
     public OutcomingMailsSplitPanel() {
-        super("OutcomingMailsSplitPanel");
+        super(NAME, TITLE);
 
-        this.setName(Lang.getInstance().translate("Outcoming Mails"));
         this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
@@ -52,21 +54,24 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 
         //TABLE
         incoming_Mails_Model = new TableModelMails(false);
-        inciming_Mail_Table = new MTable(incoming_Mails_Model);
-        inciming_Mail_Table.setAutoCreateRowSorter(true);
+        jTableJScrollPanelLeftPanel = new MTable(incoming_Mails_Model);
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
 
-        //		TableColumnModel columnModel = inciming_Mail_Table.getColumnModel(); // read column model
-        //		columnModel.getColumn(0).setMaxWidth((100));
-        //		columnModel.getColumn(1).setMaxWidth((100));
+        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel(); // read column model
+        columnModel.getColumn(TableModelMails.COLUMN_SEQNO).setPreferredWidth(150);
+        columnModel.getColumn(TableModelMails.COLUMN_SEQNO).setMaxWidth(200);
+
+        jTableJScrollPanelLeftPanel.setAutoCreateRowSorter(true);
 
 
         //	my_Sorter = new TableRowSorter(incoming_Mails_Model);
-        //	inciming_Mail_Table.setRowSorter(my_Sorter);
-        //	inciming_Mail_Table.getRowSorter();
+        //	jTableJScrollPanelLeftPanel.setRowSorter(my_Sorter);
+        //	jTableJScrollPanelLeftPanel.getRowSorter();
         //	if (incoming_Mails_Model.getRowCount() > 0) incoming_Mails_Model.fireTableDataChanged();
 	/*		
 			//CHECKBOX FOR CONFIRMED
-			TableColumn confirmedColumn = inciming_Mail_Table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_CONFIRMED);
+			TableColumn confirmedColumn = jTableJScrollPanelLeftPanel.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_CONFIRMED);
 			// confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 			confirmedColumn.setCellRenderer(new RendererBoolean());
 			confirmedColumn.setMinWidth(50);
@@ -81,8 +86,8 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         copySender.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                int row = inciming_Mail_Table.getSelectedRow();
-                row = inciming_Mail_Table.convertRowIndexToModel(row);
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 StringSelection value = new StringSelection(((RSend) incoming_Mails_Model.getItem(row)).getCreator().getAddress());
@@ -95,8 +100,8 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         copyRecipient.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                int row = inciming_Mail_Table.getSelectedRow();
-                row = inciming_Mail_Table.convertRowIndexToModel(row);
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 StringSelection value = new StringSelection(((RSend) incoming_Mails_Model.getItem(row)).getRecipient().getAddress());
@@ -135,12 +140,12 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 
         menu.add(setSeeInBlockexplorer);
 
-        TableMenuPopupUtil.installContextMenu(inciming_Mail_Table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+        TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 			
 		/*	
 			
 			//CHECKBOX FOR FAVORITE
-			TableColumn favoriteColumn = inciming_Mail_Table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_FAVORITE);
+			TableColumn favoriteColumn = jTableJScrollPanelLeftPanel.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_FAVORITE);
 			//favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 			favoriteColumn.setCellRenderer(new RendererBoolean());
 			favoriteColumn.setMinWidth(50);
@@ -151,12 +156,12 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         this.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new My_Search());
         // SET VIDEO
         this.jTableJScrollPanelLeftPanel.setModel(incoming_Mails_Model);
-        this.jTableJScrollPanelLeftPanel = inciming_Mail_Table;
+        this.jTableJScrollPanelLeftPanel = jTableJScrollPanelLeftPanel;
         this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
         //		this.setRowHeightFormat(true);
 
         // EVENTS on CURSOR
-        inciming_Mail_Table.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
+        jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
 
 
         //		 Dimension size = MainFrame.getInstance().desktopPane.getSize();
@@ -182,11 +187,14 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         public void valueChanged(ListSelectionEvent arg0) {
 
 
-            if (inciming_Mail_Table.getSelectedRow() < 0)
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
                 return;
 
-            RSend mail = (RSend) incoming_Mails_Model.getItem(inciming_Mail_Table.convertRowIndexToModel(inciming_Mail_Table.getSelectedRow()));
+            RSend mail = (RSend) incoming_Mails_Model.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             if (mail == null) return;
+
+            ((WTransactionMap) incoming_Mails_Model.getMap()).clearUnViewed(mail);
+
             MailInfo info_panel = new MailInfo(mail);
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
 
@@ -218,16 +226,6 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 
             incoming_Mails_Model.fireTableDataChanged();
 
-        }
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
         }
     }
 

@@ -3,7 +3,9 @@ package org.erachain.gui.items.mails;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
@@ -17,6 +19,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -27,18 +30,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class IncomingMailsSplitPanel extends SplitPanel {
+
+    public static String NAME = "IncomingMailsSplitPanel";
+    public static String TITLE = "Incoming Mails";
+
     private static final long serialVersionUID = 2717571093561259483L;
-    // для прозрачности
-    int alpha = 255;
-    int alpha_int;
     private TableModelMails incoming_Mails_Model;
-    private MTable inciming_Mail_Table;
+    //private MTable jTableJScrollPanelLeftPanel;
     private TableRowSorter my_Sorter;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "IncomingMailsSplitPanel.png";
 
     public IncomingMailsSplitPanel() {
-        super("IncomingMailsSplitPanel");
-        this.setName(Lang.getInstance().translate("Incoming Mails"));
+        super(NAME, TITLE);
         this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
@@ -51,8 +53,15 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
         // TABLE
         incoming_Mails_Model = new TableModelMails(true);
-        inciming_Mail_Table = new MTable(incoming_Mails_Model);
-        inciming_Mail_Table.setAutoCreateRowSorter(true);
+        jTableJScrollPanelLeftPanel = new MTable(incoming_Mails_Model);
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
+
+        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
+        columnModel.getColumn(TableModelMails.COLUMN_SEQNO).setPreferredWidth(150);
+        columnModel.getColumn(TableModelMails.COLUMN_SEQNO).setMaxWidth(200);
+
+        jTableJScrollPanelLeftPanel.setAutoCreateRowSorter(true);
 
         // MENU
         JPopupMenu menu = new JPopupMenu();
@@ -61,8 +70,8 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         copySender.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                int row = inciming_Mail_Table.getSelectedRow();
-                row = inciming_Mail_Table.convertRowIndexToModel(row);
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 StringSelection value = new StringSelection(
@@ -76,8 +85,8 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         copyRecipient.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                int row = inciming_Mail_Table.getSelectedRow();
-                row = inciming_Mail_Table.convertRowIndexToModel(row);
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 StringSelection value = new StringSelection(
@@ -92,11 +101,13 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                int row = inciming_Mail_Table.getSelectedRow();
-                row = inciming_Mail_Table.convertRowIndexToModel(row);
-                Account account = incoming_Mails_Model.getItem(row).getCreator();
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+                RSend rSend = (RSend) incoming_Mails_Model.getItem(row);
+                Account account = new Account(rSend.getCreator().getAddress());
+                Account recipient = rSend.getRecipient();
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(recipient, account, null));
 
             }
         });
@@ -106,8 +117,8 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         vouch_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                int row = inciming_Mail_Table.getSelectedRow();
-                row = inciming_Mail_Table.convertRowIndexToModel(row);
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 Transaction trans = incoming_Mails_Model.getItem(row);
                 int blockNo = trans.getBlockHeight();
                 int recNo = trans.getSeqNo();
@@ -146,7 +157,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
         menu.add(setSeeInBlockexplorer);
 
-        TableMenuPopupUtil.installContextMenu(inciming_Mail_Table, menu); // SELECT
+        TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menu); // SELECT
         // ROW
         // ON
         // WHICH
@@ -170,7 +181,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
          *
          *
          * //CHECKBOX FOR FAVORITE TableColumn favoriteColumn =
-         * inciming_Mail_Table.getColumnModel().getColumn(
+         * jTableJScrollPanelLeftPanel.getColumnModel().getColumn(
          * WalletItemPersonsTableModel.COLUMN_FAVORITE);
          * //favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.
          * class)); favoriteColumn.setCellRenderer(new RendererBoolean());
@@ -181,12 +192,12 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         this.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new My_Search());
         // SET VIDEO
         this.jTableJScrollPanelLeftPanel.setModel(incoming_Mails_Model);
-        this.jTableJScrollPanelLeftPanel = inciming_Mail_Table;
+        this.jTableJScrollPanelLeftPanel = jTableJScrollPanelLeftPanel;
         this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
         // this.setRowHeightFormat(true);
 
         // EVENTS on CURSOR
-        inciming_Mail_Table.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
+        jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
 
     }
 
@@ -208,12 +219,16 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         public void valueChanged(ListSelectionEvent arg0) {
 
             RSend mail = null;
-            if (inciming_Mail_Table.getSelectedRow() >= 0)
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0)
                 mail = (RSend) incoming_Mails_Model.getItem(
-                        inciming_Mail_Table.convertRowIndexToModel(inciming_Mail_Table.getSelectedRow()));
+                        jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             // info1.show_001(person);
             if (mail == null)
                 return;
+
+            ((WTransactionMap) incoming_Mails_Model.getMap()).clearUnViewed(mail);
+
+            //((WTransactionMap) TableModelMails.getMap()).clearUnViewed(IncomingMailsSplitPanel.this.notifyAll(););
             MailInfo info_panel = new MailInfo(mail);
 
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
@@ -245,16 +260,6 @@ public class IncomingMailsSplitPanel extends SplitPanel {
             ((DefaultRowSorter) my_Sorter).setRowFilter(filter);
             incoming_Mails_Model.fireTableDataChanged();
 
-        }
-    }
-
-    public static  Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
         }
     }
 

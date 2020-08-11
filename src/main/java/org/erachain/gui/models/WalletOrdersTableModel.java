@@ -13,8 +13,9 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class WalletOrdersTableModel extends WalletTableModel<Order> implements Observer {
-    public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_BLOCK = 1;
+
+    public static final int COLUMN_SEQNO = 0;
+    public static final int COLUMN_TIMESTAMP = 1;
     public static final int COLUMN_AMOUNT = 2;
     public static final int COLUMN_HAVE = 3;
     public static final int COLUMN_PRICE = 4;
@@ -26,8 +27,8 @@ public class WalletOrdersTableModel extends WalletTableModel<Order> implements O
 
     public WalletOrdersTableModel() {
         super(Controller.getInstance().wallet.database.getOrderMap(),
-                new String[]{"Timestamp", "Block - transaction", "Amount", "Have", "Price",
-                        "Want", "Total", "Left", "Creator", "Status"}, new Boolean[]{true}, true);
+                new String[]{"№", "Timestamp", "Amount", "Have", "Price", "Want", "Total", "Left", "Creator", "Status"},
+                new Boolean[]{false, true, true, true, true, true, true, true, true, true}, true, 10000);
 
         step = 200;
     }
@@ -41,6 +42,11 @@ public class WalletOrdersTableModel extends WalletTableModel<Order> implements O
         Order order = this.list.get(row);
 
         switch (column) {
+
+            case COLUMN_SEQNO:
+
+                return Transaction.viewDBRef(order.getId());
+
             case COLUMN_TIMESTAMP:
 
                 Tuple2<Integer, Integer> blockDBref = Transaction.parseDBRef(order.getId());
@@ -80,11 +86,6 @@ public class WalletOrdersTableModel extends WalletTableModel<Order> implements O
             case COLUMN_STATUS:
 
                 Lang.getInstance().translate(order.state());
-
-            case COLUMN_BLOCK:
-
-                blockDBref = Transaction.parseDBRef(order.getId());
-                return blockDBref == null ? "?-?" : blockDBref.a + "-" + blockDBref.b;
 
         }
 

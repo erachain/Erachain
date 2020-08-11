@@ -24,7 +24,7 @@ public class MenuDeals extends JMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send mail"),
-                        new MailSendPanel(null, null, null), MailSendPanel.getIcon());
+                        new MailSendPanel(null, null, null));
 
             }
         });
@@ -40,7 +40,7 @@ public class MenuDeals extends JMenu {
                 //
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send"),
                         new AccountAssetSendPanel(null,
-                                null, null, null, null), AccountAssetSendPanel.getIcon());
+                                null, null, null, null));
 
             }
         });
@@ -56,7 +56,7 @@ public class MenuDeals extends JMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Take on Hold"),
-                        new AccountAssetHoldPanel(null, null, null, null), AccountAssetHoldPanel.getIcon());
+                        new AccountAssetHoldPanel(null, null, null, null));
             }
         });
         add(dealsMenu_Take_On_Hold);
@@ -71,7 +71,7 @@ public class MenuDeals extends JMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Lend"),
-                        new AccountAssetLendPanel(null, null, null, null), AccountAssetLendPanel.getIcon());
+                        new AccountAssetLendPanel(null, null, null, null));
 
             }
         });
@@ -85,7 +85,7 @@ public class MenuDeals extends JMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Confiscate Debt"),
-                        new AccountAssetConfiscateDebtPanel(null, null, null, null), AccountAssetConfiscateDebtPanel.getIcon());
+                        new AccountAssetConfiscateDebtPanel(null, null, null, null));
 
             }
         });
@@ -99,7 +99,7 @@ public class MenuDeals extends JMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Repay Debt"),
-                        new AccountAssetRepayDebtPanel(null, null, null, null), AccountAssetRepayDebtPanel.getIcon());
+                        new AccountAssetRepayDebtPanel(null, null, null, null));
 
             }
         });
@@ -116,7 +116,7 @@ public class MenuDeals extends JMenu {
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Spend"),
                         new AccountAssetSpendPanel(null,
-                                null, null, null, null), AccountAssetSpendPanel.getIcon());
+                                null, null, null, null));
 
             }
         });

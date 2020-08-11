@@ -11,6 +11,7 @@ import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
@@ -20,7 +21,6 @@ import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +39,12 @@ import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
-public class IssuePersonPanel extends JPanel  {
+public class IssuePersonPanel extends IconPanel {
+
+    public static String NAME = "IssuePersonPanel";
+    public static String TITLE = "Issue Person";
+
     private static final Logger logger = LoggerFactory.getLogger(IssuePersonPanel.class);
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "IssuePersonPanel.png";
     protected JLabel titleJLabel = new JLabel();
     protected JComboBox<Account> cbxFrom = new JComboBox<>();
     protected JComboBox<String> txtFeePow = new JComboBox<>();
@@ -77,15 +80,14 @@ public class IssuePersonPanel extends JPanel  {
     protected JPanel mainPanel = new JPanel();
     private JScrollPane mainScrollPane1 = new JScrollPane();
 
-    public IssuePersonPanel() {
+    public IssuePersonPanel(String name, String title) {
+        super(name, title);
         initComponents();
         initLabels();
         titleJLabel.setFont(FONT_TITLE);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
         titleJLabel.setText(Lang.getInstance().translate("Issue Person"));
-
-
 
         cbxFrom.setModel(new AccountsComboBoxModel());
         txtName.addFocusListener(new FocusAdapter() {
@@ -107,6 +109,10 @@ public class IssuePersonPanel extends JPanel  {
         comboBoxGender.setModel(new DefaultComboBoxModel<>(items));
         comboBoxGender.setSelectedIndex(2);
         setVisible(true);
+    }
+
+    public IssuePersonPanel() {
+        this(NAME, TITLE);
     }
 
     private void initLabels() {
@@ -643,17 +649,6 @@ public class IssuePersonPanel extends JPanel  {
         }
         // ENABLE
         copyButton.setEnabled(true);
-    }
-
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 
 }

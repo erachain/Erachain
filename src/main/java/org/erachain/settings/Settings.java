@@ -47,6 +47,7 @@ public class Settings {
     public static final int DEFAULT_ACCOUNTS = 1;
     //DATA
     public static final String DEFAULT_DATA_CHAIN_DIR = "datachain";
+
     private static final String DEFAULT_DATA_LOCAL_DIR = "datalocal";
     private static final String DEFAULT_DATA_TEMP_DIR = "datatemp";
     private static final String DEFAULT_DATA_WALLET_DIR = "dataWallet";
@@ -78,6 +79,12 @@ public class Settings {
     //WEB
     private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
     private static final boolean DEFAULT_WEB_ENABLED = true;
+    private static final String DEFAULT_WEB_KEYSTORE_FILE_PATH = "SSL" + File.separator +"WEBkeystore";
+    private String webKeyStorePassword ="";
+    private String webStoreSourcePassword ="";
+    private String webKeyStorePath ="";
+    private boolean webUseSSL = false;
+
     // 19 03
     //GUI
     private static final boolean DEFAULT_GUI_ENABLED = true;
@@ -106,7 +113,14 @@ public class Settings {
     private static final int NOTIFY_INCOMING_CONFIRMATIONS = 0;
     public static String DEFAULT_LANGUAGE = "en";
 
-    public static final boolean USE_TELEGRAM_STORE = false;
+    /**
+     * Если отключить то локально не будут сохраняться телеграммы для своих счетов
+     * и соотвественно в кошельке не будет прилетать никаких весточек к моим счетам.
+     * !!! Отключать для НОД которые только форжат - надо настройки потом делать
+     *
+     * @return
+     */
+    public static final boolean USE_TELEGRAM_STORE = true;
     public static final int TELEGRAM_STORE_PERIOD = 5; // in days
 
     public final static int NET_MODE_MAIN = 0;
@@ -203,6 +217,13 @@ public class Settings {
         this.defaultPeers = peers;
     }
 
+    /**
+     * Если отключить то локально не будут сохраняться телеграммы для своих счетов
+     * и соотвественно в кошельке не будет прилетать никаких весточек к моим счетам.
+     * !!! Отключать для НОД которые только форжат - надо настройки потом делать
+     *
+     * @return
+     */
     public boolean getTelegramStoreUse() {
         return USE_TELEGRAM_STORE;
     }
@@ -814,6 +835,38 @@ public class Settings {
 
         return BlockChain.DEFAULT_WEB_PORT;
     }
+    // SSL settings
+    public String getWebKeyStorePassword() {
+        return webKeyStorePassword;
+    }
+
+    public void setWebKeyStorePassword(String keyStorePassword) {
+        webKeyStorePassword= keyStorePassword;
+    }
+
+    public String getWebStoreSourcePassword() {
+        return webStoreSourcePassword;
+    }
+    public void setWebStoreSourcePassword(String storeSourcePassword) {
+        webStoreSourcePassword= storeSourcePassword;
+    }
+
+    public String getWebKeyStorePath() {
+        if (webKeyStorePath.equals("")) return DEFAULT_WEB_KEYSTORE_FILE_PATH;
+        return webKeyStorePath;
+    }
+    public void setWebKeyStorePath(String webKeyStorePath) {
+        webStoreSourcePassword= webKeyStorePath;
+    }
+
+    public boolean isWebUseSSL() {
+        return webUseSSL;
+    }
+
+    public void setWebUseSSL(boolean webUseSSL1) {
+        webUseSSL= webUseSSL1;
+    }
+
 
     public String explorerURL;
 
@@ -1222,6 +1275,20 @@ public class Settings {
                 if (!file.exists()) {
                     file.createNewFile();
                 }
+                // read web ssl settings
+               try {
+                    JSONObject webSSLSettings = (JSONObject)this.settingsJSON.get("WEB_SSL");
+                        webKeyStorePassword = (String) webSSLSettings.get("KeyStorePassword");
+                        webKeyStorePath = (String) webSSLSettings.get("KeyStorePath");
+                        webStoreSourcePassword = (String) webSSLSettings.get("KeyStoreSourcePassword");
+                        webUseSSL = (boolean) webSSLSettings.get("Enable");
+              } catch (Exception e) {
+                    webKeyStorePassword = "";
+                    webKeyStorePath="";
+                    webStoreSourcePassword = "";
+                    webUseSSL = false;
+                }
+
             }
 
         } catch (Exception e) {
@@ -1255,5 +1322,6 @@ public class Settings {
             LOGGER.error(e.getMessage(), e);
         }
     }
+
 
 }

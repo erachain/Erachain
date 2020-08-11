@@ -9,6 +9,7 @@ import org.erachain.core.item.assets.AssetType;
 import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
+import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
@@ -18,7 +19,6 @@ import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,9 +29,11 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 /**
  * @author Саша
  */
-public class IssueAssetPanel extends JPanel  {
+public class IssueAssetPanel extends IconPanel {
 
-    private static String iconFile = Settings.getInstance().getPatnIcons()+ "IssueAssetPanel.png";
+    public static String NAME = "IssueAssetPanel";
+    public static String TITLE = "Issue Asset";
+
     private JLabel titleJLabel = new JLabel();
     private JLabel accountJLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
     private JLabel descriptionJLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
@@ -58,11 +60,12 @@ public class IssueAssetPanel extends JPanel  {
     private AssetTypesComboBoxModel assetTypesComboBoxModel;
 
     public IssueAssetPanel() {
+        super(NAME, TITLE);
         initComponents();
         titleJLabel.setFont(FONT_TITLE);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-        titleJLabel.setText(Lang.getInstance().translate("Issue Asset"));
+        titleJLabel.setText(Lang.getInstance().translate(TITLE));
         textAreaDescription.setLineWrap(true);
         textQuantity.setMaskType(textQuantity.maskLong);
         textQuantity.setText("0");
@@ -437,16 +440,6 @@ public class IssueAssetPanel extends JPanel  {
 
         // ENABLE
         issueJButton.setEnabled(true);
-    }
-
-    public static Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 
 }

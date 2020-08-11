@@ -4,19 +4,15 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
-
-import javax.swing.*;
 
 // Info for status
 public class StatusInfo extends MTextPane {
     private static final long serialVersionUID = 476307470457045006L;
 
     public StatusInfo() {
-        //	this.setContentType("text/html");
-        //	this.setBackground(MainFrame.getFrames()[0].getBackground());
     }
 
 

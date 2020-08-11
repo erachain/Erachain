@@ -51,6 +51,11 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
 
     NavigableSet<Tuple2<Integer, Tuple2<Long, Integer>>> addressKey;
 
+    /**
+     * Те записи которые не были просмотрены
+     */
+    NavigableSet<Tuple2<Long, Integer>> unViewed;
+
     static Logger LOGGER = LoggerFactory.getLogger(WTransactionMap.class.getName());
 
     public WTransactionMap(DWSet dWSet, DB database) {
@@ -173,6 +178,8 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
                     }
                 });
 
+        this.unViewed = database.createTreeSet("un_viewed_txs").comparator(Fun.TUPLE2_COMPARATOR)
+                .makeOrGet();
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -199,6 +206,16 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
         }
 
         return transactions;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Iterator<Tuple2<Long, Integer>> getUndeadIterator(boolean descending) {
+
+        if (descending) {
+            return unViewed.descendingSet().iterator();
+        } else {
+            return unViewed.iterator();
+        }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -274,20 +291,57 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
         return transactions;
     }
 
+    public boolean isUnViewed(Transaction transaction) {
+        if (transaction.getCreator() == null)
+            return false;
+        return unViewed.contains(new Tuple2<Long, Integer>(transaction.getTimestamp(), transaction.getCreator().hashCode()));
+    }
+
+    public void clearUnViewed(Transaction transaction) {
+        if (transaction.getCreator() != null)
+            unViewed.remove(new Tuple2<Long, Integer>(transaction.getTimestamp(), transaction.getCreator().hashCode()));
+    }
+
+    public void clearUnViewed() {
+        unViewed.clear();
+    }
+
+    public boolean set(Tuple2<Long, Integer> key, Transaction transaction) {
+        if (transaction.getCreator() != null)
+            unViewed.add(new Tuple2<Long, Integer>(transaction.getTimestamp(), transaction.getCreator().hashCode()));
+
+        return super.set(key, transaction);
+    }
+
     public boolean set(Account account, Transaction transaction) {
-        return super.set(new Tuple2<Long, Integer>(transaction.getTimestamp(), account.hashCode()), transaction);
+        return this.set(new Tuple2<Long, Integer>(transaction.getTimestamp(), account.hashCode()), transaction);
+    }
+
+    public void put(Tuple2<Long, Integer> key, Transaction transaction) {
+        super.put(key, transaction);
     }
 
     public void put(Account account, Transaction transaction) {
-        super.put(new Tuple2<Long, Integer>(transaction.getTimestamp(), account.hashCode()), transaction);
+        this.put(new Tuple2<Long, Integer>(transaction.getTimestamp(), account.hashCode()), transaction);
+    }
+
+    public void delete(Tuple2<Long, Integer> key) {
+        this.remove(key);
     }
 
     public void delete(Account account, Transaction transaction) {
-        super.delete(new Tuple2<Long, Integer>(transaction.getTimestamp(), account.hashCode()));
+        this.delete(new Tuple2<Long, Integer>(transaction.getTimestamp(), account.hashCode()));
     }
 
     public void delete(Transaction transaction) {
         this.delete(transaction.getCreator(), transaction);
+    }
+
+    public Transaction remove(Tuple2<Long, Integer> key) {
+        Transaction transaction = super.remove(key);
+        if (transaction.getCreator() != null)
+            unViewed.remove(new Tuple2<Long, Integer>(transaction.getTimestamp(), transaction.getCreator().hashCode()));
+        return transaction;
     }
 
 }

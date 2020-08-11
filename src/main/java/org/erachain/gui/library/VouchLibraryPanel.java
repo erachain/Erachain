@@ -52,13 +52,6 @@ public class VouchLibraryPanel extends JPanel {
         Date_Column.setMaxWidth(rr * 10);
         Date_Column.setPreferredWidth(rr + 5);//.setWidth(30);
 
-        TableColumn height_Column = column_mod.getColumn(StatementsVouchTableModel.COLUMN_HEIGHT);
-        //favoriteColumn.setCellRenderer(new RendererBoolean()); //personsTable.getDefaultRenderer(Boolean.class));
-        rr = (int) (getFontMetrics(UIManager.getFont("Table.font")).stringWidth("002222222222"));
-        height_Column.setMinWidth(rr + 1);
-        height_Column.setMaxWidth(rr * 10);
-        height_Column.setPreferredWidth(rr + 5);//.setWidth(30);
-
         jTable_Vouches.setAutoCreateRowSorter(true);
 
         TableRowSorter sorter = new TableRowSorter(model); //Создаем сортировщик
@@ -198,7 +191,7 @@ public class VouchLibraryPanel extends JPanel {
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Asset to Creator"),
                         new AccountAssetSendPanel(null,
-                                null, account, null, null), AccountAssetSendPanel.getIcon());
+                                null, account, null, null));
 
 
             }
@@ -213,7 +206,7 @@ public class VouchLibraryPanel extends JPanel {
                 Account account = (Account) model.getCreator(row);
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"),
-                        new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                        new MailSendPanel(null, account, null));
 
             }
         });

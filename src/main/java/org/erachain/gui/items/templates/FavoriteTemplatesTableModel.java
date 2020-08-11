@@ -6,21 +6,18 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.utils.ObserverMessage;
 
-import java.util.*;
-
 @SuppressWarnings("serial")
-public class FavoriteTemplatesTableModel extends FavoriteItemModelTable implements Observer {
+public class FavoriteTemplatesTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
-    public static final int COLUMN_CONFIRMED = 3;
-    public static final int COLUMN_FAVORITE = 4;
+    public static final int COLUMN_FAVORITE = 3;
 
     public FavoriteTemplatesTableModel() {
         super(DCSet.getInstance().getItemTemplateMap(),
                 Controller.getInstance().wallet.database.getTemplateFavoritesSet(),
-                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false},
+                new String[]{"Key", "Name", "Publisher", "Favorite"},
+                new Boolean[]{false, true, true, false},
                 ObserverMessage.RESET_TEMPLATE_FAVORITES_TYPE,
                 ObserverMessage.ADD_TEMPLATE_FAVORITES_TYPE,
                 ObserverMessage.REMOVE_TEMPLATE_FAVORITES_TYPE,
@@ -40,24 +37,19 @@ public class FavoriteTemplatesTableModel extends FavoriteItemModelTable implemen
 
 
         switch (column) {
-            case COLUMN_KEY:
+            case COLUMN_CONFIRMATIONS:
+                return template.getConfirmations(dcSet);
 
-                return template.getKey(DCSet.getInstance());
+            case COLUMN_KEY:
+                return template.getKey();
 
             case COLUMN_NAME:
-
                 return template;
 
             case COLUMN_ADDRESS:
-
                 return template.getOwner().getPersonAsString();
 
-            case COLUMN_CONFIRMED:
-
-                return template.isConfirmed();
-
             case COLUMN_FAVORITE:
-
                 return template.isFavorite();
 
         }

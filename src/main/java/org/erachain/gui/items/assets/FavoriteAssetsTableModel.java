@@ -13,8 +13,8 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_ADDRESS = 2;
     private static final int COLUMN_ASSET_TYPE = 3;
     public static final int COLUMN_AMOUNT = 4;
-    public static final int COLUMN_FAVORITE = 5;
-    private static final int COLUMN_I_OWNER = 6;
+    private static final int COLUMN_I_OWNER = 5;
+    public static final int COLUMN_FAVORITE = 6;
 
     public FavoriteAssetsTableModel() {
         super(DCSet.getInstance().getItemAssetMap(),
@@ -27,7 +27,6 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
                 ObserverMessage.LIST_ASSET_FAVORITES_TYPE,
                 COLUMN_FAVORITE);
 
-        COLUMN_FOR_ICON = COLUMN_NAME;
     }
 
     @Override
@@ -40,10 +39,13 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
             return null;
         }
         switch (column) {
+            case COLUMN_CONFIRMATIONS:
+                return asset.getConfirmations(dcSet);
+
             case COLUMN_KEY:
                 return asset.getKey();
             case COLUMN_NAME:
-                return asset; // use renderer with ICON .viewName();
+                return asset;
             case COLUMN_ADDRESS:
                 return asset.getOwner().getPersonAsString();
             case COLUMN_ASSET_TYPE:
@@ -54,8 +56,6 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
                 return asset.isFavorite();
             case COLUMN_I_OWNER:
                 return Controller.getInstance().isAddressIsMine(asset.getOwner().getAddress());
-            //case COLUMN_ITEM_VALUE:
-            //    return asset;
         }
         return null;
     }

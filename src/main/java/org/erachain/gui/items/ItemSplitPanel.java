@@ -5,8 +5,8 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -36,8 +36,9 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
 
     @SuppressWarnings("rawtypes")
-    public ItemSplitPanel(TimerTableModelCls tableModel, String guiName) {
-        super(guiName);
+    public ItemSplitPanel(TimerTableModelCls tableModel, String guiName, String title) {
+        super(guiName, title);
+
         this.tableModel = tableModel;
         // not show buttons
         jToolBarRightPanel.setVisible(false);
@@ -51,13 +52,15 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         // CREATE TABLE
         jTableJScrollPanelLeftPanel = new MTable(this.tableModel);
-
-        // иконку будем рисовать
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(tableModel.COLUMN_FOR_ICON)
-                .setCellRenderer(new RendererIcon());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Number.class, new WalletTableRenderer());
 
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
-        columnModel.getColumn(0).setMaxWidth((100));
+        columnModel.getColumn(0).setPreferredWidth((100));
+        columnModel.getColumn(0).setMaxWidth((150));
+        columnModel.getColumn(tableModel.COLUMN_FAVORITE).setPreferredWidth(70);
+        columnModel.getColumn(tableModel.COLUMN_FAVORITE).setMaxWidth(100);
 
         // hand cursor for Favorite column
         jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionAdapter() {

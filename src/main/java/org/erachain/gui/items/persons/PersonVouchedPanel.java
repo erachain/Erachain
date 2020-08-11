@@ -53,13 +53,6 @@ public class PersonVouchedPanel extends JPanel {
         Date_Column.setMaxWidth(rr * 10);
         Date_Column.setPreferredWidth(rr + 5);//.setWidth(30);
 
-        TableColumn height_Column = jTable_Vouches.getColumnModel().getColumn(StatementsVouchTableModel.COLUMN_HEIGHT);
-        //favoriteColumn.setCellRenderer(new RendererBoolean()); //personsTable.getDefaultRenderer(Boolean.class));
-        rr = (int) (getFontMetrics(UIManager.getFont("Table.font")).stringWidth("002222222222"));
-        height_Column.setMinWidth(rr + 1);
-        height_Column.setMaxWidth(rr * 10);
-        height_Column.setPreferredWidth(rr + 5);//.setWidth(30);
-
         jTable_Vouches.setAutoCreateRowSorter(true);
 
         TableRowSorter sorter = new TableRowSorter(model); //Создаем сортировщик
@@ -187,7 +180,7 @@ public class PersonVouchedPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Account accountTo = (Account) model.getPublicKey(row);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Asset to Person"), new AccountAssetSendPanel(null,
-                        null, accountTo, person, null), AccountAssetSendPanel.getIcon());
+                        null, accountTo, person, null));
 
                 ;
 
@@ -200,7 +193,7 @@ public class PersonVouchedPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Account account = (Account) model.getPublicKey(row);
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail to Person"), new MailSendPanel(null, account, null), MailSendPanel.getIcon());
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail to Person"), new MailSendPanel(null, account, null));
 
             }
         });

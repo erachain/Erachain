@@ -11,23 +11,18 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
-
-import java.awt.*;
 
 
 @SuppressWarnings("serial")
 
-public class AccountAssetSendPanel extends AccountAssetActionPanelCls  {
+public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
 
-    //private AccountAssetSendPanel th;
     public boolean noRecive;
-    private static String iconFile = Settings.getInstance().getPatnIcons() + "AccountAssetSendPanel.png";
+
     public AccountAssetSendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person, String message) {
-        super(false, null, assetIn, null, TransactionAmount.ACTION_SEND, accountFrom, accountTo, message);
+        super(null, null, false, assetIn, TransactionAmount.ACTION_SEND, accountFrom, accountTo, message);
 
-        //  icon.setIcon(null);
-
+        iconName = "AccountAssetSendPanel";
     }
     /*
     public AccountAssetSendPanel(AssetCls asset, Account account, Account account_To, PersonCls person, String message) {
@@ -35,11 +30,11 @@ public class AccountAssetSendPanel extends AccountAssetActionPanelCls  {
     }
     */
 
-   
+
     @Override
     public void onSendClick() {
-        
-     // confirm params
+
+        // confirm params
         if (!cheskError()) return;
 
         // CREATE TX MESSAGE
@@ -67,7 +62,7 @@ public class AccountAssetSendPanel extends AccountAssetActionPanelCls  {
 
                 // save
                 Library.saveJSONStringToEraFile(getParent(), transaction.toJson().toJSONString());
-               
+
 
             } else {
 
@@ -78,16 +73,6 @@ public class AccountAssetSendPanel extends AccountAssetActionPanelCls  {
 
         // ENABLE
         this.jButton_ok.setEnabled(true);
-    }
-
-    public static  Image getIcon() {
-        {
-            try {
-                return Toolkit.getDefaultToolkit().getImage(iconFile);
-            } catch (Exception e) {
-                return null;
-            }
-        }
     }
 
 }

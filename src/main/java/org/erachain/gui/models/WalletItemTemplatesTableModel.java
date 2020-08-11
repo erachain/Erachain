@@ -3,7 +3,6 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.templates.TemplateCls;
-import org.erachain.datachain.DCSet;
 
 @SuppressWarnings("serial")
 public class WalletItemTemplatesTableModel extends WalletTableModel<TemplateCls> {
@@ -16,7 +15,7 @@ public class WalletItemTemplatesTableModel extends WalletTableModel<TemplateCls>
     public WalletItemTemplatesTableModel() {
         super(Controller.getInstance().wallet.database.getTemplateMap(),
                 new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"},
-                new Boolean[]{true, true, true, true, true}, true);
+                new Boolean[]{true, true, true, true, true}, true, COLUMN_FAVORITE);
     }
 
     @Override
@@ -28,24 +27,22 @@ public class WalletItemTemplatesTableModel extends WalletTableModel<TemplateCls>
         TemplateCls template = this.list.get(row);
 
         switch (column) {
-            case COLUMN_KEY:
+            case COLUMN_CONFIRMATIONS:
+                return template.getConfirmations(dcSet);
 
-                return template.getKey(DCSet.getInstance());
+            case COLUMN_KEY:
+                return template.getKey();
 
             case COLUMN_NAME:
-
-                return template.viewName();
+                return template;
 
             case COLUMN_ADDRESS:
-
                 return template.getOwner().getPersonAsString();
 
             case COLUMN_CONFIRMED:
-
                 return template.isConfirmed();
 
             case COLUMN_FAVORITE:
-
                 return template.isFavorite();
 
         }

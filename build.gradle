@@ -33,7 +33,7 @@ ext {
 }
 
 //String versionEra = "4.11.08-${git.head().abbreviatedId}"
-String versionEra = "5.0.02"
+String versionEra = "5.0.03"
 archivesBaseName = 'Erachain'
 group 'org.erachain'
 //version versionEra
@@ -192,6 +192,10 @@ task CopyResourse {
     copy {
         from 'ERA/z_START_EXAMPLES'
         into 'build/libs/Erachain/z_START_EXAMPLES'
+    }
+    copy {
+        from 'ERA/SSL'
+        into 'build/libs/Erachain/SSL'
     }
 }
 

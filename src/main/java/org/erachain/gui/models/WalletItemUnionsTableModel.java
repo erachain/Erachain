@@ -10,13 +10,12 @@ public class WalletItemUnionsTableModel extends WalletTableModel<UnionCls> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
-    public static final int COLUMN_CONFIRMED = 3;
-    public static final int COLUMN_FAVORITE = 4;
+    public static final int COLUMN_FAVORITE = 3;
 
     public WalletItemUnionsTableModel() {
         super(Controller.getInstance().wallet.database.getUnionMap(),
-                new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false}, true);
+                new String[]{"Key", "Name", "Creator", "Favorite"},
+                new Boolean[]{false, true, true, false}, true, COLUMN_FAVORITE);
 
     }
 
@@ -29,24 +28,19 @@ public class WalletItemUnionsTableModel extends WalletTableModel<UnionCls> {
         UnionCls union = this.list.get(row);
 
         switch (column) {
-            case COLUMN_KEY:
+            case COLUMN_CONFIRMATIONS:
+                return union.getConfirmations(dcSet);
 
+            case COLUMN_KEY:
                 return union.getKey(DCSet.getInstance());
 
             case COLUMN_NAME:
-
-                return union.viewName();
+                return union;
 
             case COLUMN_ADDRESS:
-
                 return union.getOwner().getPersonAsString();
 
-            case COLUMN_CONFIRMED:
-
-                return union.isConfirmed();
-
             case COLUMN_FAVORITE:
-
                 return union.isFavorite();
 
         }
