@@ -1,6 +1,7 @@
 package org.erachain.core.exdata;
 
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -48,10 +49,13 @@ public class ExData {
     private static final int RECIPIENTS_SIZE_LENGTH = 3; // size version part
     private static final int SECRET_LENGTH = Crypto.HASH_LENGTH; // size version part
 
+    private static final byte HAS_PARENT_MASK = -128;
+
     private static final byte RECIPIENTS_FLAG_MASK = 64;
     private static final byte RECIPIENTS_FLAG_SING_ONLY_MASK = -128;
 
     private static final byte ENCRYPT_FLAG_MASK = 32;
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExData.class);
 
@@ -59,6 +63,9 @@ public class ExData {
      * 0 - version; 1 - flag 1;
      */
     private byte[] flags;
+
+    private byte parentRefFlags;
+    private long parentRef;
     private String title;
     private JSONObject json;
 
@@ -88,13 +95,22 @@ public class ExData {
      * OLD version 1-2
      *
      * @param version
+     * @param parentRefFlags
+     * @param parentRef
      * @param title
      * @param json
      * @param files
      */
-    public ExData(int version, String title,
+    public ExData(int version, byte parentRefFlags, long parentRef, String title,
                   JSONObject json, HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) {
         this.flags = new byte[]{(byte) version, 0, 0, 0};
+
+        this.parentRefFlags = parentRefFlags;
+        this.parentRef = parentRef;
+        if (parentRef > 0) {
+            this.flags[1] = (byte) (this.flags[1] | HAS_PARENT_MASK);
+        }
+
         this.title = title;
         this.json = json;
         this.files = files;
@@ -105,16 +121,25 @@ public class ExData {
      * Version 3
      *
      * @param flags
+     * @param parentRefFlags
+     * @param parentRef
      * @param title
      * @param recipients
      * @param json
      * @param files
      */
-    public ExData(byte[] flags, String title,
+    public ExData(byte[] flags, byte parentRefFlags, long parentRef, String title,
                   byte recipientsFlags, Account[] recipients,
                   JSONObject json, HashMap<String, Tuple3<byte[], Boolean, byte[]>> files
     ) {
         this.flags = flags;
+
+        this.parentRefFlags = parentRefFlags;
+        this.parentRef = parentRef;
+        if (parentRef > 0) {
+            this.flags[1] = (byte) (this.flags[1] | HAS_PARENT_MASK);
+        }
+
         this.title = title;
         this.recipientsFlags = recipientsFlags;
         this.recipients = recipients;
@@ -127,15 +152,24 @@ public class ExData {
      * version 3 encrypted
      *
      * @param flags
+     * @param parentRefFlags
+     * @param parentRef
      * @param title
      * @param recipients
      * @param encryptedData
      */
-    public ExData(byte[] flags, String title,
+    public ExData(byte[] flags, byte parentRefFlags, long parentRef, String title,
                   byte recipientsFlags, Account[] recipients,
                   byte secretsFlags, byte[][] secrets,
                   byte[] encryptedData) {
         this.flags = flags;
+
+        this.parentRefFlags = parentRefFlags;
+        this.parentRef = parentRef;
+        if (parentRef > 0) {
+            this.flags[1] = (byte) (this.flags[1] | HAS_PARENT_MASK);
+        }
+
         this.title = title;
 
         this.recipientsFlags = recipientsFlags;
@@ -227,6 +261,10 @@ public class ExData {
 
     public boolean isParsedWithFiles() {
         return files != null;
+    }
+
+    public long getParentRef() {
+        return parentRef;
     }
 
     public String getTitle() {
@@ -382,6 +420,12 @@ public class ExData {
 
         if (flags[0] > 2) {
             outStream.write(flags);
+        }
+
+        if (parentRef > 0) {
+            outStream.write(parentRefFlags);
+            byte[] parentRefBytes = Longs.toByteArray(parentRef);
+            outStream.write(parentRefBytes);
         }
 
         if (title != null && !title.isEmpty()) {
@@ -556,18 +600,20 @@ public class ExData {
                 String[] items = text.split("\n");
                 JSONObject dataJson = new JSONObject();
                 dataJson.put("Message", text.substring(items[0].length()));
-                return new ExData(0, items[0], dataJson, null);
+                return new ExData(0, (byte) 0, 0, items[0], dataJson, null);
 
             case 1:
                 text = new String(data, StandardCharsets.UTF_8);
                 dataJson = (JSONObject) JSONValue.parseWithException(text);
                 String title = dataJson.get("Title").toString();
-                return new ExData(1, title, dataJson, null);
+                return new ExData(1, (byte) 0, 0, title, dataJson, null);
 
             default:
 
                 byte[] flags;
                 int titleSize;
+                byte parentRefFlags = (byte) 0;
+                long parentRef = 0;
                 byte recipientsFlags;
                 Account[] recipients;
                 boolean isEncrypted;
@@ -590,6 +636,14 @@ public class ExData {
                     flags = Arrays.copyOfRange(data, position, Integer.BYTES);
                     position += Integer.BYTES;
 
+                    if (version > 2 && (flags[1] & HAS_PARENT_MASK) > 0) {
+                        /// IT IS APPENDIX - GOT PARENT
+                        parentRefFlags = data[position++];
+                        byte[] parentRefBytes = Arrays.copyOfRange(data, position, position + Long.SIZE);
+                        parentRef = Longs.fromByteArray(parentRefBytes);
+                        position += Long.SIZE;
+                    }
+
                     titleSize = Arrays.copyOfRange(data, position, position + 1)[0];
                     position++;
 
@@ -600,16 +654,12 @@ public class ExData {
                 title = new String(titleByte, StandardCharsets.UTF_8);
 
                 if (onlyTitle) {
-                    return new ExData(version, title, null, null);
+                    return new ExData(version, parentRefFlags, parentRef, title, null, null);
                 }
 
                 if (version > 2) {
 
                     ///////////// PARS by FLAGS
-
-                    if ((flags[1] & 128) > 0) {
-                        /// RESERVED
-                    }
 
                     int recipientsSize;
                     if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {
@@ -650,6 +700,8 @@ public class ExData {
                         secrets = null;
                     }
                 } else {
+                    parentRefFlags = (byte) 0;
+                    parentRef = 0;
                     isEncrypted = false;
                     flags = new byte[]{(byte) version, 0, 0, 0};
                     recipientsFlags = 0;
@@ -660,22 +712,22 @@ public class ExData {
 
                 if (data.length == position) {
                     if (version > 2) {
-                        return new ExData(flags, title, recipientsFlags, recipients, null, null);
+                        return new ExData(flags, parentRefFlags, parentRef, title, recipientsFlags, recipients, null, null);
                     } else {
                         // version 2.0 - 2.1
-                        return new ExData(version, title, null, null);
+                        return new ExData(version, parentRefFlags, parentRef, title, null, null);
                     }
                 } else {
 
 
                     if (isEncrypted) {
                         // version 3 - with SECRETS
-                        return new ExData(flags, title, recipientsFlags, recipients, secretsFlags, secrets,
+                        return new ExData(flags, parentRefFlags, parentRef, title, recipientsFlags, recipients, secretsFlags, secrets,
                                 Arrays.copyOfRange(data, position, data.length));
                     } else {
 
                         Fun.Tuple2<JSONObject, HashMap> jsonAndFiles = parseJsonAndFiles(Arrays.copyOfRange(data, position, data.length), andFiles);
-                        return new ExData(flags, title, recipientsFlags, recipients, jsonAndFiles.a,
+                        return new ExData(flags, parentRefFlags, parentRef, title, recipientsFlags, recipients, jsonAndFiles.a,
                                 jsonAndFiles.b);
                     }
                 }
@@ -746,7 +798,7 @@ public class ExData {
         return allHashes;
     }
 
-    public static byte[] make(PrivateKeyAccount creator, String title, boolean signCanOnlyRecipients, Account[] recipients, boolean isEncrypted,
+    public static byte[] make(long parentRef, PrivateKeyAccount creator, String title, boolean signCanOnlyRecipients, Account[] recipients, boolean isEncrypted,
                               TemplateCls template, HashMap<String, String> params_Template, boolean uniqueTemplate,
                               String message, boolean uniqueMessage,
                               HashMap<String, String> hashes_Map, boolean uniqueHashes,
@@ -876,10 +928,10 @@ public class ExData {
 
             secrets[recipients.length] = AEScrypto.dataEncrypt(password, privateKey, creator.getPublicKey());
 
-            return new ExData(flags, title, recipientsFlag, recipients, (byte) 0, secrets, encryptedData).toByte();
+            return new ExData(flags, (byte) 0, parentRef, title, recipientsFlag, recipients, (byte) 0, secrets, encryptedData).toByte();
         }
 
-        return new ExData(flags, title, recipientsFlag, recipients, new JSONObject(out_Map), filesMap).toByte();
+        return new ExData(flags, (byte) 0, parentRef, title, recipientsFlag, recipients, new JSONObject(out_Map), filesMap).toByte();
 
     }
 
@@ -897,6 +949,11 @@ public class ExData {
      */
     public void makeJSONforHTML(Map output,
                                 int blockNo, int seqNo, JSONObject langObj) {
+
+        if (parentRef > 0) {
+            output.put("Label_Parent", Lang.getInstance().translateFromLangObj("Parent", langObj));
+            output.put("parent", parentRef);
+        }
 
         if (title != null && !title.isEmpty()) {
             output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
@@ -1036,7 +1093,7 @@ public class ExData {
 
             // это уже не зашифрованный - сбросим
             byte[] decryptedFlags = setEncryptedFlag(flags, false);
-            return new Tuple3<>(pos, null, new ExData(decryptedFlags, title, recipientsFlags, recipients, jsonAndFiles.a,
+            return new Tuple3<>(pos, null, new ExData(decryptedFlags, parentRefFlags, parentRef, title, recipientsFlags, recipients, jsonAndFiles.a,
                     jsonAndFiles.b));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -1048,6 +1105,11 @@ public class ExData {
     public JSONObject toJson() {
 
         JSONObject toJson = new JSONObject();
+
+        if (parentRef > 0) {
+            toJson.put("parentRefFlags", parentRefFlags);
+            toJson.put("parentRef", parentRef);
+        }
 
         if (hasRecipients()) {
             JSONArray recipients = new JSONArray();

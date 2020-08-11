@@ -738,40 +738,16 @@ public class RSignNote extends Transaction implements Itemable {
         if (extendedData == null || !extendedData.isParsedWithFiles()) {
             // если уже парсили или парсили без файлов а надо с файлами
 
-            if (true || getVersion() == 2) {
 
-                // version 2
-                try {
-                    extendedData = ExData.parse(getVersion(), this.data, false, true);
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                    Long error = null;
-                    error++;
-                }
-
-            } else {
-
-                // сюда не должно прийти - OLS
+            // version 2
+            try {
+                extendedData = ExData.parse(getVersion(), this.data, false, true);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
                 Long error = null;
                 error++;
-
-                // version 1
-                String text = new String(getData(), StandardCharsets.UTF_8);
-
-                try {
-                    JSONObject dataJson = (JSONObject) JSONValue.parseWithException(text);
-                    String title = dataJson.get("Title").toString();
-
-                    extendedData = new ExData(1, title, dataJson, null);
-
-                } catch (ParseException e) {
-                    // version 0
-                    String[] items = text.split("\n");
-                    JSONObject dataJson = new JSONObject();
-                    dataJson.put("Message", text.substring(items[0].length()));
-                    extendedData = new ExData(0, items[0], dataJson, null);
-                }
             }
+
             extendedData.resolveValues(dcSet);
         }
     }

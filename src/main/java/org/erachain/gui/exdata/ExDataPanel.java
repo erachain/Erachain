@@ -781,7 +781,8 @@ public class ExDataPanel extends JPanel {
                     (Boolean) attached_Files_Model.getValueAt(i, 2), (byte[]) attached_Files_Model.getValueAt(i, 5)));
         }
 
-        return ExData.make(creator, jTextField_Title_Message.getText(),
+        long parentRef = parent.getDBRef();
+        return ExData.make(parentRef, creator, jTextField_Title_Message.getText(),
                 signCanOnlyRecipients, recipients, isEncrypted,
                 (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),
                 fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
