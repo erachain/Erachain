@@ -65,13 +65,12 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         this.jTableJScrollPanelLeftPanel = new MTable(this.recordsModel);
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
-        jTableJScrollPanelLeftPanel.setDefaultRenderer(Number.class, new WalletTableRenderer());
+        //jTableJScrollPanelLeftPanel.setDefaultRenderer(Number.class, new WalletTableRenderer());
 
         this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
 
-
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
-        columnModel.getColumn(0).setMaxWidth((100));
+        columnModel.getColumn(recordsModel.COLUMN_FAVORITE).setMaxWidth((100));
         columnModel.getColumn(recordsModel.COLUMN_FAVORITE).setMaxWidth((100));
 
         // not show buttons
@@ -122,9 +121,35 @@ public class MyTransactionsSplitPanel extends SplitPanel {
             }
         });
 
-        jButton2_jToolBar_RightPanel.setVisible(false);
+
         this.jToolBarRightPanel.setVisible(false);
-        this.toolBarLeftPanel.setVisible(false);
+
+        //  left panel tool bat visivle
+        jButton2_jToolBar_RightPanel.setVisible(false);
+
+        // button 1 in left tool bar
+        toolBarLeftPanel.setVisible(true);
+
+        button1ToolBarLeftPanel.setText(Lang.getInstance().translate("Reset Unread"));
+        button1ToolBarLeftPanel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                recordsModel.clearAllOnlyUndead();
+            }
+        });
+
+
+        // button 2 in left tool bar
+        button2ToolBarLeftPanel.setText(Lang.getInstance().translate("Unread Only"));
+        button2ToolBarLeftPanel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                button2ToolBarLeftPanel.setText((Lang.getInstance().translate(button2ToolBarLeftPanel
+                        .isSelected() ? "See All" : "Unread Only")));
+
+                recordsModel.setOnlyUndead();
+            }
+        });
 
         // set interval panel
         setIntervalPanel = new SetIntervalPanel(Controller.getInstance().wallet.database.getTransactionMap());
@@ -428,7 +453,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         if (wallet.isTransactionFavorite(transaction)) {
             int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
             if (showConfirmDialog == 0) {
-                wallet.removeDocumentFavorite(transaction);
+                wallet.removeTransactionFavorite(transaction);
             }
         } else {
             wallet.addTransactionFavorite(transaction);

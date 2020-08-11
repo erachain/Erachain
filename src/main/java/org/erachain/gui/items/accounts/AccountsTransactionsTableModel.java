@@ -9,7 +9,6 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
-import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.models.WalletTableModel;
 import org.mapdb.Fun;
 
@@ -22,18 +21,15 @@ import java.util.HashSet;
 
 @SuppressWarnings("serial")
 public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTransactionsTableModel.Trans> implements ObserverWaiter {
-    public static final int COLUMN_IS_OUTCOME = WalletTableRenderer.COLUMN_IS_OUTCOME;
-    public static final int COLUMN_UN_VIEWED = WalletTableRenderer.COLUMN_UN_VIEWED;
-    public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_SEQNO = 1;
+    public static final int COLUMN_SEQNO = 0;
+    public static final int COLUMN_TIMESTAMP = 1;
     public static final int COLUMN_AMOUNT = 2;
     public static final int COLUMN_ITEM_CLS = 3;
     public static final int COLUMN_TYPE = 4;
     public static final int COLUMN_SENDER = 5;
     public static final int COLUMN_RECIPIENT = 6;
     public static final int COLUMN_TITLE = 7;
-    public static final int COLUMN_CONFIRM = 8;
-    public static final int COLUMN_FAVORITE = 9;
+    public static final int COLUMN_FAVORITE = 8;
 
     private Account filterAccount;
 
@@ -44,10 +40,9 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
     public AccountsTransactionsTableModel() {
         super(Controller.getInstance().wallet.database.getTransactionMap(),
-                new String[]{"Date", "RecNo", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Favorite"},
+                new String[]{"№", "Date", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Favorite"},
                 new Boolean[]{false, true, true, false, false, true, true, true, true, true}, false, COLUMN_FAVORITE);
 
-        COLUMN_FOR_ICON = COLUMN_ITEM_CLS;
         step = 200;
 
     }
@@ -78,6 +73,9 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
             case COLUMN_UN_VIEWED:
                 return itemTran.isUnViewed;
+
+            case COLUMN_CONFIRMATIONS:
+                return itemTran.transaction.getConfirmations(dcSet);
 
             case COLUMN_TIMESTAMP:
                 if (itemTran.transaction.getTimestamp() == 0)
@@ -112,9 +110,6 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
             case COLUMN_TITLE:
                 return itemTran.title;
-
-            case COLUMN_CONFIRM:
-                return itemTran.transaction.isConfirmed(DCSet.getInstance());
 
             case COLUMN_FAVORITE:
                 return Controller.getInstance().isTransactionFavorite(itemTran.transaction);

@@ -14,25 +14,24 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Observer;
 
-public class StatementsTableModelMy extends WalletTableModel<Tuple2<Tuple2<Long, Integer>, Transaction>> implements Observer {
+public class MyStatementsTableModel extends WalletTableModel<Tuple2<Tuple2<Long, Integer>, Transaction>> implements Observer {
 
-    public static final int COLUMN_IS_OUTCOME = -2;
-    public static final int COLUMN_UN_VIEWED = -1;
-    public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_CREATOR = 1;
-    public static final int COLUMN_TITLE = 2;
-    public static final int COLUMN_TEMPLATE = 3;
-    public static final int COLUMN_FAVORITE = 4;
+    public static final int COLUMN_SEQNO = 0;
+    public static final int COLUMN_TIMESTAMP = 1;
+    public static final int COLUMN_CREATOR = 2;
+    public static final int COLUMN_TITLE = 3;
+    public static final int COLUMN_TEMPLATE = 4;
+    public static final int COLUMN_FAVORITE = 5;
     /**
      *
      */
     DCSet dcSet;
     Wallet wallet = Controller.getInstance().wallet;
 
-    public StatementsTableModelMy() {
+    public MyStatementsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
-                new String[]{"Timestamp", "Creator", "Title", "Template", "Favorite"},
-                new Boolean[]{true, true, true, false, false}, true, COLUMN_FAVORITE);
+                new String[]{"№", "Timestamp", "Creator", "Title", "Template", "Favorite"},
+                new Boolean[]{false, true, true, true, false, false}, true, COLUMN_FAVORITE);
 
         dcSet = DCSet.getInstance();
 
@@ -62,6 +61,12 @@ public class StatementsTableModelMy extends WalletTableModel<Tuple2<Tuple2<Long,
 
                 case COLUMN_UN_VIEWED:
                     return ((WTransactionMap) map).isUnViewed(rNote);
+
+                case COLUMN_CONFIRMATIONS:
+                    return rNote.getConfirmations(dcSet);
+
+                case COLUMN_SEQNO:
+                    return rNote.viewHeightSeq();
 
                 case COLUMN_TIMESTAMP:
 

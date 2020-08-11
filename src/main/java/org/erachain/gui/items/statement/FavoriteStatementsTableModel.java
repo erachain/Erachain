@@ -10,28 +10,26 @@ import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.utils.ObserverMessage;
 
 public class FavoriteStatementsTableModel extends FavoriteItemModelTable {
-    public static final int COLUMN_IS_OUTCOME = -2;
-    public static final int COLUMN_UN_VIEWED = -1;
-    public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_CREATOR = 1;
-    public static final int COLUMN_TITLE = 2;
-    public static final int COLUMN_TEMPLATE = 3;
-    public static final int COLUMN_FAVORITE = 4;
+    public static final int COLUMN_SEQNO = 0;
+    public static final int COLUMN_TIMESTAMP = 1;
+    public static final int COLUMN_CREATOR = 2;
+    public static final int COLUMN_TITLE = 3;
+    public static final int COLUMN_TEMPLATE = 4;
+    public static final int COLUMN_FAVORITE = 5;
 
     Wallet wallet = Controller.getInstance().wallet;
 
     public FavoriteStatementsTableModel() {
         super(DCSet.getInstance().getTransactionFinalMap(),
                 Controller.getInstance().wallet.database.getDocumentFavoritesSet(),
-                new String[]{"Timestamp", "Creator", "Title", "Template", "Favorite"},
-                new Boolean[]{true, true, true, false, false},
+                new String[]{"№", "Timestamp", "Creator", "Title", "Template", "Favorite"},
+                new Boolean[]{false, true, true, true, false, false},
                 ObserverMessage.RESET_STATEMENT_FAVORITES_TYPE,
                 ObserverMessage.ADD_STATEMENT_FAVORITES_TYPE,
                 ObserverMessage.DELETE_STATEMENT_FAVORITES_TYPE,
                 ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE,
                 COLUMN_FAVORITE);
 
-        COLUMN_FOR_ICON = -1;
     }
 
     @Override
@@ -55,6 +53,12 @@ public class FavoriteStatementsTableModel extends FavoriteItemModelTable {
 
                 case COLUMN_UN_VIEWED:
                     return false;
+
+                case COLUMN_CONFIRMATIONS:
+                    return rNote.getConfirmations(dcSet);
+
+                case COLUMN_SEQNO:
+                    return rNote.viewHeightSeq();
 
                 case COLUMN_TIMESTAMP:
 

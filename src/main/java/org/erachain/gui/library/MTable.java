@@ -34,14 +34,20 @@ public class MTable<U, T> extends JTable {
     private Tuple4<ComparisonType, String, ComparisonType, String> typeStringTuple4;
 
     private int selectedRow;
+    public final int iconSize;
 
     public MTable(TableModel model) {
         super();
+
         this.model = model;
         if (this.model != null) {
             setModel(this.model);
         }
-        setRowHeight(getFontMetrics(getFont()).getHeight());
+
+        int fontSize = getFontMetrics(getFont()).getHeight();
+        setRowHeight(fontSize + (fontSize >> 2));
+        iconSize = fontSize + (fontSize >> 3);
+
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         mouseListener = new MouseAdapter() {
             @Override

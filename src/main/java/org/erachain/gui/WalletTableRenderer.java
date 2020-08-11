@@ -1,5 +1,8 @@
 package org.erachain.gui;
 
+import org.erachain.gui.library.MTable;
+import org.erachain.gui.models.TimerTableModelCls;
+import org.erachain.utils.GUIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,9 +15,7 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
     private final DefaultTableCellRenderer adaptee = new DefaultTableCellRenderer();
     static Logger LOGGER = LoggerFactory.getLogger(WalletTableRenderer.class.getName());
 
-    public static final int COLUMN_NUMBER_SCALE = -3;
-    public static final int COLUMN_IS_OUTCOME = -2;
-    public static final int COLUMN_UN_VIEWED = -1;
+    public final static Color FORE_COLOR = new Color(0, 120, 0, 255);
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
@@ -22,43 +23,67 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
 
         adaptee.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
+        Component cell;
+
         if (value instanceof Boolean) {
-            JCheckBox checkbox = new JCheckBox();
-            checkbox.setSelected((Boolean) value);
-            checkbox.setHorizontalAlignment(JLabel.CENTER);
-            checkbox.setBorderPainted(true);
+            Boolean selected = (Boolean) value;
 
-            checkbox.setForeground(adaptee.getForeground());
-            checkbox.setBackground(adaptee.getBackground());
-            checkbox.setFont(adaptee.getFont());
-            return checkbox;
+            int sizeRow = table.getRowHeight();
 
+            cell = new JCheckBox(null, GUIUtils.createIcon(sizeRow, selected ?
+                    //new Color(38, 90, 30, 255)
+                    Color.PINK
+                    : Color.GRAY, null), selected);
+            //((JCheckBox)cell).setSelected((Boolean) value);
+            ((JCheckBox) cell).setHorizontalAlignment(JLabel.CENTER);
+            ((JCheckBox) cell).setBorderPainted(true);
+
+        } else {
+            cell = super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
         }
 
-        JLabel cell = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
         cell.setBackground(adaptee.getBackground());
-        cell.setFont(adaptee.getFont());
 
         if (value instanceof Number) {
-            cell.setHorizontalAlignment(SwingConstants.RIGHT);
+            ((JLabel) cell).setHorizontalAlignment(SwingConstants.RIGHT);
         }
 
-        Object isUnViewed = table.getValueAt(row, COLUMN_UN_VIEWED);
+        Object isUnViewed = table.getValueAt(row, TimerTableModelCls.COLUMN_UN_VIEWED);
         if (isUnViewed != null && (boolean) isUnViewed) {
-            Font font = cell.getFont();
+            Font font = adaptee.getFont();
             font = new Font(font.getName(), Font.BOLD, font.getSize());
             cell.setFont(font);
         } else {
-            cell.setBackground(adaptee.getBackground());
             cell.setFont(adaptee.getFont());
         }
 
-        Object isOutcome = table.getValueAt(row, COLUMN_IS_OUTCOME);
-        if (isOutcome != null && (boolean) isOutcome) {
-            cell.setForeground(Color.RED);
+        Object isOutcome = table.getValueAt(row, TimerTableModelCls.COLUMN_IS_OUTCOME);
+        Color color;
+        if (isOutcome != null && !(boolean) isOutcome) {
+            color = FORE_COLOR;
         } else {
-            JLabel label = new JLabel();
-            cell.setForeground(label.getForeground());
+            color = adaptee.getForeground();
+        }
+
+        cell.setForeground(color);
+
+        if (column == 0) {
+            Integer confirmations = (Integer) table.getValueAt(row, TimerTableModelCls.COLUMN_CONFIRMATIONS);
+            if (confirmations != null) {
+                int sizeRow = ((MTable) table).iconSize;
+                // ● ⚫ ◆ █ ▇ ■ ◢ ◤ ◔ ◑ ◕ ⬛ ⬜ ⬤ ⛃
+                if (confirmations == 0) {
+                    setIcon(GUIUtils.createIconArc(sizeRow, 0, color));
+                } else if (confirmations < 2) {
+                    setIcon(GUIUtils.createIconArc(sizeRow, 1, color));
+                } else if (confirmations < 6) {
+                    setIcon(GUIUtils.createIconArc(sizeRow, 2, color));
+                } else if (confirmations < 33) {
+                    setIcon(GUIUtils.createIcon(sizeRow, color, null));
+                } else {
+                    setIcon(null);
+                }
+            }
         }
 
         return cell;
@@ -74,8 +99,9 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
 
                 byte[] iconBytes = iconable.getIcon();
                 if (iconBytes != null && iconBytes.length > 0) {
+                    int rowSize = getFont().getSize() + 4;
                     ImageIcon image = new ImageIcon(iconBytes);
-                    setIcon(new ImageIcon(image.getImage().getScaledInstance(20, 20, 1)));
+                    setIcon(new ImageIcon(image.getImage().getScaledInstance(rowSize, rowSize, 1)));
                 }
 
             } else {

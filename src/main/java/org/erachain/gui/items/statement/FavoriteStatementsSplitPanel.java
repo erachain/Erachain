@@ -65,7 +65,10 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
 
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
-        columnModel.getColumn(favotitesTable.COLUMN_FAVORITE).setMaxWidth(150);
+        columnModel.getColumn(favotitesTable.COLUMN_SEQNO).setPreferredWidth(150);
+        columnModel.getColumn(favotitesTable.COLUMN_SEQNO).setMaxWidth(150);
+        columnModel.getColumn(favotitesTable.COLUMN_FAVORITE).setPreferredWidth(70);
+        columnModel.getColumn(favotitesTable.COLUMN_FAVORITE).setMaxWidth(100);
 
         //	jTableJScrollPanelLeftPanel = search_Table;
         //sorter from 0 column

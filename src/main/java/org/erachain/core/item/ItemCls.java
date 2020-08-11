@@ -380,6 +380,23 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         }
     }
 
+    public int getConfirmations(DCSet db) {
+
+        // CHECK IF IN UNCONFIRMED TRANSACTION
+
+        if (!isConfirmed())
+            return 0;
+
+        Long dbRef = db.getTransactionFinalMapSigns().get(this.reference);
+        if (dbRef == null)
+            return 0;
+
+        int height = Transaction.parseDBRefHeight(dbRef);
+
+        return 1 + db.getBlockMap().size() - height;
+
+    }
+
     public boolean isFavorite() {
         return Controller.getInstance().isItemFavorite(this);
     }

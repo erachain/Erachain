@@ -10,22 +10,24 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-public class StatementsTableModelSearch extends SearchTableModelCls<Transaction> {
+public class SearchStatementsTableModel extends SearchTableModelCls<Transaction> {
 
-    public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_TYPE = 1;
-    public static final int COLUMN_CREATOR = 2;
-    public static final int COLUMN_TITLE = 3;
-    public static final int COLUMN_FAVORITE = 4;
+    public static final int COLUMN_SEQNO = 0;
+    public static final int COLUMN_TIMESTAMP = 1;
+    public static final int COLUMN_TYPE = 2;
+    public static final int COLUMN_CREATOR = 3;
+    public static final int COLUMN_TITLE = 4;
+    public static final int COLUMN_FAVORITE = 5;
     private static final long serialVersionUID = 1L;
 
+    DCSet dcSet = DCSet.getInstance();
     Wallet wallet = Controller.getInstance().wallet;
 
-    public StatementsTableModelSearch() {
+    public SearchStatementsTableModel() {
 
         super(DCSet.getInstance().getTransactionFinalMap(),
-                new String[]{"Timestamp", "Type",
-                        "Creator", "Statement", "Favorite"}, new Boolean[]{true, true, true, true, false},
+                new String[]{"№", "Timestamp", "Type", "Creator", "Statement", "Favorite"},
+                new Boolean[]{false, true, true, true, true, false},
                 false);
 
         logger = LoggerFactory.getLogger(this.getClass());
@@ -41,6 +43,10 @@ public class StatementsTableModelSearch extends SearchTableModelCls<Transaction>
         Transaction transaction = this.list.get(row);
 
         switch (column) {
+
+            case COLUMN_SEQNO:
+                return transaction.viewHeightSeq();
+
             case COLUMN_TIMESTAMP:
                 return transaction.viewTimestamp();
             case COLUMN_TYPE:

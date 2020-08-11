@@ -209,6 +209,16 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
+    public Iterator<Tuple2<Long, Integer>> getUndeadIterator(boolean descending) {
+
+        if (descending) {
+            return unViewed.descendingSet().iterator();
+        } else {
+            return unViewed.iterator();
+        }
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Tuple2<Long, Integer>> getTypeIterator(Byte type, boolean descending) {
 
         if (descending) {
@@ -290,6 +300,10 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
     public void clearUnViewed(Transaction transaction) {
         if (transaction.getCreator() != null)
             unViewed.remove(new Tuple2<Long, Integer>(transaction.getTimestamp(), transaction.getCreator().hashCode()));
+    }
+
+    public void clearUnViewed() {
+        unViewed.clear();
     }
 
     public boolean set(Tuple2<Long, Integer> key, Transaction transaction) {

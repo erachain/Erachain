@@ -1,6 +1,7 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
+import org.erachain.datachain.DCSet;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -20,6 +21,11 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public abstract class TimerTableModelCls<U> extends AbstractTableModel implements Observer {
 
+    public static final int COLUMN_IS_OUTCOME = -3;
+    public static final int COLUMN_UN_VIEWED = -2;
+    public static final int COLUMN_CONFIRMATIONS = -1;
+    public int COLUMN_FAVORITE = 1000;
+
     private String name;
     protected String[] columnNames;
     //private Timer timer;
@@ -31,10 +37,6 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     private int DELETE_EVENT;
     private int LIST_EVENT;
 
-    public int COLUMN_FOR_ICON = 1;
-    public int COLUMN_FAVORITE = 1000;
-    public static final int COLUMN_ITEM_VALUE = 200;
-
     protected List<U> list;
 
     private Boolean[] columnAutoHeight; // = new Boolean[]{true, true, true, true, true, true, true, false, false};
@@ -42,6 +44,8 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     protected Object startKey;
     protected int step = 50;
     protected Object lastPageKey;
+
+    protected DCSet dcSet = DCSet.getInstance();
 
     protected DBTabImpl map;
     protected Logger logger;
@@ -173,7 +177,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         int count = 0;
         list = new ArrayList<>();
         if (startKey == null) {
-            try (IteratorCloseable iterator = map.getIterator()) {
+            try (IteratorCloseable iterator = map.getIterator(0, descending)) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
                     list.add((U) map.get(key));
@@ -181,7 +185,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
             } catch (IOException e) {
             }
         } else {
-            try (IteratorCloseable iterator = map.getIterator()) {
+            try (IteratorCloseable iterator = map.getIterator(0, descending)) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
                     list.add((U) map.get(key));

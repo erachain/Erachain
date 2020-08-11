@@ -65,7 +65,7 @@ public class NetworkStatus extends JLabel implements Observer {
     }
 
     private ImageIcon createIcon(Color color) {
-        return GUIUtils.createIcon(color, this.getBackground());
+        return GUIUtils.createIcon(getFont().getSize(), color, this.getBackground());
     }
 
     private void viewProgress() {

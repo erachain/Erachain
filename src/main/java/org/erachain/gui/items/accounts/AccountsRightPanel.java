@@ -95,8 +95,6 @@ public class AccountsRightPanel extends JPanel {
         columnModel.getColumn(tableModel.COLUMN_SEQNO).setMaxWidth(150);
         columnModel.getColumn(tableModel.COLUMN_AMOUNT).setPreferredWidth(150);
         columnModel.getColumn(tableModel.COLUMN_AMOUNT).setMaxWidth(200);
-        columnModel.getColumn(tableModel.COLUMN_CONFIRM).setPreferredWidth(70);
-        columnModel.getColumn(tableModel.COLUMN_CONFIRM).setMaxWidth(100);
         columnModel.getColumn(tableModel.COLUMN_FAVORITE).setPreferredWidth(100);
         columnModel.getColumn(tableModel.COLUMN_FAVORITE).setMaxWidth(150);
 
@@ -318,7 +316,7 @@ public class AccountsRightPanel extends JPanel {
         if (wallet.isTransactionFavorite(transaction)) {
             int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
             if (showConfirmDialog == 0) {
-                wallet.removeDocumentFavorite(transaction);
+                wallet.removeTransactionFavorite(transaction);
             }
         } else {
             wallet.addTransactionFavorite(transaction);

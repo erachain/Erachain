@@ -53,12 +53,6 @@ public class PersonVouchedPanel extends JPanel {
         Date_Column.setMaxWidth(rr * 10);
         Date_Column.setPreferredWidth(rr + 5);//.setWidth(30);
 
-        TableColumn height_Column = jTable_Vouches.getColumnModel().getColumn(StatementsVouchTableModel.COLUMN_HEIGHT);
-        rr = (int) (getFontMetrics(UIManager.getFont("Table.font")).stringWidth("002222222222"));
-        height_Column.setMinWidth(rr + 1);
-        height_Column.setMaxWidth(rr * 10);
-        height_Column.setPreferredWidth(rr + 5);//.setWidth(30);
-
         jTable_Vouches.setAutoCreateRowSorter(true);
 
         TableRowSorter sorter = new TableRowSorter(model); //Создаем сортировщик

@@ -11,14 +11,13 @@ public class FavoritePersonsTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
-    public static final int COLUMN_CONFIRMED = 3;
-    public static final int COLUMN_FAVORITE = 4;
+    public static final int COLUMN_FAVORITE = 3;
 
     public FavoritePersonsTableModel() {
         super(DCSet.getInstance().getItemPersonMap(),
                 Controller.getInstance().getWallet().database.getPersonFavoritesSet(),
-                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false},
+                new String[]{"Key", "Name", "Publisher", "Favorite"},
+                new Boolean[]{false, true, true, false},
                 ObserverMessage.RESET_PERSON_FAVORITES_TYPE,
                 ObserverMessage.ADD_PERSON_FAVORITES_TYPE,
                 ObserverMessage.DELETE_PERSON_FAVORITES_TYPE,
@@ -38,21 +37,17 @@ public class FavoritePersonsTableModel extends FavoriteItemModelTable {
 
 
         switch (column) {
-            case COLUMN_KEY:
+            case COLUMN_CONFIRMATIONS:
+                return person.getConfirmations(dcSet);
 
+            case COLUMN_KEY:
                 return person.getKey();
 
             case COLUMN_NAME:
-
                 return person;
 
             case COLUMN_ADDRESS:
-
                 return person.getOwner().getPersonAsString();
-
-            case COLUMN_CONFIRMED:
-
-                return person.isConfirmed();
 
             case COLUMN_FAVORITE:
 

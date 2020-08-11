@@ -7,7 +7,7 @@ import org.erachain.core.transaction.*;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
-import org.erachain.gui.WalletTableRenderer;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun.Tuple2;
 
@@ -18,9 +18,7 @@ import java.util.ArrayList;
 @SuppressWarnings("serial")
 public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2<Long, Integer>, Transaction>> {
 
-    public static final int COLUMN_IS_OUTCOME = WalletTableRenderer.COLUMN_IS_OUTCOME;
-    public static final int COLUMN_UN_VIEWED = WalletTableRenderer.COLUMN_UN_VIEWED;
-    public static final int COLUMN_CONFIRMATIONS = 0;
+    public static final int COLUMN_NUMBER = 0;
     public static final int COLUMN_TIMESTAMP = 1;
     public static final int COLUMN_TYPE = 2;
     public static final int COLUMN_CREATOR = 3;
@@ -29,9 +27,9 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
     public static final int COLUMN_RECIPIENT = 6;
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
-    public static final int COLUMN_NUMBER = 9;
-    public static final int COLUMN_FAVORITE = 10;
+    public static final int COLUMN_FAVORITE = 9;
 
+    private boolean onlyUnread = false;
 
     /**
      * В динамическом режиме перерисовывается автоматически по событию GUI_REPAINT
@@ -41,7 +39,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
      */
     public WalletTransactionsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
-                new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size", "SeqNo", "Favorite"},
+                new String[]{"№", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size", "Favorite"},
                 new Boolean[]{true, true, true, true, true, true, true, false, false, true, true},
                 true, COLUMN_FAVORITE);
 
@@ -88,6 +86,9 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
             case COLUMN_CONFIRMATIONS:
                 return transaction.getConfirmations(DCSet.getInstance());
 
+            case COLUMN_NUMBER:
+                return transaction.viewHeightSeq();
+
             case COLUMN_TIMESTAMP:
                 return transaction.viewTimestamp();//.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
 
@@ -124,9 +125,6 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
             case COLUMN_SIZE:
                 return transaction.viewSize(Transaction.FOR_NETWORK);
 
-            case COLUMN_NUMBER:
-                return transaction.viewHeightSeq();
-
             case COLUMN_FAVORITE:
                 return Controller.getInstance().isTransactionFavorite(transaction);
         }
@@ -135,27 +133,58 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
 
     }
 
+    public void setOnlyUndead() {
+        onlyUnread = !onlyUnread;
+        getInterval();
+        fireTableDataChanged();
+    }
+
+    public void clearAllOnlyUndead() {
+        ((WTransactionMap) map).clearUnViewed();
+        fireTableDataChanged();
+    }
+
     @Override
     public void getInterval() {
 
         Object key;
         int count = 0;
         list = new ArrayList<>();
-        if (startKey == null) {
-            try (IteratorCloseable iterator = map.getDescendingIterator()) {
+        if (onlyUnread) {
+            try (IteratorCloseable iterator = IteratorCloseableImpl.make(((WTransactionMap) map).getUndeadIterator(false))) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
-                    list.add(new Tuple2<>((Tuple2<Long, Integer>) key, (Transaction) map.get(key)));
+                    Transaction item = (Transaction) map.get(key);
+                    if (item == null)
+                        continue;
+                    list.add(new Tuple2<>((Tuple2<Long, Integer>) key, item));
                 }
             } catch (IOException e) {
             }
+
         } else {
-            try (IteratorCloseable iterator = map.getDescendingIterator()) {
-                while (iterator.hasNext() && count++ < step) {
-                    key = iterator.next();
-                    list.add(new Tuple2<>((Tuple2<Long, Integer>) key, (Transaction) map.get(key)));
+            if (startKey == null) {
+                try (IteratorCloseable iterator = map.getDescendingIterator()) {
+                    while (iterator.hasNext() && count++ < step) {
+                        key = iterator.next();
+                        Transaction item = (Transaction) map.get(key);
+                        if (item == null)
+                            continue;
+                        list.add(new Tuple2<>((Tuple2<Long, Integer>) key, item));
+                    }
+                } catch (IOException e) {
                 }
-            } catch (IOException e) {
+            } else {
+                try (IteratorCloseable iterator = map.getDescendingIterator()) {
+                    while (iterator.hasNext() && count++ < step) {
+                        key = iterator.next();
+                        Transaction item = (Transaction) map.get(key);
+                        if (item == null)
+                            continue;
+                        list.add(new Tuple2<>((Tuple2<Long, Integer>) key, item));
+                    }
+                } catch (IOException e) {
+                }
             }
         }
 
