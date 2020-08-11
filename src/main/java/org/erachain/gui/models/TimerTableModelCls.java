@@ -175,7 +175,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         int count = 0;
         list = new ArrayList<>();
         if (startKey == null) {
-            try (IteratorCloseable iterator = map.getIterator()) {
+            try (IteratorCloseable iterator = map.getIterator(0, descending)) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
                     list.add((U) map.get(key));
@@ -183,7 +183,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
             } catch (IOException e) {
             }
         } else {
-            try (IteratorCloseable iterator = map.getIterator()) {
+            try (IteratorCloseable iterator = map.getIterator(0, descending)) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
                     list.add((U) map.get(key));
