@@ -4,7 +4,6 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.WalletConfirmsRenderer;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
@@ -17,7 +16,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -58,10 +56,6 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         jTableJScrollPanelLeftPanel = new MTable(incoming_Mails_Model);
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
-
-        TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
-        columnModel.getColumn(incoming_Mails_Model.COLUMN_CONFIRMATIONS).setMaxWidth((100));
-        columnModel.getColumn(incoming_Mails_Model.COLUMN_CONFIRMATIONS).setCellRenderer(new WalletConfirmsRenderer());
 
         jTableJScrollPanelLeftPanel.setAutoCreateRowSorter(true);
 

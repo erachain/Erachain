@@ -27,7 +27,6 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
                 ObserverMessage.LIST_ASSET_FAVORITES_TYPE,
                 COLUMN_FAVORITE);
 
-        COLUMN_FOR_ICON = COLUMN_NAME;
     }
 
     @Override

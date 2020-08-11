@@ -10,16 +10,15 @@ import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
 public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
-    public static final int COLUMN_IS_OUTCOME = -2;
-    public static final int COLUMN_UN_VIEWED = -1;
-    public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_SEQNO = 1;
+    public static final int COLUMN_SEQNO = 0;
+    public static final int COLUMN_TIMESTAMP = 1;
     public static final int COLUMN_TYPE = 2;
     public static final int COLUMN_CREATOR = 3;
     public static final int COLUMN_TITLE = 4;
     public static final int COLUMN_FAVORITE = 5;
     private static final long serialVersionUID = 1L;
 
+    DCSet dcSet = DCSet.getInstance();
     Wallet wallet = Controller.getInstance().wallet;
 
     public FavoriteTransactionTableModel() {
@@ -53,6 +52,9 @@ public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
 
             case COLUMN_UN_VIEWED:
                 return false;
+
+            case COLUMN_CONFIRMATIONS:
+                return transaction.getConfirmations(dcSet);
 
             case COLUMN_TIMESTAMP:
                 return transaction.viewTimestamp();

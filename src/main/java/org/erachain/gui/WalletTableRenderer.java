@@ -1,5 +1,7 @@
 package org.erachain.gui;
 
+import org.erachain.gui.library.MTable;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.GUIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,11 +15,7 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
     private final DefaultTableCellRenderer adaptee = new DefaultTableCellRenderer();
     static Logger LOGGER = LoggerFactory.getLogger(WalletTableRenderer.class.getName());
 
-
     public final static Color FORE_COLOR = new Color(0, 120, 0, 255);
-    public static final int COLUMN_NUMBER_SCALE = -3;
-    public static final int COLUMN_IS_OUTCOME = -2;
-    public static final int COLUMN_UN_VIEWED = -1;
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
@@ -50,7 +48,7 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
             ((JLabel) cell).setHorizontalAlignment(SwingConstants.RIGHT);
         }
 
-        Object isUnViewed = table.getValueAt(row, COLUMN_UN_VIEWED);
+        Object isUnViewed = table.getValueAt(row, TimerTableModelCls.COLUMN_UN_VIEWED);
         if (isUnViewed != null && (boolean) isUnViewed) {
             Font font = adaptee.getFont();
             font = new Font(font.getName(), Font.BOLD, font.getSize());
@@ -59,11 +57,31 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
             cell.setFont(adaptee.getFont());
         }
 
-        Object isOutcome = table.getValueAt(row, COLUMN_IS_OUTCOME);
+        Object isOutcome = table.getValueAt(row, TimerTableModelCls.COLUMN_IS_OUTCOME);
+        Color color;
         if (isOutcome != null && (boolean) isOutcome) {
-            cell.setForeground(adaptee.getForeground());
+            color = adaptee.getForeground();
         } else {
-            cell.setForeground(FORE_COLOR);
+            color = FORE_COLOR;
+        }
+
+        cell.setForeground(color);
+
+        if (column == 0) {
+            Integer confirmations = (Integer) table.getValueAt(row, TimerTableModelCls.COLUMN_CONFIRMATIONS);
+            if (confirmations != null) {
+                int sizeRow = ((MTable) table).iconSize;
+                if (confirmations == 0) {
+                    setIcon(GUIUtils.createIconArc(sizeRow, 0, color));
+                } else if (confirmations < 2) {
+                    setIcon(GUIUtils.createIconArc(sizeRow, 1, color));
+                } else if (confirmations < 6) {
+                    setIcon(GUIUtils.createIconArc(sizeRow, 2, color));
+                } else {
+                    setIcon(GUIUtils.createIcon(sizeRow, color, null));
+                }
+
+            }
         }
 
         return cell;

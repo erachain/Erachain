@@ -1,5 +1,6 @@
 package org.erachain.gui;
 
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.GUIUtils;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ public class WalletConfirmsRenderer extends DefaultTableCellRenderer {
         cell.setBackground(adaptee.getBackground());
         //cell.set
 
-        Object isOutcome = table.getValueAt(row, WalletTableRenderer.COLUMN_IS_OUTCOME);
+        Object isOutcome = table.getValueAt(row, TimerTableModelCls.COLUMN_IS_OUTCOME);
         Color color;
         if (isOutcome != null && (boolean) isOutcome) {
             color = adaptee.getForeground();

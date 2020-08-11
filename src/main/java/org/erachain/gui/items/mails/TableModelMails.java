@@ -23,9 +23,7 @@ public class TableModelMails extends WalletTableModel<Transaction> {
 
     static Logger LOGGER = LoggerFactory.getLogger(TableModelMails.class.getName());
 
-    public static final int COLUMN_IS_OUTCOME = -2;
-    public static final int COLUMN_UN_VIEWED = -1;
-    public static final int COLUMN_CONFIRMATIONS = 0;
+    public static final int COLUMN_SEQNO = 0;
     public static final int COLUMN_DATA = 1;
     public static final int COLUMN_HEAD = 2;
     public static final int COLUMN_SENDER = 3;
@@ -61,6 +59,9 @@ public class TableModelMails extends WalletTableModel<Transaction> {
 
             case COLUMN_CONFIRMATIONS:
                 return transaction.getConfirmations(dcSet);
+
+            case COLUMN_SEQNO:
+                transaction.viewHeightSeq();
 
             case COLUMN_DATA:
                 return DateTimeFormat.timestamptoString(transaction.getTimestamp());

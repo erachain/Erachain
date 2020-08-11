@@ -20,6 +20,9 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public abstract class TimerTableModelCls<U> extends AbstractTableModel implements Observer {
 
+    public static final int COLUMN_IS_OUTCOME = -3;
+    public static final int COLUMN_UN_VIEWED = -2;
+    public static final int COLUMN_CONFIRMATIONS = -1;
     private String name;
     protected String[] columnNames;
     //private Timer timer;
@@ -31,7 +34,6 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     private int DELETE_EVENT;
     private int LIST_EVENT;
 
-    public int COLUMN_FOR_ICON = 1;
     public int COLUMN_FAVORITE = 1000;
     public static final int COLUMN_ITEM_VALUE = 200;
 

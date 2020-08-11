@@ -7,7 +7,6 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.WalletConfirmsRenderer;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
@@ -66,15 +65,13 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         this.jTableJScrollPanelLeftPanel = new MTable(this.recordsModel);
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
-        jTableJScrollPanelLeftPanel.setDefaultRenderer(Number.class, new WalletTableRenderer());
+        //jTableJScrollPanelLeftPanel.setDefaultRenderer(Number.class, new WalletTableRenderer());
 
         this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
 
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
         columnModel.getColumn(recordsModel.COLUMN_FAVORITE).setMaxWidth((100));
         columnModel.getColumn(recordsModel.COLUMN_FAVORITE).setMaxWidth((100));
-        columnModel.getColumn(recordsModel.COLUMN_CONFIRMATIONS).setMaxWidth((100));
-        columnModel.getColumn(recordsModel.COLUMN_CONFIRMATIONS).setCellRenderer(new WalletConfirmsRenderer());
 
         // not show buttons
         jToolBarRightPanel.setVisible(true);

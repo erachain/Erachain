@@ -10,8 +10,6 @@ import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.utils.ObserverMessage;
 
 public class FavoriteStatementsTableModel extends FavoriteItemModelTable {
-    public static final int COLUMN_IS_OUTCOME = -2;
-    public static final int COLUMN_UN_VIEWED = -1;
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_CREATOR = 1;
     public static final int COLUMN_TITLE = 2;
@@ -31,7 +29,6 @@ public class FavoriteStatementsTableModel extends FavoriteItemModelTable {
                 ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE,
                 COLUMN_FAVORITE);
 
-        COLUMN_FOR_ICON = -1;
     }
 
     @Override

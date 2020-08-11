@@ -8,7 +8,6 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
-import org.erachain.gui.WalletTableRenderer;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun.Tuple2;
 
@@ -19,9 +18,7 @@ import java.util.ArrayList;
 @SuppressWarnings("serial")
 public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2<Long, Integer>, Transaction>> {
 
-    public static final int COLUMN_IS_OUTCOME = WalletTableRenderer.COLUMN_IS_OUTCOME;
-    public static final int COLUMN_UN_VIEWED = WalletTableRenderer.COLUMN_UN_VIEWED;
-    public static final int COLUMN_CONFIRMATIONS = 0;
+    public static final int COLUMN_NUMBER = 0;
     public static final int COLUMN_TIMESTAMP = 1;
     public static final int COLUMN_TYPE = 2;
     public static final int COLUMN_CREATOR = 3;
@@ -30,8 +27,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
     public static final int COLUMN_RECIPIENT = 6;
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
-    public static final int COLUMN_NUMBER = 9;
-    public static final int COLUMN_FAVORITE = 10;
+    public static final int COLUMN_FAVORITE = 9;
 
     private boolean onlyUnread = false;
 
@@ -43,7 +39,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
      */
     public WalletTransactionsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
-                new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size", "SeqNo", "Favorite"},
+                new String[]{"SeqNo", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size", "Favorite"},
                 new Boolean[]{true, true, true, true, true, true, true, false, false, true, true},
                 true, COLUMN_FAVORITE);
 

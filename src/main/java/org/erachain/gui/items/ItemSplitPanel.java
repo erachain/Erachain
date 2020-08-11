@@ -7,7 +7,6 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -59,14 +58,6 @@ public abstract class ItemSplitPanel extends SplitPanel {
         columnModel.getColumn(0).setMaxWidth((100));
         columnModel.getColumn(tableModel.COLUMN_FAVORITE).setMaxWidth(100);
         columnModel.getColumn(((WalletItemTableModel) tableModel).COLUMN_CONFIRMED).setMaxWidth(100);
-
-        // иконку будем рисовать
-        try {
-            columnModel.getColumn(tableModel.COLUMN_FOR_ICON)
-                    .setCellRenderer(new RendererIcon());
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
 
         // hand cursor for Favorite column
         jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionAdapter() {
