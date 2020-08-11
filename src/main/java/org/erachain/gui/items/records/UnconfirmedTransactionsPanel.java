@@ -36,7 +36,7 @@ import java.text.SimpleDateFormat;
 public class UnconfirmedTransactionsPanel extends IconPanel {
 
     public static String NAME = "UnconfirmedTransactionsPanel";
-    public static String TITLE = "Unconfirmed Records";
+    public static String TITLE = "Unconfirmed Transactions";
 
     protected Logger logger;
     private static UnconfirmedTransactionsPanel instance;

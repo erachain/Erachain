@@ -2,7 +2,6 @@ package org.erachain.gui.settings;
 // 16 03
 
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.*;
 import org.erachain.gui.models.KnownPeersTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.IPAddressFormatValidator;
@@ -50,6 +49,8 @@ public class SettingsKnownPeersPanel extends JPanel {
         //CHECKBOX FOR CONNECTED
         TableColumn confirmedColumn = knownPeersTable.getColumnModel().getColumn(1);
         //     confirmedColumn.setCellRenderer(knownPeersTable.getDefaultRenderer(Boolean.class));
+        confirmedColumn.setPreferredWidth(70);
+        confirmedColumn.setMaxWidth(100);
 
         JLabel lblAddNewAddress = new JLabel(Lang.getInstance().translate("Add new address") + ":");
         GridBagConstraints gbc_lblAddNewAddress = new GridBagConstraints();
@@ -110,9 +111,6 @@ public class SettingsKnownPeersPanel extends JPanel {
         knownPeersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         TableMenuPopupUtil.installContextMenu(knownPeersTable, menu);
-
-        confirmedColumn.setMaxWidth(100);
-        confirmedColumn.setMinWidth(100);
 
     }
 

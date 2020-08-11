@@ -15,6 +15,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
+import org.erachain.gui.Iconable;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -28,7 +29,7 @@ import java.util.HashMap;
 //import java.math.BigDecimal;
 //import com.google.common.primitives.Longs;
 
-public abstract class ItemCls implements ExplorerJsonLine {
+public abstract class ItemCls implements Iconable, ExplorerJsonLine {
 
     protected final static long START_KEY = 1L << 14;
     public static final int ASSET_TYPE = 1;

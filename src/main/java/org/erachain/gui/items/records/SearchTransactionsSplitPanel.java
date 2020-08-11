@@ -35,7 +35,7 @@ import java.util.List;
 public class SearchTransactionsSplitPanel extends SplitPanel {
 
     public static String NAME = "SearchTransactionsSplitPanel";
-    public static String TITLE = "Search Records";
+    public static String TITLE = "Search Transactions";
 
     public JPanel info_Panel;
     public VouchLibraryPanel voush_Library_Panel;

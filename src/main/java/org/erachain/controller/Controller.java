@@ -90,7 +90,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.0.02";
+    public static String version = "5.0.03";
     public static String buildTime = "2020-08-04 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -1010,8 +1010,11 @@ public class Controller extends Observable {
 
         if (this.webService != null)
             this.webService.stop();
+        while( !this.webService.isStoped()){}
+        this.webService = null;
 
         // START API SERVICE
+        WebService.getInstance().clearInstance();
         if (Settings.getInstance().isWebEnabled()) {
             this.webService = WebService.getInstance();
             this.webService.start();
@@ -2307,6 +2310,13 @@ public class Controller extends Observable {
         return false;
     }
 
+    public boolean isMyAccountByAddress(Account address) {
+        if (this.doesWalletExists()) {
+            return this.wallet.accountExists(address);
+        }
+        return false;
+    }
+
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> getWalletUnconfirmedBalance(Account account, long key) {
         return this.wallet.getUnconfirmedBalance(account, key);
     }
@@ -3440,7 +3450,7 @@ public class Controller extends Observable {
     public byte[] getPublicKey(Account account) {
 
         // CHECK ACCOUNT IN OWN WALLET
-        if (isMyAccountByAddress(account.getAddress())) {
+        if (isMyAccountByAddress(account)) {
             if (isWalletUnlocked()) {
                 return getWalletPrivateKeyAccountByAddress(account.getAddress()).getPublicKey();
             }

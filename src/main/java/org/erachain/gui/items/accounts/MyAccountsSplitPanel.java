@@ -50,7 +50,7 @@ public class MyAccountsSplitPanel extends SplitPanel {
 
     @Override
     public void onClose() {
-        rightPanel.table_Model.deleteObservers();
+        rightPanel.tableModel.deleteObservers();
         accountPanel.tableModel.deleteObservers();
         Controller.getInstance().deleteObserver(accountPanel.reload_Button);
         Controller.getInstance().deleteObserver(accountPanel.newAccount_Button);
@@ -69,8 +69,8 @@ public class MyAccountsSplitPanel extends SplitPanel {
             if (account != null && account.equals(selectArg) && asset != null && asset.equals(assetSelect)) return;
             selectArg = account;
             assetSelect = asset;
-            rightPanel.table_Model.setAccount(account);
-            rightPanel.table_Model.fireTableDataChanged();
+            rightPanel.tableModel.setAccount(account);
+            rightPanel.tableModel.fireTableDataChanged();
             rightPanel.setAsset(asset);
             jScrollPaneJPanelRightPanel.setViewportView(rightPanel);
 

@@ -1,14 +1,17 @@
 package org.erachain.gui;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.PlaySound;
 import org.erachain.utils.SysTray;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,12 +77,17 @@ public class WalletTimer<U> implements Observer {
             if (event instanceof Transaction) {
 
                 Transaction transaction = (Transaction) event;
+                Account creator = transaction.getCreator();
+
+                Settings.getInstance().isSoundReceivePaymentEnabled();
+                Settings.getInstance().isSoundReceiveMessageEnabled();
+
 
                 if (transaction instanceof RSend) {
                     RSend rSend = (RSend) transaction;
                     if (rSend.hasAmount()) {
                         // TRANSFER
-                        if (contr.wallet.accountExists(rSend.getCreator().getAddress())) {
+                        if (contr.wallet.accountExists(creator)) {
                             sound = "send.wav";
                             head = lang.translate("Payment send");
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
@@ -96,7 +104,7 @@ public class WalletTimer<U> implements Observer {
                         }
                     } else {
                         // MAIL
-                        if (contr.wallet.accountExists(rSend.getCreator().getAddress())) {
+                        if (contr.wallet.accountExists(rSend.getCreator())) {
                             sound = "send.wav";
                             head = lang.translate("Mail send");
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
@@ -115,7 +123,10 @@ public class WalletTimer<U> implements Observer {
                     }
 
                 } else {
-                    if (contr.wallet.accountExists(transaction.getCreator().getAddress())) {
+                    if (Settings.getInstance().isSoundNewTransactionEnabled()) {
+                    }
+
+                    if (contr.wallet.accountExists(transaction.getCreator())) {
                         sound = "outcometransaction.wav";
                         head = lang.translate("Outcome transaction") + ": " + transaction.viewFullTypeName();
                         message = transaction.getTitle();
@@ -127,20 +138,38 @@ public class WalletTimer<U> implements Observer {
                 }
             } else if (event instanceof Block) {
 
-                Block block = (Block) event;
+                Block.BlockHead blockHead = ((Block) event).blockHead;
+                if (blockHead.heightBlock == 1) {
+                    return;
+                }
+                Fun.Tuple3<Integer, Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), blockHead.heightBlock);
+                if (forgingPoint == null)
+                    return;
 
                 sound = "blockforge.wav";
-                head = lang.translate("Forging Block %d").replace("%d", "" + block.heightBlock);
-                message = lang.translate("Forging Fee") + ": " + block.viewFeeAsBigDecimal();
+
+                head = lang.translate("Forging Block %d").replace("%d", "" + blockHead.heightBlock);
+                message = lang.translate("Forging Fee") + ": " + blockHead.viewFeeAsBigDecimal();
+
+                int diff = blockHead.heightBlock - forgingPoint.a;
+                if (diff < 300) {
+                    head = null;
+                    sound = null;
+                } else if (diff < 1000) {
+                    sound = null;
+                }
 
             } else {
                 head = lang.translate("EVENT");
                 message = event.toString();
             }
 
-            playSound.playSound(sound);
+            if (sound != null)
+                playSound.playSound(sound);
 
-            sysTray.sendMessage(head, message, type);
+            if (head != null) {
+                sysTray.sendMessage(head, message, type);
+            }
 
         }
     }
