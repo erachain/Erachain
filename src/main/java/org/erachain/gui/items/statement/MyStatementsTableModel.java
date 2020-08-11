@@ -2,36 +2,36 @@ package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.WalletTableModel;
-import org.mapdb.Fun;
+import org.mapdb.Fun.Tuple2;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Observer;
 
-public class StatementsTableModelMy extends WalletTableModel<Transaction> implements Observer {
+public class MyStatementsTableModel extends WalletTableModel<Tuple2<Tuple2<Long, Integer>, Transaction>> implements Observer {
 
-    public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_CREATOR = 1;
-    public static final int COLUMN_TITLE = 2;
-    public static final int COLUMN_TEMPLATE = 3;
-    public static final int COLUMN_FAVORITE = 4;
+    public static final int COLUMN_SEQNO = 0;
+    public static final int COLUMN_TIMESTAMP = 1;
+    public static final int COLUMN_CREATOR = 2;
+    public static final int COLUMN_TITLE = 3;
+    public static final int COLUMN_TEMPLATE = 4;
+    public static final int COLUMN_FAVORITE = 5;
     /**
      *
      */
     DCSet dcSet;
     Wallet wallet = Controller.getInstance().wallet;
 
-    public StatementsTableModelMy() {
+    public MyStatementsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
-                new String[]{"Timestamp", "Creator", "Title", "Template", "Favorite"},
-                new Boolean[]{true, true, true, false, false}, true, COLUMN_FAVORITE);
+                new String[]{"№", "Timestamp", "Creator", "Title", "Template", "Favorite"},
+                new Boolean[]{false, true, true, true, false, false}, true, COLUMN_FAVORITE);
 
         dcSet = DCSet.getInstance();
 
@@ -44,7 +44,9 @@ public class StatementsTableModelMy extends WalletTableModel<Transaction> implem
             if (this.list == null || this.list.isEmpty()) {
                 return null;
             }
-            RSignNote rNote = (RSignNote) list.get(row);
+
+            Tuple2<Tuple2<Long, Integer>, Transaction> rowItem = list.get(row);
+            RSignNote rNote = (RSignNote) rowItem.b;
             if (rNote == null)
                 return null;
 
@@ -52,14 +54,27 @@ public class StatementsTableModelMy extends WalletTableModel<Transaction> implem
 
             PublicKeyAccount creator;
             switch (column) {
+                case COLUMN_IS_OUTCOME:
+                    if (rNote.getCreator() != null)
+                        return rNote.getCreator().hashCode() == rowItem.a.b;
+                    return false;
+
+                case COLUMN_UN_VIEWED:
+                    return ((WTransactionMap) map).isUnViewed(rNote);
+
+                case COLUMN_CONFIRMATIONS:
+                    return rNote.getConfirmations(dcSet);
+
+                case COLUMN_SEQNO:
+                    return rNote.viewHeightSeq();
+
                 case COLUMN_TIMESTAMP:
 
                     return rNote.viewTimestamp();
 
                 case COLUMN_TEMPLATE:
 
-                    ItemCls item = rNote.getItem();
-                    return item == null ? null : item.toString();
+                    return rNote.getItem();
 
                 case COLUMN_TITLE:
 
@@ -87,17 +102,17 @@ public class StatementsTableModelMy extends WalletTableModel<Transaction> implem
     @Override
     public void getInterval() {
 
-        list = new ArrayList<Transaction>();
+        list = new ArrayList<>();
 
         Wallet wallet = Controller.getInstance().wallet;
-        Iterator<Fun.Tuple2<Long, Integer>> iterator = ((WTransactionMap) map).getTypeIterator(
+        Iterator<Tuple2<Long, Integer>> iterator = ((WTransactionMap) map).getTypeIterator(
                 (byte) Transaction.SIGN_NOTE_TRANSACTION, true);
         if (iterator == null) {
             return;
         }
 
         RSignNote rNote;
-        Fun.Tuple2<Long, Integer> key;
+        Tuple2<Long, Integer> key;
         while (iterator.hasNext()) {
             key = iterator.next();
             try {
@@ -110,7 +125,7 @@ public class StatementsTableModelMy extends WalletTableModel<Transaction> implem
                 continue;
 
             rNote.setDC(dcSet, false);
-            list.add(rNote);
+            list.add(new Tuple2<>(key, rNote));
         }
     }
 

@@ -93,7 +93,7 @@ public class Union extends UnionCls {
         position += BIRTHDAY_LENGTH;
 
         //READ BIRTDAY
-        byte[] parentBytes = Arrays.copyOfRange(data, position, position + BIRTHDAY_LENGTH);
+        byte[] parentBytes = Arrays.copyOfRange(data, position, position + PARENT_LENGTH);
         long parent = Longs.fromByteArray(parentBytes);
         position += PARENT_LENGTH;
 

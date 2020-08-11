@@ -985,7 +985,10 @@ public class TransactionCreator {
         }
 
         transaction.setDC(this.fork, forDeal, this.blockHeight, ++this.seqNo, false);
-        int valid = transaction.isValid(forDeal, 0l);
+        int valid = transaction.isValid(forDeal, 0L);
+
+        // после проверки в форке - тут сбросим Номер трнзакции - для правильно отражения Подтвержденная
+        transaction.resetSeqNo();
 
         if (valid == Transaction.VALIDATE_OK) {
 

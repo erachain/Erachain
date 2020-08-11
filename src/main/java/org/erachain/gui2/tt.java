@@ -97,7 +97,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         ASMutableTreeNode polls_Node = new ASMutableTreeNode("polls_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Polls") + "</b></html>", getIcon(pathIcons + "polls_Node.png"));
         ASMutableTreeNode hashes_Node = new ASMutableTreeNode("hashes_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Unique Hashes") + "</b></html>", getIcon(pathIcons + "hashes_Node.png"));
         ASMutableTreeNode linked_hashes_Node = new ASMutableTreeNode("linked_hashes_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Linked Hashes") + "</b></html>", getIcon(pathIcons + "linked_hashes_Node.png"));
-        ASMutableTreeNode records_Node = new ASMutableTreeNode("records_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Records") + "</b></html>", getIcon(pathIcons + "records_Node.png"));
+        ASMutableTreeNode records_Node = new ASMutableTreeNode("records_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Transactions") + "</b></html>", getIcon(pathIcons + "records_Node.png"));
         ASMutableTreeNode other_Node = new ASMutableTreeNode("other_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Network DashBoard") + "</b></html>", getIcon(pathIcons + "other_Node.png"));
         ASMutableTreeNode bank_Tree = new ASMutableTreeNode("bank_Tree", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Bank") + "</b></html>", getIcon(pathIcons + "bank_Tree.png"));
         ASMutableTreeNode telegrams_Tree = new ASMutableTreeNode("telegrams_Tree", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Telegrams") + "</b></html>", getIcon(pathIcons + "telegrams_Tree.png"));
@@ -125,26 +125,24 @@ public class tt extends JPanel { // implements TreeSelectionListener {
             root.add(bank_Tree);
 
         root.add(account_Node);
-        root.add(person_Node);
-        root.add(document_Node);
+        root.add(telegrams_Tree);
+        root.add(records_Node);
         root.add(mails_Node);
-        root.add(assets_Node);
+        root.add(document_Node);
         root.add(exchange_Node);
+        root.add(assets_Node);
+        root.add(person_Node);
+        root.add(polls_Node);
         root.add(templates_Node);
         root.add(statuses_Node);
 
         if (BlockChain.TEST_MODE)
             root.add(unions_Node);
 
-        root.add(polls_Node);
 
         root.add(hashes_Node);
         root.add(linked_hashes_Node);
 
-        if (true || BlockChain.TEST_MODE)
-            root.add(telegrams_Tree);
-
-        root.add(records_Node);
         root.add(other_Node);
 
         bank_Tree.add(new ASMutableTreeNode(IssueSendPaymentOrder.NAME, IssueSendPaymentOrder.TITLE));

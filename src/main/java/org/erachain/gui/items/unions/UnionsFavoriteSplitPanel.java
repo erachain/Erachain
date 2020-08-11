@@ -64,7 +64,7 @@ public class UnionsFavoriteSplitPanel extends ItemSplitPanel {
     @Override
     public Component getShow(ItemCls item) {
         UnionInfo unionInfo = new UnionInfo();
-        unionInfo.Get_HTML_Union_Info_001((UnionCls) item);
+        unionInfo.show_Union_001((UnionCls) item);
         return unionInfo;
     }
 }

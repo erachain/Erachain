@@ -16,6 +16,10 @@ public abstract class WalletTableModel<T> extends TimerTableModelCls<T> implemen
         addObservers();
     }
 
+    public WalletTableModel(String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
+        super(columnNames, columnAutoHeight, descending);
+    }
+
     public void addObservers() {
 
         if (Controller.getInstance().doesWalletDatabaseExists()) {

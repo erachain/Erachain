@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.items.statement.RNoteInfo;
 import org.erachain.gui.library.MTable;
@@ -59,8 +60,13 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
         searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new search_tab_filter());
         // SET VIDEO
         jTableJScrollPanelLeftPanel = new MTable(this.favotitesTable);
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
+
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
-        columnModel.getColumn(0).setMaxWidth((100));
+        columnModel.getColumn(favotitesTable.COLUMN_SEQNO).setPreferredWidth((150));
+        columnModel.getColumn(favotitesTable.COLUMN_SEQNO).setMaxWidth((150));
+        columnModel.getColumn(favotitesTable.COLUMN_FAVORITE).setPreferredWidth((70));
         columnModel.getColumn(favotitesTable.COLUMN_FAVORITE).setMaxWidth((100));
 
         //	jTableJScrollPanelLeftPanel = search_Table;

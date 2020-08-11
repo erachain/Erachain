@@ -5,7 +5,6 @@ import org.erachain.database.wallet.FavoriteItemMap;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
-import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.ObserverMessage;
 
 import java.io.IOException;
@@ -14,7 +13,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public abstract class FavoriteItemModelTable extends TimerTableModelCls implements Observer, ObserverWaiter {
+public abstract class FavoriteItemModelTable extends WalletItemTableModel implements Observer, ObserverWaiter {
 
     private final int RESET_EVENT;
     private final int ADD_EVENT;
