@@ -270,6 +270,14 @@ public class SettingsFrame extends JDialog {
             settingsJSONbuf.put("soundreceivepayment", settingsTabPane.uI_Settings_Panel.chckbxSoundReceivePayment.isSelected());
         }
 
+        if (Settings.getInstance().isSoundForgedBlockEnabled() != settingsTabPane.uI_Settings_Panel.chckbxSoundForgedBlock.isSelected()) {
+            settingsJSONbuf.put("soundforgedblock", settingsTabPane.uI_Settings_Panel.chckbxSoundForgedBlock.isSelected());
+        }
+
+        if (Settings.getInstance().isSysTrayEnabled() != settingsTabPane.uI_Settings_Panel.chckbxSysTrayEvent.isSelected()) {
+            settingsJSONbuf.put("trayeventenabled", settingsTabPane.uI_Settings_Panel.chckbxSoundForgedBlock.isSelected());
+        }
+
         if (Settings.getInstance().isGuiEnabled() != settingsTabPane.settingsBasicPanel.chckbxGuiEnabled.isSelected()) {
             settingsJSONbuf.put("guienabled", settingsTabPane.settingsBasicPanel.chckbxGuiEnabled.isSelected());
         }

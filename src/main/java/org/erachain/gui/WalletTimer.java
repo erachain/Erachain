@@ -28,21 +28,17 @@ public class WalletTimer<U> implements Observer {
 
     protected Logger logger;
     Controller contr = Controller.getInstance();
+    Settings settings = Settings.getInstance();
     SysTray sysTray = SysTray.getInstance();
     PlaySound playSound = PlaySound.getInstance();
     Lang lang = Lang.getInstance();
     private List<Integer> transactionsAlreadyPlayed;
-
-    boolean muteSound;
-    boolean muteTray;
 
     public WalletTimer() {
         transactionsAlreadyPlayed = new ArrayList<>();
 
         logger = LoggerFactory.getLogger(this.getClass());
         Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
-        muteSound = (Boolean) Settings.getInstance().getJSONObject().getOrDefault("muteTraySound", false);
-        muteTray = (Boolean) Settings.getInstance().getJSONObject().getOrDefault("muteTrayMessage", false);
 
     }
 
@@ -52,7 +48,8 @@ public class WalletTimer<U> implements Observer {
 
     public void update(Observable o, Object arg) {
 
-        if (!contr.doesWalletExists() || contr.wallet.synchronizeBodyUsed)
+        if (!contr.doesWalletExists() || contr.wallet.synchronizeBodyUsed
+                || !settings.isTrayEventEnabled())
             return;
 
         ObserverMessage messageObs = (ObserverMessage) arg;
@@ -69,9 +66,9 @@ public class WalletTimer<U> implements Observer {
                 transactionsAlreadyPlayed.remove(0);
             }
 
-            String sound = "newtransaction.wav";
-            String head = "";
-            String message = "";
+            String sound = null;
+            String head = null;
+            String message = null;
             TrayIcon.MessageType type = TrayIcon.MessageType.NONE;
 
             if (event instanceof Transaction) {
@@ -79,8 +76,7 @@ public class WalletTimer<U> implements Observer {
                 Transaction transaction = (Transaction) event;
                 Account creator = transaction.getCreator();
 
-                Settings.getInstance().isSoundReceivePaymentEnabled();
-                Settings.getInstance().isSoundReceiveMessageEnabled();
+                settings.isSoundReceiveMessageEnabled();
 
 
                 if (transaction instanceof RSend) {
@@ -88,14 +84,19 @@ public class WalletTimer<U> implements Observer {
                     if (rSend.hasAmount()) {
                         // TRANSFER
                         if (contr.wallet.accountExists(creator)) {
-                            sound = "send.wav";
+                            if (settings.isSoundNewTransactionEnabled())
+                                sound = "send.wav";
+
                             head = lang.translate("Payment send");
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
                                     + rSend.getAmount().toPlainString() + " [" + rSend.getAbsKey() + "]\n "
                                     + rSend.getRecipient().getPersonAsString() + "\n"
                                     + (rSend.getHead() != null ? "\n" + rSend.getHead() : "");
                         } else {
-                            sound = "receivepayment.wav";
+
+                            if (settings.isSoundReceivePaymentEnabled())
+                                sound = "receivepayment.wav";
+
                             head = lang.translate("Payment received");
                             message = rSend.getRecipient().getPersonAsString() + " <- \n "
                                     + rSend.getAmount().toPlainString() + " [" + rSend.getAbsKey() + "]\n "
@@ -105,14 +106,18 @@ public class WalletTimer<U> implements Observer {
                     } else {
                         // MAIL
                         if (contr.wallet.accountExists(rSend.getCreator())) {
-                            sound = "send.wav";
+                            if (settings.isSoundNewTransactionEnabled())
+                                sound = "send.wav";
+
                             head = lang.translate("Mail send");
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
                                     //+ rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
                                     + rSend.getRecipient().getPersonAsString() + "\n"
                                     + (rSend.getHead() != null ? "\n" + rSend.getHead() : "");
                         } else {
-                            sound = "receivemail.wav";
+                            if (settings.isSoundReceiveMessageEnabled())
+                                sound = "receivemail.wav";
+
                             head = lang.translate("Mail received");
                             message = rSend.getRecipient().getPersonAsString() + " <- \n "
                                     //+ rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
@@ -123,15 +128,16 @@ public class WalletTimer<U> implements Observer {
                     }
 
                 } else {
-                    if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                    }
 
                     if (contr.wallet.accountExists(transaction.getCreator())) {
-                        sound = "outcometransaction.wav";
+                        if (settings.isSoundNewTransactionEnabled())
+                            sound = "outcometransaction.wav";
+
                         head = lang.translate("Outcome transaction") + ": " + transaction.viewFullTypeName();
                         message = transaction.getTitle();
                     } else {
-                        sound = "incometransaction.wav";
+                        if (settings.isSoundNewTransactionEnabled())
+                            sound = "incometransaction.wav";
                         head = lang.translate("Income transaction") + ": " + transaction.viewFullTypeName();
                         message = transaction.getTitle();
                     }
@@ -146,7 +152,9 @@ public class WalletTimer<U> implements Observer {
                 if (forgingPoint == null)
                     return;
 
-                sound = "blockforge.wav";
+                if (settings.isSoundForgedBlockEnabled()) {
+                    sound = "blockforge.wav";
+                }
 
                 head = lang.translate("Forging Block %d").replace("%d", "" + blockHead.heightBlock);
                 message = lang.translate("Forging Fee") + ": " + blockHead.viewFeeAsBigDecimal();

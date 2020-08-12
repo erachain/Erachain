@@ -1,35 +1,24 @@
 package org.erachain.gui.settings;
 
-import java.awt.EventQueue;
+import com.google.common.base.Charsets;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.erachain.lang.Lang;
+import org.erachain.lang.LangFile;
+import org.erachain.settings.Settings;
+import org.erachain.utils.DateTimeFormat;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
-import javax.swing.SwingConstants;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
-import com.google.common.base.Charsets;
-
-import org.erachain.lang.Lang;
-import org.erachain.lang.LangFile;
-import org.erachain.settings.Settings;
-import org.erachain.utils.DateTimeFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -49,9 +38,12 @@ public class UISettingPanel extends javax.swing.JPanel {
     public javax.swing.JComboBox<String> size_Font;
     public javax.swing.JComboBox<LangFile> jComboBox_Lang;
     public javax.swing.JComboBox<String> jComboBox_Thems;
+    public JCheckBox chckbxSysTrayEvent;
     public JCheckBox chckbxSoundReceivePayment;
     public JCheckBox chckbxSoundReceiveMessage;
     public JCheckBox chckbxSoundNewTransaction;
+    public JCheckBox chckbxSoundForgedBlock;
+
     public JCheckBox chckbxSystemLookFeel;
     public JCheckBox chckbxMetallLookFeel;
     public JCheckBox chckbxOtherTemes;
@@ -392,24 +384,43 @@ public class UISettingPanel extends javax.swing.JPanel {
             }
         });
 
+        int gridy = 5;
+
+        chckbxSysTrayEvent = new JCheckBox(Lang.getInstance().translate("System Tray Events and Sounds"));
+        chckbxSysTrayEvent.setHorizontalAlignment(SwingConstants.LEFT);
+        chckbxSysTrayEvent.setSelected(Settings.getInstance().isSysTrayEnabled());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
+        add(chckbxSysTrayEvent, gridBagConstraints);
+
+        ++gridy;
+        jLabel_sounds.setText(Lang.getInstance().translate("Sounds") + ":");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
+        add(jLabel_sounds, gridBagConstraints);
 
         chckbxSoundReceivePayment = new JCheckBox(Lang.getInstance().translate("Receive payment"));
         chckbxSoundReceivePayment.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxSoundReceivePayment.setSelected(Settings.getInstance().isSoundReceivePaymentEnabled());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
         add(chckbxSoundReceivePayment, gridBagConstraints);
-
 
         chckbxSoundReceiveMessage = new JCheckBox(Lang.getInstance().translate("Receive message"));
         chckbxSoundReceiveMessage.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxSoundReceiveMessage.setSelected(Settings.getInstance().isSoundReceiveMessageEnabled());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
         add(chckbxSoundReceiveMessage, gridBagConstraints);
@@ -419,39 +430,42 @@ public class UISettingPanel extends javax.swing.JPanel {
         chckbxSoundNewTransaction.setSelected(Settings.getInstance().isSoundNewTransactionEnabled());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
         add(chckbxSoundNewTransaction, gridBagConstraints);
 
-        jLabel_sounds.setText(Lang.getInstance().translate("Sounds") + ":");
+        chckbxSoundForgedBlock = new JCheckBox(Lang.getInstance().translate("Forged Block"));
+        chckbxSoundForgedBlock.setHorizontalAlignment(SwingConstants.LEFT);
+        chckbxSoundForgedBlock.setSelected(Settings.getInstance().isSoundForgedBlockEnabled());
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
-        add(jLabel_sounds, gridBagConstraints);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
+        add(chckbxSoundForgedBlock, gridBagConstraints);
+
+        if (false) {
+            JLabel jLabel_UI = new JLabel(Lang.getInstance().translate("UI") + ":");
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = ++gridy;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+            gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
+            //     add(jLabel_UI, gridBagConstraints);
 
 
-        JLabel jLabel_UI = new JLabel(Lang.getInstance().translate("UI") + ":");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
-        //     add(jLabel_UI, gridBagConstraints);
-
-
-        jLabel1.setText("");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        add(jLabel1, gridBagConstraints);
+            jLabel1.setText("UI");
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 10;
+            gridBagConstraints.gridwidth = 7;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.weightx = 0.1;
+            gridBagConstraints.weighty = 0.1;
+            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+            add(jLabel1, gridBagConstraints);
+        }
 
 
     }// </editor-fold>

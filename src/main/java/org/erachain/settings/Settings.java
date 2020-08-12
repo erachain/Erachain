@@ -94,6 +94,8 @@ public class Settings {
     private static final boolean DEFAULT_SOUND_RECEIVE_COIN = true;
     private static final boolean DEFAULT_SOUND_MESSAGE = true;
     private static final boolean DEFAULT_SOUND_NEW_TRANSACTION = true;
+    private static final boolean DEFAULT_SOUND_FORGED_BLOCK = true;
+    private static final boolean DEFAULT_TRAY_EVENT = true;
     //private static final int DEFAULT_MAX_BYTE_PER_FEE = 512;
     private static final boolean ALLOW_FEE_LESS_REQUIRED = false;
     //DATE FORMAT
@@ -983,7 +985,23 @@ public class Settings {
 
         return DEFAULT_SOUND_NEW_TRANSACTION;
     }
-	
+
+    public boolean isSoundForgedBlockEnabled() {
+        if (this.settingsJSON.containsKey("soundforgedblock")) {
+            return ((Boolean) this.settingsJSON.get("soundforgedblock")).booleanValue();
+        }
+
+        return DEFAULT_SOUND_FORGED_BLOCK;
+    }
+
+    public boolean isTrayEventEnabled() {
+        if (this.settingsJSON.containsKey("trayeventenabled")) {
+            return ((Boolean) this.settingsJSON.get("trayeventenabled")).booleanValue();
+        }
+
+        return DEFAULT_TRAY_EVENT;
+    }
+
 	/*
 	public int getMaxBytePerFee() 
 	{
