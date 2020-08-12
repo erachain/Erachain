@@ -38,7 +38,9 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
                     Color.PINK
                     : Color.GRAY, null), selected);
             ((JCheckBox) cell).setHorizontalAlignment(JLabel.CENTER);
+            ((JCheckBox) cell).setOpaque(true);
             ((JCheckBox) cell).setBorderPainted(false);
+            ((JCheckBox) cell).setContentAreaFilled(true);
 
         } else {
             cell = super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
