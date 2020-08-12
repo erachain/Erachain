@@ -59,7 +59,7 @@ Import command completed:  1 entries successfully imported, 0 entries failed or 
 JavaKeyStoreName – имя файла защищенного хранилища (KeyStore).
 5. Переименовываем файл JavaKeyStoreName в WEBkeystore и копируем его в директорию Erachain/SSL
 6. Запускаем ноду ЕРА, открываем Файл-> Настройки, где задаем путь до WEBkeystore и пароли.
- - Для пробного WEBkeystore_example - доступ к keyStore: 123456 и пароль для сертификата: 123
+ - Для пробного WEBkeystore_example - доступ к keyStore: 123456 и пароль для сертификата: 1
 
 7. Перезапускаем ноду
 8. Открываем Блокэксплорер
