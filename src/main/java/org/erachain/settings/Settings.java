@@ -44,7 +44,6 @@ public class Settings {
     public static String sideLicense; // see sidePROTOCOL_example.json
 
     //private static final String[] DEFAULT_PEERS = { };
-    public static final String DEFAULT_THEME = "Metal";
     public static final int DEFAULT_ACCOUNTS = 1;
     //DATA
     public static final String DEFAULT_DATA_CHAIN_DIR = "datachain";
@@ -68,8 +67,12 @@ public class Settings {
     //public static final int BLOCK_MAX_SIGNATURES = 100; // blocks load onetime
     private static final int DEFAULT_CONNECTION_TIMEOUT = 20000;
     private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
+
+    // GUI SCHEME
+    public static final String DEFAULT_THEME = "System"; //"Metal";
     private static final Integer DEFAULT_FONT_SIZE = 14;
     private static final String DEFAULT_FONT_NAME = "Arial";
+
     //RPC
     private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1"; // localhost = error in accessHandler.setWhite(Settings.getInstance().getRpcAllowed());
     private static final boolean DEFAULT_RPC_ENABLED = false; //
@@ -1126,7 +1129,7 @@ public class Settings {
         if (this.settingsJSON.containsKey("markcolorselected")) {
             return this.settingsJSON.get("markcolorselected").toString();
         }
-        return "255, 225, 185";
+        return "120,250,120";
     }
 
     public Color markColorSelectedObj() {
