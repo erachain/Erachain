@@ -72,7 +72,8 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
             color = adaptee.getForeground();
         }
 
-        cell.setForeground(color);
+        if (color != null)
+            cell.setForeground(color);
 
         if (column == 0) {
             Integer confirmations = (Integer) table.getValueAt(row, TimerTableModelCls.COLUMN_CONFIRMATIONS);
