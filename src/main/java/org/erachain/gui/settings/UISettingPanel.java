@@ -38,6 +38,10 @@ public class UISettingPanel extends javax.swing.JPanel {
     public javax.swing.JComboBox<String> size_Font;
     public javax.swing.JComboBox<LangFile> jComboBox_Lang;
     public javax.swing.JComboBox<String> jComboBox_Thems;
+    public JCheckBox checkMarkIncome;
+    public javax.swing.JTextField markColor;
+    public javax.swing.JTextField markColorSelected;
+
     public JCheckBox chckbxSysTrayEvent;
     public JCheckBox chckbxSoundReceivePayment;
     public JCheckBox chckbxSoundReceiveMessage;
@@ -386,12 +390,58 @@ public class UISettingPanel extends javax.swing.JPanel {
 
         int gridy = 5;
 
+        checkMarkIncome = new JCheckBox(Lang.getInstance().translate("Mark Outcome or Income"));
+        checkMarkIncome.setHorizontalAlignment(SwingConstants.LEFT);
+        checkMarkIncome.setSelected(Settings.getInstance().markIncome());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
+        add(checkMarkIncome, gridBagConstraints);
+
+        JLabel lLabel_Color = new JLabel(Lang.getInstance().translate("Color") + ":");
+        lLabel_Color.setHorizontalAlignment(SwingConstants.RIGHT);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
+        add(lLabel_Color, gridBagConstraints);
+
+        markColor = new JTextField(Settings.getInstance().markColor());
+        markColor.setHorizontalAlignment(SwingConstants.LEFT);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
+        add(markColor, gridBagConstraints);
+
+        JLabel lLabel_ColorS = new JLabel(Lang.getInstance().translate("Selected Color") + ":");
+        lLabel_ColorS.setHorizontalAlignment(SwingConstants.RIGHT);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
+        add(lLabel_ColorS, gridBagConstraints);
+
+        markColorSelected = new JTextField(Settings.getInstance().markColorSelected());
+        markColorSelected.setHorizontalAlignment(SwingConstants.LEFT);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
+        add(markColorSelected, gridBagConstraints);
+
         chckbxSysTrayEvent = new JCheckBox(Lang.getInstance().translate("System Tray Events and Sounds"));
         chckbxSysTrayEvent.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxSysTrayEvent.setSelected(Settings.getInstance().isSysTrayEnabled());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
         add(chckbxSysTrayEvent, gridBagConstraints);

@@ -258,6 +258,7 @@ public class SettingsFrame extends JDialog {
             changeKeyCaching = true;
         }
 
+        // SOUND EVENTS
         if (Settings.getInstance().isSoundNewTransactionEnabled() != settingsTabPane.uI_Settings_Panel.chckbxSoundNewTransaction.isSelected()) {
             settingsJSONbuf.put("soundnewtransaction", settingsTabPane.uI_Settings_Panel.chckbxSoundNewTransaction.isSelected());
         }
@@ -278,6 +279,18 @@ public class SettingsFrame extends JDialog {
             settingsJSONbuf.put("trayeventenabled", settingsTabPane.uI_Settings_Panel.chckbxSoundForgedBlock.isSelected());
         }
 
+        // COLORS
+        if (Settings.getInstance().markIncome() != settingsTabPane.uI_Settings_Panel.checkMarkIncome.isSelected()) {
+            settingsJSONbuf.put("markincome", settingsTabPane.uI_Settings_Panel.checkMarkIncome.isSelected());
+        }
+        if (Settings.getInstance().markColor() != settingsTabPane.uI_Settings_Panel.markColor.getText()) {
+            settingsJSONbuf.put("markcolor", settingsTabPane.uI_Settings_Panel.markColor.getText());
+        }
+        if (Settings.getInstance().markColorSelected() != settingsTabPane.uI_Settings_Panel.markColorSelected.getText()) {
+            settingsJSONbuf.put("markcolorselected", settingsTabPane.uI_Settings_Panel.markColorSelected.getText());
+        }
+
+        // GUI
         if (Settings.getInstance().isGuiEnabled() != settingsTabPane.settingsBasicPanel.chckbxGuiEnabled.isSelected()) {
             settingsJSONbuf.put("guienabled", settingsTabPane.settingsBasicPanel.chckbxGuiEnabled.isSelected());
         }

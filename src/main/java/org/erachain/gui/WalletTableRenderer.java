@@ -2,6 +2,7 @@ package org.erachain.gui;
 
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
+import org.erachain.settings.Settings;
 import org.erachain.utils.GUIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,10 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
     private final DefaultTableCellRenderer adaptee = new DefaultTableCellRenderer();
     static Logger LOGGER = LoggerFactory.getLogger(WalletTableRenderer.class.getName());
 
-    public final static Color FORE_COLOR = new Color(0, 120, 0, 255);
+    Color color1 = new Color(255, 215, 84, 255);
+    public static boolean markIncome = Settings.getInstance().markIncome();
+    public final static Color FORE_COLOR = Settings.getInstance().markColorObj();
+    public final static Color FORE_COLOR_SELCTED = Settings.getInstance().markColorSelectedObj();
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
@@ -31,10 +35,8 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
             int sizeRow = table.getRowHeight();
 
             cell = new JCheckBox(null, GUIUtils.createIcon(sizeRow, selected ?
-                    //new Color(38, 90, 30, 255)
                     Color.PINK
                     : Color.GRAY, null), selected);
-            //((JCheckBox)cell).setSelected((Boolean) value);
             ((JCheckBox) cell).setHorizontalAlignment(JLabel.CENTER);
             ((JCheckBox) cell).setBorderPainted(true);
 
@@ -59,8 +61,13 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
 
         Object isOutcome = table.getValueAt(row, TimerTableModelCls.COLUMN_IS_OUTCOME);
         Color color;
-        if (isOutcome != null && !(boolean) isOutcome) {
-            color = FORE_COLOR;
+
+        if (isOutcome != null && !(boolean) isOutcome ^ markIncome) {
+            if (isSelected) {
+                color = FORE_COLOR_SELCTED;
+            } else {
+                color = FORE_COLOR;
+            }
         } else {
             color = adaptee.getForeground();
         }
