@@ -444,7 +444,7 @@ public class SendTableModel extends JTable implements Observer {
 
     private void setHeight(int row) {
         int textHeight = (3 + lineCount(messageBufs.get(row).getDecrMessage())) * fontHeight;
-        if (textHeight < 24 + 3 * fontHeight) {
+        if (textHeight < fontHeight + 3 * fontHeight) {
             textHeight = 24 + 3 * fontHeight;
         }
         this.setRowHeight(row, textHeight);
