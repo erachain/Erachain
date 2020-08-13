@@ -392,7 +392,7 @@ public class MailSendPanel extends IconPanel {
 
         // MESSAGES HISTORY TABLE
 
-        messagesHistoryTable = new SendTableModel((Account) cbxFrom.getSelectedItem());
+        messagesHistoryTable = new SendTableModel(this, (Account) cbxFrom.getSelectedItem());
 
         cbxFrom.addActionListener(new ActionListener() {
             @Override

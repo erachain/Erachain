@@ -7,12 +7,16 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.mails.MailSendPanel;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
@@ -70,7 +74,7 @@ public class SendTableModel extends JTable implements Observer {
     WTransactionMap tableMap = dwSet.getTransactionMap();
     private Account accountFrom;
 
-    public SendTableModel(Account accountFrom) {
+    public SendTableModel(MailSendPanel parent, Account accountFrom) {
         this.setShowGrid(false);
 
         fontHeight = this.getFontMetrics(this.getFont()).getHeight();
@@ -87,6 +91,26 @@ public class SendTableModel extends JTable implements Observer {
 
         //MENU
         JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem seeDetails = new JMenuItem(Lang.getInstance().translate("See Details"));
+        seeDetails.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JMenuItem menuItem = (JMenuItem) e.getSource();
+                JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+                Component invoker = popupMenu.getInvoker(); //this is the JMenu (in my code)
+                SendTableModel invokerAsJComponent = (SendTableModel) invoker;
+
+                int row = invokerAsJComponent.getSelectedRow();
+                row = invokerAsJComponent.convertRowIndexToModel(row);
+
+                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, messageBufs.get(row).tx,
+                        (int) (parent.getWidth() / 1.2), (int) (parent.getHeight() / 1.2), Lang.getInstance().translate("Transaction"));
+                dd.setLocationRelativeTo(parent);
+                dd.setVisible(true);
+
+            }
+        });
+        menu.add(seeDetails);
 
         JMenuItem copyMessage = new JMenuItem(Lang.getInstance().translate("Copy Message"));
         copyMessage.addActionListener(new ActionListener() {
@@ -342,11 +366,12 @@ public class SendTableModel extends JTable implements Observer {
                     transaction.getTimestamp(),
                     transaction.getAmount(),
                     transaction.getKey(),
+                    transaction.isBackward(),
                     transaction.getFee(),
                     transaction.getSignature(),
                     transaction.getCreator().getPublicKey(),
-                    transaction.isText()
-            ));
+                    transaction.isText(),
+                    transaction));
         }
     }
 
@@ -452,10 +477,12 @@ public class SendTableModel extends JTable implements Observer {
         private long timestamp;
         private BigDecimal amount;
         private long assetKey;
+        private boolean backward;
         private BigDecimal fee;
         private byte[] signature;
+        public final Transaction tx;
 
-        public MessageBuf(String title, byte[] rawMessage, boolean encrypted, PublicKeyAccount sender, Account recipient, long timestamp, BigDecimal amount, long assetKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText) {
+        public MessageBuf(String title, byte[] rawMessage, boolean encrypted, PublicKeyAccount sender, Account recipient, long timestamp, BigDecimal amount, long assetKey, boolean backward, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText, Transaction transaction) {
             this.title = title;
             this.rawMessage = rawMessage;
             this.encrypted = encrypted;
@@ -466,11 +493,13 @@ public class SendTableModel extends JTable implements Observer {
             this.timestamp = timestamp;
             this.amount = amount;
             this.assetKey = assetKey;
+            this.backward = backward;
             this.fee = fee;
             this.senderPublicKey = senderPublicKey;
             this.recipientPublicKey = null;
             this.signature = signature;
             this.isText = isText;
+            tx = transaction;
         }
 
         public byte[] getMessage() {
@@ -643,17 +672,9 @@ public class SendTableModel extends JTable implements Observer {
                 int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
                 long key = this.getAssetKey();
 
-                String send_type;
-                if (key < 0) {
-                    send_type = Lang.getInstance().translate("DEBT");
-                } else {
-                    if (amo_sign < 0) {
-                        send_type = Lang.getInstance().translate("HOLD");
-                    } else {
-                        send_type = Lang.getInstance().translate("PAY");
-                    }
-                }
-                amountStr = "<font" + fontSize + ">" + send_type + " "
+
+                String actionName = TransactionAmount.viewActionType(assetKey, amount, backward);
+                amountStr = "<font size='3'>" + actionName + " "
                         //+ Lang.getInstance().translate("Amount") + ": "
                         + NumberAsString.formatAsString(this.amount) + "</font>"
                         + " " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(DCSet.getInstance());
@@ -663,11 +684,13 @@ public class SendTableModel extends JTable implements Observer {
             return "<html>"
                     + "<body width='" + width + "'>"
                     + "<table border='0' cellpadding='3' cellspacing='0'><tr><td bgcolor='" + colorHeader + "' width='" + (width / 2 - 1) + "'>"
-                    + "<font size='2' color='" + colorTextHeader + "'>" + Lang.getInstance().translate("From") + ":" + this.sender
-                    + "<br>" + Lang.getInstance().translate("To") + ": "
-                    + this.recipient + "</font></td>"
+                    + "<font size='2.5' color='" + colorTextHeader + "'>" + Lang.getInstance().translate("From") + ":" + this.sender
+                    + "</font><br>"
+                    //+ Lang.getInstance().translate("To") + ": " + this.recipient
+                    + "<font size='3.5' color='" + colorTextHeader + "'>" + title
+                    + "</font></td>"
                     + "<td bgcolor='" + colorHeader + "' align='right' width='" + (width / 2 - 1) + "'>"
-                    + "<font size='2' color='" + colorTextHeader + "'>" + strconfirmations + " . "
+                    + "<font size='2.5' color='" + colorTextHeader + "'>" + strconfirmations + " . "
                     + DateTimeFormat.timestamptoString(this.timestamp)
                     + " " + Lang.getInstance().translate("Fee") + ": "
                     + NumberAsString.formatAsString(fee)
