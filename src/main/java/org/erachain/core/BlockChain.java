@@ -943,7 +943,11 @@ public class BlockChain {
         if (CHECKPOINT.a > 1) {
             return CHECKPOINT.b;
         } else {
-            return genesisBlock.getSignature();
+            if (GENESIS_SIGNATURE == null) {
+                return genesisBlock.getSignature();
+            } else {
+                return GENESIS_SIGNATURE;
+            }
         }
     }
 
