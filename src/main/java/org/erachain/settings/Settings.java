@@ -17,6 +17,7 @@ import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +44,6 @@ public class Settings {
     public static String sideLicense; // see sidePROTOCOL_example.json
 
     //private static final String[] DEFAULT_PEERS = { };
-    public static final String DEFAULT_THEME = "System";
     public static final int DEFAULT_ACCOUNTS = 1;
     //DATA
     public static final String DEFAULT_DATA_CHAIN_DIR = "datachain";
@@ -67,8 +67,15 @@ public class Settings {
     //public static final int BLOCK_MAX_SIGNATURES = 100; // blocks load onetime
     private static final int DEFAULT_CONNECTION_TIMEOUT = 20000;
     private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
-    private static final Integer DEFAULT_FONT_SIZE = 11;
+
+    // GUI SCHEME
+    public static final String DEFAULT_THEME = "System"; //"Metal";
+    private static final Integer DEFAULT_FONT_SIZE = 14;
     private static final String DEFAULT_FONT_NAME = "Arial";
+    private static final String DEFAULT_FONT_COLOR = "0,137,28"; //"0,120,0";
+    private static final String DEFAULT_FONT_COLOR_SELECTED = "154,255,72"; //"120,250,120";
+
+
     //RPC
     private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1"; // localhost = error in accessHandler.setWhite(Settings.getInstance().getRpcAllowed());
     private static final boolean DEFAULT_RPC_ENABLED = false; //
@@ -1098,6 +1105,47 @@ public class Settings {
         }
     }
 
+    public boolean markIncome() {
+        if (this.settingsJSON.containsKey("markincome")) {
+            return new Boolean(this.settingsJSON.get("markincome").toString());
+        }
+        return false;
+    }
+
+    public String markColor() {
+        if (this.settingsJSON.containsKey("markcolor")) {
+            return this.settingsJSON.get("markcolor").toString();
+        }
+        return DEFAULT_FONT_COLOR;
+    }
+
+    public Color markColorObj() {
+        try {
+            String[] rgb = markColor().split(",");
+            return new Color(new Integer(rgb[0].trim()), new Integer(rgb[1].trim()), new Integer(rgb[2].trim()));
+        } catch (Exception e) {
+            String[] rgb = DEFAULT_FONT_COLOR.split(",");
+            return new Color(new Integer(rgb[0].trim()), new Integer(rgb[1].trim()), new Integer(rgb[2].trim()));
+        }
+    }
+
+    public String markColorSelected() {
+        if (this.settingsJSON.containsKey("markcolorselected")) {
+            return this.settingsJSON.get("markcolorselected").toString();
+        }
+        return DEFAULT_FONT_COLOR_SELECTED;
+    }
+
+    public Color markColorSelectedObj() {
+        try {
+            String[] rgb = markColorSelected().split(",");
+            return new Color(new Integer(rgb[0].trim()), new Integer(rgb[1].trim()), new Integer(rgb[2].trim()));
+        } catch (Exception e) {
+            String[] rgb = DEFAULT_FONT_COLOR_SELECTED.split(",");
+            return new Color(new Integer(rgb[0].trim()), new Integer(rgb[1].trim()), new Integer(rgb[2].trim()));
+        }
+    }
+
     public InetAddress getCurrentIp() {
         try {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface
@@ -1141,7 +1189,7 @@ public class Settings {
 
     public String get_Font() {
         if (this.settingsJSON.containsKey("font_size")) {
-            return ((String) this.settingsJSON.get("font_size").toString());
+            return this.settingsJSON.get("font_size").toString();
         }
 
         return DEFAULT_FONT_SIZE.toString();
@@ -1150,7 +1198,7 @@ public class Settings {
 
     public String get_File_Chooser_Paht() {
         if (this.settingsJSON.containsKey("FileChooser_Path")) {
-            return ((String) this.settingsJSON.get("FileChooser_Path").toString());
+            return this.settingsJSON.get("FileChooser_Path").toString();
         }
 
         return getUserPath();
@@ -1177,7 +1225,7 @@ public class Settings {
 
     public String get_Font_Name() {
         if (this.settingsJSON.containsKey("font_name")) {
-            return ((String) this.settingsJSON.get("font_name").toString());
+            return this.settingsJSON.get("font_name").toString();
         }
 
         return DEFAULT_FONT_NAME;
@@ -1186,7 +1234,7 @@ public class Settings {
     public String get_Theme() {
 
         if (this.settingsJSON.containsKey("theme")) {
-            return ((String) this.settingsJSON.get("theme").toString());
+            return this.settingsJSON.get("theme").toString();
         }
 
         return DEFAULT_THEME;
@@ -1195,11 +1243,10 @@ public class Settings {
     public String get_LookAndFell() {
 
         if (this.settingsJSON.containsKey("LookAndFell")) {
-            return ((String) this.settingsJSON.get("LookAndFell").toString());
+            return this.settingsJSON.get("LookAndFell").toString();
         }
 
         return DEFAULT_THEME;
-
 
     }
 
