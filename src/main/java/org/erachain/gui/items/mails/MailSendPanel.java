@@ -392,7 +392,7 @@ public class MailSendPanel extends IconPanel {
 
         // MESSAGES HISTORY TABLE
 
-        messagesHistoryTable = new SendTableModel();
+        messagesHistoryTable = new SendTableModel(accountFrom);
 
         messagesHistoryTable.setTableHeader(null);
         messagesHistoryTable.setEditingColumn(0);

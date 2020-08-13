@@ -49,6 +49,11 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
      */
     NavigableSet<Tuple2<Tuple2<Integer, Long>, Tuple2<Long, Integer>>> addressAssetKey;
 
+    /**
+     * Поиск по данному счету с сортировкой по Типу
+     */
+    NavigableSet<Tuple2<Tuple2<Integer, Byte>, Tuple2<Long, Integer>>> addressTypeKey;
+
     NavigableSet<Tuple2<Integer, Tuple2<Long, Integer>>> addressKey;
 
     /**
@@ -175,6 +180,16 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
                     @Override
                     public Tuple2<Integer, Long> run(Tuple2<Long, Integer> key, Transaction value) {
                         return new Tuple2<>(key.b.hashCode(), value.getAbsKey());
+                    }
+                });
+
+        this.addressTypeKey = database.createTreeSet("address_type_txs").comparator(Fun.TUPLE2_COMPARATOR)
+                .makeOrGet();
+        Bind.secondaryKey((Bind.MapWithModificationListener) map, this.addressTypeKey,
+                new Fun.Function2<Tuple2<Integer, Byte>, Tuple2<Long, Integer>, Transaction>() {
+                    @Override
+                    public Tuple2<Integer, Byte> run(Tuple2<Long, Integer> key, Transaction value) {
+                        return new Tuple2<>(key.b.hashCode(), value.getType());
                     }
                 });
 

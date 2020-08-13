@@ -8,6 +8,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
+import org.erachain.database.wallet.DWSet;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.Library;
@@ -59,8 +60,15 @@ public class SendTableModel extends JTable implements Observer {
     private ArrayList<MessageBuf> messageBufs;
     private DefaultTableModel messagesModel;
 
-    public SendTableModel() {
+    DCSet dcSet = DCSet.getInstance();
+    Wallet wallet = Controller.getInstance().wallet;
+    DWSet dwSet = wallet.database;
+    private Account accountFrom;
+
+    public SendTableModel(Account accountFrom) {
         this.setShowGrid(false);
+
+        this.accountFrom = accountFrom;
 
         fontHeight = this.getFontMetrics(this.getFont()).getHeight();
 
@@ -81,8 +89,13 @@ public class SendTableModel extends JTable implements Observer {
             }
         }
 
-        for (Account account : Controller.getInstance().getWalletAccounts()) {
-            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
+        if (accountFrom == null) {
+            for (Account account : Controller.getInstance().getWalletAccounts()) {
+                transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
+            }
+        } else {
+            transactions.addAll(
+                    dwSet.getTransactionMap().getAddressIterator().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
         }
 
         for (Transaction messagetx : transactions) {
