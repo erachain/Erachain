@@ -92,6 +92,8 @@ public class BlockChain {
      */
     public static boolean PERSON_SEND_PROTECT = true;
 
+    public static byte[] GENESIS_SIGNATURE;
+
     public static final boolean SIDE_MODE = Settings.getInstance().isSideNet();
     public static final boolean DEMO_MODE = Settings.getInstance().isDemoNet();
     public static final boolean TEST_MODE = Settings.getInstance().isTestNet();
@@ -201,6 +203,10 @@ public class BlockChain {
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = VERS_4_11;
 
+    /**
+     * Если задан то это режим синхронизации со стрым протоколом - значит нам нельза генерить блоки и трнзакции
+     * и вести себя тихо - ничего не посылать никуда - чтобы не забанили
+     */
     public static int ALL_VALID_BEFORE = DEMO_MODE ? 0 : 0;
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : 623904; //260120;
     /**
@@ -530,6 +536,12 @@ public class BlockChain {
 
                 if (chainParams.containsKey("protectSendToAnonymous")) {
                     PERSON_SEND_PROTECT = (Boolean) chainParams.get("protectSendToAnonymous");
+                }
+
+                if (chainParams.containsKey("genesisSignature")) {
+                    // нужно для синхронизации из другой ветки например если потокол сильно поменялся
+                    // используется совместно с ключем - ALL_VALID_BEFORE
+                    GENESIS_SIGNATURE = Base58.decode(chainParams.get("genesisSignature").toString());
                 }
 
 

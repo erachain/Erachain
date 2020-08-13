@@ -32,7 +32,11 @@
   // switch ON multi-level referals system. Default is true
   "referalsOn": true,
   // Set valid all transactions before the height. Defaul = 0
+  // - нужен для синхронизации со старой веткой - чтобы оттуда все скачать пассивно и не конфликтовать
   "allValidBefore": 0,
+  // genesisSignature - для присоединения к другой ветке если вдруг поменяли протокол
+  // тут поможет для синхронизации ключ "allValidBefore": 
+  "genesisSignature": "5UCQHWxpiTPBqgpATP6wJrCuApEfHsezJPvcyt1pFh96kcfeBaNDS1CCLAKd3Dd9ad3BcV3gxRvsVfk7TwWrvowD",
   // Protect from send assets from personal account to anonymous address. Default = true
   "protectSendToAnonymous": true,
   //

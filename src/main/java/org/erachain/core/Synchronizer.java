@@ -296,7 +296,7 @@ public class Synchronizer extends Thread {
                 LOGGER.debug("*** VALIDATE in FORK [" + height + "]");
 
                 // CHECK IF VALID
-                if (!block.isSignatureValid()) {
+                if (block.heightBlock > BlockChain.ALL_VALID_BEFORE && !block.isSignatureValid()) {
                     // INVALID BLOCK THROW EXCEPTION
                     String mess = "Dishonest peer by not is Valid block, height: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
@@ -312,7 +312,7 @@ public class Synchronizer extends Thread {
                     throw new Exception(mess);
                 }
 
-                if (block.isValid(fork,
+                if (block.heightBlock > BlockChain.ALL_VALID_BEFORE && block.isValid(fork,
                         true /// это же проверка в ФОРКЕ - тут нужно! Тем более что там внутри процессинг уже идет
                 ) > 0) {
                     // INVALID BLOCK THROW EXCEPTION

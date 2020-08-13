@@ -871,7 +871,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 }
 
                 // is WALLET
-                if (BlockChain.TEST_DB > 0 || ctrl.doesWalletExists()) {
+                if (BlockChain.TEST_DB > 0 || ctrl.doesWalletExists()
+                        || height < BlockChain.ALL_VALID_BEFORE) {
 
                     if (timePoint > NTP.getTime()) {
                         continue;
