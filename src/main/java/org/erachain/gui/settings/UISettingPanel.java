@@ -456,14 +456,14 @@ public class UISettingPanel extends javax.swing.JPanel {
         });
         add(buttonSelColorSel, gridBagConstraints);
 
-        gridy += 2;
+        gridy++;
         chckbxSysTrayEvent = new JCheckBox(Lang.getInstance().translate("System Tray Events and Sounds"));
         chckbxSysTrayEvent.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxSysTrayEvent.setSelected(Settings.getInstance().isSysTrayEnabled());
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(chckbxSysTrayEvent, gridBagConstraints);
 
@@ -471,7 +471,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(8, 0, 0, 0);
         add(jLabel_sounds, gridBagConstraints);
 

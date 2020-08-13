@@ -72,8 +72,8 @@ public class Settings {
     public static final String DEFAULT_THEME = "System"; //"Metal";
     private static final Integer DEFAULT_FONT_SIZE = 14;
     private static final String DEFAULT_FONT_NAME = "Arial";
-    private static final String DEFAULT_FONT_COLOR = "0,120,0";
-    private static final String DEFAULT_FONT_COLOR_SELECTED = "120,250,120";
+    private static final String DEFAULT_FONT_COLOR = "0,137,28"; //"0,120,0";
+    private static final String DEFAULT_FONT_COLOR_SELECTED = "154,255,72"; //"120,250,120";
 
 
     //RPC
