@@ -51,7 +51,7 @@ public class MailSendPanel extends IconPanel {
     // TODO - "A" - &
     final static String wrongFirstCharOfAddress = "A";
     // private final MessagesTableModel messagesTableModel;
-    private final JTable messagesHistoryTable;
+    private final SendTableModel messagesHistoryTable;
     public JTextArea txtMessage;
     public JTextField txt_Title;
     int y;
@@ -392,7 +392,14 @@ public class MailSendPanel extends IconPanel {
 
         // MESSAGES HISTORY TABLE
 
-        messagesHistoryTable = new SendTableModel(accountFrom);
+        messagesHistoryTable = new SendTableModel((Account) cbxFrom.getSelectedItem());
+
+        cbxFrom.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                messagesHistoryTable.setAccount((Account) cbxFrom.getSelectedItem());
+            }
+        });
 
         messagesHistoryTable.setTableHeader(null);
         messagesHistoryTable.setEditingColumn(0);

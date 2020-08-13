@@ -189,7 +189,7 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
                 new Fun.Function2<Tuple2<Integer, Byte>, Tuple2<Long, Integer>, Transaction>() {
                     @Override
                     public Tuple2<Integer, Byte> run(Tuple2<Long, Integer> key, Transaction value) {
-                        return new Tuple2<>(key.b.hashCode(), value.getType());
+                        return new Tuple2<>(key.b.hashCode(), (byte) ((int) value.getType()));
                     }
                 });
 
@@ -285,6 +285,25 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
                         assetKey == null ? Long.MAX_VALUE : assetKey), Fun.HI()))));
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public IteratorCloseable<Tuple2<Long, Integer>> getAddressTypeIterator(Account account, Integer typeInt, boolean descending) {
+
+        if (typeInt == null || account == null)
+            return getAddressIterator(account, descending);
+
+        Byte type = (byte) (int) typeInt;
+        if (descending)
+            return IteratorCloseableImpl.make(new IndexIterator((NavigableSet) this.addressTypeKey.descendingSet().subSet(
+                    Fun.t2(Fun.t2(account == null ? null : account.hashCode(),
+                            type == null ? Byte.MAX_VALUE : type), Fun.HI()),
+                    Fun.t2(Fun.t2(account == null ? null : account.hashCode(), type), null))));
+
+        return IteratorCloseableImpl.make(new IndexIterator((NavigableSet) this.addressTypeKey.subSet(
+                Fun.t2(Fun.t2(account == null ? null : account.hashCode(), type), null),
+                Fun.t2(Fun.t2(account == null ? null : account.hashCode(),
+                        type == null ? Byte.MAX_VALUE : type), Fun.HI()))));
+    }
+
     public List<Pair<Account, Transaction>> get(List<Account> accounts, int limit) {
         List<Pair<Account, Transaction>> transactions = new ArrayList<Pair<Account, Transaction>>();
 
@@ -293,7 +312,7 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
             synchronized (accounts) {
                 for (Account account : accounts) {
                     List<Transaction> accountTransactions = get(account, limit);
-                    for (Transaction transaction: accountTransactions) {
+                    for (Transaction transaction : accountTransactions) {
                         transactions.add(new Pair<Account, Transaction>(account, transaction));
                     }
                 }

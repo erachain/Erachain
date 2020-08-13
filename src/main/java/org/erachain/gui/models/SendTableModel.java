@@ -9,7 +9,9 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.database.wallet.DWSet;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
@@ -17,6 +19,7 @@ import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +36,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -63,63 +67,23 @@ public class SendTableModel extends JTable implements Observer {
     DCSet dcSet = DCSet.getInstance();
     Wallet wallet = Controller.getInstance().wallet;
     DWSet dwSet = wallet.database;
+    WTransactionMap tableMap = dwSet.getTransactionMap();
     private Account accountFrom;
 
     public SendTableModel(Account accountFrom) {
         this.setShowGrid(false);
 
-        this.accountFrom = accountFrom;
-
         fontHeight = this.getFontMetrics(this.getFont()).getHeight();
 
-        messageBufs = new ArrayList<MessageBuf>();
         messagesModel = new DefaultTableModel();
+        setAccount(accountFrom);
+
         this.setModel(messagesModel);
         messagesModel.addColumn("");
 
         DefaultTableCellRenderer topRenderer = new DefaultTableCellRenderer();
         topRenderer.setVerticalAlignment(DefaultTableCellRenderer.TOP);
         this.getColumn("").setCellRenderer(topRenderer);
-
-        List<Transaction> transactions = new ArrayList<Transaction>();
-
-        for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(1000, true)) {
-            if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                transactions.add(transaction);
-            }
-        }
-
-        if (accountFrom == null) {
-            for (Account account : Controller.getInstance().getWalletAccounts()) {
-                transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
-            }
-        } else {
-            transactions.addAll(
-                    dwSet.getTransactionMap().getAddressIterator().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
-        }
-
-        for (Transaction messagetx : transactions) {
-            messagetx.setDC(DCSet.getInstance(), true);
-
-            boolean is = false;
-            for (MessageBuf message : messageBufs) {
-                if (Arrays.equals(messagetx.getSignature(), message.getSignature())) {
-                    is = true;
-                    break;
-                }
-            }
-            if (!is) {
-                addMessage(messageBufs.size(), (RSend) messagetx);
-            }
-        }
-
-        Collections.sort(messageBufs, comparator);
-
-        messagesModel.setRowCount(messageBufs.size());
-        for (int j = messageBufs.size() - 1; j >= 0; j--) {
-            setHeight(j);
-        }
-
 
         //MENU
         JPopupMenu menu = new JPopupMenu();
@@ -295,7 +259,9 @@ public class SendTableModel extends JTable implements Observer {
 
     @Override
     public Object getValueAt(int row, int column) {
-        return messageBufs.get(row).getDecrMessageHtml(this.getWidth(), (this.getSelectedRow() == row), true);
+        if (row < messageBufs.size())
+            return messageBufs.get(row).getDecrMessageHtml(this.getWidth(), (this.getSelectedRow() == row), true);
+        return null;
     }
 
     @Override
@@ -365,9 +331,10 @@ public class SendTableModel extends JTable implements Observer {
     }
 
     private void addMessage(int pos, RSend transaction) {
-        if (!transaction.hasAmount()) {
+        if (true || !transaction.hasAmount()) {
             messageBufs.add(pos, new MessageBuf(
                     // TODO use viewData instead - use transaction instead buffer
+                    transaction.getTitle(),
                     transaction.getData(),
                     transaction.isEncrypted(),
                     transaction.getCreator(), //.asPerson(),
@@ -472,6 +439,7 @@ public class SendTableModel extends JTable implements Observer {
     }
 
     public class MessageBuf {
+        private String title;
         private byte[] rawMessage;
         private String decryptedMessage;
         private boolean encrypted;
@@ -487,7 +455,8 @@ public class SendTableModel extends JTable implements Observer {
         private BigDecimal fee;
         private byte[] signature;
 
-        public MessageBuf(byte[] rawMessage, boolean encrypted, PublicKeyAccount sender, Account recipient, long timestamp, BigDecimal amount, long assetKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText) {
+        public MessageBuf(String title, byte[] rawMessage, boolean encrypted, PublicKeyAccount sender, Account recipient, long timestamp, BigDecimal amount, long assetKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText) {
+            this.title = title;
             this.rawMessage = rawMessage;
             this.encrypted = encrypted;
             this.decryptedMessage = "";
@@ -773,5 +742,71 @@ public class SendTableModel extends JTable implements Observer {
         }
     }
 
+    public synchronized void setAccount(Account accountFilter) {
+
+        List<Transaction> transactions = new ArrayList<Transaction>();
+
+        if (accountFilter == null) {
+            for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(1000, true)) {
+                if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                    transactions.add(transaction);
+                }
+            }
+        } else {
+            // только на этот счет
+            for (Transaction transaction : dcSet.getTransactionFinalMap().getTransactionsByAddressAndType(
+                    accountFilter.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION,
+                    Boolean.FALSE, null, 100, 0)) {
+                transactions.add(transaction);
+            }
+        }
+
+        if (accountFilter == null) {
+            for (Account account : Controller.getInstance().getWalletAccounts()) {
+                transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
+            }
+        } else {
+            // только из кошелька
+            try (IteratorCloseable<Fun.Tuple2<Long, Integer>> iterator =
+                         tableMap.getAddressTypeIterator(accountFilter, Transaction.SEND_ASSET_TRANSACTION, true)) {
+                while (iterator.hasNext()) {
+                    transactions.add(tableMap.get(iterator.next()));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        accountFrom = accountFilter;
+        if (messageBufs == null)
+            messageBufs = new ArrayList<MessageBuf>();
+        else
+            messageBufs.clear();
+
+        for (Transaction messagetx : transactions) {
+            messagetx.setDC(DCSet.getInstance(), true);
+
+            boolean is = false;
+            for (MessageBuf message : messageBufs) {
+                if (Arrays.equals(messagetx.getSignature(), message.getSignature())) {
+                    is = true;
+                    break;
+                }
+            }
+            if (!is) {
+                addMessage(messageBufs.size(), (RSend) messagetx);
+            }
+        }
+
+        Collections.sort(messageBufs, comparator);
+
+        messagesModel.setRowCount(messageBufs.size());
+        for (int j = messageBufs.size() - 1; j >= 0; j--) {
+            setHeight(j);
+        }
+
+        this.repaint();
+
+    }
 }
 
