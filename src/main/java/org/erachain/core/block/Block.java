@@ -1719,7 +1719,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                     }
 
                     if (!isSignatureValid) {
-                        if (!transaction.isSignatureValid(dcSetPlace)) {
+                        if (!transaction.isSignatureValid(dcSetPlace)
+                                && BlockChain.ALL_VALID_BEFORE < heightBlock) {
                             //
                             LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                     + ":" + transaction.viewFullTypeName()
@@ -1753,7 +1754,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                     // так как мы в блоке такие транзакции уже проверяем то коллизию с неподтвержденными не проверяем
                     // все равно их потом удалим - иначе при откатах может случиться оказия - что и в блоке она есть и в неподтвержденных
                     if (transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION)
-                            != Transaction.VALIDATE_OK) {
+                            != Transaction.VALIDATE_OK
+                            && BlockChain.ALL_VALID_BEFORE < heightBlock) {
                         int error = transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION);
                         LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                 + ":" + transaction.viewFullTypeName()
