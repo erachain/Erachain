@@ -445,10 +445,6 @@ public class BlockChain {
     // dcSet_in = db() - for test
     public BlockChain(DCSet dcSet_in) throws Exception {
 
-        //CREATE GENESIS BLOCK
-        genesisBlock = new GenesisBlock();
-        genesisTimestamp = genesisBlock.getTimestamp();
-
         trustedPeers.addAll(Settings.getInstance().getTrustedPeers());
 
 
@@ -748,6 +744,10 @@ public class BlockChain {
 
         }
 
+        //CREATE GENESIS BLOCK
+        genesisBlock = new GenesisBlock();
+        genesisTimestamp = genesisBlock.getTimestamp();
+
         DCSet dcSet = dcSet_in;
         if (dcSet == null) {
             dcSet = DCSet.getInstance();
@@ -939,15 +939,10 @@ public class BlockChain {
     }
 
     public byte[] getMyHardCheckPointSign() {
-        byte[] mySign;
         if (CHECKPOINT.a > 1) {
             return CHECKPOINT.b;
         } else {
-            if (GENESIS_SIGNATURE == null) {
-                return genesisBlock.getSignature();
-            } else {
-                return GENESIS_SIGNATURE;
-            }
+            return genesisBlock.getSignature();
         }
     }
 

@@ -504,11 +504,7 @@ public class GenesisBlock extends Block {
         makeTransactionsRAWandHASH();
 
         // SIGN simple as HASH
-        if (BlockChain.GENESIS_SIGNATURE == null) {
-            this.signature = generateHeadHash();
-        } else {
-            this.signature = BlockChain.GENESIS_SIGNATURE;
-        }
+        this.signature = generateHeadHash();
     }
 
     // make assets
@@ -701,6 +697,10 @@ public class GenesisBlock extends Block {
     //VALIDATE
 
     public byte[] generateHeadHash() {
+        if (BlockChain.GENESIS_SIGNATURE != null) {
+            return BlockChain.GENESIS_SIGNATURE;
+        }
+
         byte[] data = new byte[0];
 
         //WRITE VERSION
