@@ -14,8 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,8 +41,8 @@ public class UISettingPanel extends javax.swing.JPanel {
     public javax.swing.JComboBox<LangFile> jComboBox_Lang;
     public javax.swing.JComboBox<String> jComboBox_Thems;
     public JCheckBox checkMarkIncome;
-    public javax.swing.JTextField markColor;
-    public javax.swing.JTextField markColorSelected;
+    public javax.swing.JTextField markColorExample;
+    public javax.swing.JTextField markColorSelectedExample;
 
     public JCheckBox chckbxSysTrayEvent;
     public JCheckBox chckbxSoundReceivePayment;
@@ -403,100 +402,75 @@ public class UISettingPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(checkMarkIncome, gridBagConstraints);
 
-        JLabel lLabel_Color = new JLabel(Lang.getInstance().translate("Color") + " (RGB):");
-        lLabel_Color.setHorizontalAlignment(SwingConstants.RIGHT);
+        gridy++;
+
+        MTable<Object, Object> table = new MTable<>(null);
+
+        markColorExample = new JTextField("  " + Lang.getInstance().translate("Example ROWS Text") + "  ");
+        markColorExample.setForeground(Settings.getInstance().markColorObj());
+        markColorExample.setBackground(table.getBackground());
+        markColorExample.setHorizontalAlignment(SwingConstants.CENTER);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(7, 0, 8, 10);
-        add(lLabel_Color, gridBagConstraints);
+        add(markColorExample, gridBagConstraints);
 
-        MTable<Object, Object> table = new MTable<>(null);
-        markColor = new JTextField("  " + Settings.getInstance().markColor() + "  ");
-        markColor.setForeground(Settings.getInstance().markColorObj());
-        markColor.setBackground(table.getBackground());
-        markColor.setHorizontalAlignment(SwingConstants.LEFT);
+        JButton buttonSelColor = new JButton(Lang.getInstance().translate("Select"));
+        buttonSelColor.setHorizontalAlignment(SwingConstants.CENTER);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(7, 0, 8, 10);
-        add(markColor, gridBagConstraints);
-        markColor.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void changedUpdate(DocumentEvent arg0) {
-                Settings.getInstance().getJSONObject().put("markcolor", markColor.getText());
-                markColor.setForeground(Settings.getInstance().markColorObj());
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent arg0) {
-                Settings.getInstance().getJSONObject().put("markcolor", markColor.getText());
-                markColor.setForeground(Settings.getInstance().markColorObj());
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent arg0) {
-                Settings.getInstance().getJSONObject().put("markcolor", markColor.getText());
-                markColor.setForeground(Settings.getInstance().markColorObj());
+        buttonSelColor.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                selectColorPanel(markColorExample, "Select ROWS Color");
             }
         });
+        add(buttonSelColor, gridBagConstraints);
 
-        JLabel lLabel_ColorS = new JLabel(Lang.getInstance().translate("Selected Color") + " (RGB):");
-        lLabel_ColorS.setHorizontalAlignment(SwingConstants.RIGHT);
+        markColorSelectedExample = new JTextField(Lang.getInstance().translate("Example SELECTED ROWS Text"));
+        markColorSelectedExample.setForeground(Settings.getInstance().markColorSelectedObj());
+        markColorSelectedExample.setBackground(table.getSelectionBackground());
+        markColorSelectedExample.setHorizontalAlignment(SwingConstants.LEFT);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(7, 0, 8, 10);
-        add(lLabel_ColorS, gridBagConstraints);
+        add(markColorSelectedExample, gridBagConstraints);
 
-        markColorSelected = new JTextField("  " + Settings.getInstance().markColorSelected() + "  ");
-        markColorSelected.setForeground(Settings.getInstance().markColorSelectedObj());
-        markColorSelected.setBackground(table.getSelectionBackground());
-        markColorSelected.setHorizontalAlignment(SwingConstants.LEFT);
+        JButton buttonSelColorSel = new JButton(Lang.getInstance().translate("Select"));
+        buttonSelColorSel.setHorizontalAlignment(SwingConstants.CENTER);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(7, 0, 8, 10);
-        add(markColorSelected, gridBagConstraints);
-        markColorSelected.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void changedUpdate(DocumentEvent arg0) {
-                Settings.getInstance().getJSONObject().put("markcolorselected", markColorSelected.getText());
-                markColorSelected.setForeground(Settings.getInstance().markColorSelectedObj());
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent arg0) {
-                Settings.getInstance().getJSONObject().put("markcolorselected", markColorSelected.getText());
-                markColorSelected.setForeground(Settings.getInstance().markColorSelectedObj());
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent arg0) {
-                Settings.getInstance().getJSONObject().put("markcolorselected", markColorSelected.getText());
-                markColorSelected.setForeground(Settings.getInstance().markColorSelectedObj());
+        buttonSelColorSel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                selectColorPanel(markColorSelectedExample, "Select SELECTED ROWS Color");
             }
         });
+        add(buttonSelColorSel, gridBagConstraints);
 
+        gridy += 2;
         chckbxSysTrayEvent = new JCheckBox(Lang.getInstance().translate("System Tray Events and Sounds"));
         chckbxSysTrayEvent.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxSysTrayEvent.setSelected(Settings.getInstance().isSysTrayEnabled());
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(chckbxSysTrayEvent, gridBagConstraints);
 
-        ++gridy;
         jLabel_sounds.setText(Lang.getInstance().translate("Sounds") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new Insets(8, 0, 0, 0);
         add(jLabel_sounds, gridBagConstraints);
@@ -565,5 +539,23 @@ public class UISettingPanel extends javax.swing.JPanel {
 
 
     }// </editor-fold>
-    // End of variables declaration                   
+    // End of variables declaration
+
+    private void selectColorPanel(JTextField paramField, String title) {
+        final JColorChooser colorChooser = new JColorChooser(paramField.getForeground());
+        AbstractColorChooserPanel[] panels = colorChooser.getChooserPanels();
+        colorChooser.removeChooserPanel(panels[0]);
+        colorChooser.removeChooserPanel(panels[1]);
+        colorChooser.removeChooserPanel(panels[4]);
+
+        JDialog dialog = JColorChooser.createDialog(paramField, Lang.getInstance().translate(title),
+                true, colorChooser,
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        paramField.setForeground(colorChooser.getColor());
+                    }
+                },
+                null);
+        dialog.setVisible(true);
+    }
 }

@@ -283,11 +283,14 @@ public class SettingsFrame extends JDialog {
         if (Settings.getInstance().markIncome() != settingsTabPane.uI_Settings_Panel.checkMarkIncome.isSelected()) {
             settingsJSONbuf.put("markincome", settingsTabPane.uI_Settings_Panel.checkMarkIncome.isSelected());
         }
-        if (Settings.getInstance().markColor() != settingsTabPane.uI_Settings_Panel.markColor.getText()) {
-            settingsJSONbuf.put("markcolor", settingsTabPane.uI_Settings_Panel.markColor.getText());
+
+        if (Settings.getInstance().markColorObj() != settingsTabPane.uI_Settings_Panel.markColorExample.getForeground()) {
+            Color color = settingsTabPane.uI_Settings_Panel.markColorExample.getForeground();
+            settingsJSONbuf.put("markcolor", color.getRed() + "," + color.getGreen() + "," + color.getBlue());
         }
-        if (Settings.getInstance().markColorSelected() != settingsTabPane.uI_Settings_Panel.markColorSelected.getText()) {
-            settingsJSONbuf.put("markcolorselected", settingsTabPane.uI_Settings_Panel.markColorSelected.getText());
+        if (Settings.getInstance().markColorSelectedObj() != settingsTabPane.uI_Settings_Panel.markColorSelectedExample.getForeground()) {
+            Color color = settingsTabPane.uI_Settings_Panel.markColorSelectedExample.getForeground();
+            settingsJSONbuf.put("markcolorselected", color.getRed() + "," + color.getGreen() + "," + color.getBlue());
         }
 
         // GUI

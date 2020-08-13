@@ -72,6 +72,9 @@ public class Settings {
     public static final String DEFAULT_THEME = "System"; //"Metal";
     private static final Integer DEFAULT_FONT_SIZE = 14;
     private static final String DEFAULT_FONT_NAME = "Arial";
+    private static final String DEFAULT_FONT_COLOR = "0,120,0";
+    private static final String DEFAULT_FONT_COLOR_SELECTED = "120,250,120";
+
 
     //RPC
     private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1"; // localhost = error in accessHandler.setWhite(Settings.getInstance().getRpcAllowed());
@@ -1113,15 +1116,16 @@ public class Settings {
         if (this.settingsJSON.containsKey("markcolor")) {
             return this.settingsJSON.get("markcolor").toString();
         }
-        return "0,120,0";
+        return DEFAULT_FONT_COLOR;
     }
 
     public Color markColorObj() {
-        String[] rgb = markColor().split(",");
         try {
+            String[] rgb = markColor().split(",");
             return new Color(new Integer(rgb[0].trim()), new Integer(rgb[1].trim()), new Integer(rgb[2].trim()));
         } catch (Exception e) {
-            return null;
+            String[] rgb = DEFAULT_FONT_COLOR.split(",");
+            return new Color(new Integer(rgb[0].trim()), new Integer(rgb[1].trim()), new Integer(rgb[2].trim()));
         }
     }
 
@@ -1129,15 +1133,16 @@ public class Settings {
         if (this.settingsJSON.containsKey("markcolorselected")) {
             return this.settingsJSON.get("markcolorselected").toString();
         }
-        return "120,250,120";
+        return DEFAULT_FONT_COLOR_SELECTED;
     }
 
     public Color markColorSelectedObj() {
-        String[] rgb = markColorSelected().split(",");
         try {
+            String[] rgb = markColorSelected().split(",");
             return new Color(new Integer(rgb[0].trim()), new Integer(rgb[1].trim()), new Integer(rgb[2].trim()));
         } catch (Exception e) {
-            return null;
+            String[] rgb = DEFAULT_FONT_COLOR_SELECTED.split(",");
+            return new Color(new Integer(rgb[0].trim()), new Integer(rgb[1].trim()), new Integer(rgb[2].trim()));
         }
     }
 
