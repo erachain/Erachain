@@ -32,7 +32,7 @@ public class Gui extends JFrame {
 
     private Gui() throws Exception {
 
-        setGuiLookAndFeel("");
+        setGuiLookAndFeel();
 
         if (Settings.getInstance().Dump().containsKey("lang")) {
             File langFile = new File(Settings.getInstance().getLangDir(), Settings.getInstance().getLangFileName());
@@ -43,7 +43,7 @@ public class Gui extends JFrame {
             new SettingLangFrame();
         }
 
-        setGuiLookAndFeel("");
+        setGuiLookAndFeel();
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().noUseWallet && !Controller.getInstance().doesWalletExists()) {
