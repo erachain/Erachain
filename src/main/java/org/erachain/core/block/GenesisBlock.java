@@ -504,7 +504,12 @@ public class GenesisBlock extends Block {
         makeTransactionsRAWandHASH();
 
         // SIGN simple as HASH
-        this.signature = generateHeadHash();
+        if (BlockChain.GENESIS_SIGNATURE == null) {
+            this.signature = generateHeadHash();
+        } else {
+            this.signature = BlockChain.GENESIS_SIGNATURE;
+        }
+
     }
 
     // make assets
@@ -697,9 +702,6 @@ public class GenesisBlock extends Block {
     //VALIDATE
 
     public byte[] generateHeadHash() {
-        if (BlockChain.GENESIS_SIGNATURE != null) {
-            return BlockChain.GENESIS_SIGNATURE;
-        }
 
         byte[] data = new byte[0];
 
@@ -751,7 +753,10 @@ public class GenesisBlock extends Block {
 
         //VALIDATE BLOCK SIGNATURE
         byte[] digest = generateHeadHash();
-        if (!Arrays.equals(digest, this.signature)) {
+        if (!Arrays.equals(digest,
+                // TODO - как защитить свой оригинальныЙ? Если задан наш оригинальный - то его и берем
+                BlockChain.GENESIS_SIGNATURE_TRUE == null ?
+                        this.signature : BlockChain.GENESIS_SIGNATURE_TRUE)) {
             return false;
         }
 

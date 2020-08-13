@@ -36,7 +36,11 @@
   "allValidBefore": 0,
   // genesisSignature - для присоединения к другой ветке если вдруг поменяли протокол
   // тут поможет для синхронизации ключ "allValidBefore": 
-  "genesisSignature": "5UCQHWxpiTPBqgpATP6wJrCuApEfHsezJPvcyt1pFh96kcfeBaNDS1CCLAKd3Dd9ad3BcV3gxRvsVfk7TwWrvowD",
+  //"genesisSignature": [
+  // подпись блока из старой ветки
+  //  "5UCQHWxpiTPBqgpATP6wJrCuApEfHsezJPvcyt1pFh96kcfeBaNDS1CCLAKd3Dd9ad3BcV3gxRvsVfk7TwWrvowD",
+  //  подпись моего блока в новой ветке - для защиты от подмен
+  //    "trueSignature.."],
   // Protect from send assets from personal account to anonymous address. Default = true
   "protectSendToAnonymous": true,
   //

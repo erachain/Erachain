@@ -88,11 +88,19 @@ public class BlockChain {
     public static final byte[] START_PEER = null; //new byte[]{(byte)138, (byte)197, (byte)135, (byte)122};
 
     /**
-     * Защита от платжей с удостоверенного на анонима
+     * Защита от платежей с удостоверенного на анонима
      */
     public static boolean PERSON_SEND_PROTECT = true;
 
+    /**
+     * Подмена реального на чужой - для синхронизации из старой ветки
+     */
     public static byte[] GENESIS_SIGNATURE;
+    /**
+     * Мой реальный блок - что защиты от подмены
+     */
+    public static byte[] GENESIS_SIGNATURE_TRUE;
+
 
     public static final boolean SIDE_MODE = Settings.getInstance().isSideNet();
     public static final boolean DEMO_MODE = Settings.getInstance().isDemoNet();
@@ -537,7 +545,9 @@ public class BlockChain {
                 if (chainParams.containsKey("genesisSignature")) {
                     // нужно для синхронизации из другой ветки например если потокол сильно поменялся
                     // используется совместно с ключем - ALL_VALID_BEFORE
-                    GENESIS_SIGNATURE = Base58.decode(chainParams.get("genesisSignature").toString());
+                    JSONArray array = (JSONArray) chainParams.get("genesisSignature");
+                    GENESIS_SIGNATURE = Base58.decode(array.get(0).toString());
+                    GENESIS_SIGNATURE_TRUE = Base58.decode(array.get(1).toString());
                 }
 
 
