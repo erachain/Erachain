@@ -120,7 +120,7 @@ public class SettingsFrame extends JDialog {
 
         this.add(btnCancel, gbc_btnCancel);
         //AS
-        JButton btnDefaultSettings = new JButton(Lang.getInstance().translate("Default settings"));
+        JButton btnDefaultSettings = new JButton(Lang.getInstance().translate("Default Settings"));
         GridBagConstraints gbc_btnDefaultSettings = new GridBagConstraints();
         gbc_btnDefaultSettings.fill = GridBagConstraints.NONE;
         gbc_btnDefaultSettings.anchor = GridBagConstraints.WEST;
@@ -147,8 +147,8 @@ public class SettingsFrame extends JDialog {
                 Settings.freeInstance();
 
                 JOptionPane.showMessageDialog(
-                        new JFrame(), Lang.getInstance().translate("You need to restart the application for the changes to take effect."),
-                        Lang.getInstance().translate("Attention!"),
+                        new JFrame(), Lang.getInstance().translate("You need to restart the application for the changes to take effect"),
+                        Lang.getInstance().translate("Attention") + "!",
                         JOptionPane.WARNING_MESSAGE);
 
                 settingsTabPane.close();
