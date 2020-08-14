@@ -24,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Base64;
 
 @Path("assets")
 @Produces(MediaType.APPLICATION_JSON)
@@ -196,8 +197,8 @@ public class ItemAssetsResource {
         String creatorStr = (String) jsonObject.getOrDefault("creator", null);
         String name = (String) jsonObject.getOrDefault("name", null);
         String description = (String) jsonObject.getOrDefault("description", null);
-        String iconStr = (String) jsonObject.getOrDefault("icon", null);
-        byte[] =icon
+        String iconStr = (String) jsonObject.getOrDefault("icon64", null);
+        byte[] icon = Base64.getDecoder().decode(iconStr);
         String imageStr = (String) jsonObject.getOrDefault("image", null);
 
         int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());

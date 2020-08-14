@@ -3,6 +3,7 @@ package org.erachain.core.item;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import org.apache.commons.net.util.Base64;
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -16,6 +17,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.gui.Iconable;
+import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -754,4 +756,38 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
 
     }
 
+    static public Object decodeJson(JSONObject jsonObject) {
+        if (jsonObject == null)
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+
+        String creatorStr = (String) jsonObject.getOrDefault("creator", null);
+        String name = (String) jsonObject.getOrDefault("name", null);
+        String description = (String) jsonObject.getOrDefault("description", null);
+        String iconStr = (String) jsonObject.getOrDefault("icon64", null);
+        byte[] icon = java.util.Base64.getDecoder().decode(iconStr);
+        String imageStr = (String) jsonObject.getOrDefault("image", null);
+
+        int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
+
+        int error;
+        String errorMessage;
+        Controller cntr = Controller.getInstance();
+
+        Account creator = null;
+        if (creatorStr == null) {
+            error = Transaction.INVALID_CREATOR);
+            errorMessage = OnDealClick.resultMess(error);
+            return new Fun.Tuple2<>(error, errorMessage);
+        } else {
+            Fun.Tuple2<Account, String> resultCreator = Account.tryMakeAccount(creatorStr);
+            if (resultCreator.a == null) {
+                out.put("error", Transaction.INVALID_CREATOR);
+                out.put("error_message", resultCreator.b);
+                return out.toJSONString();
+            }
+            creator = resultCreator.a;
+        }
+
+        return new Tuple6<>();
+    }
 }
