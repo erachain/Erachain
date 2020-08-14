@@ -176,7 +176,7 @@ public class ItemAssetsResource {
 
     @POST
     @Path("/issue")
-    public String issueAsset(String x) {
+    public String issue(String x) {
 
         Controller cntr = Controller.getInstance();
         Object result = cntr.issueAsset(request, x);
