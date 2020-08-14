@@ -1,6 +1,7 @@
 package org.erachain.database.wallet;
 
 import com.google.common.primitives.UnsignedBytes;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.mapdb.BTreeKeySerializer;
@@ -58,6 +59,22 @@ public class AccountSeedMap {
         synchronized (this.privateKeyAccounts) {
             for (PrivateKeyAccount privateKeyAccount : this.privateKeyAccounts) {
                 if (privateKeyAccount.getAddress().equals(address)) {
+                    return privateKeyAccount;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public PrivateKeyAccount getPrivateKeyAccount(Account account) {
+        if (this.privateKeyAccounts == null) {
+            this.loadPrivateKeyAccounts();
+        }
+
+        synchronized (this.privateKeyAccounts) {
+            for (PrivateKeyAccount privateKeyAccount : this.privateKeyAccounts) {
+                if (privateKeyAccount.equals(account)) {
                     return privateKeyAccount;
                 }
             }

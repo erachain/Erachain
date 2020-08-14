@@ -3,6 +3,7 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -18,9 +19,11 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
+import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -1318,6 +1321,55 @@ public abstract class Transaction implements ExplorerJsonLine {
         transaction.put("raw", Base58.encode(this.toBytes(FOR_NETWORK, isSigned)));
 
         return transaction;
+    }
+
+    /**
+     * for RPC
+     *
+     * @param jsonObject
+     * @return
+     */
+    static public Object decodeJson(String x) {
+
+        JSONObject out = new JSONObject();
+        JSONObject jsonObject;
+        int error;
+        try {
+            //READ JSON
+            jsonObject = (JSONObject) JSONValue.parse(x);
+        } catch (NullPointerException | ClassCastException e) {
+            error = ApiErrorFactory.ERROR_JSON;
+            out.put("error", error);
+            out.put("error_message", OnDealClick.resultMess(error));
+            return out;
+        }
+
+        if (jsonObject == null) {
+            error = ApiErrorFactory.ERROR_JSON;
+            out.put("error", error);
+            out.put("error_message", OnDealClick.resultMess(error));
+            return out;
+        }
+
+        String creatorStr = (String) jsonObject.getOrDefault("creator", null);
+
+        Account creator = null;
+        if (creatorStr == null) {
+            error = Transaction.INVALID_CREATOR;
+            return new Fun.Tuple2<>(error, OnDealClick.resultMess(error));
+        } else {
+            Fun.Tuple2<Account, String> resultCreator = Account.tryMakeAccount(creatorStr);
+            if (resultCreator.a == null) {
+                return new Fun.Tuple2<>(Transaction.INVALID_CREATOR, resultCreator.b);
+            }
+            creator = resultCreator.a;
+        }
+
+        int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
+        String password = (String) jsonObject.getOrDefault("password", null);
+
+        return new Fun.Tuple4(jsonObject, creator, feePow, password);
+
     }
 
     public void sign(PrivateKeyAccount creator, int forDeal) {
