@@ -10,11 +10,17 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.utils.APIUtils;
+import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -22,7 +28,12 @@ import java.math.BigDecimal;
 @Path("assets")
 @Produces(MediaType.APPLICATION_JSON)
 @Slf4j
+
 public class ItemAssetsResource {
+
+    @Context
+    HttpServletRequest request;
+
     /**
      * Get all asset type 1
      *
@@ -163,6 +174,82 @@ public class ItemAssetsResource {
         }
 
         return out.toJSONString();
+    }
+
+    @POST
+    @Path("/issue")
+    public String issueAsset(String x) {
+
+        JSONObject jsonObject;
+        try {
+            //READ JSON
+            jsonObject = (JSONObject) JSONValue.parse(x);
+        } catch (NullPointerException | ClassCastException e) {
+            //JSON EXCEPTION
+            ///logger.error(e.getMessage());
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+        }
+
+        if (jsonObject == null)
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+
+        String creatorStr = (String) jsonObject.getOrDefault("creator", null);
+        String name = (String) jsonObject.getOrDefault("name", null);
+        String description = (String) jsonObject.getOrDefault("description", null);
+        String iconStr = (String) jsonObject.getOrDefault("icon", null);
+        byte[] =icon
+        String imageStr = (String) jsonObject.getOrDefault("image", null);
+
+        int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
+        long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0l).toString());
+        BigDecimal amount = new BigDecimal(jsonObject.getOrDefault("amount", 0).toString());
+        String title = (String) jsonObject.getOrDefault("title", null);
+        int encoding = Integer.valueOf(jsonObject.getOrDefault("encoding", 0).toString());
+        boolean encrypt = Boolean.valueOf((boolean) jsonObject.getOrDefault("encrypt", false));
+        String password = (String) jsonObject.getOrDefault("password", null);
+
+        APIUtils.askAPICallAllowed(password, "GET send\n ", request, true);
+
+        JSONObject out = new JSONObject();
+        Controller cntr = Controller.getInstance();
+
+        Account creator = null;
+        if (creatorStr == null) {
+            out.put("error", Transaction.INVALID_CREATOR);
+            out.put("error_message", OnDealClick.resultMess(Transaction.INVALID_CREATOR));
+            return out.toJSONString();
+        } else {
+            Fun.Tuple2<Account, String> resultCreator = Account.tryMakeAccount(creatorStr);
+            if (resultCreator.a == null) {
+                out.put("error", Transaction.INVALID_CREATOR);
+                out.put("error_message", resultCreator.b);
+                return out.toJSONString();
+            }
+            creator = resultCreator.a;
+        }
+
+        boolean needAmount = false;
+        Pair<Integer, Transaction> result = cntr.issueAsset(creator, name, description, feePowStr,
+                assetKey, true,
+                amount, needAmount,
+                title, message, encoding, encrypt, 0);
+
+        Transaction transaction = result.getB();
+        if (transaction == null) {
+            out.put("error", result.getA());
+            out.put("error_message", OnDealClick.resultMess(result.getA()));
+            return out.toJSONString();
+        }
+
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        if (validate == Transaction.VALIDATE_OK)
+            return transaction.toJson().toJSONString();
+        else {
+            out.put("error", validate);
+            out.put("error_message", OnDealClick.resultMess(validate));
+            return out.toJSONString();
+        }
     }
 
 }
