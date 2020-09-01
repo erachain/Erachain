@@ -44,7 +44,7 @@ public class APIItemPerson {
                 "Get Status data for Person Key. JSON ARRAY format: [timeFrom, timeTo, [par1, par2, str1, str2, reference, description], block, txNo]");
 
         help.put("GET {key}", "GET by ID");
-        help.put("GET filter/{filter_name_string}", "GET by Name Filter");
+        help.put("GET find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apiperson/image/{key}", "GET Person Image");
         help.put("Get apiperson/icon/{key}", "GET Person Icon");
 
@@ -162,8 +162,8 @@ public class APIItemPerson {
     }
 
     @GET
-    @Path("filter/{filter_name_string}")
-    public Response filter(@PathParam("filter_name_string") String filter) {
+    @Path("find/{filter_name_string}")
+    public Response find(@PathParam("filter_name_string") String filter) {
 
         if (filter == null || filter.length() < 3) {
             return Response.status(501)

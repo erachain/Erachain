@@ -40,7 +40,7 @@ public class APIItemTemplate {
         Map<String, String> help = new LinkedHashMap<>();
 
         help.put("GET {key}", "GET by ID");
-        help.put("GET filter/{filter_name_string}", "GET by Name Filter");
+        help.put("GET find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apitemplate/image/{key}", "GET Template Image");
         help.put("Get apitemplate/icon/{key}", "GET Template Icon");
 
@@ -68,8 +68,8 @@ public class APIItemTemplate {
     }
 
     @GET
-    @Path("filter/{filter_name_string}")
-    public Response filter(@PathParam("filter_name_string") String filter) {
+    @Path("find/{filter_name_string}")
+    public Response find(@PathParam("filter_name_string") String filter) {
 
         if (filter == null || filter.length() < 3) {
             return Response.status(501)

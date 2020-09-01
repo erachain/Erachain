@@ -42,7 +42,7 @@ public class APIItemPoll {
         help.put("apipoll/allPoll", "Get all poll.");
 
         help.put("GET {key}", "GET by ID");
-        help.put("GET filter/{filter_name_string}", "GET by Name Filter");
+        help.put("GET find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apipoll/image/{key}", "GET Poll Image");
         help.put("Get apipoll/icon/{key}", "GET Poll Icon");
 
@@ -90,8 +90,8 @@ public class APIItemPoll {
     }
 
     @GET
-    @Path("filter/{filter_name_string}")
-    public Response filter(@PathParam("filter_name_string") String filter) {
+    @Path("find/{filter_name_string}")
+    public Response find(@PathParam("filter_name_string") String filter) {
 
         if (filter == null || filter.length() < 3) {
             return Response.status(501)
