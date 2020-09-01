@@ -84,36 +84,6 @@ public class RecResource {
                     //return RSignNote.Parse(data, releaserReference);
                     break;
 
-                case Transaction.REGISTER_NAME_TRANSACTION:
-
-                    //PARSE REGISTER NAME TRANSACTION
-                    //return RegisterNameTransaction.Parse(data);
-                    break;
-
-                case Transaction.UPDATE_NAME_TRANSACTION:
-
-                    //PARSE UPDATE NAME TRANSACTION
-                    //return UpdateNameTransaction.Parse(data);
-                    break;
-
-                case Transaction.SELL_NAME_TRANSACTION:
-
-                    //PARSE SELL NAME TRANSACTION
-                    //return SellNameTransaction.Parse(data);
-                    break;
-
-                case Transaction.CANCEL_SELL_NAME_TRANSACTION:
-
-                    //PARSE CANCEL SELL NAME TRANSACTION
-                    //return CancelSellNameTransaction.Parse(data);
-                    break;
-
-                case Transaction.BUY_NAME_TRANSACTION:
-
-                    //PARSE CANCEL SELL NAME TRANSACTION
-                    //return BuyNameTransaction.Parse(data);
-                    break;
-
                 case Transaction.CREATE_POLL_TRANSACTION:
 
                     //PARSE CREATE POLL TRANSACTION

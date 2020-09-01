@@ -32,15 +32,12 @@ public class ApiService extends Observable {
         s.add(WalletResource.class);
         s.add(RSendResource.class);
         s.add(RecPaymentResource.class);
-        s.add(NamesResource.class);
-        s.add(NameSalesResource.class);
         s.add(ArbitraryTransactionsResource.class);
-        s.add(NamePaymentResource.class);
         s.add(ATResource.class);
         s.add(BlogPostResource.class);
         s.add(BlogResource.class);
         //s.add(CalcFeeResource.class);
-        s.add(NameStorageResource.class);
+
         //	s.add(Rec_MessageResource.class);
         s.add(RecResource.class);
         s.add(RecHashesResource.class);

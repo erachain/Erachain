@@ -22,8 +22,6 @@ import org.erachain.core.item.templates.Template;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.Union;
 import org.erachain.core.item.unions.UnionCls;
-import org.erachain.core.naming.Name;
-import org.erachain.core.naming.NameSale;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
@@ -171,102 +169,6 @@ public class TransactionCreator {
     public long getReference(PublicKeyAccount creator) {
         this.checkUpdate();
         return 0l;
-    }
-
-    public Pair<Transaction, Integer> createNameRegistration(PrivateKeyAccount creator, Name name, int feePow) {
-        //CHECK FOR UPDATES
-        this.checkUpdate();
-
-        //TIME
-        long time = NTP.getTime();
-
-        //CREATE NAME REGISTRATION
-        RegisterNameTransaction nameRegistration = new RegisterNameTransaction(creator, name, (byte) feePow, time, 0l);
-        nameRegistration.sign(creator, Transaction.FOR_NETWORK);
-        nameRegistration.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
-
-        //VALIDATE AND PROCESS
-        return new Pair<Transaction, Integer>(nameRegistration, this.afterCreate(nameRegistration, Transaction.FOR_NETWORK));
-    }
-
-    public Pair<Transaction, Integer> createNameUpdate(PrivateKeyAccount creator, Name name, int feePow) {
-        //CHECK FOR UPDATES
-        this.checkUpdate();
-
-        //TIME
-        long time = NTP.getTime();
-
-        //CREATE NAME UPDATE
-        UpdateNameTransaction nameUpdate = new UpdateNameTransaction(creator, name, (byte) feePow, time, 0l);
-        nameUpdate.sign(creator, Transaction.FOR_NETWORK);
-        nameUpdate.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
-
-        //VALIDATE AND PROCESS
-        return new Pair<Transaction, Integer>(nameUpdate, this.afterCreate(nameUpdate, Transaction.FOR_NETWORK));
-    }
-
-    public Pair<Transaction, Integer> createNameSale(PrivateKeyAccount creator, NameSale nameSale, int feePow) {
-        //CHECK FOR UPDATES
-        this.checkUpdate();
-
-        //TIME
-        long time = NTP.getTime();
-
-        //CREATE NAME SALE
-        SellNameTransaction nameSaleTransaction = new SellNameTransaction(creator, nameSale, (byte) feePow, time, 0l);
-        nameSaleTransaction.sign(creator, Transaction.FOR_NETWORK);
-        nameSaleTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
-
-        //VALIDATE AND PROCESS
-        return new Pair<Transaction, Integer>(nameSaleTransaction, this.afterCreate(nameSaleTransaction, Transaction.FOR_NETWORK));
-    }
-
-    public Pair<Transaction, Integer> createCancelNameSale(PrivateKeyAccount creator, NameSale nameSale, int feePow) {
-        //CHECK FOR UPDATES
-        this.checkUpdate();
-
-        //TIME
-        long time = NTP.getTime();
-
-        //CREATE CANCEL NAME SALE
-        CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(creator, nameSale.getKey(), (byte) feePow, time, 0l);
-        cancelNameSaleTransaction.sign(creator, Transaction.FOR_NETWORK);
-        cancelNameSaleTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
-
-        //VALIDATE AND PROCESS
-        return new Pair<Transaction, Integer>(cancelNameSaleTransaction, this.afterCreate(cancelNameSaleTransaction, Transaction.FOR_NETWORK));
-    }
-
-    public Pair<Transaction, Integer> createNamePurchase(PrivateKeyAccount creator, NameSale nameSale, int feePow) {
-        //CHECK FOR UPDATES
-        this.checkUpdate();
-
-        //TIME
-        long time = NTP.getTime();
-
-        //CREATE NAME PURCHASE
-        BuyNameTransaction namePurchase = new BuyNameTransaction(creator, nameSale, nameSale.getName().getOwner(), (byte) feePow, time, 0l);
-        namePurchase.sign(creator, Transaction.FOR_NETWORK);
-        namePurchase.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
-
-        //VALIDATE AND PROCESS
-        return new Pair<Transaction, Integer>(namePurchase, this.afterCreate(namePurchase, Transaction.FOR_NETWORK));
-    }
-
-    public Transaction createIssuePollRecord(PrivateKeyAccount creator, PollCls poll, int feePow) {
-        //CHECK FOR UPDATES
-        this.checkUpdate();
-
-        //TIME
-        long time = NTP.getTime();
-
-        //CREATE POLL CREATION
-        IssuePollRecord pollCreation = new IssuePollRecord(creator, poll, (byte) feePow, time, 0l);
-        pollCreation.sign(creator, Transaction.FOR_NETWORK);
-        pollCreation.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
-
-        return pollCreation;
-
     }
 
     public Transaction createPollCreation(PrivateKeyAccount creator, Poll poll, int feePow) {

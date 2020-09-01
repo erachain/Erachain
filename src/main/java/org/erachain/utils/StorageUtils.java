@@ -4,7 +4,6 @@ import com.google.common.base.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.naming.Name;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.NameStorageMap;
@@ -99,7 +98,8 @@ public class StorageUtils {
             if (list == null || !ByteArrayUtils.contains(list, signature)) {
                 if (name != null) {
 
-                    Name nameObj = db.getNameMap().get(name);
+                    /*
+                    Name nameObj = null; //db.getNameMap().get(name);
 
                     if (nameObj == null) {
 
@@ -117,6 +117,8 @@ public class StorageUtils {
                             return;
                         }
                     }
+
+                     */
 
 
                     NameStorageMap nameStorageMap = db

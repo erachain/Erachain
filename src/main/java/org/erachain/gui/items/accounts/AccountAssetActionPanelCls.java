@@ -24,9 +24,6 @@ import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
-import org.erachain.utils.NameUtils;
-import org.erachain.utils.NameUtils.NameResult;
-import org.erachain.utils.Pair;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -358,18 +355,11 @@ public class AccountAssetActionPanelCls extends IconPanel {
             if (PublicKeyAccount.isValidPublicKey(recipientAddress)) {
                 recipient = new PublicKeyAccount(recipientAddress);
             } else {
-                //IS IS NAME of RECIPIENT - resolve ADDRESS
-                Pair<Account, NameResult> result = NameUtils.nameToAdress(recipientAddress);
+                JOptionPane.showMessageDialog(null, "INVALID", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
-                if (result.getB() == NameResult.OK) {
-                    recipient = result.getA();
-                } else {
-                    JOptionPane.showMessageDialog(null, result.getB().getShortStatusMessage(), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-
-                    //ENABLE
-                    this.jButton_ok.setEnabled(true);
-                    return false;
-                }
+                //ENABLE
+                this.jButton_ok.setEnabled(true);
+                return false;
             }
         }
 

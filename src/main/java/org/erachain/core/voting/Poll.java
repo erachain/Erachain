@@ -5,7 +5,6 @@ import com.google.common.primitives.Ints;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
-import org.erachain.datachain.DCSet;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -108,7 +107,7 @@ public class Poll {
     }
 
     public boolean isConfirmed() {
-        return DCSet.getInstance().getPollMap().contains(this);
+        return true;
     }
 
     public boolean hasVotes() {

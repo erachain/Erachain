@@ -1,6 +1,6 @@
 package org.erachain.webserver.wrapper;
 
-import org.erachain.core.naming.Name;
+import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.utils.NumberAsString;
 
@@ -16,10 +16,10 @@ public class WebName {
     private final String owner;
     private final String namebalanceString;
 
-    public WebName(Name name) {
-        this.name = name.getName();
-        this.owner = name.getOwner().getAddress();
-        namebalanceString = NumberAsString.formatAsString(name.getOwner().getConfBalance3(0, Transaction.FEE_KEY).a) + " - " + name.getName();
+    public WebName(Account name) {
+        this.name = name.getAddress();
+        this.owner = name.getAddress();
+        namebalanceString = NumberAsString.formatAsString(name.getConfBalance3(0, Transaction.FEE_KEY).a) + " - " + name.getName();
     }
 
     public String getName() {

@@ -293,11 +293,6 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int CALCULATED_TRANSACTION = 100;
 
     // old
-    public static final int REGISTER_NAME_TRANSACTION = 6 + 130;
-    public static final int UPDATE_NAME_TRANSACTION = 7 + 130;
-    public static final int SELL_NAME_TRANSACTION = 8 + 130;
-    public static final int CANCEL_SELL_NAME_TRANSACTION = 9 + 130;
-    public static final int BUY_NAME_TRANSACTION = 10 + 130;
     public static final int ARBITRARY_TRANSACTION = 12 + 130;
     public static final int MULTI_PAYMENT_TRANSACTION = 13 + 130;
     public static final int DEPLOY_AT_TRANSACTION = 14 + 130;
@@ -1847,7 +1842,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (signature == null) {
             return getClass().getName() + ":" + viewFullTypeName();
         }
-        return getClass().getName() + ":" + viewFullTypeName() + Base58.encode(signature);
+        return getClass().getName() + ":" + viewFullTypeName() + ":" + Base58.encode(signature);
     }
 
 }

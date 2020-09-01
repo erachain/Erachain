@@ -6,15 +6,15 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * old create poll from QORA
@@ -207,6 +207,11 @@ public class CreatePollTransaction extends Transaction {
             data = Bytes.concat(data, this.signature);
 
         if (forDeal == FOR_DB_RECORD) {
+            // WRITE DBREF
+            byte[] dbRefBytes = Longs.toByteArray(this.dbRef);
+            dbRefBytes = Bytes.ensureCapacity(dbRefBytes, TIMESTAMP_LENGTH, 0);
+            data = Bytes.concat(data, dbRefBytes);
+
             // WRITE FEE
             byte[] feeBytes = Longs.toByteArray(this.fee.unscaledValue().longValue());
             data = Bytes.concat(data, feeBytes);
@@ -252,61 +257,6 @@ public class CreatePollTransaction extends Transaction {
         if (this.height > BlockChain.ITEM_POLL_FROM)
             return INVALID_TRANSACTION_TYPE;
 
-        //CHECK POLL NAME LENGTH
-        int nameLength = this.poll.getName().getBytes(StandardCharsets.UTF_8).length;
-        if (nameLength > 400 || nameLength < 1) {
-            return INVALID_NAME_LENGTH_MAX;
-        }
-
-        //CHECK POLL NAME LOWERCASE
-        if (!this.poll.getName().equals(this.poll.getName().toLowerCase())) {
-            return NAME_NOT_LOWER_CASE;
-        }
-
-        //CHECK POLL DESCRIPTION LENGTH
-        int descriptionLength = this.poll.getDescription().getBytes(StandardCharsets.UTF_8).length;
-        if (descriptionLength > BlockChain.MAX_REC_DATA_BYTES || descriptionLength < 1) {
-            return INVALID_DESCRIPTION_LENGTH_MAX;
-        }
-
-        //CHECK POLL DOES NOT EXIST ALREADY
-        if (this.dcSet.getPollMap().contains(this.poll)) {
-            return POLL_ALREADY_CREATED;
-        }
-
-        //CHECK IF POLL DOES NOT CONTAIN ANY VOTERS
-        if (this.poll.hasVotes()) {
-            return POLL_ALREADY_HAS_VOTES;
-        }
-
-        //CHECK POLL CREATOR VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(this.poll.getCreator().getAddressBytes())) {
-            return INVALID_ADDRESS;
-        }
-
-        //CHECK OPTIONS LENGTH
-        int optionsLength = poll.getOptions().size();
-        if (optionsLength > 100 || optionsLength < 1) {
-            return INVALID_OPTIONS_LENGTH;
-        }
-
-        //CHECK OPTIONS
-        List<String> options = new ArrayList<String>();
-        for (PollOption option : this.poll.getOptions()) {
-            //CHECK OPTION LENGTH
-            int optionLength = option.getName().getBytes(StandardCharsets.UTF_8).length;
-            if (optionLength > 400 || optionLength < 1) {
-                return INVALID_OPTION_LENGTH;
-            }
-
-            //CHECK OPTION UNIQUE
-            if (options.contains(option.getName())) {
-                return DUPLICATE_OPTION;
-            }
-
-            options.add(option.getName());
-        }
-
         return super.isValid(forDeal, flags);
     }
 
@@ -319,8 +269,6 @@ public class CreatePollTransaction extends Transaction {
         //UPDATE CREATOR
         super.process(block, forDeal);
 
-        //INSERT INTO DATABASE
-        this.dcSet.getPollMap().add(this.poll);
     }
 
 
@@ -331,8 +279,6 @@ public class CreatePollTransaction extends Transaction {
         //UPDATE CREATOR
         super.orphan(block, forDeal);
 
-        //DELETE FROM DATABASE
-        this.dcSet.getPollMap().delete(this.poll);
     }
 
 

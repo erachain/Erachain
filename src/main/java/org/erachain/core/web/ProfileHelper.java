@@ -1,7 +1,6 @@
 package org.erachain.core.web;
 
-import org.erachain.controller.Controller;
-import org.erachain.core.naming.Name;
+import org.erachain.core.account.Account;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -35,12 +34,13 @@ public class ProfileHelper {
         }
 
         if (currentProfile != null) {
-            Name name = currentProfile.getName();
+            Account name = currentProfile.getName();
             // RELOADING CURRENT VALUES
-            Profile profile = Profile.getProfileOpt(name);
+            Profile profile = Profile.getProfileOpt(name.getAddress());
             // PROFILE STILL ENABLED AND DO I OWN IT?
             if (profile != null && profile.isProfileEnabled()
-                    && Controller.getInstance().getName(name.getName()) != null) {
+                //&& Controller.getInstance().getName(name.getName()) != null
+            ) {
                 currentProfile = profile;
             } else {
                 currentProfile = null;
@@ -53,9 +53,10 @@ public class ProfileHelper {
     public void switchProfileOpt(String profileString) {
 
         if (profileString != null) {
-            Name name = Controller.getInstance().getName(profileString);
-            if (name != null && Controller.getInstance().getWalletNamesAsList().contains(name)) {
-                Profile profile = Profile.getProfileOpt(name);
+            Account name = new Account(profileString); //Controller.getInstance().getName(profileString);
+            if (name != null // && Controller.getInstance().getWalletNamesAsList().contains(name)
+            ) {
+                Profile profile = Profile.getProfileOpt(profileString);
                 if (profile != null && profile.isProfileEnabled()) {
                     currentProfile = profile;
                 }
