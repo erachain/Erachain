@@ -1312,7 +1312,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         
         // наращивание всех данных для скелета - так же необходимо для создания ключей tags
         if (parent == null && !transaction.isWiped()) {
-            transaction.setupFromStateDB();
+            transaction.updateFromStateDB();
         }
 
         return transaction;

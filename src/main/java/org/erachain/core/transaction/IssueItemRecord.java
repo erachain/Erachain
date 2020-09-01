@@ -87,10 +87,13 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     /**
      * нельзя вызывать для Форка и для isWIPED
      */
-    public void setupFromStateDB() {
-        if ((key == null || key == 0)
-                && this.dbRef > 0 // это не неподтвержденная транзакция
-        ) {
+    public void updateFromStateDB() {
+        if (this.dbRef == 0) {
+            // неподтвержденная транзакция не может быть обновлена
+            return;
+        }
+
+        if (key == null || key == 0) {
             // эта транзакция взята как скелет из набора блока
             // найдем сохраненную транзакцию - в ней есь Номер Сути
             IssueItemRecord issueItemRecord = (IssueItemRecord) dcSet.getTransactionFinalMap().get(this.dbRef);

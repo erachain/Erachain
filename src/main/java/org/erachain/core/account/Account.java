@@ -922,7 +922,7 @@ public class Account {
         for (int i = 1; i < confirmations && block != null && block.getVersion() > 0; i++) {
             for (Transaction transaction : block.getTransactions()) {
 
-                transaction.setDC(db, true); // need for Involved
+                transaction.setDC(db); // need for Involved
 
                 if (transaction.isInvolved(this)) {
                     if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {

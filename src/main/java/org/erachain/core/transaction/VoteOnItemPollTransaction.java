@@ -86,13 +86,13 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         return this.poll;
     }
 
-    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andSetup) {
+    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
         super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
 
         this.poll = (PollCls) this.dcSet.getItemPollMap().get(this.key);
 
-        if (false && andSetup && !isWiped())
-            setupFromStateDB();
+        if (false && andUpdateFromState && !isWiped())
+            updateFromStateDB();
     }
 
     public int getOption() {

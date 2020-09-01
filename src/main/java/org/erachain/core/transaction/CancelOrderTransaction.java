@@ -71,7 +71,7 @@ public class CancelOrderTransaction extends Transaction {
 
     //GETTERS/SETTERS
 
-    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andSetup) {
+    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
         super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
 
         Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
@@ -84,8 +84,8 @@ public class CancelOrderTransaction extends Transaction {
         }
         this.orderID = createDBRef;
 
-        if (false && andSetup && !isWiped())
-            setupFromStateDB();
+        if (false && andUpdateFromState && !isWiped())
+            updateFromStateDB();
 
     }
 

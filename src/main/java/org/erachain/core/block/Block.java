@@ -1183,7 +1183,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         JSONArray transactionsArray = new JSONArray();
 
         for (Transaction transaction : this.getTransactions()) {
-            transaction.setDC(dcSet, true);
+            transaction.setDC(dcSet);
             transactionsArray.add(transaction.toJson());
         }
 
@@ -1747,7 +1747,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                         return INVALID_BLOCK_VERSION;
                     }
 
-                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo, false);
+                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                     //CHECK IF VALID
                     // так как мы в блоке такие транзакции уже проверяем то коллизию с неподтвержденными не проверяем
@@ -1780,7 +1780,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 } else {
 
-                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo, false);
+                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                     //UPDATE REFERENCE OF SENDER
                     transaction.getCreator().setLastTimestamp(
@@ -2293,8 +2293,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                 //logger.debug("[" + seqNo + "] record is process" );
 
                 // NEED set DC for WIPED too
-                transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, seqNo,
-                        false); // здесь ще нет ничего в базе данных - нечего наращивать
+                // здесь ще нет ничего в базе данных - нечего наращивать
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                 //PROCESS
                 if (transaction.isWiped()
