@@ -124,6 +124,8 @@ public class CreatePollTransaction extends Transaction {
         long feeLong = 0;
         long seqNo = 0;
         if (forDeal == FOR_DB_RECORD) {
+            position += SIGNATURE_LENGTH;
+
             //READ SEQ_NO
             byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             seqNo = Longs.fromByteArray(seqNoBytes);
