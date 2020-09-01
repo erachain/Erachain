@@ -1214,6 +1214,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
                     key = iterator.next();
                     item = this.map.get(key);
+                    if (item == null) {
+                        String keyStr = Transaction.viewDBRef(key);
+                        boolean debug = true;
+                    }
                     if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
                         RCalculated tx = (RCalculated) item;
                         String mess = tx.getMessage();

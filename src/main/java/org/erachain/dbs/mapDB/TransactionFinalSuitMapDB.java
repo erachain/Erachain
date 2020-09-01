@@ -6,6 +6,7 @@ import com.google.common.collect.*;
 import com.google.common.primitives.SignedBytes;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
@@ -536,6 +537,45 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                                                 Fun.t2(addressKey, Long.MAX_VALUE)).iterator()));
 
         return result;
+    }
+
+    @Override
+    public boolean set(Long key, Transaction transaction) {
+        if (BlockChain.CHECK_BUGS > 3 && key > Transaction.parseDBRef("63998-0")) {
+            boolean debug = true;
+        }
+        boolean result = super.set(key, transaction);
+        if (true) {
+            Transaction tx = super.get(key);
+            // !!! нужно отключать КЭШ для этого
+            if (!Arrays.equals(tx.toBytes(Transaction.FOR_DB_RECORD, true),
+                    transaction.toBytes(Transaction.FOR_DB_RECORD, true))) {
+                boolean debug = true;
+            }
+
+        }
+        return result;
+    }
+
+    @Override
+    public void put(Long key, Transaction transaction) {
+        if (BlockChain.CHECK_BUGS > 3 && key > Transaction.parseDBRef("63998-0")) {
+            boolean debug = true;
+        }
+        if (transaction.getType() != Transaction.CALCULATED_TRANSACTION) {
+            super.put(key, transaction);
+            logger.info(Transaction.viewDBRef(key) + ": " + transaction.toString());
+            if (true) {
+                Transaction tx = super.get(key);
+                // !!! нужно отключать КЭШ для этого
+                if (!Arrays.equals(tx.toBytes(Transaction.FOR_DB_RECORD, true),
+                        transaction.toBytes(Transaction.FOR_DB_RECORD, true))) {
+                    boolean debug = false;
+                }
+            }
+        } else {
+            super.put(key, transaction);
+        }
     }
 
 }
