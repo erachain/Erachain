@@ -8,12 +8,14 @@ package org.erachain.webserver;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.ItemAssetsResource;
 import org.erachain.controller.Controller;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONArray;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -23,6 +25,7 @@ import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 //import com.google.gson.Gson;
@@ -45,11 +48,63 @@ public class APIItemAsset {
         help.put("GET apiasset/balances/[assetKey]?position=POS&offset=OFFSET&limit=LIMIT",
                 "Get balances for assetKey sorted by Own Amount. Balance positions: 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other. Default: POS=1. Balance A - total debit. Balance B - final amount.");
 
+        help.put("GET {key}", "GET by ID");
+        help.put("GET filter/{filter_name_string}", "GET by Name Filter");
         help.put("Get image/{key}", "GET Asset Image");
         help.put("Get icon/{key}", "GET Asset Icon");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
+    }
+
+    @GET
+    @Path("{key}")
+    public Response item(@PathParam("key") long key) {
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+
+        ItemCls item = map.get(key);
+        if (item == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(item.toJson()))
+                .build();
+
+    }
+
+    @GET
+    @Path("filter/{filter_name_string}")
+    public Response filter(@PathParam("filter_name_string") String filter) {
+
+        if (filter == null || filter.length() < 3) {
+            return Response.status(501)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity("error - so small filter length")
+                    .build();
+        }
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
+
+        JSONArray array = new JSONArray();
+
+        if (list != null) {
+            for (ItemCls item : list) {
+                array.add(item.toJson());
+            }
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(array))
+                .build();
+
     }
 
     @Path("image/{key}")

@@ -7,11 +7,13 @@ package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemStatusMap;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONArray;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -24,6 +26,7 @@ import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 //import com.google.gson.Gson;
@@ -43,11 +46,63 @@ public class APIItemStatus {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
+        help.put("GET {key}", "GET by ID");
+        help.put("GET filter/{filter_name_string}", "GET by Name Filter");
         help.put("Get apistatus/image/{key}", "GET Status Image");
         help.put("Get apistatus/icon/{key}", "GET Status Icon");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
+    }
+
+    @GET
+    @Path("{key}")
+    public Response item(@PathParam("key") long key) {
+
+        ItemStatusMap map = DCSet.getInstance().getItemStatusMap();
+
+        ItemCls item = map.get(key);
+        if (item == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_STATUS_NOT_EXIST);
+        }
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(item.toJson()))
+                .build();
+
+    }
+
+    @GET
+    @Path("filter/{filter_name_string}")
+    public Response filter(@PathParam("filter_name_string") String filter) {
+
+        if (filter == null || filter.length() < 3) {
+            return Response.status(501)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity("error - so small filter length")
+                    .build();
+        }
+
+        ItemStatusMap map = DCSet.getInstance().getItemStatusMap();
+        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
+
+        JSONArray array = new JSONArray();
+
+        if (list != null) {
+            for (ItemCls item : list) {
+                array.add(item.toJson());
+            }
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(array))
+                .build();
+
     }
 
     @Path("image/{key}")

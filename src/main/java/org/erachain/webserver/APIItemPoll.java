@@ -11,7 +11,10 @@ import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -37,8 +40,9 @@ public class APIItemPoll {
         Map<String, String> help = new LinkedHashMap<>();
 
         help.put("apipoll/allPoll", "Get all poll.");
-        help.put("apipoll/getPoll", "Get single poll by name.");
 
+        help.put("GET {key}", "GET by ID");
+        help.put("GET filter/{filter_name_string}", "GET by Name Filter");
         help.put("Get apipoll/image/{key}", "GET Poll Image");
         help.put("Get apipoll/icon/{key}", "GET Poll Icon");
 
@@ -66,25 +70,54 @@ public class APIItemPoll {
                 .entity(array.toJSONString()).build();
     }
 
-    /**
-     * Find poll by name
-     *
-     * @param name is name poll
-     * @return poll in JSON
-     */
     @GET
-    @Path("getPoll")
-    public Response getPoll(@QueryParam("name") String name) {
-        List<ItemCls> listPolls = DCSet.getInstance().getItemPollMap().getByFilterAsArray(name, 0, 100);
+    @Path("{key}")
+    public Response item(@PathParam("key") long key) {
 
-        //CHECK IF NAME EXISTS
-        if (listPolls == null || listPolls.isEmpty()) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.POLL_NOT_EXISTS);
+        ItemPollMap map = DCSet.getInstance().getItemPollMap();
+
+        ItemCls item = map.get(key);
+        if (item == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_POLL_NOT_EXIST);
+        }
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(item.toJson()))
+                .build();
+
+    }
+
+    @GET
+    @Path("filter/{filter_name_string}")
+    public Response filter(@PathParam("filter_name_string") String filter) {
+
+        if (filter == null || filter.length() < 3) {
+            return Response.status(501)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity("error - so small filter length")
+                    .build();
         }
 
-        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+        ItemPollMap map = DCSet.getInstance().getItemPollMap();
+        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
+
+        JSONArray array = new JSONArray();
+
+        if (list != null) {
+            for (ItemCls item : list) {
+                array.add(item.toJson());
+            }
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(listPolls.get(0).toJson().toJSONString()).build();
+                .entity(StrJSonFine.convert(array))
+                .build();
+
     }
 
     @Path("image/{key}")
