@@ -540,29 +540,12 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     }
 
     @Override
-    public boolean set(Long key, Transaction transaction) {
-        if (BlockChain.CHECK_BUGS > 3 && key > Transaction.parseDBRef("63998-0")) {
-            boolean debug = true;
-        }
-        boolean result = super.set(key, transaction);
-        if (true) {
-            Transaction tx = super.get(key);
-            // !!! нужно отключать КЭШ для этого
-            if (!Arrays.equals(tx.toBytes(Transaction.FOR_DB_RECORD, true),
-                    transaction.toBytes(Transaction.FOR_DB_RECORD, true))) {
-                boolean debug = true;
-            }
-
-        }
-        return result;
-    }
-
-    @Override
     public void put(Long key, Transaction transaction) {
+        boolean debug = false;
         if (BlockChain.CHECK_BUGS > 3 && key > Transaction.parseDBRef("63998-0")) {
-            boolean debug = true;
+            debug = true;
         }
-        if (transaction.getType() != Transaction.CALCULATED_TRANSACTION) {
+        if (debug && transaction.getType() != Transaction.CALCULATED_TRANSACTION) {
             super.put(key, transaction);
             logger.info(Transaction.viewDBRef(key) + ": " + transaction.toString());
             if (true) {
@@ -570,7 +553,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                 // !!! нужно отключать КЭШ для этого
                 if (!Arrays.equals(tx.toBytes(Transaction.FOR_DB_RECORD, true),
                         transaction.toBytes(Transaction.FOR_DB_RECORD, true))) {
-                    boolean debug = false;
+                    debug = true;
                 }
             }
         } else {

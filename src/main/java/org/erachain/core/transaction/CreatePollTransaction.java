@@ -210,7 +210,6 @@ public class CreatePollTransaction extends Transaction {
         if (forDeal == FOR_DB_RECORD) {
             // WRITE DBREF
             byte[] dbRefBytes = Longs.toByteArray(this.dbRef);
-            dbRefBytes = Bytes.ensureCapacity(dbRefBytes, TIMESTAMP_LENGTH, 0);
             data = Bytes.concat(data, dbRefBytes);
 
             // WRITE FEE

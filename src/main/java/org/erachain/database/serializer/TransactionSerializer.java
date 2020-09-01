@@ -3,9 +3,9 @@ package org.erachain.database.serializer;
 
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.mapdb.Serializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -18,13 +18,8 @@ public class TransactionSerializer implements Serializer<Transaction>, Serializa
 
     @Override
     public void serialize(DataOutput out, Transaction value) throws IOException {
-        if (true) {
-            out.writeInt(value.getDataLength(Transaction.FOR_DB_RECORD, true));
-            out.write(value.toBytes(Transaction.FOR_DB_RECORD, true));
-        } else {
-            out.writeInt(value.getDataLength(Transaction.FOR_NETWORK, true));
-            out.write(value.toBytes(Transaction.FOR_NETWORK, true));
-        }
+        out.writeInt(value.getDataLength(Transaction.FOR_DB_RECORD, true));
+        out.write(value.toBytes(Transaction.FOR_DB_RECORD, true));
     }
 
     @Override
@@ -33,11 +28,7 @@ public class TransactionSerializer implements Serializer<Transaction>, Serializa
         byte[] bytes = new byte[length];
         in.readFully(bytes);
         try {
-            if (true) {
-                return TransactionFactory.getInstance().parse(bytes, Transaction.FOR_DB_RECORD);
-            } else {
-                return TransactionFactory.getInstance().parse(bytes, Transaction.FOR_NETWORK);
-            }
+            return TransactionFactory.getInstance().parse(bytes, Transaction.FOR_DB_RECORD);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

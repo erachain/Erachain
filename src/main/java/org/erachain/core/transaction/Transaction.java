@@ -1372,7 +1372,6 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (forDeal > FOR_MYPACK) {
             // WRITE TIMESTAMP
             byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-            timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
             data = Bytes.concat(data, timestampBytes);
         }
 
@@ -1380,7 +1379,6 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (this.reference != null) {
             // NULL in imprints
             byte[] referenceBytes = Longs.toByteArray(this.reference);
-            referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
             data = Bytes.concat(data, referenceBytes);
         }
 
@@ -1401,7 +1399,6 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (forDeal == FOR_DB_RECORD) {
             // WRITE DBREF
             byte[] dbRefBytes = Longs.toByteArray(this.dbRef);
-            dbRefBytes = Bytes.ensureCapacity(dbRefBytes, TIMESTAMP_LENGTH, 0);
             data = Bytes.concat(data, dbRefBytes);
 
             // WRITE FEE
