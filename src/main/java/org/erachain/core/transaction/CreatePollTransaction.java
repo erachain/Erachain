@@ -136,6 +136,7 @@ public class CreatePollTransaction extends Transaction {
         }
 
         return new CreatePollTransaction(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
+
     }
 
     public Poll getPoll() {

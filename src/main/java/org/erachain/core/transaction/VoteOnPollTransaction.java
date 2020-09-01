@@ -320,7 +320,7 @@ public class VoteOnPollTransaction extends Transaction {
     public long calcBaseFee() {
 
         // TODO delete IT
-        if (this.getBlockHeightByParentOrLast(this.dcSet) > TODO_h1)
+        if (height > TODO_h1)
             return calcCommonFee();
         return 0;
     }
