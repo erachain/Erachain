@@ -253,7 +253,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                 reference, signatureBytes, seqNo, feeLong);
     }
 
-    public void setDC(DCSet dcSet, boolean andSetup) {
+    public void setDC(DCSet dcSet, boolean andUpdateFromState) {
 
         super.setDC(dcSet, false);
 
@@ -262,8 +262,8 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
         }
 
-        if (false && andSetup && !isWiped())
-            setupFromStateDB();
+        if (false && andUpdateFromState && !isWiped())
+            updateFromStateDB();
 
     }
 

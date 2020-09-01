@@ -578,9 +578,14 @@ public abstract class Transaction implements ExplorerJsonLine {
         this.seqNo = seqNo;
     }
 
-    // NEED FOR DB SECONDATY KEYS
-    // see org.mapdb.Bind.secondaryKeys
-    public void setDC(DCSet dcSet, boolean andSetup) {
+    /**
+     * NEED FOR DB SECONDATY KEYS see org.mapdb.Bind.secondaryKeys
+     *
+     * @param dcSet
+     * @param andUpdateFromState если нужно нарастить мясо на скелет из базв Финал. Не нужно для неподтвержденных
+     *                           и если ее нет в базе еще. Используется только для вычисления номера Сущности для отображения Выпускающих трнзакций - после их обработки, например в Блокэксплоере чтобы посмотреть какой актив был этой трнзакцией выпущен.
+     */
+    public void setDC(DCSet dcSet, boolean andUpdateFromState) {
         this.dcSet = dcSet;
 
         if (BlockChain.TEST_DB == 0 && creator != null) {
@@ -590,8 +595,12 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
         }
 
-        if (andSetup && !isWiped())
-            setupFromStateDB();
+        if (andUpdateFromState && !isWiped())
+            updateFromStateDB();
+    }
+
+    public void setDC(DCSet dcSet) {
+        setDC(dcSet, false);
     }
 
     /**
@@ -599,9 +608,10 @@ public abstract class Transaction implements ExplorerJsonLine {
      * @param forDeal
      * @param blockHeight
      * @param seqNo
-     * @param andSetup    - если нужно нарастить мясо на скелет из базв Финал. Не нужно для неподтвержденных и если ее нет в базе еще
+     * @param andUpdateFromState если нужно нарастить мясо на скелет из базв Финал. Не нужно для неподтвержденных
+     *                           и если ее нет в базе еще. Используется только для вычисления номера Сущности для отображения Выпускающих трнзакций - после их обработки, например в Блокэксплоере чтобы посмотреть какой актив был этой трнзакцией выпущен.
      */
-    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andSetup) {
+    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
         setDC(dcSet, false);
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
         this.seqNo = seqNo;
@@ -609,14 +619,18 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (forDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
             this.calcFee();
 
-        if (andSetup && !isWiped())
-            setupFromStateDB();
+        if (andUpdateFromState && !isWiped())
+            updateFromStateDB();
+    }
+
+    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo) {
+        setDC(dcSet, forDeal, blockHeight, seqNo, false);
     }
 
     /**
      * Нарастить мясо на скелет из базы состояния - нужно например для созданим вторичных ключей и Номер Сущности
      */
-    public void setupFromStateDB() {
+    public void updateFromStateDB() {
     }
 
     public boolean noDCSet() {

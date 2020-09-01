@@ -920,7 +920,7 @@ public class TradeResource {
 
                             Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
                             // CLEAR for HEAP
-                            transaction.setDC(null, false);
+                            transaction.resetDCSet();
 
                             // CHECK VALIDATE MESSAGE
                             if (result == Transaction.VALIDATE_OK) {

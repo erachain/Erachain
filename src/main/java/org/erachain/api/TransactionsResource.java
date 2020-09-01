@@ -205,7 +205,7 @@ public class TransactionsResource {
         DCSet dcSet = DCSet.getInstance();
 
         for (Transaction record : dcSet.getTransactionTab().getIncomedTransactions(address, type, from, count, descending)) {
-            record.setDC(dcSet, false);
+            record.setDC(dcSet);
             array.add(record.toJson());
         }
 
@@ -509,7 +509,7 @@ public class TransactionsResource {
                 key = (Long) iterator.next();
                 Fun.Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
                 transaction = map.get(key);
-                transaction.setDC(dcSet, Transaction.FOR_NETWORK, pair.a, pair.b, true);
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, pair.a, pair.b);
                 array.add(transaction.toJson());
             }
 
@@ -620,7 +620,7 @@ public class TransactionsResource {
             // FOR ALL ACCOUNTS
             synchronized (accounts) {
                 for (Account account : accounts) {
-                    transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+                    transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
                     // CHECK IF INVOLVED
                     if (!account.equals(transaction.getCreator()) && transaction.isInvolved(account)) {
                         array.add(transaction.toJson());
@@ -659,12 +659,12 @@ public class TransactionsResource {
 
         int seqNo = 0;
         for (Transaction transaction : block.getTransactions()) {
-            transaction.setDC(dcSet, true);
+            transaction.setDC(dcSet);
             // TODO: тут наверное поиск быстрее по HsahSet будет
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             for (Account recipient : recipients) {
                 if (recipient.equals(address)) {
-                    transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+                    transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
                     array.add(transaction.toJson());
                     break;
                 }
@@ -709,7 +709,7 @@ public class TransactionsResource {
 
         int seqNo = 0;
         for (Transaction transaction : block.getTransactions()) {
-            transaction.setDC(dcSet, true);
+            transaction.setDC(dcSet, false);
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             for (Account recipient : recipients) {
                 if (recipient.equals(address)) {
