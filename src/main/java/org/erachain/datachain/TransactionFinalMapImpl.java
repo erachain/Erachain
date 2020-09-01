@@ -10,6 +10,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.ArbitraryTransaction;
+import org.erachain.core.transaction.GenesisRecord;
 import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.*;
@@ -1312,8 +1313,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (transaction == null)
             return null;
 
-        transaction.setDC((DCSet) databaseSet, true);
-        
+        if (transaction instanceof GenesisRecord) {
+            Tuple2<Integer, Integer> seqNo = Transaction.parseDBRef(key);
+            transaction.setDC((DCSet) databaseSet, Transaction.FOR_PACK, seqNo.a, seqNo.b);
+        } else {
+            transaction.setDC((DCSet) databaseSet);
+        }
+
         // наращивание всех данных для скелета - так же необходимо для создания ключей tags
         if (parent == null && !transaction.isWiped()) {
             transaction.updateFromStateDB();
