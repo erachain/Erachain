@@ -74,6 +74,7 @@ public class WalletTelegramsFilterTableModel extends WalletTableModel<Transactio
                     } else {
                         message = "decode error";
                     }
+                    return message;
                 } else {
                     return rSend.viewData();
                 }

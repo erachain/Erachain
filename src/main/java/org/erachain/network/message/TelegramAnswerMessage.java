@@ -133,9 +133,11 @@ public class TelegramAnswerMessage extends Message {
     }
 
     public void saveToWallet(){
-        for (Transaction trans:telegransList){
-            Controller.getInstance().wallet.database.getTelegramsMap().add(trans.viewSignature(), trans);
-            
+        for (Transaction transaction : telegransList) {
+            Controller.getInstance().wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
+            if (!Controller.getInstance().wallet.accountExists(transaction.getCreator())) {
+                Controller.getInstance().addAddressFavorite(transaction.getCreator().getAddress(), "telegram", transaction.getTitle());
+            }
         }
     }
 

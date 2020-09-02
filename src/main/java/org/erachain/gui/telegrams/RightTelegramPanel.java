@@ -352,30 +352,27 @@ public class RightTelegramPanel extends javax.swing.JPanel {
                 }
             }
 
-            if (false) {
-                byte[] dataMess = Controller.getInstance().decrypt(rSend.getCreator(), rSend.getRecipient(), rSend.getData());
+            byte[] dataMess = Controller.getInstance().decrypt(rSend.getCreator(), rSend.getRecipient(), rSend.getData());
 
-                String message;
+            String message;
 
-                if (dataMess != null) {
-                    if (rSend.isText()) {
-                        try {
-                            message = new String(dataMess, "UTF-8");
-                        } catch (UnsupportedEncodingException e) {
-                            message = "error UTF-8";
-                        }
-                    } else {
-                        message = Base58.encode(dataMess);
+            if (dataMess != null) {
+                if (rSend.isText()) {
+                    try {
+                        message = new String(dataMess, "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        message = "error UTF-8";
                     }
                 } else {
-                    message = "decode error";
+                    message = Base58.encode(dataMess);
                 }
-
-                walletTelegramsFilterTableModel.setValueAt(message, row, walletTelegramsFilterTableModel.COLUMN_MESSAGE);
-                walletTelegramsFilterTableModel.fireTableCellUpdated(row, walletTelegramsFilterTableModel.COLUMN_MESSAGE);
             } else {
-                walletTelegramsFilterTableModel.fireTableDataChanged();
+                message = "decode error";
             }
+
+            walletTelegramsFilterTableModel.setValueAt(message, row, walletTelegramsFilterTableModel.COLUMN_MESSAGE);
+            //walletTelegramsFilterTableModel.fireTableCellUpdated(row, walletTelegramsFilterTableModel.COLUMN_MESSAGE);
+            walletTelegramsFilterTableModel.fireTableDataChanged();
         }
 
     }

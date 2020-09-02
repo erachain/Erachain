@@ -586,14 +586,13 @@ public class TelegramManager extends Thread {
                 if (Controller.getInstance().wallet.accountExists(transaction.getCreator())) {
                     // add as my OUTCOME
                     Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, transaction);
-                    Controller.getInstance().addAddressFavorite(transaction.getCreator().getAddress(), "telegram", transaction.getTitle());
                 } else {
                     // TRY ADD as my INCOME
                     HashSet<Account> recipients = transaction.getRecipientAccounts();
                     for (Account recipient : recipients) {
                         if (Controller.getInstance().wallet.accountExists(recipient)) {
                             Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, transaction);
-                            Controller.getInstance().addAddressFavorite(recipient.getAddress(), "telegram", transaction.getTitle());
+                            Controller.getInstance().addAddressFavorite(transaction.getCreator().getAddress(), "telegram", transaction.getTitle());
                             break;
                         }
                     }
