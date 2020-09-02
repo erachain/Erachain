@@ -2,6 +2,7 @@ package org.erachain.core.web;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.payment.Payment;
 import org.erachain.utils.*;
@@ -58,7 +59,7 @@ public class Profile {
     }
 
     public static List<Profile> getEnabledProfiles() {
-        List<Account> namesAsList = null; //Controller.getInstance().getWalletNamesAsList();
+        List<Account> namesAsList = Controller.getInstance().getWalletAccounts();
         List<Profile> results = new ArrayList<Profile>();
         for (Account name : namesAsList) {
             Profile profile = Profile.getProfileOpt(name);
