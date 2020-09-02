@@ -96,7 +96,7 @@ public class BlogUtils {
         List<BlogProfile> blogprofiles = new ArrayList<>();
         for (Profile profileWithBlog : resultProfiles) {
 
-            String name = profileWithBlog.getName().getName();
+            String name = profileWithBlog.getName().getAddress();
             if (followMap.containsKey(name)) {
                 blogprofiles.add(new BlogProfile(profileWithBlog, followMap
                         .get(name)));
@@ -442,7 +442,7 @@ public class BlogUtils {
             Profile profileOpt = Profile.getProfileOpt(blognameOpt);
 
             if (profileOpt != null) {
-                String blogowner = profileOpt.getName().getOwner().getAddress();
+                String blogowner = profileOpt.getName().getAddress();
                 //are we the owner of the blog?
                 if (Controller.getInstance().getWalletAccountByAddress(blogowner) != null) {
                     creator = blogowner;

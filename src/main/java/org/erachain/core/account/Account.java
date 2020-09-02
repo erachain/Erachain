@@ -21,10 +21,7 @@ import org.erachain.datachain.OrderMapImpl;
 import org.erachain.datachain.ReferenceMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
-import org.erachain.utils.NameUtils;
-import org.erachain.utils.NameUtils.NameResult;
 import org.erachain.utils.NumberAsString;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -126,14 +123,7 @@ public class Account {
                 return new Tuple2<Account, String>(null, "Wrong Address or PublicKey");
             }
         } else {
-            // IT IS NAME - resolve ADDRESS
-            Pair<Account, NameResult> result = NameUtils.nameToAdress(address);
-
-            if (result.getB() == NameResult.OK) {
-                return new Tuple2<Account, String>(result.getA(), null);
-            } else {
-                return new Tuple2<Account, String>(null, "The name is not registered");
-            }
+            return new Tuple2<Account, String>(null, "The name is not registered");
         }
 
     }
@@ -224,15 +214,7 @@ public class Account {
             if (PublicKeyAccount.isValidPublicKey(address)) {
                 account = new PublicKeyAccount(address);
             } else {
-
-                Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(address);
-
-                if (nameToAdress.getB() == NameResult.OK) {
-                    account = nameToAdress.getA();
-                    return (statusBad ? "??? " : "") + account.toString(assetKey);
-                } else {
-                    return (statusBad ? "??? " : "") + nameToAdress.getB().getShortStatusMessage();
-                }
+                return (statusBad ? "??? " : "") + "ERROR";
             }
         }
 

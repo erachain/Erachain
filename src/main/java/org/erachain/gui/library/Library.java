@@ -472,42 +472,6 @@ public class Library {
 
             jsonString = ((RSignNote) trans).toJson().toJSONString();
             break;
-            
-        case Transaction.REGISTER_NAME_TRANSACTION:
-
-            jsonString = ((RegisterNameTransaction) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.UPDATE_NAME_TRANSACTION:
-
-            jsonString = ((UpdateNameTransaction) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.SELL_NAME_TRANSACTION:
-
-            jsonString = ((SellNameTransaction) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.CANCEL_SELL_NAME_TRANSACTION:
-
-            jsonString = ((CancelSellNameTransaction) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.BUY_NAME_TRANSACTION:
-
-            jsonString = ((BuyNameTransaction) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.CREATE_POLL_TRANSACTION:
-
-            jsonString = ((CreatePollTransaction) trans).toJson().toJSONString();
-
-            break;
-
-        case Transaction.VOTE_ON_POLL_TRANSACTION:
-
-            jsonString = ((VoteOnPollTransaction) trans).toJson().toJSONString();
-            break;
 
         case Transaction.VOTE_ON_ITEM_POLL_TRANSACTION:
 

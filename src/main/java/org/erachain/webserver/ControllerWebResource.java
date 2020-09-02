@@ -2,7 +2,6 @@ package org.erachain.webserver;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.naming.Name;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.webserver.wrapper.WebAccount;
 import org.erachain.webserver.wrapper.WebName;
@@ -31,11 +30,11 @@ public class ControllerWebResource {
     // we need to use string because of pebble here instead of boolean
     public List<WebName> getNames(String removeZeroBalance) {
         List<WebName> results = new ArrayList<>();
-        List<Name> myNames = new ArrayList<Name>(Controller.getInstance()
-                .getWalletNamesAsList());
-        for (Name name : myNames) {
+        List<Account> myNames = new ArrayList<Account>(Controller.getInstance()
+                .getWalletAccounts());
+        for (Account name : myNames) {
             if (Boolean.valueOf(removeZeroBalance)) {
-                if (name.getOwner().getConfBalance3(0, Transaction.FEE_KEY).a.compareTo(BigDecimal.ZERO) > 0) {
+                if (name.getConfBalance3(0, Transaction.FEE_KEY).a.compareTo(BigDecimal.ZERO) > 0) {
                     results.add(new WebName(name));
                 }
 

@@ -1,20 +1,19 @@
 package org.erachain.core.web.blog;
 
-import org.erachain.core.naming.Name;
-import org.erachain.core.web.Profile;
-import org.erachain.datachain.DCSet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+import org.erachain.core.account.Account;
+import org.erachain.core.web.Profile;
 import org.erachain.utils.BlogUtils;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.LinkUtils;
 import org.erachain.utils.Pair;
 import org.erachain.webserver.WebResource;
+import org.json.simple.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -106,7 +105,7 @@ public class BlogEntry {
 
     private void addAvatar() {
         if (nameOpt != null) {
-            Name name = DCSet.getInstance().getNameMap().get(nameOpt);
+            Account name = new Account(nameOpt);
             Profile profile = Profile.getProfileOpt(name);
             if (profile != null) {
                 String avatarOpt = profile.getAvatarOpt();

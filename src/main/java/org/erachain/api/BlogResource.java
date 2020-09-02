@@ -2,16 +2,13 @@ package org.erachain.api;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.naming.Name;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.web.Profile;
 import org.erachain.core.web.blog.BlogEntry;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.NameMap;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.erachain.utils.BlogUtils;
 import org.erachain.webserver.WebResource;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -37,6 +34,7 @@ public class BlogResource {
         if (blogname.equals("Erachain.org")) {
             blogname = null;
         } else {
+            /*
             NameMap nameMap = DCSet.getInstance().getNameMap();
             Name name = nameMap.get(blogname);
 
@@ -51,6 +49,8 @@ public class BlogResource {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_BLOG_DISABLED);
             }
+
+             */
         }
 
         List<byte[]> txlist = DCSet.getInstance().getBlogPostMap()
@@ -106,6 +106,7 @@ public class BlogResource {
         if (blogname.equals("Erachain.org")) {
             blogname = null;
         } else {
+            /*
             NameMap nameMap = DCSet.getInstance().getNameMap();
             Name name = nameMap.get(blogname);
 
@@ -120,6 +121,8 @@ public class BlogResource {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_BLOG_DISABLED);
             }
+
+             */
         }
 
         List<BlogEntry> blogPosts = BlogUtils.getBlogPosts(blogname, limit);
@@ -162,6 +165,7 @@ public class BlogResource {
         if (blogname.equals("Erachain.org")) {
             blogname = null;
         } else {
+            /*
             NameMap nameMap = DCSet.getInstance().getNameMap();
             Name name = nameMap.get(blogname);
 
@@ -176,6 +180,8 @@ public class BlogResource {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_BLOG_DISABLED);
             }
+
+             */
         }
 
         List<byte[]> txlist = DCSet.getInstance().getBlogPostMap()

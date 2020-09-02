@@ -3,9 +3,9 @@ package org.erachain.api;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.StringUtil;
 import org.erachain.controller.Controller;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.core.naming.Name;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.Profile;
 import org.erachain.core.web.blog.BlogEntry;
@@ -216,11 +216,11 @@ public class BlogPostResource {
             }
 
             if (authorOpt != null) {
-                Name name = DCSet.getInstance().getNameMap().get(authorOpt);
+                Account name = new Account(authorOpt);
 
                 // Name is not owned by creator!
                 if (name == null
-                        || !name.getOwner().getAddress().equals(creator)) {
+                        || !name.getAddress().equals(creator)) {
                     throw ApiErrorFactory.getInstance().createError(
                             ApiErrorFactory.ERROR_NAME_NOT_OWNER);
                 }
@@ -330,11 +330,11 @@ public class BlogPostResource {
             }
 
             if (authorOpt != null) {
-                Name name = DCSet.getInstance().getNameMap().get(authorOpt);
+                Account name = null; //DCSet.getInstance().getNameMap().get(authorOpt);
 
                 // Name is not owned by creator!
                 if (name == null
-                        || !name.getOwner().getAddress().equals(creator)) {
+                        || !name.getAddress().equals(creator)) {
                     throw ApiErrorFactory.getInstance().createError(
                             ApiErrorFactory.ERROR_NAME_NOT_OWNER);
                 }

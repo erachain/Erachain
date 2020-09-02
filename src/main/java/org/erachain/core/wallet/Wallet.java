@@ -14,10 +14,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.Order;
-import org.erachain.core.naming.Name;
-import org.erachain.core.naming.NameSale;
 import org.erachain.core.transaction.*;
-import org.erachain.core.voting.Poll;
 import org.erachain.database.wallet.AccountMap;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
@@ -305,59 +302,6 @@ public class Wallet extends Observable /*implements Observer*/ {
 		return this.database.getBlocksHeadMap().get(account, limit);
 	}
 
-	public List<Pair<Account, Name>> getNames() {
-		if (!this.exists()) {
-			return new ArrayList<Pair<Account, Name>>();
-		}
-
-		List<Account> accounts = this.getAccounts();
-		return this.database.getNameMap().get(accounts);
-	}
-
-	public List<Name> getNames(Account account) {
-		if (!this.exists()) {
-			return new ArrayList<Name>();
-		}
-
-		return this.database.getNameMap().get(account);
-	}
-
-	public List<Pair<Account, NameSale>> getNameSales() {
-		if (!this.exists()) {
-			return new ArrayList<Pair<Account, NameSale>>();
-		}
-
-		List<Account> accounts = this.getAccounts();
-		return this.database.getNameSaleMap().get(accounts);
-	}
-
-	public List<NameSale> getNameSales(Account account) {
-		if (!this.exists()) {
-			return new ArrayList<NameSale>();
-		}
-
-		return this.database.getNameSaleMap().get(account);
-	}
-
-    @Deprecated
-    public List<Pair<Account, Poll>> getPolls() {
-        if (!this.exists()) {
-            return new ArrayList<Pair<Account, Poll>>();
-        }
-
-        List<Account> accounts = this.getAccounts();
-        return this.database.getPollMap_old().get(accounts);
-    }
-
-    @Deprecated
-    public List<Poll> getPolls(Account account) {
-        if (!this.exists()) {
-            return new ArrayList<Poll>();
-        }
-
-        return this.database.getPollMap_old().get(account);
-    }
-
 	// тут нужно понять где это используется
 	public void replaseFavoriteItems(int type) {
 		if (!this.exists()) {
@@ -614,9 +558,6 @@ public class Wallet extends Observable /*implements Observer*/ {
 			// RESET MAPS
 			this.database.getTransactionMap().clear();
 			this.database.getBlocksHeadMap().clear();
-			this.database.getNameMap().clear();
-			this.database.getNameSaleMap().clear();
-            this.database.getPollMap_old().clear();
 			this.database.getAssetMap().clear();
 			this.database.getImprintMap().clear();
 			this.database.getTemplateMap().clear();
@@ -984,15 +925,6 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 			// REGISTER ON BLOCKS
 			this.database.getBlocksHeadMap().addObserver(o);
-
-			// REGISTER ON NAMES
-			this.database.getNameMap().addObserver(o);
-
-			// REGISTER ON NAME SALES
-			this.database.getNameSaleMap().addObserver(o);
-
-			// REGISTER ON POLLS
-            this.database.getPollMap_old().addObserver(o);
 
 			// REGISTER ON ASSETS
 			this.database.getAssetMap().addObserver(o);

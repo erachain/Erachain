@@ -5,10 +5,9 @@ import com.google.common.primitives.Ints;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
-import org.erachain.datachain.DCSet;
+import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.erachain.utils.Pair;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -108,7 +107,7 @@ public class Poll {
     }
 
     public boolean isConfirmed() {
-        return DCSet.getInstance().getPollMap().contains(this);
+        return true;
     }
 
     public boolean hasVotes() {
@@ -236,7 +235,9 @@ public class Poll {
     }
 
     public int getDataLength() {
-        int length = CREATOR_LENGTH + NAME_SIZE_LENGTH + this.name.getBytes(StandardCharsets.UTF_8).length + DESCRIPTION_SIZE_LENGTH + this.description.getBytes(StandardCharsets.UTF_8).length + OPTIONS_SIZE_LENGTH;
+        int length = CREATOR_LENGTH + NAME_SIZE_LENGTH + this.name.getBytes(StandardCharsets.UTF_8).length
+                + DESCRIPTION_SIZE_LENGTH + this.description.getBytes(StandardCharsets.UTF_8).length
+                + OPTIONS_SIZE_LENGTH;
 
         for (PollOption option : this.options) {
             length += option.getDataLength();
