@@ -93,11 +93,11 @@ public class APIItemPoll {
     @Path("find/{filter_name_string}")
     public Response find(@PathParam("filter_name_string") String filter) {
 
-        if (filter == null || filter.length() < 3) {
+        if (filter == null || filter.isEmpty()) {
             return Response.status(501)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity("error - so small filter length")
+                    .entity("error - empty filter")
                     .build();
         }
 
