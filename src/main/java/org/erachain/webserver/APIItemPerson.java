@@ -2,6 +2,7 @@ package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.core.transaction.Transaction;
@@ -42,6 +43,8 @@ public class APIItemPerson {
         help.put("apiperson/status/{personKey}/{statusKey}?history=true",
                 "Get Status data for Person Key. JSON ARRAY format: [timeFrom, timeTo, [par1, par2, str1, str2, reference, description], block, txNo]");
 
+        help.put("GET {key}", "GET by ID");
+        help.put("GET find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apiperson/image/{key}", "GET Person Image");
         help.put("Get apiperson/icon/{key}", "GET Person Icon");
 
@@ -137,6 +140,56 @@ public class APIItemPerson {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(out.toJSONString()).build();
+    }
+
+    @GET
+    @Path("{key}")
+    public Response item(@PathParam("key") long key) {
+
+        ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
+
+        ItemCls item = map.get(key);
+        if (item == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
+        }
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(item.toJson()))
+                .build();
+
+    }
+
+    @GET
+    @Path("find/{filter_name_string}")
+    public Response find(@PathParam("filter_name_string") String filter) {
+
+        if (filter == null || filter.isEmpty()) {
+            return Response.status(501)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity("error - empty filter")
+                    .build();
+        }
+
+        ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
+        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
+
+        JSONArray array = new JSONArray();
+
+        if (list != null) {
+            for (ItemCls item : list) {
+                array.add(item.toJson());
+            }
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(array))
+                .build();
+
     }
 
     @Path("image/{key}")
