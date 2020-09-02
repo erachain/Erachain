@@ -6,8 +6,6 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.lang.Lang;
-import org.erachain.utils.NameUtils;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun;
 
 import javax.swing.*;
@@ -213,13 +211,6 @@ public class MultipleRecipientsPanel extends JPanel {
                     } else {
                         if (PublicKeyAccount.isValidPublicKey(recipientAddress)) {
                             values[i] = new PublicKeyAccount(recipientAddress);
-                        } else {
-                            //IS IS NAME of RECIPIENT - resolve ADDRESS
-                            Pair<Account, NameUtils.NameResult> result = NameUtils.nameToAdress(recipientAddress);
-
-                            if (result.getB() == NameUtils.NameResult.OK) {
-                                values[i] = result.getA();
-                            }
                         }
                     }
                 } catch (Exception e) {

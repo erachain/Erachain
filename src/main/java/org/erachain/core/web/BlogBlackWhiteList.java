@@ -5,20 +5,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Crypto;
-import org.erachain.core.naming.Name;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.utils.Corekeys;
-import org.erachain.utils.NameUtils;
-import org.erachain.utils.NameUtils.NameResult;
 import org.erachain.utils.Pair;
-import org.erachain.utils.ProfileUtils;
-import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -54,6 +46,7 @@ public class BlogBlackWhiteList {
             return new BlogBlackWhiteList(false, new ArrayList<String>(), null);
         }
 
+        /*
         Name blognameName = DCSet.getInstance().getNameMap().get(blogname);
 
         // Name not registered, --> Default = Whitelist
@@ -83,6 +76,8 @@ public class BlogBlackWhiteList {
             return new BlogBlackWhiteList(false, new ArrayList<>(
                     Arrays.asList(blackListEntries)), blogname);
         }
+
+         */
 
         return new BlogBlackWhiteList(true, new ArrayList<String>(), blogname);
 
@@ -117,6 +112,7 @@ public class BlogBlackWhiteList {
      */
     public boolean isAllowedPost(String accountOrName, String creator) {
 
+        /*
         Pair<Account, NameResult> nameToAdress = NameUtils
                 .nameToAdress(accountOrName);
         if (nameToAdress.getB() == NameResult.OK) {
@@ -134,6 +130,8 @@ public class BlogBlackWhiteList {
 
         }
 
+         */
+
         if (isWhitelist()) {
             return (blackwhiteList.contains(accountOrName));
         } else {
@@ -146,10 +144,10 @@ public class BlogBlackWhiteList {
      * owns and that is allowed to post in the blog. In case of a
      * whitelist the blogowner is always part of that
      */
-    public Pair<List<Account>, List<Name>> getOwnAllowedElements(
+    public Pair<List<Account>, List<Account>> getOwnAllowedElements(
             boolean removeZeroBalance) {
 
-        List<Name> resultingNames = new CopyOnWriteArrayList<Name>();
+        List<Account> resultingNames = new CopyOnWriteArrayList<Account>();
         List<Account> resultingAccounts = new CopyOnWriteArrayList<Account>();
 
         List<Account> myaccounts;
@@ -159,11 +157,11 @@ public class BlogBlackWhiteList {
         } else {
             myaccounts = new ArrayList<Account>();
         }
-        List<Name> myNames = new ArrayList<Name>(Controller.getInstance()
-                .getWalletNamesAsList());
+        List<Account> myNames = new ArrayList<Account>(Controller.getInstance().getWalletAccounts());
 
         if (isWhitelist()) {
             for (String accountOrName : blackwhiteList) {
+                /*
                 Pair<Account, NameResult> nameToAdress = NameUtils
                         .nameToAdress(accountOrName);
 
@@ -194,10 +192,12 @@ public class BlogBlackWhiteList {
 
                 }
 
+                 */
+
             }
             // IF IT IS MY OWN BLOG, MY NAME WILL BE OF COURSE PART OF THE
             // WHITELIST
-            Name blogName = Controller.getInstance().getName(blogname);
+            Account blogName = new Account(blogname);
             if (myNames.contains(blogName)) {
                 if (!resultingNames.contains(blogName)) {
                     resultingNames.add(blogName);
@@ -213,6 +213,7 @@ public class BlogBlackWhiteList {
             resultingAccounts.addAll(myaccounts);
 
             for (String accountOrName : blackwhiteList) {
+                /*
                 Pair<Account, NameResult> nameToAdress = NameUtils
                         .nameToAdress(accountOrName);
 
@@ -234,13 +235,15 @@ public class BlogBlackWhiteList {
 
                 }
 
+                 */
+
             }
         }
 
         if (removeZeroBalance) {
-            for (Name name : resultingNames) {
+            for (Account name : resultingNames) {
                 // No balance account not shown
-                if (name.getOwner().getConfBalance3(0, FEE_KEY).a.compareTo(BigDecimal.ZERO) <= 0) {
+                if (name.getConfBalance3(0, FEE_KEY).a.compareTo(BigDecimal.ZERO) <= 0) {
                     resultingNames.remove(name);
                 }
             }
@@ -252,7 +255,7 @@ public class BlogBlackWhiteList {
             }
         }
 
-        return new Pair<List<Account>, List<Name>>(resultingAccounts,
+        return new Pair<List<Account>, List<Account>>(resultingAccounts,
                 resultingNames);
 
     }

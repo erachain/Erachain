@@ -203,12 +203,10 @@ public class RVouch extends Transaction {
 
         //WRITE HEIGHT
         byte[] heightBytes = Ints.toByteArray(this.vouchHeight);
-        heightBytes = Bytes.ensureCapacity(heightBytes, HEIGHT_LENGTH, 0);
         data = Bytes.concat(data, heightBytes);
 
         //SEQ HEIGHT
         byte[] seqBytes = Ints.toByteArray(this.vouchSeqNo);
-        seqBytes = Bytes.ensureCapacity(seqBytes, SEQ_LENGTH, 0);
         data = Bytes.concat(data, seqBytes);
 
         return data;

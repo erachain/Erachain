@@ -135,15 +135,15 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
     //GETTERS/SETTERS
 
-    public void setDC(DCSet dcSet, boolean andSetup) {
+    public void setDC(DCSet dcSet, boolean andUpdateFromState) {
         super.setDC(dcSet, false);
 
         if (dcSet != null) {
             this.person = (PersonCls) this.dcSet.getItemPersonMap().get(this.key);
         }
 
-        if (false && andSetup && !isWiped())
-            setupFromStateDB();
+        if (false && andUpdateFromState && !isWiped())
+            updateFromStateDB();
 
     }
 

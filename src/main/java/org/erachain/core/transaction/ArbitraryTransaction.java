@@ -7,7 +7,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.naming.Name;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.web.blog.BlogEntry;
 import org.erachain.datachain.DCSet;
@@ -270,10 +269,9 @@ public abstract class ArbitraryTransaction extends Transaction {
                             // BLOGOWNER IS DELETING POST
                         } else if (
                                 commentEntryOpt.getBlognameOpt() != null) {
-                            Name name = this.dcSet.getNameMap().get(
-                                    commentEntryOpt.getBlognameOpt());
+                            Account name = new Account(commentEntryOpt.getBlognameOpt());
                             if (name != null
-                                    && name.getOwner().getAddress()
+                                    && name.getAddress()
                                     .equals(creatorOfDeleteTX)) {
                                 deleteCommentInternal(this.dcSet, commentEntryOpt);
 
@@ -353,10 +351,9 @@ public abstract class ArbitraryTransaction extends Transaction {
                                 // BLOGOWNER IS DELETING POST
                             } else if (author != null
                                     && blogEntryOpt.getBlognameOpt() != null) {
-                                Name name = this.dcSet.getNameMap().get(
-                                        blogEntryOpt.getBlognameOpt());
+                                Account name = new Account(blogEntryOpt.getBlognameOpt());
                                 if (name != null
-                                        && name.getOwner().getAddress()
+                                        && name.getAddress()
                                         .equals(creatorOfDeleteTX)) {
                                     deleteInternal(isShare, blogEntryOpt);
                                 }

@@ -1,5 +1,6 @@
 package org.erachain.utils;
 
+import org.erachain.core.account.Account;
 import org.erachain.core.web.NameStorageMap;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
@@ -40,6 +41,10 @@ public class ProfileUtils {
 
         return json;
 
+    }
+
+    public static JSONObject getProfile(Account account) {
+        return getProfile(account.getAddress());
     }
 
     @SuppressWarnings("unchecked")

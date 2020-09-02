@@ -30,9 +30,6 @@ public class DWSet extends DBASet {
     private FavoriteAccountsMap favoriteAccountsMap;
     private WTransactionMap transactionMap;
     private BlocksHeadMap blocksHeadMap;
-    private NameMap nameMap;
-    private NameSaleMap nameSaleMap;
-    private PollMap pollMap_old;
     private WItemAssetMap assetMap;
     private WItemImprintMap imprintMap;
     private WItemTemplateMap TemplateMap;
@@ -67,9 +64,6 @@ public class DWSet extends DBASet {
         this.favoriteAccountsMap = new FavoriteAccountsMap(this, this.database);
         this.transactionMap = new WTransactionMap(this, this.database);
         this.blocksHeadMap = new BlocksHeadMap(this, this.database);
-        this.nameMap = new NameMap(this, this.database);
-        this.nameSaleMap = new NameSaleMap(this, this.database);
-        this.pollMap_old = new PollMap(this, this.database);
         this.assetMap = new WItemAssetMap(this, this.database);
         this.imprintMap = new WItemImprintMap(this, this.database);
         this.TemplateMap = new WItemTemplateMap(this, this.database);
@@ -192,19 +186,6 @@ public class DWSet extends DBASet {
 
     public BlocksHeadMap getBlocksHeadMap() {
         return this.blocksHeadMap;
-    }
-
-    public NameMap getNameMap() {
-        return this.nameMap;
-    }
-
-    public NameSaleMap getNameSaleMap() {
-        return this.nameSaleMap;
-    }
-
-    @Deprecated
-    public PollMap getPollMap_old() {
-        return this.pollMap_old;
     }
 
     public WItemAssetMap getAssetMap() {

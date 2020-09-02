@@ -2,12 +2,9 @@ package org.erachain.core.web;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.erachain.api.NameStorageResource;
 import org.erachain.controller.Controller;
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.naming.Name;
+import org.erachain.core.account.Account;
 import org.erachain.core.payment.Payment;
-import org.erachain.datachain.DCSet;
 import org.erachain.utils.*;
 import org.json.simple.JSONObject;
 
@@ -19,13 +16,14 @@ public class Profile {
 
     private final BlogBlackWhiteList blogBlackWhiteList;
     private JSONObject jsonRepresenation;
-    private Name name;
-    private List<Name> followerCache = null;
-    private Profile(Name name) {
+    private Account name;
+    private List<Account> followerCache = null;
+
+    private Profile(Account name) {
         this.name = name;
         blogBlackWhiteList = BlogBlackWhiteList.getBlogBlackWhiteList(name
                 .toString());
-        jsonRepresenation = ProfileUtils.getProfile(name.getName());
+        jsonRepresenation = ProfileUtils.getProfile(name);
     }
 
     public static boolean isAllowedProfileName(String name) {
@@ -41,20 +39,19 @@ public class Profile {
     public static Profile getProfileOpt(String name) {
         Profile result = null;
         if (name != null) {
-            Name nameObj = DCSet.getInstance().getNameMap().get(name);
-            result = Profile.getProfileOpt(nameObj);
+            Account nameObj = null; //DCSet.getInstance().getNameMap().get(name);
+            result = Profile.getProfileOpt(name);
         }
 
         return result;
     }
 
-    public static Profile getProfileOpt(Name name) {
+    public static Profile getProfileOpt(Account name) {
 
-        if (name == null || !isAllowedProfileName(name.getName())) {
+        if (name == null || !isAllowedProfileName(name.getAddress())) {
             return null;
         }
-        Name nameReloaded = DCSet.getInstance().getNameMap()
-                .get(name.getName());
+        Account nameReloaded = null; //DCSet.getInstance().getNameMap().get(name.getName());
         if (nameReloaded == null) {
             return null;
         }
@@ -62,9 +59,9 @@ public class Profile {
     }
 
     public static List<Profile> getEnabledProfiles() {
-        List<Name> namesAsList = Controller.getInstance().getWalletNamesAsList();
+        List<Account> namesAsList = Controller.getInstance().getWalletAccounts();
         List<Profile> results = new ArrayList<Profile>();
-        for (Name name : namesAsList) {
+        for (Account name : namesAsList) {
             Profile profile = Profile.getProfileOpt(name);
             if (profile != null && profile.isProfileEnabled()) {
                 results.add(profile);
@@ -74,16 +71,16 @@ public class Profile {
         return results;
     }
 
-    public List<Name> getFollower() {
+    public List<Account> getFollower() {
 
         if (followerCache != null) {
             return followerCache;
         }
 
-        List<Name> results = new ArrayList<>();
-        Collection<Name> values = DCSet.getInstance().getNameMap().values();
+        List<Account> results = new ArrayList<>();
+        Collection<Account> values = null; //DCSet.getInstance().getNameMap().values();
 
-        for (Name name : values) {
+        for (Account name : values) {
             Profile profileOpt = Profile.getProfileOpt(name);
             // FOLLOWING ONLY WITH ENABLED PROFILE
             if (profileOpt != null && profileOpt.isProfileEnabled()) {
@@ -183,7 +180,7 @@ public class Profile {
     }
 
     public void addRemoveFollowedInternal(String blogname, boolean isRemove) {
-        Name blogName = DCSet.getInstance().getNameMap().get(blogname);
+        Account blogName = null; //DCSet.getInstance().getNameMap().get(blogname);
         if (blogName != null) {
             Profile profile = Profile.getProfileOpt(blogName);
             // ADDING ONLY IF ENABLED REMOVE ALWAYS
@@ -275,9 +272,8 @@ public class Profile {
 
     public String saveProfile(List<Payment> paymentsOpt) throws WebApplicationException {
 
-        JSONObject oldProfileJson = ProfileUtils.getProfile(name.getName());
-        JSONObject oldBWListJson = ProfileUtils.getBlogBlackWhiteList(name
-                .getName());
+        JSONObject oldProfileJson = ProfileUtils.getProfile(name);
+        JSONObject oldBWListJson = ProfileUtils.getBlogBlackWhiteList(name.getAddress());
 
         Set<String> keySet = oldBWListJson.keySet();
         // COMBINING BOTH FOR COMPARISON
@@ -402,7 +398,7 @@ public class Profile {
 
 
         BlogBlackWhiteList oldBlackWhiteList = Profile.getProfileOpt(name
-                .getName()).getBlogBlackWhiteList();
+                .getAddress()).getBlogBlackWhiteList();
 
 
         //BECAUSE THE BLACK AND WHITELIST EXCLUDE THEMSELVES WE HAVE TO PROCESS THESE EXTRA RULES TO MAKE SURE THE CONCEPT FITS.
@@ -441,8 +437,7 @@ public class Profile {
 
         addMultiPaymentsOnDemand(paymentsOpt, jsonResult);
 
-        return new NameStorageResource().updateEntry(jsonResult.toJSONString(),
-                name.getName());
+        return "false ok:"; // new NameStorageResource().updateEntry(jsonResult.toJSONString(), name.getName());
 
 //		 String jsonString = jsonRepresenation.toJSONString();
 //		 String compressValue = GZIP.compress(jsonString);
@@ -461,6 +456,7 @@ public class Profile {
         if (paymentsOpt != null && !paymentsOpt.isEmpty()) {
             JSONObject innerpayments = new JSONObject();
 
+            /*
             for (Payment payment : paymentsOpt) {
                 JSONObject amountAssetJson = new JSONObject();
                 amountAssetJson.put(NameStorageResource.AMOUNT_JSON_KEY, payment.getAmount().toString());
@@ -473,11 +469,13 @@ public class Profile {
             }
 
             jsonResult.put(NameStorageResource.PAYMENTS_JSON_KEY, innerpayments.toJSONString());
+
+             */
         }
 
     }
 
-    public Name getName() {
+    public Account getName() {
         return name;
     }
 

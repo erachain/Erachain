@@ -139,7 +139,6 @@ public class DCSet extends DBASet implements Closeable {
     private BlockSignsMap blockSignsMap;
     private BlocksHeadsMap blocksHeadsMap;
     private ReferenceMapImpl referenceMap;
-    private NameMap nameMap;
     private NameStorageMap nameStorageMap;
     private OrphanNameStorageMap orphanNameStorageMap;
     private OrphanNameStorageHelperMap orphanNameStorageHelperMap;
@@ -149,11 +148,6 @@ public class DCSet extends DBASet implements Closeable {
     private LocalDataMap localDataMap;
     private BlogPostMap blogPostMap;
     private HashtagPostMap hashtagPostMap;
-    private NameExchangeMap nameExchangeMap;
-    private UpdateNameMap updateNameMap;
-    private CancelSellNameMap cancelSellNameMap;
-    private PollMap pollMap;
-    private VoteOnPollMap voteOnPollMap;
     private VoteOnItemPollMap voteOnItemPollMap;
     private ItemAssetMap itemAssetMap;
     private IssueAssetMap issueAssetMap;
@@ -267,7 +261,6 @@ public class DCSet extends DBASet implements Closeable {
             this.vouchRecordMap = new VouchRecordMap(this, database);
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
-            this.nameMap = new NameMap(this, database);
             this.nameStorageMap = new NameStorageMap(this, database);
             this.orphanNameStorageMap = new OrphanNameStorageMap(this, database);
             this.orphanNameStorageHelperMap = new OrphanNameStorageHelperMap(this, database);
@@ -278,11 +271,6 @@ public class DCSet extends DBASet implements Closeable {
             this.localDataMap = new LocalDataMap(this, database);
             this.blogPostMap = new BlogPostMap(this, database);
             this.hashtagPostMap = new HashtagPostMap(this, database);
-            this.nameExchangeMap = new NameExchangeMap(this, database);
-            this.updateNameMap = new UpdateNameMap(this, database);
-            this.cancelSellNameMap = new CancelSellNameMap(this, database);
-            this.pollMap = new PollMap(this, database);
-            this.voteOnPollMap = new VoteOnPollMap(this, database);
             this.voteOnItemPollMap = new VoteOnItemPollMap(this, database);
 
             this.itemAssetMap = new ItemAssetMap(this, database);
@@ -441,7 +429,6 @@ public class DCSet extends DBASet implements Closeable {
         //this.hashtagPostMap = new HashtagPostMap(parent.hashtagPostMap);
         //this.nameExchangeMap = new NameExchangeMap(parent.nameExchangeMap);
         //this.updateNameMap = new UpdateNameMap(parent.updateNameMap);
-        //this.cancelSellNameMap = new CancelSellNameMap(parent.cancelSellNameMap);
 
         //this.pollMap = new PollMap(parent.pollMap);
         //this.voteOnPollMap = new VoteOnPollMap(parent.voteOnPollMap);
@@ -793,7 +780,6 @@ public class DCSet extends DBASet implements Closeable {
         this.transactionFinalCalculatedMap.clear();
         this.transactionFinalMapSigns.clear();
         this.transactionTab.clear();
-        this.nameMap.clear();
         this.nameStorageMap.clear();
         this.orphanNameStorageMap.clear();
         this.orphanNameStorageHelperMap.clear();
@@ -804,11 +790,6 @@ public class DCSet extends DBASet implements Closeable {
         this.localDataMap.clear();
         this.blogPostMap.clear();
         this.hashtagPostMap.clear();
-        this.nameExchangeMap.clear();
-        this.updateNameMap.clear();
-        this.cancelSellNameMap.clear();
-        this.pollMap.clear();
-        this.voteOnPollMap.clear();
         this.voteOnItemPollMap.clear();
 
         this.tradeMap.clear();
@@ -1198,10 +1179,6 @@ public class DCSet extends DBASet implements Closeable {
         return this.transactionTab;
     }
 
-    public NameMap getNameMap() {
-        return this.nameMap;
-    }
-
     public NameStorageMap getNameStorageMap() {
         return this.nameStorageMap;
     }
@@ -1248,30 +1225,6 @@ public class DCSet extends DBASet implements Closeable {
      */
     public HashtagPostMap getHashtagPostMap() {
         return this.hashtagPostMap;
-    }
-
-    /**
-     * для Имен - не используется в транзакциях сейчас
-     */
-    public NameExchangeMap getNameExchangeMap() {
-        return this.nameExchangeMap;
-    }
-
-    public UpdateNameMap getUpdateNameMap() {
-        return this.updateNameMap;
-    }
-
-    public CancelSellNameMap getCancelSellNameMap() {
-        return this.cancelSellNameMap;
-    }
-
-    public PollMap getPollMap() {
-        return this.pollMap;
-    }
-
-
-    public VoteOnPollMap getVoteOnPollMap() {
-        return this.voteOnPollMap;
     }
 
     /**

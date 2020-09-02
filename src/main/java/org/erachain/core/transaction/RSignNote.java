@@ -129,7 +129,7 @@ public class RSignNote extends Transaction implements Itemable {
     //GETTERS/SETTERS
 
     @Override
-    public void setDC(DCSet dcSet, boolean andSetup) {
+    public void setDC(DCSet dcSet, boolean andUpdateFromState) {
         super.setDC(dcSet, false);
 
         // LOAD values from EXTERNAL DATA
@@ -140,8 +140,8 @@ public class RSignNote extends Transaction implements Itemable {
             key = extendedData.getTemplateKey();
         }
 
-        if (andSetup && !isWiped())
-            setupFromStateDB();
+        if (andUpdateFromState && !isWiped())
+            updateFromStateDB();
     }
 
     @Override

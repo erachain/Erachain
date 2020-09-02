@@ -30,31 +30,6 @@ public class TransactionFactory {
                 //PARSE PAYMENT TRANSACTION
                 return RSignNote.Parse(data, forDeal);
 
-            case Transaction.REGISTER_NAME_TRANSACTION:
-
-                //PARSE REGISTER NAME TRANSACTION
-                return RegisterNameTransaction.Parse(data);
-
-            case Transaction.UPDATE_NAME_TRANSACTION:
-
-                //PARSE UPDATE NAME TRANSACTION
-                return UpdateNameTransaction.Parse(data);
-
-            case Transaction.SELL_NAME_TRANSACTION:
-
-                //PARSE SELL NAME TRANSACTION
-                return SellNameTransaction.Parse(data);
-
-            case Transaction.CANCEL_SELL_NAME_TRANSACTION:
-
-                //PARSE CANCEL SELL NAME TRANSACTION
-                return CancelSellNameTransaction.Parse(data);
-
-            case Transaction.BUY_NAME_TRANSACTION:
-
-                //PARSE CANCEL SELL NAME TRANSACTION
-                return BuyNameTransaction.Parse(data);
-
             case Transaction.CREATE_POLL_TRANSACTION:
 
                 //PARSE CREATE POLL TRANSACTION

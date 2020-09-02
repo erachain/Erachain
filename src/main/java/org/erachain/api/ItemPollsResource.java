@@ -9,10 +9,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.voting.Poll;
-import org.erachain.core.voting.PollOption;
 import org.erachain.utils.APIUtils;
-import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -197,18 +194,18 @@ public class ItemPollsResource {
     }
 
     @POST
-    @Path("/vote/{name}")
+    @Path("/vote/{key}")
     @Consumes(MediaType.WILDCARD)
-    public String createPollVote(String x, @PathParam("name") String name) {
+    public Response createPollVote(String x, @PathParam("key") Long key) {
 
         String password = null;
-        APIUtils.askAPICallAllowed(password, "POST polls/vote/" + name + "\n" + x, request, true);
+        APIUtils.askAPICallAllowed(password, "POST polls/vote/" + key + "\n" + x, request, true);
 
         try {
             //READ JSON
             JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
             String voter = (String) jsonObject.get("voter");
-            String option = (String) jsonObject.get("option");
+            Integer option = (Integer) jsonObject.get("option");
             String feePowStr = (String) jsonObject.get("feePow");
 
             //PARSE FEE
@@ -242,24 +239,29 @@ public class ItemPollsResource {
             }
 
             //GET POLL
-            Poll poll = Controller.getInstance().getPoll(name);
+            PollCls poll = Controller.getInstance().getPoll(key);
             if (poll == null) {
                 throw ApiErrorFactory.getInstance().createError(Transaction.POLL_NOT_EXISTS);
             }
 
             //GET OPTION
-            PollOption pollOption = poll.getOption(option);
+            String pollOption = poll.getOptions().get(option);
             if (pollOption == null) {
                 throw ApiErrorFactory.getInstance().createError(Transaction.POLL_OPTION_NOT_EXISTS);
             }
 
             //CREATE POLL
-            Pair<Transaction, Integer> result = Controller.getInstance().createPollVote(account, poll, pollOption, feePow);
+            Transaction transaction = Controller.getInstance().createItemPollVote(account, key, option, feePow);
 
-            if (result.getB() == Transaction.VALIDATE_OK)
-                return result.getA().toJson().toJSONString();
-            else
-                throw ApiErrorFactory.getInstance().createError(result.getB());
+            int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+            if (result == Transaction.VALIDATE_OK) {
+
+                return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                        .header("Access-Control-Allow-Origin", "*")
+                        .entity(transaction.toJson().toJSONString()).build();
+            } else
+                throw ApiErrorFactory.getInstance().createError(result);
 
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
@@ -366,20 +368,6 @@ public class ItemPollsResource {
         }
 
         return array.toJSONString();
-    }
-
-
-    @GET
-    @Path("/{name}")
-    public String getPoll(@PathParam("name") String name) {
-        Poll poll = Controller.getInstance().getPoll(name);
-
-        //CHECK IF NAME EXISTS
-        if (poll == null) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.POLL_NOT_EXISTS);
-        }
-
-        return poll.toJson().toJSONString();
     }
 
 }

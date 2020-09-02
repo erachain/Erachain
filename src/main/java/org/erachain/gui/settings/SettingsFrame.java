@@ -120,7 +120,7 @@ public class SettingsFrame extends JDialog {
 
         this.add(btnCancel, gbc_btnCancel);
         //AS
-        JButton btnDefaultSettings = new JButton(Lang.getInstance().translate("Default settings"));
+        JButton btnDefaultSettings = new JButton(Lang.getInstance().translate("Default Settings"));
         GridBagConstraints gbc_btnDefaultSettings = new GridBagConstraints();
         gbc_btnDefaultSettings.fill = GridBagConstraints.NONE;
         gbc_btnDefaultSettings.anchor = GridBagConstraints.WEST;
@@ -147,8 +147,8 @@ public class SettingsFrame extends JDialog {
                 Settings.freeInstance();
 
                 JOptionPane.showMessageDialog(
-                        new JFrame(), Lang.getInstance().translate("You need to restart the application for the changes to take effect."),
-                        Lang.getInstance().translate("Attention!"),
+                        new JFrame(), Lang.getInstance().translate("You need to restart the application for the changes to take effect"),
+                        Lang.getInstance().translate("Attention") + "!",
                         JOptionPane.WARNING_MESSAGE);
 
                 settingsTabPane.close();
@@ -258,6 +258,7 @@ public class SettingsFrame extends JDialog {
             changeKeyCaching = true;
         }
 
+        // SOUND EVENTS
         if (Settings.getInstance().isSoundNewTransactionEnabled() != settingsTabPane.uI_Settings_Panel.chckbxSoundNewTransaction.isSelected()) {
             settingsJSONbuf.put("soundnewtransaction", settingsTabPane.uI_Settings_Panel.chckbxSoundNewTransaction.isSelected());
         }
@@ -270,6 +271,29 @@ public class SettingsFrame extends JDialog {
             settingsJSONbuf.put("soundreceivepayment", settingsTabPane.uI_Settings_Panel.chckbxSoundReceivePayment.isSelected());
         }
 
+        if (Settings.getInstance().isSoundForgedBlockEnabled() != settingsTabPane.uI_Settings_Panel.chckbxSoundForgedBlock.isSelected()) {
+            settingsJSONbuf.put("soundforgedblock", settingsTabPane.uI_Settings_Panel.chckbxSoundForgedBlock.isSelected());
+        }
+
+        if (Settings.getInstance().isSysTrayEnabled() != settingsTabPane.uI_Settings_Panel.chckbxSysTrayEvent.isSelected()) {
+            settingsJSONbuf.put("trayeventenabled", settingsTabPane.uI_Settings_Panel.chckbxSoundForgedBlock.isSelected());
+        }
+
+        // COLORS
+        if (Settings.getInstance().markIncome() != settingsTabPane.uI_Settings_Panel.checkMarkIncome.isSelected()) {
+            settingsJSONbuf.put("markincome", settingsTabPane.uI_Settings_Panel.checkMarkIncome.isSelected());
+        }
+
+        if (Settings.getInstance().markColorObj() != settingsTabPane.uI_Settings_Panel.markColorExample.getForeground()) {
+            Color color = settingsTabPane.uI_Settings_Panel.markColorExample.getForeground();
+            settingsJSONbuf.put("markcolor", color.getRed() + "," + color.getGreen() + "," + color.getBlue());
+        }
+        if (Settings.getInstance().markColorSelectedObj() != settingsTabPane.uI_Settings_Panel.markColorSelectedExample.getForeground()) {
+            Color color = settingsTabPane.uI_Settings_Panel.markColorSelectedExample.getForeground();
+            settingsJSONbuf.put("markcolorselected", color.getRed() + "," + color.getGreen() + "," + color.getBlue());
+        }
+
+        // GUI
         if (Settings.getInstance().isGuiEnabled() != settingsTabPane.settingsBasicPanel.chckbxGuiEnabled.isSelected()) {
             settingsJSONbuf.put("guienabled", settingsTabPane.settingsBasicPanel.chckbxGuiEnabled.isSelected());
         }
