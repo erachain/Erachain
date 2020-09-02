@@ -16,6 +16,7 @@ import org.erachain.settings.Settings;
 import org.mapdb.Atomic.Var;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.Fun;
 
 import java.io.File;
 
@@ -381,6 +382,12 @@ public class DWSet extends DBASet {
             return getTransactionFavoritesSet().contains(transaction.getDBRef());
         }
         return false;
+    }
+
+    public void addAddressFavorite(String address, String name, String description) {
+        if (getFavoriteAccountsMap().contains(address))
+            return;
+        getFavoriteAccountsMap().put(address, new Fun.Tuple2<>(name, description));
     }
 
     public void addItemToFavorite(ItemCls item) {

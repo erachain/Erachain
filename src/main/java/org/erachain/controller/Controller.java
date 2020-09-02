@@ -2561,6 +2561,10 @@ public class Controller extends Observable {
         return null;
     }
 
+    public void addAddressFavorite(String address, String name, String description) {
+        this.wallet.addAddressFavorite(address, name, description);
+    }
+
     public void addItemFavorite(ItemCls item) {
         this.wallet.addItemFavorite(item);
     }
@@ -2569,7 +2573,9 @@ public class Controller extends Observable {
         this.wallet.removeItemFavorite(item);
     }
 
-    public boolean isItemFavorite(ItemCls item) { return this.wallet.isItemFavorite(item); }
+    public boolean isItemFavorite(ItemCls item) {
+        return this.wallet.isItemFavorite(item);
+    }
 
     public void addTransactionFavorite(Transaction transaction) {
         this.wallet.addTransactionFavorite(transaction);

@@ -376,6 +376,14 @@ public class Wallet extends Observable /*implements Observer*/ {
 		}
 	}
 
+	public void addAddressFavorite(String address, String name, String description) {
+		if (!this.exists()) {
+			return;
+		}
+
+		this.database.addAddressFavorite(address, name, description);
+	}
+
 	public void addItemFavorite(ItemCls item) {
 		if (!this.exists()) {
 			return;
