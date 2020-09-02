@@ -2,6 +2,7 @@ package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -13,19 +14,12 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-/*
- ## typeBytes
- 0 - record type
- 1 - record version
- 2 - property 1
- 3 = property 2
-
- #### PROPERTY 1
- typeBytes[2].0 = -128 if NO AMOUNT - check sign
-
- #### PROPERTY 2
- typeBytes[3].3-7 = point accuracy: -16..16 = BYTE - 16
- *
+/**
+ * ## typeBytes
+ * 0 - record type
+ * 1 - record version
+ * 2 - property 1
+ * 3 = property 2
  */
 public class RCalculated extends TransactionAmount {
 
@@ -73,7 +67,7 @@ public class RCalculated extends TransactionAmount {
         if (this.height > 0) {
             return (this.timestamp = Controller.getInstance().blockChain.getTimestamp(this.height) + seqNo);
         } else
-            return 0l;
+            return 0L;
     }
 
     @Override
@@ -163,8 +157,10 @@ public class RCalculated extends TransactionAmount {
         }
 
         // MESSAGE LEN
-        int messageLen = Byte.toUnsignedInt(data[position]);
-        position++;
+        Short shortLen = Shorts.fromByteArray(Arrays.copyOfRange(data, position, position + Short.BYTES));
+        position += Short.BYTES;
+        int messageLen = Short.toUnsignedInt(shortLen);
+
         // MESSAGE
         byte[] messageBytes = Arrays.copyOfRange(data, position, position + messageLen);
         String message = new String(messageBytes, StandardCharsets.UTF_8);
@@ -246,7 +242,7 @@ public class RCalculated extends TransactionAmount {
         // WRITE HEAD
         byte[] messageBytes = this.message.getBytes(StandardCharsets.UTF_8);
         // HEAD SIZE
-        data = Bytes.concat(data, new byte[]{(byte) messageBytes.length});
+        data = Bytes.concat(data, Shorts.toByteArray((short) messageBytes.length));
         // HEAD
         data = Bytes.concat(data, messageBytes);
 
@@ -276,7 +272,7 @@ public class RCalculated extends TransactionAmount {
                 /// LOAD
                 + RECIPIENT_LENGTH
                 + (this.amount == null ? 0 : AMOUNT_LENGTH + KEY_LENGTH)
-                + 1 + message.getBytes(StandardCharsets.UTF_8).length;
+                + Short.BYTES + message.getBytes(StandardCharsets.UTF_8).length;
     }
 
 }

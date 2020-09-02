@@ -70,8 +70,8 @@ public class TelegramAnswerMessage extends Message {
             HashSet<Account> recipients = tran.getRecipientAccounts();
             for(Account recipient:recipients){
             
-              if( Controller.getInstance().wallet.accountExists(recipient.getAddress()) &&  !telegransList.contains(tran))
-                              telegransList.add(tran);
+              if (Controller.getInstance().wallet.accountExists(recipient) && !telegransList.contains(tran))
+                  telegransList.add(tran);
             }
       }
         // add JSON

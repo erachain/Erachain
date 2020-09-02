@@ -23,20 +23,20 @@ public class TableModelMails extends WalletTableModel<Transaction> {
 
     static Logger LOGGER = LoggerFactory.getLogger(TableModelMails.class.getName());
 
-    public static final int COLUMN_CONFIRMATION = 0;
+    public static final int COLUMN_SEQNO = 0;
     public static final int COLUMN_DATA = 1;
     public static final int COLUMN_HEAD = 2;
     public static final int COLUMN_SENDER = 3;
     public static final int COLUMN_RECIEVER = 4;
-    //	public static final int COLUMN_CONFIRM = 5;
+
     boolean incoming;
     DCSet dcSet;
 
     public TableModelMails(boolean incoming) {
 
         super(Controller.getInstance().wallet.database.getTransactionMap(),
-                new String[]{"Confirmation", "Date", "Title", "Sender", "Reciever"},
-                new Boolean[]{true, false, true, true, false}, true, -1);
+                new String[]{"№", "Date", "Title", "Sender", "Receiver"},
+                new Boolean[]{false, true, true, true, false}, true, 1000);
         this.incoming = incoming;
         this.dcSet = DCSet.getInstance();
 
@@ -51,24 +51,28 @@ public class TableModelMails extends WalletTableModel<Transaction> {
         RSend transaction = (RSend) this.list.get(row);
 
         switch (column) {
-            case COLUMN_CONFIRMATION:
+            case COLUMN_IS_OUTCOME:
+                return !incoming;
 
+            case COLUMN_UN_VIEWED:
+                return ((WTransactionMap) map).isUnViewed(transaction);
+
+            case COLUMN_CONFIRMATIONS:
                 return transaction.getConfirmations(dcSet);
 
-            case COLUMN_DATA:
+            case COLUMN_SEQNO:
+                return transaction.viewHeightSeq();
 
+            case COLUMN_DATA:
                 return DateTimeFormat.timestamptoString(transaction.getTimestamp());
 
             case COLUMN_SENDER:
-
                 return transaction.getCreator().viewPerson();
 
             case COLUMN_RECIEVER:
-
                 return transaction.getRecipient().viewPerson();
 
             case COLUMN_HEAD:
-
                 return transaction.getHead();
 
         }

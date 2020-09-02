@@ -26,7 +26,10 @@ import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.*;
+import org.erachain.utils.M_Integer;
+import org.erachain.utils.NumberAsString;
+import org.erachain.utils.Pair;
+import org.erachain.utils.ReverseComparator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -623,6 +626,32 @@ public class BlockExplorer {
         Map output = new LinkedHashMap();
 
         Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE);
+
+        for (ItemCls item : items) {
+            output.put(item.getKey(), item.viewName());
+        }
+
+        return output;
+    }
+
+    public Map jsonQueryStatusesLite() {
+
+        Map output = new LinkedHashMap();
+
+        Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.STATUS_TYPE);
+
+        for (ItemCls item : items) {
+            output.put(item.getKey(), item.viewName());
+        }
+
+        return output;
+    }
+
+    public Map jsonQueryTemplatesLite() {
+
+        Map output = new LinkedHashMap();
+
+        Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.TEMPLATE_TYPE);
 
         for (ItemCls item : items) {
             output.put(item.getKey(), item.viewName());
@@ -2207,23 +2236,7 @@ public class BlockExplorer {
             // transactionDataJSON.put("Р ВµРЎв‚¬РЎРЉРЎС“РЎвЂ№Р ВµРЎвЂћ",
             // GZIP.webDecompress(transactionDataJSON.get("value").toString()));
 
-            if (transaction.getType() == Transaction.REGISTER_NAME_TRANSACTION) {
-                if (transactionDataJSON.get("value").toString().startsWith("?gz!")) {
-                    transactionDataJSON.put("value", GZIP.webDecompress(transactionDataJSON.get("value").toString()));
-                    transactionDataJSON.put("compressed", true);
-                } else {
-                    transactionDataJSON.put("compressed", false);
-                }
-
-            } else if (transaction.getType() == Transaction.UPDATE_NAME_TRANSACTION) {
-                if (transactionDataJSON.get("newValue").toString().startsWith("?gz!")) {
-                    transactionDataJSON.put("newValue",
-                            GZIP.webDecompress(transactionDataJSON.get("newValue").toString()));
-                    transactionDataJSON.put("compressed", true);
-                } else {
-                    transactionDataJSON.put("compressed", false);
-                }
-            } else if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
+            if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
                 Order order;
                 CancelOrderTransaction cancelOrder = (CancelOrderTransaction) unit;
                 Long orderID = cancelOrder.getOrderID();
@@ -3091,7 +3104,7 @@ public class BlockExplorer {
                 continue;
 
             if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {//.ISSUE_STATEMENT_TRANSACTION){
-                transaction.setDC(dcSet, false);
+                transaction.setDC(dcSet, true);
                 output.putAll(jsonStatement((RSignNote) transaction));
                 output.put("type", "statement");
 

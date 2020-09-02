@@ -2,8 +2,8 @@ package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.models.RendererIcon;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -82,17 +82,13 @@ public class AllAssetsFrame extends JFrame {
         this.tableModelItemAssets = new ItemAssetsTableModel();
         final MTable assetsTable = new MTable(this.tableModelItemAssets);
 
-        // иконку будем рисовать
-        assetsTable.getColumnModel().getColumn(tableModelItemAssets.COLUMN_FOR_ICON)
-                .setCellRenderer(new RendererIcon());
-
         //CHECKBOX FOR ASSET TYPE
         TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(ItemAssetsTableModel.COLUMN_ASSET_TYPE);
-        divisibleColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
 
         //CHECKBOX FOR FAVORITE
         TableColumn favoriteColumn = assetsTable.getColumnModel().getColumn(ItemAssetsTableModel.COLUMN_FAVORITE);
-        favoriteColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
+        //favoriteColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
+        favoriteColumn.setCellRenderer(new WalletTableRenderer());
 
         TableRowSorter search_Sorter = new TableRowSorter(tableModelItemAssets);
         ArrayList<RowSorter.SortKey> keys = new ArrayList<RowSorter.SortKey>();

@@ -129,7 +129,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         return this.key;
     }
 
-    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andSetup) {
+    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
         super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
 
         if (this.amount != null) {
@@ -144,8 +144,8 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
             }
         }
 
-        if (false && andSetup && !isWiped())
-            setupFromStateDB();
+        if (false && andUpdateFromState && !isWiped())
+            updateFromStateDB();
     }
 
     @Override

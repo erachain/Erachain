@@ -29,8 +29,6 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
-import org.erachain.core.naming.Name;
-import org.erachain.core.naming.NameSale;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.telegram.TelegramStore;
 import org.erachain.core.transaction.Transaction;
@@ -90,7 +88,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.0.02";
+    public static String version = "5.0.03";
     public static String buildTime = "2020-08-04 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -1010,8 +1008,11 @@ public class Controller extends Observable {
 
         if (this.webService != null)
             this.webService.stop();
+        while( !this.webService.isStoped()){}
+        this.webService = null;
 
         // START API SERVICE
+        WebService.getInstance().clearInstance();
         if (Settings.getInstance().isWebEnabled()) {
             this.webService = WebService.getInstance();
             this.webService.start();
@@ -1182,6 +1183,12 @@ public class Controller extends Observable {
     public void blockchainSyncStatusUpdate(int height) {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.BLOCKCHAIN_SYNC_STATUS, height));
+    }
+
+    public void playWalletEvent(Object object) {
+        if (gui == null || gui.walletTimer == null)
+            return;
+        gui.walletTimer.playEvent(object);
     }
 
     /**
@@ -1801,7 +1808,7 @@ public class Controller extends Observable {
         int seq = 0;
         for (Transaction transaction : transactions) {
 
-            transaction.setDC(dcSet, true);
+            transaction.setDC(dcSet);
 
             // FOR ALL ACCOUNTS
             synchronized (accounts) {
@@ -2301,6 +2308,13 @@ public class Controller extends Observable {
         return false;
     }
 
+    public boolean isMyAccountByAddress(Account address) {
+        if (this.doesWalletExists()) {
+            return this.wallet.accountExists(address);
+        }
+        return false;
+    }
+
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> getWalletUnconfirmedBalance(Account account, long key) {
         return this.wallet.getUnconfirmedBalance(account, key);
     }
@@ -2491,59 +2505,6 @@ public class Controller extends Observable {
     public TelegramMessage getTelegram(String signature) {
         return this.network.getTelegram(signature);
     }
-    // public TelegramMessage getTelegram(String signature) {
-    // return this.network.getTelegram(signature);
-    // }
-
-    public List<Pair<Account, Name>> getWalletNames() {
-        return this.wallet.getNames();
-    }
-
-    public List<Name> getWalletNamesAsList() {
-        List<Pair<Account, Name>> names = this.wallet.getNames();
-        List<Name> result = new ArrayList<>();
-        for (Pair<Account, Name> pair : names) {
-            result.add(pair.getB());
-        }
-
-        return result;
-
-    }
-
-    public List<String> getWalletNamesAsListAsString() {
-        List<Name> namesAsList = getWalletNamesAsList();
-        List<String> results = new ArrayList<String>();
-        for (Name name : namesAsList) {
-            results.add(name.getName());
-        }
-        return results;
-
-    }
-
-    @Deprecated
-    public List<Name> getWalletNames(Account account) {
-        return this.wallet.getNames(account);
-    }
-
-    @Deprecated
-    public List<Pair<Account, NameSale>> getNameSales() {
-        return this.wallet.getNameSales();
-    }
-
-    @Deprecated
-    public List<NameSale> getNameSales(Account account) {
-        return this.wallet.getNameSales(account);
-    }
-
-    @Deprecated
-    public List<NameSale> getAllNameSales() {
-        return this.dcSet.getNameExchangeMap().getNameSales();
-    }
-
-    @Deprecated
-    public List<Pair<Account, org.erachain.core.voting.Poll>> getPolls() {
-        return this.wallet.getPolls();
-    }
 
     public ItemMap getItemMap(int type) {
         switch (type) {
@@ -2587,11 +2548,6 @@ public class Controller extends Observable {
 
     public boolean isTransactionFavorite(Transaction transaction) {
         return this.wallet.isTransactionFavorite(transaction);
-    }
-
-
-    public Collection<org.erachain.core.voting.Poll> getAllPolls() {
-        return this.dcSet.getPollMap().values();
     }
 
     public Collection<ItemCls> getAllItems(int type) {
@@ -2786,22 +2742,6 @@ public class Controller extends Observable {
         return this.dcSet.getTransactionTab().getTransactionsByAddressFast100(address);
     }
 
-    // NAMES
-
-    public Name getName(String nameName) {
-        return this.dcSet.getNameMap().get(nameName);
-    }
-
-    public NameSale getNameSale(String nameName) {
-        return this.dcSet.getNameExchangeMap().getNameSale(nameName);
-    }
-
-    // POLLS
-
-    public org.erachain.core.voting.Poll getPoll(String name) {
-        return this.dcSet.getPollMap().get(name);
-    }
-
     // ASSETS
 
     public AssetCls getAsset(long key) {
@@ -2950,62 +2890,6 @@ public class Controller extends Observable {
             wallet.processTransaction(transaction);
         }
 
-    }
-
-    public Pair<Transaction, Integer> registerName(PrivateKeyAccount registrant, Account owner, String name,
-                                                   String value, int feePow) {
-        // CREATE ONLY ONE TRANSACTION AT A TIME
-        synchronized (this.transactionCreator) {
-            return this.transactionCreator.createNameRegistration(registrant, new Name(owner, name, value), feePow);
-        }
-    }
-
-    public Pair<Transaction, Integer> updateName(PrivateKeyAccount owner, Account newOwner, String name, String value,
-                                                 int feePow) {
-        // CREATE ONLY ONE TRANSACTION AT A TIME
-        synchronized (this.transactionCreator) {
-            return this.transactionCreator.createNameUpdate(owner, new Name(newOwner, name, value), feePow);
-        }
-    }
-
-    public Pair<Transaction, Integer> sellName(PrivateKeyAccount owner, String name, BigDecimal amount, int feePow) {
-        // CREATE ONLY ONE TRANSACTION AT A TIME
-        synchronized (this.transactionCreator) {
-            return this.transactionCreator.createNameSale(owner, new NameSale(name, amount), feePow);
-        }
-    }
-
-    public Pair<Transaction, Integer> cancelSellName(PrivateKeyAccount owner, NameSale nameSale, int feePow) {
-        // CREATE ONLY ONE TRANSACTION AT A TIME
-        synchronized (this.transactionCreator) {
-            return this.transactionCreator.createCancelNameSale(owner, nameSale, feePow);
-        }
-    }
-
-    public Pair<Transaction, Integer> BuyName(PrivateKeyAccount buyer, NameSale nameSale, int feePow) {
-        // CREATE ONLY ONE TRANSACTION AT A TIME
-        synchronized (this.transactionCreator) {
-            return this.transactionCreator.createNamePurchase(buyer, nameSale, feePow);
-        }
-    }
-
-    public Transaction createPoll_old(PrivateKeyAccount creator, String name, String description, List<String> options,
-                                      int feePow) {
-        // CREATE ONLY ONE TRANSACTION AT A TIME
-        synchronized (this.transactionCreator) {
-            // CREATE POLL OPTIONS
-            List<PollOption> pollOptions = new ArrayList<PollOption>();
-            for (String option : options) {
-                pollOptions.add(new PollOption(option));
-            }
-
-            // CREATE POLL
-            org.erachain.core.voting.Poll poll = new org.erachain.core.voting.Poll(creator, name, description, pollOptions);
-
-            return this.transactionCreator.createPollCreation(creator, poll, feePow);
-
-
-        }
     }
 
     public Transaction createItemPollVote(PrivateKeyAccount creator, long pollKey, int optionIndex, int feePow) {
@@ -3440,7 +3324,7 @@ public class Controller extends Observable {
     public byte[] getPublicKey(Account account) {
 
         // CHECK ACCOUNT IN OWN WALLET
-        if (isMyAccountByAddress(account.getAddress())) {
+        if (isMyAccountByAddress(account)) {
             if (isWalletUnlocked()) {
                 return getWalletPrivateKeyAccountByAddress(account.getAddress()).getPublicKey();
             }
@@ -3523,12 +3407,6 @@ public class Controller extends Observable {
 
             // ADD OBSERVER TO BLOCKGENERATOR
             // this.blockGenerator.addObserver(o);
-
-            // ADD OBSERVER TO NAMESALES
-            this.dcSet.getNameExchangeMap().addObserver(o);
-
-            // ADD OBSERVER TO POLLS
-            //this.dcSet.getPollMap().addObserver(o);
 
             // ADD OBSERVER TO ASSETS
             this.dcSet.getItemAssetMap().addObserver(o);

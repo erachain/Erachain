@@ -2,6 +2,7 @@
 // 30/03
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.GetHWeightMessage;
 import org.erachain.network.message.HWeightMessage;
@@ -106,6 +107,9 @@ public class Sender extends MonitoredThread {
     }
 
     public synchronized void sendWinBlock(BlockWinMessage winBlock) {
+        if (winBlock.getHeight() < BlockChain.ALL_VALID_BEFORE)
+            return;
+
         if (this.blockingQueue.isEmpty()
                 || this.winBlockToSend != null // если там уже занято
         ) {

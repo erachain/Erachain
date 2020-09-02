@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.StringUtil;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.BlogPostResource;
-import org.erachain.api.NameStorageResource;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -19,7 +18,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.core.naming.Name;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
@@ -28,11 +26,9 @@ import org.erachain.core.web.blog.BlogEntry;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.datachain.ItemPersonMap;
-import org.erachain.datachain.NameMap;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.*;
-import org.erachain.utils.NameUtils.NameResult;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.simple.JSONObject;
@@ -58,7 +54,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -134,7 +129,7 @@ public class WebResource {
             Profile profileOpt = Profile.getProfileOpt(name);
             if (profileOpt != null) {
                 if (profileOpt.getLikedPosts().contains(signature)) {
-                    blogEntry.addLikingUser(profileOpt.getName().getName());
+                    blogEntry.addLikingUser(profileOpt.getName().getAddress());
                 }
 
             }
@@ -205,7 +200,7 @@ public class WebResource {
             }
 
             List<Pair<String, String>> searchResults;
-            searchResults = NameUtils.getWebsitesByValue(searchValue);
+            searchResults = null; //NameUtils.getWebsitesByValue(searchValue);
 
             List<HTMLSearchResult> results = generateHTMLSearchresults(searchResults);
 
@@ -459,74 +454,6 @@ public class WebResource {
 
     }
 
-    @Path("index/namestorage.html")
-    @GET
-    public Response doNameStorage() {
-
-        String name = request.getParameter("name");
-        String key = request.getParameter("key");
-        try {
-            PebbleHelper pebbleHelper = PebbleHelper.getPebbleHelper(
-                    "web/namestorage.html", request);
-
-            List<Name> namesAsList = new CopyOnWriteArrayList<Name>(Controller
-                    .getInstance().getWalletNamesAsList());
-
-            pebbleHelper.getContextMap().put("names", namesAsList);
-
-            Name nameobj = null;
-            if (name != null) {
-                nameobj = Controller.getInstance().getName(name);
-                if (nameobj == null) {
-                    return error404(request,
-                            "You don't own this name or it is not confirmed by now!");
-                }
-            }
-
-            if (!namesAsList.isEmpty()) {
-
-                if (name == null) {
-                    Profile activeProfileOpt = ProfileHelper.getInstance()
-                            .getActiveProfileOpt(request);
-                    if (activeProfileOpt != null) {
-                        nameobj = activeProfileOpt.getName();
-                    } else {
-                        nameobj = namesAsList.get(0);
-                    }
-                }
-
-                String websiteOpt;
-                if (key != null) {
-                    websiteOpt = DCSet.getInstance().getNameStorageMap()
-                            .getOpt(nameobj.getName(), key);
-                    pebbleHelper.getContextMap().put("key", key);
-                } else {
-                    websiteOpt = DCSet
-                            .getInstance()
-                            .getNameStorageMap()
-                            .getOpt(nameobj.getName(),
-                                    Corekeys.WEBSITE.toString());
-                }
-
-                pebbleHelper.getContextMap().put("name", nameobj.getName());
-                pebbleHelper.getContextMap().put("website", websiteOpt);
-
-            } else {
-                pebbleHelper
-                        .getContextMap()
-                        .put("result",
-                                "<div class=\"alert alert-danger\" role=\"alert\">You need to register a name to create a website.<br></div>");
-            }
-            return Response.ok(pebbleHelper.evaluate(),
-                    "text/html; charset=utf-8").build();
-
-        } catch (Throwable e) {
-            logger.error(e.getMessage(), e);
-            return error404(request, null);
-        }
-
-    }
-
     @Path("index/blogdirectory.html")
     @GET
     public Response doBlogdirectory() {
@@ -537,59 +464,6 @@ public class WebResource {
 
             List<HTMLSearchResult> results = handleBlogSearch(null);
             pebbleHelper.getContextMap().put("searchresults", results);
-            return Response.ok(pebbleHelper.evaluate(),
-                    "text/html; charset=utf-8").build();
-        } catch (Throwable e) {
-            logger.error(e.getMessage(), e);
-            return error404(request, null);
-        }
-
-    }
-
-    @Path("index/namestoragehistory.html")
-    @GET
-    public Response getNameStorage() {
-
-        try {
-            String amount = request.getParameter("amount");
-            String name = request.getParameter("name");
-
-            Integer maxAmount = 20;
-            try {
-                maxAmount = Integer.valueOf(amount);
-            } catch (Throwable e) {
-                // then we use default!
-            }
-
-            if (StringUtils.isBlank(name)) {
-                Profile activeProfileOpt = ProfileHelper.getInstance()
-                        .getActiveProfileOpt(request);
-
-                if (activeProfileOpt != null) {
-                    name = activeProfileOpt.getName().getName();
-                } else {
-                    List<Name> namesAsList = new CopyOnWriteArrayList<Name>(
-                            Controller.getInstance().getWalletNamesAsList());
-
-                    if (!namesAsList.isEmpty()) {
-                        name = namesAsList.get(0).getName();
-                    }
-                }
-
-            }
-
-            name = name == null ? "" : name;
-
-            PebbleHelper pebbleHelper = PebbleHelper.getPebbleHelper(
-                    "web/namestoragehistory.html", request);
-
-            List<NameStorageTransactionHistory> history = WebNameStorageHistoryHelper
-                    .getHistory(name, maxAmount);
-
-            pebbleHelper.getContextMap().put("history", history);
-            pebbleHelper.getContextMap().put("name", name);
-            pebbleHelper.getContextMap().put("amount", maxAmount);
-
             return Response.ok(pebbleHelper.evaluate(),
                     "text/html; charset=utf-8").build();
         } catch (Throwable e) {
@@ -858,8 +732,7 @@ public class WebResource {
             }
         }
 
-        new NameStorageResource().updateEntry(storageJsonObject.toString(),
-                name);
+        //new NameStorageResource().updateEntry(storageJsonObject.toString(), name);
 
         json.put("type", "settingsSuccessfullySaved");
         return Response.status(200)
@@ -891,8 +764,8 @@ public class WebResource {
                         .entity(json.toJSONString()).build();
             }
 
-            Name name = null;
-            name = Controller.getInstance().getName(profileName);
+            Account name = null;
+            //name = Controller.getInstance().getName(profileName);
 
             if (name == null || !Profile.isAllowedProfileName(profileName)) {
 
@@ -999,11 +872,10 @@ public class WebResource {
 
             String profileName = request.getParameter("profilename");
 
-            List<Name> namesAsList = new CopyOnWriteArrayList<Name>(Controller
-                    .getInstance().getWalletNamesAsList());
+            List<Account> namesAsList = null; //new CopyOnWriteArrayList<Name>(Controller.getInstance().getWalletNamesAsList());
 
-            for (Name name : namesAsList) {
-                if (!Profile.isAllowedProfileName(name.getName())) {
+            for (Account name : namesAsList) {
+                if (!Profile.isAllowedProfileName(name.getAddress())) {
                     namesAsList.remove(name);
                 }
             }
@@ -1022,10 +894,10 @@ public class WebResource {
     }
 
     public void handleSelectNameAndProfile(PebbleHelper pebbleHelper,
-                                           String profileName, List<Name> namesAsList) {
-        Name name = null;
+                                           String profileName, List<Account> namesAsList) {
+        Account name = null;
         if (profileName != null) {
-            name = Controller.getInstance().getName(profileName);
+            //name = Controller.getInstance().getName(profileName);
         }
 
         if (!namesAsList.isEmpty()) {
@@ -1069,8 +941,7 @@ public class WebResource {
             PebbleHelper pebbleHelper = PebbleHelper.getPebbleHelper(
                     "web/main.mini.html", request);
 
-            List<Pair<String, String>> websitesByValue = NameUtils
-                    .getWebsitesByValue(null);
+            List<Pair<String, String>> websitesByValue = null; //NameUtils.getWebsitesByValue(null);
             List<HTMLSearchResult> results = generateHTMLSearchresults(websitesByValue);
 
             pebbleHelper.getContextMap().put("searchresults", results);
@@ -1143,7 +1014,7 @@ public class WebResource {
         List<BlogProfile> allEnabledBlogs = BlogUtils
                 .getEnabledBlogs(blogSearchOpt);
         for (BlogProfile blogProfile : allEnabledBlogs) {
-            String name = blogProfile.getProfile().getName().getName();
+            String name = blogProfile.getProfile().getName().getAddress();
             String title = blogProfile.getProfile().getBlogTitleOpt();
             String description = blogProfile.getProfile()
                     .getBlogDescriptionOpt();
@@ -1604,8 +1475,8 @@ public class WebResource {
 
             JSONObject jsonBlogPost = new JSONObject();
 
-            Pair<Account, NameResult> nameToAdress = NameUtils
-                    .nameToAdress(creator);
+            /*
+            Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(creator);
 
             String authorOpt = null;
             if (nameToAdress.getB() == NameResult.OK) {
@@ -1616,6 +1487,8 @@ public class WebResource {
                 jsonBlogPost.put("creator", creator);
             }
 
+             */
+
             jsonBlogPost.put("title", title);
             jsonBlogPost.put("body", contentparam);
 
@@ -1623,7 +1496,7 @@ public class WebResource {
             if (StringUtils.isNotBlank(preview) && preview.equals("true")) {
                 json.put("type", "preview");
 
-                BlogEntry entry = new BlogEntry(title, contentparam, authorOpt,
+                BlogEntry entry = new BlogEntry(title, contentparam, null, //authorOpt,
                         new Date().getTime(), creator, "", blogname);
 
                 json.put("previewBlogpost", entry.toJson());
@@ -1719,12 +1592,11 @@ public class WebResource {
             } else {
                 resultingAccounts = new ArrayList<Account>();
             }
-            List<Name> resultingNames = new ArrayList<Name>(Controller.getInstance()
-                    .getWalletNamesAsList());
+            List<Account> resultingNames = null; //new ArrayList<Name>(Controller.getInstance().getWalletNamesAsList());
 
-            for (Name name : resultingNames) {
+            for (Account name : resultingNames) {
                 // No balance account not shown
-                if (name.getOwner().getConfBalance3(0, Transaction.FEE_KEY).a.compareTo(BigDecimal.ZERO) <= 0) {
+                if (name.getConfBalance3(0, Transaction.FEE_KEY).a.compareTo(BigDecimal.ZERO) <= 0) {
                     resultingNames.remove(name);
                 }
             }
@@ -1743,9 +1615,9 @@ public class WebResource {
 
             String accountStrings = "";
 
-            for (Name name : resultingNames) {
+            for (Account name : resultingNames) {
                 accountStrings += "<option value=" + name.getName() + ">"
-                        + name.getNameBalanceString() + "</option>";
+                        + name.getBalanceUSE(1L) + "</option>";
             }
 
             for (Account account : resultingAccounts) {
@@ -1807,20 +1679,20 @@ public class WebResource {
             BlogBlackWhiteList blogBlackWhiteList = BlogBlackWhiteList
                     .getBlogBlackWhiteList(blogname);
 
-            Pair<List<Account>, List<Name>> ownAllowedElements = blogBlackWhiteList
+            Pair<List<Account>, List<Account>> ownAllowedElements = blogBlackWhiteList
                     .getOwnAllowedElements(true);
 
             List<Account> resultingAccounts = new ArrayList<Account>(
                     ownAllowedElements.getA());
-            List<Name> resultingNames = ownAllowedElements.getB();
+            List<Account> resultingNames = ownAllowedElements.getB();
 
             Collections.sort(resultingAccounts, new AccountBalanceComparator());
 
             String accountStrings = "";
 
-            for (Name name : resultingNames) {
+            for (Account name : resultingNames) {
                 accountStrings += "<option value=" + name.getName() + ">"
-                        + name.getNameBalanceString() + "</option>";
+                        + name.getBalanceUSE(1L) + "</option>";
             }
 
             for (Account account : resultingAccounts) {
@@ -1869,14 +1741,15 @@ public class WebResource {
 
             String blogname = form.getFirst(BlogPostResource.BLOGNAME_KEY);
             String followString = form.getFirst("follow");
-            NameMap nameMap = DCSet.getInstance().getNameMap();
+
             Profile activeProfileOpt = ProfileHelper.getInstance()
                     .getActiveProfileOpt(request);
 
             if (followString != null && activeProfileOpt != null
-                    && blogname != null && nameMap.contains(blogname)) {
+                    && blogname != null //&& nameMap.contains(blogname)
+            ) {
                 boolean follow = Boolean.valueOf(followString);
-                Name name = nameMap.get(blogname);
+                Account name = null; //nameMap.get(blogname);
                 Profile profile = Profile.getProfileOpt(name);
                 if (activeProfileOpt.isProfileEnabled()) {
 
@@ -1906,9 +1779,9 @@ public class WebResource {
                             }
 
                             // Prevent following of own profiles
-                            if (Controller.getInstance()
-                                    .getWalletNamesAsListAsString()
-                                    .contains(blogname)) {
+                            if (false
+                                //Controller.getInstance().getWalletNamesAsListAsString().contains(blogname)
+                            ) {
                                 result = "<center><div class=\"alert alert-danger\" role=\"alert\">Blog follow not successful<br>"
                                         + "You can't follow your own profiles"
                                         + "</div></center>";
@@ -2192,11 +2065,10 @@ public class WebResource {
                     jsonBlogPost.put("fee", 0);
                     // I am not author, but am I the owner of the blog?
                 } else if (blognameOpt != null
-                        && Controller.getInstance().getWalletNamesAsListAsString()
-                        .contains(blognameOpt)) {
-                    Name name = DCSet.getInstance().getNameMap()
-                            .get(blognameOpt);
-                    jsonBlogPost.put("creator", name.getOwner().getAddress());
+                    //&& Controller.getInstance().getWalletNamesAsListAsString().contains(blognameOpt)
+                ) {
+                    Account name = null; //DCSet.getInstance().getNameMap().get(blognameOpt);
+                    jsonBlogPost.put("creator", name.getAddress());
                     jsonBlogPost.put(BlogPostResource.AUTHOR, blognameOpt);
                 } else {
                     jsonanswer.put("type", "deleteError");
@@ -2318,10 +2190,10 @@ public class WebResource {
                     }
 
                     JSONObject jsonBlogPost = new JSONObject();
-                    String profileName = activeProfileOpt.getName().getName();
+                    String profileName = activeProfileOpt.getName().getAddress();
                     jsonBlogPost.put(BlogPostResource.AUTHOR, profileName);
                     jsonBlogPost.put("creator", activeProfileOpt.getName()
-                            .getOwner().getAddress());
+                            .getAddress());
                     jsonBlogPost.put(BlogPostResource.SHARE_KEY, signature);
                     jsonBlogPost.put("body", "share");
 
@@ -2603,7 +2475,7 @@ public class WebResource {
 
             List<String> followedBlogs = new ArrayList<String>(
                     profile.getFollowedBlogs());
-            followedBlogs.add(profile.getName().getName());
+            followedBlogs.add(profile.getName().getAddress());
 
             List<BlogEntry> blogPosts = BlogUtils.getBlogPosts(followedBlogs);
 
@@ -2710,9 +2582,10 @@ public class WebResource {
                 pebbleHelper.getContextMap().put("msg", msg);
             }
 
-            NameMap nameMap = DCSet.getInstance().getNameMap();
+            //NameMap nameMap = DCSet.getInstance().getNameMap();
             if (blogname != null) {
-                if (!nameMap.contains(blogname)) {
+                if (false  //!nameMap.contains(blogname)
+                ) {
                     return Response.ok(
                             PebbleHelper.getPebbleHelper(
                                     "web/profiledisabled.html", request)
@@ -2720,14 +2593,14 @@ public class WebResource {
                             .build();
                 }
 
-                Name name = nameMap.get(blogname);
+                Account name = null; //nameMap.get(blogname);
                 Profile profile = Profile.getProfileOpt(name);
 
                 if (profile == null || !profile.isProfileEnabled()) {
                     pebbleHelper = PebbleHelper.getPebbleHelper(
                             "web/profiledisabled.html", request);
                     if (Controller.getInstance().getWalletAccountByAddress(
-                            name.getOwner().getAddress()) != null) {
+                            name.getAddress()) != null) {
                         pebbleHelper.getContextMap().put("ownProfileName",
                                 blogname);
                     }
@@ -2743,7 +2616,7 @@ public class WebResource {
                         profile.isBlogEnabled());
                 if (Controller.getInstance().doesWalletDatabaseExists()) {
                     if (Controller.getInstance().getWalletAccountByAddress(
-                            name.getOwner().getAddress()) != null) {
+                            name.getAddress()) != null) {
                         pebbleHelper.getContextMap().put("ownProfileName",
                                 blogname);
                     }
@@ -3506,7 +3379,7 @@ public class WebResource {
     @Path("{name}")
     @GET
     public Response getNames(@PathParam("name") String nameName) {
-        Name name = Controller.getInstance().getName(nameName);
+        Account name = new Account(nameName);
 
         try {
 

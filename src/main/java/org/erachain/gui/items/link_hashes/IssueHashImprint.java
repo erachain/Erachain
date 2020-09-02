@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class IssueHashImprint extends javax.swing.JPanel {
 
-    private AuxiliaryToolTip auxiliaryToolTip;
+    private AuxiliaryToolTip auxiliaryToolTip = new AuxiliaryToolTip();
     private boolean wasChanged = false;
 
     /**
@@ -61,6 +61,8 @@ public class IssueHashImprint extends javax.swing.JPanel {
      */
     public IssueHashImprint() {
 
+        auxiliaryToolTip.setKey("AUX KEY");
+
         initComponents();
         this.jLabel_Title.setFont(new java.awt.Font("Tahoma", 0, 18));
         ;
@@ -69,11 +71,13 @@ public class IssueHashImprint extends javax.swing.JPanel {
         this.jTable_Hash.setModel(table_Model);
         this.jLabel_Account.setText(Lang.getInstance().translate("Account") + ":");
         this.jComboBox_Account.setModel(new AccountsComboBoxModel());
-        String tipURL = Lang.getInstance().translate("Задайте внешнюю ссылку ввиде URL. \n Причем если ссвлка будет закачиваться на:\n / или = или № - то значение хеша будет добавлено к ссылке");
+        String tipURL = Lang.getInstance().translate("Задайте внешнюю ссылку в виде URL. \n Причем если ссылка будет закачиваться на:\n / или = или № - то значение хеша будет добавлено к ссылке");
         this.jLabel_URL.setText(Lang.getInstance().translate("URL") + ":");
         this.jLabel_URL.setToolTipText(tipURL);
         this.jTextField_URL.setText("");
         this.jTextField_URL.setToolTipText(tipURL);
+        JToolTip tip = createToolTip();
+        tip.setTipText("TIP PROBE");
 
 
         this.jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");

@@ -3,8 +3,10 @@ package org.erachain.gui.items.statement;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
+import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -38,7 +40,7 @@ public class StatementsMySplitPanel extends SplitPanel {
     // для прозрачности
     int alpha = 255;
     int alpha_int;
-    StatementsTableModelMy my_Statements_Model;
+    MyStatementsTableModel my_Statements_Model;
     Wallet wallet = Controller.getInstance().wallet;
 
 
@@ -62,7 +64,7 @@ public class StatementsMySplitPanel extends SplitPanel {
         //TABLE
 
 
-        my_Statements_Model = new StatementsTableModelMy();
+        my_Statements_Model = new MyStatementsTableModel();
         //	my_Statements_table = new JTable(my_Statements_Model);// new Statements_Table_Model();
 
         //	my_Statements_table.setTableHeader(null);
@@ -106,9 +108,15 @@ public class StatementsMySplitPanel extends SplitPanel {
 			*/        // SET VIDEO
         //this.jTableJScrollPanelLeftPanel.setModel(my_PersonsModel);
         this.jTableJScrollPanelLeftPanel = new MTable(my_Statements_Model); //my_Statements_table;
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
+
 
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
-        columnModel.getColumn(my_Statements_Model.COLUMN_FAVORITE).setMaxWidth(150);
+        columnModel.getColumn(my_Statements_Model.COLUMN_SEQNO).setPreferredWidth(150);
+        columnModel.getColumn(my_Statements_Model.COLUMN_SEQNO).setMaxWidth(150);
+        columnModel.getColumn(my_Statements_Model.COLUMN_FAVORITE).setPreferredWidth(70);
+        columnModel.getColumn(my_Statements_Model.COLUMN_FAVORITE).setMaxWidth(100);
 
         //this.jTableJScrollPanelLeftPanel.setTableHeader(null);
         // sorter
@@ -184,7 +192,7 @@ public class StatementsMySplitPanel extends SplitPanel {
                 }
 
                 Transaction transaction = my_Statements_Model.getItem(jTableJScrollPanelLeftPanel
-                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow())).b;
                 if (transaction == null) {
                     return;
                 }
@@ -225,9 +233,11 @@ public class StatementsMySplitPanel extends SplitPanel {
 
             Transaction transaction = null;
             if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0)
-                transaction = my_Statements_Model.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                transaction = my_Statements_Model.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow())).b;
 
             if (transaction == null) return;
+
+            ((WTransactionMap) my_Statements_Model.getMap()).clearUnViewed(transaction);
 
             JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
 
@@ -240,7 +250,7 @@ public class StatementsMySplitPanel extends SplitPanel {
 
     private Transaction getItem(int row) {
         int crow = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-        return my_Statements_Model.getItem(crow);
+        return my_Statements_Model.getItem(crow).b;
     }
 
     private void favoriteSet(Transaction transaction) {

@@ -181,14 +181,15 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int ITEM_IMPRINT_DOES_NOT_EXIST = 205;
     public static final int ITEM_TEMPLATE_NOT_EXIST = 206;
     public static final int ITEM_PERSON_NOT_EXIST = 207;
-    public static final int ITEM_STATUS_NOT_EXIST = 208;
-    public static final int ITEM_UNION_NOT_EXIST = 209;
-    public static final int ITEM_DOES_NOT_STATUSED = 210;
-    public static final int ITEM_DOES_NOT_UNITED = 211;
-    public static final int ITEM_DUPLICATE_KEY = 212;
-    public static final int ITEM_DUPLICATE = 213;
-    public static final int INVALID_TIMESTAMP_START = 214;
-    public static final int INVALID_TIMESTAMP_END = 215;
+    public static final int ITEM_POLL_NOT_EXIST = 208;
+    public static final int ITEM_STATUS_NOT_EXIST = 209;
+    public static final int ITEM_UNION_NOT_EXIST = 210;
+    public static final int ITEM_DOES_NOT_STATUSED = 211;
+    public static final int ITEM_DOES_NOT_UNITED = 212;
+    public static final int ITEM_DUPLICATE_KEY = 213;
+    public static final int ITEM_DUPLICATE = 214;
+    public static final int INVALID_TIMESTAMP_START = 215;
+    public static final int INVALID_TIMESTAMP_END = 216;
 
     public static final int ITEM_PERSON_IS_DEAD = 235;
     public static final int AMOUNT_LENGHT_SO_LONG = 236;
@@ -292,11 +293,6 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int CALCULATED_TRANSACTION = 100;
 
     // old
-    public static final int REGISTER_NAME_TRANSACTION = 6 + 130;
-    public static final int UPDATE_NAME_TRANSACTION = 7 + 130;
-    public static final int SELL_NAME_TRANSACTION = 8 + 130;
-    public static final int CANCEL_SELL_NAME_TRANSACTION = 9 + 130;
-    public static final int BUY_NAME_TRANSACTION = 10 + 130;
     public static final int ARBITRARY_TRANSACTION = 12 + 130;
     public static final int MULTI_PAYMENT_TRANSACTION = 13 + 130;
     public static final int DEPLOY_AT_TRANSACTION = 14 + 130;
@@ -577,9 +573,14 @@ public abstract class Transaction implements ExplorerJsonLine {
         this.seqNo = seqNo;
     }
 
-    // NEED FOR DB SECONDATY KEYS
-    // see org.mapdb.Bind.secondaryKeys
-    public void setDC(DCSet dcSet, boolean andSetup) {
+    /**
+     * NEED FOR DB SECONDATY KEYS see org.mapdb.Bind.secondaryKeys
+     *
+     * @param dcSet
+     * @param andUpdateFromState если нужно нарастить мясо на скелет из базв Финал. Не нужно для неподтвержденных
+     *                           и если ее нет в базе еще. Используется только для вычисления номера Сущности для отображения Выпускающих трнзакций - после их обработки, например в Блокэксплоере чтобы посмотреть какой актив был этой трнзакцией выпущен.
+     */
+    public void setDC(DCSet dcSet, boolean andUpdateFromState) {
         this.dcSet = dcSet;
 
         if (BlockChain.TEST_DB == 0 && creator != null) {
@@ -589,8 +590,12 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
         }
 
-        if (andSetup && !isWiped())
-            setupFromStateDB();
+        if (andUpdateFromState && !isWiped())
+            updateFromStateDB();
+    }
+
+    public void setDC(DCSet dcSet) {
+        setDC(dcSet, false);
     }
 
     /**
@@ -598,9 +603,10 @@ public abstract class Transaction implements ExplorerJsonLine {
      * @param forDeal
      * @param blockHeight
      * @param seqNo
-     * @param andSetup    - если нужно нарастить мясо на скелет из базв Финал. Не нужно для неподтвержденных и если ее нет в базе еще
+     * @param andUpdateFromState если нужно нарастить мясо на скелет из базв Финал. Не нужно для неподтвержденных
+     *                           и если ее нет в базе еще. Используется только для вычисления номера Сущности для отображения Выпускающих трнзакций - после их обработки, например в Блокэксплоере чтобы посмотреть какой актив был этой трнзакцией выпущен.
      */
-    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andSetup) {
+    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
         setDC(dcSet, false);
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
         this.seqNo = seqNo;
@@ -608,14 +614,18 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (forDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
             this.calcFee();
 
-        if (andSetup && !isWiped())
-            setupFromStateDB();
+        if (andUpdateFromState && !isWiped())
+            updateFromStateDB();
+    }
+
+    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo) {
+        setDC(dcSet, forDeal, blockHeight, seqNo, false);
     }
 
     /**
      * Нарастить мясо на скелет из базы состояния - нужно например для созданим вторичных ключей и Номер Сущности
      */
-    public void setupFromStateDB() {
+    public void updateFromStateDB() {
     }
 
     public boolean noDCSet() {
@@ -1362,7 +1372,6 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (forDeal > FOR_MYPACK) {
             // WRITE TIMESTAMP
             byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-            timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
             data = Bytes.concat(data, timestampBytes);
         }
 
@@ -1370,7 +1379,6 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (this.reference != null) {
             // NULL in imprints
             byte[] referenceBytes = Longs.toByteArray(this.reference);
-            referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
             data = Bytes.concat(data, referenceBytes);
         }
 
@@ -1391,7 +1399,6 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (forDeal == FOR_DB_RECORD) {
             // WRITE DBREF
             byte[] dbRefBytes = Longs.toByteArray(this.dbRef);
-            dbRefBytes = Bytes.ensureCapacity(dbRefBytes, TIMESTAMP_LENGTH, 0);
             data = Bytes.concat(data, dbRefBytes);
 
             // WRITE FEE
@@ -1832,7 +1839,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (signature == null) {
             return getClass().getName() + ":" + viewFullTypeName();
         }
-        return getClass().getName() + ":" + viewFullTypeName() + Base58.encode(signature);
+        return getClass().getName() + ":" + viewFullTypeName() + ":" + Base58.encode(signature);
     }
 
 }

@@ -12,13 +12,14 @@ public class WalletItemAssetsTableModel extends WalletTableModel<AssetCls> {
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_ASSET_TYPE = 3;
     public static final int COLUMN_AMOUNT = 4;
-    public static final int COLUMN_CONFIRMED = 5;
-    public static final int COLUMN_FAVORITE = 6;
+    public static final int COLUMN_FAVORITE = 5;
+
+    DCSet dcSet = DCSet.getInstance();
 
     public WalletItemAssetsTableModel() {
         super(Controller.getInstance().wallet.database.getAssetMap(),
-                new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Confirmed", "Favorite"},
-                new Boolean[]{false, true, true, false, false, false, false, false}, true, COLUMN_FAVORITE);
+                new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite"},
+                new Boolean[]{false, true, true, false, false, false}, true, COLUMN_FAVORITE);
 
     }
 
@@ -31,32 +32,26 @@ public class WalletItemAssetsTableModel extends WalletTableModel<AssetCls> {
         AssetCls asset = this.list.get(row);
 
         switch (column) {
-            case COLUMN_KEY:
 
+            case COLUMN_CONFIRMATIONS:
+                return asset.getConfirmations(dcSet);
+
+            case COLUMN_KEY:
                 return asset.getKey(DCSet.getInstance());
 
             case COLUMN_NAME:
-
                 return asset; // for Icon
 
             case COLUMN_ADDRESS:
-
                 return asset.getOwner().getPersonAsString();
 
             case COLUMN_ASSET_TYPE:
-
                 return Lang.getInstance().translate(asset.viewAssetType());
 
             case COLUMN_AMOUNT:
-
                 return asset.getQuantity();
 
-            case COLUMN_CONFIRMED:
-
-                return asset.isConfirmed();
-
             case COLUMN_FAVORITE:
-
                 return asset.isFavorite();
         }
 

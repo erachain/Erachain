@@ -32,24 +32,22 @@ public class WalletItemPollsTableModel extends WalletTableModel<PollCls> {
         PollCls poll = this.list.get(row);
 
         switch (column) {
-            case COLUMN_KEY:
+            case COLUMN_CONFIRMATIONS:
+                return poll.getConfirmations(dcSet);
 
+            case COLUMN_KEY:
                 return poll.getKey();
 
             case COLUMN_NAME:
-
                 return poll;
 
             case COLUMN_ADDRESS:
-
                 return poll.getOwner().getPersonAsString();
 
             case COLUMN_TOTAL_VOTES:
-
                 return DCSet.getInstance().getVoteOnItemPollMap().countVotes(poll.getKey());
 
             case COLUMN_FAVORITE:
-
                 return poll.isFavorite();
 
         }

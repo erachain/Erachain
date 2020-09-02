@@ -1,35 +1,26 @@
 package org.erachain.gui.settings;
 
-import java.awt.EventQueue;
+import com.google.common.base.Charsets;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.erachain.gui.library.MTable;
+import org.erachain.lang.Lang;
+import org.erachain.lang.LangFile;
+import org.erachain.settings.Settings;
+import org.erachain.utils.DateTimeFormat;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
-import javax.swing.SwingConstants;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
-import com.google.common.base.Charsets;
-
-import org.erachain.lang.Lang;
-import org.erachain.lang.LangFile;
-import org.erachain.settings.Settings;
-import org.erachain.utils.DateTimeFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -49,9 +40,16 @@ public class UISettingPanel extends javax.swing.JPanel {
     public javax.swing.JComboBox<String> size_Font;
     public javax.swing.JComboBox<LangFile> jComboBox_Lang;
     public javax.swing.JComboBox<String> jComboBox_Thems;
+    public JCheckBox checkMarkIncome;
+    public javax.swing.JTextField markColorExample;
+    public javax.swing.JTextField markColorSelectedExample;
+
+    public JCheckBox chckbxSysTrayEvent;
     public JCheckBox chckbxSoundReceivePayment;
     public JCheckBox chckbxSoundReceiveMessage;
     public JCheckBox chckbxSoundNewTransaction;
+    public JCheckBox chckbxSoundForgedBlock;
+
     public JCheckBox chckbxSystemLookFeel;
     public JCheckBox chckbxMetallLookFeel;
     public JCheckBox chckbxOtherTemes;
@@ -87,36 +85,36 @@ public class UISettingPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
 
-        Label_Titlt = new javax.swing.JLabel();
-        jLabel_Thems = new javax.swing.JLabel();
-        jComboBox_Thems = new javax.swing.JComboBox<String>();
-        jLabel_Font = new javax.swing.JLabel();
+        Label_Titlt = new JLabel();
+        jLabel_Thems = new JLabel();
+        jComboBox_Thems = new JComboBox<String>();
+        jLabel_Font = new JLabel();
         // jComboBox_Font_Name = new javax.swing.JComboBox<>();
         // jComboBox_Font_Size = new javax.swing.JComboBox<>();
-        jLabel_Lang = new javax.swing.JLabel();
+        jLabel_Lang = new JLabel();
         //  jComboBox_Lang = new javax.swing.JComboBox<LangFile>();
-        jButton_Download_Lang = new javax.swing.JButton();
+        jButton_Download_Lang = new JButton();
         //   jCheckBoxSend_Asset = new javax.swing.JCheckBox();
         //    jCheckBox_Send_message = new javax.swing.JCheckBox();
         //    javax.swing.JCheckBox jCheckBox3_Other_Trans = new javax.swing.JCheckBox();
-        jLabel_sounds = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        jLabel_sounds = new JLabel();
+        jLabel1 = new JLabel();
+        jButton1 = new JButton();
+        jButton2 = new JButton();
 
-        setLayout(new java.awt.GridBagLayout());
+        setLayout(new GridBagLayout());
 
         Label_Titlt.setText("");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 6;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(8, 12, 0, 0);
+        gridBagConstraints.insets = new Insets(8, 12, 0, 0);
         //add(Label_Titlt, gridBagConstraints);
 
 
@@ -131,11 +129,11 @@ public class UISettingPanel extends javax.swing.JPanel {
         other_Themes.isSelected();
 
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(other_Themes, gridBagConstraints);
 
 
@@ -150,11 +148,11 @@ public class UISettingPanel extends javax.swing.JPanel {
         });
 
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(system_Theme, gridBagConstraints);
         system_Theme.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -171,11 +169,11 @@ public class UISettingPanel extends javax.swing.JPanel {
         }
 
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(metal_Theme, gridBagConstraints);
 
         metal_Theme.addActionListener(new ActionListener() {
@@ -194,71 +192,71 @@ public class UISettingPanel extends javax.swing.JPanel {
 
 
         jLabel_Thems.setText(Lang.getInstance().translate("Select Theme") + ":");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
+        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 10);
         add(jLabel_Thems, gridBagConstraints);
 
 
-        jComboBox_Thems.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[]{"YQ Theme", "Unicode", "Silver", "Plastic", "Nightly", "Golden", "Forest"}));
+        jComboBox_Thems.setModel(new DefaultComboBoxModel<String>(new String[]{"YQ Theme", "Unicode", "Silver", "Plastic", "Nightly", "Golden", "Forest"}));
 
         jComboBox_Thems.setSelectedItem(Settings.getInstance().get_Theme());
 
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(8, 0, 9, 11);
+        gridBagConstraints.insets = new Insets(8, 0, 9, 11);
         add(jComboBox_Thems, gridBagConstraints);
 
 
         jLabel_Font.setText(Lang.getInstance().translate("Font") + ":");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 10);
         add(jLabel_Font, gridBagConstraints);
 
-        font_Name = new javax.swing.JComboBox<String>();
+        font_Name = new JComboBox<String>();
 
 
-        font_Name.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[]{"Arial", "Courier", "Tahoma", "Times New Roman"}));
+        font_Name.setModel(new DefaultComboBoxModel<String>(new String[]{"Arial", "Courier", "Tahoma", "Times New Roman"}));
         font_Name.setSelectedItem(Settings.getInstance().get_Font_Name());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.7;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 11, 0);
+        gridBagConstraints.insets = new Insets(0, 0, 11, 0);
         add(font_Name, gridBagConstraints);
 
-        size_Font = new javax.swing.JComboBox<String>();
-        size_Font.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[]{"11", "12", "14", "16", "18", "20", "24"}));
+        size_Font = new JComboBox<String>();
+        size_Font.setModel(new DefaultComboBoxModel<String>(new String[]{"11", "12", "14", "16", "18", "20", "24"}));
         size_Font.setSelectedItem(Settings.getInstance().get_Font());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 7, 8, 10);
+        gridBagConstraints.insets = new Insets(0, 7, 8, 10);
         add(size_Font, gridBagConstraints);
 
         jLabel_Lang.setText(Lang.getInstance().translate("Interface language") + ":");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 10);
         add(jLabel_Lang, gridBagConstraints);
 
 
@@ -274,23 +272,23 @@ public class UISettingPanel extends javax.swing.JPanel {
 
 
         //       jComboBox_Lang.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.7;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 11, 0);
+        gridBagConstraints.insets = new Insets(0, 0, 11, 0);
         add(jComboBox_Lang, gridBagConstraints);
 
         jButton_Download_Lang.setText(Lang.getInstance().translate("Download"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 21, 0, 12);
+        gridBagConstraints.insets = new Insets(0, 21, 0, 12);
         add(jButton_Download_Lang, gridBagConstraints);
 
 
@@ -392,68 +390,172 @@ public class UISettingPanel extends javax.swing.JPanel {
             }
         });
 
+        int gridy = 5;
+
+        checkMarkIncome = new JCheckBox(Lang.getInstance().translate("Mark Outcome or Income"));
+        checkMarkIncome.setHorizontalAlignment(SwingConstants.LEFT);
+        checkMarkIncome.setSelected(Settings.getInstance().markIncome());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(7, 0, 8, 10);
+        add(checkMarkIncome, gridBagConstraints);
+
+        gridy++;
+
+        MTable<Object, Object> table = new MTable<>(null);
+
+        markColorExample = new JTextField("  " + Lang.getInstance().translate("Example ROWS Text") + "  ");
+        markColorExample.setForeground(Settings.getInstance().markColorObj());
+        markColorExample.setBackground(table.getBackground());
+        markColorExample.setHorizontalAlignment(SwingConstants.CENTER);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(7, 0, 8, 10);
+        add(markColorExample, gridBagConstraints);
+
+        JButton buttonSelColor = new JButton(Lang.getInstance().translate("Select"));
+        buttonSelColor.setHorizontalAlignment(SwingConstants.CENTER);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(7, 0, 8, 10);
+        buttonSelColor.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                selectColorPanel(markColorExample, "Select ROWS Color");
+            }
+        });
+        add(buttonSelColor, gridBagConstraints);
+
+        markColorSelectedExample = new JTextField(Lang.getInstance().translate("Example SELECTED ROWS Text"));
+        markColorSelectedExample.setForeground(Settings.getInstance().markColorSelectedObj());
+        markColorSelectedExample.setBackground(table.getSelectionBackground());
+        markColorSelectedExample.setHorizontalAlignment(SwingConstants.LEFT);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(7, 0, 8, 10);
+        add(markColorSelectedExample, gridBagConstraints);
+
+        JButton buttonSelColorSel = new JButton(Lang.getInstance().translate("Select"));
+        buttonSelColorSel.setHorizontalAlignment(SwingConstants.CENTER);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(7, 0, 8, 10);
+        buttonSelColorSel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                selectColorPanel(markColorSelectedExample, "Select SELECTED ROWS Color");
+            }
+        });
+        add(buttonSelColorSel, gridBagConstraints);
+
+        gridy++;
+        chckbxSysTrayEvent = new JCheckBox(Lang.getInstance().translate("System Tray Events and Sounds"));
+        chckbxSysTrayEvent.setHorizontalAlignment(SwingConstants.LEFT);
+        chckbxSysTrayEvent.setSelected(Settings.getInstance().isSysTrayEnabled());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(7, 0, 8, 10);
+        add(chckbxSysTrayEvent, gridBagConstraints);
+
+        jLabel_sounds.setText(Lang.getInstance().translate("Sounds") + ":");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(8, 0, 0, 0);
+        add(jLabel_sounds, gridBagConstraints);
 
         chckbxSoundReceivePayment = new JCheckBox(Lang.getInstance().translate("Receive payment"));
         chckbxSoundReceivePayment.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxSoundReceivePayment.setSelected(Settings.getInstance().isSoundReceivePaymentEnabled());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(chckbxSoundReceivePayment, gridBagConstraints);
-
 
         chckbxSoundReceiveMessage = new JCheckBox(Lang.getInstance().translate("Receive message"));
         chckbxSoundReceiveMessage.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxSoundReceiveMessage.setSelected(Settings.getInstance().isSoundReceiveMessageEnabled());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(chckbxSoundReceiveMessage, gridBagConstraints);
 
         chckbxSoundNewTransaction = new JCheckBox(Lang.getInstance().translate("Other transactions"));
         chckbxSoundNewTransaction.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxSoundNewTransaction.setSelected(Settings.getInstance().isSoundNewTransactionEnabled());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(chckbxSoundNewTransaction, gridBagConstraints);
 
-        jLabel_sounds.setText(Lang.getInstance().translate("Sounds") + ":");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
-        add(jLabel_sounds, gridBagConstraints);
+        chckbxSoundForgedBlock = new JCheckBox(Lang.getInstance().translate("Forged Block"));
+        chckbxSoundForgedBlock.setHorizontalAlignment(SwingConstants.LEFT);
+        chckbxSoundForgedBlock.setSelected(Settings.getInstance().isSoundForgedBlockEnabled());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(7, 0, 8, 10);
+        add(chckbxSoundForgedBlock, gridBagConstraints);
+
+        if (false) {
+            JLabel jLabel_UI = new JLabel(Lang.getInstance().translate("UI") + ":");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = ++gridy;
+            gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+            gridBagConstraints.insets = new Insets(8, 0, 0, 0);
+            //     add(jLabel_UI, gridBagConstraints);
 
 
-        JLabel jLabel_UI = new JLabel(Lang.getInstance().translate("UI") + ":");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
-        //     add(jLabel_UI, gridBagConstraints);
-
-
-        jLabel1.setText("");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        add(jLabel1, gridBagConstraints);
+            jLabel1.setText("UI");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 10;
+            gridBagConstraints.gridwidth = 7;
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.weightx = 0.1;
+            gridBagConstraints.weighty = 0.1;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            add(jLabel1, gridBagConstraints);
+        }
 
 
     }// </editor-fold>
-    // End of variables declaration                   
+    // End of variables declaration
+
+    private void selectColorPanel(JTextField paramField, String title) {
+        final JColorChooser colorChooser = new JColorChooser(paramField.getForeground());
+        AbstractColorChooserPanel[] panels = colorChooser.getChooserPanels();
+        colorChooser.removeChooserPanel(panels[0]);
+        colorChooser.removeChooserPanel(panels[1]);
+        colorChooser.removeChooserPanel(panels[4]);
+
+        JDialog dialog = JColorChooser.createDialog(paramField, Lang.getInstance().translate(title),
+                true, colorChooser,
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        paramField.setForeground(colorChooser.getColor());
+                    }
+                },
+                null);
+        dialog.setVisible(true);
+    }
 }

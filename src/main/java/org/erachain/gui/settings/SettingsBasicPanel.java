@@ -2,10 +2,14 @@ package org.erachain.gui.settings;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.wallet.Wallet;
+import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.FileChooser;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.lang.Lang;
 import org.erachain.lang.LangFile;
 import org.erachain.settings.Settings;
+import org.erachain.webserver.SslUtils;
+import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -13,6 +17,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
 
 @SuppressWarnings("serial")
 public class SettingsBasicPanel extends JPanel {
@@ -21,6 +28,7 @@ public class SettingsBasicPanel extends JPanel {
     private final JButton buttonResetWebKeystoreFilePath;
     private final JButton buttonBrowseWebKeystoreFilePath;
     private final JLabel labelTextWebKeystoreFilePath;
+    private final JButton buttonVeryfytWebKeystoreFilePath;
     public JTextField txtRpcPort;
     public JTextField textWebKeyStoreFilePath;
     public JTextField txtWebport;
@@ -170,7 +178,7 @@ public class SettingsBasicPanel extends JPanel {
         }
        );
 
-
+    // web settings
         JLabel lblWebPort = new JLabel(Lang.getInstance().translate("WEB port") + ":");
         GridBagConstraints gbc_lblWebPort = new GridBagConstraints();
         gbc_lblWebPort.anchor = GridBagConstraints.EAST;
@@ -287,6 +295,48 @@ public class SettingsBasicPanel extends JPanel {
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = panelRow;//21;
         add(textWebCertificatePass, gridBagConstraints);
+
+        // verifi button
+        buttonVeryfytWebKeystoreFilePath = new JButton(Lang.getInstance().translate("Check") + " SSL");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 0, 5, 5);
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = panelRow;//20;
+        buttonVeryfytWebKeystoreFilePath.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Fun.Tuple3<KeyStore, Certificate, String> result = SslUtils.getWebKeyStore(textWebKeyStoreFilePath.getText(),new String(textWebKeystorePass.getPassword()), new String(textWebCertificatePass.getPassword()));
+                    if(result.a == null){
+                        JOptionPane.showMessageDialog(
+                                new JFrame(), Lang.getInstance().translate(result.c),
+                                Lang.getInstance().translate("Error!"),
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                    else{
+                        Certificate cetrtyficatemy = result.b;
+
+                        IssueConfirmDialog dd = new IssueConfirmDialog(null, true, null,
+                                Lang.getInstance().translate("SSL is OK "), MainFrame.getInstance().getWidth()-100, MainFrame.getInstance().getHeight()-100, Lang.getInstance().translate(""));
+
+                        dd.setTitle(Lang.getInstance().translate("SSL is OK."));
+                        dd.jTextPane1.setText("Certificate: \n " + cetrtyficatemy.toString());
+                        dd.jButton1.setVisible(false);
+                        dd.jButton2.setText(Lang.getInstance().translate("OK"));
+                        dd.setLocationRelativeTo(null);
+                        dd.setVisible(true);
+
+                    }
+                } catch (FileNotFoundException e1) {
+                    JOptionPane.showMessageDialog(
+                            new JFrame(), Lang.getInstance().translate(e1.getLocalizedMessage()),
+                            Lang.getInstance().translate("Error!"),
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        add(buttonVeryfytWebKeystoreFilePath, gridBagConstraints);
+
         // WEB SSL Settings }
 
         JLabel lblWEBExplanatoryText = new JLabel(Lang.getInstance().translate("Enable/Disable decentralized web server. Use \"Access permission\" tab for additional options."));

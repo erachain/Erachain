@@ -1183,7 +1183,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         JSONArray transactionsArray = new JSONArray();
 
         for (Transaction transaction : this.getTransactions()) {
-            transaction.setDC(dcSet, true);
+            transaction.setDC(dcSet);
             transactionsArray.add(transaction.toJson());
         }
 
@@ -1527,16 +1527,16 @@ public class Block implements Closeable, ExplorerJsonLine {
         this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 
         this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
-        if (this.winValue < 1) {
+        if (this.winValue < 1 && this.heightBlock > BlockChain.ALL_VALID_BEFORE) {
             this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
             this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
 
             Tuple3<Integer, Integer, Integer> forgingPoint = creator.getLastForgingData(dcSet);
             LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue
-                + " Creator: " + this.creator.getAddress());
+                    + " Creator: " + this.creator.getAddress());
             LOGGER.debug("*** forging Value: " + this.forgingValue
                     + " creator DataPoint: " + creator.getForgingData(dcSet, forgingPoint == null ? heightBlock : forgingPoint.a)
-                + " creator LAST Data: " + creator.getLastForgingData(dcSet));
+                    + " creator LAST Data: " + creator.getLastForgingData(dcSet));
             return INVALID_BLOCK_WIN;
         }
 
@@ -1719,7 +1719,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                     }
 
                     if (!isSignatureValid) {
-                        if (!transaction.isSignatureValid(dcSetPlace)) {
+                        if (!transaction.isSignatureValid(dcSetPlace)
+                                && BlockChain.ALL_VALID_BEFORE < heightBlock) {
                             //
                             LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                     + ":" + transaction.viewFullTypeName()
@@ -1747,13 +1748,14 @@ public class Block implements Closeable, ExplorerJsonLine {
                         return INVALID_BLOCK_VERSION;
                     }
 
-                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo, false);
+                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                     //CHECK IF VALID
                     // так как мы в блоке такие транзакции уже проверяем то коллизию с неподтвержденными не проверяем
                     // все равно их потом удалим - иначе при откатах может случиться оказия - что и в блоке она есть и в неподтвержденных
                     if (transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION)
-                            != Transaction.VALIDATE_OK) {
+                            != Transaction.VALIDATE_OK
+                            && BlockChain.ALL_VALID_BEFORE < heightBlock) {
                         int error = transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION);
                         LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                 + ":" + transaction.viewFullTypeName()
@@ -1780,7 +1782,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 } else {
 
-                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo, false);
+                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                     //UPDATE REFERENCE OF SENDER
                     transaction.getCreator().setLastTimestamp(
@@ -2293,8 +2295,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                 //logger.debug("[" + seqNo + "] record is process" );
 
                 // NEED set DC for WIPED too
-                transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, seqNo,
-                        false); // здесь ще нет ничего в базе данных - нечего наращивать
+                // здесь ще нет ничего в базе данных - нечего наращивать
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                 //PROCESS
                 if (transaction.isWiped()

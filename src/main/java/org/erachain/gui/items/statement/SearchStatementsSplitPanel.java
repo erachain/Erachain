@@ -33,7 +33,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
     public static String TITLE = "Search Documents";
 
     private static final long serialVersionUID = 2717571093561259483L;
-    private StatementsTableModelSearch search_Table_Model;
+    private SearchStatementsTableModel search_Table_Model;
     private RowSorter<ItemsPersonsTableModel> search_Sorter;
     private int selected_Item;
     private JTextField key_Item;
@@ -83,12 +83,15 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         searchMyJCheckBoxLeftPanel.setVisible(false);
 
         // CREATE TABLE
-        search_Table_Model = new StatementsTableModelSearch();
+        search_Table_Model = new SearchStatementsTableModel();
         jTableJScrollPanelLeftPanel = new MTable(this.search_Table_Model);
 
         // CHECKBOX FOR FAVORITE
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
-        columnModel.getColumn(search_Table_Model.COLUMN_FAVORITE).setMaxWidth(150);
+        columnModel.getColumn(search_Table_Model.COLUMN_SEQNO).setPreferredWidth(150);
+        columnModel.getColumn(search_Table_Model.COLUMN_SEQNO).setMaxWidth(150);
+        columnModel.getColumn(search_Table_Model.COLUMN_FAVORITE).setPreferredWidth(70);
+        columnModel.getColumn(search_Table_Model.COLUMN_FAVORITE).setMaxWidth(100);
 
         // hand cursor for Favorite column
         jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionListener() {

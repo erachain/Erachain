@@ -6,7 +6,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.FavoriteItemModelTable;
 import org.erachain.utils.ObserverMessage;
 
-import java.util.*;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class FavoritePollsTableModel extends FavoriteItemModelTable implements Observer {
@@ -15,6 +15,7 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable implements O
     public static final int COLUMN_ADDRESS = 2;
     public static final int COLUMN_TOTAL_VOTES = 3;
     public static final int COLUMN_FAVORITE = 4;
+
 
     public FavoritePollsTableModel() {
         super(DCSet.getInstance().getItemPollMap(),
@@ -40,24 +41,22 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable implements O
 
 
         switch (column) {
-            case COLUMN_KEY:
+            case COLUMN_CONFIRMATIONS:
+                return poll.getConfirmations(dcSet);
 
+            case COLUMN_KEY:
                 return poll.getKey(DCSet.getInstance());
 
             case COLUMN_NAME:
-
                 return poll;
 
             case COLUMN_ADDRESS:
-
                 return poll.getOwner().getPersonAsString();
 
             case COLUMN_TOTAL_VOTES:
-
                 return DCSet.getInstance().getVoteOnItemPollMap().countVotes(poll.getKey());
 
             case COLUMN_FAVORITE:
-
                 return poll.isFavorite();
 
         }

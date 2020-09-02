@@ -287,7 +287,7 @@ public class RecordReleasePack extends Transaction {
         //ORPHAN PAYMENTS
         for (Transaction transaction : this.transactions) {
             transaction.setDC(this.dcSet,
-                    true); // нужно нарастить мясо на скелет
+                    true); // нужно нарастить мясо на скелет чтобы правильно удалить ключи?
             transaction.orphan(block, forDeal); // as Pack in body
         }
     }

@@ -7,8 +7,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.voting.Poll;
-import org.erachain.core.voting.PollOption;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -254,34 +252,6 @@ public class VoteOnPollTransaction extends Transaction {
         if (this.height > BlockChain.ITEM_POLL_FROM)
             return INVALID_TRANSACTION_TYPE;
 
-        //CHECK POLL LENGTH
-        int pollLength = this.poll.getBytes(StandardCharsets.UTF_8).length;
-        if (pollLength > 400 || pollLength < 10) {
-            return INVALID_NAME_LENGTH_MAX;
-        }
-
-        //CHECK POLL LOWERCASE
-        if (!this.poll.equals(this.poll.toLowerCase())) {
-            return NAME_NOT_LOWER_CASE;
-        }
-
-        //CHECK POLL EXISTS
-        if (!this.dcSet.getPollMap().contains(this.poll)) {
-            return POLL_NOT_EXISTS;
-        }
-
-        //CHECK OPTION EXISTS
-        Poll poll = this.dcSet.getPollMap().get(this.poll);
-        if (poll.getOptions().size() - 1 < this.option || this.option < 0) {
-            return POLL_OPTION_NOT_EXISTS;
-        }
-
-        //CHECK IF NOT VOTED ALREADY
-        PollOption option = poll.getOptions().get(this.option);
-        if (option.hasVoter(this.creator)) {
-            return ALREADY_VOTED_FOR_THAT_OPTION;
-        }
-
         return super.isValid(forDeal, flags);
 
     }
@@ -295,16 +265,6 @@ public class VoteOnPollTransaction extends Transaction {
         //UPDATE CREATOR
         super.process(block, forDeal);
 
-        //ADD VOTE TO POLL
-        Poll poll = this.dcSet.getPollMap().get(this.poll).copy();
-        int previousOption = poll.addVoter(this.creator, this.option);
-        this.dcSet.getPollMap().add(poll);
-
-        //CHECK IF WE HAD PREVIOUSLY VOTED
-        if (previousOption != -1) {
-            //ADD TO ORPHAN DATABASE
-            this.dcSet.getVoteOnPollMap().put(this, previousOption);
-        }
     }
 
 
@@ -315,17 +275,6 @@ public class VoteOnPollTransaction extends Transaction {
         //UPDATE CREATOR
         super.orphan(block, forDeal);
 
-        //DELETE VOTE FROM POLL
-        Poll poll = this.dcSet.getPollMap().get(this.poll).copy();
-        poll.deleteVoter(this.creator, this.option);
-
-        //RESTORE PREVIOUS VOTE
-        int previousOption = this.dcSet.getVoteOnPollMap().get(this);
-        if (previousOption != -1) {
-            poll.addVoter(this.creator, previousOption);
-        }
-
-        this.dcSet.getPollMap().add(poll);
     }
 
 
@@ -371,7 +320,7 @@ public class VoteOnPollTransaction extends Transaction {
     public long calcBaseFee() {
 
         // TODO delete IT
-        if (this.getBlockHeightByParentOrLast(this.dcSet) > TODO_h1)
+        if (height > TODO_h1)
             return calcCommonFee();
         return 0;
     }

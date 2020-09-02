@@ -398,7 +398,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         newBlockDC = dcSet.fork(database, "getUnconfirmedTransactions");
                     }
 
-                    transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1, false);
+                    transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
 
                     if (false // вообще-то все внутренние транзакции уже провверены на подпись!
                             && !transaction.isSignatureValid(newBlockDC)) {
@@ -537,7 +537,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     if (transaction.getTimestamp() > timestamp)
                         break;
 
-                    transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1, false);
+                    transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
 
                     if (false // тут уже все проверено внутри нашей базы
                             && !transaction.isSignatureValid(newBlockDC)) {
@@ -871,7 +871,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 }
 
                 // is WALLET
-                if (BlockChain.TEST_DB > 0 || ctrl.doesWalletExists()) {
+                if (BlockChain.TEST_DB > 0 || ctrl.doesWalletExists()
+                        || height < BlockChain.ALL_VALID_BEFORE) {
 
                     if (timePoint > NTP.getTime()) {
                         continue;

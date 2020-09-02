@@ -26,14 +26,13 @@ public class Gui extends JFrame {
 
     private volatile static Gui maingui;
     private MainFrame mainframe;
-    private GuiTimer guiTimer;
+    public final WalletTimer walletTimer;
 
     public static boolean SHOW_FEE_POWER = false;
 
     private Gui() throws Exception {
 
-
-        setGuiLookAndFeel("");
+        setGuiLookAndFeel();
 
         if (Settings.getInstance().Dump().containsKey("lang")) {
             File langFile = new File(Settings.getInstance().getLangDir(), Settings.getInstance().getLangFileName());
@@ -44,7 +43,7 @@ public class Gui extends JFrame {
             new SettingLangFrame();
         }
 
-        setGuiLookAndFeel("");
+        setGuiLookAndFeel();
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().noUseWallet && !Controller.getInstance().doesWalletExists()) {
@@ -54,6 +53,8 @@ public class Gui extends JFrame {
             mainframe = MainFrame.getInstance();
             mainframe.setVisible(true);
         }
+
+        walletTimer = new WalletTimer();
 
     }
 
