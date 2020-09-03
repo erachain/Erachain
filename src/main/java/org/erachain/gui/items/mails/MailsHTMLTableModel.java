@@ -1,4 +1,4 @@
-package org.erachain.gui.models;
+package org.erachain.gui.items.mails;
 // 30/03
 
 import org.erachain.controller.Controller;
@@ -15,7 +15,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
@@ -47,10 +46,10 @@ import java.util.List;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class SendTableModel extends JTable implements Observer {
+public class MailsHTMLTableModel extends JTable implements Observer {
 
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SendTableModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailsHTMLTableModel.class);
 
     Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
         public int compare(MessageBuf c1, MessageBuf c2) {
@@ -74,7 +73,7 @@ public class SendTableModel extends JTable implements Observer {
     WTransactionMap tableMap = dwSet.getTransactionMap();
     private Account accountFrom;
 
-    public SendTableModel(MailSendPanel parent, Account accountFrom) {
+    public MailsHTMLTableModel(MailSendPanel parent, Account accountFrom) {
         this.setShowGrid(false);
 
         fontHeight = this.getFontMetrics(this.getFont()).getHeight();
@@ -98,7 +97,7 @@ public class SendTableModel extends JTable implements Observer {
                 JMenuItem menuItem = (JMenuItem) e.getSource();
                 JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
                 Component invoker = popupMenu.getInvoker(); //this is the JMenu (in my code)
-                SendTableModel invokerAsJComponent = (SendTableModel) invoker;
+                MailsHTMLTableModel invokerAsJComponent = (MailsHTMLTableModel) invoker;
 
                 int row = invokerAsJComponent.getSelectedRow();
                 row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -118,7 +117,7 @@ public class SendTableModel extends JTable implements Observer {
                 JMenuItem menuItem = (JMenuItem) e.getSource();
                 JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
                 Component invoker = popupMenu.getInvoker(); //this is the JMenu (in my code)
-                SendTableModel invokerAsJComponent = (SendTableModel) invoker;
+                MailsHTMLTableModel invokerAsJComponent = (MailsHTMLTableModel) invoker;
 
                 int row = invokerAsJComponent.getSelectedRow();
                 row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -153,7 +152,7 @@ public class SendTableModel extends JTable implements Observer {
                 JMenuItem menuItem = (JMenuItem) e.getSource();
                 JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
                 Component invoker = popupMenu.getInvoker();
-                SendTableModel invokerAsJComponent = (SendTableModel) invoker;
+                MailsHTMLTableModel invokerAsJComponent = (MailsHTMLTableModel) invoker;
 
                 int row = invokerAsJComponent.getSelectedRow();
                 row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -171,7 +170,7 @@ public class SendTableModel extends JTable implements Observer {
                 JMenuItem menuItem = (JMenuItem) e.getSource();
                 JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
                 Component invoker = popupMenu.getInvoker();
-                SendTableModel invokerAsJComponent = (SendTableModel) invoker;
+                MailsHTMLTableModel invokerAsJComponent = (MailsHTMLTableModel) invoker;
 
                 int row = invokerAsJComponent.getSelectedRow();
                 row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -190,7 +189,7 @@ public class SendTableModel extends JTable implements Observer {
                 JMenuItem menuItem = (JMenuItem) e.getSource();
                 JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
                 Component invoker = popupMenu.getInvoker();
-                SendTableModel invokerAsJComponent = (SendTableModel) invoker;
+                MailsHTMLTableModel invokerAsJComponent = (MailsHTMLTableModel) invoker;
 
                 int row = invokerAsJComponent.getSelectedRow();
                 row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -209,7 +208,7 @@ public class SendTableModel extends JTable implements Observer {
         this.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    SendTableModel tableModelparent = (SendTableModel) e.getSource();
+                    MailsHTMLTableModel tableModelparent = (MailsHTMLTableModel) e.getSource();
 
                     Point p = e.getPoint();
                     int row = tableModelparent.rowAtPoint(p);
@@ -310,11 +309,19 @@ public class SendTableModel extends JTable implements Observer {
         }
 
         if (message.getType() == ObserverMessage.NETWORK_STATUS || (int) message.getValue() == Controller.STATUS_OK) {
+            messagesModel.setRowCount(messageBufs.size());
+            for (int j = messageBufs.size() - 1; j >= 0; j--) {
+                setHeight(j);
+            }
             this.repaint();
         }
 
         if (message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE) {
             if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
+                messagesModel.setRowCount(messageBufs.size());
+                for (int j = messageBufs.size() - 1; j >= 0; j--) {
+                    setHeight(j);
+                }
 
                 this.repaint();
             }
@@ -443,7 +450,10 @@ public class SendTableModel extends JTable implements Observer {
     }
 
     private void setHeight(int row) {
-        int textHeight = (3 + lineCount(messageBufs.get(row).getDecrMessage())) * fontHeight;
+        int lines = lineCount(messageBufs.get(row).getDecrMessage());
+        if (lines > 5)
+            lines = 5;
+        int textHeight = (3 + lines) * fontHeight;
         if (textHeight < fontHeight + 3 * fontHeight) {
             textHeight = 24 + 3 * fontHeight;
         }
@@ -604,12 +614,23 @@ public class SendTableModel extends JTable implements Observer {
         }
 
         public String getDecrMessageHtml(int width, boolean selected, boolean images) {
-            Account account = this.sender;
+
+            boolean sendType;
+            Account sideAccount;
             String imginout = "";
-            if (account != null) {
-                imginout = "<img src='file:images/messages/receive.png'>";
+            if (this.sender != null) {
+                if (Controller.getInstance().wallet.accountExists(this.sender)) {
+                    imginout = "<img src='file:images/messages/send.png'>";
+                    sideAccount = recipient;
+                    sendType = false;
+                } else {
+                    imginout = "<img src='file:images/messages/receive.png'>";
+                    sideAccount = sender;
+                    sendType = true;
+                }
             } else {
-                imginout = "<img src='file:images/messages/send.png'>";
+                sendType = false;
+                sideAccount = recipient;
             }
 
             String imgLock = "";
@@ -684,11 +705,12 @@ public class SendTableModel extends JTable implements Observer {
             return "<html>"
                     + "<body width='" + width + "'>"
                     + "<table border='0' cellpadding='3' cellspacing='0'><tr><td bgcolor='" + colorHeader + "' width='" + (width / 2 - 1) + "'>"
-                    + "<font size='2.5' color='" + colorTextHeader + "'>" + Lang.getInstance().translate("From") + ":" + this.sender
+                    + "<font size='2.5' color='" + colorTextHeader + "'>"
+                    + imginout + "  " + sideAccount.getPersonAsString()
                     + "</font><br>"
                     //+ Lang.getInstance().translate("To") + ": " + this.recipient
-                    + "<font size='3.5' color='" + colorTextHeader + "'>" + title
-                    + "</font></td>"
+                    + "<center><font size=1.5em color='" + colorTextHeader + "'><b>" + title
+                    + "</b></font></center></td>"
                     + "<td bgcolor='" + colorHeader + "' align='right' width='" + (width / 2 - 1) + "'>"
                     + "<font size='2.5' color='" + colorTextHeader + "'>" + strconfirmations + " . "
                     + DateTimeFormat.timestamptoString(this.timestamp)
@@ -697,7 +719,7 @@ public class SendTableModel extends JTable implements Observer {
                     + "<br></font>"
                     + amountStr
                     + "</td></tr></table>"
-                    + "<table border='0' cellpadding='3' cellspacing='0'><tr bgcolor='" + colorTextBackground + "'><td width='25'>" + imginout
+                    + "<table border='0' cellpadding='3' cellspacing='0'><tr bgcolor='" + colorTextBackground + "'><td width='25'>"
                     + "<td width='" + width + "'>"
                     + "<font size='2.5' color='" + colorTextMessage + "'>"
                     + Library.to_HTML(decrMessage)
