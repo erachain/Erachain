@@ -5,6 +5,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
@@ -50,6 +51,8 @@ public class MailsHTMLTableModel extends JTable implements Observer {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MailsHTMLTableModel.class);
+
+    private final DefaultTableCellRenderer adaptee = new DefaultTableCellRenderer();
 
     Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
         public int compare(MessageBuf c1, MessageBuf c2) {
@@ -491,6 +494,12 @@ public class MailsHTMLTableModel extends JTable implements Observer {
         private BigDecimal fee;
         private byte[] signature;
         public final Transaction tx;
+        private String img_Local_URL;
+        private Image cachedImage;
+        ImageIcon image = null;
+        private int max_Widht;
+        private int max_Height;
+
 
         public MessageBuf(String title, byte[] rawMessage, boolean encrypted, PublicKeyAccount sender, Account recipient, long timestamp, BigDecimal amount, long assetKey, boolean backward, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText, Transaction transaction) {
             this.title = title;
@@ -653,15 +662,17 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                 strconfirmations = "<font color=red>" + strconfirmations + "</font>";
             }
 
-            String colorHeader = "F0F0F0";
-            String colorTextHeader = "000000";
+            //String colorHeader = "F0F0F0";
+            //String colorTextHeader = "000000";
             String colorTextMessage = "000000";
-            String colorTextBackground = "FFFFFF";
+            //String colorTextBackground = "FFFFFF";
 
 
             if (selected) {
-                colorHeader = "C4DAEF";
-                colorTextBackground = "D1E8FF";
+                //colorHeader = "C4DAEF";
+                //colorHeader = Settings.getInstance().markColorSelectedObj().toString();
+                //colorTextBackground = "D1E8FF";
+                //colorTextBackground = Settings.getInstance().markColorSelectedObj().toString();
             }
 
             if (this.encrypted) {
@@ -693,33 +704,52 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                 int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
                 long key = this.getAssetKey();
 
+                AssetCls asset = Controller.getInstance().getAsset(this.getAbsAssetKey());
+                byte[] iconBytes = asset.getIcon();
+
+                iconBytes = asset.getIcon();
+                if (iconBytes != null && iconBytes.length > 1) {
+                    //if (asset.getKey() == 1l) image = new ImageIcon("images/icons/icon32.png");
+                    image = new ImageIcon(iconBytes);
+                    cachedImage = image.getImage().getScaledInstance(fontHeight, fontHeight, 1);
+                    img_Local_URL = "http:\\img_" + assetKey;
+                }
 
                 String actionName = TransactionAmount.viewActionType(assetKey, amount, backward);
-                amountStr = "<font size='3'>" + actionName + " "
+                amountStr = "<b><font size='3'>" + actionName + " "
                         //+ Lang.getInstance().translate("Amount") + ": "
-                        + NumberAsString.formatAsString(this.amount) + "</font>"
-                        + " " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(DCSet.getInstance());
+                        + NumberAsString.formatAsString(this.amount) + "</font> "
+                        // TODO ошибка открытия
+                        // error ! + (cachedImage == null? "" : "<img src='" + img_Local_URL + "'>")
+                        + " " + asset.getShort(DCSet.getInstance())
+                        + "</b>";
             }
 
 
             return "<html>"
                     + "<body width='" + width + "'>"
-                    + "<table border='0' cellpadding='3' cellspacing='0'><tr><td bgcolor='" + colorHeader + "' width='" + (width / 2 - 1) + "'>"
-                    + "<font size='2.5' color='" + colorTextHeader + "'>"
+                    + "<table border='0' cellpadding='3' cellspacing='0'><tr><td" // bgcolor='" + colorHeader
+                    + " width='" + (width / 2 - 1) + "'>"
+                    + "<font size='2.5'" // color='" + colorTextHeader
+                    + ">"
                     + imginout + "  " + sideAccount.getPersonAsString()
                     + "</font><br>"
                     //+ Lang.getInstance().translate("To") + ": " + this.recipient
-                    + "<center><font size=1.5em color='" + colorTextHeader + "'><b>" + title
+                    + "<center><font size=1.5em" // color='" + colorTextHeader
+                    + "><b>" + title
                     + "</b></font></center></td>"
-                    + "<td bgcolor='" + colorHeader + "' align='right' width='" + (width / 2 - 1) + "'>"
-                    + "<font size='2.5' color='" + colorTextHeader + "'>" + strconfirmations + " . "
+                    + "<td" // bgcolor='" + colorHeader
+                    + " align='right' width='" + (width / 2 - 1) + "'>"
+                    + "<font size='2.5'" // color='" + colorTextHeader
+                    + ">" + strconfirmations + " . "
                     + DateTimeFormat.timestamptoString(this.timestamp)
                     + " " + Lang.getInstance().translate("Fee") + ": "
                     + NumberAsString.formatAsString(fee)
                     + "<br></font>"
                     + amountStr
                     + "</td></tr></table>"
-                    + "<table border='0' cellpadding='3' cellspacing='0'><tr bgcolor='" + colorTextBackground + "'><td width='25'>"
+                    + "<table border='0' cellpadding='3' cellspacing='0'><tr" // bgcolor='" + colorTextBackground
+                    + "><td width='25'>"
                     + "<td width='" + width + "'>"
                     + "<font size='2.5' color='" + colorTextMessage + "'>"
                     + Library.to_HTML(decrMessage)
