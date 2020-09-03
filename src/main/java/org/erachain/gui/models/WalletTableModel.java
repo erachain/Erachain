@@ -24,7 +24,7 @@ public abstract class WalletTableModel<T> extends TimerTableModelCls<T> implemen
 
         if (Controller.getInstance().doesWalletDatabaseExists()) {
             super.addObservers();
-            map.addObserver(this);
+            ///map.addObserver(this);
         } else {
             // ожидаем открытия кошелька
             Controller.getInstance().wallet.addWaitingObserver(this);
