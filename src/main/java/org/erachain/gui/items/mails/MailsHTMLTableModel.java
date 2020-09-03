@@ -457,9 +457,9 @@ public class MailsHTMLTableModel extends JTable implements Observer {
         int lines = lineCount(messageBufs.get(row).getDecrMessage());
         if (lines > 5)
             lines = 5;
-        int textHeight = (3 + lines) * fontHeight;
-        if (textHeight < fontHeight + 3 * fontHeight) {
-            textHeight = 24 + 3 * fontHeight;
+        int textHeight = (4 + lines) * fontHeight;
+        if (textHeight < fontHeight + 4 * fontHeight) {
+            textHeight = 24 + 4 * fontHeight;
         }
         this.setRowHeight(row, textHeight);
     }
@@ -727,14 +727,13 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                         + "</b>";
             }
 
-
             return "<html>"
                     + "<body width='" + width + "'>"
                     + "<table border='0' cellpadding='3' cellspacing='0'><tr><td" // bgcolor='" + colorHeader
                     + " width='" + (width / 2 - 1) + "'>"
                     + "<font size='2.5'" // color='" + colorTextHeader
                     + ">"
-                    + imginout + " " + Lang.getInstance().translate(sidePreff) + ": " + sideAccount.getPersonAsString()
+                    + imginout + " " + Lang.getInstance().translate(sidePreff) + ": " + sideAccount.viewPerson()
                     + "</font><br>"
                     + "<font size=1.5em" // color='" + colorTextHeader
                     + "><b>" + title
