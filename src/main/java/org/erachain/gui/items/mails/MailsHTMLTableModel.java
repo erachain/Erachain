@@ -258,6 +258,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
         Controller.getInstance().addWalletObserver(this);
         tableMap.addObserver(this);
         Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+        dcSet.getBlockMap().addObserver(this); // for new blocks
 
     }
 
@@ -326,6 +327,9 @@ public class MailsHTMLTableModel extends JTable implements Observer {
         } else if (message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
             needUpdate = true;
 
+        } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE && Controller.getInstance().isStatusOK()) {
+            repaintConfirms();
+
         } else if (message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK) {
             needUpdate = true;
 
@@ -364,6 +368,10 @@ public class MailsHTMLTableModel extends JTable implements Observer {
             needUpdate = false;
             resetItems();
         }
+    }
+
+    private void repaintConfirms() {
+        repaint();
     }
 
     private void addMessage(int pos, RSend transaction) {

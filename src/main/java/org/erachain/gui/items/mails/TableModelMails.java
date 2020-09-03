@@ -38,9 +38,6 @@ public class TableModelMails extends WalletTableModel<Transaction> {
                 new Boolean[]{false, true, true, true, false}, true, 1000);
         this.incoming = incoming;
 
-        //LISTEN ON STATUS
-        Controller.getInstance().addObserver(this);
-
     }
 
     @Override
@@ -87,11 +84,20 @@ public class TableModelMails extends WalletTableModel<Transaction> {
 
         if (message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
             needUpdate = true;
+
         } else if (message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK) {
             needUpdate = true;
         } else {
             super.syncUpdate(o, arg);
         }
+    }
+
+    @Override
+    protected void repaintConfirms() {
+        for (int i = 0; i < list.size(); i++) {
+            setValueAt(i, COLUMN_CONFIRMATIONS, list.get(i).getConfirmations(dcSet));
+        }
+        fireTableDataChanged();
     }
 
     public void getInterval() {
