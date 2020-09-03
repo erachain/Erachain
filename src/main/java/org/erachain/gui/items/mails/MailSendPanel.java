@@ -786,24 +786,6 @@ public class MailSendPanel extends IconPanel {
 
             // CHECK VALIDATE MESSAGE
             if (result == transaction.VALIDATE_OK) {
-                // RESET FIELDS
-
-                if (amount != null && amount.compareTo(BigDecimal.ZERO) == 1) // IF
-                // MORE
-                // THAN
-                // ZERO
-                {
-                    this.txtAmount.setText("0");
-                }
-
-                // TODO "A" ??
-                if (false && this.txtTo.getText().startsWith(wrongFirstCharOfAddress)) {
-                    this.txtTo.setText("");
-                }
-
-                this.txtMessage.setText("");
-
-                // TODO "A" ??
                 if (true || this.txtTo.getText().startsWith(wrongFirstCharOfAddress)) {
                     JOptionPane.showMessageDialog(new JFrame(),
                             Lang.getInstance().translate("Message and/or payment has been sent!"),

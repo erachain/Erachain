@@ -1,7 +1,6 @@
 package org.erachain.gui.items.mails;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
@@ -9,14 +8,14 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.WalletTableModel;
 import org.erachain.utils.DateTimeFormat;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Observable;
 
 @SuppressWarnings("serial")
 public class TableModelMails extends WalletTableModel<Transaction> {
@@ -39,6 +38,9 @@ public class TableModelMails extends WalletTableModel<Transaction> {
                 new Boolean[]{false, true, true, true, false}, true, 1000);
         this.incoming = incoming;
         this.dcSet = DCSet.getInstance();
+
+        Controller.getInstance().addWalletObserver(this);
+        Controller.getInstance().addObserver(this);
 
     }
 
@@ -80,95 +82,52 @@ public class TableModelMails extends WalletTableModel<Transaction> {
         return null;
     }
 
+    @Override
+    public void syncUpdate(Observable o, Object arg) {
+        ObserverMessage message = (ObserverMessage) arg;
+
+        if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
+                || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
+            needUpdate = true;
+        } else {
+            super.syncUpdate(o, arg);
+        }
+    }
+
     public void getInterval() {
 
+        list = new ArrayList<Transaction>();
 
-        ArrayList<Transaction> all_transactions = new ArrayList<Transaction>();
+        Wallet wallet = Controller.getInstance().wallet;
+        Iterator<Fun.Tuple2<Long, Integer>> iterator = ((WTransactionMap) map).getTypeIterator(
+                (byte) Transaction.SEND_ASSET_TRANSACTION, true);
+        if (iterator == null) {
+            return;
+        }
 
-        if (false) {
-            for (Account account : Controller.getInstance().getWalletAccounts()) {
-                all_transactions.addAll(dcSet.getTransactionFinalMap()
-                        .getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
+        RSend rsend;
+        boolean outcome;
+        Fun.Tuple2<Long, Integer> key;
+        while (iterator.hasNext()) {
+            key = iterator.next();
+            try {
+                rsend = (RSend) wallet.getTransaction(key);
+            } catch (Exception e) {
+                continue;
             }
 
-            for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(300, true)) {
-                if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                    all_transactions.add(transaction);
-                }
-            }
+            if (rsend == null)
+                continue;
+            if (rsend.hasAmount())
+                continue;
 
+            // это исходящее письмо?
+            // смотрим по совпадению ключа к котроому трнзакци прилипла и стоит ли он как создатель
+            outcome = key.b.equals(rsend.getCreator().hashCode());
 
-            for (Transaction messagetx : all_transactions) {
-                boolean is = false;
-                if (!this.list.isEmpty()) {
-                    for (Transaction message1 : this.list) {
-                        if (Arrays.equals(messagetx.getSignature(), message1.getSignature())) {
-                            is = true;
-                            break;
-                        }
-                    }
-                }
-                if (!is) {
-
-                    if (messagetx.getAssetKey() == 0) {
-                        for (Account account1 : Controller.getInstance().getWalletAccounts()) {
-                            RSend a = (RSend) messagetx;
-                            if (a.getRecipient().getAddress().equals(account1.getAddress()) && incoming) {
-                                this.list.add(a);
-                            }
-
-                            if (a.getCreator().getAddress().equals(account1.getAddress()) && !incoming) {
-                                this.list.add(a);
-                            }
-
-                        }
-                    }
-                }
-            }
-
-            this.list.sort(new Comparator<Transaction>() {
-                public int compare(Transaction o1, Transaction o2) {
-                    // TODO Auto-generated method stub
-
-                    return (int) (o2.getTimestamp() - o1.getTimestamp());
-                }
-            });
-
-        } else {
-
-            list = new ArrayList<Transaction>();
-
-            Wallet wallet = Controller.getInstance().wallet;
-            Iterator<Fun.Tuple2<Long, Integer>> iterator = ((WTransactionMap) map).getTypeIterator(
-                    (byte) Transaction.SEND_ASSET_TRANSACTION, true);
-            if (iterator == null) {
-                return;
-            }
-
-            RSend rsend;
-            boolean outcome;
-            Fun.Tuple2<Long, Integer> key;
-            while (iterator.hasNext()) {
-                key = iterator.next();
-                try {
-                    rsend = (RSend) wallet.getTransaction(key);
-                } catch (Exception e) {
-                    continue;
-                }
-
-                if (rsend == null)
-                    continue;
-                if (rsend.hasAmount())
-                    continue;
-
-                // это исходящее письмо?
-                // смотрим по совпадению ключа к котроому трнзакци прилипла и стоит ли он как создатель
-                outcome = key.b.equals(rsend.getCreator().hashCode());
-
-                if (incoming ^ outcome) {
-                    rsend.setDC(dcSet, false);
-                    list.add(rsend);
-                }
+            if (incoming ^ outcome) {
+                rsend.setDC(dcSet, false);
+                list.add(rsend);
             }
         }
     }

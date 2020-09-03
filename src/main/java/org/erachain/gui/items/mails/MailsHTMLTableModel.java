@@ -58,6 +58,8 @@ public class MailsHTMLTableModel extends JTable implements Observer {
 
     private final DefaultTableCellRenderer adaptee = new DefaultTableCellRenderer();
 
+    private boolean needUpdate;
+
     Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
         public int compare(MessageBuf c1, MessageBuf c2) {
             long diff = c2.getTimestamp() - c1.getTimestamp();
@@ -87,7 +89,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
         fontHeight = this.getFontMetrics(this.getFont()).getHeight();
 
         messagesModel = new DefaultTableModel();
-        setMyAccount(myAccountFilter);
+        this.myAccountFilter = myAccountFilter;
 
         this.setModel(messagesModel);
         messagesModel.addColumn("");
@@ -249,8 +251,13 @@ public class MailsHTMLTableModel extends JTable implements Observer {
             }
         });
 
+        resetItems();
+
         Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
+        tableMap.addObserver(this);
+        Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+
     }
 
 
@@ -301,7 +308,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
         try {
             this.syncUpdate(o, arg);
         } catch (Exception e) {
-            //GUI ERROR
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -315,28 +322,15 @@ public class MailsHTMLTableModel extends JTable implements Observer {
             if (status == Wallet.STATUS_LOCKED) {
                 cryptoCloseAll();
             }
-        }
 
-        if (message.getType() == ObserverMessage.NETWORK_STATUS || (int) message.getValue() == Controller.STATUS_OK) {
-            messagesModel.setRowCount(messageBufs.size());
-            for (int j = messageBufs.size() - 1; j >= 0; j--) {
-                setHeight(j);
-            }
-            this.repaint();
-        }
+        } else if (message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK) {
+            needUpdate = true;
 
-        if (message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE) {
-            if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
-                messagesModel.setRowCount(messageBufs.size());
-                for (int j = messageBufs.size() - 1; j >= 0; j--) {
-                    setHeight(j);
-                }
+        } else if (message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE
+                || message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE) {
+            needUpdate = true;
 
-                this.repaint();
-            }
-        }
-
-        if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
+        } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
             boolean is;
             if (((Transaction) message.getValue()).getType() == Transaction.SEND_ASSET_TRANSACTION) {
                 is = false;
@@ -348,8 +342,8 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                         }
                     }
                 if (!is) {
-                    
-                    Transaction messagetx = (Transaction)message.getValue();
+
+                    Transaction messagetx = (Transaction) message.getValue();
                     messagetx.setDC(DCSet.getInstance(), false);
 
                     addMessage(0, (RSend) messagetx);
@@ -367,6 +361,9 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                     this.repaint();
                 }
             }
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
+            needUpdate = false;
+            resetItems();
         }
     }
 
