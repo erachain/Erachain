@@ -29,7 +29,7 @@ public class TableModelMails extends WalletTableModel<Transaction> {
     public static final int COLUMN_RECIEVER = 4;
 
     boolean incoming;
-    DCSet dcSet;
+    DCSet dcSet = DCSet.getInstance();
 
     public TableModelMails(boolean incoming) {
 
@@ -37,9 +37,8 @@ public class TableModelMails extends WalletTableModel<Transaction> {
                 new String[]{"№", "Date", "Title", "Sender", "Receiver"},
                 new Boolean[]{false, true, true, true, false}, true, 1000);
         this.incoming = incoming;
-        this.dcSet = DCSet.getInstance();
 
-        Controller.getInstance().addWalletObserver(this);
+        //LISTEN ON STATUS
         Controller.getInstance().addObserver(this);
 
     }
@@ -86,8 +85,9 @@ public class TableModelMails extends WalletTableModel<Transaction> {
     public void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
-        if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
-                || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
+        if (message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
+            needUpdate = true;
+        } else if (message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK) {
             needUpdate = true;
         } else {
             super.syncUpdate(o, arg);

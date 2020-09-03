@@ -253,8 +253,9 @@ public class MailsHTMLTableModel extends JTable implements Observer {
 
         resetItems();
 
-        Controller.getInstance().addWalletObserver(this);
+        //LISTEN ON STATUS
         Controller.getInstance().addObserver(this);
+        Controller.getInstance().addWalletObserver(this);
         tableMap.addObserver(this);
         Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
 
@@ -322,12 +323,10 @@ public class MailsHTMLTableModel extends JTable implements Observer {
             if (status == Wallet.STATUS_LOCKED) {
                 cryptoCloseAll();
             }
-
-        } else if (message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK) {
+        } else if (message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
             needUpdate = true;
 
-        } else if (message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE
-                || message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE) {
+        } else if (message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK) {
             needUpdate = true;
 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
