@@ -23,11 +23,10 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
     public static String NAME = "SearchTemplatesSplitPanel";
     public static String TITLE = "Search Templates";
 
-    private static TemplatesItemsTableModel tableModelTemplates = new TemplatesItemsTableModel();
     private SearchTemplatesSplitPanel th;
 
     public SearchTemplatesSplitPanel() {
-        super(tableModelTemplates, NAME, TITLE);
+        super(new TemplatesItemsTableModel(), NAME, TITLE);
 
         this.th = this;
 

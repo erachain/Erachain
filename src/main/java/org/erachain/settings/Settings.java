@@ -1131,6 +1131,10 @@ public class Settings {
         }
     }
 
+    public static String colorToHex(Color color) {
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+    }
+
     public String markColorSelected() {
         if (this.settingsJSON.containsKey("markcolorselected")) {
             return this.settingsJSON.get("markcolorselected").toString();

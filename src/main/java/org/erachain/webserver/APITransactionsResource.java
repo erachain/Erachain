@@ -429,7 +429,7 @@ public class APITransactionsResource {
         JSONArray array = new JSONArray();
         DCSet dcSet = DCSet.getInstance();
 
-        List<Transaction> transaction = dcSet.getTransactionTab().getTransactions(address, type,
+        List<Transaction> transaction = dcSet.getTransactionTab().getTransactions(new Account(address), type,
                 timestamp, count, descending);
 
         for (Transaction record : transaction) {

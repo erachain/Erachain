@@ -4,19 +4,17 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.models.TimerTableModelCls;
+import org.erachain.gui.models.WalletTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.ObserverMessage;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
 // in list of org.erachain.records in wallet
-public class PaymentOrdersTableModel extends TimerTableModelCls<Transaction> implements Observer {
+public class PaymentOrdersTableModel extends WalletTableModel<Transaction> implements Observer {
 
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -28,11 +26,10 @@ public class PaymentOrdersTableModel extends TimerTableModelCls<Transaction> imp
     public static final int COLUMN_FEE = 7;
     public static final int COLUMN_SIZE = 8;
 
-    private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
-
     public PaymentOrdersTableModel() {
-        super(new String[]{"Confirmation", "Timestamp", "Type", "Creator", "Item",
-                "Amount", "Recipient", "Fee", "Size"}, true);
+        super(Controller.getInstance().wallet.database.getTransactionMap(),
+                new String[]{"Confirmation", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"},
+                new Boolean[]{true, true, true, true, true, true, true, false, false}, true, 1000);
 
         logger = LoggerFactory.getLogger(PaymentOrdersTableModel.class);
     }
@@ -135,47 +132,5 @@ public class PaymentOrdersTableModel extends TimerTableModelCls<Transaction> imp
 
         return null;
 
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-        int messageType = message.getType();
-
-        //CHECK IF NEW LIST
-        if (messageType == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-            //CHECK IF LIST UPDATED
-            //read_trans((DCUMapImpl)message.getValue());
-            this.fireTableDataChanged();
-
-        }
-
-        if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
-                || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
-                || message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE
-                || message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE
-                ) {
-            this.fireTableDataChanged();
-        }
-    }
-
-    public void addObservers() {
-
-        Controller.getInstance().addWalletObserver(this);
-    }
-
-
-    public void deleteObservers() {
-
-        Controller.getInstance().deleteObserver(this);
     }
 }
