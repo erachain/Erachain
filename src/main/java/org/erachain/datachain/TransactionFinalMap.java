@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.dbs.DBTab;
@@ -62,6 +63,8 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
     List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int limit, int offset);
 
     List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, boolean onlyCreator, Long fromID, int limit, int offset);
+
+    List<Transaction> getTransactionsByAddressAndType(byte[] address_A_Short, Account address_B, Integer type, boolean onlyCreator, Long fromID, int limit, int offset);
 
     List<Transaction> getTransactionsByTitle(String filter, String fromWord, Long fromSeqNo, int offset, int limit, boolean descending);
 

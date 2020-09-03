@@ -19,6 +19,7 @@ import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
@@ -49,6 +50,9 @@ import java.util.*;
 @SuppressWarnings("serial")
 public class MailsHTMLTableModel extends JTable implements Observer {
 
+    public static boolean markIncome = Settings.getInstance().markIncome();
+    public final static Color FORE_COLOR = Settings.getInstance().markColorObj();
+    public final static Color FORE_COLOR_SELECTED = Settings.getInstance().markColorSelectedObj();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MailsHTMLTableModel.class);
 
@@ -74,15 +78,16 @@ public class MailsHTMLTableModel extends JTable implements Observer {
     Wallet wallet = Controller.getInstance().wallet;
     DWSet dwSet = wallet.database;
     WTransactionMap tableMap = dwSet.getTransactionMap();
-    private Account accountFilter;
+    private Account myAccountFilter;
+    private Account sideAccountFilter;
 
-    public MailsHTMLTableModel(MailSendPanel parent, Account accountFilter) {
+    public MailsHTMLTableModel(MailSendPanel parent, Account myAccountFilter) {
         this.setShowGrid(false);
 
         fontHeight = this.getFontMetrics(this.getFont()).getHeight();
 
         messagesModel = new DefaultTableModel();
-        setAccount(accountFilter);
+        setMyAccount(myAccountFilter);
 
         this.setModel(messagesModel);
         messagesModel.addColumn("");
@@ -628,20 +633,24 @@ public class MailsHTMLTableModel extends JTable implements Observer {
             Account sideAccount;
             String imginout = "";
             String sidePreff;
-            if (accountFilter != null) {
-                if (this.sender != null && this.sender.equals(accountFilter)) {
+            String colorTextHeader;
+            if (myAccountFilter != null) {
+                if (this.sender != null && this.sender.equals(myAccountFilter)) {
                     imginout = "<img src='file:images/messages/send.png'>";
                     sideAccount = recipient;
                     sidePreff = "To";
+                    colorTextHeader = markIncome ? Settings.colorToHex(Settings.getInstance().markColorObj()) : "";
                 } else {
                     imginout = "<img src='file:images/messages/receive.png'>";
                     sideAccount = sender;
                     sidePreff = "From";
+                    colorTextHeader = !markIncome ? Settings.colorToHex(Settings.getInstance().markColorObj()) : "";
                 }
             } else {
                 imginout = "";
                 sidePreff = "To";
                 sideAccount = recipient;
+                colorTextHeader = "";
             }
 
             String imgLock = "";
@@ -734,9 +743,10 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                     + "<font size='2.5'" // color='" + colorTextHeader
                     + ">"
                     + imginout + " " + Lang.getInstance().translate(sidePreff) + ": " + sideAccount.viewPerson()
+                    //+ imginout + " " + Lang.getInstance().translate("From") + ": " + sender.viewPerson()
+                    //+ "<br>" + Lang.getInstance().translate("To") + ": " + recipient.viewPerson()
                     + "</font><br>"
-                    + "<font size=1.5em" // color='" + colorTextHeader
-                    + "><b>" + title
+                    + "<font size=1.5em color='" + colorTextHeader + "'><b>" + title
                     + "</b></font></td>"
                     + "<td" // bgcolor='" + colorHeader
                     + " align='right' width='" + (width / 2 - 1) + "'>"
@@ -817,42 +827,46 @@ public class MailsHTMLTableModel extends JTable implements Observer {
         }
     }
 
-    public synchronized void setAccount(Account accountFilter) {
+    /**
+     * из кошелька только берем - там же и неподтвержденные
+     */
+    private void resetItems() {
 
         List<Transaction> transactions = new ArrayList<Transaction>();
 
-        if (accountFilter == null) {
-            for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(1000, true)) {
-                if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                    transactions.add(transaction);
-                }
-            }
-        } else {
-            // только на этот счет
-            for (Transaction transaction : dcSet.getTransactionFinalMap().getTransactionsByAddressAndType(
-                    accountFilter.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION,
-                    Boolean.FALSE, null, 100, 0)) {
-                transactions.add(transaction);
-            }
-        }
-
-        if (accountFilter == null) {
-            for (Account account : Controller.getInstance().getWalletAccounts()) {
-                transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
-            }
-        } else {
-            // только из кошелька
+        if (myAccountFilter == null) {
+            // IN WALLET - UNCONFIRMED TOO HERE - ALL
             try (IteratorCloseable<Fun.Tuple2<Long, Integer>> iterator =
-                         tableMap.getAddressTypeIterator(accountFilter, Transaction.SEND_ASSET_TRANSACTION, true)) {
+                         tableMap.getTypeIterator((byte) Transaction.SEND_ASSET_TRANSACTION, true)) {
                 while (iterator.hasNext()) {
                     transactions.add(tableMap.get(iterator.next()));
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+            }
+        } else {
+            if (this.sideAccountFilter == null) {
+                // только на этот счет и любая сторона
+                try (IteratorCloseable<Fun.Tuple2<Long, Integer>> iterator =
+                             tableMap.getAddressTypeIterator(myAccountFilter, Transaction.SEND_ASSET_TRANSACTION, true)) {
+                    while (iterator.hasNext()) {
+                        transactions.add(tableMap.get(iterator.next()));
+                    }
+                } catch (IOException e) {
+                }
+            } else {
+                // BOTH ACCOUNTS
+                try (IteratorCloseable<Fun.Tuple2<Long, Integer>> iterator =
+                             tableMap.getAddressTypeIterator(myAccountFilter, Transaction.SEND_ASSET_TRANSACTION, true)) {
+                    while (iterator.hasNext()) {
+                        Transaction transaction = tableMap.get(iterator.next());
+                        if (transaction.isInvolved(sideAccountFilter))
+                            transactions.add(transaction);
+                    }
+                } catch (IOException e) {
+                }
             }
         }
 
-        this.accountFilter = accountFilter;
         if (messageBufs == null)
             messageBufs = new ArrayList<MessageBuf>();
         else
@@ -882,6 +896,16 @@ public class MailsHTMLTableModel extends JTable implements Observer {
 
         this.repaint();
 
+    }
+
+    public synchronized void setMyAccount(Account accountFilter) {
+        this.myAccountFilter = accountFilter;
+        resetItems();
+    }
+
+    public synchronized void setSideAccount(Account accountFilter) {
+        this.sideAccountFilter = accountFilter;
+        resetItems();
     }
 }
 

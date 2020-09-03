@@ -582,18 +582,17 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     }
 
     /**
-     * @param address    may be Null for ALL
+     * @param account    may be Null for ALL
      * @param type
      * @param timestamp
      * @param count
      * @param descending
      * @return
      */
-    public List<Transaction> getTransactions(String address, int type, long timestamp, int count, boolean descending) {
+    public List<Transaction> getTransactions(Account account, int type, long timestamp, int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<>();
         try (IteratorCloseable<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
-            Account account = address == null ? null : new Account(address);
 
             int i = 0;
             Transaction transaction;

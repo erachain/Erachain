@@ -426,8 +426,59 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     /**
+     * Поиск сразу по двум счетам - получателя и отправителя
+     *
+     * @param address_A_Short
+     * @param address_B_Short
+     * @param type
+     * @param onlyCreator
+     * @param fromID
+     * @param limit
+     * @param offset
+     * @return
+     */
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Transaction> getTransactionsByAddressAndType(byte[] address_A_Short, Account address_B, Integer type,
+                                                             boolean onlyCreator, Long fromID, int limit, int offset) {
+
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        List<Transaction> transactions = new ArrayList<>();
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(address_A_Short, type, onlyCreator, fromID, false)) {
+            int counter = 0;
+            Transaction item;
+            Long key;
+            while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+
+                item = get(iterator.next());
+                if (onlyCreator && item.getCreator() != null && !item.getCreator().equals(address_A_Short)) {
+                    // пропустим всех кто не создатель
+                    continue;
+                }
+
+                if (offset > 0) {
+                    offset--;
+                    continue;
+                }
+
+                item.setDC((DCSet) databaseSet, true);
+                if (item.isInvolved(address_B)) {
+                    transactions.add(item);
+                    counter++;
+                }
+            }
+        } catch (IOException e) {
+        }
+        return transactions;
+    }
+
+    /**
      * Если слово заканчивается на "!" - то поиск полностью слова
      * или если оно короче чем MIN_WORLD_INDEX, иначе поиск по началу
+     *
      * @param words
      * @return
      */

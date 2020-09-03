@@ -396,7 +396,7 @@ public class MailSendPanel extends IconPanel {
         cbxFrom.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                messagesHistoryTable.setAccount((Account) cbxFrom.getSelectedItem());
+                messagesHistoryTable.setMyAccount((Account) cbxFrom.getSelectedItem());
             }
         });
 
@@ -486,6 +486,13 @@ public class MailSendPanel extends IconPanel {
             }
             this.add(txtTo, txtToGBC);
         }
+
+        txtTo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                messagesHistoryTable.setSideAccount(new Account(txtTo.getText()));
+            }
+        });
 
         /*
          * this.pack(); this.setLocationRelativeTo(null);
