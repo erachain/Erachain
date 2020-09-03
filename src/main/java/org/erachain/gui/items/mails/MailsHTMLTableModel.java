@@ -74,15 +74,15 @@ public class MailsHTMLTableModel extends JTable implements Observer {
     Wallet wallet = Controller.getInstance().wallet;
     DWSet dwSet = wallet.database;
     WTransactionMap tableMap = dwSet.getTransactionMap();
-    private Account accountFrom;
+    private Account accountFilter;
 
-    public MailsHTMLTableModel(MailSendPanel parent, Account accountFrom) {
+    public MailsHTMLTableModel(MailSendPanel parent, Account accountFilter) {
         this.setShowGrid(false);
 
         fontHeight = this.getFontMetrics(this.getFont()).getHeight();
 
         messagesModel = new DefaultTableModel();
-        setAccount(accountFrom);
+        setAccount(accountFilter);
 
         this.setModel(messagesModel);
         messagesModel.addColumn("");
@@ -625,21 +625,22 @@ public class MailsHTMLTableModel extends JTable implements Observer {
 
         public String getDecrMessageHtml(int width, boolean selected, boolean images) {
 
-            boolean sendType;
             Account sideAccount;
             String imginout = "";
-            if (this.sender != null) {
-                if (Controller.getInstance().wallet.accountExists(this.sender)) {
+            String sidePreff;
+            if (accountFilter != null) {
+                if (this.sender != null && this.sender.equals(accountFilter)) {
                     imginout = "<img src='file:images/messages/send.png'>";
                     sideAccount = recipient;
-                    sendType = false;
+                    sidePreff = "To";
                 } else {
                     imginout = "<img src='file:images/messages/receive.png'>";
                     sideAccount = sender;
-                    sendType = true;
+                    sidePreff = "From";
                 }
             } else {
-                sendType = false;
+                imginout = "";
+                sidePreff = "To";
                 sideAccount = recipient;
             }
 
@@ -707,13 +708,12 @@ public class MailsHTMLTableModel extends JTable implements Observer {
 
                 AssetCls asset = Controller.getInstance().getAsset(this.getAbsAssetKey());
                 byte[] iconBytes = asset.getIcon();
-
-                iconBytes = asset.getIcon();
-                if (iconBytes != null && iconBytes.length > 1) {
+                if (false && iconBytes != null && iconBytes.length > 1) {
                     //if (asset.getKey() == 1l) image = new ImageIcon("images/icons/icon32.png");
                     image = new ImageIcon(iconBytes);
                     cachedImage = image.getImage().getScaledInstance(fontHeight, fontHeight, 1);
                     img_Local_URL = "http:\\img_" + assetKey;
+                    // TODO нужно еще КЭШ картинок сделать как тут org.erachain.gui.items.assets.AssetInfo.HTML_Add_Local_Images
 
                 }
 
@@ -722,8 +722,8 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                         //+ Lang.getInstance().translate("Amount") + ": "
                         + NumberAsString.formatAsString(this.amount) + "</font> "
                         // TODO ошибка открытия
-                        //+ (cachedImage == null? "" : "<img src='" + img_Local_URL + "'>")
-                        + " " + asset.getShort(DCSet.getInstance())
+                        + (cachedImage == null ? "" : "<img src='" + img_Local_URL + "'>")
+                        + " " + asset.toString()
                         + "</b>";
             }
 
@@ -734,12 +734,11 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                     + " width='" + (width / 2 - 1) + "'>"
                     + "<font size='2.5'" // color='" + colorTextHeader
                     + ">"
-                    + imginout + "  " + sideAccount.getPersonAsString()
+                    + imginout + " " + Lang.getInstance().translate(sidePreff) + ": " + sideAccount.getPersonAsString()
                     + "</font><br>"
-                    //+ Lang.getInstance().translate("To") + ": " + this.recipient
-                    + "<center><font size=1.5em" // color='" + colorTextHeader
+                    + "<font size=1.5em" // color='" + colorTextHeader
                     + "><b>" + title
-                    + "</b></font></center></td>"
+                    + "</b></font></td>"
                     + "<td" // bgcolor='" + colorHeader
                     + " align='right' width='" + (width / 2 - 1) + "'>"
                     + "<font size='2.5'" // color='" + colorTextHeader
@@ -854,7 +853,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
             }
         }
 
-        accountFrom = accountFilter;
+        this.accountFilter = accountFilter;
         if (messageBufs == null)
             messageBufs = new ArrayList<MessageBuf>();
         else
