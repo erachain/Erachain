@@ -487,13 +487,6 @@ public class MailSendPanel extends IconPanel {
             this.add(txtTo, txtToGBC);
         }
 
-        txtTo.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                messagesHistoryTable.setSideAccount(new Account(txtTo.getText()));
-            }
-        });
-
         /*
          * this.pack(); this.setLocationRelativeTo(null);
          * this.setMaximizable(true);
@@ -525,16 +518,24 @@ public class MailSendPanel extends IconPanel {
 
         if (recipient.isEmpty()) {
             txtRecDetails.setText("");
+            messagesHistoryTable.setSideAccount(null);
             return;
         }
 
         if (true) {
             this.txtRecDetails.setText(Account.getDetailsForEncrypt(recipient, asset.getKey(),
                     encrypted.isSelected()));
+
+            Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipient);
+            if (accountRes.b == null) {
+                messagesHistoryTable.setSideAccount(accountRes.a);
+            }
+
         } else {
 
             if (txtTo.getText().equals("has no Addresses")) {
                 txtRecDetails.setText(person.viewName() + " " + Lang.getInstance().translate("has no Accounts"));
+                messagesHistoryTable.setSideAccount(null);
                 return;
             }
 
@@ -544,6 +545,8 @@ public class MailSendPanel extends IconPanel {
             // CHECK IF RECIPIENT IS VALID ADDRESS
             if (accountRes.a == null) {
                 txtRecDetails.setText(accountRes.b);
+                messagesHistoryTable.setSideAccount(null);
+
                 return;
             } else {
                 account = accountRes.a;
@@ -553,6 +556,7 @@ public class MailSendPanel extends IconPanel {
                 if (account.getBalanceUSE(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
                         && account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0) {
                     txtRecDetails.setText(Lang.getInstance().translate("Warning!") + " " + txtRecDetails.getText());
+
                 }
             }
         }
