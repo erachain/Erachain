@@ -285,8 +285,9 @@ public class MailsHTMLTableModel extends JTable implements Observer {
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (row < messageBufs.size())
+        if (row < messageBufs.size()) {
             return messageBufs.get(row).getDecrMessageHtml(this.getWidth(), (this.getSelectedRow() == row), true);
+        }
         return null;
     }
 
@@ -713,6 +714,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                     image = new ImageIcon(iconBytes);
                     cachedImage = image.getImage().getScaledInstance(fontHeight, fontHeight, 1);
                     img_Local_URL = "http:\\img_" + assetKey;
+
                 }
 
                 String actionName = TransactionAmount.viewActionType(assetKey, amount, backward);
@@ -720,7 +722,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                         //+ Lang.getInstance().translate("Amount") + ": "
                         + NumberAsString.formatAsString(this.amount) + "</font> "
                         // TODO ошибка открытия
-                        // error ! + (cachedImage == null? "" : "<img src='" + img_Local_URL + "'>")
+                        //+ (cachedImage == null? "" : "<img src='" + img_Local_URL + "'>")
                         + " " + asset.getShort(DCSet.getInstance())
                         + "</b>";
             }
