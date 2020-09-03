@@ -6,6 +6,7 @@ public class ExLink {
 
     public static final byte REPLY_TYPE = 1;
     public static final byte APPENDIX_TYPE = 2;
+    public static final byte LIKE_TYPE = 3;
 
     /**
      * 0 - transaction, 1.. - ITEM
@@ -28,6 +29,13 @@ public class ExLink {
 
     public ExLink(byte flags, byte type, long ref, byte value) {
         this.flags = flags;
+        this.type = type;
+        this.ref = ref;
+        this.value = value;
+    }
+
+    public ExLink(byte type, long ref, byte value) {
+        this.flags = 0;
         this.type = type;
         this.ref = ref;
         this.value = value;
