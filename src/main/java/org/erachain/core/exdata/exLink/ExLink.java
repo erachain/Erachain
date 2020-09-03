@@ -1,8 +1,11 @@
 package org.erachain.core.exdata.exLink;
 
+import com.google.common.primitives.Longs;
 import org.json.simple.JSONObject;
 
 public class ExLink {
+
+    public static final byte BASE_LENGTH = 11;
 
     public static final byte REPLY_TYPE = 1;
     public static final byte APPENDIX_TYPE = 2;
@@ -81,8 +84,17 @@ public class ExLink {
         return json;
     }
 
-    public byte[] toByte() throws Exception {
-        return null;
+    public byte[] toByte() {
+        byte[] data = new byte[BASE_LENGTH];
+        data[0] = flags;
+        data[1] = type;
+        data[10] = value;
+        System.arraycopy(Longs.toByteArray(ref), 0, data, 2, Long.BYTES);
+
+        return data;
     }
 
+    public int length() {
+        return BASE_LENGTH;
+    }
 }
