@@ -125,7 +125,7 @@ public class TelegramManager extends Thread {
     // GET telegrams for RECIPIENT from TIME
     public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes) {
         List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
-        if (!Controller.getInstance().isOnStopping()) {
+        if (!controller.isOnStopping()) {
 
             boolean skip = false;
             SortedMap<Long, List<TelegramMessage>> subMap = telegramsForTime.tailMap(timestamp);
@@ -170,7 +170,7 @@ public class TelegramManager extends Thread {
         // TelegramMessage telegram;
         List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
         // ASK DATABASE FOR A LIST OF PEERS
-        if (!Controller.getInstance().isOnStopping()) {
+        if (!controller.isOnStopping()) {
             List<TelegramMessage> telegramsAddress = telegramsForAddress.get(recipient);
             if (telegramsAddress == null)
                 return telegrams;
@@ -580,20 +580,43 @@ public class TelegramManager extends Thread {
 
         if (Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
             // IF MY STORE is USED
-            if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
+            if (controller.wallet.isWalletDatabaseExisting()) {
 
                 // save telegram to wallet DB
-                if (Controller.getInstance().wallet.accountExists(transaction.getCreator())) {
+                if (controller.wallet.accountExists(transaction.getCreator())) {
                     // add as my OUTCOME
-                    Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, transaction);
+                    controller.wallet.database.getTelegramsMap().add(signatureKey, transaction);
                 } else {
                     // TRY ADD as my INCOME
                     HashSet<Account> recipients = transaction.getRecipientAccounts();
                     for (Account recipient : recipients) {
-                        if (Controller.getInstance().wallet.accountExists(recipient)) {
-                            Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, transaction);
-                            Controller.getInstance().addAddressFavorite(transaction.getCreator().getAddress(), "telegram", transaction.getTitle());
-                            break;
+                        if (controller.wallet.accountExists(recipient)) {
+                            controller.wallet.database.getTelegramsMap().add(signatureKey, transaction);
+                            String address = transaction.getCreator().getAddress();
+                            if (!controller.wallet.database.getFavoriteAccountsMap().contains(address)) {
+                                String title = transaction.getTitle();
+                                String description = "";
+                                if (transaction instanceof RSend) {
+                                    RSend rsend = ((RSend) transaction);
+                                    if (rsend.isText()) {
+                                        byte[] data = rsend.getData();
+                                        if (data != null && data.length > 0) {
+                                            if (rsend.isEncrypted()) {
+                                                data = controller.decrypt(transaction.getCreator(), rsend.getRecipient(), data);
+                                            }
+                                            if (data != null && data.length > 0) {
+                                                try {
+                                                    description = new String(data, "UTF-8");
+                                                } catch (UnsupportedEncodingException e) {
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                controller.addAddressFavorite(transaction.getCreator().getAddress(),
+                                        title == null || title.isEmpty() ? "telegram" : title, description);
+                                break;
+                            }
                         }
                     }
                 }
@@ -715,7 +738,7 @@ public class TelegramManager extends Thread {
                     processMessage(blockingQueue.poll(1000, TimeUnit.MILLISECONDS));
                 } catch (java.lang.OutOfMemoryError e) {
                     LOGGER.error(e.getMessage(), e);
-                    Controller.getInstance().stopAll(281);
+                    controller.stopAll(281);
                     break;
                 } catch (java.lang.IllegalMonitorStateException e) {
                     break;
@@ -745,7 +768,7 @@ public class TelegramManager extends Thread {
                 }
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(282);
+                controller.stopAll(282);
                 break;
             }
 
