@@ -20,11 +20,10 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel {
     public static String TITLE = "Search Unions";
 
     private static final long serialVersionUID = 1L;
-    private static TableModelUnionsItemsTableModel tableModelUnions = new TableModelUnionsItemsTableModel();
     private SearchUnionSplitPanel th;
 
     public SearchUnionSplitPanel() {
-        super(tableModelUnions, NAME, TITLE);
+        super(new TableModelUnionsItemsTableModel(), NAME, TITLE);
         th = this;
 
         JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));

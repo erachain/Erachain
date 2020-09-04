@@ -234,16 +234,16 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator<Tuple2<Long, Integer>> getTypeIterator(Byte type, boolean descending) {
+    public IteratorCloseable<Tuple2<Long, Integer>> getTypeIterator(Byte type, boolean descending) {
 
         if (descending) {
-            return new IndexIterator((NavigableSet) typeKey.descendingSet().subSet(
+            return IteratorCloseableImpl.make(new IndexIterator((NavigableSet) typeKey.descendingSet().subSet(
                     Fun.t2(type, Fun.HI()),
-                    Fun.t2(type, null)));
+                    Fun.t2(type, null))));
         } else {
-            return new IndexIterator((NavigableSet) typeKey.subSet(
+            return IteratorCloseableImpl.make(new IndexIterator((NavigableSet) typeKey.subSet(
                     Fun.t2(type, null),
-                    Fun.t2(type, Fun.HI())));
+                    Fun.t2(type, Fun.HI()))));
         }
 
     }

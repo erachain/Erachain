@@ -22,10 +22,9 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
     public static String TITLE = "Search Polls";
 
     private static final long serialVersionUID = 1L;
-    private static PollsItemsTableModel tableModelPolls = new PollsItemsTableModel();
 
     public SearchPollsSplitPanel() {
-        super(tableModelPolls, NAME, TITLE);
+        super(new PollsItemsTableModel(), NAME, TITLE);
 
         jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setMaxWidth(200);
         jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(100);
