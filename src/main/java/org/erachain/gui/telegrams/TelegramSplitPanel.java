@@ -9,6 +9,7 @@ import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.SplitPanel;
@@ -22,6 +23,7 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.Converter;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -305,9 +307,10 @@ public class TelegramSplitPanel extends SplitPanel {
         copyAddress.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                Tuple2<String, Tuple2<String, String>> account = accountModel.getItem(row);
+                Tuple2<String, Tuple3<String, String, String>> account = accountModel.getItem(row);
                 StringSelection value = new StringSelection(account.a);
+
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(value, null);
             }
         });
@@ -316,12 +319,22 @@ public class TelegramSplitPanel extends SplitPanel {
         JMenuItem menu_copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
         menu_copyPublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-                Tuple2<String, Tuple2<String, String>> account = accountModel.getItem(row);
-                byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(account.a);
-                PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
-                StringSelection value = new StringSelection(public_Account.getBase58());
+                String publicKey58;
+                Tuple2<String, Tuple3<String, String, String>> item = accountModel.getItem(row);
+                if (item.b.a == null) {
+                    byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(item.a);
+                    if (publicKey == null) {
+                        publicKey58 = "not found";
+                    } else {
+                        publicKey58 = new PublicKeyAccount(publicKey).getBase58();
+                    }
+                } else {
+                    publicKey58 = item.b.a;
+                }
+                StringSelection value = new StringSelection(publicKey58);
+
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(value, null);
             }
         });
@@ -330,11 +343,11 @@ public class TelegramSplitPanel extends SplitPanel {
         JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Tuple2<String, Tuple2<String, String>> account1 = accountModel.getItem(row);
-                Account account = new Account(account1.a);
+                Tuple2<String, Tuple3<String, String, String>> item = accountModel.getItem(row);
+                Account accountTo = FavoriteAccountsMap.detPublicKeyOrAccount(item.a, item.b);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"),
                         new AccountAssetSendPanel(null,
-                                null, account, null, null));
+                                null, accountTo, null, null));
 
 
             }
@@ -344,10 +357,10 @@ public class TelegramSplitPanel extends SplitPanel {
         JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Tuple2<String, Tuple2<String, String>> account1 = accountModel.getItem(row);
-                Account account = new Account(account1.a);
+                Tuple2<String, Tuple3<String, String, String>> item = accountModel.getItem(row);
+                Account accountTo = FavoriteAccountsMap.detPublicKeyOrAccount(item.a, item.b);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"),
-                        new MailSendPanel(null, account, null));
+                        new MailSendPanel(null, accountTo, null));
 
             }
         });
@@ -356,9 +369,8 @@ public class TelegramSplitPanel extends SplitPanel {
         JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit name"));
         setName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Tuple2<String, Tuple2<String, String>> account1 = accountModel.getItem(row);
-
-                new AccountSetNameDialog(account1.b.a);
+                Tuple2<String, Tuple3<String, String, String>> item = accountModel.getItem(row);
+                new AccountSetNameDialog(item.a);
                 tableFavoriteAccounts.repaint();
 
             }
@@ -368,7 +380,7 @@ public class TelegramSplitPanel extends SplitPanel {
         JMenuItem menuItemDelete = new JMenuItem(Lang.getInstance().translate("Remove Favorite"));
         menuItemDelete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (!Controller.getInstance().isWalletUnlocked()) {
+                if (false && !Controller.getInstance().isWalletUnlocked()) {
                     // ASK FOR PASSWORD
                     String password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
                     if (password.equals("")) {
@@ -389,8 +401,8 @@ public class TelegramSplitPanel extends SplitPanel {
                 int row = tableFavoriteAccounts.getSelectedRow();
                 try {
                     row = tableFavoriteAccounts.convertRowIndexToModel(row);
-                    Tuple2<String, Tuple2<String, String>> ac = accountModel.getItem(row);
-                    Controller.getInstance().wallet.database.getFavoriteAccountsMap().delete(ac.a);
+                    Tuple2<String, Tuple3<String, String, String>> item = accountModel.getItem(row);
+                    Controller.getInstance().wallet.database.getFavoriteAccountsMap().delete(item.a);
                 } catch (Exception e1) {
                     logger.error(e1.getMessage(), e1);
                 }

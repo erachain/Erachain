@@ -6,6 +6,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.gui.PasswordPane;
 import org.erachain.lang.Lang;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -107,10 +108,10 @@ public class AccountNameAdd extends javax.swing.JDialog {
                     } else {
                         Account newAccount = result.a;
                         if (newAccount instanceof PublicKeyAccount) {
-                            favoriteAccountsMap.put(address, new Tuple3(accountName, ((PublicKeyAccount) newAccount).getBase58(),
-                                    resultStrJSonFine.convert(json)));
+                            favoriteAccountsMap.put(address, new Tuple3(newAccount.getAddress(), ((PublicKeyAccount) newAccount).getBase58(),
+                                    StrJSonFine.convert(json)));
                         } else {
-                            favoriteAccountsMap.put(address, new Tuple3(accountName, null, resultStrJSonFine.convert(json)));
+                            favoriteAccountsMap.put(address, new Tuple3(newAccount.getAddress(), null, StrJSonFine.convert(json)));
                         }
                         setVisible(false);
                     }

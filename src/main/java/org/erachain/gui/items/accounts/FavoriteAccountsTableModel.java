@@ -15,20 +15,21 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 
 @SuppressWarnings("serial")
-public class FavoriteAccountsTableModel extends WalletTableModel<Tuple2<String, Tuple2<String, String>>> {
+public class FavoriteAccountsTableModel extends WalletTableModel<Tuple2<String, Tuple3<String, String, String>>> {
 
     public static final int COLUMN_NO = 0;
     public static final int COLUMN_ADDRESS = 1;
-    public static final int COLUMN_NAME = 2;
-    public static final int COLUMN_DESCRIPTION = 3;
-    public static final int COLUMN_PERSON = 4;
+    public static final int COLUMN_PUB_KEY = 2;
+    public static final int COLUMN_NAME = 3;
+    public static final int COLUMN_DESCRIPTION = 4;
+    public static final int COLUMN_PERSON = 5;
 
     //private Tuple2<String, Tuple2<String, String>> account;
 
     public FavoriteAccountsTableModel() {
         super(Controller.getInstance().wallet.database.getFavoriteAccountsMap(),
-                new String[]{"No.", "Account", "Name", "Description", "Person"},
-                new Boolean[]{true, false, false, false}, false, -1);
+                new String[]{"No.", "Account", "PubKey", "Name", "Description", "Person"},
+                new Boolean[]{true, false, false, false, false}, false, -1);
 
     }
 
@@ -38,7 +39,7 @@ public class FavoriteAccountsTableModel extends WalletTableModel<Tuple2<String, 
             return null;
         }
 
-        Tuple2<String, Tuple2<String, String>> item = this.list.get(row);
+        Tuple2<String, Tuple3<String, String, String>> item = this.list.get(row);
         if (item == null) {
             return null;
         }
@@ -54,13 +55,14 @@ public class FavoriteAccountsTableModel extends WalletTableModel<Tuple2<String, 
                 return row + 1;
             case COLUMN_ADDRESS:
                 return item.a;
-            case COLUMN_NAME:
+            case COLUMN_PUB_KEY:
                 return item.b.a;
+            case COLUMN_NAME:
+                return item.b.b;
             case COLUMN_PERSON:
                 return new Account(item.a).viewPerson();
             case COLUMN_DESCRIPTION:
-
-                json = (JSONObject) JSONValue.parse(item.b.b);
+                json = (JSONObject) JSONValue.parse(item.b.c);
                 json = json == null ? new JSONObject() : json;
                 // set papams
                 if (json.containsKey("description")) {
@@ -80,7 +82,7 @@ public class FavoriteAccountsTableModel extends WalletTableModel<Tuple2<String, 
             try (IteratorCloseable iterator = map.getIterator()) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
-                    list.add(new Tuple2<String, Tuple2<String, String>>((String) key, (Tuple2) map.get(key)));
+                    list.add(new Tuple2<String, Tuple3<String, String, String>>((String) key, (Tuple3) map.get(key)));
                 }
             } catch (IOException e) {
             }
@@ -88,7 +90,7 @@ public class FavoriteAccountsTableModel extends WalletTableModel<Tuple2<String, 
             try (IteratorCloseable iterator = map.getIterator()) {
                 while (iterator.hasNext() && count++ < step) {
                     key = iterator.next();
-                    list.add(new Tuple2<String, Tuple2<String, String>>((String) key, (Tuple2) map.get(key)));
+                    list.add(new Tuple2<String, Tuple3<String, String, String>>((String) key, (Tuple3) map.get(key)));
                 }
             } catch (IOException e) {
             }

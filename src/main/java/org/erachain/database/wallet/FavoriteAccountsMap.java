@@ -1,5 +1,7 @@
 package org.erachain.database.wallet;
 
+import org.erachain.core.account.Account;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
@@ -43,6 +45,14 @@ public class FavoriteAccountsMap extends DCUMapImpl<String, Tuple3<String, Strin
     @Override
     protected void getMemoryMap() {
         map = new TreeMap<String, Tuple3<String, String, String>>(Fun.COMPARATOR);
+    }
+
+    public static Account detPublicKeyOrAccount(String key, Tuple3<String, String, String> item) {
+        if (item.a == null) {
+            return new Account(key);
+        } else {
+            return new PublicKeyAccount(item.a);
+        }
     }
 
     @Override
