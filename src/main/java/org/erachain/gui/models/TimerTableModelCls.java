@@ -165,11 +165,19 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         } else if (message.getType() == LIST_EVENT
                 || message.getType() == RESET_EVENT) {
             needUpdate = true;
+        } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE && Controller.getInstance().isStatusOK()) {
+            repaintConfirms();
         } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
             needUpdate = false;
             getInterval();
             this.fireTableDataChanged();
         }
+    }
+
+    /**
+     * перерисовка Подтверждений на новый блок
+     */
+    protected void repaintConfirms() {
     }
 
     public void getInterval() {

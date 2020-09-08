@@ -20,10 +20,9 @@ public class SearchStatusesSplitPanel extends SearchItemSplitPanel {
     public static String TITLE = "Search Statuses";
 
     private static final long serialVersionUID = 1L;
-    private static StatusesItemsTableModel tableModelUnions = new StatusesItemsTableModel();
 
     public SearchStatusesSplitPanel() {
-        super(tableModelUnions, NAME, TITLE);
+        super(new StatusesItemsTableModel(), NAME, TITLE);
 
         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 

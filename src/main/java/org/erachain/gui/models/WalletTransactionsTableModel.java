@@ -5,7 +5,6 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.wallet.WTransactionMap;
-import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.lang.Lang;
@@ -58,10 +57,10 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
         ItemCls item = null;
         if (transaction instanceof TransactionAmount && transaction.getAbsKey() > 0) {
             TransactionAmount transAmo = (TransactionAmount) transaction;
-            item = DCSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
+            item = dcSet.getItemAssetMap().get(transAmo.getAbsKey());
         } else if (transaction instanceof GenesisTransferAssetTransaction) {
             GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction) transaction;
-            item = DCSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
+            item = dcSet.getItemAssetMap().get(transGen.getAbsKey());
         } else if (transaction instanceof IssueItemRecord) {
             IssueItemRecord transIssue = (IssueItemRecord) transaction;
             item = transIssue.getItem();
@@ -70,7 +69,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
             item = transIssue.getItem();
         } else if (transaction instanceof RSertifyPubKeys) {
             RSertifyPubKeys sertifyPK = (RSertifyPubKeys) transaction;
-            item = DCSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
+            item = dcSet.getItemPersonMap().get(sertifyPK.getAbsKey());
         } else {
 
         }
@@ -84,7 +83,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
                 return ((WTransactionMap) map).isUnViewed(transaction);
 
             case COLUMN_CONFIRMATIONS:
-                return transaction.getConfirmations(DCSet.getInstance());
+                return transaction.getConfirmations(dcSet);
 
             case COLUMN_NUMBER:
                 return transaction.viewHeightSeq();
@@ -131,6 +130,14 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
 
         return null;
 
+    }
+
+    @Override
+    protected void repaintConfirms() {
+        for (int i = 0; i < list.size(); i++) {
+            setValueAt(i, COLUMN_CONFIRMATIONS, list.get(i).b.getConfirmations(dcSet));
+        }
+        fireTableDataChanged();
     }
 
     public void setOnlyUndead() {
@@ -188,7 +195,6 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
             }
         }
 
-        DCSet dcSet = DCSet.getInstance();
         for (Tuple2<Tuple2<Long, Integer>, Transaction> item : list) {
 
             item.b.setDC(dcSet, false);

@@ -19,7 +19,7 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
     Color color1 = new Color(255, 215, 84, 255);
     public static boolean markIncome = Settings.getInstance().markIncome();
     public final static Color FORE_COLOR = Settings.getInstance().markColorObj();
-    public final static Color FORE_COLOR_SELCTED = Settings.getInstance().markColorSelectedObj();
+    public final static Color FORE_COLOR_SELECTED = Settings.getInstance().markColorSelectedObj();
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
@@ -66,7 +66,7 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
 
         if (isOutcome != null && !(boolean) isOutcome ^ markIncome) {
             if (isSelected) {
-                color = FORE_COLOR_SELCTED;
+                color = FORE_COLOR_SELECTED;
             } else {
                 color = FORE_COLOR;
             }

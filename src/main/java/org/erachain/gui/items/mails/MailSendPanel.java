@@ -19,7 +19,6 @@ import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.items.accounts.AccountsComboBoxModel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
-import org.erachain.gui.models.SendTableModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
@@ -51,7 +50,7 @@ public class MailSendPanel extends IconPanel {
     // TODO - "A" - &
     final static String wrongFirstCharOfAddress = "A";
     // private final MessagesTableModel messagesTableModel;
-    private final SendTableModel messagesHistoryTable;
+    private final MailsHTMLTableModel messagesHistoryTable;
     public JTextArea txtMessage;
     public JTextField txt_Title;
     int y;
@@ -392,12 +391,12 @@ public class MailSendPanel extends IconPanel {
 
         // MESSAGES HISTORY TABLE
 
-        messagesHistoryTable = new SendTableModel(this, (Account) cbxFrom.getSelectedItem());
+        messagesHistoryTable = new MailsHTMLTableModel(this, (Account) cbxFrom.getSelectedItem());
 
         cbxFrom.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                messagesHistoryTable.setAccount((Account) cbxFrom.getSelectedItem());
+                messagesHistoryTable.setMyAccount((Account) cbxFrom.getSelectedItem());
             }
         });
 
@@ -427,7 +426,7 @@ public class MailSendPanel extends IconPanel {
         decryptButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ((SendTableModel) messagesHistoryTable).CryptoOpenBoxAll();
+                ((MailsHTMLTableModel) messagesHistoryTable).CryptoOpenBoxAll();
             }
         });
 
@@ -519,16 +518,24 @@ public class MailSendPanel extends IconPanel {
 
         if (recipient.isEmpty()) {
             txtRecDetails.setText("");
+            messagesHistoryTable.setSideAccount(null);
             return;
         }
 
         if (true) {
             this.txtRecDetails.setText(Account.getDetailsForEncrypt(recipient, asset.getKey(),
                     encrypted.isSelected()));
+
+            Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipient);
+            if (accountRes.b == null) {
+                messagesHistoryTable.setSideAccount(accountRes.a);
+            }
+
         } else {
 
             if (txtTo.getText().equals("has no Addresses")) {
                 txtRecDetails.setText(person.viewName() + " " + Lang.getInstance().translate("has no Accounts"));
+                messagesHistoryTable.setSideAccount(null);
                 return;
             }
 
@@ -538,6 +545,8 @@ public class MailSendPanel extends IconPanel {
             // CHECK IF RECIPIENT IS VALID ADDRESS
             if (accountRes.a == null) {
                 txtRecDetails.setText(accountRes.b);
+                messagesHistoryTable.setSideAccount(null);
+
                 return;
             } else {
                 account = accountRes.a;
@@ -547,6 +556,7 @@ public class MailSendPanel extends IconPanel {
                 if (account.getBalanceUSE(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
                         && account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0) {
                     txtRecDetails.setText(Lang.getInstance().translate("Warning!") + " " + txtRecDetails.getText());
+
                 }
             }
         }
@@ -776,24 +786,6 @@ public class MailSendPanel extends IconPanel {
 
             // CHECK VALIDATE MESSAGE
             if (result == transaction.VALIDATE_OK) {
-                // RESET FIELDS
-
-                if (amount != null && amount.compareTo(BigDecimal.ZERO) == 1) // IF
-                // MORE
-                // THAN
-                // ZERO
-                {
-                    this.txtAmount.setText("0");
-                }
-
-                // TODO "A" ??
-                if (false && this.txtTo.getText().startsWith(wrongFirstCharOfAddress)) {
-                    this.txtTo.setText("");
-                }
-
-                this.txtMessage.setText("");
-
-                // TODO "A" ??
                 if (true || this.txtTo.getText().startsWith(wrongFirstCharOfAddress)) {
                     JOptionPane.showMessageDialog(new JFrame(),
                             Lang.getInstance().translate("Message and/or payment has been sent!"),
