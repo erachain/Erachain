@@ -21,6 +21,7 @@ import org.erachain.utils.TableMenuPopupUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -195,9 +196,9 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         copyAddress.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                Tuple2<String, Tuple2<String, String>> account = accountsTableModel.getItem(row);
+                Tuple2<String, Tuple3<String, String, String>> account = accountsTableModel.getItem(row);
                 StringSelection value = new StringSelection(account.a);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(value, null);
             }
         });
@@ -206,12 +207,22 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         JMenuItem menu_copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
         menu_copyPublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-                Tuple2<String, Tuple2<String, String>> account = accountsTableModel.getItem(row);
-                byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(account.a);
-                PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
-                StringSelection value = new StringSelection(public_Account.getBase58());
+                String publicKey58;
+                Tuple2<String, Tuple3<String, String, String>> item = accountsTableModel.getItem(row);
+                if (item.b.a == null) {
+                    byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(item.a);
+                    if (publicKey == null) {
+                        publicKey58 = "not found";
+                    } else {
+                        publicKey58 = new PublicKeyAccount(publicKey).getBase58();
+                    }
+                } else {
+                    publicKey58 = item.b.a;
+                }
+                StringSelection value = new StringSelection(publicKey58);
+
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(value, null);
             }
         });
@@ -222,11 +233,10 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Tuple2<String, Tuple2<String, String>> account1 = accountsTableModel.getItem(row);
-                Account account = new Account(account1.a);
-
+                Tuple2<String, Tuple3<String, String, String>> item = accountsTableModel.getItem(row);
+                Account accountTo = FavoriteAccountsMap.detPublicKeyOrAccount(item.a, item.b);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"),
-                        new MailSendPanel(null, account, null));
+                        new MailSendPanel(null, accountTo, null));
             }
         });
         menu.add(Send_Mail_item_Menu);
@@ -236,8 +246,8 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Tuple2<String, Tuple2<String, String>> account1 = accountsTableModel.getItem(row);
-                Account accountTo = new Account(account1.a);
+                Tuple2<String, Tuple3<String, String, String>> item = accountsTableModel.getItem(row);
+                Account accountTo = FavoriteAccountsMap.detPublicKeyOrAccount(item.a, item.b);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send"), new AccountAssetSendPanel(null,
                         null, accountTo, null, null));
 
@@ -250,9 +260,8 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit name"));
         setName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Tuple2<String, Tuple2<String, String>> account1 = accountsTableModel.getItem(row);
-
-                new AccountSetNameDialog(account1.a);
+                Tuple2<String, Tuple3<String, String, String>> item = accountsTableModel.getItem(row);
+                new AccountSetNameDialog(item.a);
                 imprintsTable.repaint();
 
             }
@@ -262,7 +271,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         JMenuItem menuItemDelete = new JMenuItem(Lang.getInstance().translate("Remove Favorite"));
         menuItemDelete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (!Controller.getInstance().isWalletUnlocked()) {
+                if (false && !Controller.getInstance().isWalletUnlocked()) {
                     // ASK FOR PASSWORD
                     String password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
                     if (password.equals("")) {
@@ -283,8 +292,8 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
                 int row = imprintsTable.getSelectedRow();
                 try {
                     row = imprintsTable.convertRowIndexToModel(row);
-                    Tuple2<String, Tuple2<String, String>> ac = accountsTableModel.getItem(row);
-                    accountsMap.delete(ac.a);
+                    Tuple2<String, Tuple3<String, String, String>> item = accountsTableModel.getItem(row);
+                    accountsMap.delete(item.a);
                 } catch (Exception e1) {
                     logger.error(e1.getMessage(), e1);
                 }
@@ -346,9 +355,10 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
                         // TODO переделать с  db.getList() на перебор по ключу
                         for (String key : accountsMap.keySet()) {
                             JSONObject account = new JSONObject();
-                            Tuple2<String, String> item = accountsMap.get(key);
-                            account.put("name", item.a);
-                            account.put("json", item.b);
+                            Tuple3<String, String, String> item = accountsMap.get(key);
+                            if (item.a != null) account.put("punKey", item.a);
+                            account.put("name", item.b);
+                            account.put("json", item.c);
                             output.put(key, account);
 
                         }
@@ -424,17 +434,9 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
                         Iterator<String> itKeys = keys.iterator();
                         while (itKeys.hasNext()) {
                             String a = itKeys.next();
-                            JSONObject ss = (JSONObject) inJSON.get(a);
-                            Object a1 = ss.get("name");
-                            Object a2 = ss.get("json");
-                            accountsMap.put(a, new Tuple2(ss.get("name"), ss.get("json")));
+                            JSONObject item = (JSONObject) inJSON.get(a);
+                            accountsMap.put(a, new Tuple3(item.get("pubKey"), item.get("name"), item.get("json")));
                         }
-
-                        // while (it.hasNext()){
-                        // Object ss = it..next();
-                        // ss=ss;
-
-                        // }
 
                     } catch (Exception e) {
                         LOGGER.info("Error while reading/creating settings.json " + file.getAbsolutePath()

@@ -6,7 +6,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.utils.DateTimeFormat;
 import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import java.util.ArrayList;
@@ -61,9 +60,7 @@ public class PersonAccountsModel extends TimerTableModelCls<Fun.Tuple5<String, I
 
         Fun.Tuple5<String, Integer, Integer, Integer, Transaction> value = list.get(row);
 
-        //int height = value.b;
-        //int seq = value.c;
-        Transaction transaction = value.e; //DCSet.getInstance().getTransactionFinalMap().get(height, seq);
+        Transaction transaction = value.e;
         switch (column) {
 
             case COLUMN_ADDRESS:
@@ -102,9 +99,9 @@ public class PersonAccountsModel extends TimerTableModelCls<Fun.Tuple5<String, I
                 return transaction.getCreator().getAddress();
 
             case COLUMN_ACCOUNT_NAME:
-                Tuple2<String, String> aa = new Account(value.a).getName();
+                Tuple3<String, String, String> aa = Account.getFromFavorites(value.a);
                 if (aa == null) return "";
-                return aa.a;
+                return aa.b;
 
         }
 

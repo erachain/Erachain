@@ -84,7 +84,7 @@ public class Profile {
             Profile profileOpt = Profile.getProfileOpt(name);
             // FOLLOWING ONLY WITH ENABLED PROFILE
             if (profileOpt != null && profileOpt.isProfileEnabled()) {
-                if (profileOpt.getFollowedBlogs().contains(this.name.getName())) {
+                if (profileOpt.getFollowedBlogs().contains(this.name.getFromFavorites())) {
                     results.add(profileOpt.getName());
                 }
 

@@ -13,9 +13,11 @@ import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
+import org.json.simple.JSONObject;
 import org.mapdb.Atomic.Var;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.Fun;
 
 import java.io.File;
 
@@ -362,6 +364,16 @@ public class DWSet extends DBASet {
             return getTransactionFavoritesSet().contains(transaction.getDBRef());
         }
         return false;
+    }
+
+    public void addAddressFavorite(String address, String pubKey, String name, String description) {
+        if (getFavoriteAccountsMap().contains(address))
+            return;
+
+        JSONObject json = new JSONObject();
+        json.put("description", description);
+
+        getFavoriteAccountsMap().put(address, new Fun.Tuple3<>(pubKey, name, json.toJSONString()));
     }
 
     public void addItemToFavorite(ItemCls item) {

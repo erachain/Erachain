@@ -125,7 +125,7 @@ public class TelegramManager extends Thread {
     // GET telegrams for RECIPIENT from TIME
     public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes) {
         List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
-        if (!Controller.getInstance().isOnStopping()) {
+        if (!controller.isOnStopping()) {
 
             boolean skip = false;
             SortedMap<Long, List<TelegramMessage>> subMap = telegramsForTime.tailMap(timestamp);
@@ -170,7 +170,7 @@ public class TelegramManager extends Thread {
         // TelegramMessage telegram;
         List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
         // ASK DATABASE FOR A LIST OF PEERS
-        if (!Controller.getInstance().isOnStopping()) {
+        if (!controller.isOnStopping()) {
             List<TelegramMessage> telegramsAddress = telegramsForAddress.get(recipient);
             if (telegramsAddress == null)
                 return telegrams;
@@ -580,21 +580,15 @@ public class TelegramManager extends Thread {
 
         if (Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
             // IF MY STORE is USED
-            if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
+            if (controller.wallet.isWalletDatabaseExisting()) {
 
                 // save telegram to wallet DB
-                if (Controller.getInstance().wallet.accountExists(transaction.getCreator())) {
+                if (controller.wallet.accountExists(transaction.getCreator())) {
                     // add as my OUTCOME
-                    Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, transaction);
+                    controller.wallet.database.getTelegramsMap().add(signatureKey, transaction);
                 } else {
                     // TRY ADD as my INCOME
-                    HashSet<Account> recipients = transaction.getRecipientAccounts();
-                    for (Account recipient : recipients) {
-                        if (Controller.getInstance().wallet.accountExists(recipient)) {
-                            Controller.getInstance().wallet.database.getTelegramsMap().add(signatureKey, transaction);
-                            break;
-                        }
-                    }
+                    controller.addTelegramToWallet(transaction, signatureKey);
                 }
             }
         }
@@ -714,7 +708,7 @@ public class TelegramManager extends Thread {
                     processMessage(blockingQueue.poll(1000, TimeUnit.MILLISECONDS));
                 } catch (java.lang.OutOfMemoryError e) {
                     LOGGER.error(e.getMessage(), e);
-                    Controller.getInstance().stopAll(281);
+                    controller.stopAll(281);
                     break;
                 } catch (java.lang.IllegalMonitorStateException e) {
                     break;
@@ -744,7 +738,7 @@ public class TelegramManager extends Thread {
                 }
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(282);
+                controller.stopAll(282);
                 break;
             }
 

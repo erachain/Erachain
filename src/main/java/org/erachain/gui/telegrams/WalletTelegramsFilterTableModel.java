@@ -25,15 +25,16 @@ public class WalletTelegramsFilterTableModel extends WalletTableModel<Transactio
     public static final int COLUMN_DATE = 0;
     public static final int COLUMN_SENDER = 1;
     public static final int COLUMN_RECEIVER = 2;
-    public static final int COLUMN_MESSAGE = 3;
-    public static final int COLUMN_SIGNATURE = 4;
+    public static final int COLUMN_TITLE = 3;
+    public static final int COLUMN_MESSAGE = 4;
+    public static final int COLUMN_SIGNATURE = 5;
 
     static Logger LOGGER = LoggerFactory.getLogger(WalletTelegramsFilterTableModel.class);
 
     public WalletTelegramsFilterTableModel() {
         super(Controller.getInstance().getWallet().database.getTelegramsMap(),
-                new String[]{"Date", "Sender", "Recipient", "Message", "Signature"},
-                new Boolean[]{true, true, true, true, true, true, true, false, false}, false, -1);
+                new String[]{"Date", "Sender", "Recipient", "Title", "Message"},
+                new Boolean[]{true, true, true, true, false}, false, -1);
 
     }
 
@@ -55,6 +56,8 @@ public class WalletTelegramsFilterTableModel extends WalletTableModel<Transactio
                 return rSend.viewCreator();
             case COLUMN_RECEIVER:
                 return rSend.viewRecipient();
+            case COLUMN_TITLE:
+                return rSend.getTitle();
             case COLUMN_MESSAGE:
                 if (rSend.isEncrypted() && Controller.getInstance().isWalletUnlocked()) {
                     byte[] dataMess = Controller.getInstance().decrypt(rSend.getCreator(), rSend.getRecipient(), rSend.getData());
@@ -74,6 +77,7 @@ public class WalletTelegramsFilterTableModel extends WalletTableModel<Transactio
                     } else {
                         message = "decode error";
                     }
+                    return message;
                 } else {
                     return rSend.viewData();
                 }

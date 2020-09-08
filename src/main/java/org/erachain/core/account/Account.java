@@ -1374,10 +1374,13 @@ public class Account {
         return db.getAddressForging().getLast(getAddress());
     }
 
-    public Tuple2<String, String> getName() {
+    public static Tuple3<String, String, String> getFromFavorites(String address) {
+        return Controller.getInstance().wallet.database.getFavoriteAccountsMap().get(address);
 
-        return Controller.getInstance().wallet.database.getFavoriteAccountsMap().get(getAddress());
+    }
 
+    public Tuple3<String, String, String> getFromFavorites() {
+        return getFromFavorites(getAddress());
     }
 
     public int getAccountNo() {

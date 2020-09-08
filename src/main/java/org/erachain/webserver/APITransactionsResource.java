@@ -15,6 +15,7 @@ import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.TransactionTimestampComparator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -43,6 +44,8 @@ public class APITransactionsResource {
                 "GET Record by Height and Sequence");
         help.put("apirecords/getsignature/{height-sequence}",
                 "GET Record Signature by Height and Sequence");
+        help.put("apirecords/getvouches/{height-sequence}",
+                "GET Vouches of Record by Height and Sequence");
         help.put("apirecords/incomingfromblock/{address}/{blockStart}?type={type}",
                 Lang.getInstance().translate("Get Incoming Records for Address from {blockStart}. Filter by type. Limit checked blocks = 2000 or 100 found records. If blocks not end at height - NEXT parameter was set."));
         help.put("apirecords/getbyaddress?address={address}&asset={asset}&recordType={recordType}&unconfirmed=true",
@@ -143,6 +146,7 @@ public class APITransactionsResource {
                 .build();
     }
 
+
     // getsignature
     @GET
     @Path("getsignature/{number}")
@@ -182,6 +186,36 @@ public class APITransactionsResource {
                     .entity(StrJSonFine.convert(out))
                     .build();
         }
+    }
+
+    @GET
+    @Path("getvouches/{number}")
+    public Response getVouches(@PathParam("number") String numberStr) {
+
+        Map out = new LinkedHashMap();
+        int step = 1;
+
+        Long dbRef = Transaction.parseDBRef(numberStr);
+        if (dbRef == null) {
+            out.put("error", step);
+            out.put("message", "height-sequence error, use integer-integer value");
+        } else {
+            Fun.Tuple2<BigDecimal, List<Long>> vouchesItem = DCSet.getInstance().getVouchRecordMap().get(dbRef);
+            JSONArray values = new JSONArray();
+            if (vouchesItem != null) {
+                out.put("sum", vouchesItem.a.toPlainString());
+                for (Long dbRefVoucher : vouchesItem.b) {
+                    values.add(Transaction.viewDBRef(dbRefVoucher));
+                }
+                out.put("vouches", values);
+            }
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(out))
+                .build();
     }
 
     /**

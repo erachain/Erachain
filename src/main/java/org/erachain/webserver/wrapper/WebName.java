@@ -19,7 +19,7 @@ public class WebName {
     public WebName(Account name) {
         this.name = name.getAddress();
         this.owner = name.getAddress();
-        namebalanceString = NumberAsString.formatAsString(name.getConfBalance3(0, Transaction.FEE_KEY).a) + " - " + name.getName();
+        namebalanceString = NumberAsString.formatAsString(name.getConfBalance3(0, Transaction.FEE_KEY).a) + " - " + name.getFromFavorites();
     }
 
     public String getName() {
