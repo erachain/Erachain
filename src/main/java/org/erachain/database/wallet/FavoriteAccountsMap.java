@@ -5,7 +5,7 @@ import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +14,9 @@ import java.util.TreeMap;
 /**
  * Мои избранные счета - для телеграмм например
  * <p>
- * key: address -> value: name + description
+ * key: address -> value: pubKey, name + description
  */
-public class FavoriteAccountsMap extends DCUMapImpl<String, Tuple2<String, String>> {
+public class FavoriteAccountsMap extends DCUMapImpl<String, Tuple3<String, String, String>> {
     static Logger LOGGER = LoggerFactory.getLogger(FavoriteAccountsMap.class.getName());
 
     public FavoriteAccountsMap(DWSet dWSet, DB database) {
@@ -42,11 +42,11 @@ public class FavoriteAccountsMap extends DCUMapImpl<String, Tuple2<String, Strin
     @SuppressWarnings("unchecked")
     @Override
     protected void getMemoryMap() {
-        map = new TreeMap<String, Tuple2<String, String>>(Fun.COMPARATOR);
+        map = new TreeMap<String, Tuple3<String, String, String>>(Fun.COMPARATOR);
     }
 
     @Override
-    public void put(String key, Tuple2<String, String> value) {
+    public void put(String key, Tuple3<String, String, String> value) {
         super.put(key, value);
         ((DWSet) databaseSet).hardFlush();
     }

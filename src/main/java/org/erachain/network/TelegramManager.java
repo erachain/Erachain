@@ -588,37 +588,7 @@ public class TelegramManager extends Thread {
                     controller.wallet.database.getTelegramsMap().add(signatureKey, transaction);
                 } else {
                     // TRY ADD as my INCOME
-                    HashSet<Account> recipients = transaction.getRecipientAccounts();
-                    for (Account recipient : recipients) {
-                        if (controller.wallet.accountExists(recipient)) {
-                            controller.wallet.database.getTelegramsMap().add(signatureKey, transaction);
-                            String address = transaction.getCreator().getAddress();
-                            if (!controller.wallet.database.getFavoriteAccountsMap().contains(address)) {
-                                String title = transaction.getTitle();
-                                String description = "";
-                                if (transaction instanceof RSend) {
-                                    RSend rsend = ((RSend) transaction);
-                                    if (rsend.isText()) {
-                                        byte[] data = rsend.getData();
-                                        if (data != null && data.length > 0) {
-                                            if (rsend.isEncrypted()) {
-                                                data = controller.decrypt(transaction.getCreator(), rsend.getRecipient(), data);
-                                            }
-                                            if (data != null && data.length > 0) {
-                                                try {
-                                                    description = new String(data, "UTF-8");
-                                                } catch (UnsupportedEncodingException e) {
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                controller.addAddressFavorite(transaction.getCreator().getAddress(),
-                                        title == null || title.isEmpty() ? "telegram" : title, description);
-                                break;
-                            }
-                        }
-                    }
+                    controller.addTelegramToWallet(transaction, signatureKey);
                 }
             }
         }

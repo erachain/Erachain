@@ -31,6 +31,7 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.telegram.TelegramStore;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.core.voting.PollOption;
@@ -66,6 +67,7 @@ import java.awt.TrayIcon.MessageType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -2522,8 +2524,44 @@ public class Controller extends Observable {
         return null;
     }
 
-    public void addAddressFavorite(String address, String name, String description) {
-        this.wallet.addAddressFavorite(address, name, description);
+    public void addAddressFavorite(String address, String pubKey, String name, String description) {
+        this.wallet.addAddressFavorite(address, pubKey, name, description);
+    }
+
+    public void addTelegramToWallet(Transaction transaction, String signatureKey) {
+        HashSet<Account> recipients = transaction.getRecipientAccounts();
+        PublicKeyAccount creator = transaction.getCreator();
+        String creator58 = creator.getAddress();
+        String creatorPubKey58 = creator.getBase58();
+        for (Account recipient : recipients) {
+            if (wallet.accountExists(recipient)) {
+                wallet.database.getTelegramsMap().add(signatureKey, transaction);
+                if (!wallet.database.getFavoriteAccountsMap().contains(creator58)) {
+                    String title = transaction.getTitle();
+                    String description = "";
+                    if (transaction instanceof RSend) {
+                        RSend rsend = ((RSend) transaction);
+                        if (rsend.isText()) {
+                            byte[] data = rsend.getData();
+                            if (data != null && data.length > 0) {
+                                if (rsend.isEncrypted()) {
+                                    data = decrypt(creator, rsend.getRecipient(), data);
+                                }
+                                if (data != null && data.length > 0) {
+                                    try {
+                                        description = new String(data, "UTF-8");
+                                    } catch (UnsupportedEncodingException e) {
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    addAddressFavorite(creator58, creatorPubKey58,
+                            title == null || title.isEmpty() ? "telegram" : title, description);
+                    break;
+                }
+            }
+        }
     }
 
     public void addItemFavorite(ItemCls item) {
@@ -3361,11 +3399,18 @@ public class Controller extends Observable {
             return null;
         }
 
-        // CHECK ACCOUNT IN OWN WALLET
-        Account account = getWalletAccountByAddress(address);
-        if (account != null) {
-            if (isWalletUnlocked()) {
-                return getWalletPrivateKeyAccountByAddress(address).getPublicKey();
+        if (wallet != null) {
+            Tuple3<String, String, String> favorite = wallet.database.getFavoriteAccountsMap().get(address);
+            if (favorite != null && favorite.a != null) {
+                return Base58.decode(favorite.a);
+            }
+
+            // CHECK ACCOUNT IN OWN WALLET
+            Account account = getWalletAccountByAddress(address);
+            if (account != null) {
+                if (isWalletUnlocked()) {
+                    return getWalletPrivateKeyAccountByAddress(address).getPublicKey();
+                }
             }
         }
 

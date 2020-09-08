@@ -27,7 +27,6 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
-import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -324,12 +323,12 @@ public class Wallet extends Observable /*implements Observer*/ {
 		}
 	}
 
-	public void addAddressFavorite(String address, String name, String description) {
+	public void addAddressFavorite(String address, String pubKey, String name, String description) {
 		if (!this.exists()) {
 			return;
 		}
 
-		this.database.addAddressFavorite(address, name, description);
+		this.database.addAddressFavorite(address, pubKey, name, description);
 	}
 
 	public void addItemFavorite(ItemCls item) {
@@ -513,8 +512,8 @@ public class Wallet extends Observable /*implements Observer*/ {
 			this.database.getAccountMap().add(account, -1);
 			// set name
 			ob.put("description", Lang.getInstance().translate("Created by default Account") + " " + (nonce + 1));
-			this.database.getFavoriteAccountsMap().put(account.getAddress(), new Tuple2<String, String>(
-					Lang.getInstance().translate("My Account") + " " + (nonce + 1), StrJSonFine.convert(ob)));
+			//this.database.getFavoriteAccountsMap().put(account.getAddress(), new Tuple2<String, String>(
+			//		Lang.getInstance().translate("My Account") + " " + (nonce + 1), StrJSonFine.convert(ob)));
 			LOGGER.info("Added account #" + nonce);
 
 			this.commit();

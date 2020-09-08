@@ -365,10 +365,10 @@ public class DWSet extends DBASet {
         return false;
     }
 
-    public void addAddressFavorite(String address, String name, String description) {
+    public void addAddressFavorite(String address, String pubKey, String name, String description) {
         if (getFavoriteAccountsMap().contains(address))
             return;
-        getFavoriteAccountsMap().put(address, new Fun.Tuple2<>(name, description));
+        getFavoriteAccountsMap().put(address, new Fun.Tuple3<>(pubKey, name, description));
     }
 
     public void addItemToFavorite(ItemCls item) {

@@ -1374,8 +1374,7 @@ public class Account {
         return db.getAddressForging().getLast(getAddress());
     }
 
-    public Tuple2<String, String> getName() {
-
+    public Tuple3<String, String, String> getName() {
         return Controller.getInstance().wallet.database.getFavoriteAccountsMap().get(getAddress());
 
     }
