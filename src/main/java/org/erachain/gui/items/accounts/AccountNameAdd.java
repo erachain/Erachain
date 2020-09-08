@@ -108,10 +108,10 @@ public class AccountNameAdd extends javax.swing.JDialog {
                     } else {
                         Account newAccount = result.a;
                         if (newAccount instanceof PublicKeyAccount) {
-                            favoriteAccountsMap.put(address, new Tuple3(newAccount.getAddress(), ((PublicKeyAccount) newAccount).getBase58(),
-                                    StrJSonFine.convert(json)));
+                            favoriteAccountsMap.put(newAccount.getAddress(), new Tuple3(((PublicKeyAccount) newAccount).getBase58(),
+                                    accountName, StrJSonFine.convert(json)));
                         } else {
-                            favoriteAccountsMap.put(address, new Tuple3(newAccount.getAddress(), null, StrJSonFine.convert(json)));
+                            favoriteAccountsMap.put(newAccount.getAddress(), new Tuple3(null, accountName, StrJSonFine.convert(json)));
                         }
                         setVisible(false);
                     }
