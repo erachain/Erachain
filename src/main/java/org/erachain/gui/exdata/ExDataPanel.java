@@ -4,7 +4,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.exLinkAppendix;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -783,7 +783,7 @@ public class ExDataPanel extends JPanel {
                     (Boolean) attached_Files_Model.getValueAt(i, 2), (byte[]) attached_Files_Model.getValueAt(i, 5)));
         }
 
-        ExLink exLink = new exLinkAppendix(parent.getDBRef());
+        ExLink exLink = new ExLinkAppendix(parent.getDBRef());
         return ExData.make(exLink, creator, jTextField_Title_Message.getText(),
                 signCanOnlyRecipients, recipients, isEncrypted,
                 (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),

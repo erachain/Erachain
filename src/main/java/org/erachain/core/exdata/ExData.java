@@ -284,10 +284,16 @@ public class ExData {
         return exLink.getType();
     }
 
-    public byte getLinkValue() {
+    public byte getLinkValue1() {
         if (exLink == null)
             return 0;
-        return exLink.getValue();
+        return exLink.getValue1();
+    }
+
+    public byte getLinkValue2() {
+        if (exLink == null)
+            return 0;
+        return exLink.getValue2();
     }
 
     public String getTitle() {
@@ -673,7 +679,9 @@ public class ExData {
 
                     ///////////// PARS by FLAGS
                     if (flags[1] < 0) {
-                        exLink = ExLink.parse();
+                        byte[] exLinkBuf = new byte[32];
+                        System.arraycopy(data, position, exLinkBuf, 0, 32);
+                        exLink = ExLink.parse(exLinkBuf);
                     } else {
                         exLink = null;
                     }

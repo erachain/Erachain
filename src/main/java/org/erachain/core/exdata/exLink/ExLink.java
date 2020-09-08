@@ -5,7 +5,7 @@ import org.json.simple.JSONObject;
 
 public class ExLink {
 
-    public static final byte BASE_LENGTH = 11;
+    public static final byte BASE_LENGTH = 12;
 
     public static final byte REPLY_TYPE = 1;
     public static final byte APPENDIX_TYPE = 2;
@@ -28,34 +28,47 @@ public class ExLink {
     /**
      * Уровень связи. Например для Отзыва-Оценки - оценка, для Поручителтсво - доля поручителтсва
      */
-    private final byte value;
+    private final byte value1;
+    private final byte value2;
 
-    public ExLink(byte flags, byte type, long ref, byte value) {
-        this.flags = flags;
+    public ExLink(byte type, byte flags, byte value, long ref) {
         this.type = type;
+        this.flags = flags;
+        this.value1 = value;
+        value2 = 0;
         this.ref = ref;
-        this.value = value;
     }
 
-    public ExLink(byte type, long ref, byte value) {
-        this.flags = 0;
+    public ExLink(byte type, byte flags, long ref) {
         this.type = type;
-        this.ref = ref;
-        this.value = value;
-    }
-
-    public ExLink(byte flags, byte type, long ref) {
         this.flags = flags;
-        this.type = type;
+        this.value1 = value2 = 0;
         this.ref = ref;
-        value = 0;
     }
 
     public ExLink(byte type, long ref) {
-        this.flags = 0;
         this.type = type;
+        this.flags = 0;
+        value1 = value2 = 0;
         this.ref = ref;
-        value = 0;
+    }
+
+    public ExLink(byte[] data) {
+        this.type = data[0];
+        this.flags = data[1];
+        this.value1 = data[2];
+        this.value2 = data[3];
+        byte[] refBuf = new byte[Longs.BYTES];
+        System.arraycopy(data, 4, refBuf, 0, Long.BYTES);
+        ref = Longs.fromByteArray(refBuf);
+    }
+
+    public ExLink(byte[] type, long ref) {
+        this.type = type[0];
+        this.flags = type[1];
+        this.value1 = type[2];
+        this.value2 = type[3];
+        this.ref = ref;
     }
 
     public byte getFlags() {
@@ -70,8 +83,12 @@ public class ExLink {
         return type;
     }
 
-    public byte getValue() {
-        return value;
+    public byte getValue1() {
+        return value1;
+    }
+
+    public byte getValue2() {
+        return value2;
     }
 
     public JSONObject makeJSONforHTML() {
@@ -86,12 +103,26 @@ public class ExLink {
 
     public byte[] toByte() {
         byte[] data = new byte[BASE_LENGTH];
-        data[0] = flags;
-        data[1] = type;
-        data[10] = value;
-        System.arraycopy(Longs.toByteArray(ref), 0, data, 2, Long.BYTES);
+        data[0] = type;
+        data[1] = flags;
+        data[2] = value1;
+        data[3] = value2;
+        System.arraycopy(Longs.toByteArray(ref), 0, data, 4, Long.BYTES);
 
         return data;
+    }
+
+    public static ExLink parse(byte[] data) throws Exception {
+        switch (data[0]) {
+            case REPLY_TYPE:
+                return new ExLinkReply(data);
+            case APPENDIX_TYPE:
+                return new ExLinkAppendix(data);
+            case LIKE_TYPE:
+                return new ExLinkLike(data);
+        }
+
+        throw new Exception("wrong type");
     }
 
     public int length() {
