@@ -65,6 +65,10 @@ public class RightTelegramPanel extends javax.swing.JPanel {
 
                         if (e.getClickCount() == 2) {
                             tableMouse2Click(crow, transaction);
+                        } else {
+                            jTxtTitle.setText(transaction.getTitle());
+                            jTextPaneText.setText(walletTelegramsFilterTableModel.getValueAt(crow,
+                                    WalletTelegramsFilterTableModel.COLUMN_MESSAGE).toString());
                         }
 
                     }

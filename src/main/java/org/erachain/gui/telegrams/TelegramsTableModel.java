@@ -16,14 +16,16 @@ public class TelegramsTableModel extends TimerTableModelCls<Transaction> impleme
     public static final int COLUMN_DATE = 0;
     public static final int COLUMN_SENDER = 1;
     public static final int COLUMN_RECEIVER = 2;
-    public static final int COLUMN_MESSAGE = 3;
-    public static final int COLUMN_SIGNATURE = 4;
+    public static final int COLUMN_TITLE = 3;
+    public static final int COLUMN_MESSAGE = 4;
+    public static final int COLUMN_SIGNATURE = 5;
 
     static Logger LOGGER = LoggerFactory.getLogger(TelegramsTableModel.class);
 
     public TelegramsTableModel() {
         super(Controller.getInstance().telegramStore.database.getTelegramsMap(),
-                new String[]{"Date", "Sender", "Recipient", "Message", "Signature"}, new Boolean[]{false, true, true}, false);
+                new String[]{"Date", "Sender", "Recipient", "Title", "Message"},
+                new Boolean[]{false, true, true, true}, false);
         addObservers();
     }
 
@@ -46,6 +48,8 @@ public class TelegramsTableModel extends TimerTableModelCls<Transaction> impleme
                 return transaction.viewCreator();
             case COLUMN_RECEIVER:
                 return transaction.viewRecipient();
+            case COLUMN_TITLE:
+                return transaction.getTitle();
             case COLUMN_MESSAGE:
                 return transaction.viewData();
             case COLUMN_SIGNATURE:
