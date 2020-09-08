@@ -16,7 +16,7 @@ import java.util.TreeMap;
 /**
  * Мои избранные счета - для телеграмм например
  * <p>
- * key: address -> value: pubKey, name + description
+ * key: address -> value: pubKey, name + JSON("description": "...")
  */
 public class FavoriteAccountsMap extends DCUMapImpl<String, Tuple3<String, String, String>> {
     static Logger LOGGER = LoggerFactory.getLogger(FavoriteAccountsMap.class.getName());
