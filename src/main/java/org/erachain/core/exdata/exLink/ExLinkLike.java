@@ -9,4 +9,8 @@ public class ExLinkLike extends ExLink {
         super(data);
     }
 
+    public ExLinkLike(byte[] type, long refLink) {
+        super(type, refLink);
+    }
+
 }

@@ -679,9 +679,10 @@ public class ExData {
 
                     ///////////// PARS by FLAGS
                     if (flags[1] < 0) {
-                        byte[] exLinkBuf = new byte[32];
-                        System.arraycopy(data, position, exLinkBuf, 0, 32);
-                        exLink = ExLink.parse(exLinkBuf);
+                        // ExLink READ
+                        byte[] exLinkBuf = new byte[Long.BYTES];
+                        System.arraycopy(data, position, exLinkBuf, 0, Long.BYTES);
+                        exLink = ExLink.parse(flags, exLinkBuf);
                     } else {
                         exLink = null;
                     }

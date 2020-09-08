@@ -10,4 +10,9 @@ public class ExLinkAppendix extends ExLink {
         super(data);
     }
 
+    public ExLinkAppendix(byte[] type, long refLink) {
+        super(type, refLink);
+    }
+
+
 }

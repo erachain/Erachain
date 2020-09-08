@@ -10,4 +10,8 @@ public class ExLinkReply extends ExLink {
         super(data);
     }
 
+    public ExLinkReply(byte[] type, long refLink) {
+        super(type, refLink);
+    }
+
 }

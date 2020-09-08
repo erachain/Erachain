@@ -125,6 +125,21 @@ public class ExLink {
         throw new Exception("wrong type");
     }
 
+    public static ExLink parse(byte[] type, byte[] refLinkBytes) throws Exception {
+
+        long refLink = Longs.fromByteArray(refLinkBytes);
+        switch (type[0]) {
+            case REPLY_TYPE:
+                return new ExLinkReply(type, refLink);
+            case APPENDIX_TYPE:
+                return new ExLinkAppendix(type, refLink);
+            case LIKE_TYPE:
+                return new ExLinkLike(type, refLink);
+        }
+
+        throw new Exception("wrong type");
+    }
+
     public int length() {
         return BASE_LENGTH;
     }
