@@ -18,7 +18,7 @@ public class DocTypeAppendixPanel extends JPanel {
             initComponents();
             labelTitle.setText(Lang.getInstance().translate("Set Parent Document if it is Appendix to that Document"));
             labelDocType.setText(Lang.getInstance().translate("Parent Document SeqNo or Signature"));
-            parentReference.setText(Lang.getInstance().translate("Example") + ": 1234-12 or r6fas657w12Y65da..");
+            parentReference.setToolTipText(Lang.getInstance().translate("Example") + ": 1234-12 or r6fas657w12Y65da..");
         }
 
         private void initComponents() {
@@ -39,12 +39,12 @@ public class DocTypeAppendixPanel extends JPanel {
 
                 @Override
                 public void insertUpdate(DocumentEvent arg0) {
-                    refreshReceiverDetails();
+                    refreshParentDetails();
                 }
 
                 @Override
                 public void removeUpdate(DocumentEvent arg0) {
-                    refreshReceiverDetails();
+                    refreshParentDetails();
                 }
             });
 
@@ -115,7 +115,7 @@ public class DocTypeAppendixPanel extends JPanel {
     private JLabel parentDetails;
     // End of variables declaration
 
-    private void refreshReceiverDetails() {
+    private void refreshParentDetails() {
 
         Transaction parent = null;
 
@@ -138,7 +138,7 @@ public class DocTypeAppendixPanel extends JPanel {
             if (DCSet.getInstance().getTransactionFinalMap().contains(parentDBref)) {
                 parent = DCSet.getInstance().getTransactionFinalMap().get(parentDBref);
                 if (parent.getCreator() == null) {
-                    parentDetails.setText(Lang.getInstance().translate("Not Found"));
+                    parentDetails.setText(Lang.getInstance().translate("Empty Creator in parent transaction"));
                     return;
                 }
             } else {
