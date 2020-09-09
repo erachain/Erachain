@@ -110,7 +110,8 @@ public class ExData {
 
         this.exLink = exLink;
         if (exLink != null) {
-            this.flags[1] = (byte) (this.flags[1] | HAS_PARENT_MASK);
+            //this.flags[1] = (byte) (this.flags[1] | HAS_PARENT_MASK);
+            this.flags[1] |= HAS_PARENT_MASK;
         }
 
         this.title = title;
@@ -136,7 +137,8 @@ public class ExData {
 
         this.exLink = exLink;
         if (exLink != null) {
-            this.flags[1] = (byte) (this.flags[1] | HAS_PARENT_MASK);
+            //this.flags[1] = (byte) (this.flags[1] | HAS_PARENT_MASK);
+            this.flags[1] |= HAS_PARENT_MASK;
         }
 
         this.title = title;
@@ -164,7 +166,8 @@ public class ExData {
 
         this.exLink = exLink;
         if (exLink != null) {
-            this.flags[1] = (byte) (this.flags[1] | HAS_PARENT_MASK);
+            //this.flags[1] = (byte) (this.flags[1] | HAS_PARENT_MASK);
+            this.flags[1] |= HAS_PARENT_MASK;
         }
 
         this.title = title;
@@ -451,10 +454,6 @@ public class ExData {
             outStream.write(flags);
         }
 
-        if (exLink != null) {
-            outStream.write(exLink.toByte());
-        }
-
         if (title != null && !title.isEmpty()) {
             byte[] title_Bytes = title.getBytes(StandardCharsets.UTF_8);
             if (flags[0] > 2) {
@@ -470,6 +469,10 @@ public class ExData {
             } else {
                 outStream.write(new byte[DATA_TITLE_PART_LENGTH]);
             }
+        }
+
+        if (exLink != null) {
+            outStream.write(exLink.toByte());
         }
 
         if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {
@@ -680,9 +683,8 @@ public class ExData {
                     ///////////// PARS by FLAGS
                     if (flags[1] < 0) {
                         // ExLink READ
-                        byte[] exLinkBuf = new byte[Long.BYTES];
-                        System.arraycopy(data, position, exLinkBuf, 0, Long.BYTES);
-                        exLink = ExLink.parse(flags, exLinkBuf);
+                        exLink = ExLink.parse(data, position);
+                        position += exLink.length();
                     } else {
                         exLink = null;
                     }

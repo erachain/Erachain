@@ -127,6 +127,7 @@ public class ExLink {
 
     public static ExLink parse(byte[] type, byte[] refLinkBytes) throws Exception {
 
+
         long refLink = Longs.fromByteArray(refLinkBytes);
         switch (type[0]) {
             case REPLY_TYPE:
@@ -135,6 +136,25 @@ public class ExLink {
                 return new ExLinkAppendix(type, refLink);
             case LIKE_TYPE:
                 return new ExLinkLike(type, refLink);
+        }
+
+        throw new Exception("wrong type");
+    }
+
+    public static ExLink parse(byte[] data, int position) throws Exception {
+
+        byte[] typeBuffer = new byte[4];
+        System.arraycopy(data, position, typeBuffer, 0, 4);
+        byte[] refBuffer = new byte[Long.BYTES];
+        System.arraycopy(data, position + 4, refBuffer, 0, Long.BYTES);
+        long refLink = Longs.fromByteArray(refBuffer);
+        switch (typeBuffer[0]) {
+            case REPLY_TYPE:
+                return new ExLinkReply(typeBuffer, refLink);
+            case APPENDIX_TYPE:
+                return new ExLinkAppendix(typeBuffer, refLink);
+            case LIKE_TYPE:
+                return new ExLinkLike(typeBuffer, refLink);
         }
 
         throw new Exception("wrong type");
