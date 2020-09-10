@@ -263,6 +263,10 @@ public class ExData {
         return files != null;
     }
 
+    public ExLink getExLink() {
+        return exLink;
+    }
+
     public byte getParentRefFlags() {
         if (exLink == null)
             return 0;
