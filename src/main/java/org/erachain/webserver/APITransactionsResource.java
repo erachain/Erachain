@@ -463,7 +463,18 @@ public class APITransactionsResource {
         JSONArray array = new JSONArray();
         DCSet dcSet = DCSet.getInstance();
 
-        List<Transaction> transaction = dcSet.getTransactionTab().getTransactions(new Account(address), type,
+        Account account;
+        if (address == null) {
+            account = null;
+        } else {
+            Fun.Tuple2<Account, String> result = Account.tryMakeAccount(address);
+            if (result.a == null) {
+                throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
+            } else {
+                account = result.a;
+            }
+        }
+        List<Transaction> transaction = dcSet.getTransactionTab().getTransactions(account, type,
                 timestamp, count, descending);
 
         for (Transaction record : transaction) {
