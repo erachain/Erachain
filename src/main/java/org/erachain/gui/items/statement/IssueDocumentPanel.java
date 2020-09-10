@@ -268,7 +268,7 @@ public class IssueDocumentPanel extends IconPanel {
         try {
             messageBytes = exData_Panel.makeExData(creator, encryptCheckBox.isSelected());
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(new JFrame(), e.getMessage(),
+            JOptionPane.showMessageDialog(new JFrame(), " ERROR: " + e.getMessage(),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             return null;
         }

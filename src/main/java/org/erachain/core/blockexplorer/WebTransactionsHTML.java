@@ -171,6 +171,8 @@ public class WebTransactionsHTML {
 
         output.put("vouches", getVouches(transaction));
 
+        getLinks(output, transaction, langObj);
+
         return output;
     }
 
@@ -690,59 +692,6 @@ public class WebTransactionsHTML {
         return out;
     }
 
-    public String getLinks(Transaction transaction) {
-
-        try (IteratorCloseable<Long> appendixListIterator = DCSet.getInstance().getExLinksMap().getLinksIterator(transaction.getDBRef(), ExLink.APPENDIX_TYPE, false)) {
-            List<Long> appendixes = new ArrayList<>();
-            while (appendixListIterator.hasNext()) {
-                appendixes.add(appendixListIterator.next());
-            }
-            if (!appendixes.isEmpty()) {
-
-                TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
-                String out = "<b>" + Lang.getInstance().translateFromLangObj("Certified", langObj) + ":</b> ";
-
-                out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td>" + Lang.getInstance().translateFromLangObj("Transaction", langObj) + "<td>" + Lang.getInstance().translateFromLangObj("Date", langObj) + "<td>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + "</tr>";
-                for (Long txKey : appendixes) {
-
-                    transaction = map.get(txKey);
-
-                    out += "<tr>"
-                            + "<td><a href=?tx=" + Base58.encode(transaction.getSignature()) + get_Lang() + ">" + transaction.getBlockHeight()
-                            + "-" + transaction.getSeqNo() + "</a>"
-                            + "<td>" + DateTimeFormat.timestamptoString(transaction.getTimestamp());
-                    out += "<td>";
-
-                    out += transaction.getTitle() + "<br>";
-
-                    Fun.Tuple2<Integer, PersonCls> itemPerson = transaction.getCreator().getPerson();
-                    if (itemPerson != null) {
-                        out += "<a href=?person=" + itemPerson.b.getKey() + get_Lang() + "><b>"
-                                + itemPerson.b.viewName() + "</b></a> ("
-                                + Lang.getInstance().translateFromLangObj("Public Key", langObj) + ": "
-                                + Base58.encode(transaction.getCreator().getPublicKey()) + ")<br>";
-                    } else {
-                        out += "<a href=?address=" + transaction.getCreator().getAddress() + get_Lang() + ">" + transaction.getCreator().getAddress()
-                                + "</a> ("
-                                + Lang.getInstance().translateFromLangObj("Public Key", langObj) + ": "
-                                + Base58.encode(transaction.getCreator().getPublicKey()) + ")<br>";
-                    }
-
-                    out += Lang.getInstance().translateFromLangObj("Signature", langObj) + " : "
-                            + "<a href=?tx=" + Base58.encode(transaction.getSignature()) + ">" + transaction.getSignature() + "</a><br>";
-
-                }
-                out += "</table>";
-
-                return out;
-            }
-        } catch (IOException e) {
-            return e.getMessage();
-        }
-        return "";
-
-    }
-
     public static String htmlSignifier(long timestamp, Long personKey, String personName, PublicKeyAccount publicKey, byte[] signature, JSONObject langObj) {
 
         String out = DateTimeFormat.timestamptoString(timestamp) + " ";
@@ -828,4 +777,61 @@ public class WebTransactionsHTML {
 
         return out;
     }
+
+    public static void getLinks(HashMap output, Transaction transaction, JSONObject langObj) {
+
+        String out = "";
+
+        try (IteratorCloseable<Long> appendixListIterator = DCSet.getInstance().getExLinksMap().getLinksIterator(transaction.getDBRef(), ExLink.APPENDIX_TYPE, false)) {
+            List<Long> appendixes = new ArrayList<>();
+            while (appendixListIterator.hasNext()) {
+                appendixes.add(appendixListIterator.next());
+            }
+            if (!appendixes.isEmpty()) {
+
+                TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
+                out += "<b>" + Lang.getInstance().translateFromLangObj("Appendixes", langObj) + ":</b> ";
+
+                out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td>" + Lang.getInstance().translateFromLangObj("Transaction", langObj) + "<td>" + Lang.getInstance().translateFromLangObj("Date", langObj) + "<td>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + "</tr>";
+                for (Long txKey : appendixes) {
+
+                    transaction = map.get(txKey);
+
+                    out += "<tr>"
+                            + "<td><a href=?tx=" + Base58.encode(transaction.getSignature()) + langObj + ">" + transaction.getBlockHeight()
+                            + "-" + transaction.getSeqNo() + "</a>"
+                            + "<td>" + DateTimeFormat.timestamptoString(transaction.getTimestamp());
+                    out += "<td>";
+
+                    out += transaction.getTitle() + "<br>";
+
+                    Fun.Tuple2<Integer, PersonCls> itemPerson = transaction.getCreator().getPerson();
+                    if (itemPerson != null) {
+                        out += "<a href=?person=" + itemPerson.b.getKey() + langObj + "><b>"
+                                + itemPerson.b.viewName() + "</b></a> ("
+                                + Lang.getInstance().translateFromLangObj("Public Key", langObj) + ": "
+                                + Base58.encode(transaction.getCreator().getPublicKey()) + ")<br>";
+                    } else {
+                        out += "<a href=?address=" + transaction.getCreator().getAddress() + langObj + ">" + transaction.getCreator().getAddress()
+                                + "</a> ("
+                                + Lang.getInstance().translateFromLangObj("Public Key", langObj) + ": "
+                                + Base58.encode(transaction.getCreator().getPublicKey()) + ")<br>";
+                    }
+
+                    out += Lang.getInstance().translateFromLangObj("Signature", langObj) + " : "
+                            + "<a href=?tx=" + Base58.encode(transaction.getSignature()) + ">" + transaction.getSignature() + "</a><br>";
+
+                }
+                out += "</table>";
+
+
+            }
+        } catch (IOException e) {
+            output.put("error", e.getMessage());
+        }
+
+        output.put("links", out);
+
+    }
+
 }

@@ -36,7 +36,10 @@ function tx(data) {
         output += fformat(data.body.foot) + '<br>';
     }
     if (data.body.hasOwnProperty('vouches')) {
-        output += fformat(data.body.vouches) + '<br>';
+        output += data.body.vouches + '<br>';
+    }
+    if (data.body.hasOwnProperty('links')) {
+        output += data.body.links + '<br>';
     }
 
     output += '<br><a href ="/api/recordrawbynumber/' + data.heightSeqNo + '"> RAW </a>';

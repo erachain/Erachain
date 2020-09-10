@@ -189,6 +189,10 @@ function statement(data) {
         output += '<hr>' + data.vouches_table;
     }
 
+    if (data.hasOwnProperty('links')) {
+        output += '<hr>' + data.links;
+    }
+
     return output;
 
 }

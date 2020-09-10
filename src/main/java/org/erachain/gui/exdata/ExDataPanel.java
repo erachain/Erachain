@@ -764,8 +764,6 @@ public class ExDataPanel extends JPanel {
 
     public byte[] makeExData(PrivateKeyAccount creator, boolean isEncrypted) throws Exception {
 
-        Transaction parent = DCSet.getInstance().getTransactionFinalMap().getRecord(docTypeAppendixPanel.parentReference.getText());
-
         Account[] recipients = multipleRecipientsPanel.recipientsTableModel.getRecipients();
         boolean signCanOnlyRecipients = multipleRecipientsPanel.signCanRecipientsCheckBox.isSelected();
 
@@ -783,7 +781,13 @@ public class ExDataPanel extends JPanel {
                     (Boolean) attached_Files_Model.getValueAt(i, 2), (byte[]) attached_Files_Model.getValueAt(i, 5)));
         }
 
-        ExLink exLink = new ExLinkAppendix(parent.getDBRef());
+        Transaction parent = DCSet.getInstance().getTransactionFinalMap().getRecord(docTypeAppendixPanel.parentReference.getText());
+        ExLink exLink;
+        if (parent == null) {
+            exLink = null;
+        } else {
+            exLink = new ExLinkAppendix(parent.getDBRef());
+        }
         return ExData.make(exLink, creator, jTextField_Title_Message.getText(),
                 signCanOnlyRecipients, recipients, isEncrypted,
                 (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),
