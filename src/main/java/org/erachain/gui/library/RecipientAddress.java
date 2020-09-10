@@ -1,5 +1,6 @@
 package org.erachain.gui.library;
 
+
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
@@ -11,6 +12,8 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
+import org.mapdb.Fun;
 
 import javax.swing.*;
 import java.util.List;
@@ -33,8 +36,12 @@ public class RecipientAddress extends JComboBox {
     public RecipientAddress(){
         RecipientModel model = new RecipientModel();
         this.setModel(model);
+        this.setEditable(true);
 
+    }
 
+    public String getSelectedAddress(){
+        return (String)this.getSelectedItem();
     }
 
 
@@ -46,7 +53,8 @@ public class RecipientAddress extends JComboBox {
 
         public RecipientModel(){
             favoriteMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
-            sortAndAdd();
+            addObservers();
+  //          sortAndAdd();
         }
 
         @Override
@@ -69,14 +77,14 @@ public class RecipientAddress extends JComboBox {
             ObserverMessage message = (ObserverMessage) arg;
 
             int type = message.getType();
-            //CHECK IF LIST UPDATED
+            //CHECK IF LIST UPDATE
             if (type == LIST_EVENT || type == RESET_EVENT) {
                 sortAndAdd();
             } else if (type == ADD_EVENT) {
-                this.addElement((String) message.getValue());
+                this.addElement(((Pair<String, Fun.Tuple3<String,String,String>>)message.getValue()).getA());
 
             } else if (type == DELETE_EVENT) {
-                this.removeElement((String) message.getValue());
+                this.removeElement(((Pair<String, Fun.Tuple3<String,String,String>>)message.getValue()).getA());
             }
         }
 
@@ -99,6 +107,9 @@ public class RecipientAddress extends JComboBox {
         }
 
         private void sortAndAdd() {
+            // add empty item
+            this.addElement("");
+            // add favorite address
             IteratorCloseable<String> iterator = favoriteMap.getIterator();
             while(iterator.hasNext()) {
                 this.addElement(iterator.next());

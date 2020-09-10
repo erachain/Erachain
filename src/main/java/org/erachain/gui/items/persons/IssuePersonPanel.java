@@ -52,7 +52,7 @@ public class IssuePersonPanel extends IconPanel {
     protected JTextField txtName = new JTextField("");
     protected JTextArea txtareaDescription = new JTextArea();
     protected JDateChooser txtBirthday;
-    protected RecipientAddress recipientAddress;
+    protected RecipientAddress registerAddress;
     protected JDateChooser txtDeathday;
     protected JComboBox<String> comboBoxGender = new JComboBox<>();
     //protected JTextField textPersonNumber = new JTextField();
@@ -160,7 +160,7 @@ public class IssuePersonPanel extends IconPanel {
         txtDeathday = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
         TimeZone.setDefault(tz);
 
-        recipientAddress = new RecipientAddress();
+        registerAddress = new RecipientAddress();
         mainPanel.setLayout(new GridBagLayout());
 
 
@@ -254,7 +254,7 @@ public class IssuePersonPanel extends IconPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
-        mainPanel.add(recipientAddress, gridBagConstraints);
+        mainPanel.add(registerAddress, gridBagConstraints);
 
 
         gridBagConstraints = new GridBagConstraints();
@@ -614,6 +614,15 @@ public class IssuePersonPanel extends IconPanel {
 
         IssuePersonRecord issuePersonRecord = (IssuePersonRecord) result.getA();
 
+        // send telegtam to registrator
+        String registraddrss = registerAddress.getSelectedAddress();
+        if (registraddrss.equals("")){
+            // not send telegram
+        }else
+        {
+            // send telegram
+        }
+
         // CHECK VALIDATE MESSAGE
         if (result.getB() == Transaction.VALIDATE_OK) {
             if (!forIssue) {
@@ -671,6 +680,8 @@ public class IssuePersonPanel extends IconPanel {
                     Lang.getInstance().translate(OnDealClick.resultMess(result.getB())),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
         }
+
+
         // ENABLE
         copyButton.setEnabled(true);
     }

@@ -26,12 +26,13 @@ public class FavoriteAccountsMap extends DCUMapImpl<String, Tuple3<String, Strin
 
         if (databaseSet.isWithObserver()) {
 
-            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_LIST);
-            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_ADD);
-            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_DELETE);
-            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_RESET);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.WALLET_ACCOUNT_FAVORITE_LIST);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.WALLET_ACCOUNT_FAVORITE_ADD);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.WALLET_ACCOUNT_FAVORITE_DELETE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.WALLET_ACCOUNT_FAVORITE_RESET);
         }
     }
+
 
     @Override
     public void openMap() {
