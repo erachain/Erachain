@@ -12,6 +12,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapSigns;
@@ -640,7 +641,7 @@ public class RSignNote extends Transaction implements Itemable {
             }
 
             // проверим запрет на создание Приложений если там ограничено подписание только списком получателей
-            if (parentTx instanceof RSignNote && exLink.getType() == ExLink.APPENDIX_TYPE) {
+            if (parentTx instanceof RSignNote && exLink instanceof ExLinkAppendix) {
                 RSignNote parentRNote = (RSignNote) parentTx;
                 parentRNote.parseDataV2WithoutFiles();
                 if (parentRNote.isCanSignOnlyRecipients()
