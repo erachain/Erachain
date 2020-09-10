@@ -92,6 +92,19 @@ public class ExLink {
         return value2;
     }
 
+    public String viewTypeName() {
+        switch (type) {
+            case REPLY_TYPE:
+                return "Reply";
+            case APPENDIX_TYPE:
+                return "Appendix";
+            case LIKE_TYPE:
+                return "Likes";
+            default:
+                return "Unknown";
+        }
+    }
+
     public JSONObject makeJSONforHTML() {
         JSONObject json = new JSONObject();
         return json;

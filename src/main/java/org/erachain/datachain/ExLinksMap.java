@@ -6,11 +6,16 @@ package org.erachain.datachain;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.database.serializer.ExLinkSerializer;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
+import org.mapdb.Bind;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 
 import java.util.Map;
+import java.util.NavigableSet;
 
 
 /**
@@ -23,14 +28,17 @@ import java.util.Map;
 
 public class ExLinksMap extends DCUMap<Long, ExLink> {
 
+    @SuppressWarnings("rawtypes")
+    private NavigableSet parentLinks;
+
     public ExLinksMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_VOUCH_TYPE);
-            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_VOUCH_TYPE);
-            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_VOUCH_TYPE);
-            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_VOUCH_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_EXLINK_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_EXLINK_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_EXLINK_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_EXLINK_TYPE);
         }
     }
 
@@ -42,9 +50,22 @@ public class ExLinksMap extends DCUMap<Long, ExLink> {
     private Map<Long, ExLink> openMap(DB database) {
 
         BTreeMap<Long, ExLink> map =
-                database.createTreeMap("ex_links_records")
+                database.createTreeMap("ex_links")
                         .valueSerializer(new ExLinkSerializer())
                         .makeOrGet();
+
+        this.parentLinks = database.createTreeSet("parent_ex_links")
+                .makeOrGet();
+
+        // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
+        Bind.secondaryKey((Bind.MapWithModificationListener) map, this.parentLinks,
+                new Fun.Function2<Fun.Tuple2<Long, Byte>, Long, ExLink>() {
+                    @Override
+                    public Fun.Tuple2<Long, Byte> run(Long key, ExLink exLink) {
+                        return new Fun.Tuple2<Long, Byte>(exLink.getRef(), exLink.getType());
+                    }
+                });
+
         return map;
 
     }
@@ -61,6 +82,10 @@ public class ExLinksMap extends DCUMap<Long, ExLink> {
         openMap();
     }
 
-    //public void put(Long dbRef, ExLink exLink) {
-    //}
+    public IteratorCloseable<Long> getLinksIterator(Long dbRef, Byte type, boolean descending) {
+        return IteratorCloseableImpl.make(Fun.filter(descending ? this.parentLinks.descendingSet() : this.parentLinks,
+                new Fun.Tuple2<Long, Byte>(dbRef, type)).iterator());
+
+    }
+
 }
