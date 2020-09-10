@@ -632,6 +632,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         return this.dcSet == null;
     }
 
+    public DCSet getDCSet() {
+        return this.dcSet;
+    }
+
     public int getType() {
         return Byte.toUnsignedInt(this.typeBytes[0]);
     }

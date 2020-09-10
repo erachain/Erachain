@@ -544,46 +544,34 @@ public class RSignNote extends Transaction implements Itemable {
     public void process(Block block, int forDeal) {
 
         super.process(block, forDeal);
-        if (Controller.getInstance().onlyProtocolIndexing)
-            return;
 
-        try {
-            parseData(); // need for take HASHES from FILES
-            byte[][] hashes = extendedData.getAllHashesAsBytes(true);
-            if (hashes != null) {
-                Long dbKey = makeDBRef(height, seqNo);
-                for (byte[] hash : hashes) {
-                    dcSet.getTransactionFinalMapSigns().put(hash, dbKey);
-                }
+        parseData(); // need for take HASHES from FILES
+        extendedData.process(this);
+
+        byte[][] hashes = extendedData.getAllHashesAsBytes(true);
+        if (hashes != null) {
+            Long dbKey = makeDBRef(height, seqNo);
+            for (byte[] hash : hashes) {
+                dcSet.getTransactionFinalMapSigns().put(hash, dbKey);
             }
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            Long error = null;
-            error++;
         }
     }
 
     @Override
     public void orphan(Block block, int forDeal) {
 
+        parseData(); // also need for take HASHES from FILES
+        extendedData.orphan(this);
+
+        byte[][] hashes = extendedData.getAllHashesAsBytes(true);
+        if (hashes != null) {
+            for (byte[] hash : hashes) {
+                dcSet.getTransactionFinalMapSigns().delete(hash);
+            }
+        }
+
         super.orphan(block, forDeal);
 
-        if (Controller.getInstance().onlyProtocolIndexing)
-            return;
-
-        try {
-            parseData(); // need for take HASHES from FILES
-            byte[][] hashes = extendedData.getAllHashesAsBytes(true);
-            if (hashes != null) {
-                for (byte[] hash : hashes) {
-                    dcSet.getTransactionFinalMapSigns().delete(hash);
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            Long error = null;
-            error++;
-        }
     }
 
     @Override

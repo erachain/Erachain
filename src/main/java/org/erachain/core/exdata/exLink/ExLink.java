@@ -1,6 +1,7 @@
 package org.erachain.core.exdata.exLink;
 
 import com.google.common.primitives.Longs;
+import org.erachain.core.transaction.Transaction;
 import org.json.simple.JSONObject;
 
 public class ExLink {
@@ -14,22 +15,22 @@ public class ExLink {
     /**
      * 0 - transaction, 1.. - ITEM
      */
-    private final byte flags;
+    protected final byte flags;
     /**
      * 0 - дополнение, см. LINK_APPENDIX_TYPE...
      */
-    private final byte type;
+    protected final byte type;
 
     /**
      * Ссылка на основной документ или сущность
      */
-    private final long ref;
+    protected final long ref;
 
     /**
      * Уровень связи. Например для Отзыва-Оценки - оценка, для Поручителтсво - доля поручителтсва
      */
-    private final byte value1;
-    private final byte value2;
+    protected final byte value1;
+    protected final byte value2;
 
     public ExLink(byte type, byte flags, byte value, long ref) {
         this.type = type;
@@ -163,4 +164,11 @@ public class ExLink {
     public int length() {
         return BASE_LENGTH;
     }
+
+    public void process(Transaction transaction) {
+    }
+
+    public void orphan(Transaction transaction) {
+    }
+
 }

@@ -1162,4 +1162,16 @@ public class ExData {
 
         return toJson;
     }
+
+    public void process(Transaction transaction) {
+        if (exLink != null)
+            exLink.process(transaction);
+    }
+
+    public void orphan(Transaction transaction) {
+        if (exLink != null)
+            exLink.orphan(transaction);
+    }
+
+
 }
