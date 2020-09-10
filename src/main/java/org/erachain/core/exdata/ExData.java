@@ -472,7 +472,7 @@ public class ExData {
         }
 
         if (exLink != null) {
-            outStream.write(exLink.toByte());
+            outStream.write(exLink.toBytes());
         }
 
         if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {

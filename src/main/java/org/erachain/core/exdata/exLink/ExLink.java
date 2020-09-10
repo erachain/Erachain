@@ -102,7 +102,7 @@ public class ExLink {
         return json;
     }
 
-    public byte[] toByte() {
+    public byte[] toBytes() {
         byte[] data = new byte[BASE_LENGTH];
         data[0] = type;
         data[1] = flags;
@@ -166,9 +166,11 @@ public class ExLink {
     }
 
     public void process(Transaction transaction) {
+        transaction.getDCSet().getExLinksMap().put(transaction.getDBRef(), this);
     }
 
     public void orphan(Transaction transaction) {
+        transaction.getDCSet().getExLinksMap().remove(transaction.getDBRef());
     }
 
 }

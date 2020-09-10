@@ -131,7 +131,9 @@ public class DCSet extends DBASet implements Closeable {
     private AddressPersonMapImpl addressPersonMap;
     private PersonAddressMap personAddressMap;
     private KKKMapPersonStatusUnion kK_KPersonStatusUnionMapPersonStatusUnionTable;
+
     private VouchRecordMap vouchRecordMap;
+    private ExLinksMap exLinksMap;
     private HashesMap hashesMap;
     private HashesSignsMap hashesSignsMap;
 
@@ -259,6 +261,7 @@ public class DCSet extends DBASet implements Closeable {
             this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(this, database);
 
             this.vouchRecordMap = new VouchRecordMap(this, database);
+            this.exLinksMap = new ExLinksMap(this, database);
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
             this.nameStorageMap = new NameStorageMap(this, database);
@@ -411,6 +414,7 @@ public class DCSet extends DBASet implements Closeable {
         this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(parent.kK_KPersonStatusUnionMapPersonStatusUnionTable, this);
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
         this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap, this);
+        this.exLinksMap = new ExLinksMap(parent.exLinksMap, this);
         this.hashesMap = new HashesMap(parent.hashesMap, this);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap, this);
 
@@ -769,6 +773,7 @@ public class DCSet extends DBASet implements Closeable {
         this.personAddressMap.clear();
         this.kK_KPersonStatusUnionMapPersonStatusUnionTable.clear();
         this.vouchRecordMap.clear();
+        this.exLinksMap.clear();
         this.hashesMap.clear();
         this.hashesSignsMap.clear();
         this.blockMap.clear();
@@ -1052,9 +1057,21 @@ public class DCSet extends DBASet implements Closeable {
     }
 
     /**
+     * Ссылка на другую транзакцию<br><br>
+     * Ключ: ссылка на эту транзакцию (с ссылкой).<br>
+     * Значение: ExLink
+     *
+     * @return dcMap
+     */
+    public ExLinksMap getExLinksMap() {
+        return this.exLinksMap;
+    }
+
+
+    /**
      * Для поиска по хешу в транзакции множества хешей - саму запись
      * // found by hash -> record signature
-     *
+     * <p>
      * Ключ: хэш пользователя
      * Значение: ссылка на запись
      *
