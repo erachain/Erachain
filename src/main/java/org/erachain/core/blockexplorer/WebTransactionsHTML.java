@@ -707,8 +707,10 @@ public class WebTransactionsHTML {
                     + Base58.encode(publicKey.getPublicKey()) + ")<br>";
         }
 
-        out += Lang.getInstance().translateFromLangObj("Signature", langObj) + ": "
-                + "<a href=?tx=" + Base58.encode(signature) + ">" + Base58.encode(signature) + BlockExplorer.get_Lang(langObj) + "</a><br>";
+        if (signature != null) {
+            out += Lang.getInstance().translateFromLangObj("Signature", langObj) + ": "
+                    + "<a href=?tx=" + Base58.encode(signature) + ">" + Base58.encode(signature) + BlockExplorer.get_Lang(langObj) + "</a><br>";
+        }
 
         return out;
     }
@@ -773,7 +775,7 @@ public class WebTransactionsHTML {
             }
         }
 
-        out += "</table>";
+        ///out += "</table>";
 
         return out;
     }
@@ -788,42 +790,36 @@ public class WebTransactionsHTML {
                 appendixes.add(appendixListIterator.next());
             }
             if (!appendixes.isEmpty()) {
-
                 TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
-                out += "<b>" + Lang.getInstance().translateFromLangObj("Appendixes", langObj) + ":</b> ";
 
-                out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td>" + Lang.getInstance().translateFromLangObj("Transaction", langObj) + "<td>" + Lang.getInstance().translateFromLangObj("Date", langObj) + "<td>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + "</tr>";
-                for (Long txKey : appendixes) {
+                if (appendixes.size() == 1) {
+                    Transaction signTransaction = map.get(appendixes.get(0));
 
-                    transaction = map.get(txKey);
+                    out += "<h2>" + Lang.getInstance().translateFromLangObj("Appendix", langObj)
+                            + " " + transaction.getTitle() + "</h2>";
+                    out += "<a href=?tx=" + transaction.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
+                            + transaction.viewHeightSeq() + "</a><br>"
+                            + " " + DateTimeFormat.timestamptoString(transaction.getTimestamp()) + " ";
+                    out += "<a href=?address="
+                            + transaction.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + transaction.getCreator().getPersonAsString()
+                            + "</b></a><br>";
 
-                    out += "<tr>"
-                            + "<td><a href=?tx=" + Base58.encode(transaction.getSignature()) + langObj + ">" + transaction.getBlockHeight()
-                            + "-" + transaction.getSeqNo() + "</a>"
-                            + "<td>" + DateTimeFormat.timestamptoString(transaction.getTimestamp());
-                    out += "<td>";
+                } else {
 
-                    out += transaction.getTitle() + "<br>";
+                    int count = 0;
+                    for (Long txKey : appendixes) {
 
-                    Fun.Tuple2<Integer, PersonCls> itemPerson = transaction.getCreator().getPerson();
-                    if (itemPerson != null) {
-                        out += "<a href=?person=" + itemPerson.b.getKey() + langObj + "><b>"
-                                + itemPerson.b.viewName() + "</b></a> ("
-                                + Lang.getInstance().translateFromLangObj("Public Key", langObj) + ": "
-                                + Base58.encode(transaction.getCreator().getPublicKey()) + ")<br>";
-                    } else {
-                        out += "<a href=?address=" + transaction.getCreator().getAddress() + langObj + ">" + transaction.getCreator().getAddress()
-                                + "</a> ("
-                                + Lang.getInstance().translateFromLangObj("Public Key", langObj) + ": "
-                                + Base58.encode(transaction.getCreator().getPublicKey()) + ")<br>";
+                        Transaction signTransaction = map.get(txKey);
+                        out += "<h2>" + ++count + "." + Lang.getInstance().translateFromLangObj("Appendix", langObj)
+                                + "</h2><h3>" + transaction.getTitle() + "</h3>";
+                        out += "<a href=?tx=" + transaction.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
+                                + transaction.viewHeightSeq() + " " + DateTimeFormat.timestamptoString(transaction.getTimestamp()) + "</a><br>";
+                        out += "<b>" + htmlSignifier(signTransaction, langObj) + "</b>";
+
                     }
-
-                    out += Lang.getInstance().translateFromLangObj("Signature", langObj) + " : "
-                            + "<a href=?tx=" + Base58.encode(transaction.getSignature()) + ">" + transaction.getSignature() + "</a><br>";
-
                 }
-                out += "</table>";
 
+                ///out += "</table>";
 
             }
         } catch (IOException e) {
