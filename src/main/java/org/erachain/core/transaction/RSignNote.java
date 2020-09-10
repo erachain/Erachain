@@ -11,6 +11,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapSigns;
@@ -629,6 +630,24 @@ public class RSignNote extends Transaction implements Itemable {
 
         if (extendedData == null) {
             parseDataV2WithoutFiles();
+        }
+
+        ExLink exLink = extendedData.getExLink();
+        if (exLink != null) {
+            Transaction parentTx = dcSet.getTransactionFinalMap().get(exLink.getRef());
+            if (parentTx == null) {
+                return INVALID_BLOCK_TRANS_SEQ_ERROR;
+            }
+
+            // проверим запрет на создание Приложений если там ограничено подписание только списком получателей
+            if (parentTx instanceof RSignNote && exLink.getType() == ExLink.APPENDIX_TYPE) {
+                RSignNote parentRNote = (RSignNote) parentTx;
+                parentRNote.parseDataV2WithoutFiles();
+                if (parentRNote.isCanSignOnlyRecipients()
+                        && !parentRNote.isInvolved(creator)) {
+                    return ACCOUNT_ACCSES_DENIED;
+                }
+            }
         }
 
         JSONObject hashes = extendedData.getHashes();
