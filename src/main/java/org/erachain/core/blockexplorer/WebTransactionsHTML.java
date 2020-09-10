@@ -780,11 +780,11 @@ public class WebTransactionsHTML {
         return out;
     }
 
-    public static void getLinks(HashMap output, Transaction transaction, JSONObject langObj) {
+    public static void getLinks(HashMap output, Transaction parentTx, JSONObject langObj) {
 
         String out = "";
 
-        try (IteratorCloseable<Long> appendixListIterator = DCSet.getInstance().getExLinksMap().getLinksIterator(transaction.getDBRef(), ExLink.APPENDIX_TYPE, false)) {
+        try (IteratorCloseable<Long> appendixListIterator = DCSet.getInstance().getExLinksMap().getLinksIterator(parentTx.getDBRef(), ExLink.APPENDIX_TYPE, false)) {
             List<Long> appendixes = new ArrayList<>();
             while (appendixListIterator.hasNext()) {
                 appendixes.add(appendixListIterator.next());
@@ -793,15 +793,15 @@ public class WebTransactionsHTML {
                 TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
 
                 if (appendixes.size() == 1) {
-                    Transaction signTransaction = map.get(appendixes.get(0));
+                    Transaction childTx = map.get(appendixes.get(0));
 
                     out += "<h2>" + Lang.getInstance().translateFromLangObj("Appendix", langObj)
-                            + " " + transaction.getTitle() + "</h2>";
-                    out += "<a href=?tx=" + transaction.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
-                            + transaction.viewHeightSeq() + "</a><br>"
-                            + " " + DateTimeFormat.timestamptoString(transaction.getTimestamp()) + " ";
+                            + "</h2><h3>" + childTx.getTitle() + "</h3>";
+                    out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
+                            + childTx.viewHeightSeq() + "</a><br>"
+                            + " " + DateTimeFormat.timestamptoString(childTx.getTimestamp()) + " ";
                     out += "<a href=?address="
-                            + transaction.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + transaction.getCreator().getPersonAsString()
+                            + childTx.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + childTx.getCreator().getPersonAsString()
                             + "</b></a><br>";
 
                 } else {
@@ -809,12 +809,15 @@ public class WebTransactionsHTML {
                     int count = 0;
                     for (Long txKey : appendixes) {
 
-                        Transaction signTransaction = map.get(txKey);
-                        out += "<h2>" + ++count + "." + Lang.getInstance().translateFromLangObj("Appendix", langObj)
-                                + "</h2><h3>" + transaction.getTitle() + "</h3>";
-                        out += "<a href=?tx=" + transaction.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
-                                + transaction.viewHeightSeq() + " " + DateTimeFormat.timestamptoString(transaction.getTimestamp()) + "</a><br>";
-                        out += "<b>" + htmlSignifier(signTransaction, langObj) + "</b>";
+                        Transaction childTx = map.get(txKey);
+                        out += "<h2>" + Lang.getInstance().translateFromLangObj("Appendix", langObj) + " " + ++count
+                                + "</h2><h3>" + childTx.getTitle() + "</h3>";
+                        out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
+                                + childTx.viewHeightSeq() + "</a><br>"
+                                + " " + DateTimeFormat.timestamptoString(childTx.getTimestamp()) + " ";
+                        out += "<a href=?address="
+                                + childTx.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + childTx.getCreator().getPersonAsString()
+                                + "</b></a><br>";
 
                     }
                 }
