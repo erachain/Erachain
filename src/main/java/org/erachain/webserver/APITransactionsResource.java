@@ -290,16 +290,22 @@ public class APITransactionsResource {
     @Path("getbyaddress")
     public Response getByAddress(@QueryParam("address") String address, @QueryParam("asset") Long asset,
                                  @QueryParam("recordType") String recordType, @QueryParam("unconfirmed") boolean unconfirmed) {
-        List<Transaction> result;
-        if (address == null || address.equals("")) {
-            JSONObject ff = new JSONObject();
-            ff.put("Error", "Invalid Address");
-            return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(ff.toJSONString()).build();
+
+        Account account;
+        if (address == null) {
+            account = null;
+        } else {
+            Fun.Tuple2<Account, String> resultAcc = Account.tryMakeAccount(address);
+            if (resultAcc.a == null) {
+                throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
+            } else {
+                account = resultAcc.a;
+            }
         }
 
-        result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), 1000, true, false);
+        List<Transaction> result;
+
+        result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getShortAddressBytes(), 1000, true, false);
         if (unconfirmed)
             result.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
