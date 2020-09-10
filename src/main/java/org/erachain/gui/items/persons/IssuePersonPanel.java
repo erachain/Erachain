@@ -17,6 +17,7 @@ import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
+import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
@@ -51,6 +52,7 @@ public class IssuePersonPanel extends IconPanel {
     protected JTextField txtName = new JTextField("");
     protected JTextArea txtareaDescription = new JTextArea();
     protected JDateChooser txtBirthday;
+    protected RecipientAddress recipientAddress;
     protected JDateChooser txtDeathday;
     protected JComboBox<String> comboBoxGender = new JComboBox<>();
     //protected JTextField textPersonNumber = new JTextField();
@@ -61,6 +63,7 @@ public class IssuePersonPanel extends IconPanel {
     protected JTextField txtHairColor = new JTextField();
     protected JTextField txtHeight = new JTextField("170");
     protected MButton copyButton;
+    private JLabel jLabelRegistratorAddress = new JLabel(Lang.getInstance().translate("Registrator address") + ":");
     private JLabel jLabelFee = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
     private JLabel jLabelAccount = new JLabel(Lang.getInstance().translate("Account") + ":");
     private JLabel jLabelBirthLatitudeLongtitude = new JLabel(Lang.getInstance().translate("Coordinates of Birth") + ":");
@@ -157,6 +160,7 @@ public class IssuePersonPanel extends IconPanel {
         txtDeathday = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
         TimeZone.setDefault(tz);
 
+        recipientAddress = new RecipientAddress();
         mainPanel.setLayout(new GridBagLayout());
 
 
@@ -231,6 +235,26 @@ public class IssuePersonPanel extends IconPanel {
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(0, 0, 0, 16);
         mainPanel.add(copyButton, gridBagConstraints);
+
+       // label registrator address
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 17;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(0, 18, 0, 0);
+        mainPanel.add(jLabelRegistratorAddress, gridBagConstraints);
+        // Registrator address object
+
+
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        mainPanel.add(recipientAddress, gridBagConstraints);
 
 
         gridBagConstraints = new GridBagConstraints();
