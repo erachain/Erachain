@@ -107,11 +107,24 @@ public class ExLink {
 
     public JSONObject makeJSONforHTML() {
         JSONObject json = new JSONObject();
+        json.put("type", type);
+        json.put("typeName", viewTypeName());
+        json.put("flags", flags);
+        json.put("value1", value1);
+        json.put("value2", value2);
+        json.put("ref", Transaction.viewDBRef(ref));
+
         return json;
     }
 
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
+        json.put("type", type);
+        json.put("typeName", viewTypeName());
+        json.put("flags", flags);
+        json.put("value1", value1);
+        json.put("value2", value2);
+        json.put("ref", Transaction.viewDBRef(ref));
         return json;
     }
 

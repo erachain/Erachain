@@ -983,7 +983,11 @@ public class ExData {
         }
 
         if (exLink != null) {
+            output.put("Label_LinkType", Lang.getInstance().translateFromLangObj("Link Type", langObj));
+            output.put("exLink_Name", Lang.getInstance().translateFromLangObj(exLink.viewTypeName(), langObj));
             output.put("exLink", exLink.makeJSONforHTML());
+            output.put("Label_Parent", Lang.getInstance().translateFromLangObj("for # для", langObj));
+
         }
 
         if (isCanSignOnlyRecipients()) {

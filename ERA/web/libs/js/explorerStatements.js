@@ -101,9 +101,15 @@ function statement(data) {
 
     output += '<table><tr><td>';
     output += '<div style="word-wrap: break-word;  width: 1000px;">';
-    output += data.Label_type + ':<b>' + data.type + '</b>';
+    if (data.hasOwnProperty('exLink')) {
+        output += data.Label_LinkType + ':<b> ' + data.exLink_Name + '</b> ';
+        output += data.Label_Parent + ': <a href=?tx=' + data.exLink.ref + get_lang() + '><b>' + data.exLink.ref + '</b></a><br>';
+    } else {
+        output += data.Label_type + ':<b>' + data.type + '</b> &nbsp&nbsp';
+    }
+
     if (data.tx.hasOwnProperty("height")) {
-        output += ' &nbsp&nbsp' + data.Label_block + ': <a href=?block=' + data.tx.height + get_lang() + '><b>' + data.tx.height + '</b></a>';
+        output += data.Label_block + ': <a href=?block=' + data.tx.height + get_lang() + '><b>' + data.tx.height + '</b></a>';
         output += ' &nbsp&nbsp' + data.Label_seqNo + ': <a href=?tx=' + data.tx.seqNo + get_lang() + '><b>' + data.tx.seqNo + '</b></a>';
     }
     output += ' &nbsp&nbsp' + data.Label_date + ': <b>' + convertTimestamp(data.tx.timestamp, true) + '</b>';
@@ -113,11 +119,6 @@ function statement(data) {
     output += '<br>' + data.Label_pubKey + ': <b>' + data.tx.publickey + '</b>';
 
     output += '<br>' + data.Label_signature + ': <b>' + data.tx.signature + '</b>';
-
-    if (data.hasOwnProperty('parent')) {
-        output += '<br>' + data.Label_Parent + ': <a href=?tx=' + data.parent + get_lang() + '><b>' + data.parent + '</b></a><br>';
-    }
-
 
     if (data.hasOwnProperty('title')) {
         output += '<br>' + data.Label_title + ': <b>' + escapeHtml(data.title) + '</b>';
