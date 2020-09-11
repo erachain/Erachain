@@ -5,7 +5,9 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.persons.InsertPersonPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.mapdb.Fun.Tuple3;
@@ -349,6 +351,62 @@ public class RightTelegramPanel extends javax.swing.JPanel {
             }
         });
         menu.add(copyText);
+
+        JMenuItem tryIssuePersonText = new JMenuItem(Lang.getInstance().translate("Try Issue Person"));
+        tryIssuePersonText.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                RSend rSend = (RSend) walletTelegramsFilterTableModel.getItem(row);
+                byte[] dataMess;
+
+                if (rSend.isEncrypted()) {
+
+                    if (checkWalletUnlock(null)) {
+                        return;
+                    }
+                    dataMess = Controller.getInstance().decrypt(rSend.getCreator(), rSend.getRecipient(), rSend.getData());
+
+                } else {
+                    dataMess = rSend.getData();
+                }
+
+                String message;
+                if (dataMess != null) {
+                    if (rSend.isText()) {
+                        try {
+                            message = new String(dataMess, "UTF-8");
+                        } catch (UnsupportedEncodingException e1) {
+                            message = "error UTF-8";
+                            JOptionPane.showMessageDialog(new JFrame(),
+                                    Lang.getInstance().translate(message),
+                                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        }
+                        try {
+                            dataMess = Base58.decode(message);
+                        } catch (NumberFormatException e1) {
+                            message = "error Base58 decode";
+                            JOptionPane.showMessageDialog(new JFrame(),
+                                    Lang.getInstance().translate(message),
+                                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+
+                } else {
+                    message = "decode error";
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.getInstance().translate(message),
+                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+                }
+
+                InsertPersonPanel issuePersonPanel = new InsertPersonPanel();
+                MainPanel.getInstance().insertTab(issuePersonPanel);
+                issuePersonPanel.setByteCode(dataMess);
+
+
+            }
+        });
+        menu.add(tryIssuePersonText);
 
         menu.addSeparator();
 

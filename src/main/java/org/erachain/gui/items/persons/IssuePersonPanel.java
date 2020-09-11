@@ -68,7 +68,7 @@ public class IssuePersonPanel extends IconPanel {
     protected JTextField txtHairColor = new JTextField();
     protected JTextField txtHeight = new JTextField("170");
     protected MButton copyButton;
-    private JLabel jLabelRegistratorAddress = new JLabel(Lang.getInstance().translate("Registrator address") + ":");
+    protected JLabel jLabelRegistratorAddress = new JLabel(Lang.getInstance().translate("Registrar") + ":");
     private JLabel jLabelFee = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
     private JLabel jLabelAccount = new JLabel(Lang.getInstance().translate("Account") + ":");
     private JLabel jLabelBirthLatitudeLongtitude = new JLabel(Lang.getInstance().translate("Coordinates of Birth") + ":");
@@ -234,7 +234,7 @@ public class IssuePersonPanel extends IconPanel {
        // label registrator address
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridy = 19;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(0, 18, 0, 0);
         mainPanel.add(jLabelRegistratorAddress, gridBagConstraints);
@@ -244,7 +244,7 @@ public class IssuePersonPanel extends IconPanel {
         registrarAddress = new RecipientAddress();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridy = 19;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -253,7 +253,7 @@ public class IssuePersonPanel extends IconPanel {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 19;
+        gridBagConstraints.gridy = 20;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -262,7 +262,7 @@ public class IssuePersonPanel extends IconPanel {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 20;
+        gridBagConstraints.gridy = 21;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(0, 0, 0, 16);
