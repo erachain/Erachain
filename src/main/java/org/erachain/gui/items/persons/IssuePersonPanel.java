@@ -657,7 +657,7 @@ public class IssuePersonPanel extends IconPanel {
                     Transaction transaction = Controller.getInstance().r_Send(
                             creator, feePow, registrar, 0L,
                             null, "Person bytecode", encryptedBytes,
-                            new byte[0], new byte[1], 0);
+                            new byte[1], new byte[]{1}, 0);
 
                     Controller.getInstance().broadcastTelegram(transaction, true);
                     JOptionPane.showMessageDialog(new JFrame(),
