@@ -2,12 +2,7 @@ package org.erachain.gui.library;
 
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.persons.PersonCls;
-import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.database.wallet.FavoriteAccountsMap;
-import org.erachain.database.wallet.FavoriteItemMap;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
@@ -16,7 +11,6 @@ import org.erachain.utils.Pair;
 import org.mapdb.Fun;
 
 import javax.swing.*;
-import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -32,29 +26,25 @@ public class RecipientAddress extends JComboBox {
     private int LIST_EVENT;
     protected Observable observable;
 
-
-    public RecipientAddress(){
+    public RecipientAddress() {
         RecipientModel model = new RecipientModel();
         this.setModel(model);
         this.setEditable(true);
 
     }
 
-    public String getSelectedAddress(){
-        return (String)this.getSelectedItem();
+    public String getSelectedAddress() {
+        return (String) this.getSelectedItem();
     }
 
-
-
-
     // model
-    class RecipientModel extends DefaultComboBoxModel<String> implements Observer, ObserverWaiter{
+    class RecipientModel extends DefaultComboBoxModel<String> implements Observer, ObserverWaiter {
         protected FavoriteAccountsMap favoriteMap;
 
-        public RecipientModel(){
+        public RecipientModel() {
             favoriteMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
             addObservers();
-  //          sortAndAdd();
+            //          sortAndAdd();
         }
 
         @Override
@@ -81,25 +71,25 @@ public class RecipientAddress extends JComboBox {
             if (type == LIST_EVENT || type == RESET_EVENT) {
                 sortAndAdd();
             } else if (type == ADD_EVENT) {
-                this.addElement(((Pair<String, Fun.Tuple3<String,String,String>>)message.getValue()).getA());
+                this.addElement(((Pair<String, Fun.Tuple3<String, String, String>>) message.getValue()).getA());
 
             } else if (type == DELETE_EVENT) {
-                this.removeElement(((Pair<String, Fun.Tuple3<String,String,String>>)message.getValue()).getA());
+                this.removeElement(((Pair<String, Fun.Tuple3<String, String, String>>) message.getValue()).getA());
             }
         }
 
         @Override
         public void addObservers() {
             if (Controller.getInstance().doesWalletDatabaseExists()) {
-               Map<Integer, Integer> observersDBMap = favoriteMap.getObservableData();
+                Map<Integer, Integer> observersDBMap = favoriteMap.getObservableData();
 
-               RESET_EVENT = observersDBMap.get(DBTab.NOTIFY_RESET);
-               LIST_EVENT = observersDBMap.get(DBTab.NOTIFY_LIST);
-               ADD_EVENT = observersDBMap.get(DBTab.NOTIFY_ADD);
-               DELETE_EVENT = observersDBMap.get(DBTab.NOTIFY_REMOVE);
+                RESET_EVENT = observersDBMap.get(DBTab.NOTIFY_RESET);
+                LIST_EVENT = observersDBMap.get(DBTab.NOTIFY_LIST);
+                ADD_EVENT = observersDBMap.get(DBTab.NOTIFY_ADD);
+                DELETE_EVENT = observersDBMap.get(DBTab.NOTIFY_REMOVE);
 
                 favoriteMap.addObserver(this);
-             } else {
+            } else {
                 // ожидаем открытия кошелька
                 Controller.getInstance().wallet.addWaitingObserver(this);
             }
@@ -111,10 +101,11 @@ public class RecipientAddress extends JComboBox {
             this.addElement("");
             // add favorite address
             IteratorCloseable<String> iterator = favoriteMap.getIterator();
-            while(iterator.hasNext()) {
+            while (iterator.hasNext()) {
                 this.addElement(iterator.next());
             }
         }
+
         public void removeObservers() {
             if (Controller.getInstance().doesWalletDatabaseExists())
                 favoriteMap.deleteObserver(this);
@@ -123,4 +114,3 @@ public class RecipientAddress extends JComboBox {
     }
 
 }
-

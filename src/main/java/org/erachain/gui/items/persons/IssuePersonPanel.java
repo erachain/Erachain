@@ -4,8 +4,11 @@ import com.toedter.calendar.JDateChooser;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.IssuePersonRecord;
@@ -52,7 +55,8 @@ public class IssuePersonPanel extends IconPanel {
     protected JTextField txtName = new JTextField("");
     protected JTextArea txtareaDescription = new JTextArea();
     protected JDateChooser txtBirthday;
-    protected RecipientAddress registerAddress;
+    protected RecipientAddress registrarAddress;
+    protected JLabel registrarAddressDesc = new JLabel();
     protected JDateChooser txtDeathday;
     protected JComboBox<String> comboBoxGender = new JComboBox<>();
     //protected JTextField textPersonNumber = new JTextField();
@@ -160,9 +164,7 @@ public class IssuePersonPanel extends IconPanel {
         txtDeathday = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
         TimeZone.setDefault(tz);
 
-        registerAddress = new RecipientAddress();
         mainPanel.setLayout(new GridBagLayout());
-
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -228,34 +230,42 @@ public class IssuePersonPanel extends IconPanel {
         mainPanel.add(jLabelFee, gridBagConstraints);
 
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 18;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 16);
-        mainPanel.add(copyButton, gridBagConstraints);
-
        // label registrator address
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridy = 18;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(0, 18, 0, 0);
         mainPanel.add(jLabelRegistratorAddress, gridBagConstraints);
         // Registrator address object
 
 
-
+        registrarAddress = new RecipientAddress();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridy = 18;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
-        mainPanel.add(registerAddress, gridBagConstraints);
+        mainPanel.add(registrarAddress, gridBagConstraints);
 
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 19;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        mainPanel.add(registrarAddressDesc, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 20;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 16);
+        mainPanel.add(copyButton, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -304,7 +314,6 @@ public class IssuePersonPanel extends IconPanel {
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new Insets(0, 0, 0, 1);
         mainPanel.add(txtFeePow, gridBagConstraints);
-
 
 
         // dead
@@ -428,6 +437,14 @@ public class IssuePersonPanel extends IconPanel {
                 }
             }
         });
+
+        // set acoount TO
+        this.registrarAddress.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                refreshReceiverDetails();
+            }
+        });
+
         mainScrollPane1.setViewportView(mainPanel);
         add(mainScrollPane1, BorderLayout.CENTER);
     }
@@ -615,7 +632,7 @@ public class IssuePersonPanel extends IconPanel {
         IssuePersonRecord issuePersonRecord = (IssuePersonRecord) result.getA();
 
         // send telegtam to registrator
-        String registraddrss = registerAddress.getSelectedAddress();
+        String registraddrss = registrarAddress.getSelectedAddress();
         if (registraddrss.equals("")){
             // not send telegram
         }else
@@ -686,7 +703,28 @@ public class IssuePersonPanel extends IconPanel {
         copyButton.setEnabled(true);
     }
 
+    Account registrar;
+
+    private void refreshReceiverDetails() {
+
+        String registrarStr = registrarAddress.getSelectedAddress();
+        //Account
+        this.registrarAddressDesc.setText(Account.getDetailsForEncrypt(registrarStr, AssetCls.FEE_KEY, true));
+
+        registrar = null;
+        if (Crypto.getInstance().isValidAddress(registrarStr)) {
+            registrar = new Account(registrarStr);
+        } else {
+            if (PublicKeyAccount.isValidPublicKey(registrarStr)) {
+                registrar = new PublicKeyAccount(registrarStr);
+            }
+        }
+
+        if (registrar == null) {
+            copyButton.setText(Lang.getInstance().translate("Create Person and copy to clipboard"));
+        } else {
+            copyButton.setText(Lang.getInstance().translate("Create Person and send to Registrar"));
+        }
+    }
+
 }
-
-
-
