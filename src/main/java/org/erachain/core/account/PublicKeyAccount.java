@@ -34,21 +34,28 @@ public class PublicKeyAccount extends Account {
         return true;
     }
 
+    public static boolean validLen(String publicKey) {
+        return publicKey.length() > PublicKeyAccount.PUBLIC_KEY_LENGTH + (PublicKeyAccount.PUBLIC_KEY_LENGTH >> 3);
+    }
+
     public static boolean isValidPublicKey(String publicKey) {
 
         byte[] pk = null;
         if (publicKey.startsWith("+")) {
             // BASE.32 from  BANK
             publicKey = publicKey.substring(1);
-            try {
-                pk = Base32.decode(publicKey, PUBLIC_KEY_LENGTH);
-            } catch (Exception e) {
+            if (validLen(publicKey)) {
+                try {
+                    pk = Base32.decode(publicKey, PUBLIC_KEY_LENGTH);
+                } catch (Exception e) {
+                    return false;
+                }
+            } else
                 return false;
-            }
         } else {
             try {
                 // Base58 string len = 33-34 for ADDRESS and 40-44 for PubKey
-                if (publicKey.length() > ADDRESS_LENGTH) {
+                if (validLen(publicKey)) {
                     pk = Base58.decode(publicKey, PUBLIC_KEY_LENGTH);
                 } else
                     return false;

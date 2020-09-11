@@ -4,8 +4,12 @@ import com.toedter.calendar.JDateChooser;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.IssuePersonRecord;
@@ -17,6 +21,7 @@ import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
+import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
@@ -51,6 +56,8 @@ public class IssuePersonPanel extends IconPanel {
     protected JTextField txtName = new JTextField("");
     protected JTextArea txtareaDescription = new JTextArea();
     protected JDateChooser txtBirthday;
+    protected RecipientAddress registrarAddress;
+    protected JLabel registrarAddressDesc = new JLabel();
     protected JDateChooser txtDeathday;
     protected JComboBox<String> comboBoxGender = new JComboBox<>();
     //protected JTextField textPersonNumber = new JTextField();
@@ -61,6 +68,7 @@ public class IssuePersonPanel extends IconPanel {
     protected JTextField txtHairColor = new JTextField();
     protected JTextField txtHeight = new JTextField("170");
     protected MButton copyButton;
+    protected JLabel jLabelRegistratorAddress = new JLabel(Lang.getInstance().translate("Registrar") + ":");
     private JLabel jLabelFee = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
     private JLabel jLabelAccount = new JLabel(Lang.getInstance().translate("Account") + ":");
     private JLabel jLabelBirthLatitudeLongtitude = new JLabel(Lang.getInstance().translate("Coordinates of Birth") + ":");
@@ -139,7 +147,7 @@ public class IssuePersonPanel extends IconPanel {
         txtFeePow.setSelectedIndex(0);
         txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
 
-        copyButton = new MButton(Lang.getInstance().translate("Create Person and copy to clipboard"), 2);
+        copyButton = new MButton(Lang.getInstance().translate("Create and copy to clipboard"), 2);
         copyButton.addActionListener(e -> onIssueClick(false));
 
         addImageLabel = new AddImageLabel(Lang.getInstance().translate("Add image"),
@@ -158,7 +166,6 @@ public class IssuePersonPanel extends IconPanel {
         TimeZone.setDefault(tz);
 
         mainPanel.setLayout(new GridBagLayout());
-
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -224,14 +231,42 @@ public class IssuePersonPanel extends IconPanel {
         mainPanel.add(jLabelFee, gridBagConstraints);
 
 
+       // label registrator address
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 19;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new Insets(0, 18, 0, 0);
+        mainPanel.add(jLabelRegistratorAddress, gridBagConstraints);
+        // Registrator address object
+
+
+        registrarAddress = new RecipientAddress();
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 19;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        mainPanel.add(registrarAddress, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 20;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        mainPanel.add(registrarAddressDesc, gridBagConstraints);
+
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridy = 21;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(0, 0, 0, 16);
         mainPanel.add(copyButton, gridBagConstraints);
-
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -280,7 +315,6 @@ public class IssuePersonPanel extends IconPanel {
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new Insets(0, 0, 0, 1);
         mainPanel.add(txtFeePow, gridBagConstraints);
-
 
 
         // dead
@@ -404,6 +438,14 @@ public class IssuePersonPanel extends IconPanel {
                 }
             }
         });
+
+        // set acoount TO
+        this.registrarAddress.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                refreshReceiverDetails();
+            }
+        });
+
         mainScrollPane1.setViewportView(mainPanel);
         add(mainScrollPane1, BorderLayout.CENTER);
     }
@@ -596,14 +638,34 @@ public class IssuePersonPanel extends IconPanel {
                 PersonHuman personHuman = (PersonHuman) issuePersonRecord.getItem();
                 // SIGN
                 personHuman.sign(creator);
-                String base58str = Base58.encode(personHuman.toBytes(false, false));
-                // This method writes a string to the system clipboard.
-                // otherwise it returns null.
-                StringSelection stringSelection = new StringSelection(base58str);
-                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Person issue has been copy to buffer") + "!",
-                        Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                byte[] issueBytes = personHuman.toBytes(false, false);
+                String base58str = Base58.encode(issueBytes);
+                if (registrar == null) {
+                    // copy to clipBoard
+
+                    // This method writes a string to the system clipboard.
+                    // otherwise it returns null.
+                    StringSelection stringSelection = new StringSelection(base58str);
+                    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.getInstance().translate("Person bytecode has been copy to buffer") + "!",
+                            Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    // send telegram
+                    byte[] encryptedBytes = AEScrypto.dataEncrypt(issueBytes, creator.getPrivateKey(), registrar.getPublicKey());
+
+                    Transaction transaction = Controller.getInstance().r_Send(
+                            creator, feePow, registrar, 0L,
+                            null, "Person bytecode", encryptedBytes,
+                            new byte[1], new byte[]{1}, 0);
+
+                    Controller.getInstance().broadcastTelegram(transaction, true);
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.getInstance().translate("Person bytecode has been send to Registrar") + "!",
+                            Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+                }
+
                 // ENABLE
                 copyButton.setEnabled(true);
                 return;
@@ -647,11 +709,40 @@ public class IssuePersonPanel extends IconPanel {
                     Lang.getInstance().translate(OnDealClick.resultMess(result.getB())),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
         }
+
+
         // ENABLE
         copyButton.setEnabled(true);
     }
 
+    PublicKeyAccount registrar;
+    private void refreshReceiverDetails() {
+
+        String registrarStr = registrarAddress.getSelectedAddress();
+        //Account
+        this.registrarAddressDesc.setText(Account.getDetailsForEncrypt(registrarStr, AssetCls.FEE_KEY, true));
+
+        registrar = null;
+        if (registrarStr != null && !registrarStr.isEmpty()) {
+            if (Crypto.getInstance().isValidAddress(registrarStr)) {
+                byte[] pubKey = Controller.getInstance().getPublicKeyByAddress(registrarStr);
+                if (pubKey == null) {
+                    registrar = null;
+                } else {
+                    registrar = new PublicKeyAccount(pubKey);
+                }
+            } else {
+                if (PublicKeyAccount.isValidPublicKey(registrarStr)) {
+                    registrar = new PublicKeyAccount(registrarStr);
+                }
+            }
+        }
+
+        if (registrar == null) {
+            copyButton.setText(Lang.getInstance().translate("Create and copy to clipboard"));
+        } else {
+            copyButton.setText(Lang.getInstance().translate("Create and send to Registrar"));
+        }
+    }
+
 }
-
-
-

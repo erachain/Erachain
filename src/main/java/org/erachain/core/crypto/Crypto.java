@@ -174,43 +174,15 @@ public class Crypto {
 
         byte[] addressBytes;
 
+        if (address == null || address.isEmpty() || address.length() < 30) {
+            return false;
+        }
+
         try {
             //BASE 58 DECODE
             addressBytes = Base58.decode(address);
         } catch (Exception e) {
             //ERROR DECODING
-            return false;
-        }
-
-        if (false) {
-            //CHECK BYTES
-            if (addressBytes.length != Account.ADDRESS_LENGTH) {
-                return false;
-            }
-
-            //CHECK VERSION
-            if (addressBytes[0] == ADDRESS_VERSION
-                    || addressBytes[0] == AT_ADDRESS_VERSION) {
-
-                //REMOVE CHECKSUM
-                byte[] checkSum = new byte[4];
-                checkSum[3] = addressBytes[Account.ADDRESS_LENGTH - 1];
-                checkSum[2] = addressBytes[Account.ADDRESS_LENGTH - 2];
-                checkSum[1] = addressBytes[Account.ADDRESS_LENGTH - 3];
-                checkSum[0] = addressBytes[Account.ADDRESS_LENGTH - 4];
-
-                //GENERATE ADDRESS CHECKSUM
-                byte[] digest = this.doubleDigest(Arrays.copyOfRange(addressBytes, 0, 21));
-                byte[] checkSumTwo = new byte[4];
-                checkSumTwo[0] = digest[0];
-                checkSumTwo[1] = digest[1];
-                checkSumTwo[2] = digest[2];
-                checkSumTwo[3] = digest[3];
-
-                //CHECK IF CHECKSUMS ARE THE SAME
-                return Arrays.equals(checkSum, checkSumTwo);
-            }
-
             return false;
         }
 
