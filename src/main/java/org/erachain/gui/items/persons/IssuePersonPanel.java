@@ -727,6 +727,8 @@ public class IssuePersonPanel extends IconPanel {
             byte[] pubKey = Controller.getInstance().getPublicKeyByAddress(registrarStr);
             if (pubKey == null) {
                 registrar = null;
+            } else {
+                registrar = new PublicKeyAccount(pubKey);
             }
         } else {
             if (PublicKeyAccount.isValidPublicKey(registrarStr)) {
