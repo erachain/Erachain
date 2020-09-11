@@ -5,6 +5,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
@@ -631,29 +632,40 @@ public class IssuePersonPanel extends IconPanel {
 
         IssuePersonRecord issuePersonRecord = (IssuePersonRecord) result.getA();
 
-        // send telegtam to registrator
-        String registraddrss = registrarAddress.getSelectedAddress();
-        if (registraddrss.equals("")){
-            // not send telegram
-        }else
-        {
-            // send telegram
-        }
-
         // CHECK VALIDATE MESSAGE
         if (result.getB() == Transaction.VALIDATE_OK) {
             if (!forIssue) {
                 PersonHuman personHuman = (PersonHuman) issuePersonRecord.getItem();
                 // SIGN
                 personHuman.sign(creator);
-                String base58str = Base58.encode(personHuman.toBytes(false, false));
-                // This method writes a string to the system clipboard.
-                // otherwise it returns null.
-                StringSelection stringSelection = new StringSelection(base58str);
-                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Person issue has been copy to buffer") + "!",
-                        Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                byte[] issueBytes = personHuman.toBytes(false, false);
+                String base58str = Base58.encode(issueBytes);
+                if (registrar == null) {
+                    // copy to clipBoard
+
+                    // This method writes a string to the system clipboard.
+                    // otherwise it returns null.
+                    StringSelection stringSelection = new StringSelection(base58str);
+                    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.getInstance().translate("Person bytecode has been copy to buffer") + "!",
+                            Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    // send telegram
+                    byte[] encryptedBytes = AEScrypto.dataEncrypt(issueBytes, creator.getPrivateKey(), registrar.getPublicKey());
+
+                    Transaction transaction = Controller.getInstance().r_Send(
+                            creator, feePow, registrar, 0L,
+                            null, "Person bytecode", encryptedBytes,
+                            new byte[0], new byte[1], 0);
+
+                    Controller.getInstance().broadcastTelegram(transaction, true);
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.getInstance().translate("Person bytecode has been send to Registrar") + "!",
+                            Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+                }
+
                 // ENABLE
                 copyButton.setEnabled(true);
                 return;

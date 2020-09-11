@@ -848,6 +848,8 @@
   "Permission Request: ": "Запрос Разрешений:  ",
   "Person": "Персона",
   "Persons": "Персоны",
+  "Person bytecode has been copy to buffer": "Байткод Персоны был скопирован в буфер обмена",
+  "Person bytecode has been send to Registrar": "Байткод Персоны был выслан Регистратору",
   "Person confirm": "Подтверждение Персоны",
   "Person issue has been sent!": "Персона выпущена!",
   "Personal Voters": "Личные Голоса",
