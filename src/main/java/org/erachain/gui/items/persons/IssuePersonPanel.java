@@ -703,8 +703,7 @@ public class IssuePersonPanel extends IconPanel {
         copyButton.setEnabled(true);
     }
 
-    Account registrar;
-
+    PublicKeyAccount registrar;
     private void refreshReceiverDetails() {
 
         String registrarStr = registrarAddress.getSelectedAddress();
@@ -713,7 +712,10 @@ public class IssuePersonPanel extends IconPanel {
 
         registrar = null;
         if (Crypto.getInstance().isValidAddress(registrarStr)) {
-            registrar = new Account(registrarStr);
+            byte[] pubKey = Controller.getInstance().getPublicKeyByAddress(registrarStr);
+            if (pubKey == null) {
+                registrar = null;
+            }
         } else {
             if (PublicKeyAccount.isValidPublicKey(registrarStr)) {
                 registrar = new PublicKeyAccount(registrarStr);
@@ -721,9 +723,9 @@ public class IssuePersonPanel extends IconPanel {
         }
 
         if (registrar == null) {
-            copyButton.setText(Lang.getInstance().translate("Create Person and copy to clipboard"));
+            copyButton.setText(Lang.getInstance().translate("Create and copy to clipboard"));
         } else {
-            copyButton.setText(Lang.getInstance().translate("Create Person and send to Registrar"));
+            copyButton.setText(Lang.getInstance().translate("Create and send to Registrar"));
         }
     }
 
