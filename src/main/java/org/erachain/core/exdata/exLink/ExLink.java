@@ -184,7 +184,7 @@ public class ExLink {
                 return new ExLinkLike(typeBuffer, refLink);
         }
 
-        throw new Exception("wrong type");
+        throw new Exception("wrong type:" + typeBuffer[0]);
     }
 
     public int length() {
