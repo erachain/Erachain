@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.IssuePersonRecord;
@@ -338,6 +339,10 @@ public class InsertPersonPanel extends IssuePersonPanel {
                         : Lang.getInstance().translate("Wrong signature for data owner"));
         txtPublicKey.setText(Base58.encode(person.getOwner().getPublicKey()));
 
+    }
+
+    public PersonCls getPerson() {
+        return person;
     }
 
     private void eraseFields() {

@@ -356,52 +356,65 @@ public class RightTelegramPanel extends javax.swing.JPanel {
         tryIssuePersonText.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                RSend rSend = (RSend) walletTelegramsFilterTableModel.getItem(row);
-                byte[] dataMess;
+                Transaction transaction = walletTelegramsFilterTableModel.getItem(row);
+                if (transaction instanceof RSend) {
+                    RSend rSend = (RSend) walletTelegramsFilterTableModel.getItem(row);
+                    byte[] dataMess;
 
-                if (rSend.isEncrypted()) {
+                    if (rSend.isEncrypted()) {
 
-                    if (checkWalletUnlock(null)) {
-                        return;
-                    }
-                    dataMess = Controller.getInstance().decrypt(rSend.getCreator(), rSend.getRecipient(), rSend.getData());
-
-                } else {
-                    dataMess = rSend.getData();
-                }
-
-                String message;
-                if (dataMess != null) {
-                    if (rSend.isText()) {
-                        try {
-                            message = new String(dataMess, "UTF-8");
-                        } catch (UnsupportedEncodingException e1) {
-                            message = "error UTF-8";
-                            JOptionPane.showMessageDialog(new JFrame(),
-                                    Lang.getInstance().translate(message),
-                                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        if (checkWalletUnlock(null)) {
+                            return;
                         }
-                        try {
-                            dataMess = Base58.decode(message);
-                        } catch (NumberFormatException e1) {
-                            message = "error Base58 decode";
-                            JOptionPane.showMessageDialog(new JFrame(),
-                                    Lang.getInstance().translate(message),
-                                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                        }
+                        dataMess = Controller.getInstance().decrypt(rSend.getCreator(), rSend.getRecipient(), rSend.getData());
+
+                    } else {
+                        dataMess = rSend.getData();
                     }
 
+                    String message;
+                    if (dataMess != null) {
+                        if (rSend.isText()) {
+                            try {
+                                message = new String(dataMess, "UTF-8");
+                            } catch (UnsupportedEncodingException e1) {
+                                message = "error UTF-8";
+                                JOptionPane.showMessageDialog(new JFrame(),
+                                        Lang.getInstance().translate(message),
+                                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                            }
+                            try {
+                                dataMess = Base58.decode(message);
+                            } catch (NumberFormatException e1) {
+                                message = "error Base58 decode";
+                                JOptionPane.showMessageDialog(new JFrame(),
+                                        Lang.getInstance().translate(message),
+                                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+
+                    } else {
+                        message = "decode error";
+                        JOptionPane.showMessageDialog(new JFrame(),
+                                Lang.getInstance().translate(message),
+                                Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+                    }
+
+                    InsertPersonPanel issuePersonPanel = new InsertPersonPanel();
+                    issuePersonPanel.setByteCode(dataMess);
+                    if (issuePersonPanel.getPerson() != null) {
+                        MainPanel.getInstance().insertNewTab(
+                                Lang.getInstance().translate("Insert # Вставка") + ": " + issuePersonPanel.getPerson().getName(),
+                                issuePersonPanel);
+                    }
+
                 } else {
-                    message = "decode error";
                     JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate(message),
+                            Lang.getInstance().translate("Wrong transaction type") + ": " + transaction.viewType(),
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
                 }
-
-                InsertPersonPanel issuePersonPanel = new InsertPersonPanel();
-                MainPanel.getInstance().insertTab(issuePersonPanel);
-                issuePersonPanel.setByteCode(dataMess);
 
 
             }
