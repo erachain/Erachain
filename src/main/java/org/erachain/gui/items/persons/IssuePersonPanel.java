@@ -147,7 +147,7 @@ public class IssuePersonPanel extends IconPanel {
         txtFeePow.setSelectedIndex(0);
         txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
 
-        copyButton = new MButton(Lang.getInstance().translate("Create Person and copy to clipboard"), 2);
+        copyButton = new MButton(Lang.getInstance().translate("Create and copy to clipboard"), 2);
         copyButton.addActionListener(e -> onIssueClick(false));
 
         addImageLabel = new AddImageLabel(Lang.getInstance().translate("Add image"),
@@ -723,16 +723,18 @@ public class IssuePersonPanel extends IconPanel {
         this.registrarAddressDesc.setText(Account.getDetailsForEncrypt(registrarStr, AssetCls.FEE_KEY, true));
 
         registrar = null;
-        if (Crypto.getInstance().isValidAddress(registrarStr)) {
-            byte[] pubKey = Controller.getInstance().getPublicKeyByAddress(registrarStr);
-            if (pubKey == null) {
-                registrar = null;
+        if (registrarStr != null && !registrarStr.isEmpty()) {
+            if (Crypto.getInstance().isValidAddress(registrarStr)) {
+                byte[] pubKey = Controller.getInstance().getPublicKeyByAddress(registrarStr);
+                if (pubKey == null) {
+                    registrar = null;
+                } else {
+                    registrar = new PublicKeyAccount(pubKey);
+                }
             } else {
-                registrar = new PublicKeyAccount(pubKey);
-            }
-        } else {
-            if (PublicKeyAccount.isValidPublicKey(registrarStr)) {
-                registrar = new PublicKeyAccount(registrarStr);
+                if (PublicKeyAccount.isValidPublicKey(registrarStr)) {
+                    registrar = new PublicKeyAccount(registrarStr);
+                }
             }
         }
 
