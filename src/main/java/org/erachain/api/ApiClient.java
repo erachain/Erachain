@@ -686,6 +686,7 @@ public class ApiClient {
                             "Record HASHes. \"url\" link to files. \"message\" short description. \"hashes\" - String of HASHes delimited by \" \".",
                             ""
                     },
+                    // ASSETS
                     {
                             "GET assets",
                             "Returns an array of keys of assets with names.",
@@ -705,6 +706,11 @@ public class ApiClient {
                             "GET assets/<key>/full",
                             "Returns full information about asset with the given key.",
                             "Errors: 601 - Invalid asset ID."
+                    },
+                    {
+                            "POST assets/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"scale\": \"<scale>\", \"assetType\": \"<assetType>\", \"quantity\": \"<quantity>\", \"password\": \"<password>\"}",
+                            "Issue Item Asset.",
+                            "Errors: ..."
                     },
                     {
                             "POST blogpost/<blogname> {\"fee\": \"<fee>\", \"creator\": \"<creator>\", \"author\": \"<author>\", \"title\": \"<title>\", \"body\": \"<body>\", \"share\": \"<share>\", \"delete\": \"<delete>\"}",

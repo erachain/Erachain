@@ -6,15 +6,15 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
@@ -74,6 +74,37 @@ public class ItemPersonsResource {
         }
 
         return array.toJSONString();
+    }
+
+    @POST
+    @Path("/issue")
+    public String issue(String x) {
+
+        Controller cntr = Controller.getInstance();
+        Object result = cntr.issuePerson(request, x);
+        if (result instanceof JSONObject) {
+            return ((JSONObject) result).toJSONString();
+        }
+
+        Pair<Transaction, Integer> resultGood = (Pair<Transaction, Integer>) result;
+        if (resultGood.getB() != Transaction.VALIDATE_OK) {
+            JSONObject out = new JSONObject();
+            out.put("error", resultGood.getB());
+            out.put("error_message", OnDealClick.resultMess(resultGood.getB()));
+            return out.toJSONString();
+        }
+
+        Transaction transaction = resultGood.getA();
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        if (validate == Transaction.VALIDATE_OK)
+            return transaction.toJson().toJSONString();
+        else {
+            JSONObject out = new JSONObject();
+            out.put("error", validate);
+            out.put("error_message", OnDealClick.resultMess(validate));
+            return out.toJSONString();
+        }
     }
 
 }

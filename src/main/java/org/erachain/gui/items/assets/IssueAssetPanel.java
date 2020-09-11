@@ -320,7 +320,7 @@ public class IssueAssetPanel extends IconPanel {
 
             IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
                     creator, textName.getText(), textAreaDescription.getText(), addLogoIconLabel.getImgBytes(),
-                    addImageLabel.getImgBytes(), false, scale, assetType, quantity, feePow);
+                    addImageLabel.getImgBytes(), scale, assetType, quantity, feePow);
 
             AssetCls asset = (AssetCls) issueAssetTransaction.getItem();
 
