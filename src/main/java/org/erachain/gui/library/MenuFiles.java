@@ -321,9 +321,9 @@ public class MenuFiles extends JMenu {
         });
         add(licenseItem);
 
-        // SIDECHAIN LICENSE
+        // CLONECHAIN LICENSE
         //ABOUT
-        JMenuItem dataLicenseItem = new JMenuItem(Lang.getInstance().translate("Data License of Sidechain"));
+        JMenuItem dataLicenseItem = new JMenuItem(Lang.getInstance().translate("Data License of Clonechain"));
         //    licenseItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
         //    licenseItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
         dataLicenseItem.addActionListener(new ActionListener() {

@@ -241,13 +241,13 @@ public class IssuePersonRecord extends IssueItemRecord {
         if (isPersonAlive) {
             // IF PERSON is LIVE
             if (person.getImage().length > person.getMAXimageLenght()) {
-                if (!BlockChain.SIDE_MODE && !BlockChain.TEST_MODE && height > 157640) {
+                if (!BlockChain.CLONE_MODE && !BlockChain.TEST_MODE && height > 157640) {
                     // early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
                     return Transaction.INVALID_IMAGE_LENGTH_MAX;
                 }
             } else if (person.getImage().length < person.getMINimageLenght()) {
                 // 2998-1 - транзакция забаненая
-                if (!BlockChain.SIDE_MODE && !BlockChain.TEST_MODE && height != 2998) {
+                if (!BlockChain.CLONE_MODE && !BlockChain.TEST_MODE && height != 2998) {
                     return Transaction.INVALID_IMAGE_LENGTH_MIN;
                 }
             }

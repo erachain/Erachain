@@ -224,7 +224,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             if (this.getDBIssueMap(db).contains(this.reference)) {
                 this.key = this.getDBIssueMap(db).get(this.reference);
             } else if (BlockChain.CHECK_BUGS > 0
-                    && !BlockChain.SIDE_MODE && !BlockChain.TEST_MODE
+                    && !BlockChain.CLONE_MODE && !BlockChain.TEST_MODE
                     && Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
 
             ) {

@@ -63,7 +63,7 @@ public class LicenseDataJFrame extends JDialog {
         Toolkit kit = Toolkit.getDefaultToolkit();
         Dimension screens = kit.getScreenSize();
         initComponents();
-        setTitle(Lang.getInstance().translate("Data License of Sidechain"));
+        setTitle(Lang.getInstance().translate("Data License of Clonechain"));
         List<Image> icons = new ArrayList<Image>();
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
