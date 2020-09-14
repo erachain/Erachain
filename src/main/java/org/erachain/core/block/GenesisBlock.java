@@ -76,7 +76,7 @@ public class GenesisBlock extends Block {
             this.testnetInfo += "\nStart the other nodes with command" + ":";
             this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar erachain.jar -testnet=" + genesisTimestamp;
 
-        } else if (BlockChain.SIDE_MODE) {
+        } else if (BlockChain.CLONE_MODE) {
 
             sideSettingString = "";
             sideSettingString += Settings.genesisJSON.get(0).toString();
@@ -557,7 +557,7 @@ public class GenesisBlock extends Block {
         switch (key) {
             case (int) TemplateCls.LICENSE_KEY:
                 String license = "";
-                if (!(BlockChain.TESTS_VERS != 0 && (BlockChain.SIDE_MODE || BlockChain.TEST_MODE))) {
+                if (!(BlockChain.TESTS_VERS != 0 && (BlockChain.CLONE_MODE || BlockChain.TEST_MODE))) {
                     try {
                         //File file = new File("License Erachain.txt");
                         File file = new File("Erachain Licence Agreement (genesis).txt");
@@ -719,10 +719,10 @@ public class GenesisBlock extends Block {
         genesisTimestampBytes = Bytes.ensureCapacity(genesisTimestampBytes, 8, 0);
         data = Bytes.concat(data, genesisTimestampBytes);
 
-        if (BlockChain.SIDE_MODE) {
+        if (BlockChain.CLONE_MODE) {
             //WRITE SIDE SETTINGS
-            byte[] genesisSideBytes = this.sideSettingString.getBytes(StandardCharsets.UTF_8);
-            data = Bytes.concat(data, genesisSideBytes);
+            byte[] genesisjsonCloneBytes = this.sideSettingString.getBytes(StandardCharsets.UTF_8);
+            data = Bytes.concat(data, genesisjsonCloneBytes);
         }
 
 		/*

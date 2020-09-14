@@ -45,14 +45,14 @@ public class CoreResource {
         jsonObject.put("rpc", setting.isRpcEnabled());
         jsonObject.put("web", setting.isWebEnabled());
 
-        if (BlockChain.SIDE_MODE) {
-            JSONObject jsonSide = new JSONObject();
+        if (BlockChain.CLONE_MODE) {
+            JSONObject jsonClone = new JSONObject();
             ///jsonSide.put("magic", Ints.fromByteArray(Controller.getInstance().getMessageMagic()));
-            jsonSide.put("name", Controller.getInstance().APP_NAME);
-            jsonSide.put("timestamp", Controller.getInstance().blockChain.getGenesisBlock().getTimestamp());
-            jsonSide.put("sign", Base58.encode(Controller.getInstance().blockChain.getGenesisBlock().getSignature()));
+            jsonClone.put("name", Controller.getInstance().APP_NAME);
+            jsonClone.put("timestamp", Controller.getInstance().blockChain.getGenesisBlock().getTimestamp());
+            jsonClone.put("sign", Base58.encode(Controller.getInstance().blockChain.getGenesisBlock().getSignature()));
 
-            jsonObject.put("side", jsonSide);
+            jsonObject.put("clone", jsonClone);
 
         }
         return jsonObject;

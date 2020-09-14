@@ -1338,7 +1338,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (data == null)
             return;
 
-        if (BlockChain.SIDE_MODE) {
+        if (BlockChain.CLONE_MODE) {
             // чтобы из других цепочек не срабатывало
             data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
         } else {
@@ -1444,7 +1444,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
         }
 
-        if (BlockChain.SIDE_MODE) {
+        if (BlockChain.CLONE_MODE) {
             // чтобы из других цепочек не срабатывало
             data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
         } else {

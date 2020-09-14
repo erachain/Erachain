@@ -189,7 +189,7 @@ public class Controller extends Observable {
                     }
                 };
 
-        if (Settings.getInstance().isSideNet()) {
+        if (Settings.getInstance().isClontNet()) {
             APP_NAME = "Erachain-" + Settings.getInstance().APP_NAME;
         } else {
             APP_NAME = "Erachain";
@@ -316,10 +316,10 @@ public class Controller extends Observable {
     public byte[] getMessageMagic() {
         if (this.messageMagic == null) {
             long longTestNetStamp = Settings.getInstance().getGenesisStamp();
-            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE || BlockChain.SIDE_MODE) {
+            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE || BlockChain.CLONE_MODE) {
                 byte[] seedTestNetStamp = Crypto.getInstance().digest(Longs.toByteArray(longTestNetStamp));
                 this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
-            } else if (BlockChain.SIDE_MODE) {
+            } else if (BlockChain.CLONE_MODE) {
                 byte[] seedTestNetStamp = blockChain.getGenesisBlock().getSignature();
                 this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
             } else {
