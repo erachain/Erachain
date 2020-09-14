@@ -6,11 +6,16 @@ import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
+import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun;
 
 import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.text.DefaultEditorKit;
+import java.awt.event.*;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -25,16 +30,51 @@ public class RecipientAddress extends JComboBox {
     private int DELETE_EVENT;
     private int LIST_EVENT;
     protected Observable observable;
+    private String selectedItem= "";
 
     public RecipientAddress() {
         RecipientModel model = new RecipientModel();
         this.setModel(model);
         this.setEditable(true);
 
+// result
+        this.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange()==1){
+                    selectedItem =(String)e.getItem();
+                }
+            }
+        });
+
+        // menu
+
+
     }
 
     public String getSelectedAddress() {
-        return (String) this.getSelectedItem();
+        return (String) this.selectedItem;
+    }
+
+    public void showMenu(final MouseEvent e) {
+        if (e.isPopupTrigger()) {
+            this.requestFocus();
+            final JPopupMenu menu = new JPopupMenu();
+            JMenuItem item;
+            item = new JMenuItem(new DefaultEditorKit.CopyAction());
+            item.setText(Lang.getInstance().translate("Copy"));
+            item.setEnabled(true);
+            menu.add(item);
+            item = new JMenuItem(new DefaultEditorKit.CutAction());
+            item.setText(Lang.getInstance().translate("Cut"));
+            item.setEnabled(true);
+            menu.add(item);
+            item = new JMenuItem(new DefaultEditorKit.PasteAction());
+            item.setText(Lang.getInstance().translate("Paste"));
+            item.setEnabled(this.isEditable());
+            menu.add(item);
+            menu.show(e.getComponent(), e.getX(), e.getY());
+        }
     }
 
     // model

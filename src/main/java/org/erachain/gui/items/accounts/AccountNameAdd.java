@@ -6,6 +6,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.gui.PasswordPane;
 import org.erachain.lang.Lang;
+import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -121,6 +122,11 @@ public class AccountNameAdd extends javax.swing.JDialog {
             }
 
         });
+
+        // popup menu
+        MenuPopupUtil.installContextMenu(jTextFieldAccount);
+        MenuPopupUtil.installContextMenu(jTextFieldName);
+        MenuPopupUtil.installContextMenu(jTextAreaDescription);
 
         this.setLocationRelativeTo(null);
         setModal(true);

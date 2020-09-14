@@ -249,6 +249,7 @@ public class IssuePersonPanel extends IconPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
+  //      gridBagConstraints.insets = new Insets(5, 5, 5, 8);
         mainPanel.add(registrarAddress, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
