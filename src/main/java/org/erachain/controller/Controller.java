@@ -189,7 +189,7 @@ public class Controller extends Observable {
                     }
                 };
 
-        if (Settings.getInstance().isClontNet()) {
+        if (Settings.getInstance().isCloneNet()) {
             APP_NAME = "Erachain-" + Settings.getInstance().APP_NAME;
         } else {
             APP_NAME = "Erachain";

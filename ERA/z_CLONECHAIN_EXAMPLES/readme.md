@@ -1,5 +1,5 @@
 # Clonechains
-How make Your own Clonechain with KYC, exchange, assets, polls etc.
+How make Your own blockchain with KYC, exchange, assets, polls etc. as clone of Erachain blockchain
 
 For start Your own clonechain put genesis.json file into application folder. See examples in z_genesis folder.
 
