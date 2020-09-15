@@ -41,7 +41,7 @@ public class Settings {
     public static long genesisStamp = DEFAULT_MAINNET_STAMP;
 
     public static String peersURL = "https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json";
-    public static String sideLicense; // see clonePROTOCOL_example.json
+    public static String cloneLicense; // see clonePROTOCOL_example.json
 
     //private static final String[] DEFAULT_PEERS = { };
     public static final int DEFAULT_ACCOUNTS = 1;

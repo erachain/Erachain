@@ -5,7 +5,7 @@
   "blockPeriod": 5,
   // external Block Explorer
   "explorer": "http://my-clonechain.dom:9057",
-  "sideLicense": "Clonechain Licence Agreement.pdf",
+  "cloneLicense": "Clonechain Licence Agreement.pdf",
   // COMPU it is Fee Asset
   ////"COMPU_Accuracy": 8,
   //
