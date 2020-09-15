@@ -45,24 +45,31 @@ public class RecipientAddress extends JComboBox {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
-                listnerworker(e);
+                lifework(e);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                listnerworker(e);
+                lifework(e);
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                listnerworker(e);
+                lifework(e);
             }
         });
     }
 
-    private void listnerworker(DocumentEvent e){
+    private void lifework(DocumentEvent e){
         selectedItem = comboTextField.getText();
-        if(worker!=null)worker.recipientAddressWorker(selectedItem);
+        if (worker != null) {
+            try {
+                worker.recipientAddressWorker(selectedItem);
+            } catch (Exception ex) {
+                // ex.printStackTrace();
+            }
+        }
+
     }
 
     public String getSelectedAddress() {
