@@ -18,10 +18,7 @@ import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
-import org.erachain.gui.library.AddImageLabel;
-import org.erachain.gui.library.IssueConfirmDialog;
-import org.erachain.gui.library.MButton;
-import org.erachain.gui.library.RecipientAddress;
+import org.erachain.gui.library.*;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
@@ -92,8 +89,7 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
         super(name, title);
         initComponents();
         initLabels();
-        // worker recipient address
-        titleJLabel.setFont(FONT_TITLE);
+       titleJLabel.setFont(FONT_TITLE);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
         titleJLabel.setText(Lang.getInstance().translate("Issue Person"));
@@ -717,12 +713,9 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
     }
 
     PublicKeyAccount registrar;
+    private void refreshReceiverDetails() {
 
-
-    // выполняемая процедура при изменении адреса получателя
-    @Override
-    public void recipientAddressWorker(String registrarStr) {
-
+        String registrarStr = registrarAddress.getSelectedAddress();
         //Account
         this.registrarAddressDesc.setText(Account.getDetailsForEncrypt(registrarStr, AssetCls.FEE_KEY, true));
 
@@ -749,4 +742,9 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
         }
     }
 
+// выполняемая процедура при изменении адреса получателя
+    @Override
+    public void recipientAddressWorker(String e) {
+        refreshReceiverDetails();
+    }
 }

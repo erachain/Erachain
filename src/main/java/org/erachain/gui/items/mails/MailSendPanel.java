@@ -784,7 +784,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
 
     // выполняемая процедура при изменении адреса получателя
     @Override
-    public void recipientAddressWorker() {
+    public void recipientAddressWorker(String e) {
         refreshReceiverDetails();
     }
 

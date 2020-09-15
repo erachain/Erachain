@@ -485,7 +485,7 @@ public class AccountAssetActionPanelCls extends IconPanel implements RecipientAd
 
     // выполняемая процедура при изменении адреса получателя
     @Override
-    public void recipientAddressWorker() {
+    public void recipientAddressWorker(String e) {
         refreshReceiverDetails();
     }
 
