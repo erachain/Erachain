@@ -10,6 +10,7 @@ import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -26,48 +27,48 @@ public class RecipientAddress extends JComboBox {
     private int ADD_EVENT;
     private int DELETE_EVENT;
     private int LIST_EVENT;
-    private String selectedItem= "";
+    private String selectedItem = "";
     private JTextField comboTextField;
-    private RecipientAddressInterface worker=null;
+    private RecipientAddressInterface worker = null;
 
 
-    public RecipientAddress() {
+    public RecipientAddress(RecipientAddressInterface item) {
         RecipientModel model = new RecipientModel();
         this.setModel(model);
         this.setEditable(true);
+        worker = item;
 
 // select & edit text account
         comboTextField = (JTextField) this.getEditor().getEditorComponent();
         MenuPopupUtil.installContextMenu(comboTextField);
-        comboTextField.getDocument().addDocumentListener(new DocumentListener(){
+        comboTextField.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
                 selectedItem = comboTextField.getText();
-               if(worker!=null) worker.recipientAddressWorker();
+                if (worker != null) worker.recipientAddressWorker();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 selectedItem = comboTextField.getText();
-                if(worker!=null)worker.recipientAddressWorker();
+                if (worker != null) worker.recipientAddressWorker();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
                 selectedItem = comboTextField.getText();
-                if(worker!=null)worker.recipientAddressWorker();
+                if (worker != null) worker.recipientAddressWorker();
             }
         });
     }
 
     public String getSelectedAddress() {
-        return (String) this.selectedItem;
+        return this.selectedItem;
     }
 
-    // add procedure in Class
-    public void setWorker(RecipientAddressInterface item){
-        worker = item;
+    public void setSelectedAddress(String address) {
+        this.selectedItem = address;
     }
 
     // model class
@@ -147,6 +148,6 @@ public class RecipientAddress extends JComboBox {
 
     public interface RecipientAddressInterface {
         public void recipientAddressWorker();
-}
+    }
 
 }

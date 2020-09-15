@@ -18,7 +18,10 @@ import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
-import org.erachain.gui.library.*;
+import org.erachain.gui.library.AddImageLabel;
+import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.MButton;
+import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
@@ -90,7 +93,6 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
         initComponents();
         initLabels();
         // worker recipient address
-        registrarAddress.setWorker(this);
         titleJLabel.setFont(FONT_TITLE);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -239,7 +241,7 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
         // Registrator address object
 
 
-        registrarAddress = new RecipientAddress();
+        registrarAddress = new RecipientAddress(this);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 19;
