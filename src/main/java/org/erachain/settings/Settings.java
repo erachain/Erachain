@@ -303,7 +303,7 @@ public class Settings {
 
     public String getPeersPath() {
         return this.userPath + (isDemoNet() ? "peers-demo.json" : isTestNet() ? "peers-test.json" :
-                isCloneNet() ? "peers-clone.json" : "peers.json");
+                isCloneNet() ? "clonePEERS.json" : "peers.json");
     }
 
     public String getDataWalletPath() {
