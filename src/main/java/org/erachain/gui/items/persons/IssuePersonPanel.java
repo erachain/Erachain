@@ -715,9 +715,12 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
     }
 
     PublicKeyAccount registrar;
-    private void refreshReceiverDetails() {
 
-        String registrarStr = registrarAddress.getSelectedAddress();
+
+    // выполняемая процедура при изменении адреса получателя
+    @Override
+    public void recipientAddressWorker(String registrarStr) {
+
         //Account
         this.registrarAddressDesc.setText(Account.getDetailsForEncrypt(registrarStr, AssetCls.FEE_KEY, true));
 
@@ -744,9 +747,4 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
         }
     }
 
-// выполняемая процедура при изменении адреса получателя
-    @Override
-    public void recipientAddressWorker() {
-        refreshReceiverDetails();
-    }
 }

@@ -43,20 +43,17 @@ public class RecipientAddress extends JComboBox {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
-                selectedItem = comboTextField.getText();
-               if(worker!=null) worker.recipientAddressWorker();
+                listnerworker(e);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                selectedItem = comboTextField.getText();
-                if(worker!=null)worker.recipientAddressWorker();
+                listnerworker(e);
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                selectedItem = comboTextField.getText();
-                if(worker!=null)worker.recipientAddressWorker();
+                listnerworker(e);
             }
         });
     }
@@ -68,6 +65,11 @@ public class RecipientAddress extends JComboBox {
     // add procedure in Class
     public void setWorker(RecipientAddressInterface item){
         worker = item;
+    }
+
+    private void listnerworker(DocumentEvent e){
+        selectedItem = comboTextField.getText();
+        if(worker!=null)worker.recipientAddressWorker(selectedItem);
     }
 
     // model class
@@ -146,7 +148,7 @@ public class RecipientAddress extends JComboBox {
     }
 
     public interface RecipientAddressInterface {
-        public void recipientAddressWorker();
+        public void recipientAddressWorker(String e);
 }
 
 }
