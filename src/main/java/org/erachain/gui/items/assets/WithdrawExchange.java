@@ -152,7 +152,7 @@ public class WithdrawExchange extends IconPanel {
                     null, new Account(accountTo), null, message);
 
             panel.jComboBox_Asset.setEnabled(false);
-            panel.jTextField_To.setEnabled(false);
+            panel.recipientAddress.setEnabled(false);
             panel.jTextArea_Description.setEnabled(false);
             String rate = jsonObject.get("rate").toString();
             String bal = jsonObject.get("bal").toString();
