@@ -18,10 +18,7 @@ import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
-import org.erachain.gui.library.AddImageLabel;
-import org.erachain.gui.library.IssueConfirmDialog;
-import org.erachain.gui.library.MButton;
-import org.erachain.gui.library.RecipientAddress;
+import org.erachain.gui.library.*;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
@@ -44,7 +41,7 @@ import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
-public class IssuePersonPanel extends IconPanel {
+public class IssuePersonPanel extends IconPanel implements RecipientAddress.RecipientAddressInterface {
 
     public static String NAME = "IssuePersonPanel";
     public static String TITLE = "Issue Person";
@@ -92,11 +89,12 @@ public class IssuePersonPanel extends IconPanel {
         super(name, title);
         initComponents();
         initLabels();
+        // worker recipient address
+        registrarAddress.setWorker(this);
         titleJLabel.setFont(FONT_TITLE);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
         titleJLabel.setText(Lang.getInstance().translate("Issue Person"));
-
         cbxFrom.setModel(new AccountsComboBoxModel());
         txtName.addFocusListener(new FocusAdapter() {
             @Override
@@ -746,4 +744,9 @@ public class IssuePersonPanel extends IconPanel {
         }
     }
 
+// выполняемая процедура при изменении адреса получателя
+    @Override
+    public void recipientAddressWorker() {
+        registrarAddressDesc.setText(registrarAddress.getSelectedAddress());
+    }
 }

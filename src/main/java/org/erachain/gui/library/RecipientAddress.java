@@ -6,16 +6,13 @@ import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
-import org.erachain.lang.Lang;
+import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun;
-
 import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.text.DefaultEditorKit;
-import java.awt.event.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -29,62 +26,57 @@ public class RecipientAddress extends JComboBox {
     private int ADD_EVENT;
     private int DELETE_EVENT;
     private int LIST_EVENT;
-    protected Observable observable;
     private String selectedItem= "";
+    private JTextField comboTextField;
+    private RecipientAddressInterface worker=null;
+
 
     public RecipientAddress() {
         RecipientModel model = new RecipientModel();
         this.setModel(model);
         this.setEditable(true);
 
-// result
-        this.addItemListener(new ItemListener() {
+// select & edit text account
+        comboTextField = (JTextField) this.getEditor().getEditorComponent();
+        MenuPopupUtil.installContextMenu(comboTextField);
+        comboTextField.getDocument().addDocumentListener(new DocumentListener(){
+
             @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange()==1){
-                    selectedItem =(String)e.getItem();
-                }
+            public void insertUpdate(DocumentEvent e) {
+                selectedItem = comboTextField.getText();
+               if(worker!=null) worker.recipientAddressWorker();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                selectedItem = comboTextField.getText();
+                if(worker!=null)worker.recipientAddressWorker();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                selectedItem = comboTextField.getText();
+                if(worker!=null)worker.recipientAddressWorker();
             }
         });
-
-        // menu
-
-
     }
 
     public String getSelectedAddress() {
         return (String) this.selectedItem;
     }
 
-    public void showMenu(final MouseEvent e) {
-        if (e.isPopupTrigger()) {
-            this.requestFocus();
-            final JPopupMenu menu = new JPopupMenu();
-            JMenuItem item;
-            item = new JMenuItem(new DefaultEditorKit.CopyAction());
-            item.setText(Lang.getInstance().translate("Copy"));
-            item.setEnabled(true);
-            menu.add(item);
-            item = new JMenuItem(new DefaultEditorKit.CutAction());
-            item.setText(Lang.getInstance().translate("Cut"));
-            item.setEnabled(true);
-            menu.add(item);
-            item = new JMenuItem(new DefaultEditorKit.PasteAction());
-            item.setText(Lang.getInstance().translate("Paste"));
-            item.setEnabled(this.isEditable());
-            menu.add(item);
-            menu.show(e.getComponent(), e.getX(), e.getY());
-        }
+    // add procedure in Class
+    public void setWorker(RecipientAddressInterface item){
+        worker = item;
     }
 
-    // model
+    // model class
     class RecipientModel extends DefaultComboBoxModel<String> implements Observer, ObserverWaiter {
         protected FavoriteAccountsMap favoriteMap;
 
         public RecipientModel() {
             favoriteMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
             addObservers();
-            //          sortAndAdd();
         }
 
         @Override
@@ -152,5 +144,9 @@ public class RecipientAddress extends JComboBox {
         }
 
     }
+
+    public interface RecipientAddressInterface {
+        public void recipientAddressWorker();
+}
 
 }
