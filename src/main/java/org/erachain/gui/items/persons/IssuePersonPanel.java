@@ -438,12 +438,12 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
             }
         });
 
-        // set acoount TO
+       /* // set acoount TO
         this.registrarAddress.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 refreshReceiverDetails();
             }
-        });
+        });*/
 
         mainScrollPane1.setViewportView(mainPanel);
         add(mainScrollPane1, BorderLayout.CENTER);
@@ -747,6 +747,6 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
 // выполняемая процедура при изменении адреса получателя
     @Override
     public void recipientAddressWorker() {
-        registrarAddressDesc.setText(registrarAddress.getSelectedAddress());
+        refreshReceiverDetails();
     }
 }
