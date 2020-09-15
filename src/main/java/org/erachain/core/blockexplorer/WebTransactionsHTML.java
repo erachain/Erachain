@@ -4,6 +4,7 @@ import org.apache.commons.net.util.Base64;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
@@ -16,11 +17,13 @@ import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -166,7 +169,9 @@ public class WebTransactionsHTML {
                 output.put("body", transaction.toJson());
         }
 
-        output.put("vouches", get_Vouches(transaction));
+        output.put("vouches", getVouches(transaction));
+
+        getLinks(output, transaction, langObj);
 
         return output;
     }
@@ -644,7 +649,7 @@ public class WebTransactionsHTML {
 
     }
 
-    public String get_Vouches(Transaction transaction) {
+    public String getVouches(Transaction transaction) {
 
         Fun.Tuple2<BigDecimal, List<Long>> vouchesItem = DCSet.getInstance().getVouchRecordMap().get(transaction.getDBRef());
         if (vouchesItem == null || vouchesItem.b.isEmpty())
@@ -702,8 +707,10 @@ public class WebTransactionsHTML {
                     + Base58.encode(publicKey.getPublicKey()) + ")<br>";
         }
 
-        out += Lang.getInstance().translateFromLangObj("Signature", langObj) + ": "
-                + "<a href=?tx=" + Base58.encode(signature) + ">" + Base58.encode(signature) + BlockExplorer.get_Lang(langObj) + "</a><br>";
+        if (signature != null) {
+            out += Lang.getInstance().translateFromLangObj("Signature", langObj) + ": "
+                    + "<a href=?tx=" + Base58.encode(signature) + ">" + Base58.encode(signature) + BlockExplorer.get_Lang(langObj) + "</a><br>";
+        }
 
         return out;
     }
@@ -768,8 +775,62 @@ public class WebTransactionsHTML {
             }
         }
 
-        out += "</table>";
+        ///out += "</table>";
 
         return out;
     }
+
+    public static void getLinks(HashMap output, Transaction parentTx, JSONObject langObj) {
+
+        String out = "";
+
+        try (IteratorCloseable<Long> appendixListIterator = DCSet.getInstance().getExLinksMap().getLinksIterator(parentTx.getDBRef(), ExLink.APPENDIX_TYPE, false)) {
+            List<Long> appendixes = new ArrayList<>();
+            while (appendixListIterator.hasNext()) {
+                appendixes.add(appendixListIterator.next());
+            }
+            if (!appendixes.isEmpty()) {
+                TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
+
+                if (appendixes.size() == 1) {
+                    Transaction childTx = map.get(appendixes.get(0));
+
+                    out += "<h2>" + Lang.getInstance().translateFromLangObj("Appendix", langObj)
+                            + "</h2><h3>" + childTx.getTitle() + "</h3>";
+                    out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
+                            + childTx.viewHeightSeq() + "</a> "
+                            + " " + DateTimeFormat.timestamptoString(childTx.getTimestamp()) + " ";
+                    out += "<a href=?address="
+                            + childTx.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + childTx.getCreator().getPersonAsString()
+                            + "</b></a><br>";
+
+                } else {
+
+                    int count = 0;
+                    for (Long txKey : appendixes) {
+
+                        Transaction childTx = map.get(txKey);
+                        out += "<h2>" + Lang.getInstance().translateFromLangObj("Appendix", langObj) + " " + ++count
+                                + "</h2><h3>" + childTx.getTitle() + "</h3>";
+                        out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
+                                + childTx.viewHeightSeq() + "</a> "
+                                + " " + DateTimeFormat.timestamptoString(childTx.getTimestamp()) + " ";
+                        out += "<a href=?address="
+                                + childTx.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + childTx.getCreator().getPersonAsString()
+                                + "</b></a><br>";
+
+                    }
+                }
+
+                ///out += "</table>";
+
+            }
+        } catch (IOException e) {
+            output.put("error", e.getMessage());
+        }
+
+        output.put("links", out);
+
+    }
+
 }

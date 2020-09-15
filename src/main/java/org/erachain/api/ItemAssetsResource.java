@@ -10,11 +10,15 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.gui.transaction.OnDealClick;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -22,7 +26,12 @@ import java.math.BigDecimal;
 @Path("assets")
 @Produces(MediaType.APPLICATION_JSON)
 @Slf4j
+
 public class ItemAssetsResource {
+
+    @Context
+    HttpServletRequest request;
+
     /**
      * Get all asset type 1
      *
@@ -163,6 +172,29 @@ public class ItemAssetsResource {
         }
 
         return out.toJSONString();
+    }
+
+    @POST
+    @Path("/issue")
+    public String issue(String x) {
+
+        Controller cntr = Controller.getInstance();
+        Object result = cntr.issueAsset(request, x);
+        if (result instanceof JSONObject) {
+            return ((JSONObject) result).toJSONString();
+        }
+
+        Transaction transaction = (Transaction) result;
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        if (validate == Transaction.VALIDATE_OK)
+            return transaction.toJson().toJSONString();
+        else {
+            JSONObject out = new JSONObject();
+            out.put("error", validate);
+            out.put("error_message", OnDealClick.resultMess(validate));
+            return out.toJSONString();
+        }
     }
 
 }

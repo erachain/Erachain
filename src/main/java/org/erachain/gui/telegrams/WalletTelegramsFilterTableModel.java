@@ -5,11 +5,13 @@ import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.wallet.TelegramsMap;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.gui.models.WalletTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,15 +27,16 @@ public class WalletTelegramsFilterTableModel extends WalletTableModel<Transactio
     public static final int COLUMN_DATE = 0;
     public static final int COLUMN_SENDER = 1;
     public static final int COLUMN_RECEIVER = 2;
-    public static final int COLUMN_MESSAGE = 3;
-    public static final int COLUMN_SIGNATURE = 4;
+    public static final int COLUMN_TITLE = 3;
+    public static final int COLUMN_MESSAGE = 4;
+    public static final int COLUMN_SIGNATURE = 5;
 
     static Logger LOGGER = LoggerFactory.getLogger(WalletTelegramsFilterTableModel.class);
 
     public WalletTelegramsFilterTableModel() {
         super(Controller.getInstance().getWallet().database.getTelegramsMap(),
-                new String[]{"Date", "Sender", "Recipient", "Message", "Signature"},
-                new Boolean[]{true, true, true, true, true, true, true, false, false}, false, -1);
+                new String[]{"Date", "Sender", "Recipient", "Title", "Message"},
+                new Boolean[]{true, true, true, true, false}, false, -1);
 
     }
 
@@ -55,6 +58,8 @@ public class WalletTelegramsFilterTableModel extends WalletTableModel<Transactio
                 return rSend.viewCreator();
             case COLUMN_RECEIVER:
                 return rSend.viewRecipient();
+            case COLUMN_TITLE:
+                return rSend.getTitle();
             case COLUMN_MESSAGE:
                 if (rSend.isEncrypted() && Controller.getInstance().isWalletUnlocked()) {
                     byte[] dataMess = Controller.getInstance().decrypt(rSend.getCreator(), rSend.getRecipient(), rSend.getData());
@@ -74,6 +79,7 @@ public class WalletTelegramsFilterTableModel extends WalletTableModel<Transactio
                     } else {
                         message = "decode error";
                     }
+                    return message;
                 } else {
                     return rSend.viewData();
                 }
@@ -91,52 +97,57 @@ public class WalletTelegramsFilterTableModel extends WalletTableModel<Transactio
 
         list = new ArrayList<>();
 
-        for (Transaction transaction : ((TelegramsMap) map).values()) {
-            HashSet<Account> recipients = transaction.getRecipientAccounts();
-            if (receiver != null) {
+        try (IteratorCloseable iterator = IteratorCloseableImpl.make(map.getIterator())) {
+            while (iterator.hasNext()) {
+                Transaction transaction = (Transaction) map.get(iterator.next());
+                HashSet<Account> recipients = transaction.getRecipientAccounts();
+                if (receiver != null) {
 
-                if (transaction.getCreator().getAddress().equals(sender)) {
-                    for (Account recipient : recipients) {
-                        if (recipient.getAddress().equals(receiver)) {
-                            //list.add(new Tuple3(sender, reciever, transaction));
-                            list.add(0, transaction);
-                            continue;
-                        }
-
-                    }
-
-                }
-                if (transaction.getCreator().getAddress().equals(receiver)) {
-                    for (Account pecipient : recipients) {
-                        if (pecipient.getAddress().equals(sender)) {
-                            //Tuple3 tt = new Tuple3(receiver, sender, transaction);
-                            if (!list.contains(transaction))
+                    if (transaction.getCreator().getAddress().equals(sender)) {
+                        for (Account recipient : recipients) {
+                            if (recipient.getAddress().equals(receiver)) {
+                                //list.add(new Tuple3(sender, reciever, transaction));
                                 list.add(0, transaction);
+                                continue;
+                            }
+
+                        }
+
+                    }
+                    if (transaction.getCreator().getAddress().equals(receiver)) {
+                        for (Account pecipient : recipients) {
+                            if (pecipient.getAddress().equals(sender)) {
+                                //Tuple3 tt = new Tuple3(receiver, sender, transaction);
+                                if (!list.contains(transaction))
+                                    list.add(0, transaction);
+                            }
                         }
                     }
-                }
 
 
-            } else {
-                // add all recipients
-
-                if (transaction.getCreator().getAddress().equals(sender)) {
-
-                    for (Account recipient : recipients) {
-                        //list.add(new Tuple3(sender,recipient.getAddress(),transaction));
-                        list.add(0, transaction);
-                    }
                 } else {
-                    // add recipient = sender
-                    for (Account recipient : recipients) {
-                        if (recipient.getAddress().equals(sender)) {
-                            //ttt.add(new Tuple3(transaction.getCreator().getAddress(), sender, transaction));
+                    // add all recipients
+
+                    if (transaction.getCreator().getAddress().equals(sender)) {
+
+                        for (Account recipient : recipients) {
+                            //list.add(new Tuple3(sender,recipient.getAddress(),transaction));
                             list.add(0, transaction);
-                            continue;
+                        }
+                    } else {
+                        // add recipient = sender
+                        for (Account recipient : recipients) {
+                            if (recipient.getAddress().equals(sender)) {
+                                //ttt.add(new Tuple3(transaction.getCreator().getAddress(), sender, transaction));
+                                list.add(0, transaction);
+                                continue;
+                            }
                         }
                     }
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

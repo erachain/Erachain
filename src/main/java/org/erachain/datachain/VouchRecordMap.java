@@ -3,6 +3,7 @@ package org.erachain.datachain;
 
 //import java.lang.reflect.Array;
 
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
@@ -65,4 +66,7 @@ public class VouchRecordMap extends DCUMap<Long, Tuple2<BigDecimal, List<Long>>>
         openMap();
     }
 
+    public void put(Long dbRef, ExLink exLink) {
+
+    }
 }

@@ -178,8 +178,7 @@ public class Account {
             return "address is OK";
         } else {
             // Base58 string len = 33-34 for ADDRESS and 40-44 for PubKey
-            if (address.length() > PublicKeyAccount.PUBLIC_KEY_LENGTH + (PublicKeyAccount.PUBLIC_KEY_LENGTH >> 3)
-                    && PublicKeyAccount.isValidPublicKey(address)) {
+            if (PublicKeyAccount.isValidPublicKey(address)) {
                 if (itemKey > 0) {
                     Account account = new PublicKeyAccount(address);
                     if (account.isPerson()) {
@@ -1374,10 +1373,13 @@ public class Account {
         return db.getAddressForging().getLast(getAddress());
     }
 
-    public Tuple2<String, String> getName() {
+    public static Tuple3<String, String, String> getFromFavorites(String address) {
+        return Controller.getInstance().wallet.database.getFavoriteAccountsMap().get(address);
 
-        return Controller.getInstance().wallet.database.getFavoriteAccountsMap().get(getAddress());
+    }
 
+    public Tuple3<String, String, String> getFromFavorites() {
+        return getFromFavorites(getAddress());
     }
 
     public int getAccountNo() {

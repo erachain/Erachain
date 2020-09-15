@@ -27,7 +27,6 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
-import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -225,6 +224,14 @@ public class Wallet extends Observable /*implements Observer*/ {
 		return this.secureDatabase.getAccountSeedMap().getPrivateKeyAccount(address);
 	}
 
+	public PrivateKeyAccount getPrivateKeyAccount(Account account) {
+		if (this.secureDatabase == null) {
+			return null;
+		}
+
+		return this.secureDatabase.getAccountSeedMap().getPrivateKeyAccount(account);
+	}
+
 	public void addWaitingObserver(ObserverWaiter observer) {
 		waitingObservers.add(observer);
 	}
@@ -322,6 +329,14 @@ public class Wallet extends Observable /*implements Observer*/ {
 					this.database.getPersonFavoritesSet().replace(this.personsFavorites.getKeys());
 				}
 		}
+	}
+
+	public void addAddressFavorite(String address, String pubKey, String name, String description) {
+		if (!this.exists()) {
+			return;
+		}
+
+		this.database.addAddressFavorite(address, pubKey, name, description);
 	}
 
 	public void addItemFavorite(ItemCls item) {
@@ -505,8 +520,8 @@ public class Wallet extends Observable /*implements Observer*/ {
 			this.database.getAccountMap().add(account, -1);
 			// set name
 			ob.put("description", Lang.getInstance().translate("Created by default Account") + " " + (nonce + 1));
-			this.database.getFavoriteAccountsMap().put(account.getAddress(), new Tuple2<String, String>(
-					Lang.getInstance().translate("My Account") + " " + (nonce + 1), StrJSonFine.convert(ob)));
+			//this.database.getFavoriteAccountsMap().put(account.getAddress(), new Tuple2<String, String>(
+			//		Lang.getInstance().translate("My Account") + " " + (nonce + 1), StrJSonFine.convert(ob)));
 			LOGGER.info("Added account #" + nonce);
 
 			this.commit();
@@ -520,13 +535,32 @@ public class Wallet extends Observable /*implements Observer*/ {
 		return account.getAddress();
 	}
 
+	/**
+	 * Clear and load account from WalletKeys secret database
+	 */
+	public void updateAccountsFromSecretKeys() {
+
+		int number = 0;
+		/// deadlock org.erachain.database.wallet.AccountMap
+		AccountMap mapAccs = database.getAccountMap();
+		synchronized (mapAccs) {
+			mapAccs.clear();
+			for (PrivateKeyAccount privateAccount : getprivateKeyAccounts()) {
+				mapAccs.add(privateAccount, ++number);
+			}
+		}
+
+		database.hardFlush();
+
+	}
+
 	// SYNCRHONIZE
 
 	// UPDATE all accounts for all assets unconfirmed balance
 	public void update_account_assets() {
 		List<Tuple2<Account, Long>> accounts_assets = this.getAccountsAssets();
 
-        for (Tuple2<Account, Long> account_asset : accounts_assets) {
+		for (Tuple2<Account, Long> account_asset : accounts_assets) {
 			this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
 					BigDecimal.ZERO, false);
 		}
@@ -1814,9 +1848,6 @@ public class Wallet extends Observable /*implements Observer*/ {
 			return 2;
 		}
 
-		// LOAD accounts
-		Controller.getInstance().wallet.database.getAccountMap().clear();
-
 		if (!Controller.getInstance().isWalletUnlocked()) {
 			// ASK FOR PASSWORD
 			String password = PasswordPane.showUnlockWalletDialog(null);
@@ -1828,16 +1859,8 @@ public class Wallet extends Observable /*implements Observer*/ {
 			}
 		}
 
-		int number = 0;
-		/// deadlock org.erachain.database.wallet.AccountMap
-		AccountMap mapAccs = Controller.getInstance().wallet.database.getAccountMap();
-		synchronized (mapAccs) {
-			for (PrivateKeyAccount privateAccount : Controller.getInstance().getWalletPrivateKeyAccounts()) {
-				mapAccs.add(privateAccount, ++number);
-			}
-		}
-
-		Controller.getInstance().wallet.database.hardFlush();
+		// LOAD accounts
+		updateAccountsFromSecretKeys();
 
 		if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
 			Controller.getInstance().wallet.initiateItemsFavorites();

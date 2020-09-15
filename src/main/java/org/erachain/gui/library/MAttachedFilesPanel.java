@@ -1,6 +1,6 @@
 package org.erachain.gui.library;
 
-import org.erachain.core.exdata.AttacheFilesModel;
+import org.erachain.gui.exdata.AttacheFilesModel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;

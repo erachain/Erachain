@@ -3051,7 +3051,7 @@ public class BlockExplorer {
 
         rNote.parseData();
 
-        Map output = new LinkedHashMap();
+        HashMap output = new LinkedHashMap();
 
         output.put("Label_type", Lang.getInstance().translateFromLangObj("Type", langObj));
         output.put("Label_statement", Lang.getInstance().translateFromLangObj("Statement", langObj));
@@ -3075,6 +3075,8 @@ public class BlockExplorer {
         rNote.getExData().makeJSONforHTML(output, block, seqNo, langObj);
 
         output.put("vouches_table", WebTransactionsHTML.getVouchesNew(rNote, langObj));
+
+        WebTransactionsHTML.getLinks(output, rNote, langObj);
 
 
         return output;

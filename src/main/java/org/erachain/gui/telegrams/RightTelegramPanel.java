@@ -5,7 +5,9 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.persons.InsertPersonPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.mapdb.Fun.Tuple3;
@@ -65,6 +67,10 @@ public class RightTelegramPanel extends javax.swing.JPanel {
 
                         if (e.getClickCount() == 2) {
                             tableMouse2Click(crow, transaction);
+                        } else {
+                            jTxtTitle.setText(transaction.getTitle());
+                            jTextPaneText.setText(walletTelegramsFilterTableModel.getValueAt(crow,
+                                    WalletTelegramsFilterTableModel.COLUMN_MESSAGE).toString());
                         }
 
                     }
@@ -124,11 +130,12 @@ public class RightTelegramPanel extends javax.swing.JPanel {
         jPanelTop = new javax.swing.JPanel();
         jLabelLeft = new javax.swing.JLabel();
         jLabelCenter = new javax.swing.JLabel();
-        jLabelRaght = new javax.swing.JLabel();
+        jLabelRecipient = new javax.swing.JLabel();
         jScrollPaneCenter = new javax.swing.JScrollPane();
-        jcheckIsEnscript = new JCheckBox();
+        checkIsEncrypt = new JCheckBox();
         jPanelBottom = new javax.swing.JPanel();
         jScrollPaneText = new javax.swing.JScrollPane();
+        jTxtTitle = new javax.swing.JTextField();
         jTextPaneText = new javax.swing.JTextPane();
         jButtonSendTelegram = new javax.swing.JButton();
 
@@ -158,14 +165,14 @@ public class RightTelegramPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 0;
         jPanelTop.add(jLabelCenter, gridBagConstraints);
 
-        jLabelRaght.setText("jLabel3");
+        jLabelRecipient.setText("jLabel3");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.3;
-        jPanelTop.add(jLabelRaght, gridBagConstraints);
+        jPanelTop.add(jLabelRecipient, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -187,47 +194,75 @@ public class RightTelegramPanel extends javax.swing.JPanel {
         add(jScrollPaneCenter, gridBagConstraints);
 
         java.awt.GridBagLayout jPanelBottomLayout = new java.awt.GridBagLayout();
-        jPanelBottomLayout.columnWidths = new int[]{0, 6, 0};
-        jPanelBottomLayout.rowHeights = new int[]{0};
+//        jPanelBottomLayout.columnWidths = new int[]{0, 6, 0};
+//        jPanelBottomLayout.rowHeights = new int[]{0};
         jPanelBottom.setLayout(jPanelBottomLayout);
 
         jScrollPaneText.setViewportView(jTextPaneText);
 
+
+        JLabel jLabelTitle = new JLabel(Lang.getInstance().translate("Title")+ ":");
+        jLabelTitle.setToolTipText(Lang.getInstance().translate("Title - it is public text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(6, 10, 6, 6);
         gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+       // gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+
+        jPanelBottom.add(jLabelTitle, gridBagConstraints);
+
+
+        jTxtTitle.setToolTipText(Lang.getInstance().translate("Title - it is public text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 0);
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.2;
+        gridBagConstraints.weightx = 0.8;
+        gridBagConstraints.gridwidth = 2;
+        jPanelBottom.add(jTxtTitle, gridBagConstraints);
+
+        jScrollPaneText.setToolTipText(Lang.getInstance().translate("Message body - that may be encrypted"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.weightx = 0.8;
+        gridBagConstraints.weighty = 0.1;
         jPanelBottom.add(jScrollPaneText, gridBagConstraints);
 
         jButtonSendTelegram.setText("jButton1");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.2;
+        gridBagConstraints.gridy = 2;
+       // gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.anchor = GridBagConstraints.LAST_LINE_END;
+       // gridBagConstraints.weightx = 0.1;
+       // gridBagConstraints.weighty = 0.1;
         jPanelBottom.add(jButtonSendTelegram, gridBagConstraints);
 
 
-        jcheckIsEnscript.setSelected(true);
-        jcheckIsEnscript.setText(Lang.getInstance().translate("Encrypt message"));
+        checkIsEncrypt.setSelected(true);
+        checkIsEncrypt.setText(Lang.getInstance().translate("Encrypt message"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
+       // gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+       // gridBagConstraints.weightx = 1.0;
+      //  gridBagConstraints.gridwidth = 2;
 
-        jPanelBottom.add(jcheckIsEnscript, gridBagConstraints);
+        jPanelBottom.add(checkIsEncrypt, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
@@ -317,12 +352,80 @@ public class RightTelegramPanel extends javax.swing.JPanel {
         });
         menu.add(copyText);
 
+        JMenuItem tryIssuePersonText = new JMenuItem(Lang.getInstance().translate("Try Issue Person"));
+        tryIssuePersonText.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                Transaction transaction = walletTelegramsFilterTableModel.getItem(row);
+                if (transaction instanceof RSend) {
+                    RSend rSend = (RSend) walletTelegramsFilterTableModel.getItem(row);
+                    byte[] dataMess;
+
+                    if (rSend.isEncrypted()) {
+
+                        if (checkWalletUnlock(null)) {
+                            return;
+                        }
+                        dataMess = Controller.getInstance().decrypt(rSend.getCreator(), rSend.getRecipient(), rSend.getData());
+
+                    } else {
+                        dataMess = rSend.getData();
+                    }
+
+                    String message;
+                    if (dataMess != null) {
+                        if (rSend.isText()) {
+                            try {
+                                message = new String(dataMess, "UTF-8");
+                            } catch (UnsupportedEncodingException e1) {
+                                message = "error UTF-8";
+                                JOptionPane.showMessageDialog(new JFrame(),
+                                        Lang.getInstance().translate(message),
+                                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                            }
+                            try {
+                                dataMess = Base58.decode(message);
+                            } catch (NumberFormatException e1) {
+                                message = "error Base58 decode";
+                                JOptionPane.showMessageDialog(new JFrame(),
+                                        Lang.getInstance().translate(message),
+                                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+
+                    } else {
+                        message = "decode error";
+                        JOptionPane.showMessageDialog(new JFrame(),
+                                Lang.getInstance().translate(message),
+                                Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+                    }
+
+                    InsertPersonPanel issuePersonPanel = new InsertPersonPanel();
+                    issuePersonPanel.setByteCode(dataMess);
+                    if (issuePersonPanel.getPerson() != null) {
+                        MainPanel.getInstance().insertNewTab(
+                                Lang.getInstance().translate("Insert # Вставка") + ": " + issuePersonPanel.getPerson().getName(),
+                                issuePersonPanel);
+                    }
+
+                } else {
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.getInstance().translate("Wrong transaction type") + ": " + transaction.viewType(),
+                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+                }
+
+
+            }
+        });
+        menu.add(tryIssuePersonText);
+
         menu.addSeparator();
 
         JMenuItem deleteTelegram = new JMenuItem(Lang.getInstance().translate("Delete Telegram"));
         deleteTelegram.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
 
                 Tuple3<Long, Long, Transaction> tt = (Tuple3<Long, Long, Transaction>) walletTelegramsFilterTableModel.getValueAt(row, 0);
                 Controller.getInstance().getWallet().database.getTelegramsMap().delete(tt.c.viewSignature());
@@ -352,30 +455,27 @@ public class RightTelegramPanel extends javax.swing.JPanel {
                 }
             }
 
-            if (false) {
-                byte[] dataMess = Controller.getInstance().decrypt(rSend.getCreator(), rSend.getRecipient(), rSend.getData());
+            byte[] dataMess = Controller.getInstance().decrypt(rSend.getCreator(), rSend.getRecipient(), rSend.getData());
 
-                String message;
+            String message;
 
-                if (dataMess != null) {
-                    if (rSend.isText()) {
-                        try {
-                            message = new String(dataMess, "UTF-8");
-                        } catch (UnsupportedEncodingException e) {
-                            message = "error UTF-8";
-                        }
-                    } else {
-                        message = Base58.encode(dataMess);
+            if (dataMess != null) {
+                if (rSend.isText()) {
+                    try {
+                        message = new String(dataMess, "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        message = "error UTF-8";
                     }
                 } else {
-                    message = "decode error";
+                    message = Base58.encode(dataMess);
                 }
-
-                walletTelegramsFilterTableModel.setValueAt(message, row, walletTelegramsFilterTableModel.COLUMN_MESSAGE);
-                walletTelegramsFilterTableModel.fireTableCellUpdated(row, walletTelegramsFilterTableModel.COLUMN_MESSAGE);
             } else {
-                walletTelegramsFilterTableModel.fireTableDataChanged();
+                message = "decode error";
             }
+
+            walletTelegramsFilterTableModel.setValueAt(message, row, walletTelegramsFilterTableModel.COLUMN_MESSAGE);
+            //walletTelegramsFilterTableModel.fireTableCellUpdated(row, walletTelegramsFilterTableModel.COLUMN_MESSAGE);
+            walletTelegramsFilterTableModel.fireTableDataChanged();
         }
 
     }
@@ -384,13 +484,14 @@ public class RightTelegramPanel extends javax.swing.JPanel {
     public javax.swing.JButton jButtonSendTelegram;
     public javax.swing.JLabel jLabelCenter;
     public javax.swing.JLabel jLabelLeft;
-    public javax.swing.JLabel jLabelRaght;
+    public javax.swing.JLabel jLabelRecipient;
     public javax.swing.JPanel jPanelBottom;
     private javax.swing.JPanel jPanelTop;
     private javax.swing.JScrollPane jScrollPaneCenter;
     private javax.swing.JScrollPane jScrollPaneText;
     public MTable jTableMessages;
+    public javax.swing.JTextField jTxtTitle;
     public javax.swing.JTextPane jTextPaneText;
-    public JCheckBox jcheckIsEnscript;
+    public JCheckBox checkIsEncrypt;
     // End of variables declaration
 }

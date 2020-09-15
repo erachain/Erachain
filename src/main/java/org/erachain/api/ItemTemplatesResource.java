@@ -16,7 +16,7 @@ import javax.ws.rs.core.MediaType;
 @Path("templates")
 @Produces(MediaType.APPLICATION_JSON)
 @Slf4j
-public class ItemTemplateResource {
+public class ItemTemplatesResource {
     /**
      * Get all template type 1
      *
