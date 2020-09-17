@@ -1,6 +1,7 @@
 package org.erachain.gui.exdata;
 
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.exdata.items.DocTypeComboBox.DocTypeComboBox;
@@ -19,7 +20,6 @@ public class DocTypeAppendixPanel extends JPanel {
          */
         public DocTypeAppendixPanel() {
             initComponents();
-            labelTitle.setText(Lang.getInstance().translate("Set Parent Document if it is Appendix to that Document"));
             labelDocType.setText(Lang.getInstance().translate("Parent Document SeqNo or Signature"));
             parentReference.setToolTipText(Lang.getInstance().translate("Example") + ": 1234-12 or r6fas657w12Y65da..");
         }
@@ -31,9 +31,33 @@ public class DocTypeAppendixPanel extends JPanel {
             typeDocymentCombox.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
-                    if (e.getStateChange()==ItemEvent.SELECTED){
+                    if (e.getStateChange()==ItemEvent.SELECTED) {
                         // возвращаем выбранный объект
-                        int item = (int)e.getItem();
+                        int item = (int) e.getItem();
+                        if (item == 0) {
+                            labelTitle.setVisible(false);
+                            labelDocType.setVisible(false);
+                            parentReference.setVisible(false);
+                            parentDetails.setVisible(false);
+                        } else {
+                            labelTitle.setVisible(true);
+                            labelDocType.setVisible(true);
+                            parentReference.setVisible(true);
+                            parentDetails.setVisible(true);
+                            switch (item) {
+                                case ExData.LINK_APPENDIX_TYPE:
+                                    labelTitle.setText(Lang.getInstance().translate("Set Parent Document and Copy all Recipients for Appendix"));
+                                    break;
+                                case ExData.LINK_REPLY_TYPE:
+                                    labelTitle.setText(Lang.getInstance().translate("Set Parent Document and Copy all Recipients for Reply"));
+                                    break;
+                                case ExData.LINK_COMMENT_TYPE:
+                                    labelTitle.setText(Lang.getInstance().translate("Set Parent Document for Comment"));
+                                    break;
+                                default:
+                                    labelTitle.setText(Lang.getInstance().translate("Set Parent Document"));
+                            }
+                        }
                     }
                 }
             });
@@ -132,6 +156,10 @@ public class DocTypeAppendixPanel extends JPanel {
             gridBagConstraints.weighty = 0.2;
             add(filler1, gridBagConstraints);
 
+            labelTitle.setVisible(false);
+            labelDocType.setVisible(false);
+            parentReference.setVisible(false);
+            parentDetails.setVisible(false);
 
         }// </editor-fold>
 

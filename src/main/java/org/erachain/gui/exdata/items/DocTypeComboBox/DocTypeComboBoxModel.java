@@ -12,7 +12,7 @@ class DocTypeComboBoxModel extends DefaultComboBoxModel<Integer> {
         this.addElement((int) ExData.LINK_APPENDIX_TYPE);
         this.addElement((int) ExData.LINK_REPLY_TYPE);
         this.addElement((int) ExData.LINK_COMMENT_TYPE);
-        this.addElement((int) ExData.LINK_SURELY_TYPE);
+        //this.addElement((int) ExData.LINK_SURELY_TYPE);
 
     }
 
