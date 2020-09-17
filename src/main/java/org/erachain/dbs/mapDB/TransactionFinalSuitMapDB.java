@@ -542,10 +542,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @Override
     public void put(Long key, Transaction transaction) {
         boolean debug = false;
-        if (false && BlockChain.CHECK_BUGS > 3 && key > Transaction.parseDBRef("63998-0")) {
+        if (BlockChain.CHECK_BUGS > 3 && key > Transaction.parseDBRef("274840-1")) {
             debug = true;
         }
-        if (debug && transaction.getType() != Transaction.CALCULATED_TRANSACTION) {
+        if (debug && transaction.getType() != Transaction.SIGN_NOTE_TRANSACTION) {
             super.put(key, transaction);
             logger.info(Transaction.viewDBRef(key) + ": " + transaction.toString());
             if (true) {
