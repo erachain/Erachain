@@ -93,7 +93,11 @@ public class ExLink {
     }
 
     public String viewTypeName() {
-        switch (type) {
+      return viewTypeName(type);
+    }
+
+    public static String viewTypeName(int ss) {
+        switch (ss) {
             case REPLY_TYPE:
                 return "Reply";
             case APPENDIX_TYPE:
