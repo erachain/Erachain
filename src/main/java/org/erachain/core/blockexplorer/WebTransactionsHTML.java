@@ -4,7 +4,7 @@ import org.apache.commons.net.util.Base64;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
@@ -784,7 +784,7 @@ public class WebTransactionsHTML {
 
         String out = "";
 
-        try (IteratorCloseable<Long> appendixListIterator = DCSet.getInstance().getExLinksMap().getLinksIterator(parentTx.getDBRef(), ExLink.APPENDIX_TYPE, false)) {
+        try (IteratorCloseable<Long> appendixListIterator = DCSet.getInstance().getExLinksMap().getLinksIterator(parentTx.getDBRef(), ExData.LINK_APPENDIX_TYPE, false)) {
             List<Long> appendixes = new ArrayList<>();
             while (appendixListIterator.hasNext()) {
                 appendixes.add(appendixListIterator.next());

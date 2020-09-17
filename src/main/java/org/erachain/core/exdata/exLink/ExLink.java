@@ -1,16 +1,13 @@
 package org.erachain.core.exdata.exLink;
 
 import com.google.common.primitives.Longs;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.json.simple.JSONObject;
 
 public class ExLink {
 
     public static final byte BASE_LENGTH = 12;
-
-    public static final byte REPLY_TYPE = 1;
-    public static final byte APPENDIX_TYPE = 2;
-    public static final byte LIKE_TYPE = 3;
 
     /**
      * 0 - transaction, 1.. - ITEM
@@ -98,12 +95,16 @@ public class ExLink {
 
     public static String viewTypeName(int ss) {
         switch (ss) {
-            case REPLY_TYPE:
-                return "Reply";
-            case APPENDIX_TYPE:
+            case ExData.LINK_SIMPLE_TYPE:
+                return "Common";
+            case ExData.LINK_APPENDIX_TYPE:
                 return "Appendix";
-            case LIKE_TYPE:
-                return "Likes";
+            case ExData.LINK_REPLY_TYPE:
+                return "Reply";
+            case ExData.LINK_COMMENT_TYPE:
+                return "Comment";
+            case ExData.LINK_SURELY_TYPE:
+                return "Surely";
             default:
                 return "Unknown";
         }
@@ -145,12 +146,12 @@ public class ExLink {
 
     public static ExLink parse(byte[] data) throws Exception {
         switch (data[0]) {
-            case REPLY_TYPE:
+            case ExData.LINK_REPLY_TYPE:
                 return new ExLinkReply(data);
-            case APPENDIX_TYPE:
+            case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(data);
-            case LIKE_TYPE:
-                return new ExLinkLike(data);
+            case ExData.LINK_COMMENT_TYPE:
+                return new ExLinkComment(data);
         }
 
         throw new Exception("wrong type");
@@ -161,12 +162,12 @@ public class ExLink {
 
         long refLink = Longs.fromByteArray(refLinkBytes);
         switch (type[0]) {
-            case REPLY_TYPE:
+            case ExData.LINK_REPLY_TYPE:
                 return new ExLinkReply(type, refLink);
-            case APPENDIX_TYPE:
+            case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(type, refLink);
-            case LIKE_TYPE:
-                return new ExLinkLike(type, refLink);
+            case ExData.LINK_COMMENT_TYPE:
+                return new ExLinkComment(type, refLink);
         }
 
         throw new Exception("wrong type");
@@ -180,12 +181,12 @@ public class ExLink {
         System.arraycopy(data, position + 4, refBuffer, 0, Long.BYTES);
         long refLink = Longs.fromByteArray(refBuffer);
         switch (typeBuffer[0]) {
-            case REPLY_TYPE:
+            case ExData.LINK_REPLY_TYPE:
                 return new ExLinkReply(typeBuffer, refLink);
-            case APPENDIX_TYPE:
+            case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(typeBuffer, refLink);
-            case LIKE_TYPE:
-                return new ExLinkLike(typeBuffer, refLink);
+            case ExData.LINK_COMMENT_TYPE:
+                return new ExLinkComment(typeBuffer, refLink);
         }
 
         throw new Exception("wrong type:" + typeBuffer[0]);
