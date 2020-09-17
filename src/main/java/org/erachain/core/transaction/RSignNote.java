@@ -11,6 +11,8 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapSigns;
@@ -544,46 +546,34 @@ public class RSignNote extends Transaction implements Itemable {
     public void process(Block block, int forDeal) {
 
         super.process(block, forDeal);
-        if (Controller.getInstance().onlyProtocolIndexing)
-            return;
 
-        try {
-            parseData(); // need for take HASHES from FILES
-            byte[][] hashes = extendedData.getAllHashesAsBytes(true);
-            if (hashes != null) {
-                Long dbKey = makeDBRef(height, seqNo);
-                for (byte[] hash : hashes) {
-                    dcSet.getTransactionFinalMapSigns().put(hash, dbKey);
-                }
+        parseData(); // need for take HASHES from FILES
+        extendedData.process(this);
+
+        byte[][] hashes = extendedData.getAllHashesAsBytes(true);
+        if (hashes != null) {
+            Long dbKey = makeDBRef(height, seqNo);
+            for (byte[] hash : hashes) {
+                dcSet.getTransactionFinalMapSigns().put(hash, dbKey);
             }
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            Long error = null;
-            error++;
         }
     }
 
     @Override
     public void orphan(Block block, int forDeal) {
 
+        parseData(); // also need for take HASHES from FILES
+        extendedData.orphan(this);
+
+        byte[][] hashes = extendedData.getAllHashesAsBytes(true);
+        if (hashes != null) {
+            for (byte[] hash : hashes) {
+                dcSet.getTransactionFinalMapSigns().delete(hash);
+            }
+        }
+
         super.orphan(block, forDeal);
 
-        if (Controller.getInstance().onlyProtocolIndexing)
-            return;
-
-        try {
-            parseData(); // need for take HASHES from FILES
-            byte[][] hashes = extendedData.getAllHashesAsBytes(true);
-            if (hashes != null) {
-                for (byte[] hash : hashes) {
-                    dcSet.getTransactionFinalMapSigns().delete(hash);
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            Long error = null;
-            error++;
-        }
     }
 
     @Override
@@ -641,6 +631,24 @@ public class RSignNote extends Transaction implements Itemable {
 
         if (extendedData == null) {
             parseDataV2WithoutFiles();
+        }
+
+        ExLink exLink = extendedData.getExLink();
+        if (exLink != null) {
+            Transaction parentTx = dcSet.getTransactionFinalMap().get(exLink.getRef());
+            if (parentTx == null) {
+                return INVALID_BLOCK_TRANS_SEQ_ERROR;
+            }
+
+            // проверим запрет на создание Приложений если там ограничено подписание только списком получателей
+            if (parentTx instanceof RSignNote && exLink instanceof ExLinkAppendix) {
+                RSignNote parentRNote = (RSignNote) parentTx;
+                parentRNote.parseDataV2WithoutFiles();
+                if (parentRNote.isCanSignOnlyRecipients()
+                        && !parentRNote.isInvolved(creator)) {
+                    return ACCOUNT_ACCSES_DENIED;
+                }
+            }
         }
 
         JSONObject hashes = extendedData.getHashes();
@@ -738,40 +746,16 @@ public class RSignNote extends Transaction implements Itemable {
         if (extendedData == null || !extendedData.isParsedWithFiles()) {
             // если уже парсили или парсили без файлов а надо с файлами
 
-            if (true || getVersion() == 2) {
 
-                // version 2
-                try {
-                    extendedData = ExData.parse(getVersion(), this.data, false, true);
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                    Long error = null;
-                    error++;
-                }
-
-            } else {
-
-                // сюда не должно прийти - OLS
+            // version 2
+            try {
+                extendedData = ExData.parse(getVersion(), this.data, false, true);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
                 Long error = null;
                 error++;
-
-                // version 1
-                String text = new String(getData(), StandardCharsets.UTF_8);
-
-                try {
-                    JSONObject dataJson = (JSONObject) JSONValue.parseWithException(text);
-                    String title = dataJson.get("Title").toString();
-
-                    extendedData = new ExData(1, title, dataJson, null);
-
-                } catch (ParseException e) {
-                    // version 0
-                    String[] items = text.split("\n");
-                    JSONObject dataJson = new JSONObject();
-                    dataJson.put("Message", text.substring(items[0].length()));
-                    extendedData = new ExData(0, items[0], dataJson, null);
-                }
             }
+
             extendedData.resolveValues(dcSet);
         }
     }

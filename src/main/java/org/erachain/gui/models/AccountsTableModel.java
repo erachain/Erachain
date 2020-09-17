@@ -5,9 +5,11 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.utils.NumberAsString;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
@@ -15,7 +17,7 @@ import org.mapdb.Fun.Tuple5;
 import java.math.BigDecimal;
 
 @SuppressWarnings("serial")
-public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> implements ObserverWaiter {
+public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> implements ObserverWaiter {
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_NAME = 2;
     public static final int COLUMN_BALANCE_1 = 3;
@@ -33,7 +35,7 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
                 new String[]{"No.", "Account", "Name",
                         "Balance 1 (OWN)", "Balance 2 (DEBT)", "Balance 3 (HOLD)", "Balance 4 (SPEND)",
                         AssetCls.FEE_NAME},
-                new Boolean[]{true, false, false, false, false, false, false, false}, false);
+                new Boolean[]{true, false, false, false, false, false, false, false}, false, -1000);
 
         getInterval();
         fireTableDataChanged();
@@ -72,9 +74,13 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
                 return account.getPersonAsString();
 
             case COLUMN_NAME:
-                Tuple2<String, String> aa = account.getName();
-                if (aa == null) return "";
-                return aa.a;
+                FavoriteAccountsMap favoriteMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
+                if (favoriteMap.contains(account.getAddress())) {
+                    Fun.Tuple3<String, String, String> itemAccount = favoriteMap.get(account.getAddress());
+                    if (itemAccount.b != null)
+                        return itemAccount.b;
+                }
+                return "";
 
             case COLUMN_BALANCE_1:
                 if (this.asset == null) return "-";
@@ -128,26 +134,8 @@ public class AccountsTableModel extends TimerTableModelCls<PublicKeyAccount> imp
 
     @Override
     public void getInterval() {
-
         list = Controller.getInstance().wallet.getPublicKeyAccounts();
 
-    }
-
-    public void addObservers() {
-
-        super.addObservers();
-        if (Controller.getInstance().doesWalletDatabaseExists()) {
-        } else {
-            // ожидаем открытия кошелька
-            Controller.getInstance().wallet.addWaitingObserver(this);
-        }
-    }
-
-    public void deleteObservers() {
-
-        super.deleteObservers();
-        if (Controller.getInstance().doesWalletDatabaseExists())
-            map.deleteObserver(this);
     }
 
 }

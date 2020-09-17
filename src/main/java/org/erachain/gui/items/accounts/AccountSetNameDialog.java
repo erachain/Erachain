@@ -8,7 +8,7 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class AccountSetNameDialog extends javax.swing.JDialog {
 
-    public JSONObject ansver;
+    public JSONObject answer;
     FavoriteAccountsMap db = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
     /**
      * Creates new form Account_Show
@@ -36,6 +36,7 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
 
     private AccountSetNameDialog th;
     private String account;
+    private String accountPubKey;
     private javax.swing.JButton jButton_Cancel;
 
 
@@ -53,7 +54,7 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
         th = this;
         account = adr;
 
-        if (!Controller.getInstance().isWalletUnlocked()) {
+        if (false && !Controller.getInstance().isWalletUnlocked()) {
             //ASK FOR PASSWORD
             String password = PasswordPane.showUnlockWalletDialog(this);
             if (password.equals("")) {
@@ -78,18 +79,19 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
         this.setIconImages(icons);
         initComponents();
-        ansver.put("type", "cancel");
+        answer.put("type", "cancel");
         // account in db?
         if (db.contains(account)) {
             // read json
-            Tuple2<String, String> ss = db.get(account);
-            ansver = (JSONObject) JSONValue.parse(ss.b);
-            ansver = ansver == null ? new JSONObject() : ansver;
+            Tuple3<String, String, String> ss = db.get(account);
+            accountPubKey = ss.a;
+            answer = (JSONObject) JSONValue.parse(ss.c);
+            answer = answer == null ? new JSONObject() : answer;
             // set papams
-            th.jTextField_Name.setText(db.get(account).a);
+            th.jTextField_Name.setText(db.get(account).b);
             th.jTextArea_Description.setText("");
-            if (ansver.containsKey("description")) {
-                th.jTextArea_Description.setText((String) ansver.get("description"));
+            if (answer.containsKey("description")) {
+                th.jTextArea_Description.setText((String) answer.get("description"));
             }
         }
 
@@ -118,7 +120,7 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
                     ans.put("description", desc);
 
                 }
-                db.put(account, new Tuple2(name, StrJSonFine.convert(ans)));
+                db.put(account, new Tuple3(accountPubKey, name, StrJSonFine.convert(ans)));
                 setVisible(false);
                 //dispose();
             }
@@ -131,7 +133,7 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                ansver.put("type", "cancel");
+                answer.put("type", "cancel");
                 setVisible(false);
             }
 
@@ -164,7 +166,7 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
         jButton_OK = new javax.swing.JButton();
         jButton_Cancel = new javax.swing.JButton();
         jLabel_Description = new javax.swing.JLabel();
-        ansver = new JSONObject();
+        answer = new JSONObject();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();

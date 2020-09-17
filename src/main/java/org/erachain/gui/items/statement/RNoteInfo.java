@@ -3,6 +3,7 @@ package org.erachain.gui.items.statement;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
@@ -245,6 +246,15 @@ public class RNoteInfo extends javax.swing.JPanel {
 
         exData = statement.getExData();
         exData.resolveValues(DCSet.getInstance());
+
+        ExLink exLink = exData.getExLink();
+        if (exLink != null) {
+            resultStr += Lang.getInstance().translate("Link Type") + ": " + Lang.getInstance().translate(exLink.viewTypeName()) + " "
+                    + Lang.getInstance().translate("for # для") + " " + Transaction.viewDBRef(exLink.getRef());
+            Transaction transaction = DCSet.getInstance().getTransactionFinalMap().get(exLink.getRef());
+            resultStr += "<br>" + transaction.getTitle() + " : " + transaction.getCreator().getPersonAsString() + "</b><br>";
+
+        }
 
         String title = exData.getTitle();
         if (title != null)

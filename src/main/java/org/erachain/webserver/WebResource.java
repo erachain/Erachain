@@ -11,7 +11,6 @@ import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.BlogPostResource;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.blockexplorer.WrongSearchException;
 import org.erachain.core.crypto.Base58;
@@ -442,10 +441,10 @@ public class WebResource {
         DCSet dcSet = DCSet.getInstance();
         Collection<Transaction> values = dcSet.getTransactionTab().values();
 
-        List<PrivateKeyAccount> privateKeyAccounts = Controller.getInstance().getWalletPrivateKeyAccounts();
+        List<Account> myAccounts = Controller.getInstance().getWalletAccounts();
 
         for (Transaction transaction : values) {
-            if (privateKeyAccounts.contains(transaction.getCreator())) {
+            if (myAccounts.contains(transaction.getCreator())) {
                 dcSet.getTransactionTab().delete(transaction);
             }
         }
@@ -1616,7 +1615,7 @@ public class WebResource {
             String accountStrings = "";
 
             for (Account name : resultingNames) {
-                accountStrings += "<option value=" + name.getName() + ">"
+                accountStrings += "<option value=" + name.getFromFavorites() + ">"
                         + name.getBalanceUSE(1L) + "</option>";
             }
 
@@ -1641,7 +1640,7 @@ public class WebResource {
             if (activeProfileOpt != null
                     && resultingNames.contains(activeProfileOpt.getName())) {
                 pebbleHelper.getContextMap().put("primaryname",
-                        activeProfileOpt.getName().getName());
+                        activeProfileOpt.getName().getFromFavorites());
             }
 
             pebbleHelper.getContextMap().put("option", accountStrings);
@@ -1691,7 +1690,7 @@ public class WebResource {
             String accountStrings = "";
 
             for (Account name : resultingNames) {
-                accountStrings += "<option value=" + name.getName() + ">"
+                accountStrings += "<option value=" + name.getFromFavorites() + ">"
                         + name.getBalanceUSE(1L) + "</option>";
             }
 
@@ -1716,7 +1715,7 @@ public class WebResource {
             if (activeProfileOpt != null
                     && resultingNames.contains(activeProfileOpt.getName())) {
                 pebbleHelper.getContextMap().put("primaryname",
-                        activeProfileOpt.getName().getName());
+                        activeProfileOpt.getName().getFromFavorites());
             }
 
             pebbleHelper.getContextMap().put("option", accountStrings);
@@ -2169,7 +2168,7 @@ public class WebResource {
                             .get(Base58.decode(signature));
                     if (list != null
                             && list.contains(activeProfileOpt.getName()
-                            .getName())) {
+                            .getFromFavorites())) {
                         json.put("type", "YouAlreadySharedThisPost");
 
                         return Response
@@ -2179,7 +2178,7 @@ public class WebResource {
                                 .entity(json.toJSONString()).build();
                     }
 
-                    if (activeProfileOpt.getName().getName().equals(sourceBlog)) {
+                    if (activeProfileOpt.getName().getFromFavorites().equals(sourceBlog)) {
                         json.put("type", "YouCantShareYourOwnPosts");
 
                         return Response
