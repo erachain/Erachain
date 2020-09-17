@@ -91,23 +91,37 @@ public class DocTypeAppendixPanel extends JPanel {
             layout.rowHeights = new int[]{0, 5, 0, 5, 0};
             setLayout(layout);
 
-            int dridY = 0;
+            JPanel panel = new JPanel();
+            java.awt.GridBagLayout panelLayout = new java.awt.GridBagLayout();
+            panel.setLayout(panelLayout);
 
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = dridY;
+            gridBagConstraints.gridy = 0;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
             gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
-            add(typeDocumentLabel, gridBagConstraints);
+            panel.add(typeDocumentLabel, gridBagConstraints);
 
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = dridY;
+            gridBagConstraints.gridy = 0;
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
             gridBagConstraints.weightx = 0.1;
-            gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 8);
-            add(typeDocymentCombox, gridBagConstraints);
+            gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+            panel.add(typeDocymentCombox, gridBagConstraints);
+
+             int dridY = 0;
+
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+            gridBagConstraints.weightx = 0.1;
+            gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
+            add(panel, gridBagConstraints);
 
             dridY++;
 
