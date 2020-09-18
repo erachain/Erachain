@@ -56,10 +56,11 @@ public class ExData {
 
     private static final byte ENCRYPT_FLAG_MASK = 32;
 
-    public static final int LINK_APPENDIX_TYPE = 1; // дополнение / приложение к другому документу или Сущности
-    public static final int LINK_COMMENT_TYPE = 2; // комментарий с оценкой
-    public static final int LINK_RATING_TYPE = 3; // оценка с значением
-    public static final int LINK_SURELY_TYPE = 4; // гарантия / поручительство на долю
+    public static final byte LINK_SIMPLE_TYPE = 0; // для выбора типа в ГУИ
+    public static final byte LINK_APPENDIX_TYPE = 1; // дополнение / приложение к другому документу или Сущности
+    public static final byte LINK_REPLY_TYPE = 2; // ответ всем на предыдущий документ - Ссылка для отслеживания
+    public static final byte LINK_COMMENT_TYPE = 3; // комментарий с оценкой
+    public static final byte LINK_SURELY_TYPE = 4; // гарантия / поручительство на долю
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExData.class);
 

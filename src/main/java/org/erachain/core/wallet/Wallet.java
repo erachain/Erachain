@@ -224,6 +224,14 @@ public class Wallet extends Observable /*implements Observer*/ {
 		return this.secureDatabase.getAccountSeedMap().getPrivateKeyAccount(address);
 	}
 
+	public PrivateKeyAccount getPrivateKeyAccount(Account account) {
+		if (this.secureDatabase == null) {
+			return null;
+		}
+
+		return this.secureDatabase.getAccountSeedMap().getPrivateKeyAccount(account);
+	}
+
 	public void addWaitingObserver(ObserverWaiter observer) {
 		waitingObservers.add(observer);
 	}

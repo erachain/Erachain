@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.PropertyConfigurator;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.api.ApiClient;
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.ApiService;
 import org.erachain.at.AT;
 import org.erachain.core.*;
@@ -43,6 +44,7 @@ import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
 import org.erachain.gui.GuiTimer;
 import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.network.Network;
 import org.erachain.network.Peer;
@@ -54,6 +56,7 @@ import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -191,7 +194,7 @@ public class Controller extends Observable {
                     }
                 };
 
-        if (Settings.getInstance().isSideNet()) {
+        if (Settings.getInstance().isCloneNet()) {
             APP_NAME = "Erachain-" + Settings.getInstance().APP_NAME;
         } else {
             APP_NAME = "Erachain";
@@ -318,10 +321,10 @@ public class Controller extends Observable {
     public byte[] getMessageMagic() {
         if (this.messageMagic == null) {
             long longTestNetStamp = Settings.getInstance().getGenesisStamp();
-            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE || BlockChain.SIDE_MODE) {
+            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE || BlockChain.CLONE_MODE) {
                 byte[] seedTestNetStamp = Crypto.getInstance().digest(Longs.toByteArray(longTestNetStamp));
                 this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
-            } else if (BlockChain.SIDE_MODE) {
+            } else if (BlockChain.CLONE_MODE) {
                 byte[] seedTestNetStamp = blockChain.getGenesisBlock().getSignature();
                 this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
             } else {
@@ -2259,6 +2262,14 @@ public class Controller extends Observable {
         }
     }
 
+    public PrivateKeyAccount getWalletPrivateKeyAccountByAddress(Account account) {
+        if (this.doesWalletExists()) {
+            return this.wallet.getPrivateKeyAccount(account);
+        } else {
+            return null;
+        }
+    }
+
     public byte[] decrypt(PublicKeyAccount creator, Account recipient, byte[] data) {
 
         Account account = this.getWalletAccountByAddress(creator.getAddress());
@@ -2995,8 +3006,66 @@ public class Controller extends Observable {
 
     }
 
+    public Object issueAsset(HttpServletRequest request, String x) {
+
+        Object result = Transaction.decodeJson(x);
+        if (result instanceof JSONObject) {
+            return result;
+        }
+
+        Fun.Tuple4<Account, Integer, String, JSONObject> transactionResult = (Fun.Tuple4<Account, Integer, String, JSONObject>) result;
+        Account creator = transactionResult.a;
+        int feePow = transactionResult.b;
+        String password = transactionResult.c;
+        JSONObject jsonObject = transactionResult.d;
+
+        if (jsonObject == null) {
+            int error = ApiErrorFactory.ERROR_JSON;
+            return new Fun.Tuple2<>(error, OnDealClick.resultMess(error));
+        }
+
+        String name = (String) jsonObject.getOrDefault("name", null);
+        String description = (String) jsonObject.getOrDefault("description", null);
+
+        byte[] icon;
+        String icon64 = (String) jsonObject.getOrDefault("icon64", null);
+        if (icon64 == null) {
+            String icon58 = (String) jsonObject.getOrDefault("icon", null);
+            if (icon58 == null)
+                icon = null;
+            else
+                icon = Base58.decode(icon58);
+        } else {
+            icon = java.util.Base64.getDecoder().decode(icon64);
+        }
+
+        byte[] image;
+        String image64 = (String) jsonObject.getOrDefault("image64", null);
+        if (image64 == null) {
+            String image58 = (String) jsonObject.getOrDefault("image", null);
+            if (image58 == null)
+                image = null;
+            else
+                image = Base58.decode(image58);
+        } else {
+            image = java.util.Base64.getDecoder().decode(image64);
+        }
+
+        Integer scale = (Integer) jsonObject.getOrDefault("scale", 0);
+        Integer assetType = (Integer) jsonObject.getOrDefault("assetType", 0);
+        Long quantity = (Long) jsonObject.getOrDefault("quantity", 0L);
+
+        APIUtils.askAPICallAllowed(password, "POST issue Asset " + name, request, true);
+        PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
+
+        return issueAsset(creatorPrivate,
+                name, description, icon, image, scale,
+                assetType, quantity, feePow);
+
+    }
+
     public Transaction issueAsset(PrivateKeyAccount creator, String name, String description, byte[] icon, byte[] image,
-                                  boolean movable, int scale, int assetType, long quantity, int feePow) {
+                                  int scale, int assetType, long quantity, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createIssueAssetTransaction(creator, name, description, icon, image, scale,
@@ -3041,6 +3110,80 @@ public class Controller extends Observable {
                     deathday, gender, race, birthLatitude, birthLongitude, skinColor, eyeColor, hairСolor, height, icon,
                     image, description, owner, ownerSignature);
         }
+    }
+
+    public Object issuePerson(HttpServletRequest request, String x) {
+
+        Object result = Transaction.decodeJson(x);
+        if (result instanceof JSONObject) {
+            return result;
+        }
+
+        Fun.Tuple4<Account, Integer, String, JSONObject> transactionResult = (Fun.Tuple4<Account, Integer, String, JSONObject>) result;
+        Account creator = transactionResult.a;
+        int feePow = transactionResult.b;
+        String password = transactionResult.c;
+        JSONObject jsonObject = transactionResult.d;
+
+        if (jsonObject == null) {
+            int error = ApiErrorFactory.ERROR_JSON;
+            return new Fun.Tuple2<>(error, OnDealClick.resultMess(error));
+        }
+
+        String name = (String) jsonObject.getOrDefault("name", null);
+        String description = (String) jsonObject.getOrDefault("description", null);
+
+        byte[] icon;
+        String icon64 = (String) jsonObject.getOrDefault("icon64", null);
+        if (icon64 == null) {
+            String icon58 = (String) jsonObject.getOrDefault("icon", null);
+            if (icon58 == null)
+                icon = null;
+            else
+                icon = Base58.decode(icon58);
+        } else {
+            icon = java.util.Base64.getDecoder().decode(icon64);
+        }
+
+        byte[] image;
+        String image64 = (String) jsonObject.getOrDefault("image64", null);
+        if (image64 == null) {
+            String image58 = (String) jsonObject.getOrDefault("image", null);
+            if (image58 == null)
+                image = null;
+            else
+                image = Base58.decode(image58);
+        } else {
+            image = java.util.Base64.getDecoder().decode(image64);
+        }
+
+        Integer scale = (Integer) jsonObject.getOrDefault("scale", 0);
+        Integer assetType = (Integer) jsonObject.getOrDefault("assetType", 0);
+        Long birthday = (Long) jsonObject.getOrDefault("birthday", 0L);
+        Long deathday = (Long) jsonObject.getOrDefault("deathday", null);
+        Integer gender = (Integer) jsonObject.getOrDefault("gender", 0);
+        String race = jsonObject.getOrDefault("race", null).toString();
+        Float birthLatitude = (Float) jsonObject.getOrDefault("birthLatitude", 0.0f);
+        Float birthLongitude = (Float) jsonObject.getOrDefault("birthLongitude", 0.0f);
+        String skinColor = jsonObject.getOrDefault("skinColor", null).toString();
+        String eyeColor = jsonObject.getOrDefault("eyeColor", null).toString();
+        String hairСolor = jsonObject.getOrDefault("hairСolor", null).toString();
+        Integer height = (Integer) jsonObject.getOrDefault("height", 0);
+        String owner58 = jsonObject.getOrDefault("owner", null).toString();
+        PublicKeyAccount owner = new PublicKeyAccount(owner58);
+        String ownerSignature58 = jsonObject.getOrDefault("ownerSignature", null).toString();
+        byte[] ownerSignature = Base58.decode(ownerSignature58);
+
+        APIUtils.askAPICallAllowed(password, "POST issue Person " + name, request, true);
+        PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
+
+        PersonHuman person = new PersonHuman(owner, name, birthday, deathday, (byte) (int) gender,
+                race, birthLatitude, birthLongitude,
+                skinColor, eyeColor, hairСolor, height, icon, image, description,
+                ownerSignature);
+
+        return issuePersonHuman(creatorPrivate, feePow, person);
+
     }
 
     public Pair<Transaction, Integer> issuePersonHuman(PrivateKeyAccount creator, int feePow, PersonHuman human) {

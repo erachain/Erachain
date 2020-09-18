@@ -318,6 +318,11 @@ public class ObserverMessage {
     public static final int WALLET_ACCOUNT_PROPERTIES_LIST = 12119;
     public static final int WALLET_ACCOUNT_PROPERTIES_RESET = 12120;
 
+    public static final int WALLET_ACCOUNT_FAVORITE_ADD = 12121;
+    public static final int WALLET_ACCOUNT_FAVORITE_DELETE = 12122;
+    public static final int WALLET_ACCOUNT_FAVORITE_LIST = 12123;
+    public static final int WALLET_ACCOUNT_FAVORITE_RESET = 12124;
+
     public static final int WALLET_ADD_TELEGRAM_TYPE = 1000003;
     public static final int WALLET_REMOVE_TELEGRAM_TYPE = 1000001;
     public static final int WALLET_LIST_TELEGRAM_TYPE = 1000002;

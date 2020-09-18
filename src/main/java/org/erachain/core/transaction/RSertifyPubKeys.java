@@ -354,7 +354,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         data = this.toBytes(FOR_NETWORK, false);
         if (data == null) return;
 
-        if (BlockChain.SIDE_MODE) {
+        if (BlockChain.CLONE_MODE) {
             // чтобы из других цепочек не срабатывало
             data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
         } else {
@@ -460,7 +460,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         byte[] data = this.toBytes(Transaction.FOR_NETWORK, false);
         if (data == null) return false;
 
-        if (BlockChain.SIDE_MODE) {
+        if (BlockChain.CLONE_MODE) {
             // чтобы из других цепочек не срабатывало
             data = Bytes.concat(data, Controller.getInstance().blockChain.getGenesisBlock().getSignature());
         } else {

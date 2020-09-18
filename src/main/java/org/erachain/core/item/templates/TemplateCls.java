@@ -49,7 +49,7 @@ public abstract class TemplateCls extends ItemCls {
 
     @Override
     public long getStartKey() {
-        if (!BlockChain.SIDE_MODE)
+        if (!BlockChain.CLONE_MODE)
             return MIN_START_KEY;
 
         long startKey = BlockChain.startKeys[ItemCls.ASSET_TYPE];

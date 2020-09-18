@@ -53,7 +53,7 @@ see readme in /z_START_EXAMPLES
 ## Demo Network (DemoNet)
 see readme in /z_START_EXAMPLES
 
-## Sidechains (для тестеров)
+## Clonechains (для тестеров)
 see readme in /z_GENESIS_EXAMPLES
 
 ## Other

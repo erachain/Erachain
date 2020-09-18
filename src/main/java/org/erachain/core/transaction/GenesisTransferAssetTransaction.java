@@ -308,7 +308,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
             // CREATOR update
             GenesisBlock.CREATOR.changeBalance(this.dcSet, true, false, key, this.amount, false, false);
 
-            if (BlockChain.SIDE_MODE && key == FEE_KEY) {
+            if (BlockChain.CLONE_MODE && key == FEE_KEY) {
                 BigDecimal sideRoyalty = amount.multiply(new BigDecimal("0.05")); // 5%
                 BlockChain.ROYALTY_ACCOUNT.changeBalance(dcSet, false, false, Transaction.FEE_KEY,
                         sideRoyalty, false, false);

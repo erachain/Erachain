@@ -19,6 +19,7 @@ import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.items.accounts.AccountsComboBoxModel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
+import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
@@ -27,8 +28,6 @@ import org.mapdb.Fun.Tuple2;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("serial")
 
-public class MailSendPanel extends IconPanel {
+public class MailSendPanel extends IconPanel implements RecipientAddress.RecipientAddressInterface {
 
     public static String NAME = "MailSendPanel";
     public static String TITLE = "Send Mail";
@@ -57,7 +56,7 @@ public class MailSendPanel extends IconPanel {
     PersonCls person;
     private JComboBox<Account> cbxFrom;
     private JComboBox cbx_To;
-    private JTextField txtTo;
+    private RecipientAddress recipientBox;
     private JTextField txtAmount;
     private JComboBox<String> txtFeePow;
     private JCheckBox encrypted;
@@ -148,24 +147,7 @@ public class MailSendPanel extends IconPanel {
         txtToGBC.gridx = 1;
         txtToGBC.gridy = y;
 
-        txtTo = new JTextField();
-        txtTo.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void changedUpdate(DocumentEvent arg0) {
-                refreshReceiverDetails();
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent arg0) {
-                refreshReceiverDetails();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent arg0) {
-                refreshReceiverDetails();
-            }
-        });
+        recipientBox = new RecipientAddress(this);
 
         // LABEL RECEIVER
         GridBagConstraints labelDetailsGBC = new GridBagConstraints();
@@ -245,7 +227,7 @@ public class MailSendPanel extends IconPanel {
         this.txtMessage.setColumns(25);
         // this.txtMessage.setMinimumSize(new Dimension(200,150));
 
-        this.txtMessage.setBorder(this.txtTo.getBorder());
+        this.txtMessage.setBorder(this.recipientBox.getBorder());
 
         JScrollPane messageScroll = new JScrollPane(this.txtMessage);
         // messageScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -431,7 +413,6 @@ public class MailSendPanel extends IconPanel {
         });
 
         // CONTEXT MENU
-        MenuPopupUtil.installContextMenu(txtTo);
         MenuPopupUtil.installContextMenu(txtAmount);
         MenuPopupUtil.installContextMenu(txtMessage);
         MenuPopupUtil.installContextMenu(txtRecDetails);
@@ -454,8 +435,8 @@ public class MailSendPanel extends IconPanel {
             this.cbx_To = new JComboBox(accounts_To_Model);
             if (accounts_To_Model.getSize() != 0) {
                 this.add(this.cbx_To, txtToGBC);
-                txtTo.setText(cbx_To.getSelectedItem().toString());
-                Account account1 = new Account(txtTo.getText());
+                recipientBox.setSelectedAddress(cbx_To.getSelectedItem().toString());
+                Account account1 = new Account(recipientBox.getSelectedAddress());
                 txtRecDetails.setText(account1.toString());
                 toLabel.setText(Lang.getInstance().translate("Select Account To") + ": ");
                 cbx_To.addActionListener(new ActionListener() {
@@ -463,7 +444,7 @@ public class MailSendPanel extends IconPanel {
                     public void actionPerformed(ActionEvent e) {
                         String str = (String) cbx_To.getSelectedItem();
                         if (str != null) {
-                            txtTo.setText(cbx_To.getSelectedItem().toString());
+                            recipientBox.setSelectedAddress(cbx_To.getSelectedItem().toString());
                             refreshReceiverDetails();
                         }
 
@@ -471,7 +452,7 @@ public class MailSendPanel extends IconPanel {
                 });
             } else {
 
-                this.txtTo.setText("has no Accounts");
+                this.recipientBox.setSelectedAddress("has no Accounts");
                 sendButton.setEnabled(false);
 
             }
@@ -479,12 +460,12 @@ public class MailSendPanel extends IconPanel {
 
             if (accountTo != null) {
                 if (accountTo instanceof PublicKeyAccount) {
-                    txtTo.setText(((PublicKeyAccount) accountTo).getBase58());
+                    recipientBox.setSelectedAddress(((PublicKeyAccount) accountTo).getBase58());
                 } else {
-                    txtTo.setText(accountTo.getAddress());
+                    recipientBox.setSelectedAddress(accountTo.getAddress());
                 }
             }
-            this.add(txtTo, txtToGBC);
+            this.add(recipientBox, txtToGBC);
         }
 
         /*
@@ -511,7 +492,7 @@ public class MailSendPanel extends IconPanel {
     }
 
     private void refreshReceiverDetails() {
-        String recipient = txtTo.getText();
+        String recipient = recipientBox.getSelectedAddress();
 
         AssetCls asset = Controller.getInstance().getAsset(Transaction.FEE_KEY);
         sendButton.setEnabled(false);
@@ -533,7 +514,7 @@ public class MailSendPanel extends IconPanel {
 
         } else {
 
-            if (txtTo.getText().equals("has no Addresses")) {
+            if (recipientBox.getSelectedAddress().equals("has no Addresses")) {
                 txtRecDetails.setText(person.viewName() + " " + Lang.getInstance().translate("has no Accounts"));
                 messagesHistoryTable.setSideAccount(null);
                 return;
@@ -605,7 +586,7 @@ public class MailSendPanel extends IconPanel {
         Account sender = (Account) cbxFrom.getSelectedItem();
 
         // READ RECIPIENT
-        String recipientAddress = txtTo.getText();
+        String recipientAddress = recipientBox.getSelectedAddress();
 
         // ORDINARY RECIPIENT
         Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipientAddress);
@@ -786,7 +767,7 @@ public class MailSendPanel extends IconPanel {
 
             // CHECK VALIDATE MESSAGE
             if (result == transaction.VALIDATE_OK) {
-                if (true || this.txtTo.getText().startsWith(wrongFirstCharOfAddress)) {
+                if (true || this.recipientBox.getSelectedAddress().startsWith(wrongFirstCharOfAddress)) {
                     JOptionPane.showMessageDialog(new JFrame(),
                             Lang.getInstance().translate("Message and/or payment has been sent!"),
                             Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
@@ -799,6 +780,12 @@ public class MailSendPanel extends IconPanel {
         }
         // ENABLE
         this.sendButton.setEnabled(true);
+    }
+
+    // выполняемая процедура при изменении адреса получателя
+    @Override
+    public void recipientAddressWorker(String e) {
+        refreshReceiverDetails();
     }
 
 }

@@ -891,7 +891,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             ) {
 
                                 /// если это девелоп то не проверяем ниже особые счета
-                                if (BlockChain.SIDE_MODE || BlockChain.TEST_MODE)
+                                if (BlockChain.CLONE_MODE || BlockChain.TEST_MODE)
                                     return NO_BALANCE;
 
                                 wrong = true;
@@ -914,7 +914,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
                                     && this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b.compareTo(this.fee) < 0
                                     && !BlockChain.ERA_COMPU_ALL_UP) {
-                                if (BlockChain.SIDE_MODE || BlockChain.TEST_MODE)
+                                if (BlockChain.CLONE_MODE || BlockChain.TEST_MODE)
                                     return NOT_ENOUGH_FEE;
 
                                 // TODO: delete wrong check in new CHAIN
@@ -935,7 +935,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     true);
 
                             if (amount.compareTo(forSale) > 0) {
-                                if (BlockChain.SIDE_MODE || BlockChain.TEST_MODE)
+                                if (BlockChain.CLONE_MODE || BlockChain.TEST_MODE)
                                     return NO_BALANCE;
 
                                 // TODO: delete wrong check in new CHAIN

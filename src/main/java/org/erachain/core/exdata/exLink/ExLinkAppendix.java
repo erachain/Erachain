@@ -1,9 +1,11 @@
 package org.erachain.core.exdata.exLink;
 
+import org.erachain.core.exdata.ExData;
+
 public class ExLinkAppendix extends ExLink {
 
     public ExLinkAppendix(long parentSeqNo) {
-        super(APPENDIX_TYPE, parentSeqNo);
+        super(ExData.LINK_APPENDIX_TYPE, parentSeqNo);
     }
 
     public ExLinkAppendix(byte[] data) {

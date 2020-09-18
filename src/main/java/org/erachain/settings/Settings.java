@@ -41,7 +41,7 @@ public class Settings {
     public static long genesisStamp = DEFAULT_MAINNET_STAMP;
 
     public static String peersURL = "https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json";
-    public static String sideLicense; // see sidePROTOCOL_example.json
+    public static String sideLicense; // see clonePROTOCOL_example.json
 
     //private static final String[] DEFAULT_PEERS = { };
     public static final int DEFAULT_ACCOUNTS = 1;
@@ -133,7 +133,7 @@ public class Settings {
     public static final int TELEGRAM_STORE_PERIOD = 5; // in days
 
     public final static int NET_MODE_MAIN = 0;
-    public final static int NET_MODE_SIDE = 1;
+    public final static int NET_MODE_CLONE = 1;
     public final static int NET_MODE_DEMO = 2;
     public final static int NET_MODE_TEST = 3;
     public static int NET_MODE;
@@ -303,7 +303,7 @@ public class Settings {
 
     public String getPeersPath() {
         return this.userPath + (isDemoNet() ? "peers-demo.json" : isTestNet() ? "peers-test.json" :
-                isSideNet() ? "peers-side.json" : "peers.json");
+                isCloneNet() ? "peers-clone.json" : "peers.json");
     }
 
     public String getDataWalletPath() {
@@ -676,8 +676,8 @@ public class Settings {
         return NET_MODE == NET_MODE_MAIN;
     }
 
-    public boolean isSideNet() {
-        return NET_MODE == NET_MODE_SIDE;
+    public boolean isCloneNet() {
+        return NET_MODE == NET_MODE_CLONE;
     }
 
     public boolean isDemoNet() {
