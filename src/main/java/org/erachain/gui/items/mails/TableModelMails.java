@@ -25,8 +25,10 @@ public class TableModelMails extends WalletTableModel<Transaction> {
     public static final int COLUMN_SEQNO = 0;
     public static final int COLUMN_DATA = 1;
     public static final int COLUMN_HEAD = 2;
-    public static final int COLUMN_SENDER = 3;
-    public static final int COLUMN_RECIEVER = 4;
+    public static final int COLUMN_AMOUNT = 3;
+    public static final int COLUMN_ASSET = 4;
+    public static final int COLUMN_SENDER = 5;
+    public static final int COLUMN_RECIEVER = 6;
 
     boolean incoming;
     DCSet dcSet = DCSet.getInstance();
@@ -34,8 +36,8 @@ public class TableModelMails extends WalletTableModel<Transaction> {
     public TableModelMails(boolean incoming) {
 
         super(Controller.getInstance().wallet.database.getTransactionMap(),
-                new String[]{"№", "Date", "Title", "Sender", "Receiver"},
-                new Boolean[]{false, true, true, true, false}, true, 1000);
+                new String[]{"№", "Date", "Title", "Amount", "Asset", "Sender", "Receiver"},
+                new Boolean[]{false, true, true, true, true, true, false}, true, 1000);
         this.incoming = incoming;
 
     }
@@ -72,6 +74,16 @@ public class TableModelMails extends WalletTableModel<Transaction> {
 
             case COLUMN_HEAD:
                 return transaction.getHead();
+
+            case COLUMN_AMOUNT:
+                if (transaction.hasAmount())
+                    return transaction.viewAmount();
+                return "";
+
+            case COLUMN_ASSET:
+                if (transaction.hasAmount())
+                    return transaction.getAsset().viewName();
+                return "";
 
         }
 
@@ -119,12 +131,11 @@ public class TableModelMails extends WalletTableModel<Transaction> {
             try {
                 rsend = (RSend) wallet.getTransaction(key);
             } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
                 continue;
             }
 
             if (rsend == null)
-                continue;
-            if (rsend.hasAmount())
                 continue;
 
             // это исходящее письмо?
