@@ -76,9 +76,14 @@ public class TableModelMails extends WalletTableModel<Transaction> {
                 return transaction.getHead();
 
             case COLUMN_AMOUNT:
-                return transaction.viewAmount();
+                if (transaction.hasAmount())
+                    return transaction.viewAmount();
+                return "";
+
             case COLUMN_ASSET:
-                return transaction.getAsset().viewName();
+                if (transaction.hasAmount())
+                    return transaction.getAsset().viewName();
+                return "";
 
         }
 
@@ -126,12 +131,11 @@ public class TableModelMails extends WalletTableModel<Transaction> {
             try {
                 rsend = (RSend) wallet.getTransaction(key);
             } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
                 continue;
             }
 
             if (rsend == null)
-                continue;
-            if (false && rsend.hasAmount())
                 continue;
 
             // это исходящее письмо?
