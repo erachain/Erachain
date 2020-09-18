@@ -46,13 +46,13 @@ public class DocTypeAppendixPanel extends JPanel {
                             parentDetails.setVisible(true);
                             switch (item) {
                                 case ExData.LINK_APPENDIX_TYPE:
-                                    labelTitle.setText(Lang.getInstance().translate("Set Parent Document and Copy all Recipients for Appendix"));
+                                    labelTitle.setText(Lang.getInstance().translate("Set parent Document for Appendix (It will be set all involved accounts as Recipients)"));
                                     break;
                                 case ExData.LINK_REPLY_TYPE:
-                                    labelTitle.setText(Lang.getInstance().translate("Set Parent Document and Copy all Recipients for Reply"));
+                                    labelTitle.setText(Lang.getInstance().translate("Set parent Document for Reply (It will be set all involved accounts as Recipients)"));
                                     break;
                                 case ExData.LINK_COMMENT_TYPE:
-                                    labelTitle.setText(Lang.getInstance().translate("Set Parent Document for Comment"));
+                                    labelTitle.setText(Lang.getInstance().translate("Set parent Document for Comment"));
                                     break;
                                 default:
                                     labelTitle.setText(Lang.getInstance().translate("Set Parent Document"));
