@@ -87,8 +87,8 @@ public class AboutFrame extends JDialog implements Observer {
         aboutPanel.add(lblAuthorsLabel, gbc_lblAuthorsLabel);
 
         int gridy = 2;
-        if (BlockChain.SIDE_MODE) {
-            JLabel appNameLabel = new JLabel(Lang.getInstance().translate("sidechain") + ": "
+        if (BlockChain.CLONE_MODE) {
+            JLabel appNameLabel = new JLabel(Lang.getInstance().translate("clonechain") + ": "
                     + Controller.getInstance().APP_NAME);
             appNameLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
             appNameLabel.setForeground(Color.RED);

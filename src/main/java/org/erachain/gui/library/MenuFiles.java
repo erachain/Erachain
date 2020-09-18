@@ -218,8 +218,8 @@ public class MenuFiles extends JMenu {
                             panel);
 
                     AssetCls asset = ct.getAsset(assetKey);
-                    panel.jTextField_To.setText(recipient);
-                    panel.jTextField_To.setEditable(false);
+                    panel.recipientAddress.setSelectedAddress(recipient);
+                    panel.recipientAddress.setEditable(false);
                     panel.jTextField_Mess_Title.setText(head);
                     panel.jTextField_Mess_Title.setEditable(false);
                     panel.jTextField_Amount.setText(amount);
@@ -321,9 +321,9 @@ public class MenuFiles extends JMenu {
         });
         add(licenseItem);
 
-        // SIDECHAIN LICENSE
+        // CLONECHAIN LICENSE
         //ABOUT
-        JMenuItem dataLicenseItem = new JMenuItem(Lang.getInstance().translate("Data License of Sidechain"));
+        JMenuItem dataLicenseItem = new JMenuItem(Lang.getInstance().translate("Data License of Clonechain"));
         //    licenseItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
         //    licenseItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
         dataLicenseItem.addActionListener(new ActionListener() {

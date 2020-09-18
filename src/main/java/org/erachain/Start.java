@@ -107,11 +107,11 @@ public class Start {
 
         }
 
-        ///////////////////  SIDECHAINS ///////////
-        file = new File("sideGENESIS.json");
+        ///////////////////  CLONECHAINS ///////////
+        file = new File("cloneGENESIS.json");
         if (Settings.NET_MODE == Settings.NET_MODE_MAIN && Settings.TEST_DB_MODE == 0 && file.exists()) {
             // START SIDE CHAIN
-            LOGGER.info("sideGENESIS.json USED");
+            LOGGER.info("cloneGENESIS.json USED");
             try {
                 List<String> lines = Files.readLines(file, Charsets.UTF_8);
 
@@ -138,7 +138,7 @@ public class Start {
                     Settings.ERA_COMPU_ALL_UP = true;
                 }
 
-                Settings.NET_MODE = Settings.NET_MODE_SIDE;
+                Settings.NET_MODE = Settings.NET_MODE_CLONE;
 
             } catch (Exception e) {
                 LOGGER.info("Error while reading " + file.getAbsolutePath());

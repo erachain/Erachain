@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.IssuePersonRecord;
@@ -94,6 +95,10 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtDeathdayTxt.setVisible(false);
         txtDeathdayTxt.setEditable(false);
 
+        jLabelRegistratorAddress.setVisible(false);
+        registrarAddress.setVisible(false);
+        registrarAddressDesc.setVisible(false);
+
         addImageLabel.setVisible(false);
         comboBoxGender.setVisible(false);
         txtGenderTxt.setEditable(false);
@@ -179,62 +184,15 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
         pasteButton = new MButton(Lang.getInstance().translate("Paste Person from clipboard"), 2);
         pasteButton.addActionListener(arg0 -> {
-            person = null;
-            reset();
             String base58str = getClipboardContents();
-            byte[] dataPerson;
             try {
-                dataPerson = Base58.decode(base58str);
-                person = (PersonHuman) PersonFactory.getInstance().parse(dataPerson, false);
+                byte[] dataPerson = Base58.decode(base58str);
+                setByteCode(dataPerson);
             } catch (Exception ee) {
                 JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.getInstance().translate("Error"),
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            txtName.setText(person.viewName());
-            ImageIcon image = new ImageIcon(person.getImage());
-            int x = image.getIconWidth();
-            int y = image.getIconHeight();
-            int x1 = 250;
-            double k = ((double) x / (double) x1);
-            y = (int) ((double) y / k);
-            if (y != 0) {
-                Image Im = image.getImage().getScaledInstance(x1, y, 1);
-                iconLabel.setIcon(new ImageIcon(Im));
-            }
-            // SET ONE TIME ZONE for Birthday
-            TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-            txtBirthdayTxt.setText(person.getBirthdayStr());
-            txtDeathdayTxt.setText(person.getDeathdayStr());
-            txtDeathdayTxt.setVisible(false);
-            jLabelDead.setVisible(false);
-            if (!person.isAlive(0L)) {
-                txtDeathdayTxt.setVisible(true);
-                jLabelDead.setVisible(true);
-            }
-            TimeZone.setDefault(TimeZone.getDefault());
-
-            txtareaDescription.setText(person.getDescription() == null ? "" : person.getDescription());
-
-            comboBoxGender.setSelectedIndex(person.getGender());
-            txtGenderTxt.setText(comboBoxGender.getSelectedItem().toString());
-
-            txtBirthLatitude.setText("" + person.getBirthLatitude() + ", " + person.getBirthLongitude());
-            if (person.getSkinColor() != null) {
-                txtSkinColor.setText(person.getSkinColor());
-            }
-            if (person.getEyeColor() != null) {
-                txtEyeColor.setText(person.getEyeColor());
-            }
-            if (person.getHairColor() != null) {
-                txtHairColor.setText(person.getHairColor());
-            }
-            txtHeight.setText("" + person.getHeight());
-
-            txtSign.setText(
-                    person.isSignatureValid(DCSet.getInstance()) ? Base58.encode(person.getOwnerSignature())
-                            : Lang.getInstance().translate("Wrong signature for data owner"));
-            txtPublicKey.setText(Base58.encode(person.getOwner().getPublicKey()));
 
         });
 
@@ -254,7 +212,6 @@ public class InsertPersonPanel extends IssuePersonPanel {
             if (checkWalletUnlock()) {
                 return;
             }
-
 
             // READ CREATOR
             Account creatorAccount = (Account) cbxFrom.getSelectedItem();
@@ -327,6 +284,66 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
     }
 
+    public void setByteCode(byte[] dataPerson) {
+        person = null;
+        reset();
+        try {
+            person = (PersonHuman) PersonFactory.getInstance().parse(dataPerson, false);
+        } catch (Exception ee) {
+            JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.getInstance().translate("Error"),
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        txtName.setText(person.viewName());
+        ImageIcon image = new ImageIcon(person.getImage());
+        int x = image.getIconWidth();
+        int y = image.getIconHeight();
+        int x1 = 250;
+        double k = ((double) x / (double) x1);
+        y = (int) ((double) y / k);
+        if (y != 0) {
+            Image Im = image.getImage().getScaledInstance(x1, y, 1);
+            iconLabel.setIcon(new ImageIcon(Im));
+        }
+        // SET ONE TIME ZONE for Birthday
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        txtBirthdayTxt.setText(person.getBirthdayStr());
+        txtDeathdayTxt.setText(person.getDeathdayStr());
+        txtDeathdayTxt.setVisible(false);
+        jLabelDead.setVisible(false);
+        if (!person.isAlive(0L)) {
+            txtDeathdayTxt.setVisible(true);
+            jLabelDead.setVisible(true);
+        }
+        TimeZone.setDefault(TimeZone.getDefault());
+
+        txtareaDescription.setText(person.getDescription() == null ? "" : person.getDescription());
+
+        comboBoxGender.setSelectedIndex(person.getGender());
+        txtGenderTxt.setText(comboBoxGender.getSelectedItem().toString());
+
+        txtBirthLatitude.setText("" + person.getBirthLatitude() + ", " + person.getBirthLongitude());
+        if (person.getSkinColor() != null) {
+            txtSkinColor.setText(person.getSkinColor());
+        }
+        if (person.getEyeColor() != null) {
+            txtEyeColor.setText(person.getEyeColor());
+        }
+        if (person.getHairColor() != null) {
+            txtHairColor.setText(person.getHairColor());
+        }
+        txtHeight.setText("" + person.getHeight());
+
+        txtSign.setText(
+                person.isSignatureValid(DCSet.getInstance()) ? Base58.encode(person.getOwnerSignature())
+                        : Lang.getInstance().translate("Wrong signature for data owner"));
+        txtPublicKey.setText(Base58.encode(person.getOwner().getPublicKey()));
+
+    }
+
+    public PersonCls getPerson() {
+        return person;
+    }
 
     private void eraseFields() {
         txtFeePow.setSelectedItem("0");

@@ -13,10 +13,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("statuss")
+@Path("statuses")
 @Produces(MediaType.APPLICATION_JSON)
 @Slf4j
-public class ItemStatusResource {
+public class ItemStatusesResource {
     /**
      * Get all status type 1
      *
