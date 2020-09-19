@@ -920,13 +920,8 @@ public class ExData {
             recipientsFlag |= RECIPIENTS_FLAG_SING_ONLY_MASK;
         }
 
-        if (recipients != null) {
-            for (int i = 0; i < recipients.length; ++i) {
-                if (recipients[i].equals())
-            }
-            if (recipients.length > 0) {
-                flags[1] = (byte) (flags[1] | RECIPIENTS_FLAG_MASK);
-            }
+        if (recipients != null && recipients.length > 0) {
+            flags[1] = (byte) (flags[1] | RECIPIENTS_FLAG_MASK);
         }
 
         if (isEncrypted) {

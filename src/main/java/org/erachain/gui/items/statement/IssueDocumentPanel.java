@@ -35,7 +35,7 @@ public class IssueDocumentPanel extends IconPanel {
     private MButton jButton_Work_Cancel;
     private MButton jButton_Work_OK;
     private MButton jButton_Work_OK1;
-    private javax.swing.JComboBox jComboBox_Account_Work;
+    public javax.swing.JComboBox jComboBox_Account_Work;
     public JCheckBox encryptCheckBox;
     private javax.swing.JLabel jLabel_Account_Work;
     private javax.swing.JLabel jLabel_Fee_Work;
@@ -99,7 +99,7 @@ public class IssueDocumentPanel extends IconPanel {
         layout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
         setLayout(layout);
 
-        exData_Panel = new ExDataPanel();
+        exData_Panel = new ExDataPanel(this);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;

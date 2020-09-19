@@ -1,6 +1,5 @@
 package org.erachain.gui.exdata;
 
-import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
@@ -13,8 +12,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.Arrays;
-import java.util.HashSet;
 
 public class DocTypeAppendixPanel extends JPanel {
 
@@ -41,7 +38,7 @@ public class DocTypeAppendixPanel extends JPanel {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
 
-                    updateRecipients();
+                    exPanel.updateRecipients();
 
                     // возвращаем выбранный объект
                     int item = (int) e.getItem();
@@ -71,7 +68,6 @@ public class DocTypeAppendixPanel extends JPanel {
                                 labelTitle.setText(Lang.getInstance().translate("Set parent Document for Comment")
                                         + ".\n\n" + Lang.getInstance().translate("This will erase Recipients list by default")
                                         + ".\n" + Lang.getInstance().translate("But You may edit Recipients list"));
-                                exPanel.resetRecipients();
                                 break;
                             default:
                                 labelTitle.setText(Lang.getInstance().translate("Set Parent Document"));
@@ -203,26 +199,6 @@ public class DocTypeAppendixPanel extends JPanel {
         // TODO add your handling code here:
     }
 
-    private void updateRecipients() {
-        if (parentTx == null) {
-            return;
-        }
-
-        int typeLink = (int) typeDocymentCombox.getSelectedItem();
-        if (typeLink == ExData.LINK_COMMENT_TYPE_FOR_VIEW) {
-            exPanel.resetRecipients();
-        } else if (typeLink == ExData.LINK_REPLY_COMMENT_TYPE
-                || typeLink == ExData.LINK_APPENDIX_TYPE) {
-
-            HashSet<Account> accountsTx = parentTx.getInvolvedAccounts();
-            Account[] recipients = exPanel.getRecipients();
-            accountsTx.addAll(Arrays.asList(recipients));
-            exPanel.setRecipients(accountsTx.toArray(recipients));
-
-        }
-
-    }
-
     // Variables declaration - do not modify
     private Box.Filler filler1;
     private JLabel labelDocType;
@@ -267,7 +243,12 @@ public class DocTypeAppendixPanel extends JPanel {
 
         parentDetails.setText(parentTx.getCreator().getAddress() + " " + parentTx.getTitle());
 
-        updateRecipients();
+        exPanel.updateRecipients();
+
+    }
+
+    public int getSelectedItem() {
+        return (int) typeDocymentCombox.getSelectedItem();
 
     }
 
