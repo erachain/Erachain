@@ -73,6 +73,12 @@ public class IssueDocumentPanel extends IconPanel {
         });
         jButton_Work_OK1.setText(Lang.getInstance().translate("Sign and Pack"));
 
+        jComboBox_Account_Work.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                exData_Panel.updateRecipients();
+            }
+        });
+
         jLabel_Fee_Work.setText(Lang.getInstance().translate("Fee Power") + ":");
         this.jButton_Work_Cancel.setVisible(false);
     }
