@@ -46,13 +46,19 @@ public class DocTypeAppendixPanel extends JPanel {
                             parentDetails.setVisible(true);
                             switch (item) {
                                 case ExData.LINK_APPENDIX_TYPE:
-                                    labelTitle.setText(Lang.getInstance().translate("Set parent Document for Appendix (It will be set all involved accounts as Recipients)"));
+                                    labelTitle.setText(Lang.getInstance().translate("Set parent Document for Appendix")
+                                            + ". " + Lang.getInstance().translate("will be reset Recipients list to involved accounts list by default")
+                                            + ". " + Lang.getInstance().translate("But You may edit Recipients list"));
                                     break;
-                                case ExData.LINK_REPLY_TYPE:
-                                    labelTitle.setText(Lang.getInstance().translate("Set parent Document for Reply (It will be set all involved accounts as Recipients)"));
+                                case ExData.LINK_REPLY_COMMENT_TYPE:
+                                    labelTitle.setText(Lang.getInstance().translate("Set parent Document for Reply")
+                                            + ". " + Lang.getInstance().translate("will be reset Recipients list to involved accounts list by default")
+                                            + ". " + Lang.getInstance().translate("But You may edit Recipients list"));
                                     break;
-                                case ExData.LINK_COMMENT_TYPE:
-                                    labelTitle.setText(Lang.getInstance().translate("Set parent Document for Comment"));
+                                case ExData.LINK_COMMENT_TYPE_FOR_VIEW:
+                                    labelTitle.setText(Lang.getInstance().translate("Set parent Document for Comment")
+                                            + ". " + Lang.getInstance().translate("will be erase Recipients list by default")
+                                            + ". " + Lang.getInstance().translate("But You may edit Recipients list"));
                                     break;
                                 default:
                                     labelTitle.setText(Lang.getInstance().translate("Set Parent Document"));
@@ -65,7 +71,10 @@ public class DocTypeAppendixPanel extends JPanel {
             labelDocType = new JLabel();
             filler1 = new Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0),
                     new java.awt.Dimension(0, 32767));
-            labelTitle = new JLabel();
+            labelTitle = new JTextArea();
+            labelTitle.setEditable(false);
+            //labelTitle.setEnabled(false);
+
             parentDetails = new JLabel();
 
             parentReference = new JTextField();
@@ -125,7 +134,6 @@ public class DocTypeAppendixPanel extends JPanel {
 
             dridY++;
 
-            labelTitle.setText("jLabel3");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = dridY;//0;
@@ -134,7 +142,7 @@ public class DocTypeAppendixPanel extends JPanel {
             gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 0);
             add(labelTitle, gridBagConstraints);
             dridY++;
-            labelDocType.setText("jLabel2");
+
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = dridY;//2;
@@ -185,7 +193,7 @@ public class DocTypeAppendixPanel extends JPanel {
     // Variables declaration - do not modify
     private Box.Filler filler1;
     private JLabel labelDocType;
-    private JLabel labelTitle;
+    private JTextArea labelTitle;
     public JTextField parentReference;
     private JLabel parentDetails;
     private JLabel typeDocumentLabel;

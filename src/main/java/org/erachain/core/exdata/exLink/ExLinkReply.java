@@ -5,7 +5,7 @@ import org.erachain.core.exdata.ExData;
 public class ExLinkReply extends ExLink {
 
     public ExLinkReply(long parentSeqNo) {
-        super(ExData.LINK_REPLY_TYPE, parentSeqNo);
+        super(ExData.LINK_REPLY_COMMENT_TYPE, parentSeqNo);
     }
 
     public ExLinkReply(byte[] data) {
