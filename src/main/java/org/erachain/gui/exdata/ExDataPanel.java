@@ -315,7 +315,7 @@ public class ExDataPanel extends JPanel {
 
         params_Template_Model = new ParamsTemplateModel();
         jTable_Params_Message_Public = new MTable(params_Template_Model);
-        docTypeAppendixPanel = new DocTypeAppendixPanel();
+        docTypeAppendixPanel = new DocTypeAppendixPanel(this);
         params_Template_Model.addTableModelListener(new TableModelListener() {
 
             @Override
@@ -760,6 +760,18 @@ public class ExDataPanel extends JPanel {
 
         }
 
+    }
+
+    public void setRecipients(Account[] recipients) {
+        multipleRecipientsPanel.recipientsTableModel.setRecipients(recipients);
+    }
+
+    public Account[] getRecipients() {
+        return multipleRecipientsPanel.recipientsTableModel.getRecipients();
+    }
+
+    public void resetRecipients() {
+        multipleRecipientsPanel.recipientsTableModel.clearRecipients();
     }
 
     public byte[] makeExData(PrivateKeyAccount creator, boolean isEncrypted) throws Exception {

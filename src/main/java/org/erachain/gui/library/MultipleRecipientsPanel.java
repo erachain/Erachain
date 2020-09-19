@@ -195,6 +195,21 @@ public class MultipleRecipientsPanel extends JPanel {
             }
         }
 
+        public void setRecipients(Account[] recipients) {
+            clearRecipients();
+
+            for (int i = 0; i < recipients.length; ++i) {
+                setValueAt(recipients[i], i, 0);
+            }
+        }
+
+        public void clearRecipients() {
+            while (getRowCount() > 0) {
+                this.removeRow(getRowCount() - 1);
+            }
+            this.addRow(new Object[]{"", ""});
+        }
+
         public Account[] getRecipients() {
             if (withoutCheckBox.isSelected())
                 return new Account[0];
