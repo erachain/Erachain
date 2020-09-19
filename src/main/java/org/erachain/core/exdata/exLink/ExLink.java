@@ -160,16 +160,16 @@ public class ExLink {
 
     public static ExLink parse(byte[] type, byte[] refLinkBytes) throws Exception {
 
-
         long refLink = Longs.fromByteArray(refLinkBytes);
         switch (type[0]) {
             case ExData.LINK_REPLY_COMMENT_TYPE:
                 return new ExLinkReply(type, refLink);
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(type, refLink);
+            // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 
-        throw new Exception("wrong type");
+        throw new Exception("wrong type: " + type[0]);
     }
 
     public static ExLink parse(byte[] data, int position) throws Exception {
@@ -184,6 +184,7 @@ public class ExLink {
                 return new ExLinkReply(typeBuffer, refLink);
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(typeBuffer, refLink);
+            // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 
         throw new Exception("wrong type:" + typeBuffer[0]);

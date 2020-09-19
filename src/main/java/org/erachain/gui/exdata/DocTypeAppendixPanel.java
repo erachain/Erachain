@@ -47,18 +47,18 @@ public class DocTypeAppendixPanel extends JPanel {
                             switch (item) {
                                 case ExData.LINK_APPENDIX_TYPE:
                                     labelTitle.setText(Lang.getInstance().translate("Set parent Document for Appendix")
-                                            + ". " + Lang.getInstance().translate("will be reset Recipients list to involved accounts list by default")
-                                            + ". " + Lang.getInstance().translate("But You may edit Recipients list"));
+                                            + ".\n\n" + Lang.getInstance().translate("This will be reset Recipients list to involved accounts list by default")
+                                            + ".\n" + Lang.getInstance().translate("But You may edit Recipients list"));
                                     break;
                                 case ExData.LINK_REPLY_COMMENT_TYPE:
                                     labelTitle.setText(Lang.getInstance().translate("Set parent Document for Reply")
-                                            + ". " + Lang.getInstance().translate("will be reset Recipients list to involved accounts list by default")
-                                            + ". " + Lang.getInstance().translate("But You may edit Recipients list"));
+                                            + ".\n\n" + Lang.getInstance().translate("This will be reset Recipients list to involved accounts list by default")
+                                            + "\n" + Lang.getInstance().translate("But You may edit Recipients list"));
                                     break;
                                 case ExData.LINK_COMMENT_TYPE_FOR_VIEW:
                                     labelTitle.setText(Lang.getInstance().translate("Set parent Document for Comment")
-                                            + ". " + Lang.getInstance().translate("will be erase Recipients list by default")
-                                            + ". " + Lang.getInstance().translate("But You may edit Recipients list"));
+                                            + ".\n\n" + Lang.getInstance().translate("This will erase Recipients list by default")
+                                            + ".\n" + Lang.getInstance().translate("But You may edit Recipients list"));
                                     break;
                                 default:
                                     labelTitle.setText(Lang.getInstance().translate("Set Parent Document"));
