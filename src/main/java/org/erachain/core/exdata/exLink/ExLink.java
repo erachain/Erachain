@@ -89,19 +89,21 @@ public class ExLink {
         return value2;
     }
 
-    public String viewTypeName() {
-      return viewTypeName(type);
+    public String viewTypeName(boolean hasRecipients) {
+        return viewTypeName(type, hasRecipients);
     }
 
-    public static String viewTypeName(int ss) {
+    public static String viewTypeName(int ss, boolean hasRecipients) {
         switch (ss) {
             case ExData.LINK_SIMPLE_TYPE:
                 return "Common";
             case ExData.LINK_APPENDIX_TYPE:
                 return "Appendix";
-            case ExData.LINK_REPLY_TYPE:
-                return "Reply";
-            case ExData.LINK_COMMENT_TYPE:
+            case ExData.LINK_REPLY_COMMENT_TYPE:
+                if (hasRecipients)
+                    return "Reply";
+                return "Comment";
+            case ExData.LINK_COMMENT_TYPE_FOR_VIEW:
                 return "Comment";
             case ExData.LINK_SURELY_TYPE:
                 return "Surely";
@@ -110,10 +112,10 @@ public class ExLink {
         }
     }
 
-    public JSONObject makeJSONforHTML() {
+    public JSONObject makeJSONforHTML(boolean hasRecipients) {
         JSONObject json = new JSONObject();
         json.put("type", type);
-        json.put("typeName", viewTypeName());
+        json.put("typeName", viewTypeName(type, hasRecipients));
         json.put("flags", flags);
         json.put("value1", value1);
         json.put("value2", value2);
@@ -122,10 +124,10 @@ public class ExLink {
         return json;
     }
 
-    public JSONObject toJson() {
+    public JSONObject toJson(boolean hasRecipients) {
         JSONObject json = new JSONObject();
         json.put("type", type);
-        json.put("typeName", viewTypeName());
+        json.put("typeName", viewTypeName(type, hasRecipients));
         json.put("flags", flags);
         json.put("value1", value1);
         json.put("value2", value2);
@@ -146,31 +148,28 @@ public class ExLink {
 
     public static ExLink parse(byte[] data) throws Exception {
         switch (data[0]) {
-            case ExData.LINK_REPLY_TYPE:
+            case ExData.LINK_REPLY_COMMENT_TYPE:
                 return new ExLinkReply(data);
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(data);
-            case ExData.LINK_COMMENT_TYPE:
-                return new ExLinkComment(data);
+            // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 
-        throw new Exception("wrong type");
+        throw new Exception("wrong type: " + data[0]);
     }
 
     public static ExLink parse(byte[] type, byte[] refLinkBytes) throws Exception {
 
-
         long refLink = Longs.fromByteArray(refLinkBytes);
         switch (type[0]) {
-            case ExData.LINK_REPLY_TYPE:
+            case ExData.LINK_REPLY_COMMENT_TYPE:
                 return new ExLinkReply(type, refLink);
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(type, refLink);
-            case ExData.LINK_COMMENT_TYPE:
-                return new ExLinkComment(type, refLink);
+            // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 
-        throw new Exception("wrong type");
+        throw new Exception("wrong type: " + type[0]);
     }
 
     public static ExLink parse(byte[] data, int position) throws Exception {
@@ -181,12 +180,11 @@ public class ExLink {
         System.arraycopy(data, position + 4, refBuffer, 0, Long.BYTES);
         long refLink = Longs.fromByteArray(refBuffer);
         switch (typeBuffer[0]) {
-            case ExData.LINK_REPLY_TYPE:
+            case ExData.LINK_REPLY_COMMENT_TYPE:
                 return new ExLinkReply(typeBuffer, refLink);
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(typeBuffer, refLink);
-            case ExData.LINK_COMMENT_TYPE:
-                return new ExLinkComment(typeBuffer, refLink);
+            // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 
         throw new Exception("wrong type:" + typeBuffer[0]);
