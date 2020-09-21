@@ -541,23 +541,17 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
     @Override
     public void put(Long key, Transaction transaction) {
-        boolean debug = false;
-        if (false && BlockChain.CHECK_BUGS > 3 && key > Transaction.parseDBRef("63998-0")) {
-            debug = true;
-        }
-        if (debug && transaction.getType() != Transaction.CALCULATED_TRANSACTION) {
-            super.put(key, transaction);
+
+        super.put(key, transaction);
+
+        if (BlockChain.CHECK_BUGS > 3 && transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
             logger.info(Transaction.viewDBRef(key) + ": " + transaction.toString());
-            if (true) {
-                Transaction tx = super.get(key);
-                // !!! нужно отключать КЭШ для этого
-                if (!Arrays.equals(tx.toBytes(Transaction.FOR_DB_RECORD, true),
-                        transaction.toBytes(Transaction.FOR_DB_RECORD, true))) {
-                    debug = true;
-                }
+            Transaction tx = transaction.copy();
+            // !!! нужно отключать КЭШ для этого
+            if (!Arrays.equals(tx.toBytes(Transaction.FOR_DB_RECORD, true),
+                    transaction.toBytes(Transaction.FOR_DB_RECORD, true))) {
+                boolean debug = true;
             }
-        } else {
-            super.put(key, transaction);
         }
     }
 

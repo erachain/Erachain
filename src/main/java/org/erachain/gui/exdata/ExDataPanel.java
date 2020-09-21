@@ -5,10 +5,12 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
+import org.erachain.core.exdata.exLink.ExLinkReply;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.*;
 import org.erachain.lang.Lang;
 import org.erachain.utils.FileHash;
@@ -39,6 +41,8 @@ import java.util.Set;
  * @author Саша
  */
 public class ExDataPanel extends JPanel {
+
+    IssueDocumentPanel parentPanel;
 
     public MultipleRecipientsPanel multipleRecipientsPanel;
     public MSplitPane sp_pan;
@@ -81,11 +85,12 @@ public class ExDataPanel extends JPanel {
     public DocTypeAppendixPanel docTypeAppendixPanel;
 
 
-
     /**
      * Creates new form IssueDocumentPanel
      */
-    public ExDataPanel() {
+    public ExDataPanel(IssueDocumentPanel parentPanel) {
+
+        this.parentPanel = parentPanel;
 
         jTextPane_Message_Public = new MImprintEDITPane();
         jTextPane_Message_Public.addHyperlinkListener(new HyperlinkListener() {
@@ -315,7 +320,7 @@ public class ExDataPanel extends JPanel {
 
         params_Template_Model = new ParamsTemplateModel();
         jTable_Params_Message_Public = new MTable(params_Template_Model);
-        docTypeAppendixPanel = new DocTypeAppendixPanel();
+        docTypeAppendixPanel = new DocTypeAppendixPanel(this);
         params_Template_Model.addTableModelListener(new TableModelListener() {
 
             @Override
@@ -762,6 +767,26 @@ public class ExDataPanel extends JPanel {
 
     }
 
+    public void updateRecipients() {
+        if (docTypeAppendixPanel.parentTx == null) {
+            return;
+        }
+
+        int typeLink = docTypeAppendixPanel.getSelectedItem();
+        if (typeLink == ExData.LINK_COMMENT_TYPE_FOR_VIEW) {
+            multipleRecipientsPanel.recipientsTableModel.clearRecipients();
+        } else if (typeLink == ExData.LINK_REPLY_COMMENT_TYPE
+                || typeLink == ExData.LINK_APPENDIX_TYPE) {
+
+            Account sender = (Account) parentPanel.jComboBox_Account_Work.getSelectedItem();
+
+            HashSet<Account> accountsTx = docTypeAppendixPanel.parentTx.getInvolvedAccounts();
+            accountsTx.remove(sender);
+            multipleRecipientsPanel.recipientsTableModel.setRecipients(accountsTx.toArray(new Account[]{}));
+        }
+
+    }
+
     public byte[] makeExData(PrivateKeyAccount creator, boolean isEncrypted) throws Exception {
 
         Account[] recipients = multipleRecipientsPanel.recipientsTableModel.getRecipients();
@@ -783,10 +808,24 @@ public class ExDataPanel extends JPanel {
 
         Transaction parent = DCSet.getInstance().getTransactionFinalMap().getRecord(docTypeAppendixPanel.parentReference.getText());
         ExLink exLink;
-        if (parent == null) {
+        int linkType = docTypeAppendixPanel.getSelectedItem();
+        if (parent == null || linkType == ExData.LINK_SIMPLE_TYPE) {
             exLink = null;
         } else {
-            exLink = new ExLinkAppendix(parent.getDBRef());
+            switch (linkType) {
+                case ExData.LINK_APPENDIX_TYPE:
+                    exLink = new ExLinkAppendix(parent.getDBRef());
+                    break;
+                case ExData.LINK_REPLY_COMMENT_TYPE:
+                    exLink = new ExLinkReply(parent.getDBRef());
+                    break;
+                case ExData.LINK_COMMENT_TYPE_FOR_VIEW:
+                    APPENDIX_TYPE:
+                    exLink = new ExLinkReply(parent.getDBRef());
+                    break;
+                default:
+                    exLink = null;
+            }
         }
         return ExData.make(exLink, creator, jTextField_Title_Message.getText(),
                 signCanOnlyRecipients, recipients, isEncrypted,

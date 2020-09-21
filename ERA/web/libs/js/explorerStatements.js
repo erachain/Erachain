@@ -102,8 +102,9 @@ function statement(data) {
     output += '<table><tr><td>';
     output += '<div style="word-wrap: break-word;  width: 1000px;">';
     if (data.hasOwnProperty('exLink')) {
-        output += data.Label_LinkType + ':<b> ' + data.exLink_Name + '</b> ';
-        output += data.Label_Parent + ': <a href=?tx=' + data.exLink.ref + get_lang() + '><b>' + data.exLink.ref + '</b></a><br>';
+        output += '<h3>' // + data.Label_LinkType + ': '
+            + data.exLink_Name + ' '
+            + data.Label_Parent + ': <a href=?tx=' + data.exLink.ref + get_lang() + '><b>' + data.exLink.ref + '</b></a></h3>';
     } else {
         output += data.Label_type + ':<b>' + data.type + '</b> &nbsp&nbsp';
     }

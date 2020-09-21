@@ -14,6 +14,7 @@ import javax.validation.constraints.Null;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class MultipleRecipientsPanel extends JPanel {
     public final Table_Model recipientsTableModel;
@@ -195,22 +196,35 @@ public class MultipleRecipientsPanel extends JPanel {
             }
         }
 
+        public void setRecipients(Account[] recipients) {
+            clearRecipients();
+
+            for (int i = 0; i < recipients.length; ++i) {
+                addRow(new Object[]{recipients[i].getAddress(), ""});
+            }
+        }
+
+        public void clearRecipients() {
+            while (getRowCount() > 0) {
+                this.removeRow(getRowCount() - 1);
+            }
+            //this.addRow(new Object[]{"", ""});
+        }
+
         public Account[] getRecipients() {
-            if (withoutCheckBox.isSelected())
+            if (withoutCheckBox.isSelected() || getRowCount() == 0)
                 return new Account[0];
 
-            // without LAST empty
-            Account[] values = new Account[this.getRowCount() - 1];
-
-            for (int i = 0; i < values.length; i++) {
+            ArrayList<Account> temp = new ArrayList<>();
+            for (int i = 0; i < getRowCount(); i++) {
                 try {
                     //ORDINARY RECIPIENT
                     String recipientAddress = this.getValueAt(i, 0).toString();
                     if (Crypto.getInstance().isValidAddress(recipientAddress)) {
-                        values[i] = new Account(recipientAddress);
+                        temp.add(new Account(recipientAddress));
                     } else {
                         if (PublicKeyAccount.isValidPublicKey(recipientAddress)) {
-                            values[i] = new PublicKeyAccount(recipientAddress);
+                            temp.add(new PublicKeyAccount(recipientAddress));
                         }
                     }
                 } catch (Exception e) {
@@ -218,7 +232,7 @@ public class MultipleRecipientsPanel extends JPanel {
                 }
             }
 
-            return values;
+            return temp.toArray(new Account[0]);
         }
 
     }
