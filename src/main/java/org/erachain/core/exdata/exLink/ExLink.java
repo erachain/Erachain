@@ -153,7 +153,6 @@ public class ExLink {
                 return new ExLinkReply(data);
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(data);
-            // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 
         throw new Exception("wrong type: " + data[0]);
@@ -168,7 +167,6 @@ public class ExLink {
                 return new ExLinkReply(type, refLink);
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(type, refLink);
-            // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 
         throw new Exception("wrong type: " + type[0]);
@@ -187,7 +185,6 @@ public class ExLink {
                 return new ExLinkReply(typeBuffer, refLink);
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(typeBuffer, refLink);
-            // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 
         throw new Exception("wrong type:" + typeBuffer[0]);
