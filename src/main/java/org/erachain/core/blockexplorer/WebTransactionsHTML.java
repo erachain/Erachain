@@ -839,11 +839,14 @@ public class WebTransactionsHTML {
             if (!appendixes.isEmpty()) {
                 TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
 
-                if (appendixes.size() == 1) {
-                    Transaction childTx = map.get(appendixes.get(0));
+                out += "<h2>" + Lang.getInstance().translateFromLangObj("Replays and Comments", langObj)
+                        + "</h2>";
 
-                    out += "<h2>" + Lang.getInstance().translateFromLangObj("Reply", langObj)
-                            + "</h2><h3>" + childTx.getTitle() + "</h3>";
+                int count = 0;
+                for (Long txKey : appendixes) {
+
+                    Transaction childTx = map.get(txKey);
+                    out += "<h3>" + childTx.getTitle() + "</h3>";
                     out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
                             + childTx.viewHeightSeq() + "</a> "
                             + " " + DateTimeFormat.timestamptoString(childTx.getTimestamp()) + " ";
@@ -851,22 +854,6 @@ public class WebTransactionsHTML {
                             + childTx.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + childTx.getCreator().getPersonAsString()
                             + "</b></a><br>";
 
-                } else {
-
-                    int count = 0;
-                    for (Long txKey : appendixes) {
-
-                        Transaction childTx = map.get(txKey);
-                        out += "<h2>" + Lang.getInstance().translateFromLangObj("Reply", langObj) + " " + ++count
-                                + "</h2><h3>" + childTx.getTitle() + "</h3>";
-                        out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
-                                + childTx.viewHeightSeq() + "</a> "
-                                + " " + DateTimeFormat.timestamptoString(childTx.getTimestamp()) + " ";
-                        out += "<a href=?address="
-                                + childTx.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + childTx.getCreator().getPersonAsString()
-                                + "</b></a><br>";
-
-                    }
                 }
 
                 ///out += "</table>";
