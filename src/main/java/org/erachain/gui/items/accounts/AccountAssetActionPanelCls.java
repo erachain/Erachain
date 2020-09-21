@@ -19,6 +19,7 @@ import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.assets.AssetInfo;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.library.MDecimalFormatedTextField;
+import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -26,8 +27,6 @@ import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
@@ -35,7 +34,7 @@ import java.nio.charset.StandardCharsets;
 
 //import org.erachain.gui.AccountRenderer;
 
-public class AccountAssetActionPanelCls extends IconPanel {
+public class AccountAssetActionPanelCls extends IconPanel implements RecipientAddress.RecipientAddressInterface {
 
     // TODO - "A" - &
     //static String wrongFirstCharOfAddress = "A";
@@ -232,24 +231,6 @@ public class AccountAssetActionPanelCls extends IconPanel {
             }
         });
 
-        // set acoount TO
-        this.jTextField_To.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void changedUpdate(DocumentEvent arg0) {
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent arg0) {
-                refreshReceiverDetails();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent arg0) {
-                refreshReceiverDetails();
-            }
-        });
-
         this.jLabel_Mess_Title.setText(Lang.getInstance().translate("Title") + ":");
         this.jLabel_Mess.setText(Lang.getInstance().translate("Message") + ":");
         this.jCheckBox_Enscript.setText(Lang.getInstance().translate("Encrypt message") + ":");
@@ -266,7 +247,6 @@ public class AccountAssetActionPanelCls extends IconPanel {
         jLabel_Fee.setVisible(Gui.SHOW_FEE_POWER);
 
         // CONTEXT MENU
-        MenuPopupUtil.installContextMenu(this.jTextField_To);
         MenuPopupUtil.installContextMenu(this.jTextField_Amount);
         MenuPopupUtil.installContextMenu(this.jTextArea_Description);
         MenuPopupUtil.installContextMenu(this.jTextField_Recive_Detail);
@@ -283,9 +263,9 @@ public class AccountAssetActionPanelCls extends IconPanel {
             jButton_ok.setEnabled(false);
         } else {
             if (recipient instanceof PublicKeyAccount) {
-                jTextField_To.setText(((PublicKeyAccount) recipient).getBase58());
+                recipientAddress.setSelectedAddress(((PublicKeyAccount) recipient).getBase58());
             } else {
-                jTextField_To.setText(recipient.getAddress());
+                recipientAddress.setSelectedAddress(recipient.getAddress());
             }
             jButton_ok.setEnabled(true);
         }
@@ -295,9 +275,9 @@ public class AccountAssetActionPanelCls extends IconPanel {
     protected void checkReadyToOK() {
 
         try {
-            String recipientAddress = jTextField_To.getText().trim();
-            if (recipientAddress.isEmpty() ||
-                    !Crypto.getInstance().isValidAddress(recipientAddress) && !PublicKeyAccount.isValidPublicKey(recipientAddress)) {
+            String recipientAddressStr = recipientAddress.getSelectedAddress().trim();
+            if (recipientAddressStr.isEmpty() ||
+                    !Crypto.getInstance().isValidAddress(recipientAddressStr) && !PublicKeyAccount.isValidPublicKey(recipientAddressStr)) {
                 jButton_ok.setEnabled(false);
                 return;
             }
@@ -314,7 +294,7 @@ public class AccountAssetActionPanelCls extends IconPanel {
 
         checkReadyToOK();
 
-        String recipient = jTextField_To.getText();
+        String recipient = recipientAddress.getSelectedAddress();
         AssetCls asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
 
         this.jTextField_Recive_Detail.setText(Account.getDetailsForEncrypt(recipient, asset.getKey(),
@@ -346,14 +326,14 @@ public class AccountAssetActionPanelCls extends IconPanel {
         }
 
         //READ RECIPIENT
-        String recipientAddress = jTextField_To.getText().trim();
+        String recipientAddressStr = recipientAddress.getSelectedAddress().trim();
 
         //ORDINARY RECIPIENT
-        if (Crypto.getInstance().isValidAddress(recipientAddress)) {
-            this.recipient = new Account(recipientAddress);
+        if (Crypto.getInstance().isValidAddress(recipientAddressStr)) {
+            this.recipient = new Account(recipientAddressStr);
         } else {
-            if (PublicKeyAccount.isValidPublicKey(recipientAddress)) {
-                recipient = new PublicKeyAccount(recipientAddress);
+            if (PublicKeyAccount.isValidPublicKey(recipientAddressStr)) {
+                recipient = new PublicKeyAccount(recipientAddressStr);
             } else {
                 JOptionPane.showMessageDialog(null, "INVALID", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
@@ -503,6 +483,12 @@ public class AccountAssetActionPanelCls extends IconPanel {
 
     }
 
+    // выполняемая процедура при изменении адреса получателя
+    @Override
+    public void recipientAddressWorker(String e) {
+        refreshReceiverDetails();
+    }
+
     public void onSendClick() {
 
     }
@@ -518,7 +504,6 @@ public class AccountAssetActionPanelCls extends IconPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jLabel_Recive_Detail = new javax.swing.JLabel();
-        jTextField_To = new javax.swing.JTextField();
         jLabel_Account = new javax.swing.JLabel();
         jLabel_To = new javax.swing.JLabel();
         jComboBox_Account = new javax.swing.JComboBox<>();
@@ -555,7 +540,7 @@ public class AccountAssetActionPanelCls extends IconPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
         add(jLabel_Recive_Detail, gridBagConstraints);
 
-        jTextField_To.setText("");
+        recipientAddress = new RecipientAddress(this);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
@@ -563,7 +548,7 @@ public class AccountAssetActionPanelCls extends IconPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.3;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
-        add(jTextField_To, gridBagConstraints);
+        add(recipientAddress, gridBagConstraints);
 
         jLabel_Account.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel_Account.setText("jLabel2");
@@ -760,6 +745,7 @@ public class AccountAssetActionPanelCls extends IconPanel {
     public MDecimalFormatedTextField jTextField_Amount;
     public javax.swing.JTextField jTextField_Mess_Title;
     private javax.swing.JTextField jTextField_Recive_Detail;
-    public javax.swing.JTextField jTextField_To;
+    public RecipientAddress recipientAddress;
     // End of variables declaration
+
 }

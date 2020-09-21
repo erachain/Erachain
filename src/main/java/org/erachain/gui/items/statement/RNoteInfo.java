@@ -249,7 +249,7 @@ public class RNoteInfo extends javax.swing.JPanel {
 
         ExLink exLink = exData.getExLink();
         if (exLink != null) {
-            resultStr += Lang.getInstance().translate("Link Type") + ": " + Lang.getInstance().translate(exLink.viewTypeName()) + " "
+            resultStr += Lang.getInstance().translate("Link Type") + ": " + Lang.getInstance().translate(exData.viewLinkTypeName()) + " "
                     + Lang.getInstance().translate("for # для") + " " + Transaction.viewDBRef(exLink.getRef());
             Transaction transaction = DCSet.getInstance().getTransactionFinalMap().get(exLink.getRef());
             resultStr += "<br>" + transaction.getTitle() + " : " + transaction.getCreator().getPersonAsString() + "</b><br>";

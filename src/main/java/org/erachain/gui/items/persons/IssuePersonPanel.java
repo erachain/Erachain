@@ -18,10 +18,7 @@ import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
-import org.erachain.gui.library.AddImageLabel;
-import org.erachain.gui.library.IssueConfirmDialog;
-import org.erachain.gui.library.MButton;
-import org.erachain.gui.library.RecipientAddress;
+import org.erachain.gui.library.*;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
@@ -44,7 +41,7 @@ import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
-public class IssuePersonPanel extends IconPanel {
+public class IssuePersonPanel extends IconPanel implements RecipientAddress.RecipientAddressInterface {
 
     public static String NAME = "IssuePersonPanel";
     public static String TITLE = "Issue Person";
@@ -92,11 +89,10 @@ public class IssuePersonPanel extends IconPanel {
         super(name, title);
         initComponents();
         initLabels();
-        titleJLabel.setFont(FONT_TITLE);
+       titleJLabel.setFont(FONT_TITLE);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
         titleJLabel.setText(Lang.getInstance().translate("Issue Person"));
-
         cbxFrom.setModel(new AccountsComboBoxModel());
         txtName.addFocusListener(new FocusAdapter() {
             @Override
@@ -241,7 +237,7 @@ public class IssuePersonPanel extends IconPanel {
         // Registrator address object
 
 
-        registrarAddress = new RecipientAddress();
+        registrarAddress = new RecipientAddress(this);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 19;
@@ -249,6 +245,7 @@ public class IssuePersonPanel extends IconPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
+  //      gridBagConstraints.insets = new Insets(5, 5, 5, 8);
         mainPanel.add(registrarAddress, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
@@ -439,12 +436,12 @@ public class IssuePersonPanel extends IconPanel {
             }
         });
 
-        // set acoount TO
+       /* // set acoount TO
         this.registrarAddress.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 refreshReceiverDetails();
             }
-        });
+        });*/
 
         mainScrollPane1.setViewportView(mainPanel);
         add(mainScrollPane1, BorderLayout.CENTER);
@@ -716,9 +713,8 @@ public class IssuePersonPanel extends IconPanel {
     }
 
     PublicKeyAccount registrar;
-    private void refreshReceiverDetails() {
+    private void refreshReceiverDetails(String registrarStr) {
 
-        String registrarStr = registrarAddress.getSelectedAddress();
         //Account
         this.registrarAddressDesc.setText(Account.getDetailsForEncrypt(registrarStr, AssetCls.FEE_KEY, true));
 
@@ -745,4 +741,9 @@ public class IssuePersonPanel extends IconPanel {
         }
     }
 
+// выполняемая процедура при изменении адреса получателя
+    @Override
+    public void recipientAddressWorker(String e) {
+        refreshReceiverDetails(e);
+    }
 }
