@@ -1,16 +1,35 @@
 package org.erachain.gui.items.assets;
 
+
+import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.IconPanel;
+
 
 public class MultiPayOutsPanel extends IconPanel {
 
 
     public static String NAME = "MultiPayOutsPanel";
     public static String TITLE = "Multi paument out";
+    private ComboBoxAssetsModel accountsModel;
+    private ComboBoxAssetsModel accountsModel1;
 
     public MultiPayOutsPanel() {
         super(NAME, TITLE);
         initComponents();
+        accountsModel = new ComboBoxAssetsModel();
+        accountsModel1 = new ComboBoxAssetsModel();
+        this.jComboBoxAsset1.setModel(accountsModel);
+        this.jComboBoxOtborAsset.setModel(accountsModel1);
+        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new Integer[] {
+                TransactionAmount.ACTION_DEBT,
+                TransactionAmount.ACTION_SEND,
+                TransactionAmount.ACTION_HOLD,
+                TransactionAmount.ACTION_REPAY_DEBT,
+                TransactionAmount.ACTION_SPEND,
+                TransactionAmount.ACTION_PLEDGE,
+                TransactionAmount.ACTION_RESERCED_6
+        }));
         }
 
 
@@ -71,7 +90,7 @@ public class MultiPayOutsPanel extends IconPanel {
             gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 10);
             add(jLabelTitle, gridBagConstraints);
 
-            jComboBoxAsset1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+           // jComboBoxAsset1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 6;
             gridBagConstraints.gridy = 2;
@@ -90,7 +109,7 @@ public class MultiPayOutsPanel extends IconPanel {
             gridBagConstraints.insets = new java.awt.Insets(14, 10, 0, 0);
             add(jLabel5, gridBagConstraints);
 
-            jComboBoxOtborAsset.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+            //jComboBoxOtborAsset.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 6;
             gridBagConstraints.gridy = 8;
@@ -109,7 +128,7 @@ public class MultiPayOutsPanel extends IconPanel {
             gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
             add(jLabelVidBalance, gridBagConstraints);
 
-            jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 6;
             gridBagConstraints.gridy = 10;
@@ -376,9 +395,9 @@ public class MultiPayOutsPanel extends IconPanel {
         private javax.swing.JButton jButton2;
         private javax.swing.JButton jButton3;
         private javax.swing.JCheckBox jCheckBoxConfirmResult;
-        private javax.swing.JComboBox<String> jComboBox3;
-        private javax.swing.JComboBox<String> jComboBoxAsset1;
-        private javax.swing.JComboBox<String> jComboBoxOtborAsset;
+        private javax.swing.JComboBox<Integer> jComboBox3;
+        private javax.swing.JComboBox<ItemCls> jComboBoxAsset1;
+        private javax.swing.JComboBox<ItemCls> jComboBoxOtborAsset;
         private javax.swing.JComboBox<String> jComboBoxOtborPoDeistviy;
         private javax.swing.JComboBox<String> jComboBoxStoronaBalance;
         private javax.swing.JLabel jLabel1;
