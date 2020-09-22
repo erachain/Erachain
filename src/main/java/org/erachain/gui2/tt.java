@@ -177,6 +177,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         assets_Node.add(new ASMutableTreeNode(SearchAssetsSplitPanel.NAME, SearchAssetsSplitPanel.TITLE));
         assets_Node.add(new ASMutableTreeNode(IssueAssetPanel.NAME, IssueAssetPanel.TITLE));
         assets_Node.add(new ASMutableTreeNode(MyBalanceTab.NAME, MyBalanceTab.TITLE));
+        assets_Node.add(new ASMutableTreeNode(MultiPayOutsPanel.NAME, MultiPayOutsPanel.TITLE));
 
         if (Settings.EXCHANGE_IN_OUT) {
             exchange_Node.add(new ASMutableTreeNode(DepositExchange.NAME, DepositExchange.TITLE));
