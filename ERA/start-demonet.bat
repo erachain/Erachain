@@ -3,7 +3,7 @@
 set app=erachain
 set task=erachain-demo
 
-set pars=-testnet=demo
+set pars=-pass=1 -seed=10:new:1 -dbschain=mapdb -bugs=7 -datachainpath=dataDEMO -testnet=demo
 
 set jpars=
 
