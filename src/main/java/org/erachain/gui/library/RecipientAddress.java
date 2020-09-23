@@ -14,6 +14,7 @@ import org.mapdb.Fun;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.*;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Observable;
@@ -36,6 +37,8 @@ public class RecipientAddress extends JComboBox {
     public RecipientAddress(RecipientAddressInterface item) {
         RecipientModel model = new RecipientModel();
         this.setModel(model);
+        this.setRenderer(model.getRender());
+
         this.setEditable(true);
         worker = item;
 
@@ -88,6 +91,7 @@ public class RecipientAddress extends JComboBox {
         public RecipientModel() {
             favoriteMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
             addObservers();
+
         }
 
         @Override
@@ -115,12 +119,10 @@ public class RecipientAddress extends JComboBox {
             if (type == LIST_EVENT || type == RESET_EVENT) {
                 sortAndAdd();
             } else if (type == ADD_EVENT) {
-                Pair<String, Fun.Tuple3<String, String, String>> pair = (Pair<String, Fun.Tuple3<String, String, String>>) message.getValue();
-                this.addElement(pair.getB().b + " " + pair.getA());
+                this.addElement(((Pair<String, Object>) message.getValue()).getA());
 
             } else if (type == DELETE_EVENT) {
-                Pair<String, Fun.Tuple3<String, String, String>> pair = (Pair<String, Fun.Tuple3<String, String, String>>) message.getValue();
-                this.removeElement(pair.getB().b + " " + pair.getA());
+                this.removeElement(((Pair<String, Object>) message.getValue()).getA());
             }
         }
 
@@ -155,12 +157,7 @@ public class RecipientAddress extends JComboBox {
             try (IteratorCloseable<String> iterator = favoriteMap.getIterator()) {
                 while (iterator.hasNext()) {
                     String key = iterator.next();
-                    Fun.Tuple3<String, String, String> item = favoriteMap.get(key);
-                    if (item == null) {
-                        this.addElement(key);
-                    } else {
-                        this.addElement(item.b + " - " + key);
-                    }
+                    this.addElement(key);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -170,6 +167,28 @@ public class RecipientAddress extends JComboBox {
         public void removeObservers() {
             if (Controller.getInstance().doesWalletDatabaseExists())
                 favoriteMap.deleteObserver(this);
+        }
+
+        public Render getRender() {
+            return new Render();
+        }
+
+        public class Render extends DefaultListCellRenderer {
+
+            public Render() {
+            }
+
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value != null) {
+                    Fun.Tuple3<String, String, String> item = favoriteMap.get((String) value);
+                    if (item != null) {
+                        this.setText(item.b + " - " + value.toString());
+                    }
+                }
+                return this;
+            }
         }
 
     }
