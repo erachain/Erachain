@@ -472,7 +472,8 @@ public class TelegramSplitPanel extends SplitPanel {
                     try {
                         messageBytes = Base58.decode(message);
                     } catch (Exception e) {
-                        JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex") + "!",
+                                Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
                         //ENABLE
                         this.rightTelegramPanel.jButtonSendTelegram.setEnabled(true);

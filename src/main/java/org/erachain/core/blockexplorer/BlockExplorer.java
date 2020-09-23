@@ -3076,6 +3076,7 @@ public class BlockExplorer {
         output.put("Label_No", Lang.getInstance().translateFromLangObj("No.", langObj));
         output.put("Label_pubKey", Lang.getInstance().translateFromLangObj("Public Key", langObj));
         output.put("Label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
+        output.put("Label_Link", Lang.getInstance().translateFromLangObj("Link", langObj));
 
         int block = rNote.getBlockHeight();
         int seqNo = rNote.getSeqNo();

@@ -101,13 +101,7 @@ function statement(data) {
 
     output += '<table><tr><td>';
     output += '<div style="word-wrap: break-word;  width: 1000px;">';
-    if (data.hasOwnProperty('exLink')) {
-        output += '<h3>' // + data.Label_LinkType + ': '
-            + data.exLink_Name + ' '
-            + data.Label_Parent + ': <a href=?tx=' + data.exLink.ref + get_lang() + '><b>' + data.exLink.ref + '</b></a></h3>';
-    } else {
-        output += data.Label_type + ':<b>' + data.type + '</b> &nbsp&nbsp';
-    }
+    output += data.Label_type + ':<b>' + data.type + '</b> &nbsp&nbsp';
 
     if (data.tx.hasOwnProperty("height")) {
         output += data.Label_block + ': <a href=?block=' + data.tx.height + get_lang() + '><b>' + data.tx.height + '</b></a>';
@@ -120,6 +114,12 @@ function statement(data) {
     output += '<br>' + data.Label_pubKey + ': <b>' + data.tx.publickey + '</b>';
 
     output += '<br>' + data.Label_signature + ': <b>' + data.tx.signature + '</b>';
+
+    if (data.hasOwnProperty('exLink')) {
+        output += '<h3>'
+            + '<img src="img/parentTx.png" style="height:1.5em"> ' + data.exLink_Name + ' '
+            + data.Label_Parent + ' <a href=?tx=' + data.exLink.ref + get_lang() + '><b>' + data.exLink.ref + '</b></a></h3>';
+    }
 
     if (data.hasOwnProperty('title')) {
         output += '<br>' + data.Label_title + ': <b>' + escapeHtml(data.title) + '</b>';

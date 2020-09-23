@@ -43,7 +43,7 @@ public class WalletTelegramsFilterTableModel extends WalletTableModel<Transactio
     @Override
     public Object getValueAt(int row, int column) {
 
-        if (this.list == null || this.list.size() == 0) {
+        if (this.list == null || this.list.isEmpty() || this.list.size() >= row) {
             return null;
         }
 
