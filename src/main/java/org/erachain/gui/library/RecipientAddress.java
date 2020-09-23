@@ -14,6 +14,7 @@ import org.mapdb.Fun;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -105,6 +106,7 @@ public class RecipientAddress extends JComboBox {
             }
         }
 
+
         public synchronized void syncUpdate(Observable o, Object arg) {
             ObserverMessage message = (ObserverMessage) arg;
 
@@ -113,11 +115,18 @@ public class RecipientAddress extends JComboBox {
             if (type == LIST_EVENT || type == RESET_EVENT) {
                 sortAndAdd();
             } else if (type == ADD_EVENT) {
-                this.addElement(((Pair<String, Fun.Tuple3<String, String, String>>) message.getValue()).getA());
+                Pair<String, Fun.Tuple3<String, String, String>> pair = (Pair<String, Fun.Tuple3<String, String, String>>) message.getValue();
+                this.addElement(pair.getB().b + " " + pair.getA());
 
             } else if (type == DELETE_EVENT) {
-                this.removeElement(((Pair<String, Fun.Tuple3<String, String, String>>) message.getValue()).getA());
+                Pair<String, Fun.Tuple3<String, String, String>> pair = (Pair<String, Fun.Tuple3<String, String, String>>) message.getValue();
+                this.removeElement(pair.getB().b + " " + pair.getA());
             }
+        }
+
+        @Override
+        public String getElementAt(int row) {
+            return super.getElementAt(row);
         }
 
         @Override
@@ -131,6 +140,7 @@ public class RecipientAddress extends JComboBox {
                 DELETE_EVENT = observersDBMap.get(DBTab.NOTIFY_REMOVE);
 
                 favoriteMap.addObserver(this);
+
             } else {
                 // ожидаем открытия кошелька
                 Controller.getInstance().wallet.addWaitingObserver(this);
@@ -142,9 +152,18 @@ public class RecipientAddress extends JComboBox {
             // add empty item
             this.addElement("");
             // add favorite address
-            IteratorCloseable<String> iterator = favoriteMap.getIterator();
-            while (iterator.hasNext()) {
-                this.addElement(iterator.next());
+            try (IteratorCloseable<String> iterator = favoriteMap.getIterator()) {
+                while (iterator.hasNext()) {
+                    String key = iterator.next();
+                    Fun.Tuple3<String, String, String> item = favoriteMap.get(key);
+                    if (item == null) {
+                        this.addElement(key);
+                    } else {
+                        this.addElement(item.b + " - " + key);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
