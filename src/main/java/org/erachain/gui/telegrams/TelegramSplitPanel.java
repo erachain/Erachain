@@ -497,7 +497,7 @@ public class TelegramSplitPanel extends SplitPanel {
 
         if (messageBytes != null) {
             if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded!") + " <= MAX", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded") + " <= MAX", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
                 this.rightTelegramPanel.jButtonSendTelegram.setEnabled(true);
@@ -528,17 +528,24 @@ public class TelegramSplitPanel extends SplitPanel {
         if (head == null) head = "";
         if (head.getBytes(StandardCharsets.UTF_8).length > 256) {
 
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Title size exceeded!") + " <= 256", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Title size exceeded") + " <= 256",
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             return;
 
         }
 
-        // CREATE TX MESSAGE
-        Transaction transaction = Controller.getInstance().r_Send(
-                Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key,
-                amount, head, messageBytes, isTextByte, encrypted, 0);
+        PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Wallet is busy, try later") + "!",
+                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+        } else {
+            // CREATE TX MESSAGE
+            Transaction transaction = Controller.getInstance().r_Send(
+                    creator, feePow, recipient, key,
+                    amount, head, messageBytes, isTextByte, encrypted, 0);
 
-        Controller.getInstance().broadcastTelegram(transaction, true);
+            Controller.getInstance().broadcastTelegram(transaction, true);
+        }
 
 
         // ENABLE
