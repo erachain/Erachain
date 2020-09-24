@@ -55,7 +55,7 @@
   "Address to Withdraw": "Адрес для вывода",
   "Addresses": "Адреса",
   "address is OK": "адрес годный",
-  "address is unknown - cant't encrypt for it, please use public key instead": "адрес неизвестен - невозможно зашифровать для него, пожалуйста используйте публичный ключ вместо него",
+  "address is unknown - can't encrypt for it, please use public key instead": "адрес неизвестен - невозможно зашифровать для него, пожалуйста используйте публичный ключ вместо него",
   "address or public key is invalid": "адрес или публичный ключ негодные",
   "Additional": "Дополнительный",
   "Adjusting time with %offset% milliseconds.": "Корректировка времени на %offset% миллисекунд.",
