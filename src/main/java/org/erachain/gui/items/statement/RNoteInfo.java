@@ -270,8 +270,8 @@ public class RNoteInfo extends javax.swing.JPanel {
             Account[] recipients = exData.getRecipients();
             int size = recipients.length;
             for (int i = 1; i <= size; ++i) {
-                if (i > 3 && size > 5) {
-                    resultStr += "... ";
+                if (i > 7 && size > 10) {
+                    resultStr += "... <br>";
                     i = size;
                 }
                 resultStr += i + " " + recipients[i - 1].getAddress() + "<br>";
