@@ -335,15 +335,6 @@ public class MainPanel extends javax.swing.JPanel {
 
             }
 
-            if (str.equals(Lang.getInstance().translate("Multi paument out")) || str.equals("MultiPayOutsPanel")) {
-                insertTab(new MultiPayOutsPanel());
-                return;
-
-            }
-
-
-
-
             if (str.equals(Lang.getInstance().translate("My Loans")) || str.equals("MyLoansSplitPanel")) {
                 insertTab(new MyLoansSplitPanel());
                 return;

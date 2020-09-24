@@ -13,8 +13,8 @@ public class MultiPayOutsPanel extends IconPanel {
 
     public static String NAME = "MultiPayOutsPanel";
     public static String TITLE = "Multi paument out";
-    private ComboBoxAssetsModel accountsModel;
-    private ComboBoxAssetsModel accountsModel1;
+    public ComboBoxAssetsModel accountsModel;
+    public ComboBoxAssetsModel accountsModel1;
 
     public MultiPayOutsPanel() {
         super(NAME, TITLE);
@@ -413,7 +413,7 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
-        add(jPanel3, gridBagConstraints);
+      //  add(jPanel3, gridBagConstraints);
 
         jLabel1.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -555,58 +555,58 @@ public class MultiPayOutsPanel extends IconPanel {
     }
 
 
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.ButtonGroup buttonGroupGender;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JCheckBox jCheckBoxConfirmResult;
-    private javax.swing.JCheckBox jCheckBoxOnlyPersons;
-    private javax.swing.JComboBox<ItemCls> jComboBoxAsset;
-    private javax.swing.JComboBox<ItemCls> jComboBoxOtborAsset;
-    private javax.swing.JComboBox<Integer> jComboBoxOtborPoDeistviy;
-    private javax.swing.JComboBox<String> jComboBoxStoronaBalance;
-    private javax.swing.JComboBox<Integer> jComboBoxVidBalance;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JLabel jLabelAsset1;
-    private javax.swing.JLabel jLabelDataStart;
-    private javax.swing.JLabel jLabelDateEnd;
-    private javax.swing.JLabel jLabelMetodPaumentDecscription;
-    private javax.swing.JLabel jLabelMetodPaumentItemMax;
-    private javax.swing.JLabel jLabelMetodPaumentItemMin;
-    private javax.swing.JLabel jLabelTitle;
-    private javax.swing.JLabel jLabelTitlemetod;
-    private javax.swing.JLabel jLabelVidBalance;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JRadioButton jRadioButtonMetodCoff;
-    private javax.swing.JRadioButton jRadioButtonMetodSumm;
-    private javax.swing.JRadioButton jRadioButtonPersonsAll;
-    private javax.swing.JRadioButton jRadioButtonPersonsOnlyMen;
-    private javax.swing.JRadioButton jRadioButtonPersonsOnlyWomem;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JSeparator jSeparator5;
-    private javax.swing.JTextField jTextFieldBQ;
-    private javax.swing.JTextField jTextFieldDateEnd;
-    private javax.swing.JTextField jTextFieldDateStart;
-    private javax.swing.JTextField jTextFieldLQ;
-    private javax.swing.JTextField jTextFieldMetodPaumentItemMax;
-    private javax.swing.JTextField jTextFieldMetodPaumentItemMin;
+    public javax.swing.ButtonGroup buttonGroup1;
+    public javax.swing.ButtonGroup buttonGroupGender;
+    public javax.swing.JButton jButton1;
+    public javax.swing.JButton jButton2;
+    public javax.swing.JButton jButton3;
+    public javax.swing.JCheckBox jCheckBoxConfirmResult;
+    public javax.swing.JCheckBox jCheckBoxOnlyPersons;
+    public javax.swing.JComboBox<ItemCls> jComboBoxAsset;
+    public javax.swing.JComboBox<ItemCls> jComboBoxOtborAsset;
+    public javax.swing.JComboBox<Integer> jComboBoxOtborPoDeistviy;
+    public javax.swing.JComboBox<String> jComboBoxStoronaBalance;
+    public javax.swing.JComboBox<Integer> jComboBoxVidBalance;
+    public javax.swing.JLabel jLabel1;
+    public javax.swing.JLabel jLabel13;
+    public javax.swing.JLabel jLabel19;
+    public javax.swing.JLabel jLabel2;
+    public javax.swing.JLabel jLabel20;
+    public javax.swing.JLabel jLabel3;
+    public javax.swing.JLabel jLabel4;
+    public javax.swing.JLabel jLabel5;
+    public javax.swing.JLabel jLabel6;
+    public javax.swing.JLabel jLabel8;
+    public javax.swing.JLabel jLabel9;
+    public javax.swing.JLabel jLabelAsset1;
+    public javax.swing.JLabel jLabelDataStart;
+    public javax.swing.JLabel jLabelDateEnd;
+    public javax.swing.JLabel jLabelMetodPaumentDecscription;
+    public javax.swing.JLabel jLabelMetodPaumentItemMax;
+    public javax.swing.JLabel jLabelMetodPaumentItemMin;
+    public javax.swing.JLabel jLabelTitle;
+    public javax.swing.JLabel jLabelTitlemetod;
+    public javax.swing.JLabel jLabelVidBalance;
+    public javax.swing.JPanel jPanel1;
+    public javax.swing.JPanel jPanel2;
+    public javax.swing.JPanel jPanel3;
+    public javax.swing.JPanel jPanel4;
+    public javax.swing.JRadioButton jRadioButtonMetodCoff;
+    public javax.swing.JRadioButton jRadioButtonMetodSumm;
+    public javax.swing.JRadioButton jRadioButtonPersonsAll;
+    public javax.swing.JRadioButton jRadioButtonPersonsOnlyMen;
+    public javax.swing.JRadioButton jRadioButtonPersonsOnlyWomem;
+    public javax.swing.JSeparator jSeparator1;
+    public javax.swing.JSeparator jSeparator2;
+    public javax.swing.JSeparator jSeparator3;
+    public javax.swing.JSeparator jSeparator4;
+    public javax.swing.JSeparator jSeparator5;
+    public javax.swing.JTextField jTextFieldBQ;
+    public javax.swing.JTextField jTextFieldDateEnd;
+    public javax.swing.JTextField jTextFieldDateStart;
+    public javax.swing.JTextField jTextFieldLQ;
+    public javax.swing.JTextField jTextFieldMetodPaumentItemMax;
+    public javax.swing.JTextField jTextFieldMetodPaumentItemMin;
 
 
 }
