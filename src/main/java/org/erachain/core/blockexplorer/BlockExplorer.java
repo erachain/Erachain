@@ -1444,36 +1444,48 @@ public class BlockExplorer {
         output.put("Label_denied", Lang.getInstance().translateFromLangObj("DENIED", langObj));
         output.put("Label_sum", Lang.getInstance().translateFromLangObj("SUM", langObj));
 
+        output.put("Label_Positions", Lang.getInstance().translateFromLangObj("Balance Positions", langObj));
         output.put("Label_Sides", Lang.getInstance().translateFromLangObj("Balance Sides", langObj));
-        if (assetKey.equals(Transaction.FEE_KEY) && position == TransactionAmount.ACTION_SPEND) {
-            output.put("label_Balance_Pos", Lang.getInstance().translateFromLangObj("Statistics", langObj));
-            output.put("Side_Help", Lang.getInstance().translateFromLangObj("Side_Help_COMPU_BONUS", langObj));
-            output.put("Label_TotalDebit", Lang.getInstance().translateFromLangObj("Bonus", langObj));
-            output.put("Label_Left", Lang.getInstance().translateFromLangObj("Spend", langObj));
-            output.put("Label_TotalCredit", Lang.getInstance().translateFromLangObj("Bonus-Spend", langObj));
-            output.put("Label_TotalForged", Lang.getInstance().translateFromLangObj("Forged", langObj));
-            if (side == TransactionAmount.BALANCE_SIDE_FORGED) {
-                // Это запрос на баланса Нафоржили - он в 5-й позиции на стороне 2
-                position = TransactionAmount.ACTION_PLEDGE;
-                side = TransactionAmount.BALANCE_SIDE_LEFT;
-            }
-        } else {
-            if (position == TransactionAmount.ACTION_SEND) {
-                output.put("label_Balance_Pos", Lang.getInstance().translateFromLangObj("Balance 1 (OWN)", langObj));
-            } else if (position == TransactionAmount.ACTION_DEBT) {
-                output.put("label_Balance_Pos", Lang.getInstance().translateFromLangObj("Balance 2 (DEBT)", langObj));
-            } else if (position == TransactionAmount.ACTION_HOLD) {
-                output.put("label_Balance_Pos", Lang.getInstance().translateFromLangObj("Balance 3 (HOLD)", langObj));
-            } else if (position == TransactionAmount.ACTION_SPEND) {
-                output.put("label_Balance_Pos", Lang.getInstance().translateFromLangObj("Balance 4 (SPEND)", langObj));
-            } else if (position == TransactionAmount.ACTION_PLEDGE) {
-                output.put("label_Balance_Pos", Lang.getInstance().translateFromLangObj("Balance 5 (PLEDGE)", langObj));
+
+        output.put("label_Balance_1", Lang.getInstance().translateFromLangObj(Account.balancePositionName(1), langObj));
+        output.put("label_Balance_2", Lang.getInstance().translateFromLangObj(Account.balancePositionName(2), langObj));
+        output.put("label_Balance_3", Lang.getInstance().translateFromLangObj(Account.balancePositionName(3), langObj));
+        output.put("label_Balance_4", Lang.getInstance().translateFromLangObj(Account.balancePositionName(4), langObj));
+        output.put("label_Balance_5", Lang.getInstance().translateFromLangObj(Account.balancePositionName(5), langObj));
+
+        output.put("label_Balance_Pos", Lang.getInstance().translateFromLangObj(Account.balancePositionName(position), langObj));
+        output.put("label_Balance_Side", Lang.getInstance().translateFromLangObj(Account.balanceSideName(side), langObj));
+
+        output.put("Label_TotalDebit", Lang.getInstance().translateFromLangObj(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_DEBIT), langObj));
+        output.put("Label_Left", Lang.getInstance().translateFromLangObj(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_LEFT), langObj));
+        output.put("Label_TotalCredit", Lang.getInstance().translateFromLangObj(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_CREDIT), langObj));
+
+        output.put("Side_Help", Lang.getInstance().translateFromLangObj("Side_Help", langObj));
+
+        if (assetKey.equals(Transaction.FEE_KEY)) {
+            output.put("label_Balance_4", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUPositionName(4), langObj));
+            output.put("label_Balance_5", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUPositionName(5), langObj));
+
+            if (position == TransactionAmount.ACTION_SPEND || position == TransactionAmount.ACTION_PLEDGE) {
+
+                output.put("label_Balance_Pos", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUPositionName(position), langObj));
+                output.put("label_Balance_Side", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUSideName(side), langObj));
+
+                output.put("Label_TotalDebit", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_DEBIT), langObj));
+                output.put("Label_Left", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_LEFT), langObj));
+                output.put("Label_TotalCredit", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_CREDIT), langObj));
+                output.put("Label_TotalForged", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_FORGED), langObj));
+
+                output.put("Side_Help", Lang.getInstance().translateFromLangObj("Side_Help_COMPU_BONUS", langObj));
+
+                if (side == TransactionAmount.BALANCE_SIDE_FORGED) {
+                    // Это запрос на баланса Нафоржили - он в 5-й позиции на стороне 2
+                    position = TransactionAmount.ACTION_PLEDGE;
+                    side = TransactionAmount.BALANCE_SIDE_LEFT;
+                }
+
             }
 
-            output.put("Side_Help", Lang.getInstance().translateFromLangObj("Side_Help", langObj));
-            output.put("Label_TotalDebit", Lang.getInstance().translateFromLangObj("Total Debit", langObj));
-            output.put("Label_Left", Lang.getInstance().translateFromLangObj("Left # остаток", langObj));
-            output.put("Label_TotalCredit", Lang.getInstance().translateFromLangObj("Total Credit", langObj));
         }
 
 
@@ -3064,6 +3076,7 @@ public class BlockExplorer {
         output.put("Label_No", Lang.getInstance().translateFromLangObj("No.", langObj));
         output.put("Label_pubKey", Lang.getInstance().translateFromLangObj("Public Key", langObj));
         output.put("Label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
+        output.put("Label_Link", Lang.getInstance().translateFromLangObj("Link", langObj));
 
         int block = rNote.getBlockHeight();
         int seqNo = rNote.getSeqNo();

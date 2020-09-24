@@ -17,72 +17,92 @@ function person_asset(data) {
 
     output += '<img src="data:image/gif;base64,' + data.person_img + '" width = "350" /></td><td style ="padding-left:20px">';
 
-    output += '<h2><center>' + data.label_Balance_Pos + '</center></h2>';
-
-    var sideName;
-    if (data.side == 1)
-        sideName = data.Label_TotalDebit;
-    if (data.side == 2)
-        sideName = data.Label_Left;
-    if (data.side == 3)
-        sideName = data.Label_TotalCredit;
-    if (data.side == 4)
-        sideName = data.Label_TotalForged;
-
+    var color;
+    var img;
     if (data.sum > 0) {
-        output += '<b><span style="font-size:2em; color:#0cb70c"> &nbsp&nbsp ' + sideName + '</span></b><br>';
-        output += '<img src="img/check-yes.png" style="height:110px">'
-        output += '<b><span style="font-size:4em; color:#0cb70c"> &nbsp&nbsp +' + data.sum + '</span></b><br>';
-        output += '<br>';
+        color = '#0cb70c';
+        img = 'check-yes.png';
     } else if (data.sum == 0) {
-        output += '<b><span style="font-size:2em; color:crimson"> &nbsp&nbsp ' + sideName + '</span></b><br>';
-        output += '<img src="img/check-no.png" style="height:120px">'
-        output += '<br><br>';
+        color = 'crimson';
+        img = 'check-no.png';
     } else {
-        output += '<b><span style="font-size:2em; color:crimson"> &nbsp&nbsp ' + sideName + '</span></b><br>';
-        output += '<img src="img/check-no.png" style="height:120px">'
-        output += '<b><span style="font-size:3em; color:crimson"> &nbsp&nbsp ' + data.sum + '</span></b><br>';
-        output += '<br>';
+        color = 'crimson';
+        img = 'check-no.png';
     }
 
-    output += data.Label_person + ': <a href ="?person=' +
-        data.person_key + get_lang() + '">[' + data.person_key + ']' + data.person_name + '</a><br>';
+    output += '<h2><center style="font-si-ze:2em; color:' + color;
+    output += '"> &nbsp&nbsp ' + data.label_Balance_Pos + ' [' + data.label_Balance_Side + ']</center></h2>';
+    output += '<h2><img src="img/' + img + '" style="height:2em">'
+    output += '<span style="font-siz-e:3em; color:'+ color + '"> &nbsp&nbsp ' + data.sum + '</span></h2>';
+    output += '<br>';
 
-    output += data.Label_asset + ': <a href ="?asset=' +
-        data.asset_key + get_lang() + '">[' + data.asset_key + ']' + data.asset_name + '</a><br>';
 
-    output += '<span style="font-size:1.2em">' + data.Label_Sides + ': &nbsp&nbsp ';
+    output += '<h4>' + data.Label_Positions + ': ';
 
-    if (data.side == '1')
-        output +=  ': &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_TotalDebit + '</span></b>';
+    if (data.position == 1)
+        output +=  '&nbsp&nbsp <b><span style="font-size:1.2em; color:#0cb70c">' + data.label_Balance_1 + '</span></b>';
     else
-        output +=  ': &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=1' + get_lang()
+        output +=  '&nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=1&side=' + data.side + get_lang()
+                                 + '">' + data.label_Balance_1 + '</a>';
+
+    if (data.position == 2)
+        output +=  ' &nbsp&nbsp <b><span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.label_Balance_2 + '</span></b>';
+    else
+        output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=2&side=' + data.side + get_lang()
+                                        + '">' + data.label_Balance_2 + '</a>';
+
+    if (data.position == 3)
+        output +=  ' &nbsp&nbsp <b><span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.label_Balance_3 + '</span></b>';
+    else
+        output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=3&side=' + data.side + get_lang()
+                                        + '">' + data.label_Balance_3 + '</a>';
+
+    if (data.position == 4)
+        output +=  ' &nbsp&nbsp <b><span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.label_Balance_4 + '</span></b>';
+    else
+        output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=4&side=' + data.side + get_lang()
+                                        + '">' + data.label_Balance_4 + '</a>';
+
+    output += '</h4>';
+
+    output += '<span style="font-size:1.3em">' + data.Label_Sides + ': ';
+
+    if (data.side == 1)
+        output +=  ' &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_TotalDebit + '</span></b>';
+    else
+        output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=1' + get_lang()
                                  + '">' + data.Label_TotalDebit + '</a>';
 
-    if (data.side == '2')
+    if (data.side == 2)
         output +=  ' &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_Left + '</span></b>';
     else
         output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=2' + get_lang()
                                         + '">' + data.Label_Left + '</a>';
 
-    if (data.side == '3')
+    if (data.side == 3)
         output +=  ' &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_TotalCredit + '</span></b>';
     else
         output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=3' + get_lang()
                                         + '">' + data.Label_TotalCredit + '</a>';
 
     if (data.hasOwnProperty('Label_TotalForged')) {
-        if (data.side == '4')
-            output +=  ' &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_TotalForged + '</span></b>';
-        else
-            output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=4' + get_lang()
-                                           + '">' + data.Label_TotalForged + '</a>';
+        if (data.side == 4)
+                output +=  ' &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_TotalForged + '</span></b>';
+            else
+                output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=4' + get_lang()
+                                               + '">' + data.Label_TotalForged + '</a>';
    }
-
 
     output +=  ' &nbsp&nbsp <span id="side-help" style="display:none;"><br>' + data.Side_Help + '</span>';
     output +=  ' &nbsp&nbsp <a href ="#" onclick="$(\'#side-help\').toggle();"><span class="glyphicon glyphicon-question-sign"></span></a>';
-    output += '</span>';
+    output += '</span><br>';
+
+
+    output += '<span style="font-size:1.2em">' + data.Label_person + ': <a href ="?person=' +
+        data.person_key + get_lang() + '">[' + data.person_key + ']' + data.person_name + '</a><br>';
+
+    output += data.Label_asset + ': <a href ="?asset=' +
+        data.asset_key + get_lang() + '">[' + data.asset_key + ']' + data.asset_name + '</a><br></span>';
 
     output += '<br>';
     output += '<br>';
