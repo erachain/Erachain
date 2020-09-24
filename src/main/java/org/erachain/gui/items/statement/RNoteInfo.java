@@ -268,9 +268,13 @@ public class RNoteInfo extends javax.swing.JPanel {
         if (exData.hasRecipients()) {
             resultStr += "<h2>" + Lang.getInstance().translate("Recipients") + "</h2>";
             Account[] recipients = exData.getRecipients();
-            int i = 1;
-            for (Account recipient : recipients) {
-                resultStr += i + " " + recipient.getAddress() + "<br>";
+            int size = recipients.length;
+            for (int i = 1; i <= size; ++i) {
+                if (i > 3 && size > 5) {
+                    resultStr += "... ";
+                    i = size;
+                }
+                resultStr += i + " " + recipients[i - 1].getAddress() + "<br>";
             }
             resultStr += "<br>";
         }
