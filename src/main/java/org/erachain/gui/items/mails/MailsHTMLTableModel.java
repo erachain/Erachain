@@ -357,7 +357,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                         setHeight(j);
                     }
 
-                    if (messageBufs.get(1).getOpend() && Controller.getInstance().isWalletUnlocked()) {
+                    if (!messageBufs.isEmpty() && messageBufs.get(0).getOpend() && Controller.getInstance().isWalletUnlocked()) {
                         CryptoOpenBox(0, 1);
                     }
 
