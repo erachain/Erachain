@@ -9,6 +9,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.erachain.utils.APIUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -320,6 +321,18 @@ public class ItemPollsResource {
         } else
             throw ApiErrorFactory.getInstance().createError(result);
 
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("listfrom/{start}")
+    public String getList(@PathParam("start") long start,
+                          @DefaultValue("50") @QueryParam("page") int page) {
+
+        JSONObject output = new JSONObject();
+        ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.POLL_TYPE, start, page, output);
+
+        return output.toJSONString();
     }
 
     @SuppressWarnings("unchecked")

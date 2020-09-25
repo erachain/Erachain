@@ -6,6 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
@@ -112,6 +113,18 @@ public class ItemAssetsResource {
         }
 
         return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryItemAsset(assetAsLong));
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("listfrom/{start}")
+    public String getList(@PathParam("start") long start,
+                          @DefaultValue("50") @QueryParam("page") int page) {
+
+        JSONObject output = new JSONObject();
+        ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.ASSET_TYPE, start, page, output);
+
+        return output.toJSONString();
     }
 
     /**

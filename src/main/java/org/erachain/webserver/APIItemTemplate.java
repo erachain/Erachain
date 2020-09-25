@@ -10,12 +10,10 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemTemplateMap;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -43,6 +41,7 @@ public class APIItemTemplate {
         help.put("GET find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apitemplate/image/{key}", "GET Template Image");
         help.put("Get apitemplate/icon/{key}", "GET Template Icon");
+        help.put("Get listfrom/{start}?page={pageSize}", "Gel list from {start} limit by {pageSize}");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -169,6 +168,24 @@ public class APIItemTemplate {
         return Response.status(200)
                 .header("Access-Control-Allow-Origin", "*")
                 .entity("")
+                .build();
+    }
+
+    @GET
+    @Path("listfrom/{start}")
+    public Response getList(@PathParam("start") long start,
+                            @DefaultValue("50") @QueryParam("page") int page) {
+
+        if (page > 50 || page < 1) {
+            page = 50;
+        }
+
+        JSONObject output = new JSONObject();
+        ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, start, page, output);
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(output.toJSONString())
                 .build();
     }
 

@@ -17,6 +17,7 @@ import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.gui.Iconable;
 import org.erachain.utils.Pair;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple6;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Map;
 
 //import java.math.BigDecimal;
 //import com.google.common.primitives.Longs;
@@ -573,18 +575,32 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         return getShort(DCSet.getInstance());
     }
 
+    public JSONObject toJsonLite(boolean withIcon) {
+
+        JSONObject itemJSON = new JSONObject();
+
+        // ADD DATA
+        itemJSON.put("key", this.getKey());
+        itemJSON.put("name", this.name);
+
+        if (withIcon)
+            itemJSON.put("icon", Base58.encode(this.getIcon()));
+
+        return itemJSON;
+    }
+
     @SuppressWarnings("unchecked")
     public JSONObject toJson() {
 
-        JSONObject itemJSON = new JSONObject();
+        JSONObject itemJSON = toJsonLite(false);
 
         // ADD DATA
         itemJSON.put("item_type", this.getItemTypeName());
         itemJSON.put("item_type_sub", this.getItemSubType());
         itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
         itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
-        itemJSON.put("key", this.getKey());
-        itemJSON.put("name", this.name);
+        //itemJSON.put("key", this.getKey());
+        //itemJSON.put("name", this.name);
         itemJSON.put("description", this.description);
         itemJSON.put("creator", this.owner.getAddress()); // @Deprecated
         itemJSON.put("owner", this.owner.getAddress());
@@ -646,6 +662,35 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             json.put("icon", Base64.encodeBase64String(getIcon()));
 
         return json;
+    }
+
+    public static void makeJsonLitePage(DCSet dcSet, int itemType, long start, int pageSize,
+                                        Map output) {
+
+        ItemMap map = dcSet.getItem_Map(itemType);
+        ItemCls element;
+        long size = map.size();
+
+        if (start < 1 || start > size && size > 0) {
+            start = size;
+        }
+        output.put("start", start);
+
+        long key = start;
+        JSONArray array = new JSONArray();
+
+        while (key > start - pageSize && key > 0) {
+            element = map.get(key--);
+            if (element != null) {
+                array.add(element.toJsonLite(true));
+            }
+        }
+
+        output.put("pageItems", array);
+        output.put("pageSize", pageSize);
+        output.put("listSize", size);
+        output.put("lastNumber", key);
+
     }
 
     public HashMap getNovaItems() {
