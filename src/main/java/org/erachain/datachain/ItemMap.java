@@ -413,7 +413,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                     .iterator();
         } else {
             iterator = ((NavigableSet) map.keySet())
-                    .subSet(0L, fromKey)
+                    .subSet(fromKey, Long.MAX_VALUE)
                     .iterator();
         }
         return IteratorCloseableImpl.make(iterator);
