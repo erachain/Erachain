@@ -327,10 +327,12 @@ public class ItemPollsResource {
     @GET
     @Path("listfrom/{start}")
     public String getList(@PathParam("start") long start,
-                          @DefaultValue("50") @QueryParam("page") int page) {
+                          @DefaultValue("20") @QueryParam("page") int page,
+                          @DefaultValue("true") @QueryParam("showperson") boolean showPerson,
+                          @DefaultValue("true") @QueryParam("desc") boolean descending) {
 
         JSONObject output = new JSONObject();
-        ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.POLL_TYPE, start, page, output);
+        ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.POLL_TYPE, start, page, output, showPerson, descending);
 
         return output.toJSONString();
     }

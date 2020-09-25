@@ -41,7 +41,7 @@ public class APIItemTemplate {
         help.put("GET find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apitemplate/image/{key}", "GET Template Image");
         help.put("Get apitemplate/icon/{key}", "GET Template Icon");
-        help.put("Get listfrom/{start}?page={pageSize}", "Gel list from {start} limit by {pageSize}");
+        help.put("Get listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} defaul - true, {descending} - true");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -174,14 +174,16 @@ public class APIItemTemplate {
     @GET
     @Path("listfrom/{start}")
     public Response getList(@PathParam("start") long start,
-                            @DefaultValue("50") @QueryParam("page") int page) {
+                            @DefaultValue("20") @QueryParam("page") int page,
+                            @DefaultValue("true") @QueryParam("showperson") boolean showPerson,
+                            @DefaultValue("true") @QueryParam("desc") boolean descending) {
 
         if (page > 50 || page < 1) {
             page = 50;
         }
 
         JSONObject output = new JSONObject();
-        ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, start, page, output);
+        ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, start, page, output, showPerson, descending);
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")

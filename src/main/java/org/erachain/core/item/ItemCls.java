@@ -577,7 +577,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         return getShort(DCSet.getInstance());
     }
 
-    public JSONObject toJsonLite(boolean withIcon) {
+    public JSONObject toJsonLite(boolean withIcon, boolean showPerson) {
 
         JSONObject itemJSON = new JSONObject();
 
@@ -586,7 +586,17 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJSON.put("name", this.name);
 
         if (withIcon)
-            itemJSON.put("icon", Base58.encode(this.getIcon()));
+            itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+
+        itemJSON.put("owner", this.owner.getAddress());
+        if (showPerson) {
+            Fun.Tuple2<Integer, PersonCls> person = this.owner.getPerson();
+            if (person != null) {
+                itemJSON.put("ownerPersonKey", person.b.getKey());
+                itemJSON.put("ownerPersonName", person.b.getName());
+            }
+        }
+
 
         return itemJSON;
     }
@@ -594,7 +604,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     @SuppressWarnings("unchecked")
     public JSONObject toJson() {
 
-        JSONObject itemJSON = toJsonLite(false);
+        JSONObject itemJSON = toJsonLite(false, false);
 
         // ADD DATA
         itemJSON.put("item_type", this.getItemTypeName());
@@ -605,7 +615,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         //itemJSON.put("name", this.name);
         itemJSON.put("description", this.description);
         itemJSON.put("creator", this.owner.getAddress()); // @Deprecated
-        itemJSON.put("owner", this.owner.getAddress());
         itemJSON.put("owner_publick_key", this.owner.getBase58());
         itemJSON.put("owner_publickey", this.owner.getBase58());
         itemJSON.put("isConfirmed", this.isConfirmed());
@@ -625,8 +634,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         JSONObject itemJSON = new JSONObject();
 
         // ADD DATA
-        itemJSON.put("icon", Base58.encode(this.getIcon()));
-        itemJSON.put("image", Base58.encode(this.getImage()));
+        itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+        itemJSON.put("image", java.util.Base64.getEncoder().encodeToString(this.getImage()));
 
         return itemJSON;
     }
@@ -667,7 +676,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     }
 
     public static void makeJsonLitePage(DCSet dcSet, int itemType, long start, int pageSize,
-                                        Map output) {
+                                        Map output, boolean showPerson, boolean descending) {
 
         ItemMap map = dcSet.getItem_Map(itemType);
         ItemCls element;
@@ -683,12 +692,12 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         JSONArray array = new JSONArray();
 
         long key = 0;
-        try (IteratorCloseable<Long> iterator = map.getIteratorFrom(start, true)) {
+        try (IteratorCloseable<Long> iterator = map.getIteratorFrom(start, descending)) {
             while (iterator.hasNext() && pageSize-- > 0) {
                 key = iterator.next();
                 element = map.get(key);
                 if (element != null) {
-                    array.add(element.toJsonLite(true));
+                    array.add(element.toJsonLite(true, showPerson));
                 }
             }
         } catch (IOException e) {
