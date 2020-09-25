@@ -297,8 +297,9 @@ public class AccountAssetActionPanelCls extends IconPanel implements RecipientAd
         String recipient = recipientAddress.getSelectedAddress();
         AssetCls asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
 
-        this.jTextField_Recive_Detail.setText(Account.getDetailsForEncrypt(recipient, asset.getKey(),
-                this.jCheckBox_Enscript.isSelected()));
+        this.jTextField_Recive_Detail.setText(Lang.getInstance().translate(
+                Account.getDetailsForEncrypt(recipient, asset.getKey(),
+                        this.jCheckBox_Enscript.isSelected())));
 
     }
 

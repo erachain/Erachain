@@ -233,7 +233,7 @@ public class Account {
         // CHECK IF RECIPIENT IS VALID ADDRESS
         if (Crypto.getInstance().isValidAddress(address)) {
             if (forEncrypt && null == Controller.getInstance().getPublicKeyByAddress(address)) {
-                return "address is unknown - cant't encrypt for it, please use public key instead";
+                return "address is unknown - can't encrypt for it, please use public key instead";
             }
             if (itemKey > 0) {
                 Account account = new Account(address);
