@@ -53,6 +53,7 @@ public class MultiPayOutsPanel extends IconPanel {
         });
         setTextJLabelMetodPaumentDecscription((String) jComboBoxMetodPaymentType.getModel().getSelectedItem());
 
+        jLabelMetodPaumentDecscription.setHorizontalAlignment(SwingConstants.LEFT);
         jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"All accounts", "Persons","Men", "Women"}));
         // paragrafs font
         Font ff = (Font) UIManager.get("Label.font");
@@ -250,6 +251,7 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LAST_LINE_START;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jLabelMetodPaumentDecscription, gridBagConstraints);
