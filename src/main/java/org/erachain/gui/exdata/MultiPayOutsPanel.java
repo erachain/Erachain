@@ -506,7 +506,7 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.weightx = 0.1;
         add(jSeparator5, gridBagConstraints);
 
-        jTextField1.setText("jTextField1");
+        jTextField1.setText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 10;
