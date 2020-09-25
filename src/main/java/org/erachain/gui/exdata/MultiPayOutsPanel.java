@@ -8,6 +8,11 @@ import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.models.RenderComboBoxOtborPoDeistviy;
 import org.erachain.gui.models.RenderComboBoxVidBalance;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
 
 public class MultiPayOutsPanel extends IconPanel {
 
@@ -39,7 +44,30 @@ public class MultiPayOutsPanel extends IconPanel {
         jComboBoxOtborPoDeistviy.setModel(new javax.swing.DefaultComboBoxModel<>(new Integer[] {1,2,3,4,5 }));
         jComboBoxOtborPoDeistviy.setRenderer(new RenderComboBoxOtborPoDeistviy());
         jComboBoxMetodPaymentType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Summ", "%"}));
+
+        jComboBoxMetodPaymentType.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                setTextJLabelMetodPaumentDecscription((String) e.getItem());
+            }
+        });
+        setTextJLabelMetodPaumentDecscription((String) jComboBoxMetodPaymentType.getModel().getSelectedItem());
+
         jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"All accounts", "Persons","Men", "Women"}));
+        // paragrafs font
+        Font ff = (Font) UIManager.get("Label.font");
+        Font paragrFont = new java.awt.Font(ff.getFontName(), 1, ff.getSize()+1);
+        jLabel5.setFont(paragrFont); // NOI18N
+        jLabelTitlemetod.setFont(paragrFont); // NOI18N
+        jLabel20.setFont(paragrFont); // NOI18N
+        jLabel4.setFont(paragrFont); // NOI18N
+    }
+    private void setTextJLabelMetodPaumentDecscription(String ss){
+        if( ss.equals("%")){
+            jLabelMetodPaumentDecscription.setText("будет начислен процент на сумму каждого отобранного счета");
+        }else{
+            jLabelMetodPaumentDecscription.setText("будет распределена сумма по всем отобранного счетам");
+        }
     }
 
 
