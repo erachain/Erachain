@@ -10,7 +10,6 @@ import org.erachain.gui.models.RenderComboBoxVidBalance;
 
 public class MultiPayOutsPanel extends IconPanel {
 
-
     public static String NAME = "MultiPayOutsPanel";
     public static String TITLE = "Multi paument out";
     public ComboBoxAssetsModel accountsModel;
@@ -38,16 +37,15 @@ public class MultiPayOutsPanel extends IconPanel {
         }));
         jComboBoxOtborPoDeistviy.setModel(new javax.swing.DefaultComboBoxModel<>(new Integer[] {1,2,3,4,5 }));
         jComboBoxOtborPoDeistviy.setRenderer(new RenderComboBoxOtborPoDeistviy());
+        jComboBoxMetodPaymentType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Summ", "%"}));
+        jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"All accounts", "Persons","Men", "Women"}));
     }
-
 
 
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
         jLabel13 = new javax.swing.JLabel();
-        buttonGroupGender = new javax.swing.ButtonGroup();
         jLabelTitle = new javax.swing.JLabel();
         jComboBoxAsset = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
@@ -60,8 +58,6 @@ public class MultiPayOutsPanel extends IconPanel {
         jLabel9 = new javax.swing.JLabel();
         jLabelAsset1 = new javax.swing.JLabel();
         jLabelTitlemetod = new javax.swing.JLabel();
-        jRadioButtonMetodCoff = new javax.swing.JRadioButton();
-        jRadioButtonMetodSumm = new javax.swing.JRadioButton();
         jLabelMetodPaumentDecscription = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabelMetodPaumentItemMin = new javax.swing.JLabel();
@@ -78,16 +74,11 @@ public class MultiPayOutsPanel extends IconPanel {
         jLabel20 = new javax.swing.JLabel();
         jComboBoxOtborPoDeistviy = new javax.swing.JComboBox<>();
         jPanel3 = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        jButtonViewResult = new javax.swing.JButton();
+        jButtonCancel = new javax.swing.JButton();
+        jButtonSend = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jCheckBoxConfirmResult = new javax.swing.JCheckBox();
-        jPanel4 = new javax.swing.JPanel();
-        jCheckBoxOnlyPersons = new javax.swing.JCheckBox();
-        jRadioButtonPersonsOnlyWomem = new javax.swing.JRadioButton();
-        jRadioButtonPersonsOnlyMen = new javax.swing.JRadioButton();
-        jRadioButtonPersonsAll = new javax.swing.JRadioButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -97,12 +88,16 @@ public class MultiPayOutsPanel extends IconPanel {
         jSeparator3 = new javax.swing.JSeparator();
         jSeparator4 = new javax.swing.JSeparator();
         jSeparator5 = new javax.swing.JSeparator();
+        jTextField1 = new javax.swing.JTextField();
+        jButtonCalcCompu = new javax.swing.JButton();
+        jComboBoxMetodPaymentType = new javax.swing.JComboBox<>();
+        jComboBoxPersonFilter = new javax.swing.JComboBox<>();
 
         jLabel13.setText("jLabel13");
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
-        layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
-        layout.rowHeights = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        layout.rowHeights = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
         setLayout(layout);
 
         jLabelTitle.setText("Multi paument");
@@ -115,7 +110,7 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 10);
         add(jLabelTitle, gridBagConstraints);
 
-//        jComboBoxAsset.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+     //   jComboBoxAsset.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 2;
@@ -131,17 +126,16 @@ public class MultiPayOutsPanel extends IconPanel {
         jLabel5.setText("отбор по активу");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridy = 14;
         gridBagConstraints.gridwidth = 15;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(14, 0, 0, 0);
         add(jLabel5, gridBagConstraints);
 
 //        jComboBoxOtborAsset.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridy = 16;
         gridBagConstraints.gridwidth = 9;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -152,7 +146,7 @@ public class MultiPayOutsPanel extends IconPanel {
         jLabelVidBalance.setText("Вид баланса");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 20;
+        gridBagConstraints.gridy = 18;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         add(jLabelVidBalance, gridBagConstraints);
@@ -160,7 +154,7 @@ public class MultiPayOutsPanel extends IconPanel {
 //        jComboBoxVidBalance.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 20;
+        gridBagConstraints.gridy = 18;
         gridBagConstraints.gridwidth = 9;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -171,14 +165,14 @@ public class MultiPayOutsPanel extends IconPanel {
         jLabel8.setText("Больше чем");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 24;
+        gridBagConstraints.gridy = 22;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         add(jLabel8, gridBagConstraints);
 
         jTextFieldBQ.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 24;
+        gridBagConstraints.gridy = 22;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
@@ -187,8 +181,7 @@ public class MultiPayOutsPanel extends IconPanel {
         jTextFieldLQ.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 12;
-        gridBagConstraints.gridy = 24;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridy = 22;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.2;
@@ -198,7 +191,7 @@ public class MultiPayOutsPanel extends IconPanel {
         jLabel9.setText("Меньше чем");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 10;
-        gridBagConstraints.gridy = 24;
+        gridBagConstraints.gridy = 22;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 17, 0, 0);
         add(jLabel9, gridBagConstraints);
@@ -220,34 +213,14 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.gridwidth = 15;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 0);
         add(jLabelTitlemetod, gridBagConstraints);
-
-        buttonGroup1.add(jRadioButtonMetodCoff);
-        jRadioButtonMetodCoff.setText("Koficient");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 10;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        add(jRadioButtonMetodCoff, gridBagConstraints);
-
-        buttonGroup1.add(jRadioButtonMetodSumm);
-        jRadioButtonMetodSumm.setText("Summa");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        add(jRadioButtonMetodSumm, gridBagConstraints);
 
         jLabelMetodPaumentDecscription.setText("по общеме значению");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 12;
-        gridBagConstraints.gridwidth = 9;
+        gridBagConstraints.gridx = 10;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jLabelMetodPaumentDecscription, gridBagConstraints);
@@ -333,7 +306,7 @@ public class MultiPayOutsPanel extends IconPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 32;
+        gridBagConstraints.gridy = 30;
         gridBagConstraints.gridwidth = 9;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.2;
@@ -343,7 +316,7 @@ public class MultiPayOutsPanel extends IconPanel {
         jLabel19.setText("Сторона баланса");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 22;
+        gridBagConstraints.gridy = 20;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         add(jLabel19, gridBagConstraints);
@@ -351,7 +324,7 @@ public class MultiPayOutsPanel extends IconPanel {
         jComboBoxStoronaBalance.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 22;
+        gridBagConstraints.gridy = 20;
         gridBagConstraints.gridwidth = 9;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -364,17 +337,16 @@ public class MultiPayOutsPanel extends IconPanel {
         jLabel20.setText("Отбор по действию");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 28;
+        gridBagConstraints.gridy = 26;
         gridBagConstraints.gridwidth = 15;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(9, 0, 0, 0);
         add(jLabel20, gridBagConstraints);
 
-//        jComboBoxOtborPoDeistviy.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+    //    jComboBoxOtborPoDeistviy.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 30;
+        gridBagConstraints.gridy = 28;
         gridBagConstraints.gridwidth = 9;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -387,38 +359,38 @@ public class MultiPayOutsPanel extends IconPanel {
         jPanel3Layout.rowHeights = new int[] {0};
         jPanel3.setLayout(jPanel3Layout);
 
-        jButton2.setText("ViewResult");
+        jButtonViewResult.setText("ViewResult");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        jPanel3.add(jButton2, gridBagConstraints);
+        jPanel3.add(jButtonViewResult, gridBagConstraints);
 
-        jButton3.setText("Cancel");
+        jButtonCancel.setText("Cancel");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        jPanel3.add(jButton3, gridBagConstraints);
+        jPanel3.add(jButtonCancel, gridBagConstraints);
 
-        jButton1.setText("Send");
-        jButton1.setToolTipText("");
+        jButtonSend.setText("Send");
+        jButtonSend.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
-        jPanel3.add(jButton1, gridBagConstraints);
+        jPanel3.add(jButtonSend, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 44;
+        gridBagConstraints.gridy = 42;
         gridBagConstraints.gridwidth = 15;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
-      //  add(jPanel3, gridBagConstraints);
+        add(jPanel3, gridBagConstraints);
 
         jLabel1.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 48;
+        gridBagConstraints.gridy = 46;
         gridBagConstraints.gridwidth = 15;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.3;
@@ -427,72 +399,23 @@ public class MultiPayOutsPanel extends IconPanel {
 
         jCheckBoxConfirmResult.setText("Подтверждаю правильность результата");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 42;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 10);
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 40;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 10);
         add(jCheckBoxConfirmResult, gridBagConstraints);
-
-        java.awt.GridBagLayout jPanel4Layout = new java.awt.GridBagLayout();
-        jPanel4Layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0};
-        jPanel4Layout.rowHeights = new int[] {0};
-        jPanel4.setLayout(jPanel4Layout);
-
-        jCheckBoxOnlyPersons.setText("Только персоны");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 22);
-        jPanel4.add(jCheckBoxOnlyPersons, gridBagConstraints);
-
-        buttonGroupGender.add(jRadioButtonPersonsOnlyWomem);
-        jRadioButtonPersonsOnlyWomem.setText("Женщинам");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        jPanel4.add(jRadioButtonPersonsOnlyWomem, gridBagConstraints);
-
-        buttonGroupGender.add(jRadioButtonPersonsOnlyMen);
-        jRadioButtonPersonsOnlyMen.setText("Мужчинам");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        jPanel4.add(jRadioButtonPersonsOnlyMen, gridBagConstraints);
-
-        buttonGroupGender.add(jRadioButtonPersonsAll);
-        jRadioButtonPersonsAll.setText("Всем");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        jPanel4.add(jRadioButtonPersonsAll, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 38;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        add(jPanel4, gridBagConstraints);
 
         jLabel2.setText("Выберите Актив");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridy = 16;
         add(jLabel2, gridBagConstraints);
 
         jLabel3.setText("Выберите действие");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 30;
+        gridBagConstraints.gridy = 28;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         add(jLabel3, gridBagConstraints);
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
@@ -500,11 +423,10 @@ public class MultiPayOutsPanel extends IconPanel {
         jLabel4.setText("Отбор по персонам");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 36;
+        gridBagConstraints.gridy = 34;
         gridBagConstraints.gridwidth = 15;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         add(jLabel4, gridBagConstraints);
 
         jLabel6.setText("Сумма");
@@ -523,7 +445,7 @@ public class MultiPayOutsPanel extends IconPanel {
         add(jSeparator1, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.gridwidth = 15;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
@@ -531,7 +453,7 @@ public class MultiPayOutsPanel extends IconPanel {
         add(jSeparator2, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 26;
+        gridBagConstraints.gridy = 24;
         gridBagConstraints.gridwidth = 15;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
@@ -539,7 +461,7 @@ public class MultiPayOutsPanel extends IconPanel {
         add(jSeparator3, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 34;
+        gridBagConstraints.gridy = 32;
         gridBagConstraints.gridwidth = 15;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
@@ -547,66 +469,94 @@ public class MultiPayOutsPanel extends IconPanel {
         add(jSeparator4, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 40;
+        gridBagConstraints.gridy = 38;
         gridBagConstraints.gridwidth = 15;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         add(jSeparator5, gridBagConstraints);
+
+        jTextField1.setText("jTextField1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        add(jTextField1, gridBagConstraints);
+
+        jButtonCalcCompu.setText("Расчитать COMPU");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 40;
+        gridBagConstraints.insets = new java.awt.Insets(7, 10, 0, 10);
+        add(jButtonCalcCompu, gridBagConstraints);
+
+        jComboBoxMetodPaymentType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Summa", "Cofficient" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        add(jComboBoxMetodPaymentType, gridBagConstraints);
+
+        jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Only Persons", "Men", "Women" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 36;
+        gridBagConstraints.gridwidth = 9;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
+        add(jComboBoxPersonFilter, gridBagConstraints);
     }
 
 
-    public javax.swing.ButtonGroup buttonGroup1;
-    public javax.swing.ButtonGroup buttonGroupGender;
-    public javax.swing.JButton jButton1;
-    public javax.swing.JButton jButton2;
-    public javax.swing.JButton jButton3;
-    public javax.swing.JCheckBox jCheckBoxConfirmResult;
-    public javax.swing.JCheckBox jCheckBoxOnlyPersons;
-    public javax.swing.JComboBox<ItemCls> jComboBoxAsset;
-    public javax.swing.JComboBox<ItemCls> jComboBoxOtborAsset;
-    public javax.swing.JComboBox<Integer> jComboBoxOtborPoDeistviy;
-    public javax.swing.JComboBox<String> jComboBoxStoronaBalance;
-    public javax.swing.JComboBox<Integer> jComboBoxVidBalance;
-    public javax.swing.JLabel jLabel1;
-    public javax.swing.JLabel jLabel13;
-    public javax.swing.JLabel jLabel19;
-    public javax.swing.JLabel jLabel2;
-    public javax.swing.JLabel jLabel20;
-    public javax.swing.JLabel jLabel3;
-    public javax.swing.JLabel jLabel4;
-    public javax.swing.JLabel jLabel5;
-    public javax.swing.JLabel jLabel6;
-    public javax.swing.JLabel jLabel8;
-    public javax.swing.JLabel jLabel9;
-    public javax.swing.JLabel jLabelAsset1;
-    public javax.swing.JLabel jLabelDataStart;
-    public javax.swing.JLabel jLabelDateEnd;
-    public javax.swing.JLabel jLabelMetodPaumentDecscription;
-    public javax.swing.JLabel jLabelMetodPaumentItemMax;
-    public javax.swing.JLabel jLabelMetodPaumentItemMin;
-    public javax.swing.JLabel jLabelTitle;
-    public javax.swing.JLabel jLabelTitlemetod;
-    public javax.swing.JLabel jLabelVidBalance;
-    public javax.swing.JPanel jPanel1;
-    public javax.swing.JPanel jPanel2;
-    public javax.swing.JPanel jPanel3;
-    public javax.swing.JPanel jPanel4;
-    public javax.swing.JRadioButton jRadioButtonMetodCoff;
-    public javax.swing.JRadioButton jRadioButtonMetodSumm;
-    public javax.swing.JRadioButton jRadioButtonPersonsAll;
-    public javax.swing.JRadioButton jRadioButtonPersonsOnlyMen;
-    public javax.swing.JRadioButton jRadioButtonPersonsOnlyWomem;
-    public javax.swing.JSeparator jSeparator1;
-    public javax.swing.JSeparator jSeparator2;
-    public javax.swing.JSeparator jSeparator3;
-    public javax.swing.JSeparator jSeparator4;
-    public javax.swing.JSeparator jSeparator5;
-    public javax.swing.JTextField jTextFieldBQ;
-    public javax.swing.JTextField jTextFieldDateEnd;
-    public javax.swing.JTextField jTextFieldDateStart;
-    public javax.swing.JTextField jTextFieldLQ;
-    public javax.swing.JTextField jTextFieldMetodPaumentItemMax;
-    public javax.swing.JTextField jTextFieldMetodPaumentItemMin;
-
+    private javax.swing.JButton jButtonCalcCompu;
+    private javax.swing.JButton jButtonCancel;
+    private javax.swing.JButton jButtonSend;
+    private javax.swing.JButton jButtonViewResult;
+    private javax.swing.JCheckBox jCheckBoxConfirmResult;
+    private javax.swing.JComboBox<ItemCls> jComboBoxAsset;
+    private javax.swing.JComboBox<String> jComboBoxMetodPaymentType;
+    private javax.swing.JComboBox<ItemCls> jComboBoxOtborAsset;
+    private javax.swing.JComboBox<Integer> jComboBoxOtborPoDeistviy;
+    private javax.swing.JComboBox<String> jComboBoxPersonFilter;
+    private javax.swing.JComboBox<String> jComboBoxStoronaBalance;
+    private javax.swing.JComboBox<Integer> jComboBoxVidBalance;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel19;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabelAsset1;
+    private javax.swing.JLabel jLabelDataStart;
+    private javax.swing.JLabel jLabelDateEnd;
+    private javax.swing.JLabel jLabelMetodPaumentDecscription;
+    private javax.swing.JLabel jLabelMetodPaumentItemMax;
+    private javax.swing.JLabel jLabelMetodPaumentItemMin;
+    private javax.swing.JLabel jLabelTitle;
+    private javax.swing.JLabel jLabelTitlemetod;
+    private javax.swing.JLabel jLabelVidBalance;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextFieldBQ;
+    private javax.swing.JTextField jTextFieldDateEnd;
+    private javax.swing.JTextField jTextFieldDateStart;
+    private javax.swing.JTextField jTextFieldLQ;
+    private javax.swing.JTextField jTextFieldMetodPaumentItemMax;
+    private javax.swing.JTextField jTextFieldMetodPaumentItemMin;
 
 }
