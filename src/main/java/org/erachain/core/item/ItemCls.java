@@ -15,6 +15,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.Iconable;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
@@ -24,6 +25,7 @@ import org.mapdb.Fun.Tuple6;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -675,21 +677,26 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             start = size;
         }
         output.put("start", start);
+        output.put("pageSize", pageSize);
+        output.put("listSize", size);
 
-        long key = start;
         JSONArray array = new JSONArray();
 
-        while (key > start - pageSize && key > 0) {
-            element = map.get(key--);
-            if (element != null) {
-                array.add(element.toJsonLite(true));
+        long key = 0;
+        try (IteratorCloseable<Long> iterator = map.getIteratorFrom(start, true)) {
+            while (iterator.hasNext() && pageSize-- > 0) {
+                key = iterator.next();
+                element = map.get(key);
+                if (element != null) {
+                    array.add(element.toJsonLite(true));
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         output.put("pageItems", array);
-        output.put("pageSize", pageSize);
-        output.put("listSize", size);
-        output.put("lastNumber", key);
+        output.put("lastKey", key);
 
     }
 
