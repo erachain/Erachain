@@ -340,6 +340,10 @@ public class ExData {
         return json;
     }
 
+    public JSONObject getTemplateValues() {
+        return json == null ? null : (JSONObject) json.get("PR");
+    }
+
     public HashMap<String, Tuple3<byte[], Boolean, byte[]>> getFiles() {
         return files;
     }
