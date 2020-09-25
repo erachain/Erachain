@@ -1,9 +1,10 @@
-package org.erachain.gui.items.assets;
+package org.erachain.gui.exdata;
 
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.IconPanel;
+import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.models.RenderComboBoxOtborPoDeistviy;
 import org.erachain.gui.models.RenderComboBoxVidBalance;
 

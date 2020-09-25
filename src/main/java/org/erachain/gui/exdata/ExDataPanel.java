@@ -8,7 +8,6 @@ import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.items.assets.MultiPayOutsPanel;
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.*;
