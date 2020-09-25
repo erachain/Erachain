@@ -503,43 +503,13 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
             return;
         }
 
-        if (true) {
-            this.txtRecDetails.setText(Account.getDetailsForEncrypt(recipient, asset.getKey(),
-                    encrypted.isSelected()));
+        this.txtRecDetails.setText(Lang.getInstance().translate(
+                Account.getDetailsForEncrypt(recipient, asset.getKey(),
+                        encrypted.isSelected())));
 
-            Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipient);
-            if (accountRes.b == null) {
-                messagesHistoryTable.setSideAccount(accountRes.a);
-            }
-
-        } else {
-
-            if (recipientBox.getSelectedAddress().equals("has no Addresses")) {
-                txtRecDetails.setText(person.viewName() + " " + Lang.getInstance().translate("has no Accounts"));
-                messagesHistoryTable.setSideAccount(null);
-                return;
-            }
-
-            Account account = null;
-            Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipient);
-
-            // CHECK IF RECIPIENT IS VALID ADDRESS
-            if (accountRes.a == null) {
-                txtRecDetails.setText(accountRes.b);
-                messagesHistoryTable.setSideAccount(null);
-
-                return;
-            } else {
-                account = accountRes.a;
-
-                txtRecDetails.setText(account.toString(asset.getKey()));
-
-                if (account.getBalanceUSE(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
-                        && account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0) {
-                    txtRecDetails.setText(Lang.getInstance().translate("Warning!") + " " + txtRecDetails.getText());
-
-                }
-            }
+        Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipient);
+        if (accountRes.b == null) {
+            messagesHistoryTable.setSideAccount(accountRes.a);
         }
 
         sendButton.setEnabled(true);

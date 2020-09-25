@@ -18,7 +18,10 @@ import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
-import org.erachain.gui.library.*;
+import org.erachain.gui.library.AddImageLabel;
+import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.MButton;
+import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
@@ -716,7 +719,8 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
     private void refreshReceiverDetails(String registrarStr) {
 
         //Account
-        this.registrarAddressDesc.setText(Account.getDetailsForEncrypt(registrarStr, AssetCls.FEE_KEY, true));
+        this.registrarAddressDesc.setText(Lang.getInstance().translate(
+                Account.getDetailsForEncrypt(registrarStr, AssetCls.FEE_KEY, true)));
 
         registrar = null;
         if (registrarStr != null && !registrarStr.isEmpty()) {
