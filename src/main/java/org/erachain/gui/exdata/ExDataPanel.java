@@ -1,5 +1,6 @@
 package org.erachain.gui.exdata;
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
@@ -369,9 +370,12 @@ public class ExDataPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
 
         jTabbedPane_Type.addTab(Lang.getInstance().translate("Type"), docTypeAppendixPanel);
-        JScrollPane multiPayScrollBar = new JScrollPane();
-        multiPayScrollBar.setViewportView(multiPayOutsPanel);
-        jTabbedPane_Type.addTab(Lang.getInstance().translate("Multi pay out"), multiPayScrollBar);
+
+        if (BlockChain.TEST_MODE) {
+            JScrollPane multiPayScrollBar = new JScrollPane();
+            multiPayScrollBar.setViewportView(multiPayOutsPanel);
+            jTabbedPane_Type.addTab(Lang.getInstance().translate("Multi pay out"), multiPayScrollBar);
+        }
 
         jTabbedPane_Type.addTab(Lang.getInstance().translate("Recipients"), multipleRecipientsPanel);
 
