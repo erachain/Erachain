@@ -374,7 +374,7 @@ public class ExDataPanel extends JPanel {
         if (BlockChain.TEST_MODE) {
             JScrollPane multiPayScrollBar = new JScrollPane();
             multiPayScrollBar.setViewportView(multiPayOutsPanel);
-            jTabbedPane_Type.addTab(Lang.getInstance().translate("Multi pay out"), multiPayScrollBar);
+            jTabbedPane_Type.addTab(Lang.getInstance().translate("Payouts"), multiPayScrollBar);
         }
 
         jTabbedPane_Type.addTab(Lang.getInstance().translate("Recipients"), multipleRecipientsPanel);
