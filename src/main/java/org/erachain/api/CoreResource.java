@@ -52,7 +52,8 @@ public class CoreResource {
             jsonClone.put("timestamp", Controller.getInstance().blockChain.getGenesisBlock().getTimestamp());
             jsonClone.put("sign", Base58.encode(Controller.getInstance().blockChain.getGenesisBlock().getSignature()));
 
-            jsonObject.put(Settings.CLONE_OR_SIDE.toLowerCase(), jsonClone);
+            if (false) jsonObject.put(Settings.CLONE_OR_SIDE.toLowerCase(), jsonClone);
+            else jsonObject.put("side", jsonClone);
 
         }
         return jsonObject;
