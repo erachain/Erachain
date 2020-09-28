@@ -52,7 +52,7 @@ public class CoreResource {
             jsonClone.put("timestamp", Controller.getInstance().blockChain.getGenesisBlock().getTimestamp());
             jsonClone.put("sign", Base58.encode(Controller.getInstance().blockChain.getGenesisBlock().getSignature()));
 
-            jsonObject.put("clone", jsonClone);
+            jsonObject.put(Settings.CLONE_OR_SIDE.toLowerCase(), jsonClone);
 
         }
         return jsonObject;

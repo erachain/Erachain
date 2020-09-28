@@ -41,7 +41,9 @@ public class Settings {
     public static long genesisStamp = DEFAULT_MAINNET_STAMP;
 
     public static String peersURL = "https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json";
-    public static String cloneLicense; // see clonePROTOCOL_example.json
+    public static String cloneLicense; // see sidePROTOCOL_example.json
+
+    public static final String CLONE_OR_SIDE = "Side"; // cloneChain or SideChain
 
     //private static final String[] DEFAULT_PEERS = { };
     public static final int DEFAULT_ACCOUNTS = 1;
@@ -303,7 +305,7 @@ public class Settings {
 
     public String getPeersPath() {
         return this.userPath + (isDemoNet() ? "peers-demo.json" : isTestNet() ? "peers-test.json" :
-                isCloneNet() ? "clonePEERS.json" : "peers.json");
+                isCloneNet() ? Settings.CLONE_OR_SIDE.toLowerCase() + "PEERS.json" : "peers.json");
     }
 
     public String getDataWalletPath() {

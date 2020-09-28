@@ -4,8 +4,9 @@
   // Blocks period [sec], minumum: 3, default: 30
   "blockPeriod": 5,
   // external Block Explorer
-  "explorer": "http://my-clonechain.dom:9057",
+  "explorer": "http://my-chain.dom:9057",
   "cloneLicense": "Clonechain Licence Agreement.pdf",
+  "sideLicense": "Sidechain Licence Agreement.pdf",
   // COMPU it is Fee Asset
   ////"COMPU_Accuracy": 8,
   //

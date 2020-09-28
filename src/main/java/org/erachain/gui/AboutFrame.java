@@ -3,6 +3,7 @@ package org.erachain.gui;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 
 import javax.swing.*;
@@ -88,7 +89,7 @@ public class AboutFrame extends JDialog implements Observer {
 
         int gridy = 2;
         if (BlockChain.CLONE_MODE) {
-            JLabel appNameLabel = new JLabel(Lang.getInstance().translate("clonechain") + ": "
+            JLabel appNameLabel = new JLabel(Lang.getInstance().translate(Settings.CLONE_OR_SIDE.toLowerCase() + "chain") + ": "
                     + Controller.getInstance().APP_NAME);
             appNameLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
             appNameLabel.setForeground(Color.RED);

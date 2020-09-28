@@ -459,9 +459,9 @@ public class BlockChain {
         if (TEST_DB > 0 || TEST_MODE && !DEMO_MODE) {
             ;
         } else if (CLONE_MODE) {
-            File file = new File("clonePROTOCOL.json");
+            File file = new File(Settings.CLONE_OR_SIDE.toLowerCase() + "PROTOCOL.json");
             if (file.exists()) {
-                LOGGER.info("clonePROTOCOL.json USED");
+                LOGGER.info(Settings.CLONE_OR_SIDE.toLowerCase() + "PROTOCOL.json USED");
                 // START SIDE CHAIN
                 String jsonString = "";
                 try {
@@ -515,8 +515,8 @@ public class BlockChain {
                     Settings.peersURL = chainParams.get("peersURL").toString();
                 }
 
-                if (chainParams.containsKey("cloneLicense")) {
-                    Settings.cloneLicense = chainParams.get("cloneLicense").toString();
+                if (chainParams.containsKey(Settings.CLONE_OR_SIDE.toLowerCase() + "License")) {
+                    Settings.cloneLicense = chainParams.get(Settings.CLONE_OR_SIDE.toLowerCase() + "License").toString();
                 }
 
                 if (chainParams.containsKey("startKey")) {
