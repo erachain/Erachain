@@ -374,6 +374,8 @@ public class BlockChain {
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
 
     public static final int TIME_ROYALTY_START = 1;
+    public static final int TIME_ROYALTY_PERCENT = 8400; // x0.001
+    public static final int TIME_ROYALTY_MIN = 1000; // x0.001
 
     /**
      * Multi-level Referal Sysytem. Levels for deep
@@ -1083,7 +1085,7 @@ public class BlockChain {
             }
         } else {
             if (previousForgingPoint == null)
-                return 0l;
+                return 0L;
         }
 
         int previousForgingHeight = previousForgingPoint.a;
