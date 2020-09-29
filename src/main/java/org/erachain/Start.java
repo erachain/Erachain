@@ -108,10 +108,10 @@ public class Start {
         }
 
         ///////////////////  CLONECHAINS ///////////
-        file = new File("cloneGENESIS.json");
+        file = new File(Settings.CLONE_OR_SIDE.toLowerCase() + "GENESIS.json");
         if (Settings.NET_MODE == Settings.NET_MODE_MAIN && Settings.TEST_DB_MODE == 0 && file.exists()) {
             // START SIDE CHAIN
-            LOGGER.info("cloneGENESIS.json USED");
+            LOGGER.info(Settings.CLONE_OR_SIDE.toLowerCase() + "GENESIS.json USED");
             try {
                 List<String> lines = Files.readLines(file, Charsets.UTF_8);
 

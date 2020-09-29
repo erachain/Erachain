@@ -1,9 +1,9 @@
-# Clonechains
+# Sidechains (Clonechains)
 How make Your own blockchain with KYC, exchange, assets, polls etc. as clone of Erachain blockchain
 
-For start Your own clonechain put genesis.json file into application folder. See examples in z_genesis folder.
+For start Your own blockchain put sideGENESIS.json file into application folder. See examples in z_SIDECHAIN_EXAMPLES folder.
 
-See https://github.com/erachain/clonechains
+See https://github.com/erachain/sidechains
 
 В файле genesis.json необходимо указать данные для цепочки:
 + имя цепочки  
