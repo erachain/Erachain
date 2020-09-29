@@ -375,7 +375,7 @@ public class BlockChain {
 
     public static final int TIME_ROYALTY_START = 1;
     public static final int TIME_ROYALTY_PERCENT = 8400; // x0.001
-    public static final int TIME_ROYALTY_MIN = 1000; // x0.001
+    public static final int TIME_ROYALTY_MIN = 10; // x0.001
 
     /**
      * Multi-level Referal Sysytem. Levels for deep

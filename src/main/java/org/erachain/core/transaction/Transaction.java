@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -1737,69 +1738,81 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     // previous forging block or changed ERA volume
-    public Tuple3<Long, Long, Long> getRoyaltyData(Long person) {
-        return dcSet.getTimeRoyaltyMap().get(person, dbRef);
+    public Tuple3<Long, Long, Long> peekRoyaltyData(Long personKey) {
+        return dcSet.getTimeRoyaltyMap().peek(personKey);
     }
 
-    public void setRoyaltyData(Long person, Long royaltyBalance) {
-        dcSet.getTimeRoyaltyMap().putAndProcess(person, dbRef, royaltyBalance);
+    public void pushRoyaltyData(Long personKey, Long royaltyBalance, Long royaltyValue) {
+        dcSet.getTimeRoyaltyMap().push(personKey, dbRef, royaltyBalance, royaltyValue);
     }
 
-    public Tuple3<Long, Long, Long> removeRoyaltyData(Long person) {
-        return dcSet.getTimeRoyaltyMap().removeAndProcess(new Tuple2<Long, Long>(person, dbRef));
-    }
-
-    public Tuple3<Long, Long, Long> getLastRoyaltyData(Long person) {
-        return dcSet.getTimeRoyaltyMap().getLast(person);
+    public Tuple3<Long, Long, Long> popRoyaltyData(Long personKey) {
+        return dcSet.getTimeRoyaltyMap().pop(personKey);
     }
 
     private void calcRoyalty(Block block, Account account, Long personKey, long koeff, boolean asOrphan) {
 
-        BigDecimal giftBG;
+        BigDecimal royaltyBG;
         if (asOrphan) {
             // это откат - списываем
-            Tuple3<Long, Long, Long> lastValue = removeRoyaltyData(personKey);
-            giftBG = BigDecimal.valueOf(lastValue.a, BlockChain.FEE_SCALE);
+            Tuple3<Long, Long, Long> lastValue = peekRoyaltyData(personKey);
+            if (lastValue.c == 0) {
+                return;
+            }
+
+            royaltyBG = BigDecimal.valueOf(lastValue.c, BlockChain.FEE_SCALE);
 
         } else {
             // это прямое начисление
-
-            Tuple3<Long, Long, Long> lastRoyaltyPoint = getLastRoyaltyData(personKey);
-            if (lastRoyaltyPoint == null)
+            BigDecimal balance = account.getBalance(dcSet, FEE_KEY, 1).b;
+            if (balance == null)
                 return;
+
+            Long royaltyBalance = balance.setScale(BlockChain.FEE_SCALE).longValue();
+            Tuple3<Long, Long, Long> lastRoyaltyPoint = peekRoyaltyData(personKey);
+            if (lastRoyaltyPoint == null) {
+                // уще ничего не было - считать нечего
+                pushRoyaltyData(personKey, royaltyBalance, 0L);
+                return;
+            }
+
+            if (royaltyBalance == 0) {
+                return;
+            }
 
             Long previousForgingSeqNo = lastRoyaltyPoint.a;
             int diff = height - (int) (previousForgingSeqNo >> 32);
             if (diff < 1) {
-                // TODO если уменьшается то ?? или если увеличивается?? надо обработать
+                pushRoyaltyData(personKey, royaltyBalance, 0L);
                 return;
             }
 
             long perc = diff * koeff;
-            if (perc < BlockChain.TIME_ROYALTY_MIN)
+            if (perc < BlockChain.TIME_ROYALTY_MIN) {
+                pushRoyaltyData(personKey, royaltyBalance, 0L);
                 return;
+            }
 
-            Tuple2<BigDecimal, BigDecimal> balance = account.getBalance(dcSet, FEE_KEY, 1);
-            giftBG = BigDecimal.valueOf(perc, BlockChain.FEE_SCALE).multiply(balance.b);
-            Long giftValue = giftBG.setScale(BlockChain.FEE_SCALE).longValue();
+            royaltyBG = BigDecimal.valueOf(perc, BlockChain.FEE_SCALE).multiply(balance).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
+            Long royaltyValue = royaltyBG.longValue();
 
-            setRoyaltyData(personKey, giftBG.setScale(BlockChain.FEE_SCALE).longValue());
+            pushRoyaltyData(personKey, royaltyBalance, royaltyValue);
 
         }
 
-        account.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false, true);
+        account.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, royaltyBG, false, true);
         // учтем что получили бонусы
-        account.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
+        account.changeCOMPUBonusBalances(dcSet, asOrphan, royaltyBG, Transaction.BALANCE_SIDE_DEBIT);
 
-        if (block.txCalculated != null && !asOrphan) {
-            block.txCalculated.add(new RCalculated(account, FEE_KEY, giftBG,
+        if (block != null && block.txCalculated != null && !asOrphan) {
+            block.txCalculated.add(new RCalculated(account, FEE_KEY, royaltyBG,
                     "EXO-maining ", this.dbRef, seqNo));
 
         }
 
         // учтем эмиссию
         GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
-                giftBG, true, false);
+                royaltyBG, true, false);
 
 
     }
@@ -1820,7 +1833,6 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (creator != null) {
                 personDuration = creator.getPersonDuration(dcSet);
                 if (personDuration != null && personDuration.a != null) {
-                    Tuple3<Long, Long, Long> lastValue = removeRoyaltyData(personDuration.a);
                     calcRoyalty(block, creator, personDuration.a, koeff, asOrphan);
                 }
             }
@@ -1839,13 +1851,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (creator != null) {
                 personDuration = creator.getPersonDuration(dcSet);
                 if (personDuration != null && personDuration.a != null) {
-                    Long personKey = personDuration.a;
-                    Tuple3<Long, Long, Long> lastRoyaltyPoint = getLastRoyaltyData(personKey);
-                    if (lastRoyaltyPoint == null)
-                        return;
-
-                    calcRoyalty(block, creator, personKey, koeff, asOrphan);
-
+                    calcRoyalty(block, creator, personDuration.a, koeff, asOrphan);
                 }
             }
 
