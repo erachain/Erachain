@@ -129,6 +129,15 @@ public class BlockExplorer {
 
     }
 
+    /**
+     * Для списков с ключом LONG - для сущностей всех например
+     *
+     * @param type
+     * @param start    LONG
+     * @param pageSize
+     * @param output
+     * @param langObj
+     */
     public void makePage(Class type, long start, int pageSize,
                          Map output, JSONObject langObj) {
 
@@ -159,6 +168,16 @@ public class BlockExplorer {
 
     }
 
+    /**
+     * Для списков с ключом INT - для блоков
+     *
+     * @param type
+     * @param keys
+     * @param start
+     * @param pageSize
+     * @param output
+     * @param langObj
+     */
     public void makePage(Class type, List keys, int start, int pageSize,
                          Map output, JSONObject langObj) {
 

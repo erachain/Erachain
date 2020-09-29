@@ -103,7 +103,7 @@ public class API {
         help.put("GET Record by Height and Sequence", "recordbynumber/{height-sequence}");
         help.put("GET Record RAW", "recordraw/{signature}");
         help.put("GET Record RAW by Height and Sequence", "recordrawbynumber/{block-seqNo]");
-        help.put("GET Record RAW by Height and Sequence", "recordrawbynumber/{block]/[seqNo]");
+        help.put("GET Record RAW by Height and Sequence 2", "recordrawbynumber/{block]/[seqNo]");
 
         help.put("*** ADDRESS ***", "");
         help.put("GET Address Validate", "addressvalidate/{address}");
