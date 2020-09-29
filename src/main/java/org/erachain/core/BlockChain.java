@@ -373,6 +373,7 @@ public class BlockChain {
     //
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
 
+    public static final int TIME_ROYALTY_START = 1;
 
     /**
      * Multi-level Referal Sysytem. Levels for deep

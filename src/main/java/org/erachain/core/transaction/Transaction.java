@@ -1736,6 +1736,18 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     }
 
+    /**
+     * Time Royalty for Person
+     *
+     * @param asOrphan
+     */
+    public void processRoyalty(boolean asOrphan) {
+        if (BlockChain.TIME_ROYALTY_START <= 0)
+            return;
+
+
+    }
+
     // REST
 
     // public abstract void process(DLSet db);
@@ -1751,6 +1763,9 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         if (forDeal > Transaction.FOR_PACK) {
             // this.calcFee();
+
+            // CALC ROYALTY
+            processRoyalty(false);
 
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
