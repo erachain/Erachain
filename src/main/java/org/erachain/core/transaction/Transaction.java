@@ -1787,13 +1787,15 @@ public abstract class Transaction implements ExplorerJsonLine {
                 return;
             }
 
-            long perc = diff * koeff;
-            if (perc < BlockChain.TIME_ROYALTY_MIN) {
+            long percent = diff * koeff;
+            if (percent < BlockChain.TIME_ROYALTY_MIN) {
                 pushRoyaltyData(personKey, royaltyBalance, 0L);
                 return;
             }
 
-            royaltyBG = BigDecimal.valueOf(perc, BlockChain.FEE_SCALE).multiply(balance).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
+            royaltyBG = BigDecimal.valueOf(percent, BlockChain.FEE_SCALE).multiply(balance)
+                    .movePointRight(8)
+                    .setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
             Long royaltyValue = royaltyBG.longValue();
 
             pushRoyaltyData(personKey, royaltyBalance, royaltyValue);
@@ -1826,7 +1828,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (BlockChain.TIME_ROYALTY_START <= 0)
             return;
 
-        long koeff = 30L * (long) BlockChain.BLOCKS_PER_DAY(height) * (long) BlockChain.TIME_ROYALTY_PERCENT / 1000L;
+        long koeff = 1000000L * (long) BlockChain.TIME_ROYALTY_PERCENT / (30L * (long) BlockChain.BLOCKS_PER_DAY(height));
         Tuple4<Long, Integer, Integer, Integer> personDuration;
 
         if (asOrphan) {
