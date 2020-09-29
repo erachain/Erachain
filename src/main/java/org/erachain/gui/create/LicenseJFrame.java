@@ -186,8 +186,8 @@ public class LicenseJFrame extends JDialog {
                 setVisible(false);
 
                 if (parent != null) {
-                    if (BlockChain.CLONE_MODE && Settings.sideLicense != null) {
-                        File sideLicense = new File(Settings.sideLicense);
+                    if (BlockChain.CLONE_MODE && Settings.cloneLicense != null) {
+                        File sideLicense = new File(Settings.cloneLicense);
                         if (sideLicense.isFile()) {
                             th.setVisible(false);
                             new LicenseDataJFrame(true, parent, goCreateWallet);
