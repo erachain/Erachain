@@ -218,8 +218,8 @@ public class MenuFiles extends JMenu {
                             panel);
 
                     AssetCls asset = ct.getAsset(assetKey);
-                    panel.jTextField_To.setText(recipient);
-                    panel.jTextField_To.setEditable(false);
+                    panel.recipientAddress.setSelectedAddress(recipient);
+                    panel.recipientAddress.setEditable(false);
                     panel.jTextField_Mess_Title.setText(head);
                     panel.jTextField_Mess_Title.setEditable(false);
                     panel.jTextField_Amount.setText(amount);

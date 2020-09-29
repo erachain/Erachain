@@ -6,11 +6,16 @@ import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
+import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -24,27 +29,69 @@ public class RecipientAddress extends JComboBox {
     private int ADD_EVENT;
     private int DELETE_EVENT;
     private int LIST_EVENT;
-    protected Observable observable;
+    private String selectedItem = "";
+    private JTextField comboTextField;
+    private RecipientAddressInterface worker = null;
 
-    public RecipientAddress() {
+
+    public RecipientAddress(RecipientAddressInterface item) {
         RecipientModel model = new RecipientModel();
         this.setModel(model);
+        this.setRenderer(model.getRender());
+
         this.setEditable(true);
+        worker = item;
+
+// select & edit text account
+        comboTextField = (JTextField) this.getEditor().getEditorComponent();
+        MenuPopupUtil.installContextMenu(comboTextField);
+        comboTextField.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                lifework(e);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                lifework(e);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                lifework(e);
+            }
+        });
+    }
+
+    private void lifework(DocumentEvent e){
+        selectedItem = comboTextField.getText();
+        if (worker != null) {
+            try {
+                worker.recipientAddressWorker(selectedItem);
+            } catch (Exception ex) {
+                // ex.printStackTrace();
+            }
+        }
 
     }
 
     public String getSelectedAddress() {
-        return (String) this.getSelectedItem();
+        return this.selectedItem;
     }
 
-    // model
+    public void setSelectedAddress(String address) {
+        this.selectedItem = address;
+    }
+
+    // model class
     class RecipientModel extends DefaultComboBoxModel<String> implements Observer, ObserverWaiter {
         protected FavoriteAccountsMap favoriteMap;
 
         public RecipientModel() {
             favoriteMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
             addObservers();
-            //          sortAndAdd();
+
         }
 
         @Override
@@ -63,6 +110,7 @@ public class RecipientAddress extends JComboBox {
             }
         }
 
+
         public synchronized void syncUpdate(Observable o, Object arg) {
             ObserverMessage message = (ObserverMessage) arg;
 
@@ -71,11 +119,16 @@ public class RecipientAddress extends JComboBox {
             if (type == LIST_EVENT || type == RESET_EVENT) {
                 sortAndAdd();
             } else if (type == ADD_EVENT) {
-                this.addElement(((Pair<String, Fun.Tuple3<String, String, String>>) message.getValue()).getA());
+                this.addElement(((Pair<String, Object>) message.getValue()).getA());
 
             } else if (type == DELETE_EVENT) {
-                this.removeElement(((Pair<String, Fun.Tuple3<String, String, String>>) message.getValue()).getA());
+                this.removeElement(((Pair<String, Object>) message.getValue()).getA());
             }
+        }
+
+        @Override
+        public String getElementAt(int row) {
+            return super.getElementAt(row);
         }
 
         @Override
@@ -89,6 +142,7 @@ public class RecipientAddress extends JComboBox {
                 DELETE_EVENT = observersDBMap.get(DBTab.NOTIFY_REMOVE);
 
                 favoriteMap.addObserver(this);
+
             } else {
                 // ожидаем открытия кошелька
                 Controller.getInstance().wallet.addWaitingObserver(this);
@@ -100,9 +154,13 @@ public class RecipientAddress extends JComboBox {
             // add empty item
             this.addElement("");
             // add favorite address
-            IteratorCloseable<String> iterator = favoriteMap.getIterator();
-            while (iterator.hasNext()) {
-                this.addElement(iterator.next());
+            try (IteratorCloseable<String> iterator = favoriteMap.getIterator()) {
+                while (iterator.hasNext()) {
+                    String key = iterator.next();
+                    this.addElement(key);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
@@ -111,6 +169,32 @@ public class RecipientAddress extends JComboBox {
                 favoriteMap.deleteObserver(this);
         }
 
+        public Render getRender() {
+            return new Render();
+        }
+
+        public class Render extends DefaultListCellRenderer {
+
+            public Render() {
+            }
+
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value != null) {
+                    Fun.Tuple3<String, String, String> item = favoriteMap.get((String) value);
+                    if (item != null) {
+                        this.setText(item.b + " - " + value.toString());
+                    }
+                }
+                return this;
+            }
+        }
+
+    }
+
+    public interface RecipientAddressInterface {
+        public void recipientAddressWorker(String e);
     }
 
 }

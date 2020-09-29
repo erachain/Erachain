@@ -409,7 +409,10 @@ public class Library {
             return descr;
 
         // PLAIN TEXT
-        return descr.replaceAll(" ", "&ensp;").replaceAll("\t", "&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;")
+        return descr.replaceAll(" ", "&ensp;")
+                .replaceAll("\t", "&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
                 .replaceAll("\n", "<br>");
 
     }

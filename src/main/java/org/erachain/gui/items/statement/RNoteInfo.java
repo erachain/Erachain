@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -81,6 +82,8 @@ public class RNoteInfo extends javax.swing.JPanel {
         jTextArea_Body = new MTextPane();
         jPanel2 = new javax.swing.JPanel();
         file_Panel = new MAttachedFilesPanel();
+        file_Panel.setVisible(false);
+
         new javax.swing.JLabel();
 
         // jTable_Sign = new javax.swing.JTable();
@@ -249,7 +252,7 @@ public class RNoteInfo extends javax.swing.JPanel {
 
         ExLink exLink = exData.getExLink();
         if (exLink != null) {
-            resultStr += Lang.getInstance().translate("Link Type") + ": " + Lang.getInstance().translate(exLink.viewTypeName()) + " "
+            resultStr += Lang.getInstance().translate("Link Type") + ": " + Lang.getInstance().translate(exData.viewLinkTypeName()) + " "
                     + Lang.getInstance().translate("for # для") + " " + Transaction.viewDBRef(exLink.getRef());
             Transaction transaction = DCSet.getInstance().getTransactionFinalMap().get(exLink.getRef());
             resultStr += "<br>" + transaction.getTitle() + " : " + transaction.getCreator().getPersonAsString() + "</b><br>";
@@ -268,9 +271,13 @@ public class RNoteInfo extends javax.swing.JPanel {
         if (exData.hasRecipients()) {
             resultStr += "<h2>" + Lang.getInstance().translate("Recipients") + "</h2>";
             Account[] recipients = exData.getRecipients();
-            int i = 1;
-            for (Account recipient : recipients) {
-                resultStr += i + " " + recipient.getAddress() + "<br>";
+            int size = recipients.length;
+            for (int i = 1; i <= size; ++i) {
+                if (i > 7 && size > 10) {
+                    resultStr += "... <br>";
+                    i = size;
+                }
+                resultStr += i + " " + recipients[i - 1].getAddress() + "<br>";
             }
             resultStr += "<br>";
         }
@@ -288,6 +295,15 @@ public class RNoteInfo extends javax.swing.JPanel {
                 resultStr += Library.to_HTML(valuedText);
             }
             resultStr += "<hr><br>";
+
+            JSONObject params = exData.getTemplateValues();
+            if (params != null) {
+                resultStr += " <h3>" + Lang.getInstance().translate("Template Values") + "</h3>";
+                Set<String> keys = params.keySet();
+                for (String key : keys) {
+                    resultStr += key + ": " + params.get(key) + "<br>";
+                }
+            }
         }
 
         String message = exData.getMessage();
@@ -309,14 +325,26 @@ public class RNoteInfo extends javax.swing.JPanel {
         if (exData.hasFiles()) {
             HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = exData.getFiles();
             Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it_Files = files.entrySet().iterator();
-            while (it_Files.hasNext()) {
-                Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it_Files.next();
-                boolean zip = new Boolean(file.getValue().b);
-                String name_File = file.getKey();
-                byte[] file_byte = file.getValue().c;
-                file_Panel.addRow(name_File, zip, file_byte);
+            resultStr += "<h3>" + Lang.getInstance().translate("Files") + "</h3>";
+            if (true) {
+                int i = 1;
+                while (it_Files.hasNext()) {
+                    Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it_Files.next();
+                    boolean zip = new Boolean(file.getValue().b);
+                    String name_File = file.getKey();
+                    resultStr += i++ + " " + name_File + " " + (zip ? Lang.getInstance().translate("Ziped") : "") + "<br>";
+                }
+                resultStr += "<br";
+            } else {
+                while (it_Files.hasNext()) {
+                    Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it_Files.next();
+                    boolean zip = new Boolean(file.getValue().b);
+                    String name_File = file.getKey();
+                    byte[] file_byte = file.getValue().c;
+                    file_Panel.addRow(name_File, zip, file_byte);
+                }
+                file_Panel.fireTableDataChanged();
             }
-            file_Panel.fireTableDataChanged();
 
         } else if (statementEncrypted != null) {
             file_Panel.clear();

@@ -2077,7 +2077,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     this.txCalculated = new ArrayList<RCalculated>();
 
                 this.txCalculated.add(new RCalculated(this.creator, Transaction.FEE_KEY,
-                        forgerEarn, "forging", Transaction.makeDBRef(this.heightBlock, 0), 0l));
+                        forgerEarn, "forging", Transaction.makeDBRef(this.heightBlock, 0), 0L));
             }
         }
 

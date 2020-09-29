@@ -56,10 +56,11 @@ public class ExData {
 
     private static final byte ENCRYPT_FLAG_MASK = 32;
 
-    public static final int LINK_APPENDIX_TYPE = 1; // дополнение / приложение к другому документу или Сущности
-    public static final int LINK_COMMENT_TYPE = 2; // комментарий с оценкой
-    public static final int LINK_RATING_TYPE = 3; // оценка с значением
-    public static final int LINK_SURELY_TYPE = 4; // гарантия / поручительство на долю
+    public static final byte LINK_SIMPLE_TYPE = 0; // для выбора типа в ГУИ
+    public static final byte LINK_APPENDIX_TYPE = 1; // дополнение / приложение к другому документу или Сущности
+    public static final byte LINK_REPLY_COMMENT_TYPE = 2; // ответ всем на предыдущий документ - Ссылка для отслеживания
+    public static final byte LINK_COMMENT_TYPE_FOR_VIEW = 3; // замечание без получетелей - используется только для ГУИ
+    public static final byte LINK_SURELY_TYPE = 5; // гарантия / поручительство на долю
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExData.class);
 
@@ -303,6 +304,14 @@ public class ExData {
         return exLink.getValue2();
     }
 
+    public String viewLinkTypeName() {
+        if (exLink == null) {
+            return ExLink.viewTypeName(LINK_SIMPLE_TYPE, false);
+        }
+        return exLink.viewTypeName(hasRecipients());
+    }
+
+
     public String getTitle() {
         return title;
     }
@@ -329,6 +338,10 @@ public class ExData {
 
     public JSONObject getJsonObject() {
         return json;
+    }
+
+    public JSONObject getTemplateValues() {
+        return json == null ? null : (JSONObject) json.get("PR");
     }
 
     public HashMap<String, Tuple3<byte[], Boolean, byte[]>> getFiles() {
@@ -988,8 +1001,8 @@ public class ExData {
 
         if (exLink != null) {
             output.put("Label_LinkType", Lang.getInstance().translateFromLangObj("Link Type", langObj));
-            output.put("exLink_Name", Lang.getInstance().translateFromLangObj(exLink.viewTypeName(), langObj));
-            output.put("exLink", exLink.makeJSONforHTML());
+            output.put("exLink_Name", Lang.getInstance().translateFromLangObj(exLink.viewTypeName(hasRecipients()), langObj));
+            output.put("exLink", exLink.makeJSONforHTML(hasRecipients()));
             output.put("Label_Parent", Lang.getInstance().translateFromLangObj("for # для", langObj));
 
         }
@@ -1143,7 +1156,7 @@ public class ExData {
         toJson.put("title", title);
 
         if (exLink != null) {
-            toJson.put("exLink", exLink.toJson());
+            toJson.put("exLink", exLink.toJson(hasRecipients()));
         }
 
         if (hasRecipients()) {

@@ -357,7 +357,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                         setHeight(j);
                     }
 
-                    if (messageBufs.get(1).getOpend() && Controller.getInstance().isWalletUnlocked()) {
+                    if (!messageBufs.isEmpty() && messageBufs.get(0).getOpend() && Controller.getInstance().isWalletUnlocked()) {
                         CryptoOpenBox(0, 1);
                     }
 
@@ -699,9 +699,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
             }
 
             String decrMessage = this.getDecrMessage();
-            decrMessage = decrMessage.replace("<", "&lt;");
-            decrMessage = decrMessage.replace(">", "&gt;");
-            decrMessage = decrMessage.replace("\n", "<br>");
+            decrMessage = Library.to_HTML(decrMessage);
 
             String amountStr = "";
 
@@ -766,7 +764,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                     + "><td width='25'>"
                     + "<td width='" + width + "'>"
                     + "<font size='2.5' color='" + colorTextMessage + "'>"
-                    + Library.to_HTML(decrMessage)
+                    + decrMessage
                     + "</font>"
                     + "<td width='30'>" + imgLock
                     + "</td></tr></table>"
