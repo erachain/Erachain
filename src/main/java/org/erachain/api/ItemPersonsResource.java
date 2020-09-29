@@ -6,6 +6,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
@@ -74,6 +75,20 @@ public class ItemPersonsResource {
         }
 
         return array.toJSONString();
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("listfrom/{start}")
+    public String getList(@PathParam("start") long start,
+                          @DefaultValue("20") @QueryParam("page") int page,
+                          @DefaultValue("true") @QueryParam("showperson") boolean showPerson,
+                          @DefaultValue("true") @QueryParam("desc") boolean descending) {
+
+        JSONObject output = new JSONObject();
+        ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.PERSON_TYPE, start, page, output, showPerson, descending);
+
+        return output.toJSONString();
     }
 
     @POST
