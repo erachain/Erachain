@@ -1753,7 +1753,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         return dcSet.getTimeRoyaltyMap().getLast(person);
     }
 
-    private void calcRoyalty(Block block, Long personKey, long koeff, boolean asOrphan) {
+    private void calcRoyalty(Block block, Account account, Long personKey, long koeff, boolean asOrphan) {
 
         BigDecimal giftBG;
         if (asOrphan) {
@@ -1779,7 +1779,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (perc < BlockChain.TIME_ROYALTY_MIN)
                 return;
 
-            Tuple2<BigDecimal, BigDecimal> balance = creator.getBalance(dcSet, FEE_KEY, 1);
+            Tuple2<BigDecimal, BigDecimal> balance = account.getBalance(dcSet, FEE_KEY, 1);
             giftBG = BigDecimal.valueOf(perc, BlockChain.FEE_SCALE).multiply(balance.b);
             Long giftValue = giftBG.setScale(BlockChain.FEE_SCALE).longValue();
 
@@ -1787,12 +1787,12 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         }
 
-        creator.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false, true);
+        account.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false, true);
         // учтем что получили бонусы
-        creator.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
+        account.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
 
         if (block.txCalculated != null && !asOrphan) {
-            block.txCalculated.add(new RCalculated(creator, FEE_KEY, giftBG,
+            block.txCalculated.add(new RCalculated(account, FEE_KEY, giftBG,
                     "EXO-maining ", this.dbRef, seqNo));
 
         }
@@ -1814,43 +1814,51 @@ public abstract class Transaction implements ExplorerJsonLine {
             return;
 
         long koeff = 30L * (long) BlockChain.BLOCKS_PER_DAY(height) * (long) BlockChain.TIME_ROYALTY_PERCENT / 1000L;
+        Tuple4<Long, Integer, Integer, Integer> personDuration;
 
         if (asOrphan) {
             if (creator != null) {
-                Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(dcSet);
+                personDuration = creator.getPersonDuration(dcSet);
                 if (personDuration != null && personDuration.a != null) {
                     Tuple3<Long, Long, Long> lastValue = removeRoyaltyData(personDuration.a);
-                    calcRoyalty(block, personDuration.a, koeff, asOrphan);
+                    calcRoyalty(block, creator, personDuration.a, koeff, asOrphan);
                 }
+            }
 
-                HashSet<Account> recipients = getRecipientAccounts();
-                if (recipients != null && !recipients.isEmpty()) {
-                    for (Account recipient : recipients) {
-                        personDuration = recipient.getPersonDuration(dcSet);
-                        if (personDuration != null && personDuration.a != null) {
-                            calcRoyalty(block, personDuration.a, koeff, asOrphan);
-                        }
+            HashSet<Account> recipients = getRecipientAccounts();
+            if (recipients != null && !recipients.isEmpty()) {
+                for (Account recipient : recipients) {
+                    personDuration = recipient.getPersonDuration(dcSet);
+                    if (personDuration != null && personDuration.a != null) {
+                        calcRoyalty(block, recipient, personDuration.a, koeff, asOrphan);
                     }
                 }
             }
         } else {
 
             if (creator != null) {
-
-                Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(dcSet);
+                personDuration = creator.getPersonDuration(dcSet);
                 if (personDuration != null && personDuration.a != null) {
                     Long personKey = personDuration.a;
                     Tuple3<Long, Long, Long> lastRoyaltyPoint = getLastRoyaltyData(personKey);
                     if (lastRoyaltyPoint == null)
                         return;
 
-                    calcRoyalty(block, personKey, koeff, asOrphan);
+                    calcRoyalty(block, creator, personKey, koeff, asOrphan);
 
                 }
             }
-        }
 
-        HashSet<Account> recipients = getRecipientAccounts();
+            HashSet<Account> recipients = getRecipientAccounts();
+            if (recipients != null && !recipients.isEmpty()) {
+                for (Account recipient : recipients) {
+                    personDuration = recipient.getPersonDuration(dcSet);
+                    if (personDuration != null && personDuration.a != null) {
+                        calcRoyalty(block, recipient, personDuration.a, koeff, asOrphan);
+                    }
+                }
+            }
+        }
 
     }
 
