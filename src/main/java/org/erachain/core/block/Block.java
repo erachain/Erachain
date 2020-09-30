@@ -2243,7 +2243,8 @@ public class Block implements Closeable, ExplorerJsonLine {
     private void makeHoldRoyalty(DCSet dcSet, boolean asOrphan) {
 
         // ловим блок когда можно начислять
-        if (heightBlock % BlockChain.HOLD_ROYALTY_PERIOD_DAYS * BlockChain.BLOCKS_PER_DAY(heightBlock) != 0)
+        if (heightBlock % 10 != 0)
+            //BlockChain.HOLD_ROYALTY_PERIOD_DAYS * BlockChain.BLOCKS_PER_DAY(heightBlock) != 0)
             return;
 
         // если сумма малая - не начисляем
@@ -2269,6 +2270,10 @@ public class Block implements Closeable, ExplorerJsonLine {
                 holder.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY, balanceHold, false, true);
                 // учтем что получили бонусы
                 holder.changeCOMPUBonusBalances(dcSet, asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
+
+                // у эмитента снимем
+                BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY, balanceHold, false, true);
+                BlockChain.HOLD_ROYALTY_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
 
                 totalPayedRoyalty = totalPayedRoyalty.add(balanceHold);
             }

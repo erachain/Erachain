@@ -381,7 +381,7 @@ public class BlockChain {
 
     public static final BigDecimal HOLD_ROYALTY_MIN = new BigDecimal("0.0100"); // если меньше то распределение не делаем
     public static final int HOLD_ROYALTY_PERIOD_DAYS = 1; // как часто начисляем
-    public static final Account HOLD_ROYALTY_EMITTER = new Account("q"); // если меньше то распределение не делаем
+    public static Account HOLD_ROYALTY_EMITTER = new Account("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"); // если меньше то распределение не делаем
 
 
     /**
@@ -464,7 +464,7 @@ public class BlockChain {
     public BlockChain(DCSet dcSet_in) throws Exception {
 
         trustedPeers.addAll(Settings.getInstance().getTrustedPeers());
-
+        //HOLD_ROYALTY_EMITTER = new Account("q");
 
         if (TEST_DB > 0 || TEST_MODE && !DEMO_MODE) {
             ;
