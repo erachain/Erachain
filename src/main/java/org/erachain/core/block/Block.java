@@ -18,6 +18,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -2233,8 +2235,37 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     }
 
+    /**
+     * Начисление всем за участие в проекте
+     */
+    private void makeHoldRoyalty(DCSet dcSet, boolean asOrphan) {
+
+        // ловим блок когда можно начислять
+        if (heightBlock % BlockChain.HOLD_ROYALTY_PERIOD_DAYS * BlockChain.BLOCKS_PER_DAY(heightBlock) != 0)
+            return;
+
+        // если сумма малая - не начисляем
+        BigDecimal holdRoyalty = GenesisBlock.CREATOR.getBalance(dcSet, Transaction.FEE_KEY, TransactionAmount.ACTION_DEBT).b;
+        if (holdRoyalty.compareTo(BlockChain.HOLD_ROYALTY_MIN) < 0)
+            return;
+
+        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
+        try (IteratorCloseable<byte[]> iterator = map.getIteratorByAsset(Transaction.FEE_KEY)) {
+            BigDecimal balanceHold;
+            BigDecimal totalHold = ;
+            while (iterator.hasNext()) {
+                balanceHold = map.get(iterator.next()).a.b;
+            }
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
+
+    }
+
     // TODO - make it trownable
     public void process(DCSet dcSet) throws Exception {
+
+        makeHoldRoyalty(dcSet, false);
 
         Controller cnt = Controller.getInstance();
         if (cnt.isOnStopping())

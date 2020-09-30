@@ -373,12 +373,19 @@ public class BlockChain {
     //
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
 
-    public static final int TIME_ROYALTY_START = 1;
-    public static final int TIME_ROYALTY_PERCENT = 8400; // x0.001
-    public static final int TIME_ROYALTY_MIN = 10; // x0.001
+    public static final int ACTION_ROYALTY_START = 1;
+    public static final int ACTION_ROYALTY_PERCENT = 8400; // x0.001
+    public static final int ACTION_ROYALTY_MIN = 10; // x0.001
+    public static final int ACTION_ROYALTY_MAX_DAYS = 30; // x0.001
+    public static final BigDecimal ACTION_ROYALTY_TO_HOLD_ROYALTY = new BigDecimal("0.0100"); // сколько добавляем к награде
+
+    public static final BigDecimal HOLD_ROYALTY_MIN = new BigDecimal("0.0100"); // если меньше то распределение не делаем
+    public static final int HOLD_ROYALTY_PERIOD_DAYS = 1; // как часто начисляем
+    public static final Account HOLD_ROYALTY_EMITTER = new Account("q"); // если меньше то распределение не делаем
+
 
     /**
-     * Multi-level Referal Sysytem. Levels for deep
+     * Multi-level Referal System. Levels for deep
      */
     public static final int FEE_INVITED_DEEP = TEST_DB > 0 || MAIN_MODE ? 0 : 3;
     /**

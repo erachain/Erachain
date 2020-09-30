@@ -1764,7 +1764,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         } else {
             // это прямое начисление
-            BigDecimal balance = account.getBalance(dcSet, FEE_KEY, 1).b;
+            BigDecimal balance = account.getBalance(dcSet, FEE_KEY, TransactionAmount.ACTION_SEND).b;
             if (balance == null)
                 return;
 
@@ -1787,10 +1787,17 @@ public abstract class Transaction implements ExplorerJsonLine {
                 return;
             }
 
+            int dayBlocks = BlockChain.BLOCKS_PER_DAY(height);
+            int diffDays = diff / dayBlocks;
+            if (diffDays > BlockChain.ACTION_ROYALTY_MAX_DAYS) {
+                diff = BlockChain.ACTION_ROYALTY_MAX_DAYS * dayBlocks;
+            }
+
             long percent = diff * koeff;
-            if (percent < BlockChain.TIME_ROYALTY_MIN) {
+            if (percent < BlockChain.ACTION_ROYALTY_MIN) {
                 pushRoyaltyData(personKey, royaltyBalance, 0L);
                 return;
+
             }
 
             royaltyBG = BigDecimal.valueOf(percent, BlockChain.FEE_SCALE).multiply(balance)
@@ -1816,6 +1823,11 @@ public abstract class Transaction implements ExplorerJsonLine {
         GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
                 royaltyBG, true, false);
 
+        // учтем начисления для держателей долей
+        GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, false, -FEE_KEY,
+                royaltyBG.multiply(BlockChain.ACTION_ROYALTY_TO_HOLD_ROYALTY).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN),
+                true, false);
+
 
     }
 
@@ -1825,10 +1837,10 @@ public abstract class Transaction implements ExplorerJsonLine {
      * @param asOrphan
      */
     public void processRoyalty(Block block, boolean asOrphan) {
-        if (BlockChain.TIME_ROYALTY_START <= 0)
+        if (BlockChain.ACTION_ROYALTY_START <= 0)
             return;
 
-        long koeff = 1000000L * (long) BlockChain.TIME_ROYALTY_PERCENT / (30L * (long) BlockChain.BLOCKS_PER_DAY(height));
+        long koeff = 1000000L * (long) BlockChain.ACTION_ROYALTY_PERCENT / (30L * (long) BlockChain.BLOCKS_PER_DAY(height));
         Tuple4<Long, Integer, Integer, Integer> personDuration;
 
         if (asOrphan) {
