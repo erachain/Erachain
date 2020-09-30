@@ -16,6 +16,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
@@ -37,6 +38,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.*;
@@ -2245,17 +2247,37 @@ public class Block implements Closeable, ExplorerJsonLine {
             return;
 
         // если сумма малая - не начисляем
-        BigDecimal holdRoyalty = GenesisBlock.CREATOR.getBalance(dcSet, Transaction.FEE_KEY, TransactionAmount.ACTION_DEBT).b;
-        if (holdRoyalty.compareTo(BlockChain.HOLD_ROYALTY_MIN) < 0)
+        BigDecimal readyToRoyalty = GenesisBlock.CREATOR.getBalance(dcSet, Transaction.FEE_KEY, TransactionAmount.ACTION_DEBT).b;
+        if (readyToRoyalty.compareTo(BlockChain.HOLD_ROYALTY_MIN) < 0)
             return;
 
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
+        AssetCls asset = dcSet.getItemAssetMap().get(Transaction.FEE_KEY);
+        BigDecimal totalHold = asset.getReleased(dcSet);
+        BigDecimal koeff = readyToRoyalty.divide(totalHold, BlockChain.FEE_SCALE, RoundingMode.DOWN);
+        BigDecimal totalPayedRoyalty = BigDecimal.ZERO;
+
         try (IteratorCloseable<byte[]> iterator = map.getIteratorByAsset(Transaction.FEE_KEY)) {
             BigDecimal balanceHold;
-            BigDecimal totalHold = ;
+            Account holder;
             while (iterator.hasNext()) {
+                byte[] key = iterator.next();
+                holder = new Account(ItemAssetBalanceMap.getShortAccountFromKey(key));
                 balanceHold = map.get(iterator.next()).a.b;
+                balanceHold = balanceHold.multiply(koeff);
+
+                holder.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY, balanceHold, false, true);
+                // учтем что получили бонусы
+                holder.changeCOMPUBonusBalances(dcSet, asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
+
+                totalPayedRoyalty = totalPayedRoyalty.add(balanceHold);
             }
+
+            // учтем снятие с начисления для держателей долей
+            GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, false, -Transaction.FEE_KEY,
+                    totalPayedRoyalty,
+                    true, false);
+
         } catch (IOException e) {
             //e.printStackTrace();
         }
@@ -2437,6 +2459,8 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         //REMOVE FEE
         feeProcess(dcSet, true);
+
+        makeHoldRoyalty(dcSet, true);
 
         if (this.forgingInfoUpdate != null) {
             // обновить форжинговые данные - один раз для всех трнзакций в блоке
