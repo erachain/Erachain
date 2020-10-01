@@ -1645,8 +1645,6 @@ public class Block implements Closeable, ExplorerJsonLine {
             transactionsSignatures = new byte[SIGNATURE_LENGTH * transactionCount + atBytesLength];
             byte[] transactionSignature;
 
-            this.getTransactions();
-
             boolean isPrimarySet = !dcSetPlace.isFork();
 
             long timerProcess = 0;
@@ -1669,9 +1667,14 @@ public class Block implements Closeable, ExplorerJsonLine {
                     // make pool for calculated
                     this.txCalculated = new ArrayList<RCalculated>();
                 }
+
             } else {
                 this.txCalculated = null;
             }
+
+            makeHoldRoyalty(dcSetPlace, false);
+
+            this.getTransactions();
 
             long processTiming = System.nanoTime();
             long processTimingLocal;
@@ -1974,6 +1977,9 @@ public class Block implements Closeable, ExplorerJsonLine {
      */
 
     public synchronized void close() {
+
+        txCalculated = null;
+
         if (validatedForkDB != null) {
             try {
                 validatedForkDB.close();
@@ -2076,10 +2082,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, forgerEarn, Transaction.BALANCE_SIDE_FORGED);
 
             // MAKE CALCULATED TRANSACTIONS
-            if (!asOrphan && !Controller.getInstance().noCalculated) {
-                if (this.txCalculated == null)
-                    this.txCalculated = new ArrayList<RCalculated>();
-
+            if (this.txCalculated != null) {
                 this.txCalculated.add(new RCalculated(this.creator, Transaction.FEE_KEY,
                         forgerEarn, "forging", Transaction.makeDBRef(this.heightBlock, 0), 0L));
             }
@@ -2254,7 +2257,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
         AssetCls asset = dcSet.getItemAssetMap().get(BlockChain.HOLD_ROYALTY_ASSET);
-        BigDecimal totalHold = asset.getReleased(dcSet).negate();
+        BigDecimal totalHold = asset.getReleased(dcSet);
         BigDecimal koeff = readyToRoyalty.divide(totalHold, BlockChain.FEE_SCALE + 5, RoundingMode.DOWN);
         BigDecimal totalPayedRoyalty = BigDecimal.ZERO;
 
@@ -2279,13 +2282,9 @@ public class Block implements Closeable, ExplorerJsonLine {
                 BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY, balanceHold, false, true);
                 BlockChain.HOLD_ROYALTY_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
 
-                if (!asOrphan && !Controller.getInstance().noCalculated) {
-                    if (this.txCalculated == null)
-                        this.txCalculated = new ArrayList<RCalculated>();
-
+                if (this.txCalculated != null) {
                     txCalculated.add(new RCalculated(holder, Transaction.FEE_KEY, balanceHold,
                             "AS-staking", txReference, 0L));
-
                 }
 
                 totalPayedRoyalty = totalPayedRoyalty.add(balanceHold);
@@ -2309,8 +2308,6 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     // TODO - make it trownable
     public void process(DCSet dcSet) throws Exception {
-
-        makeHoldRoyalty(dcSet, false);
 
         Controller cnt = Controller.getInstance();
         if (cnt.isOnStopping())
@@ -2338,16 +2335,19 @@ public class Block implements Closeable, ExplorerJsonLine {
         // RESET forginf Info Updates
         this.forgingInfoUpdate = null;
 
+        if (/// теперь нужно считать так как у нас из Форка слив напрямую идет dcSet.isFork() ||
+                cnt.noCalculated) {
+            this.txCalculated = null;
+        } else {
+            // make pool for calculated
+            this.txCalculated = new ArrayList<RCalculated>();
+        }
+
+        makeHoldRoyalty(dcSet, false);
+
         this.getTransactions();
 
         if (this.transactionCount > 0) {
-            if (/// теперь нужно счтитать так как у нас из Форка слив напрямую идет dcSet.isFork() ||
-                    cnt.noCalculated) {
-                this.txCalculated = null;
-            } else {
-                // make pool for calculated
-                this.txCalculated = new ArrayList<RCalculated>();
-            }
 
             //DLSet dbSet = Controller.getInstance().getDBSet();
             TransactionMap unconfirmedMap = dcSet.getTransactionTab();
