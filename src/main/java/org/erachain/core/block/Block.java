@@ -2253,7 +2253,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             return;
 
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
-        AssetCls asset = dcSet.getItemAssetMap().get(Transaction.FEE_KEY);
+        AssetCls asset = dcSet.getItemAssetMap().get(BlockChain.HOLD_ROYALTY_ASSET);
         BigDecimal totalHold = asset.getReleased(dcSet).negate();
         BigDecimal koeff = readyToRoyalty.divide(totalHold, BlockChain.FEE_SCALE + 5, RoundingMode.DOWN);
         BigDecimal totalPayedRoyalty = BigDecimal.ZERO;
