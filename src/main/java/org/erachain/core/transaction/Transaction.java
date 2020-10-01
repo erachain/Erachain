@@ -1768,8 +1768,6 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (balance == null || balance.signum() <= 0)
                 return;
 
-            balance = balance.add(BigDecimal.TEN); // TEST
-
             Long royaltyBalance = balance.setScale(BlockChain.FEE_SCALE).longValue();
             Tuple3<Long, Long, Long> lastRoyaltyPoint = peekRoyaltyData(personKey);
             if (lastRoyaltyPoint == null) {
