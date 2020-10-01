@@ -2250,7 +2250,9 @@ public class Block implements Closeable, ExplorerJsonLine {
             return;
 
         // ловим блок когда можно начислять
-        if (heightBlock % BlockChain.HOLD_ROYALTY_PERIOD_DAYS * BlockChain.BLOCKS_PER_DAY(heightBlock) != 0)
+        int mod1 = BlockChain.BLOCKS_PER_DAY(heightBlock) * BlockChain.HOLD_ROYALTY_PERIOD_DAYS;
+        int mod = heightBlock % mod1;
+        if (heightBlock % (BlockChain.BLOCKS_PER_DAY(heightBlock) * BlockChain.HOLD_ROYALTY_PERIOD_DAYS) != 0)
             return;
 
         // если сумма малая - не начисляем
