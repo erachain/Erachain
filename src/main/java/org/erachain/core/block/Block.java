@@ -2248,24 +2248,25 @@ public class Block implements Closeable, ExplorerJsonLine {
             return;
 
         // если сумма малая - не начисляем
-        BigDecimal readyToRoyalty = GenesisBlock.CREATOR.getBalance(dcSet, Transaction.FEE_KEY, TransactionAmount.ACTION_DEBT).b;
+        BigDecimal readyToRoyalty = GenesisBlock.CREATOR.getBalance(dcSet, Transaction.FEE_KEY, TransactionAmount.ACTION_DEBT).b.negate();
         if (readyToRoyalty.compareTo(BlockChain.HOLD_ROYALTY_MIN) < 0)
             return;
 
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
         AssetCls asset = dcSet.getItemAssetMap().get(Transaction.FEE_KEY);
-        BigDecimal totalHold = asset.getReleased(dcSet);
-        BigDecimal koeff = readyToRoyalty.divide(totalHold, BlockChain.FEE_SCALE, RoundingMode.DOWN);
+        BigDecimal totalHold = asset.getReleased(dcSet).negate();
+        BigDecimal koeff = readyToRoyalty.divide(totalHold, BlockChain.FEE_SCALE + 5, RoundingMode.DOWN);
         BigDecimal totalPayedRoyalty = BigDecimal.ZERO;
 
         try (IteratorCloseable<byte[]> iterator = map.getIteratorByAsset(Transaction.FEE_KEY)) {
             BigDecimal balanceHold;
             Account holder;
+            long txReference = Transaction.makeDBRef(heightBlock, 0);
             while (iterator.hasNext()) {
                 byte[] key = iterator.next();
                 holder = new Account(ItemAssetBalanceMap.getShortAccountFromKey(key));
-                balanceHold = map.get(iterator.next()).a.b;
-                balanceHold = balanceHold.multiply(koeff);
+                balanceHold = map.get(key).a.b;
+                balanceHold = balanceHold.multiply(koeff).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
 
                 holder.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY, balanceHold, false, true);
                 // учтем что получили бонусы
@@ -2275,6 +2276,15 @@ public class Block implements Closeable, ExplorerJsonLine {
                 BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY, balanceHold, false, true);
                 BlockChain.HOLD_ROYALTY_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
 
+                if (!asOrphan && !Controller.getInstance().noCalculated) {
+                    if (this.txCalculated == null)
+                        this.txCalculated = new ArrayList<RCalculated>();
+
+                    txCalculated.add(new RCalculated(holder, Transaction.FEE_KEY, balanceHold,
+                            "AS-staking", txReference, 0L));
+
+                }
+
                 totalPayedRoyalty = totalPayedRoyalty.add(balanceHold);
             }
 
@@ -2282,6 +2292,11 @@ public class Block implements Closeable, ExplorerJsonLine {
             GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, false, -Transaction.FEE_KEY,
                     totalPayedRoyalty,
                     true, false);
+
+            if (this.txCalculated != null) {
+                txCalculated.add(new RCalculated(GenesisBlock.CREATOR, Transaction.FEE_KEY, totalPayedRoyalty.negate(),
+                        "AS-staking OUT", txReference, 0L));
+            }
 
         } catch (IOException e) {
             //e.printStackTrace();

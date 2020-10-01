@@ -1800,8 +1800,9 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             }
 
-            royaltyBG = BigDecimal.valueOf(percent, BlockChain.FEE_SCALE).multiply(balance)
-                    .movePointRight(8)
+            royaltyBG = BigDecimal.valueOf(percent, BlockChain.FEE_SCALE)
+                    .movePointLeft(0)
+                    .multiply(balance)
                     .setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
             Long royaltyValue = royaltyBG.longValue();
 
@@ -1815,7 +1816,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         if (block != null && block.txCalculated != null && !asOrphan) {
             block.txCalculated.add(new RCalculated(account, FEE_KEY, royaltyBG,
-                    "EXO-maining ", this.dbRef, seqNo));
+                    "EXO-maining", this.dbRef, 0L));
 
         }
 
