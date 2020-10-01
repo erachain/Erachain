@@ -1764,9 +1764,11 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         } else {
             // это прямое начисление
-            BigDecimal balance = account.getBalance(dcSet, FEE_KEY, TransactionAmount.ACTION_SEND).b;
-            if (balance == null)
+            BigDecimal balance = account.getBalance(dcSet, BlockChain.ACTION_ROYALTY_ASSET, TransactionAmount.ACTION_SEND).b;
+            if (balance == null || balance.signum() <= 0)
                 return;
+
+            balance = balance.add(BigDecimal.TEN); // TEST
 
             Long royaltyBalance = balance.setScale(BlockChain.FEE_SCALE).longValue();
             Tuple3<Long, Long, Long> lastRoyaltyPoint = peekRoyaltyData(personKey);
@@ -1810,7 +1812,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         }
 
-        account.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, royaltyBG, false, true);
+        account.changeBalance(this.dcSet, asOrphan, false, BlockChain.HOLD_ROYALTY_ASSET, royaltyBG, false, true);
         // учтем что получили бонусы
         account.changeCOMPUBonusBalances(dcSet, asOrphan, royaltyBG, Transaction.BALANCE_SIDE_DEBIT);
 
@@ -1821,11 +1823,11 @@ public abstract class Transaction implements ExplorerJsonLine {
         }
 
         // учтем эмиссию
-        GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
+        GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, false, BlockChain.ACTION_ROYALTY_ASSET,
                 royaltyBG, true, false);
 
         // учтем начисления для держателей долей
-        GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, false, -FEE_KEY,
+        GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, false, -BlockChain.ACTION_ROYALTY_ASSET,
                 royaltyBG.multiply(BlockChain.ACTION_ROYALTY_TO_HOLD_ROYALTY).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN),
                 true, false);
 

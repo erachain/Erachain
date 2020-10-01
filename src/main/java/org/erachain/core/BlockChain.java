@@ -12,6 +12,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlocksHeadsMap;
@@ -375,13 +376,15 @@ public class BlockChain {
 
     public static final int ACTION_ROYALTY_START = 1;
     public static final int ACTION_ROYALTY_PERCENT = 8400; // x0.001
-    public static final int ACTION_ROYALTY_MIN = 10; // x0.001
+    public static final int ACTION_ROYALTY_MIN = 1; // x0.001
     public static final int ACTION_ROYALTY_MAX_DAYS = 30; // x0.001
     public static final BigDecimal ACTION_ROYALTY_TO_HOLD_ROYALTY = new BigDecimal("0.0100"); // сколько добавляем к награде
+    public static final long ACTION_ROYALTY_ASSET = AssetCls.FEE_KEY;
 
     public static final BigDecimal HOLD_ROYALTY_MIN = new BigDecimal("0.0100"); // если меньше то распределение не делаем
     public static final int HOLD_ROYALTY_PERIOD_DAYS = 1; // как часто начисляем
     public static Account HOLD_ROYALTY_EMITTER = new Account("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"); // если меньше то распределение не делаем
+    public static final long HOLD_ROYALTY_ASSET = AssetCls.ERA_KEY;
 
 
     /**

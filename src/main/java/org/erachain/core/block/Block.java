@@ -2258,7 +2258,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         BigDecimal koeff = readyToRoyalty.divide(totalHold, BlockChain.FEE_SCALE + 5, RoundingMode.DOWN);
         BigDecimal totalPayedRoyalty = BigDecimal.ZERO;
 
-        try (IteratorCloseable<byte[]> iterator = map.getIteratorByAsset(Transaction.FEE_KEY)) {
+        try (IteratorCloseable<byte[]> iterator = map.getIteratorByAsset(BlockChain.HOLD_ROYALTY_ASSET)) {
             BigDecimal balanceHold;
             Account holder;
             long txReference = Transaction.makeDBRef(heightBlock, 0);
@@ -2266,6 +2266,9 @@ public class Block implements Closeable, ExplorerJsonLine {
                 byte[] key = iterator.next();
                 holder = new Account(ItemAssetBalanceMap.getShortAccountFromKey(key));
                 balanceHold = map.get(key).a.b;
+                if (balanceHold.signum() <= 0)
+                    continue;
+
                 balanceHold = balanceHold.multiply(koeff).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
 
                 holder.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY, balanceHold, false, true);
