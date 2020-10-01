@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
@@ -86,8 +87,13 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
                 case DBS_ROCK_DB:
                     map = new ItemAssetBalanceSuitRocksDB(databaseSet, database, this);
                     break;
-                default:
-                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, this);
+                default: {
+                    if (BlockChain.HOLD_ROYALTY_PERIOD_DAYS > 0)
+                        // тут нужна обработка по списку держателей Актива
+                        map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceMap) parent, databaseSet, this);
+                    else
+                        map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, this);
+                }
             }
         }
     }

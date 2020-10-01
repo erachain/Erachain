@@ -382,7 +382,7 @@ public class BlockChain {
     public static final long ACTION_ROYALTY_ASSET = AssetCls.FEE_KEY;
 
     public static final BigDecimal HOLD_ROYALTY_MIN = new BigDecimal("0.0100"); // если меньше то распределение не делаем
-    public static final int HOLD_ROYALTY_PERIOD_DAYS = 1; // как часто начисляем
+    public static final int HOLD_ROYALTY_PERIOD_DAYS = 7; // как часто начисляем
     public static Account HOLD_ROYALTY_EMITTER = new Account("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"); // если меньше то распределение не делаем
     public static final long HOLD_ROYALTY_ASSET = AssetCls.ERA_KEY;
 
