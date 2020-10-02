@@ -217,7 +217,7 @@ public class ExData {
                 }
             } else
                 // v2.0
-                if (json.containsKey("TM") && json.get("Template") != null) {
+                if (json.containsKey("Template") && json.get("Template") != null) {
                     try {
                         templateKey = new Long(json.get("Template").toString());
                     } catch (Exception e) {
