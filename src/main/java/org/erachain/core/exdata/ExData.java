@@ -267,6 +267,45 @@ public class ExData {
                 if (json.containsKey("Message"))
                     message = (String) json.get("Message");
 
+            // v 2.1
+            if (json.containsKey("F")) {
+                Object filesObj = json.get("F");
+                if (filesObj instanceof JSONArray) {
+                    // NEW STYLE
+                    JSONArray filesArray = (JSONArray) filesObj;
+                    fileHeaders = new Tuple3[filesArray.size()];
+
+                    for (int i = 0; i < filesArray.size(); i++) {
+                        JSONObject fileJson = (JSONObject) filesArray.get(i);
+
+                        String name = (String) fileJson.get("FN"); // File_Name
+                        Boolean zip = new Boolean((String) fileJson.get("ZP")); // ZIP
+                        int size = new Integer((String) fileJson.get("SZ"));
+                        filesMap.put(name, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
+
+                    }
+                }
+
+            } else {
+
+                files_key_Set = files.keySet();
+                for (int i = 0; i < files_key_Set.size(); i++) {
+                    JSONObject file = (JSONObject) files.get(i + "");
+
+                    String name = (String) file.get("FN"); // File_Name
+                    Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
+                    int size = new Integer((String) file.get("SZ"));
+                    byte[] fileBytes = Arrays.copyOfRange(data, position, position + size);
+                    position = position + size;
+                    byte[] fileBytesOrig = null;
+                }
+            } else{
+                // v 2.0
+                if (json.containsKey("Message"))
+                    message = (String) json.get("Message");
+            }
+
+
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
