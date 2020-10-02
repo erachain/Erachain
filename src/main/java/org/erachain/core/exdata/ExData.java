@@ -80,8 +80,8 @@ public class ExData {
     /**
      * Name: hash, is ZIP?, file data
      */
-    private Tuple3<String, byte[], Boolean>[] fileHeaders;
-    private byte[][] files;
+    private HashMap<String, Tuple3<byte[], Boolean, byte[]>> files;
+    private HashMap<String, Tuple3<byte[], Boolean, byte[]>> files;
 
 
     private byte recipientsFlags;
@@ -104,11 +104,10 @@ public class ExData {
      * @param exLink
      * @param title
      * @param json
-     * @param fileHeaders
      * @param files
      */
     public ExData(int version, ExLink exLink, String title,
-                  JSONObject json, Tuple3<String, byte[], Boolean>[] fileHeaders, byte[][] files) {
+                  JSONObject json, HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) {
         this.flags = new byte[]{(byte) version, 0, 0, 0};
 
         this.exLink = exLink;
@@ -119,7 +118,6 @@ public class ExData {
 
         this.title = title;
         this.json = json;
-        this.fileHeaders = fileHeaders;
         this.files = files;
 
     }
@@ -132,12 +130,11 @@ public class ExData {
      * @param title
      * @param recipients
      * @param json
-     * @param fileHeaders
      * @param files
      */
     public ExData(byte[] flags, ExLink exLink, String title,
                   byte recipientsFlags, Account[] recipients,
-                  JSONObject json, Tuple3<String, byte[], Boolean>[] fileHeaders, byte[][] files) {
+                  JSONObject json, HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) {
         this.flags = flags;
 
         this.exLink = exLink;
@@ -150,7 +147,6 @@ public class ExData {
         this.recipientsFlags = recipientsFlags;
         this.recipients = recipients;
         this.json = json;
-        this.fileHeaders = fileHeaders;
         this.files = files;
 
     }
@@ -266,45 +262,6 @@ public class ExData {
                 // v 2.0
                 if (json.containsKey("Message"))
                     message = (String) json.get("Message");
-
-            // v 2.1
-            if (json.containsKey("F")) {
-                Object filesObj = json.get("F");
-                if (filesObj instanceof JSONArray) {
-                    // NEW STYLE
-                    JSONArray filesArray = (JSONArray) filesObj;
-                    fileHeaders = new Tuple3[filesArray.size()];
-
-                    for (int i = 0; i < filesArray.size(); i++) {
-                        JSONObject fileJson = (JSONObject) filesArray.get(i);
-
-                        String name = (String) fileJson.get("FN"); // File_Name
-                        Boolean zip = new Boolean((String) fileJson.get("ZP")); // ZIP
-                        int size = new Integer((String) fileJson.get("SZ"));
-                        filesMap.put(name, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
-
-                    }
-                }
-
-            } else {
-
-                files_key_Set = files.keySet();
-                for (int i = 0; i < files_key_Set.size(); i++) {
-                    JSONObject file = (JSONObject) files.get(i + "");
-
-                    String name = (String) file.get("FN"); // File_Name
-                    Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
-                    int size = new Integer((String) file.get("SZ"));
-                    byte[] fileBytes = Arrays.copyOfRange(data, position, position + size);
-                    position = position + size;
-                    byte[] fileBytesOrig = null;
-                }
-            } else{
-                // v 2.0
-                if (json.containsKey("Message"))
-                    message = (String) json.get("Message");
-            }
-
 
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -605,7 +562,7 @@ public class ExData {
 
                     Object filesObj = json.get("F");
                     if (filesObj instanceof JSONArray) {
-                        // NEW STYLE
+                        // new STYLE
                         JSONArray filesArray = (JSONArray) json.get("F");
 
                         for (int i = 0; i < filesArray.size(); i++) {
@@ -726,13 +683,13 @@ public class ExData {
                 String[] items = text.split("\n");
                 JSONObject dataJson = new JSONObject();
                 dataJson.put("Message", text.substring(items[0].length()));
-                return new ExData(0, null, items[0], dataJson, null, files);
+                return new ExData(0, null, items[0], dataJson, null);
 
             case 1:
                 text = new String(data, StandardCharsets.UTF_8);
                 dataJson = (JSONObject) JSONValue.parseWithException(text);
                 String title = dataJson.get("Title").toString();
-                return new ExData(1, null, title, dataJson, null, files);
+                return new ExData(1, null, title, dataJson, null);
 
             default:
 
@@ -771,7 +728,7 @@ public class ExData {
                 title = new String(titleByte, StandardCharsets.UTF_8);
 
                 if (onlyTitle) {
-                    return new ExData(version, null, title, null, null, files);
+                    return new ExData(version, null, title, null, null);
                 }
 
                 if (version > 2) {
@@ -835,10 +792,10 @@ public class ExData {
 
                 if (data.length == position) {
                     if (version > 2) {
-                        return new ExData(flags, exLink, title, recipientsFlags, recipients, null, null, files);
+                        return new ExData(flags, exLink, title, recipientsFlags, recipients, null, null);
                     } else {
                         // version 2.0 - 2.1
-                        return new ExData(version, exLink, title, null, null, files);
+                        return new ExData(version, exLink, title, null, null);
                     }
                 } else {
 
@@ -851,7 +808,7 @@ public class ExData {
 
                         Fun.Tuple2<JSONObject, HashMap> jsonAndFiles = parseJsonAndFiles(Arrays.copyOfRange(data, position, data.length), andFiles);
                         return new ExData(flags, exLink, title, recipientsFlags, recipients, jsonAndFiles.a,
-                                jsonAndFiles.b, files);
+                                jsonAndFiles.b);
                     }
                 }
 
@@ -1055,7 +1012,7 @@ public class ExData {
             return new ExData(flags, exLink, title, recipientsFlag, recipients, (byte) 0, secrets, encryptedData).toByte();
         }
 
-        return new ExData(flags, exLink, title, recipientsFlag, recipients, new JSONObject(out_Map), filesMap, files).toByte();
+        return new ExData(flags, exLink, title, recipientsFlag, recipients, new JSONObject(out_Map), filesMap).toByte();
 
     }
 
@@ -1221,7 +1178,7 @@ public class ExData {
             // это уже не зашифрованный - сбросим
             byte[] decryptedFlags = setEncryptedFlag(flags, false);
             return new Tuple3<>(pos, null, new ExData(decryptedFlags, exLink, title, recipientsFlags, recipients, jsonAndFiles.a,
-                    jsonAndFiles.b, files));
+                    jsonAndFiles.b));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             return new Fun.Tuple3<>(pos, e.getMessage(), null);
