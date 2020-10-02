@@ -2250,8 +2250,6 @@ public class Block implements Closeable, ExplorerJsonLine {
             return;
 
         // ловим блок когда можно начислять
-        int mod1 = BlockChain.BLOCKS_PER_DAY(heightBlock) * BlockChain.HOLD_ROYALTY_PERIOD_DAYS;
-        int mod = heightBlock % mod1;
         if (heightBlock % (BlockChain.BLOCKS_PER_DAY(heightBlock) * BlockChain.HOLD_ROYALTY_PERIOD_DAYS) != 0)
             return;
 
@@ -2274,10 +2272,10 @@ public class Block implements Closeable, ExplorerJsonLine {
                 byte[] key = iterator.next();
                 holder = new Account(ItemAssetBalanceMap.getShortAccountFromKey(key));
                 balanceHold = map.get(key).a.b;
+                balanceHold = balanceHold.multiply(koeff).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
+
                 if (balanceHold.signum() <= 0)
                     continue;
-
-                balanceHold = balanceHold.multiply(koeff).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
 
                 holder.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY, balanceHold, false, true);
                 // учтем что получили бонусы

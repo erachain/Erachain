@@ -69,7 +69,7 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
             map = treeMap;
         }
 
-        if (BlockChain.HOLD_ROYALTY_PERIOD_DAYS > 0) {
+        if (BlockChain.HOLD_ROYALTY_PERIOD_DAYS > 0 || !Controller.getInstance().onlyProtocolIndexing) {
             // TODO сделать потом отдельную таблицу только для заданного Актива - для ускорения
             // если включены выплаты - то нужно этот индекс тоже делать - хотя можно отдельно по одному Активу только - нужному
 

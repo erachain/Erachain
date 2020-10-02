@@ -1768,7 +1768,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (balance == null || balance.signum() <= 0)
                 return;
 
-            Long royaltyBalance = balance.setScale(BlockChain.FEE_SCALE).longValue();
+            Long royaltyBalance = balance.setScale(BlockChain.FEE_SCALE).unscaledValue().longValue();
             Tuple3<Long, Long, Long> lastRoyaltyPoint = peekRoyaltyData(personKey);
             if (lastRoyaltyPoint == null) {
                 // уще ничего не было - считать нечего
@@ -1794,23 +1794,25 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
 
             long percent = diff * koeff;
-            if (percent < BlockChain.ACTION_ROYALTY_MIN) {
+
+            royaltyBG = BigDecimal.valueOf(percent, BlockChain.FEE_SCALE)
+                    .movePointLeft(3)
+                    .multiply(balance)
+                    .setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
+
+            if (royaltyBG.compareTo(BlockChain.ACTION_ROYALTY_MIN) < 0) {
                 pushRoyaltyData(personKey, royaltyBalance, 0L);
                 return;
 
             }
 
-            royaltyBG = BigDecimal.valueOf(percent, BlockChain.FEE_SCALE)
-                    .movePointLeft(0)
-                    .multiply(balance)
-                    .setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
-            Long royaltyValue = royaltyBG.longValue();
+            Long royaltyValue = royaltyBG.unscaledValue().longValue();
 
             pushRoyaltyData(personKey, royaltyBalance, royaltyValue);
 
         }
 
-        account.changeBalance(this.dcSet, asOrphan, false, BlockChain.HOLD_ROYALTY_ASSET, royaltyBG, false, true);
+        account.changeBalance(this.dcSet, asOrphan, false, BlockChain.ACTION_ROYALTY_ASSET, royaltyBG, false, true);
         // учтем что получили бонусы
         account.changeCOMPUBonusBalances(dcSet, asOrphan, royaltyBG, Transaction.BALANCE_SIDE_DEBIT);
 
@@ -1826,7 +1828,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         // учтем начисления для держателей долей
         GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, false, -BlockChain.ACTION_ROYALTY_ASSET,
-                royaltyBG.multiply(BlockChain.ACTION_ROYALTY_TO_HOLD_ROYALTY).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN),
+                royaltyBG.multiply(BlockChain.ACTION_ROYALTY_TO_HOLD_ROYALTY_PERCENT).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN),
                 true, false);
 
 
