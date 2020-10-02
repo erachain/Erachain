@@ -194,10 +194,13 @@ public class ExData {
 
         try {
             // v 2.1
-            if (json.containsKey("TM")) {
+            if (json.containsKey("TM") && json.get("TM") != null) {
+                try {
+                    templateKey = new Long(json.get("TM").toString());
+                } catch (Exception e) {
+                }
 
-                templateKey = new Long(json.get("TM").toString());
-                if (dcSet != null) {
+                if (dcSet != null && templateKey == 0) {
                     template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, templateKey);
                 }
                 if (template != null) {
@@ -214,10 +217,13 @@ public class ExData {
                 }
             } else
                 // v2.0
-                if (json.containsKey("Template")) {
+                if (json.containsKey("TM") && json.get("Template") != null) {
+                    try {
+                        templateKey = new Long(json.get("Template").toString());
+                    } catch (Exception e) {
+                    }
 
-                    templateKey = new Long(json.get("Template").toString());
-                    if (dcSet != null) {
+                    if (dcSet != null && templateKey == 0) {
                         template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, templateKey);
                     }
                     if (template != null) {
