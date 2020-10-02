@@ -1764,7 +1764,9 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         } else {
             // это прямое начисление
-            BigDecimal balance = account.getBalance(dcSet, BlockChain.ACTION_ROYALTY_ASSET, TransactionAmount.ACTION_SEND).b;
+            ///BigDecimal balance = account.getBalance(dcSet, BlockChain.ACTION_ROYALTY_ASSET, TransactionAmount.ACTION_SEND).b;
+            // по всем счетам персоны
+            BigDecimal balance = PersonCls.getTotalBalance(dcSet, personKey, BlockChain.ACTION_ROYALTY_ASSET, TransactionAmount.ACTION_SEND);
             if (balance == null || balance.signum() <= 0)
                 return;
 
