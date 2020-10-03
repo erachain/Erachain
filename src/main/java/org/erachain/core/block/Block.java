@@ -2128,17 +2128,15 @@ public class Block implements Closeable, ExplorerJsonLine {
                 this.creator.changeBalance(dcSet, asOrphan, false, asset.getKey(),
                         earnedPair.a, true, false);
 
-                if (this.txCalculated != null) {
-                    this.txCalculated.add(new RCalculated(this.creator, asset.getKey(),
-                            earnedPair.a, "forging", Transaction.makeDBRef(this.heightBlock, 0), 0L));
-                }
-
                 // учтем для эмитента
                 asset.getOwner().changeBalance(dcSet, asOrphan, false, asset.getKey(),
                         earnedPair.b, true, false);
+
                 if (this.txCalculated != null) {
+                    this.txCalculated.add(new RCalculated(this.creator, asset.getKey(),
+                            earnedPair.a, "Asset Total Forged", Transaction.makeDBRef(this.heightBlock, 0), 0L));
                     this.txCalculated.add(new RCalculated(asset.getOwner(), asset.getKey(),
-                            earnedPair.b, "burning", Transaction.makeDBRef(this.heightBlock, 0), 0L));
+                            earnedPair.b, "Asset Total Burned", Transaction.makeDBRef(this.heightBlock, 0), 0L));
                 }
 
             }
