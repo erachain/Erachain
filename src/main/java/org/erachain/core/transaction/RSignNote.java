@@ -666,7 +666,7 @@ public class RSignNote extends Transaction implements Itemable {
                 TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
                 for (byte[] hash : allHashes) {
                     if (map.contains(hash)) {
-                        LOGGER.info("NOT VALID - hash already exist: " + Base58.encode(hash));
+                        ///LOGGER.info("NOT VALID - hash already exist: " + Base58.encode(hash));
                         return HASH_ALREDY_EXIST;
                     }
                 }
