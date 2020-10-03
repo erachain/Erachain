@@ -380,6 +380,7 @@ public class BlockChain {
     public static final int ACTION_ROYALTY_MAX_DAYS = 30; // x0.001
     public static final BigDecimal ACTION_ROYALTY_TO_HOLD_ROYALTY_PERCENT = new BigDecimal("0.01"); // сколько добавляем к награде
     public static final long ACTION_ROYALTY_ASSET = AssetCls.FEE_KEY;
+    public static final boolean ACTION_ROYALTY_PERSONS_ONLY = false;
 
     public static final BigDecimal HOLD_ROYALTY_MIN = new BigDecimal("0.0001"); // если меньше то распределение не делаем
     public static final int HOLD_ROYALTY_PERIOD_DAYS = 7; // как часто начисляем

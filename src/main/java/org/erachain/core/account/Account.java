@@ -1276,6 +1276,10 @@ public class Account {
         return Ints.fromByteArray(shortBytes);
     }
 
+    public long hashCodeLong() {
+        return Longs.fromByteArray(shortBytes);
+    }
+
     // EQUALS
     @Override
     public boolean equals(Object b) {

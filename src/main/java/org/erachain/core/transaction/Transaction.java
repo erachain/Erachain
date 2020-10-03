@@ -1750,12 +1750,24 @@ public abstract class Transaction implements ExplorerJsonLine {
         return dcSet.getTimeRoyaltyMap().pop(personKey);
     }
 
-    private void calcRoyalty(Block block, Account account, Long personKey, long koeff, boolean asOrphan) {
+    private void calcRoyalty(Block block, Account account, long koeff, boolean asOrphan) {
+
+        Tuple4<Long, Integer, Integer, Integer> personDuration;
+        Long royaltyID;
+        if (BlockChain.ACTION_ROYALTY_PERSONS_ONLY) {
+            personDuration = creator.getPersonDuration(dcSet);
+            if (personDuration == null || personDuration.a == null) {
+                return;
+            }
+            royaltyID = personDuration.a;
+        } else {
+            royaltyID = account.hashCodeLong();
+        }
 
         BigDecimal royaltyBG;
         if (asOrphan) {
             // это откат - списываем
-            Tuple3<Long, Long, Long> lastValue = peekRoyaltyData(personKey);
+            Tuple3<Long, Long, Long> lastValue = peekRoyaltyData(royaltyID);
             if (lastValue.c == 0) {
                 return;
             }
@@ -1764,17 +1776,22 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         } else {
             // это прямое начисление
-            ///BigDecimal balance = account.getBalance(dcSet, BlockChain.ACTION_ROYALTY_ASSET, TransactionAmount.ACTION_SEND).b;
-            // по всем счетам персоны
-            BigDecimal balance = PersonCls.getTotalBalance(dcSet, personKey, BlockChain.ACTION_ROYALTY_ASSET, TransactionAmount.ACTION_SEND);
+            BigDecimal balance;
+            if (BlockChain.ACTION_ROYALTY_PERSONS_ONLY) {
+                // по всем счетам персоны
+                balance = PersonCls.getTotalBalance(dcSet, royaltyID, BlockChain.ACTION_ROYALTY_ASSET, TransactionAmount.ACTION_SEND);
+            } else {
+                balance = account.getBalance(dcSet, BlockChain.ACTION_ROYALTY_ASSET, TransactionAmount.ACTION_SEND).b;
+            }
+
             if (balance == null || balance.signum() <= 0)
                 return;
 
             Long royaltyBalance = balance.setScale(BlockChain.FEE_SCALE).unscaledValue().longValue();
-            Tuple3<Long, Long, Long> lastRoyaltyPoint = peekRoyaltyData(personKey);
+            Tuple3<Long, Long, Long> lastRoyaltyPoint = peekRoyaltyData(royaltyID);
             if (lastRoyaltyPoint == null) {
                 // уще ничего не было - считать нечего
-                pushRoyaltyData(personKey, royaltyBalance, 0L);
+                pushRoyaltyData(royaltyID, royaltyBalance, 0L);
                 return;
             }
 
@@ -1785,7 +1802,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             Long previousForgingSeqNo = lastRoyaltyPoint.a;
             int diff = height - (int) (previousForgingSeqNo >> 32);
             if (diff < 1) {
-                pushRoyaltyData(personKey, royaltyBalance, 0L);
+                pushRoyaltyData(royaltyID, royaltyBalance, 0L);
                 return;
             }
 
@@ -1803,14 +1820,14 @@ public abstract class Transaction implements ExplorerJsonLine {
                     .setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
 
             if (royaltyBG.compareTo(BlockChain.ACTION_ROYALTY_MIN) < 0) {
-                pushRoyaltyData(personKey, royaltyBalance, 0L);
+                pushRoyaltyData(royaltyID, royaltyBalance, 0L);
                 return;
 
             }
 
             Long royaltyValue = royaltyBG.unscaledValue().longValue();
 
-            pushRoyaltyData(personKey, royaltyBalance, royaltyValue);
+            pushRoyaltyData(royaltyID, royaltyBalance, royaltyValue);
 
         }
 
@@ -1850,37 +1867,25 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         if (asOrphan) {
             if (creator != null) {
-                personDuration = creator.getPersonDuration(dcSet);
-                if (personDuration != null && personDuration.a != null) {
-                    calcRoyalty(block, creator, personDuration.a, koeff, asOrphan);
-                }
+                calcRoyalty(block, creator, koeff, asOrphan);
             }
 
             HashSet<Account> recipients = getRecipientAccounts();
             if (recipients != null && !recipients.isEmpty()) {
                 for (Account recipient : recipients) {
-                    personDuration = recipient.getPersonDuration(dcSet);
-                    if (personDuration != null && personDuration.a != null) {
-                        calcRoyalty(block, recipient, personDuration.a, koeff, asOrphan);
-                    }
+                    calcRoyalty(block, recipient, koeff, asOrphan);
                 }
             }
         } else {
 
             if (creator != null) {
-                personDuration = creator.getPersonDuration(dcSet);
-                if (personDuration != null && personDuration.a != null) {
-                    calcRoyalty(block, creator, personDuration.a, koeff, asOrphan);
-                }
+                calcRoyalty(block, creator, koeff, asOrphan);
             }
 
             HashSet<Account> recipients = getRecipientAccounts();
             if (recipients != null && !recipients.isEmpty()) {
                 for (Account recipient : recipients) {
-                    personDuration = recipient.getPersonDuration(dcSet);
-                    if (personDuration != null && personDuration.a != null) {
-                        calcRoyalty(block, recipient, personDuration.a, koeff, asOrphan);
-                    }
+                    calcRoyalty(block, recipient, koeff, asOrphan);
                 }
             }
         }
