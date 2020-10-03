@@ -423,6 +423,7 @@ public class ExData {
     // info to byte[]
     @SuppressWarnings("unchecked")
 
+    static boolean newStyle = true;
     public static byte[] toByteJsonAndFiles(ByteArrayOutputStream outStream, JSONObject json,
                                             HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) throws Exception {
 
@@ -439,28 +440,44 @@ public class ExData {
         }
 
         // if insert Files
-        Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it = files.entrySet().iterator();
-        JSONObject files_Json = new JSONObject();
+        Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> iterator = files.entrySet().iterator();
+        JSONArray filesJsonArray = new JSONArray();
+
         int i = 0;
-        ArrayList<byte[]> out_files = new ArrayList<byte[]>();
-        while (it.hasNext()) {
-            Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it.next();
-            JSONObject file_Json = new JSONObject();
-            file_Json.put("FN", file.getKey()); // File_Name
-            file_Json.put("ZP", file.getValue().b.toString()); // ZIP
-            file_Json.put("SZ", file.getValue().c.length + ""); // Size
-            files_Json.put(i + "", file_Json);
-            out_files.add(i, file.getValue().c);
-            i++;
+        byte[][] outFiles = new byte[files.size()][];
+        if (newStyle) {
+            while (iterator.hasNext()) {
+                Entry<String, Tuple3<byte[], Boolean, byte[]>> file = iterator.next();
+                JSONObject fileJson = new JSONObject();
+                fileJson.put("FN", file.getKey()); // File_Name
+                fileJson.put("ZP", file.getValue().b); // ZIP
+                fileJson.put("SZ", file.getValue().c.length); // Size
+                filesJsonArray.add(fileJson);
+                outFiles[i++] = file.getValue().c;
+            }
+            json.put("F", filesJsonArray);
+        } else {
+            //ArrayList<byte[]> out_files = new ArrayList<byte[]>();
+            while (iterator.hasNext()) {
+                Entry<String, Tuple3<byte[], Boolean, byte[]>> file = iterator.next();
+                JSONObject fileJson = new JSONObject();
+                fileJson.put("FN", file.getKey()); // File_Name
+                fileJson.put("ZP", file.getValue().b); // ZIP
+                fileJson.put("SZ", file.getValue().c.length); // Size
+                filesJsonArray.add(fileJson);
+                outFiles[i++] = file.getValue().c;
+                i++;
+            }
+            json.put("F", filesJsonArray);
+
         }
-        json.put("F", files_Json);
         JSON_Bytes = json.toString().getBytes(StandardCharsets.UTF_8);
         // convert int to byte
         size_Json = ByteBuffer.allocate(DATA_JSON_PART_LENGTH).putInt(JSON_Bytes.length).array();
         outStream.write(size_Json);
         outStream.write(JSON_Bytes);
-        for (i = 0; i < out_files.size(); i++) {
-            outStream.write(out_files.get(i));
+        for (i = 0; i < outFiles.length; i++) {
+            outStream.write(outFiles[i]);
         }
         return outStream.toByteArray();
 
@@ -567,8 +584,8 @@ public class ExData {
                             JSONObject file = (JSONObject) filesArray.get(i);
 
                             String name = (String) file.get("FN"); // File_Name
-                            Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
-                            int size = new Integer((String) file.get("SZ"));
+                            Boolean zip = (Boolean) file.get("ZP"); // ZIP
+                            int size = (int) (long) file.get("SZ");
                             byte[] fileBytes = Arrays.copyOfRange(data, position, position + size);
                             position = position + size;
                             byte[] fileBytesOrig = null;
@@ -593,8 +610,8 @@ public class ExData {
                             JSONObject file = (JSONObject) files.get(i + "");
 
                             String name = (String) file.get("FN"); // File_Name
-                            Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
-                            int size = new Integer((String) file.get("SZ"));
+                            Boolean zip = new Boolean(file.get("ZP").toString()); // ZIP
+                            int size = (int) (long) new Long(file.get("SZ").toString());
                             byte[] fileBytes = Arrays.copyOfRange(data, position, position + size);
                             position = position + size;
                             byte[] fileBytesOrig = null;
@@ -933,7 +950,7 @@ public class ExData {
         while (it_Filles.hasNext()) {
             Tuple3<String, Boolean, byte[]> file = it_Filles.next();
 
-            boolean zip = file.b;
+            Boolean zip = file.b;
             byte[] fileBytes = file.c;
             byte[] fileBytesOrig = null;
             if (zip) {
