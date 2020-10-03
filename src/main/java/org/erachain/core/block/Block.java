@@ -2094,6 +2094,57 @@ public class Block implements Closeable, ExplorerJsonLine {
                     new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), true, false);
         }
 
+        if (transactionCount > 0) {
+            // подсчет наград с ПЕРЕВОДОВ
+            HashMap<AssetCls, Tuple2<BigDecimal, BigDecimal>> earnedAllAssets = new HashMap<>();
+            Tuple2<BigDecimal, BigDecimal> earnedPair;
+            BigDecimal assetFee;
+            BigDecimal assetFeeBurn;
+            for (Transaction transaction : getTransactions()) {
+                if (transaction.assetFee == null)
+                    continue;
+
+                AssetCls asset = transaction.getAsset();
+                if (earnedAllAssets.containsKey(asset)) {
+                    earnedPair = earnedAllAssets.get(asset);
+                    assetFee = earnedPair.a;
+                    assetFeeBurn = earnedPair.b;
+                } else {
+                    assetFee = BigDecimal.ZERO;
+                    assetFeeBurn = BigDecimal.ZERO;
+                }
+
+                earnedPair = new Tuple2(assetFee.add(transaction.assetFee.subtract(transaction.assetFeeBurn)),
+                        assetFeeBurn.add(transaction.assetFeeBurn));
+                earnedAllAssets.put(asset, earnedPair);
+
+            }
+
+            // FOR ASSETS
+            for (AssetCls asset : earnedAllAssets.keySet()) {
+                earnedPair = earnedAllAssets.get(asset);
+
+                // учтем для форжера
+                this.creator.changeBalance(dcSet, asOrphan, false, asset.getKey(),
+                        earnedPair.a, true, false);
+
+                if (this.txCalculated != null) {
+                    this.txCalculated.add(new RCalculated(this.creator, asset.getKey(),
+                            earnedPair.a, "forging", Transaction.makeDBRef(this.heightBlock, 0), 0L));
+                }
+
+                // учтем для эмитента
+                asset.getOwner().changeBalance(dcSet, asOrphan, false, asset.getKey(),
+                        earnedPair.b, true, false);
+                if (this.txCalculated != null) {
+                    this.txCalculated.add(new RCalculated(asset.getOwner(), asset.getKey(),
+                            earnedPair.b, "burning", Transaction.makeDBRef(this.heightBlock, 0), 0L));
+                }
+
+            }
+
+        }
+
         //logger.debug("<<< core.block.Block.orphan(DLSet) #3");
 
     }

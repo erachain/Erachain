@@ -398,11 +398,11 @@ public abstract class Transaction implements ExplorerJsonLine {
     /**
      * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
      */
-    protected BigDecimal assetFee = null;
+    public BigDecimal assetFee = null;
     /**
      * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
      */
-    protected BigDecimal assetFeeBurn = null;
+    public BigDecimal assetFeeBurn = null;
 
     // transactions
     // protected BigDecimal fee = new BigDecimal.valueOf(999000);

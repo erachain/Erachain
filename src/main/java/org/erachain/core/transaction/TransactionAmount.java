@@ -309,15 +309,17 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     @Override
     public long calcBaseFee() {
-        if (hasAmount() && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
+        if (hasAmount() && getActionType() == ACTION_SEND // только для передачи в собственность!
+                && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
                 && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)) {
             BigDecimal perc = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
-            assetFee = amount.multiply(perc).setScale(asset.getScale(), RoundingMode.DOWN);
+            assetFee = amount.abs().multiply(perc).setScale(asset.getScale(), RoundingMode.DOWN);
             if (!BlockChain.ASSET_BURN_PERCENTAGE.isEmpty()
                     && BlockChain.ASSET_BURN_PERCENTAGE.containsKey(key)) {
                 perc = BlockChain.ASSET_BURN_PERCENTAGE.get(key);
-                assetFeeBurn = assetFee.multiply(perc).setScale(asset.getScale(), RoundingMode.DOWN);
+                assetFeeBurn = assetFee.multiply(perc).setScale(asset.getScale(), RoundingMode.UP);
             }
+            return super.calcBaseFee() >> 1;
         }
         return super.calcBaseFee();
     }
@@ -1228,16 +1230,20 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     } else {
                         leftAmount = amount;
                     }
-                    
+
                     Tuple3<String, Long, String> leftCreditKey = new Tuple3<String, Long, String>(
                             this.creator.getAddress(), absKey, this.recipient.getAddress()); // REVERSE
                     db.getCredit_AddressesMap().add(leftCreditKey, leftAmount);
                 }
             }
         }
-                
+
         if (absKey == Transaction.RIGHTS_KEY && block != null) {
             block.addForgingInfoUpdate(this.recipient);
+        }
+
+        if (assetFee != null) {
+            this.creator.changeBalance(db, !backward, backward, absKey, this.assetFee, !incomeReverse, false);
         }
     }
 
@@ -1344,12 +1350,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     // ONLY RETURN CREDIT
                     db.getCredit_AddressesMap().sub(leftCreditKey, amount);
                 }
-                
+
             }
         }
 
         if (absKey == Transaction.RIGHTS_KEY && block != null) {
             block.addForgingInfoUpdate(this.recipient);
+        }
+
+        if (assetFee != null) {
+            this.creator.changeBalance(db, backward, backward, absKey, this.assetFee, !incomeReverse, false);
         }
 
     }
