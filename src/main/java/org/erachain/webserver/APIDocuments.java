@@ -78,7 +78,7 @@ public class APIDocuments {
             Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
             if (tx instanceof RSignNote) {
                 RSignNote statement = (RSignNote) tx;
-                statement.parseData();
+                statement.parseDataFull();
                 ExData exData = statement.getExData();
 
                 HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = exData.getFiles();
@@ -131,7 +131,7 @@ public class APIDocuments {
            Transaction tx = DCSet.getInstance().getTransactionFinalMap().get(block, seqNo);
            if (tx instanceof RSignNote) {
                RSignNote statement = (RSignNote) tx;
-               statement.parseData();
+               statement.parseDataFull();
                ExData exData = statement.getExData();
 
                HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = exData.getFiles();

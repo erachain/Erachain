@@ -81,8 +81,6 @@ public class ExData {
      * Name: hash, is ZIP?, file data
      */
     private HashMap<String, Tuple3<byte[], Boolean, byte[]>> files;
-    private HashMap<String, Tuple3<byte[], Boolean, byte[]>> files;
-
 
     private byte recipientsFlags;
     private Account[] recipients;

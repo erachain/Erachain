@@ -50,7 +50,7 @@ public class MyStatementsTableModel extends WalletTableModel<Tuple2<Tuple2<Long,
             if (rNote == null)
                 return null;
 
-            rNote.parseData();
+            rNote.parseDataFull();
 
             PublicKeyAccount creator;
             switch (column) {

@@ -42,7 +42,7 @@ public class FavoriteStatementsTableModel extends FavoriteItemModelTable {
             if (rNote == null)
                 return null;
 
-            rNote.parseData();
+            rNote.parseDataFull();
 
             PublicKeyAccount creator;
             switch (column) {
