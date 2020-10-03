@@ -658,7 +658,7 @@ public class RSignNote extends Transaction implements Itemable {
             }
         }
 
-        if (height > BlockChain.VERS_4_23_01) {
+        if (height > BlockChain.VERS_5_01_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого
             parseDataFull(); // need for take HASHES from FILES
             byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
@@ -666,6 +666,7 @@ public class RSignNote extends Transaction implements Itemable {
                 TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
                 for (byte[] hash : allHashes) {
                     if (map.contains(hash)) {
+                        LOGGER.info("NOT VALID - hash already exist: " + Base58.encode(hash));
                         return HASH_ALREDY_EXIST;
                     }
                 }
