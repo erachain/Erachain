@@ -296,14 +296,25 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 amount = amount.add(this.amount);
             }
         }
-        
+
         return amount;
     }
-    
+
     @Override
     public BigDecimal getAmount(Account account) {
         String address = account.getAddress();
         return getAmount(address);
+    }
+
+    @Override
+    public long calcBaseFee() {
+        if (hasAmount() && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
+                && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)) {
+            Long perc = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
+            return amount.unscaledValue().longValue() * perc / 1000L;
+        } else {
+            return super.calcBaseFee();
+        }
     }
 
     public boolean hasAmount() {
@@ -313,6 +324,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public static int getActionType(long assetKey, BigDecimal amount, boolean isBackward) {
         return Account.balancePosition(assetKey, amount, isBackward);
     }
+
     public int getActionType() {
         return getActionType(this.key, this.amount, this.isBackward());
     }
