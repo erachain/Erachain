@@ -395,6 +395,15 @@ public abstract class Transaction implements ExplorerJsonLine {
     // TODO REMOVE REFERENCE - use TIMESTAMP as reference
     protected Long reference = 0l;
     protected BigDecimal fee = BigDecimal.ZERO; // - for genesis
+    /**
+     * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
+     */
+    protected BigDecimal assetFee = null;
+    /**
+     * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
+     */
+    protected BigDecimal assetFeeBurn = null;
+
     // transactions
     // protected BigDecimal fee = new BigDecimal.valueOf(999000);
     protected byte feePow = 0;

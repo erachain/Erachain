@@ -382,14 +382,14 @@ public class BlockChain {
     public static final boolean ACTION_ROYALTY_PERSONS_ONLY = false;
 
     /**
-     * какие проценты при переводе каких активов - Ключ : процент * 0.001.
+     * какие проценты при переводе каких активов - Ключ : процент.
      * Это Доход форжера за минусом Сгорания
      */
-    public static final HashMap<Long, Long> ASSET_TRANSFER_PERCENTAGE = new HashMap<>();
+    public static final HashMap<Long, BigDecimal> ASSET_TRANSFER_PERCENTAGE = new HashMap<>();
     /**
-     * какие проценты сжигаем при переводе активов - Ключ : процент * 0.001
+     * какие проценты сжигаем при переводе активов - Ключ : процент
      */
-    public static final HashMap<Long, Long> ASSET_BORN_PERCENTAGE = new HashMap<>();
+    public static final HashMap<Long, BigDecimal> ASSET_BURN_PERCENTAGE = new HashMap<>();
 
     public static final BigDecimal HOLD_ROYALTY_MIN = new BigDecimal("0.0001"); // если меньше то распределение не делаем
     public static final int HOLD_ROYALTY_PERIOD_DAYS = 7; // как часто начисляем
@@ -600,10 +600,10 @@ public class BlockChain {
             ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
         } else {
 
-            //ASSET_TRANSFER_PERCENTAGE.put(1L, 1000L); // 1%
-            ASSET_TRANSFER_PERCENTAGE.put(2L, 1000L);
-            //ASSET_BORN_PERCENTAGE.put(1L, 500L); // 0.5%
-            ASSET_BORN_PERCENTAGE.put(2L, 500L);
+            ASSET_TRANSFER_PERCENTAGE.put(1L, new BigDecimal("0.01"));
+            ASSET_TRANSFER_PERCENTAGE.put(2L, new BigDecimal("0.01"));
+            ASSET_BURN_PERCENTAGE.put(1L, new BigDecimal("0.5"));
+            ASSET_BURN_PERCENTAGE.put(2L, new BigDecimal("0.5"));
 
             ////////// WIPED
             // WRONG Issue Person #125

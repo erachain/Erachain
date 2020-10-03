@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -310,11 +311,15 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public long calcBaseFee() {
         if (hasAmount() && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
                 && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)) {
-            Long perc = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
-            return amount.unscaledValue().longValue() * perc / 1000L;
-        } else {
-            return super.calcBaseFee();
+            BigDecimal perc = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
+            assetFee = amount.multiply(perc).setScale(asset.getScale(), RoundingMode.DOWN);
+            if (!BlockChain.ASSET_BURN_PERCENTAGE.isEmpty()
+                    && BlockChain.ASSET_BURN_PERCENTAGE.containsKey(key)) {
+                perc = BlockChain.ASSET_BURN_PERCENTAGE.get(key);
+                assetFeeBurn = assetFee.multiply(perc).setScale(asset.getScale(), RoundingMode.DOWN);
+            }
         }
+        return super.calcBaseFee();
     }
 
     public boolean hasAmount() {
@@ -324,7 +329,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public static int getActionType(long assetKey, BigDecimal amount, boolean isBackward) {
         return Account.balancePosition(assetKey, amount, isBackward);
     }
-
     public int getActionType() {
         return getActionType(this.key, this.amount, this.isBackward());
     }
