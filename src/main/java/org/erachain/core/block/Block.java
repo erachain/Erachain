@@ -1550,6 +1550,12 @@ public class Block implements Closeable, ExplorerJsonLine {
             return INVALID_REFERENCE;
         }
 
+        if (this.winValue < 1) {
+            // значит проскочило по BlockChain.ALL_VALID_BEFORE
+            // присвоим его как предыдущее значение
+            this.winValue = parentBlockHead.winValue;
+        }
+
         // вычислив всю силу цепочки
         this.totalWinValue = this.parentBlockHead.totalWinValue + this.winValue;
 
