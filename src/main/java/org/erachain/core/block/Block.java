@@ -2343,7 +2343,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             }
 
             // учтем снятие с начисления для держателей долей
-            GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, false, -Transaction.FEE_KEY,
+            GenesisBlock.CREATOR.changeBalance(dcSet, asOrphan, false, -Transaction.FEE_KEY,
                     totalPayedRoyalty,
                     true, false);
 
