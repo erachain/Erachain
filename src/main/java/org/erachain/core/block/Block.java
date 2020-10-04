@@ -2071,8 +2071,9 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (this.blockHead.totalFee > 0) {
             BigDecimal forgerEarn;
             if (BlockChain.CLONE_MODE) {
+                // Авторские начисления на счет Эрачейн от всех комиссий в блоке
                 long blockFeeRoyaltyLong = this.blockHead.totalFee / 20; // 5%
-                BlockChain.ROYALTY_ACCOUNT.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
+                BlockChain.CLONE_ROYALTY_ERACHAIN_ACCOUNT.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
                         new BigDecimal(blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE), false, false);
 
                 forgerEarn = new BigDecimal(this.blockHead.totalFee - blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE)
