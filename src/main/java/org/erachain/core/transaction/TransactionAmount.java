@@ -312,12 +312,15 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (hasAmount() && getActionType() == ACTION_SEND // только для передачи в собственность!
                 && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
                 && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)) {
-            BigDecimal perc = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
-            assetFee = amount.abs().multiply(perc).setScale(asset.getScale(), RoundingMode.DOWN);
+            Fun.Tuple2<BigDecimal, BigDecimal> percItem = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
+            assetFee = amount.abs().multiply(percItem.a).setScale(asset.getScale(), RoundingMode.DOWN);
+            if (assetFee.compareTo(percItem.b) < 0) {
+                // USE MINIMAL VALUE
+                assetFee = percItem.b.setScale(asset.getScale(), RoundingMode.DOWN);
+            }
             if (!BlockChain.ASSET_BURN_PERCENTAGE.isEmpty()
                     && BlockChain.ASSET_BURN_PERCENTAGE.containsKey(key)) {
-                perc = BlockChain.ASSET_BURN_PERCENTAGE.get(key);
-                assetFeeBurn = assetFee.multiply(perc).setScale(asset.getScale(), RoundingMode.UP);
+                assetFeeBurn = assetFee.multiply(BlockChain.ASSET_BURN_PERCENTAGE.get(key)).setScale(asset.getScale(), RoundingMode.UP);
             }
             return super.calcBaseFee() >> 1;
         }

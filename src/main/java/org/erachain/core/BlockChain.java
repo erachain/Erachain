@@ -386,10 +386,10 @@ public class BlockChain {
     public static final boolean ACTION_ROYALTY_PERSONS_ONLY = false;
 
     /**
-     * какие проценты при переводе каких активов - Ключ : процент.
+     * какие проценты при переводе каких активов - Ключ : процент + минималка.
      * Это Доход форжера за минусом Сгорания
      */
-    public static final HashMap<Long, BigDecimal> ASSET_TRANSFER_PERCENTAGE = new HashMap<>();
+    public static final HashMap<Long, Tuple2<BigDecimal, BigDecimal>> ASSET_TRANSFER_PERCENTAGE = new HashMap<>();
     /**
      * какие проценты сжигаем при переводе активов - Ключ : процент
      */
@@ -604,8 +604,8 @@ public class BlockChain {
             ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
         } else {
 
-            ASSET_TRANSFER_PERCENTAGE.put(1L, new BigDecimal("0.01"));
-            ASSET_TRANSFER_PERCENTAGE.put(2L, new BigDecimal("0.01"));
+            ASSET_TRANSFER_PERCENTAGE.put(1L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
+            ASSET_TRANSFER_PERCENTAGE.put(2L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
             ASSET_BURN_PERCENTAGE.put(1L, new BigDecimal("0.5"));
             ASSET_BURN_PERCENTAGE.put(2L, new BigDecimal("0.5"));
 
