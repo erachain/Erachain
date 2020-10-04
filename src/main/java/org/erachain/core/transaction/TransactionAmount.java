@@ -1243,6 +1243,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
 
         if (assetFee != null) {
+            // учтем что он еще заплатил коэффицинт с суммы
             this.creator.changeBalance(db, !backward, backward, absKey, this.assetFee, !incomeReverse, false);
             if (block.txCalculated != null) {
                 block.txCalculated.add(new RCalculated(this.creator, absKey,
