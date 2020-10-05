@@ -1,5 +1,6 @@
 package org.erachain.gui.exdata;
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
@@ -83,6 +84,7 @@ public class ExDataPanel extends JPanel {
     public JCheckBox checkBoxMakeHashAndCheckUniqueHashes;
     public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
     public DocTypeAppendixPanel docTypeAppendixPanel;
+    public MultiPayOutsPanel multiPayOutsPanel;
 
 
     /**
@@ -313,14 +315,14 @@ public class ExDataPanel extends JPanel {
         jButton_Add_Other_Hashes = new MButton();
         jButton_Remove_Other_Hashes = new MButton();
         jPanel_Title = new JPanel();
-
         jLabel_Title_Message = new JLabel();
         jTextField_Title_Message = new JTextField();
         jButton_Input_Hashes_From_File_Other_Hashes = new MButton();
-
         params_Template_Model = new ParamsTemplateModel();
         jTable_Params_Message_Public = new MTable(params_Template_Model);
         docTypeAppendixPanel = new DocTypeAppendixPanel(this);
+        multiPayOutsPanel = new MultiPayOutsPanel();
+
         params_Template_Model.addTableModelListener(new TableModelListener() {
 
             @Override
@@ -369,6 +371,13 @@ public class ExDataPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
 
         jTabbedPane_Type.addTab(Lang.getInstance().translate("Type"), docTypeAppendixPanel);
+
+        if (BlockChain.TEST_MODE) {
+            JScrollPane multiPayScrollBar = new JScrollPane();
+            multiPayScrollBar.setViewportView(multiPayOutsPanel);
+            jTabbedPane_Type.addTab(Lang.getInstance().translate("Payouts"), multiPayScrollBar);
+        }
+
         jTabbedPane_Type.addTab(Lang.getInstance().translate("Recipients"), multipleRecipientsPanel);
 
         fill_Template_Panel = new MFillTemplatePanel();
