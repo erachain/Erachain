@@ -2101,7 +2101,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), true, false);
         }
 
-        if (transactionCount > 0) {
+        if (transactionCount > 0 && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()) {
             // подсчет наград с ПЕРЕВОДОВ
             HashMap<AssetCls, Tuple2<BigDecimal, BigDecimal>> earnedAllAssets = new HashMap<>();
             Tuple2<BigDecimal, BigDecimal> earnedPair;
