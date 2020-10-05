@@ -58,7 +58,7 @@ public class RNoteInfo extends javax.swing.JPanel {
             return;
         this.transaction = transaction;
         statement = (RSignNote) transaction;
-        statement.parseData();
+        statement.parseDataFull();
 
         initComponents();
 
@@ -188,7 +188,7 @@ public class RNoteInfo extends javax.swing.JPanel {
                         }
 
                         statement = result.c;
-                        statement.parseData();
+                        statement.parseDataFull();
                         viewInfo();
 
                     } else if (statementEncrypted != null) {

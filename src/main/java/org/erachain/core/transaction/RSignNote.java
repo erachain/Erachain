@@ -544,7 +544,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         super.process(block, forDeal);
 
-        parseData(); // need for take HASHES from FILES
+        parseDataFull(); // need for take HASHES from FILES
         extendedData.process(this);
 
         byte[][] hashes = extendedData.getAllHashesAsBytes(true);
@@ -559,7 +559,7 @@ public class RSignNote extends Transaction implements Itemable {
     @Override
     public void orphan(Block block, int forDeal) {
 
-        parseData(); // also need for take HASHES from FILES
+        parseDataFull(); // also need for take HASHES from FILES
         extendedData.orphan(this);
 
         byte[][] hashes = extendedData.getAllHashesAsBytes(true);
@@ -658,14 +658,15 @@ public class RSignNote extends Transaction implements Itemable {
             }
         }
 
-        if (height > BlockChain.VERS_4_23_01) {
+        if (height > BlockChain.VERS_5_01_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого
-            parseData(); // need for take HASHES from FILES
+            parseDataFull(); // need for take HASHES from FILES
             byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
             if (allHashes != null && allHashes.length > 0) {
                 TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
                 for (byte[] hash : allHashes) {
                     if (map.contains(hash)) {
+                        ///LOGGER.info("NOT VALID - hash already exist: " + Base58.encode(hash));
                         return HASH_ALREDY_EXIST;
                     }
                 }
@@ -738,7 +739,7 @@ public class RSignNote extends Transaction implements Itemable {
         }
     }
 
-    public void parseData() {
+    public void parseDataFull() {
 
         if (extendedData == null || !extendedData.isParsedWithFiles()) {
             // если уже парсили или парсили без файлов а надо с файлами

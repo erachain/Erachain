@@ -82,7 +82,6 @@ public class ExData {
      */
     private HashMap<String, Tuple3<byte[], Boolean, byte[]>> files;
 
-
     private byte recipientsFlags;
     private Account[] recipients;
 
@@ -194,12 +193,16 @@ public class ExData {
 
         try {
             // v 2.1
-            if (json.containsKey("TM")) {
+            if (json.containsKey("TM") && json.get("TM") != null) {
+                try {
+                    templateKey = new Long(json.get("TM").toString());
+                } catch (Exception e) {
+                }
 
-                templateKey = new Long(json.get("TM").toString());
-                if (dcSet != null) {
+                if (templateKey != 0) {
                     template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, templateKey);
                 }
+
                 if (template != null) {
                     valuedText = template.viewDescription();
 
@@ -214,10 +217,13 @@ public class ExData {
                 }
             } else
                 // v2.0
-                if (json.containsKey("Template")) {
+                if (json.containsKey("Template") && json.get("Template") != null) {
+                    try {
+                        templateKey = new Long(json.get("Template").toString());
+                    } catch (Exception e) {
+                    }
 
-                    templateKey = new Long(json.get("Template").toString());
-                    if (dcSet != null) {
+                    if (templateKey != 0) {
                         template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, templateKey);
                     }
                     if (template != null) {
@@ -417,6 +423,7 @@ public class ExData {
     // info to byte[]
     @SuppressWarnings("unchecked")
 
+    static boolean newStyle = true;
     public static byte[] toByteJsonAndFiles(ByteArrayOutputStream outStream, JSONObject json,
                                             HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) throws Exception {
 
@@ -433,28 +440,44 @@ public class ExData {
         }
 
         // if insert Files
-        Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it = files.entrySet().iterator();
-        JSONObject files_Json = new JSONObject();
+        Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> iterator = files.entrySet().iterator();
+        JSONArray filesJsonArray = new JSONArray();
+
         int i = 0;
-        ArrayList<byte[]> out_files = new ArrayList<byte[]>();
-        while (it.hasNext()) {
-            Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it.next();
-            JSONObject file_Json = new JSONObject();
-            file_Json.put("FN", file.getKey()); // File_Name
-            file_Json.put("ZP", file.getValue().b.toString()); // ZIP
-            file_Json.put("SZ", file.getValue().c.length + ""); // Size
-            files_Json.put(i + "", file_Json);
-            out_files.add(i, file.getValue().c);
-            i++;
+        byte[][] outFiles = new byte[files.size()][];
+        if (newStyle) {
+            while (iterator.hasNext()) {
+                Entry<String, Tuple3<byte[], Boolean, byte[]>> file = iterator.next();
+                JSONObject fileJson = new JSONObject();
+                fileJson.put("FN", file.getKey()); // File_Name
+                fileJson.put("ZP", file.getValue().b); // ZIP
+                fileJson.put("SZ", file.getValue().c.length); // Size
+                filesJsonArray.add(fileJson);
+                outFiles[i++] = file.getValue().c;
+            }
+            json.put("F", filesJsonArray);
+        } else {
+            //ArrayList<byte[]> out_files = new ArrayList<byte[]>();
+            while (iterator.hasNext()) {
+                Entry<String, Tuple3<byte[], Boolean, byte[]>> file = iterator.next();
+                JSONObject fileJson = new JSONObject();
+                fileJson.put("FN", file.getKey()); // File_Name
+                fileJson.put("ZP", file.getValue().b); // ZIP
+                fileJson.put("SZ", file.getValue().c.length); // Size
+                filesJsonArray.add(fileJson);
+                outFiles[i++] = file.getValue().c;
+                i++;
+            }
+            json.put("F", filesJsonArray);
+
         }
-        json.put("F", files_Json);
         JSON_Bytes = json.toString().getBytes(StandardCharsets.UTF_8);
         // convert int to byte
         size_Json = ByteBuffer.allocate(DATA_JSON_PART_LENGTH).putInt(JSON_Bytes.length).array();
         outStream.write(size_Json);
         outStream.write(JSON_Bytes);
-        for (i = 0; i < out_files.size(); i++) {
-            outStream.write(out_files.get(i));
+        for (i = 0; i < outFiles.length; i++) {
+            outStream.write(outFiles[i]);
         }
         return outStream.toByteArray();
 
@@ -552,31 +575,59 @@ public class ExData {
                 if (json.containsKey("F")) {
                     // v 2.1
 
-                    files = (JSONObject) json.get("F");
+                    Object filesObj = json.get("F");
+                    if (filesObj instanceof JSONArray) {
+                        // new STYLE
+                        JSONArray filesArray = (JSONArray) json.get("F");
 
-                    files_key_Set = files.keySet();
-                    for (int i = 0; i < files_key_Set.size(); i++) {
-                        JSONObject file = (JSONObject) files.get(i + "");
+                        for (int i = 0; i < filesArray.size(); i++) {
+                            JSONObject file = (JSONObject) filesArray.get(i);
 
-                        String name = (String) file.get("FN"); // File_Name
-                        Boolean zip = new Boolean((String) file.get("ZP")); // ZIP
-                        int size = new Integer((String) file.get("SZ"));
-                        byte[] fileBytes = Arrays.copyOfRange(data, position, position + size);
-                        position = position + size;
-                        byte[] fileBytesOrig = null;
-                        if (zip) {
-                            try {
-                                fileBytesOrig = ZipBytes.decompress(fileBytes);
-                            } catch (DataFormatException e1) {
-                                LOGGER.error(e1.getMessage(), e1);
+                            String name = (String) file.get("FN"); // File_Name
+                            Boolean zip = (Boolean) file.get("ZP"); // ZIP
+                            int size = (int) (long) file.get("SZ");
+                            byte[] fileBytes = Arrays.copyOfRange(data, position, position + size);
+                            position = position + size;
+                            byte[] fileBytesOrig = null;
+                            if (zip) {
+                                try {
+                                    fileBytesOrig = ZipBytes.decompress(fileBytes);
+                                } catch (DataFormatException e1) {
+                                    LOGGER.error(e1.getMessage(), e1);
+                                }
+                            } else {
+                                fileBytesOrig = fileBytes;
                             }
-                        } else {
-                            fileBytesOrig = fileBytes;
+                            filesMap.put(name, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
+
                         }
-                        filesMap.put(name, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
+                    } else {
+                        // OLD style
+                        files = (JSONObject) json.get("F");
 
+                        files_key_Set = files.keySet();
+                        for (int i = 0; i < files_key_Set.size(); i++) {
+                            JSONObject file = (JSONObject) files.get(i + "");
+
+                            String name = (String) file.get("FN"); // File_Name
+                            Boolean zip = new Boolean(file.get("ZP").toString()); // ZIP
+                            int size = (int) (long) new Long(file.get("SZ").toString());
+                            byte[] fileBytes = Arrays.copyOfRange(data, position, position + size);
+                            position = position + size;
+                            byte[] fileBytesOrig = null;
+                            if (zip) {
+                                try {
+                                    fileBytesOrig = ZipBytes.decompress(fileBytes);
+                                } catch (DataFormatException e1) {
+                                    LOGGER.error(e1.getMessage(), e1);
+                                }
+                            } else {
+                                fileBytesOrig = fileBytes;
+                            }
+                            filesMap.put(name, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
+
+                        }
                     }
-
                 } else if (json.containsKey("&*&*%$$%_files_#$@%%%")) {
                     //v2.0
 
@@ -878,13 +929,14 @@ public class ExData {
             }
         }
 
-        // add hashes
-        Iterator<Entry<String, String>> it_Hash = hashes_Map.entrySet().iterator();
-        while (it_Hash.hasNext()) {
-            Entry<String, String> hash = it_Hash.next();
-            hashes_JSON.put(hash.getKey(), hash.getValue());
-        }
-        if (!hashes_JSON.isEmpty()) {
+        if (hashes_Map != null && !hashes_Map.isEmpty()) {
+            // add hashes
+            Iterator<Entry<String, String>> it_Hash = hashes_Map.entrySet().iterator();
+            while (it_Hash.hasNext()) {
+                Entry<String, String> hash = it_Hash.next();
+                hashes_JSON.put(hash.getKey(), hash.getValue());
+            }
+
             out_Map.put("HS", hashes_JSON);
 
             if (!isEncrypted && uniqueHashes) {
@@ -898,7 +950,7 @@ public class ExData {
         while (it_Filles.hasNext()) {
             Tuple3<String, Boolean, byte[]> file = it_Filles.next();
 
-            boolean zip = file.b;
+            Boolean zip = file.b;
             byte[] fileBytes = file.c;
             byte[] fileBytesOrig = null;
             if (zip) {

@@ -222,7 +222,7 @@ public class MPDFView extends javax.swing.JPanel {
             if (record.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
 
                 RSignNote note = (RSignNote) record;
-                note.parseData();
+                note.parseDataFull();
                 ExData exData = note.getExData();
 
                 HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = exData.getFiles();

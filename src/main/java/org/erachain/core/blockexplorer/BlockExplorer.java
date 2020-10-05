@@ -3100,6 +3100,9 @@ public class BlockExplorer {
         int block = rNote.getBlockHeight();
         int seqNo = rNote.getSeqNo();
 
+        // TODO нужно для получения Файлов и их Хэшей - надо потом сделать отдельную Мап для файлов чтобы их всех нераспаковывать каждый раз и ХШИ в трнзакцици держать
+        rNote.parseDataFull();
+
         output.put("tx", rNote.toJson());
 
         output.put("creator_name", rNote.getCreator().getPersonAsString());
