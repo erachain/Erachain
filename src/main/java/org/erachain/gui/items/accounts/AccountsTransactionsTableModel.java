@@ -121,10 +121,12 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
     @Override
     protected void repaintConfirms() {
-        for (int i = 0; i < list.size(); i++) {
-            setValueAt(i, COLUMN_CONFIRMATIONS, list.get(i).transaction.getConfirmations(dcSet));
+        if (list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                setValueAt(i, COLUMN_CONFIRMATIONS, list.get(i).transaction.getConfirmations(dcSet));
+            }
+            fireTableDataChanged();
         }
-        fireTableDataChanged();
     }
 
     @Override
