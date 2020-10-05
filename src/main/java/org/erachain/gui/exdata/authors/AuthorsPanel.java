@@ -3,6 +3,8 @@ package org.erachain.gui.exdata.authors;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 import javax.swing.*;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -27,6 +29,8 @@ public class AuthorsPanel extends JPanel {
         jButtonAddAuthor.setVisible(false);
         jButtonRemoveAuthor.setVisible(true);
 
+        AuthorsTableModel = new TableModel(0);
+        jTableAuthors = new MTable(AuthorsTableModel);
 
         this.jButtonRemoveAuthor.addActionListener(new ActionListener() {
             // delete row
@@ -52,13 +56,14 @@ public class AuthorsPanel extends JPanel {
                 AuthorsTableModel.fireTableDataChanged();
             }
         });
+
         this.setLayout(new GridBagLayout());
 
         jScrollPaneAuthors.setOpaque(false);
         jScrollPaneAuthors.setPreferredSize(new Dimension(0, 0));
 
-        AuthorsTableModel = new TableModel(0);
-        jTableAuthors = new MTable(AuthorsTableModel);
+
+
         jTableAuthors.setVisible(true);
         jScrollPaneAuthors.setViewportView(jTableAuthors);
 

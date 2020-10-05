@@ -14,10 +14,16 @@ import javax.swing.table.DefaultTableModel;
 import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
 
 public class TableModel extends DefaultTableModel {
+    private static final int CODE_HUMAN_COL =0;
+    private static final int NAME_HUMAN_COL =2;
+    private static final int HEIGHT_HUMAN_COL =1;
+    private static final int DESCRIPTION_COL =3;
 
-    public HashMap<Integer,PersonHuman> authors;
+
 
         public TableModel(int rows) {
             super(new Object[]{Lang.getInstance().translate("Number"),
@@ -26,14 +32,25 @@ public class TableModel extends DefaultTableModel {
                             Lang.getInstance().translate("Description")
                     },
                     rows);
-            this.addRow(new Object[]{(int)0, "","",""});
+            this.addRow(new Object[]{(Integer)0, "","",""});
 
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            if (column == 0)
-                return true;
+            switch (column) {
+                case CODE_HUMAN_COL:
+                    return true;
+
+                case HEIGHT_HUMAN_COL:
+                    if(((String)getValueAt(row,NAME_HUMAN_COL)).equals("")) return false;
+                    return true;
+
+                case DESCRIPTION_COL:
+                    if(((String)getValueAt(row,NAME_HUMAN_COL)).equals("")) return false;
+                    return true;
+            }
+
             return false;
         }
 
@@ -55,39 +72,33 @@ public class TableModel extends DefaultTableModel {
         @Override
         public void setValueAt(Object aValue, int row, int column) {
             //IF STRING
-            PersonHuman result = null;
+            switch (column) {
+                case CODE_HUMAN_COL :
+                    PersonHuman result = null;
+                    int codePerson = (Integer) aValue;
+                    Iterator a = this.dataVector.iterator();
+                    // find duble
+                    while (a.hasNext()){
+                        Vector b = (Vector)a.next();
+                       if ((Integer)b.get(0)==codePerson) return;
 
-                //CHECK IF NOT EMPTY
-                int codePerson = (Integer) aValue;
-                if (codePerson!=0) {
-                    //CHECK IF LAST ROW
-                    if (row == this.getRowCount() - 1) {
-                        this.addRow(new Object[]{(int) 0, "", "", ""});
                     }
-
                     result = (PersonHuman) Controller.getInstance().getPerson(codePerson);
-
-                    if (result == null) {
-                       super.setValueAt(
-                                Lang.getInstance().translate("Person not found"),
-                                row, column + 2);
-                    } else {
+                    if (result != null ) {
                         super.setValueAt(aValue, row, column);
-                        super.setValueAt("", row, column + 1);
-                        super.setValueAt(result.getName(), row, column + 2);
-                        super.setValueAt(result.getDescription(), row, column + 3);
-                        authors.put((Integer) aValue, result);
+                        super.setValueAt(result.getName(), row, NAME_HUMAN_COL);
+                        this.addRow(new Object[]{(Integer)0, "","",""});
                     }
-
-            } else {
-                super.setValueAt(aValue, row, column);
-
-
-                //CHECK IF LAST ROW
-                if (row == this.getRowCount() - 1) {
-                    this.addRow(new Object[]{((int) 0), "","",""});
+                    return;
+                case HEIGHT_HUMAN_COL:
+                    super.setValueAt((String)aValue, row, column);
+                    return;
+                case DESCRIPTION_COL:
+                    super.setValueAt((String)aValue, row, column);
+                    return;
                 }
-            }
+              return;
+
         }
 
         public void setAuthors(PersonHuman[] Authors) {
@@ -102,22 +113,30 @@ public class TableModel extends DefaultTableModel {
             while (getRowCount() > 0) {
                 this.removeRow(getRowCount() - 1);
             }
-            authors.clear();
+
             //this.addRow(new Object[]{"", ""});
         }
 
-        public PersonHuman[] getAuthors() {
-            if (getRowCount() == 0)
+        public ArrayList<Integer> getAuthors() {
+            if (this.getRowCount() == 0)
                 return null;
+            ArrayList<Integer> result = new ArrayList<Integer>();
+            Iterator a = this.dataVector.iterator();
+            // find duble
+            while (a.hasNext()){
+                Vector b = (Vector)a.next();
+                result.add((Integer)b.get(0));
 
-            return (PersonHuman[]) authors.entrySet().toArray();
+            }
+            return result;
         }
 
         @Override
         public void removeRow(int row){
             super.removeRow(row);
-         int  code = (int) super.getValueAt(row,0);
-         authors.remove(code);
+            if (this.getRowCount()==0){
+                 this.addRow(new Object[]{(Integer)0, "","",""});
+            }
 
         }
     }
