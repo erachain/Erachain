@@ -324,6 +324,8 @@ public class Synchronizer extends Thread {
                 } else {
                     // тут не было проверки заголовка а надо бы - чтобы его создать
                     int invalid = block.isValidHead(fork);
+                    // чисто для лога - мол предупреждение что там Заголовок битый
+                    LOGGER.info("BLOCK BEFORE ALL_VALID head ERROR: " + invalid);
                     // и полностью просчитать блок
                     block.process(fork);
                 }
