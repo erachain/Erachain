@@ -1276,6 +1276,10 @@ public class Account {
         return Ints.fromByteArray(shortBytes);
     }
 
+    public long hashCodeLong() {
+        return Longs.fromByteArray(shortBytes);
+    }
+
     // EQUALS
     @Override
     public boolean equals(Object b) {
@@ -1449,7 +1453,7 @@ public class Account {
         return getFromFavorites(getAddress());
     }
 
-    public int getAccountNo() {
+    public Integer getAccountNo() {
         return Controller.getInstance().wallet.database.getAccountMap().getAccountNo(getAddress());
     }
 

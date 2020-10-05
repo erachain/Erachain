@@ -7,20 +7,21 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.IssueItemMap;
-import org.erachain.datachain.ItemAssetBalanceMap;
-import org.erachain.datachain.ItemMap;
+import org.erachain.datachain.*;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ByteArrayUtils;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
+import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.Stack;
+import java.util.TreeMap;
 
 //import java.math.BigDecimal;
 //import java.util.Arrays;
@@ -386,6 +387,26 @@ public abstract class PersonCls extends ItemCls {
                 + this.name // + "♥"
                 ///+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC")
                 ;
+    }
+
+    public static BigDecimal getTotalBalance(DCSet dcSet, Long personKey, Long assetKey, int position) {
+        TreeMap<String, Stack<Fun.Tuple3<Integer, Integer, Integer>>> addresses
+                = dcSet.getPersonAddressMap().getItems(personKey);
+
+        if (addresses.isEmpty())
+            return null;
+
+        TransactionFinalMap transactionsMap = dcSet.getTransactionFinalMap();
+        BigDecimal balanceTotal = BigDecimal.ZERO;
+
+        for (String address : addresses.keySet()) {
+            Account account = new Account(address);
+            Tuple2<BigDecimal, BigDecimal> balance = account.getBalanceInPosition(assetKey, position);
+            if (balance != null)
+                balanceTotal = balanceTotal.add(balance.b);
+        }
+
+        return balanceTotal;
     }
 
     @Override

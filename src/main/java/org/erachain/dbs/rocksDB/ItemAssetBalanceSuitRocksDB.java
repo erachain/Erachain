@@ -3,6 +3,7 @@ package org.erachain.dbs.rocksDB;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
@@ -92,29 +93,36 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
         // indexes = new ArrayList<>(); - null - not use SIZE index and counter
 
+        indexes = new ArrayList<>();
+
+        if (BlockChain.HOLD_ROYALTY_PERIOD_DAYS > 0 || !Controller.getInstance().onlyProtocolIndexing) {
+            // TODO сделать потом отдельную таблицу только для заданного Актива - для ускорения
+            // если включены выплаты - то нужно этот индекс тоже делать - хотя можно отдельно по одному Активу только - нужному
+            balanceKeyAssetIndex = new SimpleIndexDB<>(balanceKeyAssetIndexName,
+                    (key, value) -> {
+                        // Address
+                        byte[] shortAddress = new byte[20];
+                        System.arraycopy(key, 0, shortAddress, 0, 20);
+                        // ASSET KEY
+                        byte[] assetKeyBytes = new byte[8];
+                        System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+
+                        byte[] shiftForSortBuff;
+                        shiftForSortBuff = seralizerBigDecimal.toBytes(value.a.b.negate());
+
+                        return org.bouncycastle.util.Arrays.concatenate(
+                                assetKeyBytes,
+                                shiftForSortBuff
+                                //shortAddress - он уже есть в главном ключе
+                        );
+                    },
+                    (result) -> result);
+            indexes.add(balanceKeyAssetIndex);
+        }
+
         if (Controller.getInstance().onlyProtocolIndexing)
             // NOT USE SECONDARY INDEXES
             return;
-
-        balanceKeyAssetIndex = new SimpleIndexDB<>(balanceKeyAssetIndexName,
-                (key, value) -> {
-                    // Address
-                    byte[] shortAddress = new byte[20];
-                    System.arraycopy(key, 0, shortAddress, 0, 20);
-                    // ASSET KEY
-                    byte[] assetKeyBytes = new byte[8];
-                    System.arraycopy(key, 20, assetKeyBytes, 0, 8);
-
-                    byte[] shiftForSortBuff;
-                    shiftForSortBuff = seralizerBigDecimal.toBytes(value.a.b.negate());
-
-                    return org.bouncycastle.util.Arrays.concatenate(
-                            assetKeyBytes,
-                            shiftForSortBuff
-                            //shortAddress - он уже есть в главном ключе
-                    );
-                },
-                (result) -> result);
 
         balanceAddressIndex = new SimpleIndexDB<>(balanceAddressIndexName,
                 (key, value) -> {
@@ -131,8 +139,6 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                 },
                 (result) -> result); // ByteableTrivial
 
-        indexes = new ArrayList<>();
-        indexes.add(balanceKeyAssetIndex);
         indexes.add(balanceAddressIndex);
     }
 

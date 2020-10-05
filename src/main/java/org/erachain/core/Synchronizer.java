@@ -312,13 +312,24 @@ public class Synchronizer extends Thread {
                     throw new Exception(mess);
                 }
 
-                if (block.heightBlock > BlockChain.ALL_VALID_BEFORE && block.isValid(fork,
-                        true /// это же проверка в ФОРКЕ - тут нужно! Тем более что там внутри процессинг уже идет
-                ) > 0) {
-                    // INVALID BLOCK THROW EXCEPTION
-                    String mess = "Dishonest peer by not is Valid block, height: " + height;
-                    peer.ban(BAN_BLOCK_TIMES << 1, mess);
-                    throw new Exception(mess);
+                if (block.heightBlock > BlockChain.ALL_VALID_BEFORE) {
+                    if (block.isValid(fork,
+                            true /// это же проверка в ФОРКЕ - тут нужно! Тем более что там внутри процессинг уже идет
+                    ) > 0) {
+                        // INVALID BLOCK THROW EXCEPTION
+                        String mess = "Dishonest peer by not is Valid block, height: " + height;
+                        peer.ban(BAN_BLOCK_TIMES << 1, mess);
+                        throw new Exception(mess);
+                    }
+                } else {
+                    // тут не было проверки заголовка а надо бы - чтобы его создать
+                    int invalid = block.isValidHead(fork);
+                    if (invalid > 0) {
+                        // чисто для лога - мол предупреждение что там Заголовок битый
+                        LOGGER.info("BEFORE ALL_VALID - Block.Head ERROR: " + invalid);
+                    }
+                    // и полностью просчитать блок
+                    block.process(fork);
                 }
             }
 
