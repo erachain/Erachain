@@ -581,6 +581,14 @@ public class BlockChain {
             }
         } else if (DEMO_MODE) {
 
+            if (false) {
+                // это как пример для отладки
+                ASSET_TRANSFER_PERCENTAGE.put(1L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
+                ASSET_TRANSFER_PERCENTAGE.put(2L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
+                ASSET_BURN_PERCENTAGE.put(1L, new BigDecimal("0.5"));
+                ASSET_BURN_PERCENTAGE.put(2L, new BigDecimal("0.5"));
+            }
+
             // GENERAL TRUST
             TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
             TRUSTED_ANONYMOUS.add("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh");
@@ -603,14 +611,6 @@ public class BlockChain {
 
             ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
         } else {
-
-            if (false) {
-                // это как пример для отладки
-                ASSET_TRANSFER_PERCENTAGE.put(1L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
-                ASSET_TRANSFER_PERCENTAGE.put(2L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
-                ASSET_BURN_PERCENTAGE.put(1L, new BigDecimal("0.5"));
-                ASSET_BURN_PERCENTAGE.put(2L, new BigDecimal("0.5"));
-            }
 
             ////////// WIPED
             // WRONG Issue Person #125
