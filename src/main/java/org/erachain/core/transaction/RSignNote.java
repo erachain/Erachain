@@ -344,9 +344,6 @@ public class RSignNote extends Transaction implements Itemable {
         //ADD CREATOR/SERVICE/DATA
         if (data != null && data.length > 0) {
 
-            // parse DATA - may it for webserver.API.recordParse
-            parseDataV2WithoutFiles();
-
             transaction.put("exData", extendedData.toJson());
 
         }

@@ -12,6 +12,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlocksHeadsMap;
@@ -106,6 +107,11 @@ public class BlockChain {
     public static final boolean DEMO_MODE = Settings.getInstance().isDemoNet();
     public static final boolean TEST_MODE = Settings.getInstance().isTestNet();
     public static final boolean MAIN_MODE = !TEST_MODE && !CLONE_MODE;
+
+    /**
+     * Счет на который начисляются %% для Эрачейн с сайдченов
+     */
+    public static Account CLONE_ROYALTY_ERACHAIN_ACCOUNT = new Account("7RYEVPZg7wbu2bmz3tWnzrhPavjpyQ4tnp");
 
     /**
      * default = 30 sec
@@ -215,7 +221,7 @@ public class BlockChain {
      * Если задан то это режим синхронизации со стрым протоколом - значит нам нельза генерить блоки и трнзакции
      * и вести себя тихо - ничего не посылать никуда - чтобы не забанили
      */
-    public static int ALL_VALID_BEFORE = DEMO_MODE ? 0 : 0;
+    public static int ALL_VALID_BEFORE = DEMO_MODE ? 0 : 0; // see in sidePROTOCOL.json as 'allValidBefore'
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : 623904; //260120;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам<bR>
@@ -264,8 +270,6 @@ public class BlockChain {
     public static final int DEVELOP_FORGING_START = 100;
 
     public HashSet<String> trustedPeers = new HashSet<>();
-
-    public static Account ROYALTY_ACCOUNT = new Account("7RYEVPZg7wbu2bmz3tWnzrhPavjpyQ4tnp");
 
     public static final HashSet<Integer> validBlocks = new HashSet<>();
 
@@ -373,9 +377,32 @@ public class BlockChain {
     //
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
 
+    public static final int ACTION_ROYALTY_START = 0; // if - 0 - OFF
+    public static final int ACTION_ROYALTY_PERCENT = 8400; // x0.001
+    public static final BigDecimal ACTION_ROYALTY_MIN = new BigDecimal("0.000001"); // x0.001
+    public static final int ACTION_ROYALTY_MAX_DAYS = 30; // x0.001
+    public static final BigDecimal ACTION_ROYALTY_TO_HOLD_ROYALTY_PERCENT = new BigDecimal("0.01"); // сколько добавляем к награде
+    public static final long ACTION_ROYALTY_ASSET = AssetCls.FEE_KEY;
+    public static final boolean ACTION_ROYALTY_PERSONS_ONLY = false;
 
     /**
-     * Multi-level Referal Sysytem. Levels for deep
+     * какие проценты при переводе каких активов - Ключ : процент + минималка.
+     * Это Доход форжера за минусом Сгорания
+     */
+    public static final HashMap<Long, Tuple2<BigDecimal, BigDecimal>> ASSET_TRANSFER_PERCENTAGE = new HashMap<>();
+    /**
+     * какие проценты сжигаем при переводе активов - Ключ : процент
+     */
+    public static final HashMap<Long, BigDecimal> ASSET_BURN_PERCENTAGE = new HashMap<>();
+
+    public static final int HOLD_ROYALTY_PERIOD_DAYS = 0; // как часто начисляем? Если = 0 - на начислять
+    public static final BigDecimal HOLD_ROYALTY_MIN = new BigDecimal("0.0001"); // если меньше то распределение не делаем
+    public static Account HOLD_ROYALTY_EMITTER = new Account("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"); // если меньше то распределение не делаем
+    public static final long HOLD_ROYALTY_ASSET = AssetCls.ERA_KEY;
+
+
+    /**
+     * Multi-level Referal System. Levels for deep
      */
     public static final int FEE_INVITED_DEEP = TEST_DB > 0 || MAIN_MODE ? 0 : 3;
     /**
@@ -454,14 +481,14 @@ public class BlockChain {
     public BlockChain(DCSet dcSet_in) throws Exception {
 
         trustedPeers.addAll(Settings.getInstance().getTrustedPeers());
-
+        //HOLD_ROYALTY_EMITTER = new Account("q");
 
         if (TEST_DB > 0 || TEST_MODE && !DEMO_MODE) {
             ;
         } else if (CLONE_MODE) {
-            File file = new File("sidePROTOCOL.json");
+            File file = new File(Settings.CLONE_OR_SIDE.toLowerCase() + "PROTOCOL.json");
             if (file.exists()) {
-                LOGGER.info("sidePROTOCOL.json USED");
+                LOGGER.info(Settings.CLONE_OR_SIDE.toLowerCase() + "PROTOCOL.json USED");
                 // START SIDE CHAIN
                 String jsonString = "";
                 try {
@@ -515,8 +542,8 @@ public class BlockChain {
                     Settings.peersURL = chainParams.get("peersURL").toString();
                 }
 
-                if (chainParams.containsKey("sideLicense")) {
-                    Settings.sideLicense = chainParams.get("sideLicense").toString();
+                if (chainParams.containsKey(Settings.CLONE_OR_SIDE.toLowerCase() + "License")) {
+                    Settings.cloneLicense = chainParams.get(Settings.CLONE_OR_SIDE.toLowerCase() + "License").toString();
                 }
 
                 if (chainParams.containsKey("startKey")) {
@@ -576,6 +603,14 @@ public class BlockChain {
 
             ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
         } else {
+
+            if (false) {
+                // это как пример для отладки
+                ASSET_TRANSFER_PERCENTAGE.put(1L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
+                ASSET_TRANSFER_PERCENTAGE.put(2L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
+                ASSET_BURN_PERCENTAGE.put(1L, new BigDecimal("0.5"));
+                ASSET_BURN_PERCENTAGE.put(2L, new BigDecimal("0.5"));
+            }
 
             ////////// WIPED
             // WRONG Issue Person #125
@@ -1082,7 +1117,7 @@ public class BlockChain {
             }
         } else {
             if (previousForgingPoint == null)
-                return 0l;
+                return 0L;
         }
 
         int previousForgingHeight = previousForgingPoint.a;

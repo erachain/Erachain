@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -394,6 +395,15 @@ public abstract class Transaction implements ExplorerJsonLine {
     // TODO REMOVE REFERENCE - use TIMESTAMP as reference
     protected Long reference = 0l;
     protected BigDecimal fee = BigDecimal.ZERO; // - for genesis
+    /**
+     * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
+     */
+    public BigDecimal assetFee = null;
+    /**
+     * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
+     */
+    public BigDecimal assetFeeBurn = null;
+
     // transactions
     // protected BigDecimal fee = new BigDecimal.valueOf(999000);
     protected byte feePow = 0;
@@ -1736,6 +1746,161 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     }
 
+    // previous forging block or changed ERA volume
+    public Tuple3<Long, Long, Long> peekRoyaltyData(Long personKey) {
+        return dcSet.getTimeRoyaltyMap().peek(personKey);
+    }
+
+    public void pushRoyaltyData(Long personKey, Long royaltyBalance, Long royaltyValue) {
+        dcSet.getTimeRoyaltyMap().push(personKey, dbRef, royaltyBalance, royaltyValue);
+    }
+
+    public Tuple3<Long, Long, Long> popRoyaltyData(Long personKey) {
+        return dcSet.getTimeRoyaltyMap().pop(personKey);
+    }
+
+    private void calcRoyalty(Block block, Account account, long koeff, boolean asOrphan) {
+
+        Tuple4<Long, Integer, Integer, Integer> personDuration;
+        Long royaltyID;
+        if (BlockChain.ACTION_ROYALTY_PERSONS_ONLY) {
+            personDuration = creator.getPersonDuration(dcSet);
+            if (personDuration == null || personDuration.a == null) {
+                return;
+            }
+            royaltyID = personDuration.a;
+        } else {
+            royaltyID = account.hashCodeLong();
+        }
+
+        BigDecimal royaltyBG;
+        if (asOrphan) {
+            // это откат - списываем
+            Tuple3<Long, Long, Long> lastValue = peekRoyaltyData(royaltyID);
+            if (lastValue.c == 0) {
+                return;
+            }
+
+            royaltyBG = BigDecimal.valueOf(lastValue.c, BlockChain.FEE_SCALE);
+
+        } else {
+            // это прямое начисление
+            BigDecimal balance;
+            if (BlockChain.ACTION_ROYALTY_PERSONS_ONLY) {
+                // по всем счетам персоны
+                balance = PersonCls.getTotalBalance(dcSet, royaltyID, BlockChain.ACTION_ROYALTY_ASSET, TransactionAmount.ACTION_SEND);
+            } else {
+                balance = account.getBalance(dcSet, BlockChain.ACTION_ROYALTY_ASSET, TransactionAmount.ACTION_SEND).b;
+            }
+
+            if (balance == null || balance.signum() <= 0)
+                return;
+
+            Long royaltyBalance = balance.setScale(BlockChain.FEE_SCALE).unscaledValue().longValue();
+            Tuple3<Long, Long, Long> lastRoyaltyPoint = peekRoyaltyData(royaltyID);
+            if (lastRoyaltyPoint == null) {
+                // уще ничего не было - считать нечего
+                pushRoyaltyData(royaltyID, royaltyBalance, 0L);
+                return;
+            }
+
+            if (royaltyBalance == 0) {
+                return;
+            }
+
+            Long previousForgingSeqNo = lastRoyaltyPoint.a;
+            int diff = height - (int) (previousForgingSeqNo >> 32);
+            if (diff < 1) {
+                pushRoyaltyData(royaltyID, royaltyBalance, 0L);
+                return;
+            }
+
+            int dayBlocks = BlockChain.BLOCKS_PER_DAY(height);
+            int diffDays = diff / dayBlocks;
+            if (diffDays > BlockChain.ACTION_ROYALTY_MAX_DAYS) {
+                diff = BlockChain.ACTION_ROYALTY_MAX_DAYS * dayBlocks;
+            }
+
+            long percent = diff * koeff;
+
+            royaltyBG = BigDecimal.valueOf(percent, BlockChain.FEE_SCALE)
+                    .movePointLeft(3)
+                    .multiply(balance)
+                    .setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
+
+            if (royaltyBG.compareTo(BlockChain.ACTION_ROYALTY_MIN) < 0) {
+                pushRoyaltyData(royaltyID, royaltyBalance, 0L);
+                return;
+
+            }
+
+            Long royaltyValue = royaltyBG.unscaledValue().longValue();
+
+            pushRoyaltyData(royaltyID, royaltyBalance, royaltyValue);
+
+        }
+
+        account.changeBalance(this.dcSet, asOrphan, false, BlockChain.ACTION_ROYALTY_ASSET, royaltyBG, false, true);
+        // учтем что получили бонусы
+        account.changeCOMPUBonusBalances(dcSet, asOrphan, royaltyBG, Transaction.BALANCE_SIDE_DEBIT);
+
+        if (block != null && block.txCalculated != null && !asOrphan) {
+            block.txCalculated.add(new RCalculated(account, FEE_KEY, royaltyBG,
+                    "EXO-maining", this.dbRef, 0L));
+
+        }
+
+        // учтем эмиссию
+        GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, false, BlockChain.ACTION_ROYALTY_ASSET,
+                royaltyBG, true, false);
+
+        // учтем начисления для держателей долей
+        GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, false, -BlockChain.ACTION_ROYALTY_ASSET,
+                royaltyBG.multiply(BlockChain.ACTION_ROYALTY_TO_HOLD_ROYALTY_PERCENT).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN),
+                true, false);
+
+
+    }
+
+    /**
+     * Time Royalty for Person
+     *
+     * @param asOrphan
+     */
+    public void processRoyalty(Block block, boolean asOrphan) {
+        if (BlockChain.ACTION_ROYALTY_START <= 0)
+            return;
+
+        long koeff = 1000000L * (long) BlockChain.ACTION_ROYALTY_PERCENT / (30L * (long) BlockChain.BLOCKS_PER_DAY(height));
+        Tuple4<Long, Integer, Integer, Integer> personDuration;
+
+        if (asOrphan) {
+            if (creator != null) {
+                calcRoyalty(block, creator, koeff, asOrphan);
+            }
+
+            HashSet<Account> recipients = getRecipientAccounts();
+            if (recipients != null && !recipients.isEmpty()) {
+                for (Account recipient : recipients) {
+                    calcRoyalty(block, recipient, koeff, asOrphan);
+                }
+            }
+        } else {
+
+            if (creator != null) {
+                calcRoyalty(block, creator, koeff, asOrphan);
+            }
+
+            HashSet<Account> recipients = getRecipientAccounts();
+            if (recipients != null && !recipients.isEmpty()) {
+                for (Account recipient : recipients) {
+                    calcRoyalty(block, recipient, koeff, asOrphan);
+                }
+            }
+        }
+
+    }
+
     // REST
 
     // public abstract void process(DLSet db);
@@ -1751,6 +1916,9 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         if (forDeal > Transaction.FOR_PACK) {
             // this.calcFee();
+
+            // CALC ROYALTY
+            processRoyalty(block, false);
 
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance

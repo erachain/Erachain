@@ -16,6 +16,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -48,10 +49,11 @@ public class APIItemAsset {
         help.put("GET apiasset/balances/[assetKey]?position=POS&offset=OFFSET&limit=LIMIT",
                 "Get balances for assetKey sorted by Own Amount. Balance positions: 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other. Default: POS=1. Balance A - total debit. Balance B - final amount.");
 
-        help.put("GET {key}", "GET by ID");
-        help.put("GET find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
-        help.put("Get image/{key}", "GET Asset Image");
-        help.put("Get icon/{key}", "GET Asset Icon");
+        help.put("GET {key}", "Get by ID");
+        help.put("GET find/{filter_name_string}", "Get by words in Name. Use patterns from 5 chars in words");
+        help.put("Get image/{key}", "Get Asset Image");
+        help.put("Get icon/{key}", "Get Asset Icon");
+        help.put("Get listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} defaul - true, {descending} - true");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -196,6 +198,26 @@ public class APIItemAsset {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(ItemAssetsResource.getBalances(assetKey, offset, position, limit))
+                .build();
+    }
+
+    @GET
+    @Path("listfrom/{start}")
+    public Response getList(@PathParam("start") long start,
+                            @DefaultValue("20") @QueryParam("page") int page,
+                            @DefaultValue("true") @QueryParam("showperson") boolean showPerson,
+                            @DefaultValue("true") @QueryParam("desc") boolean descending) {
+
+        if (page > 50 || page < 1) {
+            page = 50;
+        }
+
+        JSONObject output = new JSONObject();
+        ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.ASSET_TYPE, start, page, output, showPerson, descending);
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(output.toJSONString())
                 .build();
     }
 

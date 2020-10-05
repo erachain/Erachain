@@ -8,6 +8,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
 import org.slf4j.Logger;
@@ -400,6 +402,22 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         }
 
         return result;
+    }
+
+    public IteratorCloseable<Long> getIteratorFrom(long fromKey, boolean descending) {
+
+        Iterator<Long> iterator;
+        if (descending) {
+            iterator = ((NavigableMap) map).descendingKeySet()
+                    .subSet(fromKey, 0L)
+                    .iterator();
+        } else {
+            iterator = ((NavigableSet) map.keySet())
+                    .subSet(fromKey, Long.MAX_VALUE)
+                    .iterator();
+        }
+        return IteratorCloseableImpl.make(iterator);
+
     }
 
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {

@@ -3,14 +3,13 @@ package org.erachain.api;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.blockexplorer.BlockExplorer;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 @Path("statuses")
@@ -98,6 +97,20 @@ public class ItemStatusesResource {
         }
 
         return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryItemStatus(statusAsLong));
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("listfrom/{start}")
+    public String getList(@PathParam("start") long start,
+                          @DefaultValue("20") @QueryParam("page") int page,
+                          @DefaultValue("true") @QueryParam("showperson") boolean showPerson,
+                          @DefaultValue("true") @QueryParam("desc") boolean descending) {
+
+        JSONObject output = new JSONObject();
+        ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.STATUS_TYPE, start, page, output, showPerson, descending);
+
+        return output.toJSONString();
     }
 
 }

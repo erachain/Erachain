@@ -6,6 +6,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
+import org.erachain.core.exdata.exLink.ExLinkReply;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -816,10 +817,24 @@ public class ExDataPanel extends JPanel {
 
         Transaction parent = DCSet.getInstance().getTransactionFinalMap().getRecord(docTypeAppendixPanel.parentReference.getText());
         ExLink exLink;
-        if (parent == null) {
+        int linkType = docTypeAppendixPanel.getSelectedItem();
+        if (parent == null || linkType == ExData.LINK_SIMPLE_TYPE) {
             exLink = null;
         } else {
-            exLink = new ExLinkAppendix(parent.getDBRef());
+            switch (linkType) {
+                case ExData.LINK_APPENDIX_TYPE:
+                    exLink = new ExLinkAppendix(parent.getDBRef());
+                    break;
+                case ExData.LINK_REPLY_COMMENT_TYPE:
+                    exLink = new ExLinkReply(parent.getDBRef());
+                    break;
+                case ExData.LINK_COMMENT_TYPE_FOR_VIEW:
+                    APPENDIX_TYPE:
+                    exLink = new ExLinkReply(parent.getDBRef());
+                    break;
+                default:
+                    exLink = null;
+            }
         }
         return ExData.make(exLink, creator, jTextField_Title_Message.getText(),
                 signCanOnlyRecipients, recipients, isEncrypted,
