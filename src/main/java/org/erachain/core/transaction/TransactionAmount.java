@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -296,14 +297,34 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 amount = amount.add(this.amount);
             }
         }
-        
+
         return amount;
     }
-    
+
     @Override
     public BigDecimal getAmount(Account account) {
         String address = account.getAddress();
         return getAmount(address);
+    }
+
+    @Override
+    public long calcBaseFee() {
+        if (hasAmount() && getActionType() == ACTION_SEND // только для передачи в собственность!
+                && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
+                && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)) {
+            Fun.Tuple2<BigDecimal, BigDecimal> percItem = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
+            assetFee = amount.abs().multiply(percItem.a).setScale(asset.getScale(), RoundingMode.DOWN);
+            if (assetFee.compareTo(percItem.b) < 0) {
+                // USE MINIMAL VALUE
+                assetFee = percItem.b.setScale(asset.getScale(), RoundingMode.DOWN);
+            }
+            if (!BlockChain.ASSET_BURN_PERCENTAGE.isEmpty()
+                    && BlockChain.ASSET_BURN_PERCENTAGE.containsKey(key)) {
+                assetFeeBurn = assetFee.multiply(BlockChain.ASSET_BURN_PERCENTAGE.get(key)).setScale(asset.getScale(), RoundingMode.UP);
+            }
+            return super.calcBaseFee() >> 1;
+        }
+        return super.calcBaseFee();
     }
 
     public boolean hasAmount() {
@@ -1212,16 +1233,28 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     } else {
                         leftAmount = amount;
                     }
-                    
+
                     Tuple3<String, Long, String> leftCreditKey = new Tuple3<String, Long, String>(
                             this.creator.getAddress(), absKey, this.recipient.getAddress()); // REVERSE
                     db.getCredit_AddressesMap().add(leftCreditKey, leftAmount);
                 }
             }
         }
-                
+
         if (absKey == Transaction.RIGHTS_KEY && block != null) {
             block.addForgingInfoUpdate(this.recipient);
+        }
+
+        if (assetFee != null) {
+            // учтем что он еще заплатил коэффицинт с суммы
+            this.creator.changeBalance(db, !backward, backward, absKey, this.assetFee, !incomeReverse, false);
+            if (block.txCalculated != null) {
+                block.txCalculated.add(new RCalculated(this.creator, absKey,
+                        this.assetFee.negate(), "Asset Fee", this.dbRef, 0L));
+                //block.txCalculated.add(new RCalculated(asset.getOwner(), absKey,
+                //        this.assetFeeBurn, "Asset Burn", this.dbRef, 0L));
+
+            }
         }
     }
 
@@ -1328,12 +1361,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     // ONLY RETURN CREDIT
                     db.getCredit_AddressesMap().sub(leftCreditKey, amount);
                 }
-                
+
             }
         }
 
         if (absKey == Transaction.RIGHTS_KEY && block != null) {
             block.addForgingInfoUpdate(this.recipient);
+        }
+
+        if (assetFee != null) {
+            this.creator.changeBalance(db, backward, backward, absKey, this.assetFee, !incomeReverse, false);
         }
 
     }
