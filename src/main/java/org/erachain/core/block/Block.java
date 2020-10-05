@@ -2301,10 +2301,6 @@ public class Block implements Closeable, ExplorerJsonLine {
      */
     private void makeHoldRoyalty(DCSet dcSet, boolean asOrphan) {
 
-        if (dcSet.isFork())
-            // в форке нет Индекса!
-            return;
-
         // ловим блок когда можно начислять
         if (heightBlock % (BlockChain.BLOCKS_PER_DAY(heightBlock) * BlockChain.HOLD_ROYALTY_PERIOD_DAYS) != 0)
             return;
