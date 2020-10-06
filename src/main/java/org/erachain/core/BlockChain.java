@@ -253,11 +253,6 @@ public class BlockChain {
     public static final int VERS_5_01_01 = TEST_DB > 0 || CLONE_MODE ? 0 : DEMO_MODE ? 426167 : TEST_MODE ? 0 : 990000;
 
     /**
-     * Включает реферальную систему
-     */
-    public static int REFERAL_BONUS_FOR_PERSON = CLONE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
-
-    /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
      */
     public static final int START_ISSUE_RIGHTS = TEST_DB > 0 || CLONE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
@@ -400,6 +395,11 @@ public class BlockChain {
     public static Account HOLD_ROYALTY_EMITTER = new Account("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"); // если меньше то распределение не делаем
     public static final long HOLD_ROYALTY_ASSET = AssetCls.ERA_KEY;
 
+
+    /**
+     * Включает реферальную систему
+     */
+    public static int REFERRAL_BONUS_FOR_PERSON = TEST_DB > 0 || !MAIN_MODE ? 0 : VERS_5_01_01;
 
     /**
      * Multi-level Referral System. Levels for deep
@@ -558,7 +558,7 @@ public class BlockChain {
                 }
 
                 if (chainParams.containsKey("referalsOn")) {
-                    REFERAL_BONUS_FOR_PERSON = (Boolean) chainParams.get("referalsOn") ? 0 : Integer.MAX_VALUE;
+                    REFERRAL_BONUS_FOR_PERSON = (Boolean) chainParams.get("referalsOn") ? 0 : Integer.MAX_VALUE;
                 }
 
                 if (chainParams.containsKey("allValidBefore")) {
@@ -959,7 +959,7 @@ public class BlockChain {
     }
 
     public static boolean REFERAL_BONUS_FOR_PERSON(int height) {
-        return TEST_DB == 0 && height > REFERAL_BONUS_FOR_PERSON;
+        return height > REFERRAL_BONUS_FOR_PERSON;
     }
 
     public static int getCheckPoint(DCSet dcSet, boolean useDynamic) {

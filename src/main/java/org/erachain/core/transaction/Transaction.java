@@ -1931,9 +1931,6 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (BlockChain.FEE_INVITED_DEEP > 0) {
                 long invitedFee = getInvitedFee();
                 if (invitedFee > 0) {
-                    if (BlockChain.CHECK_BUGS > 3 && height == 3104) {
-                        boolean debug = true;
-                    }
                     process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
                             block != null && block.txCalculated != null ?
                                     block.txCalculated : null, "Referal bonus " + "@" + this.viewHeightSeq());
