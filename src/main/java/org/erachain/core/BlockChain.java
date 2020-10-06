@@ -402,14 +402,14 @@ public class BlockChain {
 
 
     /**
-     * Multi-level Referal System. Levels for deep
+     * Multi-level Referral System. Levels for deep
      */
-    public static final int FEE_INVITED_DEEP = TEST_DB > 0 || MAIN_MODE ? 0 : 3;
+    public static final int FEE_INVITED_DEEP = TEST_DB > 0 ? 0 : 3;
     /**
-     * Stop referals system on this person Number. Причем рефералка которая должна упать этим персонам
+     * Stop referals system on this person Number. Причем рефералка которая должна упасть этим персонам
      * (с номером ниже заданного) по сути просто сжигается - то есть идет дефляция.
      */
-    public static final long BONUS_STOP_PERSON_KEY = CLONE_MODE || TEST_MODE ? 0 : 13L;
+    public static final long BONUS_STOP_PERSON_KEY = TEST_DB > 0 || !MAIN_MODE ? 0 : 13L;
 
     public static final int FEE_INVITED_SHIFT = 1;
     /**
