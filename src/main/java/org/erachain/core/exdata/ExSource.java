@@ -9,7 +9,7 @@ import org.json.simple.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 
-public class ExAuthor {
+public class ExSource {
 
     public static final byte BASE_LENGTH = 12;
 
@@ -22,45 +22,45 @@ public class ExAuthor {
     protected String memo;
 
     /**
-     * Ссылка на персону
+     * Ссылка на источник
      */
-    protected final long key;
+    protected final long ref;
 
     /**
      * Доля или вклад
      */
     protected final int share;
 
-    public ExAuthor() {
+    public ExSource() {
         this.flags = 0;
         this.share = 0;
-        this.key = 0L;
+        this.ref = 0L;
         this.memo = null;
         memoBytes = null;
     }
 
-    public ExAuthor(byte flags, int share, long key, String memo) {
+    public ExSource(byte flags, int share, long ref, String memo) {
         this.flags = flags;
         this.share = share;
-        this.key = key;
+        this.ref = ref;
         this.memo = memo;
         memoBytes = memo == null || memo.isEmpty() ? null : memo.getBytes(StandardCharsets.UTF_8);
     }
 
-    public ExAuthor(byte flags, int share, long key, byte[] memoBytes) {
+    public ExSource(byte flags, int share, long ref, byte[] memoBytes) {
         this.memoBytes = memoBytes;
         this.flags = flags;
         this.share = share;
-        this.key = key;
+        this.ref = ref;
     }
 
-    public ExAuthor(byte[] data, int position) {
+    public ExSource(byte[] data, int position) {
         this.flags = data[position];
         this.share = Ints.fromBytes((byte) 0, (byte) 0, data[position + 2], data[position + 3]);
 
         byte[] keyBuf = new byte[Longs.BYTES];
         System.arraycopy(data, position + 4, keyBuf, 0, Long.BYTES);
-        key = Longs.fromByteArray(keyBuf);
+        ref = Longs.fromByteArray(keyBuf);
 
         int memoLen = data[position + 1];
         this.memoBytes = new byte[memoLen];
@@ -71,8 +71,8 @@ public class ExAuthor {
         return flags;
     }
 
-    public long getKey() {
-        return key;
+    public long getRef() {
+        return ref;
     }
 
     public String getMemo() {
@@ -91,7 +91,7 @@ public class ExAuthor {
 
     public JSONObject makeJSONforHTML() {
         JSONObject json = toJson();
-        json.put("name", Controller.getInstance().getPerson(key).getName());
+        json.put("title", Controller.getInstance().getTransaction(ref).getTitle());
         if (memo == null) {
             json.put("memo", "");
         }
@@ -104,7 +104,7 @@ public class ExAuthor {
         json.put("memo", getMemo());
         json.put("flags", flags);
         json.put("share", share);
-        json.put("key", Transaction.viewDBRef(key));
+        json.put("ref", Transaction.viewDBRef(ref));
         return json;
     }
 
@@ -115,15 +115,15 @@ public class ExAuthor {
         data[1] = (byte) memoSize;
         data[2] = (byte) (share >> 8);
         data[3] = (byte) share;
-        System.arraycopy(Longs.toByteArray(key), 0, data, 4, Long.BYTES);
+        System.arraycopy(Longs.toByteArray(ref), 0, data, 4, Long.BYTES);
         if (memoSize > 0)
             System.arraycopy(memoBytes, 0, data, BASE_LENGTH, memoSize);
 
         return data;
     }
 
-    public static ExAuthor parse(byte[] data, int position) throws Exception {
-        return new ExAuthor(data, position);
+    public static ExSource parse(byte[] data, int position) throws Exception {
+        return new ExSource(data, position);
     }
 
     public int length() {
@@ -138,7 +138,7 @@ public class ExAuthor {
         if (memoBytes != null && memoBytes.length > 255)
             return Transaction.INVALID_DATA_LENGTH;
 
-        if (!dcSet.getItemPersonMap().contains(key))
+        if (!dcSet.getItemPersonMap().contains(ref))
             return Transaction.ITEM_PERSON_NOT_EXIST;
 
         return Transaction.VALIDATE_OK;

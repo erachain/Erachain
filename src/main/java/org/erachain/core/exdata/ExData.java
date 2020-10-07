@@ -50,6 +50,7 @@ public class ExData {
 
     private static final int RECIPIENTS_SIZE_LENGTH = 3; // size version part
     private static final int AUTHORS_SIZE_LENGTH = 3; // size version part
+    private static final int SOURCES_SIZE_LENGTH = 3; // size version part
     private static final int SECRET_LENGTH = Crypto.HASH_LENGTH; // size version part
 
     private static final byte HAS_PARENT_MASK = -128;
@@ -59,6 +60,7 @@ public class ExData {
 
     private static final byte ENCRYPT_FLAG_MASK = 32;
     private static final byte AUTHORS_FLAG_MASK = 16;
+    private static final byte SOURCES_FLAG_MASK = 8;
 
     public static final byte LINK_SIMPLE_TYPE = 0; // для выбора типа в ГУИ
     public static final byte LINK_APPENDIX_TYPE = 1; // дополнение / приложение к другому документу или Сущности
@@ -91,6 +93,9 @@ public class ExData {
 
     private byte authorsFlags;
     private ExAuthor[] authors;
+
+    private byte sourcesFlags;
+    private ExSource[] sources;
 
     private long templateKey;
     private TemplateCls template;
@@ -136,12 +141,15 @@ public class ExData {
      * @param recipients
      * @param authorsFlags
      * @param authors
+     * @param sourcesFlags
+     * @param sources
      * @param json
      * @param files
      */
     public ExData(byte[] flags, ExLink exLink, String title,
                   byte recipientsFlags, Account[] recipients,
-                  byte authorsFlags, ExAuthor[] authors, JSONObject json, HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) {
+                  byte authorsFlags, ExAuthor[] authors, byte sourcesFlags, ExSource[] sources,
+                  JSONObject json, HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) {
         this.flags = flags;
 
         this.exLink = exLink;
@@ -157,6 +165,9 @@ public class ExData {
         this.authorsFlags = authorsFlags;
         this.authors = authors;
 
+        this.sourcesFlags = sourcesFlags;
+        this.sources = sources;
+
         this.json = json;
         this.files = files;
 
@@ -164,17 +175,20 @@ public class ExData {
 
     /**
      * version 3 encrypted
-     *  @param flags
+     * @param flags
      * @param exLink
      * @param title
      * @param recipients
      * @param authorsFlags
      * @param authors
+     * @param sourcesFlags
+     * @param sources
      * @param encryptedData
      */
     public ExData(byte[] flags, ExLink exLink, String title,
                   byte recipientsFlags, Account[] recipients,
-                  byte authorsFlags, ExAuthor[] authors, byte secretsFlags, byte[][] secrets,
+                  byte authorsFlags, ExAuthor[] authors, byte sourcesFlags, ExSource[] sources,
+                  byte secretsFlags, byte[][] secrets,
                   byte[] encryptedData) {
         this.flags = flags;
 
@@ -191,6 +205,9 @@ public class ExData {
 
         this.authorsFlags = authorsFlags;
         this.authors = authors;
+
+        this.sourcesFlags = sourcesFlags;
+        this.sources = sources;
 
         this.secretsFlags = secretsFlags;
         this.secrets = secrets;
@@ -359,6 +376,10 @@ public class ExData {
         return authors == null ? new ExAuthor[0] : authors;
     }
 
+    public ExSource[] getSources() {
+        return sources == null ? new ExSource[0] : sources;
+    }
+
     public byte[][] getSecrets() {
         return secrets == null ? new byte[0][] : secrets;
     }
@@ -381,6 +402,10 @@ public class ExData {
 
     public boolean hasAuthors() {
         return authors != null && authors.length > 0;
+    }
+
+    public boolean hasSources() {
+        return sources != null && sources.length > 0;
     }
 
     public boolean isCanSignOnlyRecipients() {
@@ -557,6 +582,16 @@ public class ExData {
 
             for (int i = 0; i < authors.length; i++) {
                 outStream.write(authors[i].toBytes());
+            }
+        }
+
+        if ((flags[1] & SOURCES_FLAG_MASK) > 0) {
+            byte[] sourcesSize = Ints.toByteArray(sources.length);
+            sourcesSize[0] = sourcesFlags;
+            outStream.write(sourcesSize);
+
+            for (int i = 0; i < sources.length; i++) {
+                outStream.write(sources[i].toBytes());
             }
         }
 
@@ -750,6 +785,8 @@ public class ExData {
                 Account[] recipients;
                 byte authorsFlags;
                 ExAuthor[] authors;
+                byte sourcesFlags;
+                ExSource[] sources;
                 boolean isEncrypted;
                 byte secretsFlags;
                 byte[][] secrets;
@@ -815,32 +852,49 @@ public class ExData {
                         recipients = new Account[0];
                     }
 
-                    int authorSize;
                     if ((flags[1] & AUTHORS_FLAG_MASK) > 0) {
                         //////// AUTHORS
-                        byte[] sizeBytes = Arrays.copyOfRange(data, position, position + AUTHORS_FLAG_MASK + 1);
+                        byte[] sizeBytes = Arrays.copyOfRange(data, position, position + AUTHORS_SIZE_LENGTH + 1);
                         authorsFlags = sizeBytes[0];
                         sizeBytes[0] = 0;
-                        authorSize = Ints.fromByteArray(sizeBytes);
+                        int authorsSize = Ints.fromByteArray(sizeBytes);
                         position += AUTHORS_SIZE_LENGTH + 1;
 
-                        authors = new ExAuthor[authorSize];
-                        for (int i = 0; i < authorSize; i++) {
+                        authors = new ExAuthor[authorsSize];
+                        for (int i = 0; i < authorsSize; i++) {
                             authors[i] = new ExAuthor(data, position);
                             position += authors[i].length();
                         }
 
                     } else {
-                        authorSize = 0;
                         authorsFlags = 0;
                         authors = new ExAuthor[0];
+                    }
+
+                    if ((flags[1] & SOURCES_FLAG_MASK) > 0) {
+                        //////// SOURCES
+                        byte[] sizeBytes = Arrays.copyOfRange(data, position, position + SOURCES_SIZE_LENGTH + 1);
+                        sourcesFlags = sizeBytes[0];
+                        sizeBytes[0] = 0;
+                        int sourcesSize = Ints.fromByteArray(sizeBytes);
+                        position += SOURCES_SIZE_LENGTH + 1;
+
+                        sources = new ExSource[sourcesSize];
+                        for (int i = 0; i < sourcesSize; i++) {
+                            sources[i] = new ExSource(data, position);
+                            position += sources[i].length();
+                        }
+
+                    } else {
+                        sourcesFlags = 0;
+                        sources = new ExSource[0];
                     }
 
                     isEncrypted = (flags[1] & ENCRYPT_FLAG_MASK) > 0;
                     if (isEncrypted) {
                         secretsFlags = Arrays.copyOfRange(data, position, position + 1)[0];
                         position++;
-                        int secretsSize = recipientsSize + authorSize + 1;
+                        int secretsSize = recipientsSize + 1;
                         secrets = new byte[secretsSize][];
                         int passwordLen;
                         for (int i = 0; i < secretsSize; i++) {
@@ -864,13 +918,16 @@ public class ExData {
                     authorsFlags = 0;
                     authors = null;
 
+                    sourcesFlags = 0;
+                    sources = null;
+
                     secretsFlags = 0;
                     secrets = null;
                 }
 
                 if (data.length == position) {
                     if (version > 2) {
-                        return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, null, null);
+                        return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, null, null);
                     } else {
                         // version 2.0 - 2.1
                         return new ExData(version, exLink, title, null, null);
@@ -880,12 +937,12 @@ public class ExData {
 
                     if (isEncrypted) {
                         // version 3 - with SECRETS
-                        return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, secretsFlags, secrets,
+                        return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, secretsFlags, secrets,
                                 Arrays.copyOfRange(data, position, data.length));
                     } else {
 
                         Fun.Tuple2<JSONObject, HashMap> jsonAndFiles = parseJsonAndFiles(Arrays.copyOfRange(data, position, data.length), andFiles);
-                        return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, jsonAndFiles.a,
+                        return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, jsonAndFiles.a,
                                 jsonAndFiles.b);
                     }
                 }
@@ -957,7 +1014,7 @@ public class ExData {
     }
 
     public static byte[] make(ExLink exLink, PrivateKeyAccount creator, String title, boolean signCanOnlyRecipients, Account[] recipients,
-                              ExAuthor[] authors, boolean isEncrypted,
+                              ExAuthor[] authors, ExSource[] sources, boolean isEncrypted,
                               TemplateCls template, HashMap<String, String> params_Template, boolean uniqueTemplate,
                               String message, boolean uniqueMessage,
                               HashMap<String, String> hashes_Map, boolean uniqueHashes,
@@ -1049,6 +1106,11 @@ public class ExData {
             flags[1] = (byte) (flags[1] | AUTHORS_FLAG_MASK);
         }
 
+        byte sourcesFlags = 0;
+        if (sources != null && sources.length > 0) {
+            flags[1] = (byte) (flags[1] | SOURCES_FLAG_MASK);
+        }
+
         if (isEncrypted) {
             // случайный пароль и его для всех шифруем
             flags[1] = (byte) (flags[1] | ENCRYPT_FLAG_MASK);
@@ -1093,10 +1155,10 @@ public class ExData {
 
             secrets[recipients.length] = AEScrypto.dataEncrypt(password, privateKey, creator.getPublicKey());
 
-            return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, (byte) 0, secrets, encryptedData).toByte();
+            return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, (byte) 0, secrets, encryptedData).toByte();
         }
 
-        return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, new JSONObject(out_Map), filesMap).toByte();
+        return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, new JSONObject(out_Map), filesMap).toByte();
 
     }
 
@@ -1148,6 +1210,15 @@ public class ExData {
                 authorsOut.add(author.makeJSONforHTML());
             }
             output.put("authors", authorsOut);
+        }
+
+        if (sources != null && sources.length > 0) {
+            output.put("Label_Sources", Lang.getInstance().translateFromLangObj("Sources", langObj));
+            JSONArray sourcesOut = new JSONArray();
+            for (ExSource source : sources) {
+                sourcesOut.add(source.makeJSONforHTML());
+            }
+            output.put("sources", sourcesOut);
         }
 
         if (isEncrypted()) {
@@ -1270,7 +1341,8 @@ public class ExData {
 
             // это уже не зашифрованный - сбросим
             byte[] decryptedFlags = setEncryptedFlag(flags, false);
-            return new Tuple3<>(pos, null, new ExData(decryptedFlags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, jsonAndFiles.a,
+            return new Tuple3<>(pos, null, new ExData(decryptedFlags, exLink, title, recipientsFlags, recipients,
+                    authorsFlags, authors, sourcesFlags, sources, jsonAndFiles.a,
                     jsonAndFiles.b));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -1307,6 +1379,15 @@ public class ExData {
             toJson.put("authors", authors);
         }
 
+        if (hasSources()) {
+            JSONArray sources = new JSONArray();
+            for (ExSource source : getSources()) {
+                sources.add(source.toJson());
+            }
+            toJson.put("sourcesFlags", sourcesFlags);
+            toJson.put("sources", sources);
+        }
+
         if (isEncrypted()) {
             JSONArray secretsArray = new JSONArray();
             for (byte[] secret : getSecrets()) {
@@ -1338,6 +1419,15 @@ public class ExData {
         if (hasAuthors()) {
             for (ExAuthor author : getAuthors()) {
                 result = author.isValid(dcSet);
+                if (result != Transaction.VALIDATE_OK) {
+                    return result;
+                }
+            }
+        }
+
+        if (hasSources()) {
+            for (ExSource source : getSources()) {
+                result = source.isValid(dcSet);
                 if (result != Transaction.VALIDATE_OK) {
                     return result;
                 }
