@@ -69,7 +69,7 @@ public class MultipleRecipientsPanel extends JPanel {
                 }
 
                 if (recipientsTableModel.getRowCount() < 1) {
-                    recipientsTableModel.addRow(new Object[]{"", ""});
+                    recipientsTableModel.addEmpty();
                     interval = 0;
                 }
 
@@ -137,8 +137,12 @@ public class MultipleRecipientsPanel extends JPanel {
                             Lang.getInstance().translate("Description")
                     },
                     rows);
-            this.addRow(new Object[]{"", ""});
+            this.addEmpty();
 
+        }
+
+        private void addEmpty() {
+            this.addRow(new Object[]{"", ""});
         }
 
         @Override
@@ -172,7 +176,7 @@ public class MultipleRecipientsPanel extends JPanel {
                 if (!address.isEmpty()) {
                     //CHECK IF LAST ROW
                     if (row == this.getRowCount() - 1) {
-                        this.addRow(new Object[]{"", ""});
+                        this.addEmpty();
                     }
 
                     Fun.Tuple2<Account, String> result = Account.tryMakeAccount(address);
@@ -191,7 +195,7 @@ public class MultipleRecipientsPanel extends JPanel {
 
                 //CHECK IF LAST ROW
                 if (row == this.getRowCount() - 1) {
-                    this.addRow(new Object[]{"", ""});
+                    this.addEmpty();
                 }
             }
         }
@@ -208,12 +212,11 @@ public class MultipleRecipientsPanel extends JPanel {
             while (getRowCount() > 0) {
                 this.removeRow(getRowCount() - 1);
             }
-            //this.addRow(new Object[]{"", ""});
         }
 
         public Account[] getRecipients() {
             if (withoutCheckBox.isSelected() || getRowCount() == 0)
-                return new Account[0];
+                return null;
 
             ArrayList<Account> temp = new ArrayList<>();
             for (int i = 0; i < getRowCount(); i++) {

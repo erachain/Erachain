@@ -2,9 +2,8 @@ package org.erachain.gui.exdata.authors;
 
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
+
 import javax.swing.*;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,7 +11,7 @@ import java.awt.event.ActionListener;
 
 public class AuthorsPanel extends JPanel {
     public final TableModel AuthorsTableModel;
-    private final MTable jTableAuthors;
+    public final MTable jTableAuthors;
     private JScrollPane jScrollPaneAuthors;
     private JButton jButtonAddAuthor;
     private JButton jButtonRemoveAuthor;
