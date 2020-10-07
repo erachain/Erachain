@@ -300,7 +300,7 @@ public class RNoteInfo extends javax.swing.JPanel {
                     i = size;
                 }
 
-                PersonCls person = cntr.getPerson(authors[i - 1].getRef());
+                PersonCls person = cntr.getPerson(authors[i - 1].getKey());
                 String memo = authors[i - 1].getMemo();
 
                 resultStr += i + ". " + authors[i - 1].getShare() + " x " + person.toString(cntr.getDCSet()) + (memo == null ? "" : " - " + memo) + "<br>";

@@ -2,6 +2,7 @@ package org.erachain.core.exdata;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
@@ -26,7 +27,7 @@ public class ExAuthor {
     /**
      * Ссылка на персону
      */
-    protected final long ref;
+    protected final long key;
 
     /**
      * Доля или вклад
@@ -36,33 +37,33 @@ public class ExAuthor {
     public ExAuthor() {
         this.flags = 0;
         this.share = 0;
-        this.ref = 0L;
+        this.key = 0L;
         this.memo = null;
         memoBytes = null;
     }
 
-    public ExAuthor(byte flags, int share, long ref, String memo) {
+    public ExAuthor(byte flags, int share, long key, String memo) {
         this.flags = flags;
         this.share = share;
-        this.ref = ref;
+        this.key = key;
         this.memo = memo;
         memoBytes = memo == null || memo.isEmpty() ? null : memo.getBytes(StandardCharsets.UTF_8);
     }
 
-    public ExAuthor(byte flags, int share, long ref, byte[] memoBytes) {
+    public ExAuthor(byte flags, int share, long key, byte[] memoBytes) {
         this.memoBytes = memoBytes;
         this.flags = flags;
         this.share = share;
-        this.ref = ref;
+        this.key = key;
     }
 
     public ExAuthor(byte[] data, int position) {
         this.flags = data[position];
         this.share = Ints.fromBytes((byte) 0, (byte) 0, data[position + 2], data[position + 3]);
 
-        byte[] refBuf = new byte[Longs.BYTES];
-        System.arraycopy(data, position + 4, refBuf, 0, Long.BYTES);
-        ref = Longs.fromByteArray(refBuf);
+        byte[] keyBuf = new byte[Longs.BYTES];
+        System.arraycopy(data, position + 4, keyBuf, 0, Long.BYTES);
+        key = Longs.fromByteArray(keyBuf);
 
         int memoLen = data[position + 1];
         this.memoBytes = new byte[memoLen];
@@ -73,8 +74,8 @@ public class ExAuthor {
         return flags;
     }
 
-    public long getRef() {
-        return ref;
+    public long getKey() {
+        return key;
     }
 
     public String getMemo() {
@@ -92,7 +93,13 @@ public class ExAuthor {
     }
 
     public JSONObject makeJSONforHTML() {
-        return toJson();
+        JSONObject json = toJson();
+        json.put("name", Controller.getInstance().getPerson(key).getName());
+        if (memo == null) {
+            json.put("memo", "");
+        }
+
+        return json;
     }
 
     public JSONObject toJson() {
@@ -100,7 +107,7 @@ public class ExAuthor {
         json.put("memo", getMemo());
         json.put("flags", flags);
         json.put("share", share);
-        json.put("ref", Transaction.viewDBRef(ref));
+        json.put("key", Transaction.viewDBRef(key));
         return json;
     }
 
@@ -111,7 +118,7 @@ public class ExAuthor {
         data[1] = (byte) memoSize;
         data[2] = (byte) (share >> 8);
         data[3] = (byte) share;
-        System.arraycopy(Longs.toByteArray(ref), 0, data, 4, Long.BYTES);
+        System.arraycopy(Longs.toByteArray(key), 0, data, 4, Long.BYTES);
         if (memoSize > 0)
             System.arraycopy(memoBytes, 0, data, BASE_LENGTH, memoSize);
 
@@ -134,7 +141,7 @@ public class ExAuthor {
         if (memoBytes != null && memoBytes.length > 255)
             return Transaction.INVALID_DATA_LENGTH;
 
-        if (!dcSet.getItemPersonMap().contains(ref))
+        if (!dcSet.getItemPersonMap().contains(key))
             return Transaction.ITEM_PERSON_NOT_EXIST;
 
         return Transaction.VALIDATE_OK;
