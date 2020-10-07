@@ -843,7 +843,7 @@ public class ExDataPanel extends JPanel {
             }
         }
         return ExData.make(exLink, creator, jTextField_Title_Message.getText(),
-                signCanOnlyRecipients, recipients, isEncrypted,
+                signCanOnlyRecipients, recipients, authors, isEncrypted,
                 (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),
                 fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
                 jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),

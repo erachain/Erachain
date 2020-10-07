@@ -11,8 +11,6 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExData;
-import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapSigns;
@@ -630,33 +628,8 @@ public class RSignNote extends Transaction implements Itemable {
             parseDataV2WithoutFiles();
         }
 
-        ExLink exLink = extendedData.getExLink();
-        if (exLink != null) {
-            Transaction parentTx = dcSet.getTransactionFinalMap().get(exLink.getRef());
-            if (parentTx == null) {
-                return INVALID_BLOCK_TRANS_SEQ_ERROR;
-            }
-
-            // проверим запрет на создание Приложений если там ограничено подписание только списком получателей
-            if (parentTx instanceof RSignNote && exLink instanceof ExLinkAppendix) {
-                RSignNote parentRNote = (RSignNote) parentTx;
-                parentRNote.parseDataV2WithoutFiles();
-                if (parentRNote.isCanSignOnlyRecipients()
-                        && !parentRNote.isInvolved(creator)) {
-                    return ACCOUNT_ACCSES_DENIED;
-                }
-            }
-        }
-
-        JSONObject hashes = extendedData.getHashes();
-
-        if (hashes != null) {
-            for (Object hashObject : hashes.keySet()) {
-                if (Base58.isExtraSymbols(hashObject.toString())) {
-                    return INVALID_DATA_FORMAT;
-                }
-            }
-        }
+        result = extendedData.isValid(dcSet, this);
+        if (result != Transaction.VALIDATE_OK) return result;
 
         if (height > BlockChain.VERS_5_01_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого

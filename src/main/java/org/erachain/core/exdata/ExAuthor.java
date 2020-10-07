@@ -48,15 +48,17 @@ public class ExAuthor {
         this.ref = ref;
     }
 
-    public ExAuthor(byte[] data) {
-        this.flags = data[0];
-        this.share = Ints.fromBytes((byte) 0, (byte) 0, data[2], data[3]);
+    public ExAuthor(byte[] data, int position) {
+        this.flags = data[position];
+        this.share = Ints.fromBytes((byte) 0, (byte) 0, data[position + 2], data[position + 3]);
+
         byte[] refBuf = new byte[Longs.BYTES];
-        System.arraycopy(data, 4, refBuf, 0, Long.BYTES);
+        System.arraycopy(data, position + 4, refBuf, 0, Long.BYTES);
         ref = Longs.fromByteArray(refBuf);
-        int memoLen = data[1];
+
+        int memoLen = data[position + 1];
         this.memoBytes = new byte[memoLen];
-        System.arraycopy(data, 4, refBuf, 0, Long.BYTES);
+        System.arraycopy(data, position + BASE_LENGTH, memoBytes, 0, memoLen);
     }
 
     public byte getFlags() {
@@ -106,8 +108,8 @@ public class ExAuthor {
         return data;
     }
 
-    public static ExAuthor parse(byte[] data) throws Exception {
-        return new ExAuthor(data);
+    public static ExAuthor parse(byte[] data, int position) throws Exception {
+        return new ExAuthor(data, position);
     }
 
     public int length() {
