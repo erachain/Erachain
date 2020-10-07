@@ -551,7 +551,7 @@ public class ExData {
         }
 
         if ((flags[1] & AUTHORS_FLAG_MASK) > 0) {
-            byte[] authorsSize = Ints.toByteArray(recipients.length);
+            byte[] authorsSize = Ints.toByteArray(authors.length);
             authorsSize[0] = authorsFlags;
             outStream.write(authorsSize);
 
@@ -817,7 +817,7 @@ public class ExData {
 
                     int authorSize;
                     if ((flags[1] & AUTHORS_FLAG_MASK) > 0) {
-                        //////// RECIPIENTS
+                        //////// AUTHORS
                         byte[] sizeBytes = Arrays.copyOfRange(data, position, position + AUTHORS_FLAG_MASK + 1);
                         authorsFlags = sizeBytes[0];
                         sizeBytes[0] = 0;
@@ -840,7 +840,7 @@ public class ExData {
                     if (isEncrypted) {
                         secretsFlags = Arrays.copyOfRange(data, position, position + 1)[0];
                         position++;
-                        int secretsSize = recipientsSize + 1;
+                        int secretsSize = recipientsSize + authorSize + 1;
                         secrets = new byte[secretsSize][];
                         int passwordLen;
                         for (int i = 0; i < secretsSize; i++) {
@@ -862,7 +862,7 @@ public class ExData {
                     recipients = null;
 
                     authorsFlags = 0;
-                    authors = new ExAuthor[0];
+                    authors = null;
 
                     secretsFlags = 0;
                     secrets = null;
