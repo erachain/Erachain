@@ -205,6 +205,11 @@ function statement(data) {
         output += '<hr>';
     }
 
+    if (data.hasOwnProperty('tags')) {
+        output += '<b>' + data.Label_Tags + '</b>: ' + data.tags;
+        output += '<hr>';
+    }
+
     output += '</div>';
 
     if (data.hasOwnProperty('vouches_table')) {
