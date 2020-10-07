@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExAuthor;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.ExSource;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.templates.TemplateCls;
@@ -289,7 +290,7 @@ public class RNoteInfo extends javax.swing.JPanel {
             resultStr += "<br>";
         }
 
-        // recipients
+        // AUTHORS
         if (exData.hasAuthors()) {
             resultStr += "<h2>" + Lang.getInstance().translate("Authors") + "</h2>";
             ExAuthor[] authors = exData.getAuthors();
@@ -374,6 +375,31 @@ public class RNoteInfo extends javax.swing.JPanel {
 
         } else if (statementEncrypted != null) {
             file_Panel.clear();
+        }
+
+        // AUTHORS
+        if (exData.hasSources()) {
+            resultStr += "<h2>" + Lang.getInstance().translate("Sources") + "</h2>";
+            ExSource[] sources = exData.getSources();
+            int size = sources.length;
+            for (int i = 1; i <= size; ++i) {
+                if (i > 7 && size > 10) {
+                    resultStr += "... <br>";
+                    i = size;
+                }
+
+                Transaction sourceTx = cntr.getTransaction(sources[i - 1].getRef());
+                String memo = sources[i - 1].getMemo();
+
+                resultStr += i + ". " + sources[i - 1].getWeight() + " x " + sourceTx.toString() + (memo == null ? "" : " - " + memo) + "<br>";
+            }
+            resultStr += "<br>";
+        }
+
+        if (exData.getTags() != null) {
+            resultStr += "<h4>" + Lang.getInstance().translate("Tags") + "</h4>";
+            resultStr += statement.getExTags();
+
         }
 
         jTextArea_Body.setText(resultStr);
