@@ -195,6 +195,16 @@ function statement(data) {
 
     }
 
+    if (data.hasOwnProperty('sources')) {
+        output += '<b>' + data.Label_sources + '</b>:';
+        for (i in data.sources) {
+            output += '<br>' + i + '. ' + data.sources[i].share + ' x ';
+            output += '<a href=?tx=' + data.sources[i].ref + get_lang() + '><b>' + data.sources[i].title + '</b></a>';
+            output += ' - ' + data.sources[i].memo;
+        }
+        output += '<hr>';
+    }
+
     output += '</div>';
 
     if (data.hasOwnProperty('vouches_table')) {

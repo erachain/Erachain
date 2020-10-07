@@ -3,6 +3,7 @@ package org.erachain.core.exdata;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
@@ -143,4 +144,14 @@ public class ExSource {
 
         return Transaction.VALIDATE_OK;
     }
+
+    public void process(Transaction transaction) {
+        // создадим связь в базе - как источник / пользователи + потребители + получатели +
+        transaction.getDCSet().getExLinksMap().put(transaction.getDBRef(), new ExLink(ExData.LINK_SOURCE_TYPE, ref));
+    }
+
+    public void orphan(Transaction transaction) {
+        transaction.getDCSet().getExLinksMap().remove(transaction.getDBRef());
+    }
+
 }

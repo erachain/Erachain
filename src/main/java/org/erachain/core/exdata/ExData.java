@@ -66,6 +66,7 @@ public class ExData {
     public static final byte LINK_APPENDIX_TYPE = 1; // дополнение / приложение к другому документу или Сущности
     public static final byte LINK_REPLY_COMMENT_TYPE = 2; // ответ всем на предыдущий документ - Ссылка для отслеживания
     public static final byte LINK_COMMENT_TYPE_FOR_VIEW = 3; // замечание без получетелей - используется только для ГУИ
+    public static final byte LINK_SOURCE_TYPE = 4; // как Источник множественный
     public static final byte LINK_SURELY_TYPE = 5; // гарантия / поручительство на долю
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExData.class);
@@ -1457,12 +1458,25 @@ public class ExData {
     public void process(Transaction transaction) {
         if (exLink != null)
             exLink.process(transaction);
+
+        if (sources != null) {
+            for (ExSource source : sources) {
+                source.process(transaction);
+            }
+        }
+
     }
 
     public void orphan(Transaction transaction) {
         if (exLink != null)
             exLink.orphan(transaction);
-    }
 
+        if (sources != null) {
+            for (ExSource source : sources) {
+                source.orphan(transaction);
+            }
+        }
+
+    }
 
 }
