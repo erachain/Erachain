@@ -30,34 +30,34 @@ public class ExSource {
     /**
      * Доля или вклад
      */
-    protected final int share;
+    protected final int weight;
 
     public ExSource() {
         this.flags = 0;
-        this.share = 0;
+        this.weight = 0;
         this.ref = 0L;
         this.memo = null;
         memoBytes = null;
     }
 
-    public ExSource(byte flags, int share, long ref, String memo) {
+    public ExSource(byte flags, int weight, long ref, String memo) {
         this.flags = flags;
-        this.share = share;
+        this.weight = weight;
         this.ref = ref;
         this.memo = memo;
         memoBytes = memo == null || memo.isEmpty() ? null : memo.getBytes(StandardCharsets.UTF_8);
     }
 
-    public ExSource(byte flags, int share, long ref, byte[] memoBytes) {
+    public ExSource(byte flags, int weight, long ref, byte[] memoBytes) {
         this.memoBytes = memoBytes;
         this.flags = flags;
-        this.share = share;
+        this.weight = weight;
         this.ref = ref;
     }
 
     public ExSource(byte[] data, int position) {
         this.flags = data[position];
-        this.share = Ints.fromBytes((byte) 0, (byte) 0, data[position + 2], data[position + 3]);
+        this.weight = Ints.fromBytes((byte) 0, (byte) 0, data[position + 2], data[position + 3]);
 
         byte[] keyBuf = new byte[Longs.BYTES];
         System.arraycopy(data, position + 4, keyBuf, 0, Long.BYTES);
@@ -86,8 +86,8 @@ public class ExSource {
         return memo;
     }
 
-    public int getShare() {
-        return share;
+    public int getWeight() {
+        return weight;
     }
 
     public JSONObject makeJSONforHTML() {
@@ -104,7 +104,7 @@ public class ExSource {
         JSONObject json = new JSONObject();
         json.put("memo", getMemo());
         json.put("flags", flags);
-        json.put("share", share);
+        json.put("weight", weight);
         json.put("ref", Transaction.viewDBRef(ref));
         return json;
     }
@@ -114,8 +114,8 @@ public class ExSource {
         byte[] data = new byte[BASE_LENGTH + memoSize];
         data[0] = flags;
         data[1] = (byte) memoSize;
-        data[2] = (byte) (share >> 8);
-        data[3] = (byte) share;
+        data[2] = (byte) (weight >> 8);
+        data[3] = (byte) weight;
         System.arraycopy(Longs.toByteArray(ref), 0, data, 4, Long.BYTES);
         if (memoSize > 0)
             System.arraycopy(memoBytes, 0, data, BASE_LENGTH, memoSize);
@@ -132,7 +132,7 @@ public class ExSource {
     }
 
     public int isValid(DCSet dcSet) {
-        if (share > 1000 || share < 0) {
+        if (weight > 1000 || weight < 0) {
             return Transaction.INVALID_AMOUNT;
         }
 

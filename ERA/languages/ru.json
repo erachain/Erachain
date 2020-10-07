@@ -1342,6 +1342,8 @@
   "Web port %port% already in use!": "Веб-порт %port% уже используется!",
   "WEB port": "Веб порт",
   "WEB server white list. The addresses are allowed to access the node.": "Веб белый лист. Этим адресам разрешён доступ к этому узлу.",
+  "Weight": "Вес",
+  "weight": "вес",
   "Win Value": "Победное Значение",
   "Withdraw": "Вывести",
   "Withdraw Exchange": "Вывод с биржи",
