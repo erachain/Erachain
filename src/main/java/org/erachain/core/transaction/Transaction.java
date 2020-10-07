@@ -413,6 +413,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected Fun.Tuple4<Long, Integer, Integer, Integer> creatorPersonDuration;
     protected PersonCls creatorPerson;
 
+    /**
+     * Для создания поисковых Меток - Тип сущности + номер. например @A12
+     */
     protected Object[][] itemsKeys;
 
     /**
@@ -763,11 +766,21 @@ public abstract class Transaction implements ExplorerJsonLine {
         }
     }
 
-    public static String[] tags(String tags, String words, Object[][] itemsKeys) {
-        if (words != null)
-            tags += " " + words;
+    public static String[] tags(String type, String tags, String words, Object[][] itemsKeys) {
 
-        String[] tagsWords = tags.toLowerCase().split(SPLIT_CHARS);
+        String allTags = "";
+
+        if (type != null)
+            allTags += " " + type;
+
+        if (tags != null)
+            allTags += " " + tags;
+
+
+        if (words != null)
+            allTags += " " + words;
+
+        String[] tagsWords = allTags.toLowerCase().split(SPLIT_CHARS);
 
         if (itemsKeys == null || itemsKeys.length == 0)
             return tagsWords;
@@ -787,6 +800,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         return tagsArray;
     }
 
+    public String getExTags() {
+        return null;
+    }
+
     /**
      * При удалении - транзакция то берется из базы для создания индексов к удалению.
      * И она скелет - нужно базу данных задать и водтянуть номера сущностей и все заново просчитать чтобы правильно удалить метки.
@@ -800,7 +817,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             makeItemsKeys();
 
         try {
-            return tags(viewTypeName(), getTitle(), itemsKeys);
+            return tags(viewTypeName(), getExTags(), getTitle(), itemsKeys);
         } catch (Exception e) {
             LOGGER.error(toString() + " - itemsKeys.len: " + itemsKeys.length);
             throw e;

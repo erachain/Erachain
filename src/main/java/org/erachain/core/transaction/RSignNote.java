@@ -167,6 +167,18 @@ public class RSignNote extends Transaction implements Itemable {
         }
     }
 
+    @Override
+    public String getExTags() {
+        if (extendedData != null) {
+            byte[] exTags = extendedData.getTags();
+            if (exTags != null && exTags.length > 0) {
+                return new String(exTags, StandardCharsets.UTF_8);
+            }
+        }
+
+        return null;
+    }
+
     public static boolean hasTemplate(byte[] typeBytes) {
         if (typeBytes[2] < 0) return true;
         return false;

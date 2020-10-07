@@ -812,6 +812,8 @@ public class ExDataPanel extends JPanel {
         ExAuthor[] authors = authorsPanel.authorsAuthorsModel.getAuthors();
         ExSource[] sources = null;
 
+        String tags = docTypeAppendixPanel.tagsField.getText();
+
         // hashes StandardCharsets.UTF_8
         HashMap<String, String> hashes_Map = new HashMap<String, String>();
         int hR = hashes_Table_Model.getRowCount();
@@ -848,7 +850,7 @@ public class ExDataPanel extends JPanel {
             }
         }
         return ExData.make(exLink, creator, jTextField_Title_Message.getText(),
-                signCanOnlyRecipients, recipients, authors, sources, isEncrypted,
+                signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
                 (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),
                 fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
                 jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),
