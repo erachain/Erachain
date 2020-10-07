@@ -229,6 +229,7 @@ public class PersonConfirmDialog extends JDialog {
         SertifyPubKeysDetailsFrame ww = new SertifyPubKeysDetailsFrame((RSertifyPubKeys) transaction);
         dd.jScrollPane1.setViewportView(ww);
         dd.setLocationRelativeTo(this);
+        dd.pack();
         dd.setVisible(true);
 
         // JOptionPane.OK_OPTION
@@ -298,6 +299,8 @@ public class PersonConfirmDialog extends JDialog {
         info.show_001(person);
         info.setFocusable(false);
         jLabel_PersonInfo.setViewportView(info);
+        pack();
+
         // jLabel_PersonInfo.set
         // jLabel_PersonInfo.setText(Lang.getInstance().translate("Public Keys
         // of") + " " + person.viewName() +":");

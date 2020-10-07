@@ -104,7 +104,7 @@ public class ExAuthor {
         json.put("memo", getMemo());
         json.put("flags", flags);
         json.put("share", share);
-        json.put("key", Transaction.viewDBRef(key));
+        json.put("key", key);
         return json;
     }
 

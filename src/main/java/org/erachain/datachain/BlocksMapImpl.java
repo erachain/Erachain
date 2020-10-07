@@ -241,16 +241,18 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         // удаляем данные форжинга - внутри уже идет проверка на повторное удаление
         creator.delForgingData(dcSet, height);
 
-        if (BlockChain.CHECK_BUGS > 5) {
+        delete(height);
+
+        if (BlockChain.CHECK_BUGS > 5 && !BlockChain.ERA_COMPU_ALL_UP && BlockChain.ALL_VALID_BEFORE > height) {
             Fun.Tuple3<Integer, Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(creator.getAddress());
-            if (lastPoint.a > height) {
-                LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + height);
-                Long i = null;
-                i++;
+            if (lastPoint == null) {
+                if (lastPoint.a > height) {
+                    LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + height);
+                    Long i = null;
+                    i++;
+                }
             }
         }
-
-        delete(height);
 
     }
 
