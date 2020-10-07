@@ -231,7 +231,6 @@ public class MultipleRecipientsPanel extends JPanel {
                         }
                     }
                 } catch (Exception e) {
-                    break;
                 }
             }
 

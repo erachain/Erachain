@@ -7,17 +7,19 @@ import org.erachain.lang.Lang;
 
 import javax.swing.table.DefaultTableModel;
 import javax.validation.constraints.Null;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
-public class TableModel extends DefaultTableModel {
+public class AuthorsModel extends DefaultTableModel {
     private static final int KEY_COL = 0;
     private static final int SHARE_COL = 1;
     private static final int NAME_COL = 2;
     private static final int MEMO_COL = 3;
 
 
-    public TableModel(int rows) {
+    public AuthorsModel(int rows) {
         super(new String[]{Lang.getInstance().translate("Number"),
                         Lang.getInstance().translate("Share"),
                         Lang.getInstance().translate("Name"),
@@ -32,14 +34,13 @@ public class TableModel extends DefaultTableModel {
         switch (column) {
             case KEY_COL:
                 return true;
-
-            case SHARE_COL:
-            case MEMO_COL:
-                if (((String) getValueAt(row, NAME_COL)).equals("")) return false;
-                return true;
+            case NAME_COL:
+                return false;
+            default:
+                if (getValueAt(row, NAME_COL).equals("")) return false;
         }
 
-        return false;
+        return true;
     }
 
     private void addEmpty() {
@@ -109,14 +110,20 @@ public class TableModel extends DefaultTableModel {
         if (this.getRowCount() == 0)
             return null;
 
-        ExAuthor[] result = new ExAuthor[getRowCount()];
+        List<ExAuthor> temp = new ArrayList<>();
         Iterator iterator = this.dataVector.iterator();
-        int i = 0;
         while (iterator.hasNext()) {
             Vector item = (Vector) iterator.next();
-            result[i++] = new ExAuthor((byte) 0, (Integer) item.elementAt(1), (Long) item.elementAt(0), (String) item.elementAt(3));
+            if (item.elementAt(NAME_COL).equals("")) {
+                // персоны такой нет
+                continue;
+            }
+
+            temp.add(new ExAuthor((byte) 0, (Integer) item.elementAt(SHARE_COL),
+                    (Long) item.elementAt(KEY_COL), (String) item.elementAt(MEMO_COL)));
         }
-        return result;
+
+        return temp.toArray(new ExAuthor[0]);
 
     }
 

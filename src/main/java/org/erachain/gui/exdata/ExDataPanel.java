@@ -808,7 +808,7 @@ public class ExDataPanel extends JPanel {
         Account[] recipients = multipleRecipientsPanel.recipientsTableModel.getRecipients();
         boolean signCanOnlyRecipients = multipleRecipientsPanel.signCanRecipientsCheckBox.isSelected();
 
-        ExAuthor[] authors = authorsPanel.AuthorsTableModel.getAuthors();
+        ExAuthor[] authors = authorsPanel.authorsAuthorsModel.getAuthors();
 
         // hashes StandardCharsets.UTF_8
         HashMap<String, String> hashes_Map = new HashMap<String, String>();

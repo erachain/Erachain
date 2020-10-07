@@ -33,6 +33,14 @@ public class ExAuthor {
      */
     protected final int share;
 
+    public ExAuthor() {
+        this.flags = 0;
+        this.share = 0;
+        this.ref = 0L;
+        this.memo = null;
+        memoBytes = null;
+    }
+
     public ExAuthor(byte flags, int share, long ref, String memo) {
         this.flags = flags;
         this.share = share;
@@ -97,13 +105,15 @@ public class ExAuthor {
     }
 
     public byte[] toBytes() {
-        byte[] data = new byte[BASE_LENGTH + memoBytes.length];
+        int memoSize = memoBytes == null ? 0 : memoBytes.length;
+        byte[] data = new byte[BASE_LENGTH + memoSize];
         data[0] = flags;
-        data[1] = (byte) memoBytes.length;
+        data[1] = (byte) memoSize;
         data[2] = (byte) (share >> 8);
         data[3] = (byte) share;
         System.arraycopy(Longs.toByteArray(ref), 0, data, 4, Long.BYTES);
-        System.arraycopy(memoBytes, 0, data, BASE_LENGTH, memoBytes.length);
+        if (memoSize > 0)
+            System.arraycopy(memoBytes, 0, data, BASE_LENGTH, memoSize);
 
         return data;
     }
@@ -113,7 +123,7 @@ public class ExAuthor {
     }
 
     public int length() {
-        return BASE_LENGTH + memoBytes.length;
+        return BASE_LENGTH + (memoBytes == null ? 0 : memoBytes.length);
     }
 
     public int isValid(DCSet dcSet) {
@@ -121,7 +131,7 @@ public class ExAuthor {
             return Transaction.INVALID_AMOUNT;
         }
 
-        if (memoBytes.length > 255)
+        if (memoBytes != null && memoBytes.length > 255)
             return Transaction.INVALID_DATA_LENGTH;
 
         if (!dcSet.getItemPersonMap().contains(ref))
