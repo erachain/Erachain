@@ -2,7 +2,6 @@ package org.erachain.core.exdata.exLink;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.erachain.controller.Controller;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -28,8 +27,8 @@ public abstract class ExLinkMemo extends ExLink {
         System.arraycopy(data, position + BASE_LENGTH + 1, memoBytes, 0, memoSize);
     }
 
-    public ExLinkMemo(byte type, int weight, long ref, byte[] memoBytes) {
-        super(type, (byte) 0, (byte) 0, (byte) 0, ref);
+    public ExLinkMemo(byte type, byte flags, int value, long ref, byte[] memoBytes) {
+        super(type, flags, (byte) (value >> 8), (byte) value, ref);
         this.memoBytes = memoBytes;
     }
 
@@ -43,26 +42,24 @@ public abstract class ExLinkMemo extends ExLink {
         return memo;
     }
 
-    public int getWeight() {
-        return Ints.fromBytes(0, 0, (byte) value1, (byte) value2);
+    public int getValue() {
+        return Ints.fromBytes((byte) 0, (byte) 0, value1, value2);
     }
 
     public JSONObject makeJSONforHTML() {
-        JSONObject json = toJson();
-        json.put("title", Controller.getInstance().getTransaction(ref).getTitle());
-        if (memo == null) {
-            json.put("memo", "");
+        JSONObject json = super.makeJSONforHTML();
+        if (getMemo() != null) {
+            json.put("memo", memo);
         }
 
         return json;
     }
 
     public JSONObject toJson() {
-        JSONObject json = new JSONObject();
-        json.put("memo", getMemo());
-        json.put("flags", flags);
-        json.put("weight", weight);
-        json.put("ref", Transaction.viewDBRef(ref));
+        JSONObject json = super.toJson(false);
+        if (getMemo() != null) {
+            json.put("memo", memo);
+        }
         return json;
     }
 

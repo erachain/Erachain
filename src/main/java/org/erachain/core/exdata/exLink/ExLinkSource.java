@@ -1,116 +1,47 @@
 package org.erachain.core.exdata.exLink;
 
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 
-import java.nio.charset.StandardCharsets;
-
-public class ExLinkSource extends ExLink {
-
-    protected final byte[] memoBytes;
-    protected String memo;
+public class ExLinkSource extends ExLinkMemo {
 
     public ExLinkSource(long parentSeqNo, String memo) {
-        super(ExData.LINK_SOURCE_TYPE, parentSeqNo);
-        this.memo = memo;
-        memoBytes = memo == null || memo.isEmpty() ? null : memo.getBytes(StandardCharsets.UTF_8);
+        super(ExData.LINK_SOURCE_TYPE, parentSeqNo, memo);
     }
 
     public ExLinkSource(byte[] data, int position) {
-        super(data);
-        this.memoBytes = new byte[this.flags];
-        System.arraycopy(data, position + BASE_LENGTH, memoBytes, 0, this.flags);
+        super(data, position);
     }
 
-    public ExLinkSource(byte[] type, long refLink, byte[] data, int position) {
-        super(type, refLink);
-        this.memoBytes = new byte[this.flags];
-        System.arraycopy(data, position + BASE_LENGTH, memoBytes, 0, this.flags);
-    }
-
-    public ExLinkSource(int weight, long ref, String memo) {
-        this.type = ExData.LINK_SOURCE_TYPE;
-        this.flags = (byte) weight;
-        this.ref = ref;
-        this.memo = memo;
-        memoBytes = memo == null || memo.isEmpty() ? null : memo.getBytes(StandardCharsets.UTF_8);
-    }
-
-    public ExLinkSource(int weight, long ref, byte[] memoBytes) {
-        this.memoBytes = memoBytes;
-        this.flags = (byte) memoBytes.length;
-        this.value1 = (byte) (weight >> 8);
-        this.value2 = (byte) weight;
-        this.ref = ref;
-    }
-
-    public String getMemo() {
-        if (memo == null) {
-            if (memoBytes == null || memoBytes.length == 0)
-                return null;
-            else
-                memo = new String(this.memoBytes, StandardCharsets.UTF_8);
-        }
-        return memo;
-    }
-
-    public int getWeight() {
-        return Ints.fromBytes(0, 0, (byte) value1, (byte) value2);
+    public ExLinkSource(byte type, byte flags, int value, long ref, byte[] memoBytes) {
+        super(ExData.LINK_SOURCE_TYPE, flags, value, ref, memoBytes);
     }
 
     public JSONObject makeJSONforHTML() {
-        JSONObject json = toJson();
+        JSONObject json = super.makeJSONforHTML();
         json.put("title", Controller.getInstance().getTransaction(ref).getTitle());
-        if (memo == null) {
-            json.put("memo", "");
-        }
+        json.put("ref", Transaction.viewDBRef(ref));
 
         return json;
     }
 
     public JSONObject toJson() {
-        JSONObject json = new JSONObject();
-        json.put("memo", getMemo());
-        json.put("flags", flags);
-        json.put("weight", weight);
+        JSONObject json = super.toJson(false);
         json.put("ref", Transaction.viewDBRef(ref));
+
         return json;
     }
 
-    public byte[] toBytes() {
-        int memoSize = memoBytes == null ? 0 : memoBytes.length;
-        byte[] data = new byte[BASE_LENGTH + memoSize];
-        data[0] = flags;
-        data[1] = (byte) memoSize;
-        data[2] = (byte) (weight >> 8);
-        data[3] = (byte) weight;
-        System.arraycopy(Longs.toByteArray(ref), 0, data, 4, Long.BYTES);
-        if (memoSize > 0)
-            System.arraycopy(memoBytes, 0, data, BASE_LENGTH, memoSize);
-
-        return data;
-    }
-
-    public static ExLinkSource parse(byte[] data, int position) throws Exception {
-        return new ExLinkSource(data, position);
-    }
-
-    public int length() {
-        return BASE_LENGTH + (memoBytes == null ? 0 : memoBytes.length);
-    }
 
     public int isValid(DCSet dcSet) {
-        if (weight > 1000 || weight < 0) {
-            return Transaction.INVALID_AMOUNT;
-        }
 
-        if (memoBytes != null && memoBytes.length > 255)
-            return Transaction.INVALID_DATA_LENGTH;
+        int result = super.isValid(dcSet);
+        if (result != Transaction.VALIDATE_OK) {
+            return result;
+        }
 
         if (!dcSet.getItemPersonMap().contains(ref))
             return Transaction.ITEM_PERSON_NOT_EXIST;
