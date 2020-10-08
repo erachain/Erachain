@@ -35,7 +35,6 @@ public class ExLinkSource extends ExLinkMemo {
         return json;
     }
 
-
     public int isValid(DCSet dcSet) {
 
         int result = super.isValid(dcSet);

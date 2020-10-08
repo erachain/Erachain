@@ -8,7 +8,6 @@ import org.json.simple.JSONObject;
 
 public class ExLinkAuthor extends ExLinkMemo {
 
-
     public ExLinkAuthor(long parentSeqNo, String memo) {
         super(ExData.LINK_AUTHOR_TYPE, parentSeqNo, memo);
     }
@@ -21,14 +20,12 @@ public class ExLinkAuthor extends ExLinkMemo {
         super(ExData.LINK_AUTHOR_TYPE, flags, value, ref, memoBytes);
     }
 
-
     public JSONObject makeJSONforHTML() {
         JSONObject json = super.makeJSONforHTML();
         json.put("name", Controller.getInstance().getPerson(ref).getName());
 
         return json;
     }
-
 
     public int isValid(DCSet dcSet) {
         int result = super.isValid(dcSet);
