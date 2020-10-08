@@ -2469,6 +2469,10 @@ public class Controller extends Observable {
         return database.getTransactionFinalMap().get(refDB);
     }
 
+    public Transaction getTransaction(String refDB) {
+        return dcSet.getTransactionFinalMap().getRecord(refDB);
+    }
+
     public List<Transaction> getLastWalletTransactions(Account account, int limit) {
         return this.wallet.getLastTransactions(account, limit);
     }

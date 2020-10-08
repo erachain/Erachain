@@ -9,7 +9,7 @@ import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
@@ -29,6 +29,8 @@ import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,7 +39,7 @@ import java.nio.charset.StandardCharsets;
 
 //import org.erachain.gui.AccountRenderer;
 
-public class AccountAssetActionPanelCls extends IconPanel implements RecipientAddress.RecipientAddressInterface {
+public abstract class AccountAssetActionPanelCls extends IconPanel implements RecipientAddress.RecipientAddressInterface {
 
     // TODO - "A" - &
     //static String wrongFirstCharOfAddress = "A";
@@ -140,6 +142,24 @@ public class AccountAssetActionPanelCls extends IconPanel implements RecipientAd
         jComboBox_Asset.setModel(new ComboBoxAssetsModel());
         jComboBox_Asset.setEditable(false);
         //this.jComboBox_Asset.setEnabled(assetIn != null);
+
+        exLinkText.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                viewLinkParent();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                viewLinkParent();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                viewLinkParent();
+            }
+        });
 
 
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
@@ -349,10 +369,10 @@ public class AccountAssetActionPanelCls extends IconPanel implements RecipientAd
             }
         }
 
-        ExLink exLink = null;
+        exLink = null;
         Long linkRef = Transaction.parseDBRef(exLinkText.getText());
         if (linkRef != null) {
-            exLink = new ExLinkSource(linkRef, null);
+            exLink = new ExLinkAppendix(linkRef);
         }
 
         int parsing = 0;
@@ -489,6 +509,16 @@ public class AccountAssetActionPanelCls extends IconPanel implements RecipientAd
         return true;
     }
 
+    private void viewLinkParent() {
+        String refStr = exLinkText.getText();
+        Transaction parentTx = Controller.getInstance().getTransaction(refStr);
+        if (parentTx == null) {
+            exLinkDescription.setText(Lang.getInstance().translate("Not Found") + "!");
+        } else {
+            exLinkDescription.setText(parentTx.toStringShort());
+        }
+    }
+
     public void confirmaftecreatetransaction() {
 
         //CHECK VALIDATE MESSAGE
@@ -510,9 +540,7 @@ public class AccountAssetActionPanelCls extends IconPanel implements RecipientAd
         refreshReceiverDetails();
     }
 
-    public void onSendClick() {
-
-    }
+    public abstract void onSendClick();
 
 
     private void initComponents(String message) {
@@ -720,7 +748,7 @@ public class AccountAssetActionPanelCls extends IconPanel implements RecipientAd
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
         add(jComboBox_Fee, gridBagConstraints);
 //exLink
-        exLinkTextLabel.setText(Lang.getInstance().translate("Ссылка на"));
+        exLinkTextLabel.setText(Lang.getInstance().translate("Append to") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 20;
@@ -737,7 +765,7 @@ public class AccountAssetActionPanelCls extends IconPanel implements RecipientAd
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
          add(exLinkText, gridBagConstraints);
 
-        exLinkDescriptionLabel.setText(Lang.getInstance().translate("description"));
+        exLinkDescriptionLabel.setText(Lang.getInstance().translate("Parent") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 20;

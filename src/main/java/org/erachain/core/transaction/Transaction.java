@@ -2094,9 +2094,13 @@ public abstract class Transaction implements ExplorerJsonLine {
     @Override
     public String toString() {
         if (signature == null) {
-            return getClass().getName() + ":" + viewFullTypeName();
+            return getClass().getName() + " : " + viewFullTypeName();
         }
-        return getClass().getName() + ":" + viewFullTypeName() + ":" + Base58.encode(signature);
+        return getClass().getName() + ": " + viewFullTypeName() + " : " + Base58.encode(signature);
+    }
+
+    public String toStringShort() {
+        return viewFullTypeName() + ": " + getTitle();
     }
 
 }
