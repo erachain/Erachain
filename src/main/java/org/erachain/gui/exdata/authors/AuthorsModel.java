@@ -1,7 +1,7 @@
 package org.erachain.gui.exdata.authors;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.exdata.ExAuthor;
+import org.erachain.core.exdata.exLink.ExLinkAuthor;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.lang.Lang;
 
@@ -106,11 +106,11 @@ public class AuthorsModel extends DefaultTableModel {
         }
     }
 
-    public ExAuthor[] getAuthors() {
+    public ExLinkAuthor[] getAuthors() {
         if (this.getRowCount() == 0)
             return null;
 
-        List<ExAuthor> temp = new ArrayList<>();
+        List<ExLinkAuthor> temp = new ArrayList<>();
         Iterator iterator = this.dataVector.iterator();
         while (iterator.hasNext()) {
             Vector item = (Vector) iterator.next();
@@ -119,11 +119,11 @@ public class AuthorsModel extends DefaultTableModel {
                 continue;
             }
 
-            temp.add(new ExAuthor((byte) 0, (Integer) item.elementAt(SHARE_COL),
+            temp.add(new ExLinkAuthor((byte) 0, (Integer) item.elementAt(SHARE_COL),
                     (Long) item.elementAt(KEY_COL), (String) item.elementAt(MEMO_COL)));
         }
 
-        return temp.toArray(new ExAuthor[0]);
+        return temp.toArray(new ExLinkAuthor[0]);
 
     }
 

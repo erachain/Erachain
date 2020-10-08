@@ -3,12 +3,8 @@ package org.erachain.gui.exdata;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.exdata.ExAuthor;
 import org.erachain.core.exdata.ExData;
-import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkAppendix;
-import org.erachain.core.exdata.exLink.ExLinkReply;
-import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.exdata.exLink.*;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -809,7 +805,7 @@ public class ExDataPanel extends JPanel {
         Account[] recipients = multipleRecipientsPanel.recipientsTableModel.getRecipients();
         boolean signCanOnlyRecipients = multipleRecipientsPanel.signCanRecipientsCheckBox.isSelected();
 
-        ExAuthor[] authors = authorsPanel.authorsAuthorsModel.getAuthors();
+        ExLinkAuthor[] authors = authorsPanel.authorsAuthorsModel.getAuthors();
         ExLinkSource[] sources = null;
 
         String tags = docTypeAppendixPanel.tagsField.getText();

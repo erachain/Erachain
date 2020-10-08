@@ -47,7 +47,7 @@ public abstract class ExLinkMemo extends ExLink {
     }
 
     public JSONObject makeJSONforHTML() {
-        JSONObject json = super.makeJSONforHTML();
+        JSONObject json = super.makeJSONforHTML(false);
         if (getMemo() != null) {
             json.put("memo", memo);
         }
@@ -68,8 +68,8 @@ public abstract class ExLinkMemo extends ExLink {
         byte[] data = new byte[BASE_LENGTH + memoSize];
         data[0] = flags;
         data[1] = (byte) memoSize;
-        data[2] = (byte) (weight >> 8);
-        data[3] = (byte) weight;
+        data[2] = value1;
+        data[3] = value2;
         System.arraycopy(Longs.toByteArray(ref), 0, data, 4, Long.BYTES);
         if (memoSize > 0)
             System.arraycopy(memoBytes, 0, data, BASE_LENGTH, memoSize);
@@ -78,7 +78,15 @@ public abstract class ExLinkMemo extends ExLink {
     }
 
     public static ExLinkMemo parse(byte[] data, int position) throws Exception {
-        return new ExLinkMemo(data, position);
+        switch (data[0]) {
+            case ExData.LINK_SOURCE_TYPE:
+                return new ExLinkSource(data, position);
+            case ExData.LINK_AUTHOR_TYPE:
+                return new ExLinkAppendix(data);
+            // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
+        }
+
+        throw new Exception("wrong type: " + data[0]);
     }
 
     public int length() {
@@ -86,10 +94,6 @@ public abstract class ExLinkMemo extends ExLink {
     }
 
     public int isValid(DCSet dcSet) {
-        if (weight > 1000 || weight < 0) {
-            return Transaction.INVALID_AMOUNT;
-        }
-
         if (memoBytes != null && memoBytes.length > 255)
             return Transaction.INVALID_DATA_LENGTH;
 
@@ -97,15 +101,6 @@ public abstract class ExLinkMemo extends ExLink {
             return Transaction.ITEM_PERSON_NOT_EXIST;
 
         return Transaction.VALIDATE_OK;
-    }
-
-    public void process(Transaction transaction) {
-        // создадим связь в базе - как источник / пользователи + потребители + получатели +
-        transaction.getDCSet().getExLinksMap().put(transaction.getDBRef(), new ExLink(ExData.LINK_SOURCE_TYPE, ref));
-    }
-
-    public void orphan(Transaction transaction) {
-        transaction.getDCSet().getExLinksMap().remove(transaction.getDBRef());
     }
 
 }

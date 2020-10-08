@@ -10,8 +10,8 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
-import org.erachain.core.exdata.ExAuthor;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.exLink.ExLinkAuthor;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapSigns;
@@ -168,7 +168,7 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         if (extendedData.hasAuthors()) {
-            for (ExAuthor author : extendedData.getAuthors()) {
+            for (ExLinkAuthor author : extendedData.getAuthors()) {
                 listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, author.getKey()});
             }
         }

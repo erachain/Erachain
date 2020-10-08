@@ -2,9 +2,9 @@ package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.exdata.ExAuthor;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkAuthor;
 import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.templates.TemplateCls;
@@ -293,7 +293,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         // AUTHORS
         if (exData.hasAuthors()) {
             resultStr += "<h2>" + Lang.getInstance().translate("Authors") + "</h2>";
-            ExAuthor[] authors = exData.getAuthors();
+            ExLinkAuthor[] authors = exData.getAuthors();
             int size = authors.length;
             for (int i = 1; i <= size; ++i) {
                 if (i > 7 && size > 10) {

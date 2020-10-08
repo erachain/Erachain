@@ -43,6 +43,11 @@ public class ExLinkSource extends ExLinkMemo {
             return result;
         }
 
+        int weight = getValue();
+        if (weight > 1000 || weight < 0) {
+            return Transaction.INVALID_AMOUNT;
+        }
+
         if (!dcSet.getItemPersonMap().contains(ref))
             return Transaction.ITEM_PERSON_NOT_EXIST;
 
