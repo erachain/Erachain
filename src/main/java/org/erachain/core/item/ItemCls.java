@@ -45,7 +45,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     public static final int STATEMENT_TYPE = 7;
     public static final int POLL_TYPE = 8;
     public static final int AUTHOR_TYPE = 41;
-    public static final int SEQNO_TYPE = 10;
 
     public static final int MAX_ICON_LENGTH = 11000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
     public static final int MAX_IMAGE_LENGTH = 1100000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
@@ -271,8 +270,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
                 return "T"; // TEMPLATE
             case ItemCls.AUTHOR_TYPE:
                 return "PA"; // for quick search
-            case ItemCls.SEQNO_TYPE:
-                return "TX"; // for quick search
             default:
                 return "x";
 

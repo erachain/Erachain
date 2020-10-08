@@ -12,8 +12,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExAuthor;
 import org.erachain.core.exdata.ExData;
-import org.erachain.core.exdata.ExSource;
-import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapSigns;
@@ -158,13 +156,11 @@ public class RSignNote extends Transaction implements Itemable {
 
         ArrayList<Object> listTags = new ArrayList<>();
 
-        ExLink exLink = extendedData.getExLink();
-        if (exLink != null) {
-            listTags.add(new Object[]{ItemCls.SEQNO_TYPE, exLink.viewRef()});
-        }
-
         if (creatorPersonDuration != null) {
+            // AS PERSON
             listTags.add(new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a});
+            // AS AUTHOR
+            listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, creatorPersonDuration.a});
         }
 
         if (key != 0) {
@@ -177,19 +173,7 @@ public class RSignNote extends Transaction implements Itemable {
             }
         }
 
-        if (extendedData.hasAuthors()) {
-            for (ExAuthor author : extendedData.getAuthors()) {
-                listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, author.getKey()});
-            }
-        }
-
-        if (extendedData.hasSources()) {
-            for (ExSource source : extendedData.getSources()) {
-                listTags.add(new Object[]{ItemCls.SEQNO_TYPE, source.viewRef()});
-            }
-        }
-
-        itemsKeys = listTags.toArray(itemsKeys);
+        itemsKeys = listTags.toArray(new Object[][]{});
 
     }
 
