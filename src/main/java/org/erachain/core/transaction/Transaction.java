@@ -1963,6 +1963,10 @@ public abstract class Transaction implements ExplorerJsonLine {
                 }
             }
 
+            if (exLink != null) {
+                exLink.process(this);
+            }
+
             // UPDATE REFERENCE OF SENDER
             this.creator.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
         }
@@ -2001,6 +2005,10 @@ public abstract class Transaction implements ExplorerJsonLine {
             // set last transaction signature for this ACCOUNT
             this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
+        }
+
+        if (exLink != null) {
+            exLink.orphan(this);
         }
 
         // CLEAR all FOOTPRINTS and empty data

@@ -301,10 +301,10 @@ public class RNoteInfo extends javax.swing.JPanel {
                     i = size;
                 }
 
-                PersonCls person = cntr.getPerson(authors[i - 1].getKey());
+                PersonCls person = cntr.getPerson(authors[i - 1].getRef());
                 String memo = authors[i - 1].getMemo();
 
-                resultStr += i + ". " + authors[i - 1].getShare() + " x " + person.toString(cntr.getDCSet()) + (memo == null ? "" : " - " + memo) + "<br>";
+                resultStr += i + ". " + authors[i - 1].getValue() + " x " + person.toString(cntr.getDCSet()) + (memo == null ? "" : " - " + memo) + "<br>";
             }
             resultStr += "<br>";
         }
@@ -391,7 +391,7 @@ public class RNoteInfo extends javax.swing.JPanel {
                 Transaction sourceTx = cntr.getTransaction(sources[i - 1].getRef());
                 String memo = sources[i - 1].getMemo();
 
-                resultStr += i + ". " + sources[i - 1].getWeight() + " x " + sourceTx.toString() + (memo == null ? "" : " - " + memo) + "<br>";
+                resultStr += i + ". " + sources[i - 1].getValue() + " x " + sourceTx.toString() + (memo == null ? "" : " - " + memo) + "<br>";
             }
             resultStr += "<br>";
         }

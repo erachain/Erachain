@@ -16,7 +16,7 @@ public class ExLinkAuthor extends ExLinkMemo {
         super(data, position);
     }
 
-    public ExLinkAuthor(byte type, byte flags, int value, long ref, byte[] memoBytes) {
+    public ExLinkAuthor(byte flags, int value, long ref, byte[] memoBytes) {
         super(ExData.LINK_AUTHOR_TYPE, flags, value, ref, memoBytes);
     }
 
@@ -43,4 +43,15 @@ public class ExLinkAuthor extends ExLinkMemo {
 
         return Transaction.VALIDATE_OK;
     }
+
+    @Override
+    public void process(Transaction transaction) {
+        // EMPTY
+    }
+
+    @Override
+    public void orphan(Transaction transaction) {
+        // EMPTY
+    }
+
 }

@@ -169,7 +169,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         if (extendedData.hasAuthors()) {
             for (ExLinkAuthor author : extendedData.getAuthors()) {
-                listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, author.getKey()});
+                listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, author.getRef()});
             }
         }
 

@@ -214,6 +214,9 @@ public class ExLink {
                 return new ExLinkReply(typeBuffer, refLink);
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(typeBuffer, refLink);
+            case ExData.LINK_AUTHOR_TYPE:
+            case ExData.LINK_SOURCE_TYPE:
+                return ExLinkMemo.parse(data, position);
             // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 

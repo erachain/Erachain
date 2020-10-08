@@ -7,6 +7,7 @@ import org.erachain.lang.Lang;
 
 import javax.swing.table.DefaultTableModel;
 import javax.validation.constraints.Null;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -120,7 +121,7 @@ public class AuthorsModel extends DefaultTableModel {
             }
 
             temp.add(new ExLinkAuthor((byte) 0, (Integer) item.elementAt(SHARE_COL),
-                    (Long) item.elementAt(KEY_COL), (String) item.elementAt(MEMO_COL)));
+                    (Long) item.elementAt(KEY_COL), ((String) item.elementAt(MEMO_COL)).getBytes(StandardCharsets.UTF_8)));
         }
 
         return temp.toArray(new ExLinkAuthor[0]);

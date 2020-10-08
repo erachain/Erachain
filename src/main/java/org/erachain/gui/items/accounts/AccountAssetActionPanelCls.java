@@ -8,6 +8,8 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
@@ -25,6 +27,7 @@ import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -45,6 +48,8 @@ public class AccountAssetActionPanelCls extends IconPanel implements RecipientAd
     public byte[] messageBytes;
 
     public BigDecimal amount;
+
+    public ExLink exLink;
 
     public int feePow;
 
@@ -344,8 +349,23 @@ public class AccountAssetActionPanelCls extends IconPanel implements RecipientAd
             }
         }
 
+        ExLink exLink = null;
+        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
+        if (linkRef != null) {
+            exLink = new ExLinkSource(linkRef, null);
+        }
+
         int parsing = 0;
 
+        try {
+            //READ AMOUNT
+            parsing = 1;
+
+            //READ FEE
+            parsing = 2;
+            feePow = Integer.parseInt((String) this.jComboBox_Fee.getSelectedItem());
+        } catch (Exception e) {
+        }
 
         try {
             //READ AMOUNT
@@ -523,7 +543,7 @@ public class AccountAssetActionPanelCls extends IconPanel implements RecipientAd
         jTextArea_Account_Description = new javax.swing.JTextArea();
 
         exLinkDescriptionLabel = new JLabel();
-        exLincTexlLabel = new JLabel();
+        exLinkTextLabel = new JLabel();
         exLinkText = new JTextField();
         exLinkDescription = new JTextField();
 
@@ -700,13 +720,13 @@ public class AccountAssetActionPanelCls extends IconPanel implements RecipientAd
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
         add(jComboBox_Fee, gridBagConstraints);
 //exLink
-        exLincTexlLabel.setText(Lang.getInstance().translate("Ссылка на"));
+        exLinkTextLabel.setText(Lang.getInstance().translate("Ссылка на"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 20;
         gridBagConstraints.anchor= GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
-        add(exLincTexlLabel, gridBagConstraints);
+        add(exLinkTextLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -784,7 +804,7 @@ public class AccountAssetActionPanelCls extends IconPanel implements RecipientAd
     public RecipientAddress recipientAddress;
     public JTextField exLinkText;
     public JTextField exLinkDescription;
-    public JLabel exLincTexlLabel;
+    public JLabel exLinkTextLabel;
     public JLabel exLinkDescriptionLabel;
 
 
