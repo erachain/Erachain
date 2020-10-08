@@ -237,7 +237,7 @@ function person(data) {
     output += '<table><tr style="vertical-align:top">';
 
     if (data.image.length > 0) {
-        output += '<td><img src="data:image/gif;base64,' + data.image + '" width = "350" /></td><td style ="padding-left:20px">';
+        output += '<td><img src="data:image/gif;base64,' + data.image + '" width = "350" /></td><td style ="width: 70%; padding-left:20px">';
         output += '<br>';
     }
 
@@ -248,7 +248,8 @@ function person(data) {
     output += '<h4> [ <input id="key1" name="person" size="4" type="text" value="' + data.key + '" class="" style="font-size: 1em;"'
                    + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
     output += '<a href=?tx=' + data.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.seqNo + '</b></a>';
-    output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a></h4>';
+    output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a>';
+    output += ' ' +'<a href=?q=@PA' + data.key + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Authorship + '</b></a></h4>';
 
     output += '<br>';
 

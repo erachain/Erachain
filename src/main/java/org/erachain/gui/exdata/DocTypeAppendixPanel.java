@@ -105,6 +105,9 @@ public class DocTypeAppendixPanel extends JPanel {
             }
         });
 
+        tagsLabel = new JLabel(Lang.getInstance().translate("Tags"));
+        tagsField = new JTextField();
+
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
         layout.columnWidths = new int[]{0, 5, 0};
         layout.rowHeights = new int[]{0, 5, 0, 5, 0};
@@ -114,27 +117,44 @@ public class DocTypeAppendixPanel extends JPanel {
         java.awt.GridBagLayout panelLayout = new java.awt.GridBagLayout();
         panel.setLayout(panelLayout);
 
+        int dridY = 0;
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = dridY;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
+        add(tagsLabel, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = dridY;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+        add(tagsField, gridBagConstraints);
+        dridY++;
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = dridY;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         panel.add(typeDocumentLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = dridY;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         panel.add(typeDocymentCombox, gridBagConstraints);
 
-        int dridY = 0;
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = dridY;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -169,6 +189,7 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 8);
         add(parentReference, gridBagConstraints);
         dridY++;
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -177,7 +198,6 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 0);
         add(parentDetails, gridBagConstraints);
-
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -207,6 +227,10 @@ public class DocTypeAppendixPanel extends JPanel {
     private JLabel parentDetails;
     private JLabel typeDocumentLabel;
     private DocTypeComboBox typeDocymentCombox;
+
+    private JLabel tagsLabel;
+    public JTextField tagsField;
+
     // End of variables declaration
 
     private void refreshParentDetails() {

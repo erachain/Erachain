@@ -2,8 +2,11 @@ package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.exdata.ExAuthor;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.ExSource;
 import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
@@ -53,7 +56,12 @@ public class RNoteInfo extends javax.swing.JPanel {
     private MSplitPane jSplitPane1;
     private MTextPane jTextArea_Body;
 
+    Controller cntr;
+
     public RNoteInfo(Transaction transaction) {
+
+        cntr = Controller.getInstance();
+
         if (transaction == null)
             return;
         this.transaction = transaction;
@@ -152,10 +160,10 @@ public class RNoteInfo extends javax.swing.JPanel {
             encrypted.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (!encrypted.isSelected()) {
-                        if (!Controller.getInstance().isWalletUnlocked()) {
+                        if (!cntr.isWalletUnlocked()) {
                             //ASK FOR PASSWORD
                             String password = PasswordPane.showUnlockWalletDialog(null);
-                            if (!Controller.getInstance().unlockWallet(password)) {
+                            if (!cntr.unlockWallet(password)) {
                                 //WRONG PASSWORD
                                 JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
@@ -167,7 +175,7 @@ public class RNoteInfo extends javax.swing.JPanel {
 
                         statementEncrypted = statement;
 
-                        Account account = Controller.getInstance().getInvolvedAccount(statement);
+                        Account account = cntr.getInvolvedAccount(statement);
                         Fun.Tuple3<Integer, String, RSignNote> result = statement.decrypt(account);
                         if (result.a < 0) {
                             JOptionPane.showMessageDialog(null,
@@ -282,6 +290,25 @@ public class RNoteInfo extends javax.swing.JPanel {
             resultStr += "<br>";
         }
 
+        // AUTHORS
+        if (exData.hasAuthors()) {
+            resultStr += "<h2>" + Lang.getInstance().translate("Authors") + "</h2>";
+            ExAuthor[] authors = exData.getAuthors();
+            int size = authors.length;
+            for (int i = 1; i <= size; ++i) {
+                if (i > 7 && size > 10) {
+                    resultStr += "... <br>";
+                    i = size;
+                }
+
+                PersonCls person = cntr.getPerson(authors[i - 1].getKey());
+                String memo = authors[i - 1].getMemo();
+
+                resultStr += i + ". " + authors[i - 1].getShare() + " x " + person.toString(cntr.getDCSet()) + (memo == null ? "" : " - " + memo) + "<br>";
+            }
+            resultStr += "<br>";
+        }
+
         if (exData.isEncrypted()) {
             resultStr += "<h3>" + Lang.getInstance().translate("Encrypted") + "</h3><br>";
         }
@@ -348,6 +375,31 @@ public class RNoteInfo extends javax.swing.JPanel {
 
         } else if (statementEncrypted != null) {
             file_Panel.clear();
+        }
+
+        // AUTHORS
+        if (exData.hasSources()) {
+            resultStr += "<h2>" + Lang.getInstance().translate("Sources") + "</h2>";
+            ExSource[] sources = exData.getSources();
+            int size = sources.length;
+            for (int i = 1; i <= size; ++i) {
+                if (i > 7 && size > 10) {
+                    resultStr += "... <br>";
+                    i = size;
+                }
+
+                Transaction sourceTx = cntr.getTransaction(sources[i - 1].getRef());
+                String memo = sources[i - 1].getMemo();
+
+                resultStr += i + ". " + sources[i - 1].getWeight() + " x " + sourceTx.toString() + (memo == null ? "" : " - " + memo) + "<br>";
+            }
+            resultStr += "<br>";
+        }
+
+        if (exData.getTags() != null) {
+            resultStr += "<h4>" + Lang.getInstance().translate("Tags") + "</h4>";
+            resultStr += statement.getExTags();
+
         }
 
         jTextArea_Body.setText(resultStr);

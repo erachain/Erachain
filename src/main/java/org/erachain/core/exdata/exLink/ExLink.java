@@ -77,6 +77,10 @@ public class ExLink {
         return ref;
     }
 
+    public String viewRef() {
+        return Transaction.viewDBRef(ref);
+    }
+
     public byte getType() {
         return type;
     }
@@ -105,6 +109,8 @@ public class ExLink {
                 return "Comment";
             case ExData.LINK_COMMENT_TYPE_FOR_VIEW:
                 return "Comment";
+            case ExData.LINK_SOURCE_TYPE:
+                return "InSource";
             case ExData.LINK_SURELY_TYPE:
                 return "Surely";
             default:
