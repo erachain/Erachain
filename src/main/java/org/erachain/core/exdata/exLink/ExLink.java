@@ -29,6 +29,14 @@ public class ExLink {
     protected final byte value1;
     protected final byte value2;
 
+    public ExLink(byte type, byte flags, byte value1, byte value2, long ref) {
+        this.type = type;
+        this.flags = flags;
+        this.value1 = value1;
+        this.value2 = value2;
+        this.ref = ref;
+    }
+
     public ExLink(byte type, byte flags, byte value, long ref) {
         this.type = type;
         this.flags = flags;
