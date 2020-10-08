@@ -888,6 +888,7 @@ public class ExData {
                         for (int i = 0; i < authorsSize; i++) {
                             authors[i] = new ExLinkAuthor(data, position);
                             position += authors[i].length();
+                            ExLink exLink1 = ExLink.parse(authors[i].toBytes());
                         }
 
                     } else {

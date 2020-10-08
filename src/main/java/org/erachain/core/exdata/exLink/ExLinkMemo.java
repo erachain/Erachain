@@ -71,7 +71,7 @@ public abstract class ExLinkMemo extends ExLink {
     public byte[] toBytes() {
         int memoSize = memoBytes == null ? 0 : memoBytes.length;
         byte[] data = new byte[BASE_LENGTH + 1 + memoSize];
-        data[0] = flags;
+        data[0] = type;
         data[1] = flags;
         data[2] = value1;
         data[3] = value2;
