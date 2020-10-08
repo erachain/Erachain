@@ -1,83 +1,52 @@
-package org.erachain.core.exdata;
+package org.erachain.core.exdata.exLink;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
-import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 
-public class ExSource {
-
-    public static final byte BASE_LENGTH = 12;
-
-    /**
-     *
-     */
-    protected final byte flags;
+public class ExLinkSource extends ExLink {
 
     protected final byte[] memoBytes;
     protected String memo;
 
-    /**
-     * Ссылка на источник
-     */
-    protected final long ref;
-
-    /**
-     * Доля или вклад
-     */
-    protected final int weight;
-
-    public ExSource() {
-        this.flags = 0;
-        this.weight = 0;
-        this.ref = 0L;
-        this.memo = null;
-        memoBytes = null;
+    public ExLinkSource(long parentSeqNo, String memo) {
+        super(ExData.LINK_SOURCE_TYPE, parentSeqNo);
+        this.memo = memo;
+        memoBytes = memo == null || memo.isEmpty() ? null : memo.getBytes(StandardCharsets.UTF_8);
     }
 
-    public ExSource(byte flags, int weight, long ref, String memo) {
-        this.flags = flags;
-        this.weight = weight;
+    public ExLinkSource(byte[] data, int position) {
+        super(data);
+        this.memoBytes = new byte[this.flags];
+        System.arraycopy(data, position + BASE_LENGTH, memoBytes, 0, this.flags);
+    }
+
+    public ExLinkSource(byte[] type, long refLink, byte[] data, int position) {
+        super(type, refLink);
+        this.memoBytes = new byte[this.flags];
+        System.arraycopy(data, position + BASE_LENGTH, memoBytes, 0, this.flags);
+    }
+
+    public ExLinkSource(int weight, long ref, String memo) {
+        this.type = ExData.LINK_SOURCE_TYPE;
+        this.flags = (byte) weight;
         this.ref = ref;
         this.memo = memo;
         memoBytes = memo == null || memo.isEmpty() ? null : memo.getBytes(StandardCharsets.UTF_8);
     }
 
-    public ExSource(byte flags, int weight, long ref, byte[] memoBytes) {
+    public ExLinkSource(int weight, long ref, byte[] memoBytes) {
         this.memoBytes = memoBytes;
-        this.flags = flags;
-        this.weight = weight;
+        this.flags = (byte) memoBytes.length;
+        this.value1 = (byte) (weight >> 8);
+        this.value2 = (byte) weight;
         this.ref = ref;
-    }
-
-    public ExSource(byte[] data, int position) {
-        this.flags = data[position];
-        this.weight = Ints.fromBytes((byte) 0, (byte) 0, data[position + 2], data[position + 3]);
-
-        byte[] keyBuf = new byte[Longs.BYTES];
-        System.arraycopy(data, position + 4, keyBuf, 0, Long.BYTES);
-        ref = Longs.fromByteArray(keyBuf);
-
-        int memoLen = data[position + 1];
-        this.memoBytes = new byte[memoLen];
-        System.arraycopy(data, position + BASE_LENGTH, memoBytes, 0, memoLen);
-    }
-
-    public byte getFlags() {
-        return flags;
-    }
-
-    public long getRef() {
-        return ref;
-    }
-
-    public String viewRef() {
-        return Transaction.viewDBRef(ref);
     }
 
     public String getMemo() {
@@ -91,7 +60,7 @@ public class ExSource {
     }
 
     public int getWeight() {
-        return weight;
+        return Ints.fromBytes(0, 0, (byte) value1, (byte) value2);
     }
 
     public JSONObject makeJSONforHTML() {
@@ -127,8 +96,8 @@ public class ExSource {
         return data;
     }
 
-    public static ExSource parse(byte[] data, int position) throws Exception {
-        return new ExSource(data, position);
+    public static ExLinkSource parse(byte[] data, int position) throws Exception {
+        return new ExLinkSource(data, position);
     }
 
     public int length() {

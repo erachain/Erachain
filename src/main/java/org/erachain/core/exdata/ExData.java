@@ -11,6 +11,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.RSignNote;
@@ -97,7 +98,7 @@ public class ExData {
     private ExAuthor[] authors;
 
     private byte sourcesFlags;
-    private ExSource[] sources;
+    private ExLinkSource[] sources;
 
     private byte[] tags;
     private long templateKey;
@@ -152,7 +153,7 @@ public class ExData {
      */
     public ExData(byte[] flags, ExLink exLink, String title,
                   byte recipientsFlags, Account[] recipients,
-                  byte authorsFlags, ExAuthor[] authors, byte sourcesFlags, ExSource[] sources,
+                  byte authorsFlags, ExAuthor[] authors, byte sourcesFlags, ExLinkSource[] sources,
                   byte[] tags, JSONObject json, HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) {
         this.flags = flags;
 
@@ -194,7 +195,7 @@ public class ExData {
      */
     public ExData(byte[] flags, ExLink exLink, String title,
                   byte recipientsFlags, Account[] recipients,
-                  byte authorsFlags, ExAuthor[] authors, byte sourcesFlags, ExSource[] sources,
+                  byte authorsFlags, ExAuthor[] authors, byte sourcesFlags, ExLinkSource[] sources,
                   byte[] tags, byte secretsFlags, byte[][] secrets,
                   byte[] encryptedData) {
         this.flags = flags;
@@ -385,8 +386,8 @@ public class ExData {
         return authors == null ? new ExAuthor[0] : authors;
     }
 
-    public ExSource[] getSources() {
-        return sources == null ? new ExSource[0] : sources;
+    public ExLinkSource[] getSources() {
+        return sources == null ? new ExLinkSource[0] : sources;
     }
 
     public byte[] getTags() {
@@ -805,7 +806,7 @@ public class ExData {
                 byte authorsFlags;
                 ExAuthor[] authors;
                 byte sourcesFlags;
-                ExSource[] sources;
+                ExLinkSource[] sources;
                 byte[] tags;
                 boolean isEncrypted;
                 byte secretsFlags;
@@ -899,15 +900,15 @@ public class ExData {
                         int sourcesSize = Ints.fromByteArray(sizeBytes);
                         position += SOURCES_SIZE_LENGTH + 1;
 
-                        sources = new ExSource[sourcesSize];
+                        sources = new ExLinkSource[sourcesSize];
                         for (int i = 0; i < sourcesSize; i++) {
-                            sources[i] = new ExSource(data, position);
+                            sources[i] = new ExLinkSource(data, position);
                             position += sources[i].length();
                         }
 
                     } else {
                         sourcesFlags = 0;
-                        sources = new ExSource[0];
+                        sources = new ExLinkSource[0];
                     }
 
                     if ((flags[1] & TAGS_FLAG_MASK) > 0) {
@@ -1045,7 +1046,7 @@ public class ExData {
     }
 
     public static byte[] make(ExLink exLink, PrivateKeyAccount creator, String title, boolean signCanOnlyRecipients, Account[] recipients,
-                              ExAuthor[] authors, ExSource[] sources, String tagsStr, boolean isEncrypted,
+                              ExAuthor[] authors, ExLinkSource[] sources, String tagsStr, boolean isEncrypted,
                               TemplateCls template, HashMap<String, String> params_Template, boolean uniqueTemplate,
                               String message, boolean uniqueMessage,
                               HashMap<String, String> hashes_Map, boolean uniqueHashes,
@@ -1254,7 +1255,7 @@ public class ExData {
         if (sources != null && sources.length > 0) {
             output.put("Label_Sources", Lang.getInstance().translateFromLangObj("Sources", langObj));
             JSONArray sourcesOut = new JSONArray();
-            for (ExSource source : sources) {
+            for (ExLinkSource source : sources) {
                 sourcesOut.add(source.makeJSONforHTML());
             }
             output.put("sources", sourcesOut);
@@ -1425,7 +1426,7 @@ public class ExData {
 
         if (hasSources()) {
             JSONArray sources = new JSONArray();
-            for (ExSource source : getSources()) {
+            for (ExLinkSource source : getSources()) {
                 sources.add(source.toJson());
             }
             toJson.put("sourcesFlags", sourcesFlags);
@@ -1474,7 +1475,7 @@ public class ExData {
         }
 
         if (hasSources()) {
-            for (ExSource source : getSources()) {
+            for (ExLinkSource source : getSources()) {
                 result = source.isValid(dcSet);
                 if (result != Transaction.VALIDATE_OK) {
                     return result;
@@ -1511,7 +1512,7 @@ public class ExData {
             exLink.process(transaction);
 
         if (sources != null) {
-            for (ExSource source : sources) {
+            for (ExLinkSource source : sources) {
                 source.process(transaction);
             }
         }
@@ -1523,7 +1524,7 @@ public class ExData {
             exLink.orphan(transaction);
 
         if (sources != null) {
-            for (ExSource source : sources) {
+            for (ExLinkSource source : sources) {
                 source.orphan(transaction);
             }
         }

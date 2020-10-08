@@ -655,7 +655,7 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
                     byte[] encryptedBytes = AEScrypto.dataEncrypt(issueBytes, creator.getPrivateKey(), registrar.getPublicKey());
 
                     Transaction transaction = Controller.getInstance().r_Send(
-                            creator, feePow, registrar, 0L,
+                            creator, exLink, feePow, registrar, 0L,
                             null, "Person bytecode", encryptedBytes,
                             new byte[1], new byte[]{1}, 0);
 

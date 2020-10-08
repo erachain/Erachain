@@ -297,7 +297,7 @@ public class APIUtils {
         // TODO RSend insert!
         Integer result;
         // SEND ASSET PAYMENT
-        Transaction transaction = Controller.getInstance().r_Send(account, feePow, new Account(recipient),
+        Transaction transaction = Controller.getInstance().r_Send(account, exLink, feePow, new Account(recipient),
                 asset.getKey(DCSet.getInstance()), bdAmount, title,
                 message, isText, isEncrypted, 0);
         

@@ -14,6 +14,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
@@ -372,6 +373,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + REFERENCE_LENGTH;
     protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + TIMESTAMP_LENGTH + FEE_LENGTH;
 
+    public static final byte HAS_EXLINK_MASK = 32;
+
     /**
      * Используется для разделения строки поисковых слов для всех трнзакций.<br>
      * % и @ и # - пусть они будут служебные и по ним не делать разделения
@@ -417,6 +420,8 @@ public abstract class Transaction implements ExplorerJsonLine {
      * Для создания поисковых Меток - Тип сущности + номер ее. например @P12 - персона 12
      */
     protected Object[][] itemsKeys;
+
+    protected ExLink exLink;
 
     /**
      * если да то значит взята из Пула трнзакций и на двойную трату проверялась
@@ -1469,6 +1474,10 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         // WRITE CREATOR
         data = Bytes.concat(data, this.creator.getPublicKey());
+
+        if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
+            data = Bytes.concat(data, exLink.toBytes());
+        }
 
         if (forDeal > FOR_PACK) {
             // WRITE FEE POWER

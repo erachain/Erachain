@@ -409,7 +409,7 @@ public class RSendResource {
 
                     if (false) {
                         Transaction transaction = cnt.r_Send(creator,
-                                0, recipient,
+                                exLink, 0, recipient,
                                 2l, null, "LoadTest_" + address.substring(1, 5) + " " + counter,
                                 (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
                                 new byte[]{(byte) 1}, 0);
@@ -453,7 +453,7 @@ public class RSendResource {
                         }
                     } else {
 
-                        WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, (byte) 0, recipient, 2l, null,
+                        WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, exLink, (byte) 0, recipient, 2l, null,
                                 "LoadTest_" + address.substring(1, 5) + " " + counter,
                                 (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
                                 new byte[]{(byte) 1}, NTP.getTime(), 0l));
@@ -599,7 +599,7 @@ public class RSendResource {
                     if (false) {
                         // ERA - она еще форжинговые балансы изменяет - поэтому КОМПУ лучше всего
                         Transaction transaction = cnt.r_Send(creator,
-                                0, recipient,
+                                exLink, 0, recipient,
                                 2l, amount, "LoadTestSend_" + address.substring(1, 5) + " " + counter,
                                 (address + counter + "TEST SEND ERA").getBytes(StandardCharsets.UTF_8), encryptMessage,
                                 new byte[]{(byte) 1}, 0);
@@ -640,7 +640,7 @@ public class RSendResource {
 
                     } else {
 
-                        WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, (byte) 0, recipient, 2L,
+                        WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, exLink, (byte) 0, recipient, 2L,
                                 amount, "TEST" + counter, null, isText, encryptMessage, NTP.getTime(), 0l));
 
                         weakRef.get().sign(creator, Transaction.FOR_NETWORK);

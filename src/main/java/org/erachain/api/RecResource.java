@@ -7,6 +7,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
@@ -175,13 +176,18 @@ public class RecResource {
                         else
                             encryptMessage = new byte[]{1};
 
+                        ExLink exLink;
+                        step++;
+                        if (jsonObject.containsKey("exlink"))
+                            exLink = ExLink.parse(jsonObject.get("exlink"));
+
                     } catch (Exception e1) {
                         //logger.info(e1);
                         return APIUtils.errorMess(-step, e1.toString() + " on step: " + step);
                     }
                     record = new RSend((byte) version, (byte) property1, (byte) property2,
                             creatorPK,
-                            (byte) feePow, recipient, key, amount, head,
+                            exLink, (byte) feePow, recipient, key, amount, head,
                             data, isText, encryptMessage, timestamp, reference);
 
                     break;

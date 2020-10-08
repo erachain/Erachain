@@ -831,6 +831,39 @@ public class WebTransactionsHTML {
         }
 
         try (IteratorCloseable<Long> appendixListIterator = DCSet.getInstance().getExLinksMap()
+                .getLinksIterator(parentTx.getDBRef(), ExData.LINK_SOURCE_TYPE, false)) {
+            List<Long> appendixes = new ArrayList<>();
+            while (appendixListIterator.hasNext()) {
+                appendixes.add(appendixListIterator.next());
+            }
+            if (!appendixes.isEmpty()) {
+                TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
+
+                out += "<h2>" + Lang.getInstance().translateFromLangObj("Usage", langObj)
+                        + "</h2>";
+
+                int count = 0;
+                for (Long txKey : appendixes) {
+
+                    Transaction childTx = map.get(txKey);
+                    out += "<h3>" + childTx.getTitle() + "</h3>";
+                    out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
+                            + childTx.viewHeightSeq() + "</a> "
+                            + " " + DateTimeFormat.timestamptoString(childTx.getTimestamp()) + " ";
+                    out += "<a href=?address="
+                            + childTx.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + childTx.getCreator().getPersonAsString()
+                            + "</b></a><br>";
+
+                }
+
+                ///out += "</table>";
+
+            }
+        } catch (IOException e) {
+            output.put("error", e.getMessage());
+        }
+
+        try (IteratorCloseable<Long> appendixListIterator = DCSet.getInstance().getExLinksMap()
                 .getLinksIterator(parentTx.getDBRef(), ExData.LINK_REPLY_COMMENT_TYPE, false)) {
             List<Long> appendixes = new ArrayList<>();
             while (appendixListIterator.hasNext()) {

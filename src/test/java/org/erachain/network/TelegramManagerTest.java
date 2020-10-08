@@ -90,7 +90,7 @@ public class TelegramManagerTest {
             //transaction = cntr.r_Send(
             //        sender, FEE_POWER, recipient1, 0l, amount,
             //        title + i, isText, data, encrypted);
-            transaction = new RSend(sender, FEE_POWER, recipient1, 0l, amount, title + i, message, isText, encrypted, timestamp, 0l);
+            transaction = new RSend(sender, exLink, FEE_POWER, recipient1, 0l, amount, title + i, message, isText, encrypted, timestamp, 0l);
             transaction.sign(sender, Transaction.FOR_NETWORK);
 
 
@@ -192,7 +192,7 @@ public class TelegramManagerTest {
 
             String message = user + ":" + randomPrice;
 
-            Transaction transaction = new RSend(creator, (byte) 0, recipient, 0, amount, phone,
+            Transaction transaction = new RSend(creator, exLink, (byte) 0, recipient, 0, amount, phone,
                     message.getBytes(), new byte[1], new byte[1],
                     System.currentTimeMillis(), 0l);
             transaction.sign(creator, Transaction.FOR_NETWORK);
@@ -257,7 +257,7 @@ public class TelegramManagerTest {
 
         String message = "{\"info\":\"sldkf jslkfd jsldfk\"}";
 
-        transaction = new RSend(sender, (byte) 0, recipient1, 0, amount, "---",
+        transaction = new RSend(sender, exLink, (byte) 0, recipient1, 0, amount, "---",
                 message.getBytes(), new byte[1], new byte[1],
                 System.currentTimeMillis(), 0l);
         transaction.sign(sender, Transaction.FOR_NETWORK);
@@ -272,7 +272,7 @@ public class TelegramManagerTest {
         message = "{\"info\":\"sldkf jslkfd jsldfk\",\"__DELETE\":{\"list\":[\""
                 + transaction.viewSignature() + "\"]}}";
 
-        transaction = new RSend(sender, (byte) 0, recipient1, 0, amount, "---",
+        transaction = new RSend(sender, exLink, (byte) 0, recipient1, 0, amount, "---",
                 message.getBytes(), new byte[]{1}, new byte[1],
                 System.currentTimeMillis(), 0l);
         transaction.sign(sender, Transaction.FOR_NETWORK);

@@ -115,7 +115,7 @@ public class TestRecSendOutsideClaims {
         RSend r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                maker, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
+                maker, exLink, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -125,7 +125,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                recipientPK, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -135,7 +135,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                recipientPK, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -146,7 +146,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                maker, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
+                maker, exLink, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -171,7 +171,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                recipientPK, FEE_POWER, recipient2, keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, FEE_POWER, recipient2, keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -196,7 +196,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                recipientPK, FEE_POWER, recipient2, credit_keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, FEE_POWER, recipient2, credit_keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -206,7 +206,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 this.prop1_backward,
                 prop2,
-                recipientPK, FEE_POWER, recipient2, credit_keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, FEE_POWER, recipient2, credit_keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -216,7 +216,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                recipientPK2, FEE_POWER, maker, credit_keyA, new BigDecimal(2), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK2, exLink, FEE_POWER, maker, credit_keyA, new BigDecimal(2), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK2, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -226,7 +226,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                recipientPK, FEE_POWER, maker, credit_keyA, new BigDecimal(2), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, FEE_POWER, maker, credit_keyA, new BigDecimal(2), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -250,7 +250,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                recipientPK, FEE_POWER, maker, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, FEE_POWER, maker, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -277,7 +277,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                maker, FEE_POWER, recipientPK, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
+                maker, exLink, FEE_POWER, recipientPK, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -287,7 +287,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                recipientPK, FEE_POWER, maker, keyA, new BigDecimal(10), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, FEE_POWER, maker, keyA, new BigDecimal(10), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -297,7 +297,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                recipientPK, FEE_POWER, maker, keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, FEE_POWER, maker, keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -328,7 +328,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                recipientPK2, FEE_POWER, maker, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK2, exLink, FEE_POWER, maker, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK2, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -340,7 +340,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                recipientPK2, FEE_POWER, maker, keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK2, exLink, FEE_POWER, maker, keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK2, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 

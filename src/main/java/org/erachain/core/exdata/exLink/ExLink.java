@@ -152,6 +152,21 @@ public class ExLink {
         return data;
     }
 
+    public static ExLink parse(JSONObject json) throws Exception {
+        int type = (int) (long) (Long) json.get("type");
+        switch (type) {
+            case ExData.LINK_REPLY_COMMENT_TYPE:
+                return new ExLinkReply(json);
+            case ExData.LINK_APPENDIX_TYPE:
+                return new ExLinkAppendix(json);
+            case ExData.LINK_SOURCE_TYPE:
+                return new ExLinkSou(json);
+            // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
+        }
+
+        throw new Exception("wrong type: " + data[0]);
+    }
+
     public static ExLink parse(byte[] data) throws Exception {
         switch (data[0]) {
             case ExData.LINK_REPLY_COMMENT_TYPE:
