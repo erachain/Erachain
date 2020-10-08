@@ -21,7 +21,7 @@ public abstract class ExLinkMemo extends ExLink {
     }
 
     public ExLinkMemo(byte[] data, int position) {
-        super(data);
+        super(data, position);
         int memoSize = data[position + BASE_LENGTH];
         this.memoBytes = new byte[memoSize];
         System.arraycopy(data, position + BASE_LENGTH + 1, memoBytes, 0, memoSize);

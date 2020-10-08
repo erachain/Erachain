@@ -2,7 +2,9 @@ package org.erachain.gui.exdata.authors;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.exdata.exLink.ExLinkAuthor;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonHuman;
+import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 
 import javax.swing.table.DefaultTableModel;
@@ -115,13 +117,21 @@ public class AuthorsModel extends DefaultTableModel {
         Iterator iterator = this.dataVector.iterator();
         while (iterator.hasNext()) {
             Vector item = (Vector) iterator.next();
-            if (item.elementAt(NAME_COL).equals("")) {
+            Long personKey;
+            try {
+                personKey = (Long) item.elementAt(KEY_COL);
+                ItemCls person = DCSet.getInstance().getItemPersonMap().get(personKey);
+                if (person == null) {
+                    // персоны такой нет
+                    continue;
+                }
+            } catch (Exception e) {
                 // персоны такой нет
                 continue;
             }
 
             temp.add(new ExLinkAuthor((byte) 0, (Integer) item.elementAt(SHARE_COL),
-                    (Long) item.elementAt(KEY_COL), ((String) item.elementAt(MEMO_COL)).getBytes(StandardCharsets.UTF_8)));
+                    personKey, ((String) item.elementAt(MEMO_COL)).getBytes(StandardCharsets.UTF_8)));
         }
 
         return temp.toArray(new ExLinkAuthor[0]);
