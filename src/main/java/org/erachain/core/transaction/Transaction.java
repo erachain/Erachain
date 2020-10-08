@@ -414,7 +414,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected PersonCls creatorPerson;
 
     /**
-     * Для создания поисковых Меток - Тип сущности + номер. например @A12
+     * Для создания поисковых Меток - Тип сущности + номер ее. например @P12 - персона 12
      */
     protected Object[][] itemsKeys;
 

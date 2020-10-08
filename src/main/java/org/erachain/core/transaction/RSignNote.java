@@ -10,7 +10,10 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
+import org.erachain.core.exdata.ExAuthor;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.ExSource;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapSigns;
@@ -21,6 +24,7 @@ import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -151,20 +155,42 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public void makeItemsKeys() {
-        if (creatorPersonDuration != null && key != 0) {
-            itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
-                    new Object[]{ItemCls.TEMPLATE_TYPE, key}
-            };
-        } else if (creatorPersonDuration != null) {
-            itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a}
-            };
-        } else if (key != 0) {
-            itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.TEMPLATE_TYPE, key}
-            };
+
+        ArrayList<Object> listTags = new ArrayList<>();
+
+        ExLink exLink = extendedData.getExLink();
+        if (exLink != null) {
+            listTags.add(new Object[]{ItemCls.SEQNO_TYPE, exLink.viewRef()});
         }
+
+        if (creatorPersonDuration != null) {
+            listTags.add(new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a});
+        }
+
+        if (key != 0) {
+            listTags.add(new Object[]{ItemCls.TEMPLATE_TYPE, key});
+        }
+
+        if (extendedData.hasAuthors()) {
+            for (ExAuthor author : extendedData.getAuthors()) {
+                listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, author.getKey()});
+            }
+        }
+
+        if (extendedData.hasAuthors()) {
+            for (ExAuthor author : extendedData.getAuthors()) {
+                listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, author.getKey()});
+            }
+        }
+
+        if (extendedData.hasSources()) {
+            for (ExSource source : extendedData.getSources()) {
+                listTags.add(new Object[]{ItemCls.SEQNO_TYPE, source.viewRef()});
+            }
+        }
+
+        itemsKeys = listTags.toArray(itemsKeys);
+
     }
 
     @Override

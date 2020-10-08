@@ -76,6 +76,10 @@ public class ExSource {
         return ref;
     }
 
+    public String viewRef() {
+        return Transaction.viewDBRef(ref);
+    }
+
     public String getMemo() {
         if (memo == null) {
             if (memoBytes == null || memoBytes.length == 0)

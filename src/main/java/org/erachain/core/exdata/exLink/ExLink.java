@@ -77,6 +77,10 @@ public class ExLink {
         return ref;
     }
 
+    public String viewRef() {
+        return Transaction.viewDBRef(ref);
+    }
+
     public byte getType() {
         return type;
     }
