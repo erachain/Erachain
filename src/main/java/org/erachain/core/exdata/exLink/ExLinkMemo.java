@@ -23,8 +23,12 @@ public abstract class ExLinkMemo extends ExLink {
     public ExLinkMemo(byte[] data, int position) {
         super(data, position);
         int memoSize = data[position + BASE_LENGTH];
-        this.memoBytes = new byte[memoSize];
-        System.arraycopy(data, position + BASE_LENGTH + 1, memoBytes, 0, memoSize);
+        if (memoSize > 0) {
+            this.memoBytes = new byte[memoSize];
+            System.arraycopy(data, position + BASE_LENGTH + 1, memoBytes, 0, memoSize);
+        } else {
+            memoBytes = null;
+        }
     }
 
     public ExLinkMemo(byte type, byte flags, int value, long ref, byte[] memoBytes) {
@@ -63,16 +67,18 @@ public abstract class ExLinkMemo extends ExLink {
         return json;
     }
 
+    @Override
     public byte[] toBytes() {
         int memoSize = memoBytes == null ? 0 : memoBytes.length;
-        byte[] data = new byte[BASE_LENGTH + memoSize];
+        byte[] data = new byte[BASE_LENGTH + 1 + memoSize];
         data[0] = flags;
-        data[1] = (byte) memoSize;
+        data[1] = flags;
         data[2] = value1;
         data[3] = value2;
         System.arraycopy(Longs.toByteArray(ref), 0, data, 4, Long.BYTES);
+        data[BASE_LENGTH] = (byte) memoSize;
         if (memoSize > 0)
-            System.arraycopy(memoBytes, 0, data, BASE_LENGTH, memoSize);
+            System.arraycopy(memoBytes, 0, data, BASE_LENGTH + 1, memoSize);
 
         return data;
     }

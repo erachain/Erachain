@@ -69,6 +69,16 @@ public class ExLink {
         ref = Longs.fromByteArray(refBuf);
     }
 
+    public ExLink(byte[] data, int position) {
+        this.type = data[position];
+        this.flags = data[position + 1];
+        this.value1 = data[position + 2];
+        this.value2 = data[position + 3];
+        byte[] refBuf = new byte[Longs.BYTES];
+        System.arraycopy(data, position + 4, refBuf, 0, Long.BYTES);
+        ref = Longs.fromByteArray(refBuf);
+    }
+
     public ExLink(byte[] type, long ref) {
         this.type = type[0];
         this.flags = type[1];
