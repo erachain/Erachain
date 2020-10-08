@@ -3,6 +3,7 @@ package org.erachain.core.exdata.exLink;
 import com.google.common.primitives.Longs;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 
 public class ExLink {
@@ -98,6 +99,13 @@ public class ExLink {
 
     public byte getValue2() {
         return value2;
+    }
+
+    public Object getParent(DCSet dcSet) {
+        if (type == ExData.LINK_AUTHOR_TYPE) {
+            return dcSet.getItemPersonMap().get(ref);
+        }
+        return dcSet.getTransactionFinalMap().get(ref);
     }
 
     public String viewTypeName(boolean hasRecipients) {

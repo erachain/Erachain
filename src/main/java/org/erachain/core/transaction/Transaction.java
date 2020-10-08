@@ -763,6 +763,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         return "";
     }
 
+    public ExLink getExLink() {
+        return exLink;
+    }
+
     public void makeItemsKeys() {
         if (creatorPersonDuration != null) {
             itemsKeys = new Object[][]{
