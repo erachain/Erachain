@@ -2,7 +2,6 @@ package org.erachain.core.exdata.exLink;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
@@ -18,6 +17,17 @@ public abstract class ExLinkMemo extends ExLink {
         super(type, parentSeqNo);
         this.memo = memo;
         memoBytes = memo == null || memo.isEmpty() ? null : memo.getBytes(StandardCharsets.UTF_8);
+    }
+
+    public ExLinkMemo(byte[] data) {
+        super(data);
+        int memoSize = data[BASE_LENGTH];
+        if (memoSize > 0) {
+            this.memoBytes = new byte[memoSize];
+            System.arraycopy(data, BASE_LENGTH + 1, memoBytes, 0, memoSize);
+        } else {
+            memoBytes = null;
+        }
     }
 
     public ExLinkMemo(byte[] data, int position) {
@@ -81,17 +91,6 @@ public abstract class ExLinkMemo extends ExLink {
             System.arraycopy(memoBytes, 0, data, BASE_LENGTH + 1, memoSize);
 
         return data;
-    }
-
-    public static ExLinkMemo parse(byte[] data, int position) throws Exception {
-        switch (data[0]) {
-            case ExData.LINK_SOURCE_TYPE:
-                return new ExLinkSource(data, position);
-            case ExData.LINK_AUTHOR_TYPE:
-                return new ExLinkAuthor(data, position);
-        }
-
-        throw new Exception("wrong type: " + data[0]);
     }
 
     public int length() {

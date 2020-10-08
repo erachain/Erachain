@@ -12,6 +12,10 @@ public class ExLinkAuthor extends ExLinkMemo {
         super(ExData.LINK_AUTHOR_TYPE, parentSeqNo, memo);
     }
 
+    public ExLinkAuthor(byte[] data) {
+        super(data);
+    }
+
     public ExLinkAuthor(byte[] data, int position) {
         super(data, position);
     }

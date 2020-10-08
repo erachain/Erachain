@@ -181,8 +181,9 @@ public class ExLink {
         int type = (int) (long) (Long) json.get("type");
         switch (type) {
             case ExData.LINK_AUTHOR_TYPE:
+                //return new ExLinkAuthor(json);
             case ExData.LINK_SOURCE_TYPE:
-                return ExLinkMemo.parse(json);
+                //return new ExLinkSource(json);
         }
 
         throw new Exception("wrong type: " + type);
@@ -195,8 +196,9 @@ public class ExLink {
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(data);
             case ExData.LINK_AUTHOR_TYPE:
+                return new ExLinkAuthor(data);
             case ExData.LINK_SOURCE_TYPE:
-                return ExLinkMemo.parse(data);
+                return new ExLinkSource(data);
             // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 
@@ -211,9 +213,6 @@ public class ExLink {
                 return new ExLinkReply(type, refLink);
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(type, refLink);
-            case ExData.LINK_AUTHOR_TYPE:
-            case ExData.LINK_SOURCE_TYPE:
-                return ExLinkMemo.parse(type, refLinkBytes);
             // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 
@@ -232,9 +231,6 @@ public class ExLink {
                 return new ExLinkReply(typeBuffer, refLink);
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(typeBuffer, refLink);
-            case ExData.LINK_AUTHOR_TYPE:
-            case ExData.LINK_SOURCE_TYPE:
-                return ExLinkMemo.parse(data, position);
             // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 

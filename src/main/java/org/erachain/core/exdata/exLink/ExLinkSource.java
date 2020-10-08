@@ -12,6 +12,10 @@ public class ExLinkSource extends ExLinkMemo {
         super(ExData.LINK_SOURCE_TYPE, parentSeqNo, memo);
     }
 
+    public ExLinkSource(byte[] data) {
+        super(data);
+    }
+
     public ExLinkSource(byte[] data, int position) {
         super(data, position);
     }
