@@ -648,6 +648,10 @@ public class ExData {
         int JSONSize = Ints.fromByteArray(jsonSizeBytes);
         position += Transaction.DATA_JSON_PART_LENGTH;
 
+        if (JSONSize == 0) {
+            return new Fun.Tuple2<>(null, null);
+        }
+
         //READ JSON
         byte[] jsonData = Arrays.copyOfRange(data, position, position + JSONSize);
 
@@ -888,7 +892,7 @@ public class ExData {
                         for (int i = 0; i < authorsSize; i++) {
                             authors[i] = new ExLinkAuthor(data, position);
                             position += authors[i].length();
-                            ExLink exLink1 = ExLink.parse(authors[i].toBytes());
+                            //ExLink exLink1 = ExLink.parse(authors[i].toBytes());
                         }
 
                     } else {
