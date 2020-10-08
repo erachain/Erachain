@@ -3271,7 +3271,7 @@ public class Controller extends Observable {
         }
     }
 
-    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, String recipientStr,
+    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink exLink, String recipientStr,
                                                   int feePow, long assetKey, boolean checkAsset, BigDecimal amount, boolean needAmount,
                                                   String title, String message, int messagecode, boolean encrypt, long timestamp) {
 

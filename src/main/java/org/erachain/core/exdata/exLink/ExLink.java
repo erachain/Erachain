@@ -54,8 +54,7 @@ public class ExLink {
 
     public ExLink(byte type, long ref) {
         this.type = type;
-        this.flags = 0;
-        value1 = value2 = 0;
+        flags = value1 = value2 = 0;
         this.ref = ref;
     }
 
@@ -163,16 +162,12 @@ public class ExLink {
     public static ExLink parse(JSONObject json) throws Exception {
         int type = (int) (long) (Long) json.get("type");
         switch (type) {
-            case ExData.LINK_REPLY_COMMENT_TYPE:
-                return new ExLinkReply(json);
-            case ExData.LINK_APPENDIX_TYPE:
-                return new ExLinkAppendix(json);
+            case ExData.LINK_AUTHOR_TYPE:
             case ExData.LINK_SOURCE_TYPE:
-                return new ExLinkSou(json);
-            // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
+                return ExLinkMemo.parse(json);
         }
 
-        throw new Exception("wrong type: " + data[0]);
+        throw new Exception("wrong type: " + type);
     }
 
     public static ExLink parse(byte[] data) throws Exception {
@@ -181,6 +176,9 @@ public class ExLink {
                 return new ExLinkReply(data);
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(data);
+            case ExData.LINK_AUTHOR_TYPE:
+            case ExData.LINK_SOURCE_TYPE:
+                return ExLinkMemo.parse(data);
             // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 
@@ -195,6 +193,9 @@ public class ExLink {
                 return new ExLinkReply(type, refLink);
             case ExData.LINK_APPENDIX_TYPE:
                 return new ExLinkAppendix(type, refLink);
+            case ExData.LINK_AUTHOR_TYPE:
+            case ExData.LINK_SOURCE_TYPE:
+                return ExLinkMemo.parse(type, refLinkBytes);
             // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 

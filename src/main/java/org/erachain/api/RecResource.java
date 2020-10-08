@@ -127,6 +127,7 @@ public class RecResource {
 
                 case Transaction.SEND_ASSET_TRANSACTION:
 
+                    ExLink exLink = null;
                     Account recipient = null;
                     long key = 0;
                     BigDecimal amount = null;
@@ -176,10 +177,9 @@ public class RecResource {
                         else
                             encryptMessage = new byte[]{1};
 
-                        ExLink exLink;
                         step++;
                         if (jsonObject.containsKey("exlink"))
-                            exLink = ExLink.parse(jsonObject.get("exlink"));
+                            exLink = ExLink.parse((JSONObject) jsonObject.get("exlink"));
 
                     } catch (Exception e1) {
                         //logger.info(e1);

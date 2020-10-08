@@ -82,8 +82,7 @@ public abstract class ExLinkMemo extends ExLink {
             case ExData.LINK_SOURCE_TYPE:
                 return new ExLinkSource(data, position);
             case ExData.LINK_AUTHOR_TYPE:
-                return new ExLinkAppendix(data);
-            // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
+                return new ExLinkAuthor(data, position);
         }
 
         throw new Exception("wrong type: " + data[0]);

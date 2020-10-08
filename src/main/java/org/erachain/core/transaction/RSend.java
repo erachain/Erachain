@@ -246,7 +246,8 @@ public class RSend extends TransactionAmount {
 
         ExLink exLink;
         if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
-
+            exLink = ExLink.parse(data, position);
+            position += exLink.length();
         } else {
             exLink = null;
         }
