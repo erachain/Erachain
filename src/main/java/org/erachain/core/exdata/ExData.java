@@ -1475,6 +1475,8 @@ public class ExData {
         }
 
         if (hasAuthors()) {
+            if (!rNote.isCreatorPersonalized()) return Transaction.CREATOR_NOT_PERSONALIZED;
+
             for (ExLinkAuthor author : getAuthors()) {
                 result = author.isValid(dcSet);
                 if (result != Transaction.VALIDATE_OK) {

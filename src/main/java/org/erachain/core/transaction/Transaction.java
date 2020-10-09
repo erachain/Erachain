@@ -1177,6 +1177,14 @@ public abstract class Transaction implements ExplorerJsonLine {
         return false;
     }
 
+    public Fun.Tuple4<Long, Integer, Integer, Integer> getCreatorPersonDuration() {
+        return creatorPersonDuration;
+    }
+
+    public boolean isCreatorPersonalized() {
+        return creatorPersonDuration != null;
+    }
+
     ////
     // VIEW
     public String viewType() {
