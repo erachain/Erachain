@@ -516,38 +516,38 @@ public class GenesisBlock extends Block {
     public static AssetVenture makeAsset(long key) {
         switch ((int) key) {
             case (int) AssetCls.ERA_KEY:
-                return new AssetVenture(CREATOR, AssetCls.ERA_NAME, icon, image, AssetCls.ERA_DESCR, 0, 8, 0l);
+                return new AssetVenture(CREATOR, AssetCls.ERA_NAME, icon, image, AssetCls.ERA_DESCR, 0, 8, 0L);
             case (int) AssetCls.FEE_KEY:
-                return new AssetVenture(CREATOR, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, 0, 8, 0l);
+                return new AssetVenture(CREATOR, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, 0, 8, 0L);
             case (int) AssetCls.TRUST_KEY:
-                return new AssetVenture(CREATOR, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, 0, 8, 0l);
+                return new AssetVenture(CREATOR, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, 0, 8, 0L);
             case (int) AssetCls.REAL_KEY:
-                return new AssetVenture(CREATOR, AssetCls.REAL_NAME, icon, image, AssetCls.REAL_DESCR, 0, 8, 0l);
+                return new AssetVenture(CREATOR, AssetCls.REAL_NAME, icon, image, AssetCls.REAL_DESCR, 0, 8, 0L);
             case (int) AssetCls.REAL_KEY + 1:
                 return new AssetVenture(
                         CREATOR,
                         "РА", icon, image, "Единица Ра",
-                        0, 8, 0l);
+                        0, 8, 0L);
             case (int) AssetCls.REAL_KEY + 2:
                 return new AssetVenture(
                         CREATOR,
                         "RUNEURO", icon, image, "RuNeuro",
-                        0, 8, 0l);
+                        0, 8, 0L);
             case (int) AssetCls.REAL_KEY + 3:
                 return new AssetVenture(
                         CREATOR,
                         "ERG", icon, image, "1 миллион ЕРГ. Основная учётная единица, мера полезного ЭНЕРГОПОТОКА (пользы для ноосферы) управления данной средой - ЭРГ (ERG). Для обеспчения жизни на земле постоянно требуется поток энергии. Из общего потока энергии полезный поток всегда меньше полного. Отношение полезного энергопотока к полному энергопотоку = КПД Системы.",
-                        0, 8, 0l);
+                        0, 8, 0L);
             case (int) AssetCls.REAL_KEY + 4:
                 return new AssetVenture(
                         CREATOR,
                         "LERG", icon, image, "1 миллион потраченных ЕРГ - ПЭРГ (Lost ERG)",
-                        0, 8, 0l);
+                        0, 8, 0L);
             case (int) AssetCls.REAL_KEY + 5:
                 return new AssetVenture(
                         new PublicKeyAccount(Base58.decode("5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF")),
                         "A", icon, image, "ARONICLE.COM shares",
-                        0, 8, 0l);
+                        0, 8, 0L);
         }
         return null;
     }
@@ -626,7 +626,7 @@ public class GenesisBlock extends Block {
             // MAKE OLD STYLE ASSET with DEVISIBLE:
             // PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
             asset = new AssetVenture((byte) 0, asset.getOwner(), asset.getName(),
-                    asset.getIcon(), asset.getImage(), asset.getDescription(), AssetCls.AS_INSIDE_ASSETS, 8, 0l);
+                    asset.getIcon(), asset.getImage(), asset.getDescription(), AssetCls.AS_INSIDE_ASSETS, 8, 0L);
             transactions.add(new GenesisIssueAssetTransaction(asset));
         }
 
@@ -774,7 +774,7 @@ public class GenesisBlock extends Block {
         byte[] transactionsSignatures = new byte[0];
         for (Transaction transaction : this.getTransactions()) {
             transaction.setDC(db);
-            if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
+            if (transaction.isValid(Transaction.FOR_NETWORK, 0L) != Transaction.VALIDATE_OK) {
                 return INVALID_BLOCK_VERSION;
             }
             transactionsSignatures = Bytes.concat(transactionsSignatures, transaction.getSignature());
@@ -798,7 +798,7 @@ public class GenesisBlock extends Block {
         super.process(dcSet);
 
         if (false) {
-            AssetVenture item = new AssetVenture(CREATOR, AssetCls.LIA_NAME, null, null, AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
+            AssetVenture item = new AssetVenture(CREATOR, AssetCls.LIA_NAME, null, null, AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0L);
             item.setReference(this.signature);
             dcSet.getItemAssetMap().put(AssetCls.LIA_KEY, item);
         }
