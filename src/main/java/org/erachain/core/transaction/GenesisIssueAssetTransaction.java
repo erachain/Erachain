@@ -76,25 +76,19 @@ public class GenesisIssueAssetTransaction extends GenesisIssueItemRecord {
 
         super.process(block, forDeal);
 
-        Account owner = item.getOwner();
-        Long novaKey = item.isNovaAsset(owner, dcSet);
-        if (novaKey > 0) {
-            // ЭТО ЗАДАННЫЙ актив
-            AssetCls asset = (AssetCls) item;
-            long quantity = asset.getQuantity();
-            if (quantity > 0L) {
-                // надо добавить баланс на счет
-                owner.changeBalance(dcSet, false, false, novaKey,
-                        new BigDecimal(quantity).setScale(0), false, false);
+        AssetCls asset = (AssetCls) item;
+        long quantity = asset.getQuantity();
+        if (quantity > 0L) {
+            Account owner = item.getOwner();
+            Long assetKey = item.getKey(dcSet);
+            // надо добавить баланс на счет
+            owner.changeBalance(dcSet, false, false, assetKey,
+                    new BigDecimal(quantity).setScale(0), false, false);
 
-                // make HOLD balance
-                owner.changeBalance(dcSet, false, true, novaKey,
-                        new BigDecimal(-quantity).setScale(0), false, false);
-            }
-
+            // make HOLD balance
+            owner.changeBalance(dcSet, false, true, assetKey,
+                    new BigDecimal(-quantity).setScale(0), false, false);
         }
-
     }
-
 
 }
