@@ -1,5 +1,8 @@
 # Blockchain platform Erachain
 
+## Extra-minimg and Extra-staking
+see 
+
 For clone code:  
 1. Use InteliJ IDEA - New > Project from Version Control...
 1. After load project - import Gradle project
