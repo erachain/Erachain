@@ -12,6 +12,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exLink.ExLinkAuthor;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapSigns;
@@ -204,6 +205,22 @@ public class RSignNote extends Transaction implements Itemable {
 
     public Account[] getRecipients() {
         return extendedData.getRecipients();
+    }
+
+    public boolean hasAuthors() {
+        return extendedData.hasAuthors();
+    }
+
+    public boolean hasSources() {
+        return extendedData.hasSources();
+    }
+
+    public ExLinkAuthor[] getAuthors() {
+        return extendedData.getAuthors();
+    }
+
+    public ExLinkSource[] getSources() {
+        return extendedData.getSources();
     }
 
     public static int getSignersLength(byte[] typeBytes) {
@@ -711,12 +728,26 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public long calcBaseFee() {
+
+        long fee = calcCommonFee();
         byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
 
-        if (allHashes == null) {
-            return calcCommonFee();
+        if (allHashes != null) {
+            fee += allHashes.length * 100 * BlockChain.FEE_PER_BYTE;
         }
-        return calcCommonFee() + allHashes.length * 100;
+
+        if (exLink != null)
+            fee += 100 * BlockChain.FEE_PER_BYTE;
+
+        if (extendedData.hasAuthors()) {
+            fee += extendedData.getAuthors().length * 100 * BlockChain.FEE_PER_BYTE;
+        }
+
+        if (extendedData.hasSources()) {
+            fee += extendedData.getSources().length * 100 * BlockChain.FEE_PER_BYTE;
+        }
+
+        return fee;
     }
 
     public void parseDataV2WithoutFiles() {
@@ -731,6 +762,7 @@ public class RSignNote extends Transaction implements Itemable {
                 error++;
             }
             extendedData.resolveValues(dcSet);
+            exLink = extendedData.getExLink();
         }
     }
 
@@ -750,6 +782,7 @@ public class RSignNote extends Transaction implements Itemable {
             }
 
             extendedData.resolveValues(dcSet);
+            exLink = extendedData.getExLink();
         }
     }
 

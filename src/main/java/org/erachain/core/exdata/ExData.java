@@ -437,6 +437,7 @@ public class ExData {
         if (Transaction.hasPublicText(title, null, false, false)
                 || message != null && !message.isEmpty()
                 || templateKey > 0
+                || hasAuthors()
                 || files != null && !files.isEmpty())
             return true;
 
