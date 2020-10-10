@@ -141,10 +141,13 @@ function statement(data) {
 
     if (data.hasOwnProperty('authors')) {
         output += '<b>' + data.Label_authors + '</b>:';
+        var index = 1;
         for (i in data.authors) {
-            output += '<br>' + i + '. ' + data.authors[i].share + ' x ';
+            output += '<br>' + index++ + '. ' + data.authors[i].share + ' x ';
             output += '<a href=?person=' + data.authors[i].ref + get_lang() + '><b>' + data.authors[i].name + '</b></a>';
-            output += ' - ' + data.authors[i].memo;
+            if (data.authors[i].hasOwnProperty('memo')) {
+                output += ' - ' + data.authors[i].memo;
+            }
         }
         output += '<hr>';
     }
@@ -197,10 +200,13 @@ function statement(data) {
 
     if (data.hasOwnProperty('sources')) {
         output += '<b>' + data.Label_sources + '</b>:';
+        var index = 1;
         for (i in data.sources) {
-            output += '<br>' + i + '. ' + data.sources[i].weight + ' x ';
-            output += '<a href=?tx=' + data.sources[i].ref + get_lang() + '><b>' + data.sources[i].title + '</b></a>';
-            output += ' - ' + data.sources[i].memo;
+            output += '<br>' + index++ + '. ' + data.sources[i].weight + ' x ';
+            output += '<a href=?tx=' + data.sources[i].ref + get_lang() + '><b>' + data.sources[i].name + '</b></a>';
+            if (data.sources[i].hasOwnProperty('memo')) {
+                output += ' - ' + data.sources[i].memo;
+            }
         }
         output += '<hr>';
     }

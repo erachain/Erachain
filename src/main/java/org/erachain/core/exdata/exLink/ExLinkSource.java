@@ -26,14 +26,15 @@ public class ExLinkSource extends ExLinkMemo {
 
     public JSONObject makeJSONforHTML(JSONObject langObj) {
         JSONObject json = super.makeJSONforHTML(langObj);
-        json.put("title", Controller.getInstance().getTransaction(ref).getTitle());
+        json.put("name", Controller.getInstance().getTransaction(ref).toStringShortAsCreator());
+        json.put("weight", getValue());
 
         return json;
     }
 
     public JSONObject toJson() {
         JSONObject json = super.toJson(false);
-        json.put("ref", Transaction.viewDBRef(ref));
+        json.put("weight", getValue());
 
         return json;
     }

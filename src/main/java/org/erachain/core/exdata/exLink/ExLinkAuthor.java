@@ -27,6 +27,15 @@ public class ExLinkAuthor extends ExLinkMemo {
     public JSONObject makeJSONforHTML(JSONObject langObj) {
         JSONObject json = super.makeJSONforHTML(langObj);
         json.put("name", Controller.getInstance().getPerson(ref).getName());
+        json.put("share", getValue());
+        json.put("ref", ref);
+
+        return json;
+    }
+
+    public JSONObject toJson() {
+        JSONObject json = super.toJson(false);
+        json.put("share", getValue());
         json.put("ref", ref);
 
         return json;
