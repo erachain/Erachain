@@ -5,6 +5,8 @@ import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -61,6 +63,21 @@ public class AuthorsPanel extends JPanel {
         jScrollPaneAuthors.setOpaque(false);
         jScrollPaneAuthors.setPreferredSize(new Dimension(0, 0));
 
+
+        TableColumnModel columnModel = jTableAuthors.getColumnModel();
+        TableColumn columnNo = columnModel.getColumn(AuthorsModel.KEY_COL);
+        columnNo.setMinWidth(50);
+        columnNo.setMaxWidth(150);
+        columnNo.setPreferredWidth(50);
+        columnNo.setWidth(50);
+        columnNo.sizeWidthToFit();
+
+        TableColumn columnShare = columnModel.getColumn(AuthorsModel.SHARE_COL);
+        columnShare.setMinWidth(100);
+        columnShare.setMaxWidth(150);
+        columnShare.setPreferredWidth(100);
+        columnShare.setWidth(100);
+        columnShare.sizeWidthToFit();
 
 
         jTableAuthors.setVisible(true);

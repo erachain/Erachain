@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Vector;
 
 public class AuthorsModel extends DefaultTableModel {
-    private static final int KEY_COL = 0;
-    private static final int SHARE_COL = 1;
-    private static final int NAME_COL = 2;
-    private static final int MEMO_COL = 3;
+    public static final int KEY_COL = 0;
+    public static final int SHARE_COL = 1;
+    public static final int NAME_COL = 2;
+    public static final int MEMO_COL = 3;
 
 
     public AuthorsModel(int rows) {
