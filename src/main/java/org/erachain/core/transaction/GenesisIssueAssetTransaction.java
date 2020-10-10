@@ -6,6 +6,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.utils.NumberAsString;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 // core.block.Block.isValid(DLSet) - check as false it
@@ -75,7 +76,19 @@ public class GenesisIssueAssetTransaction extends GenesisIssueItemRecord {
 
         super.process(block, forDeal);
 
-    }
+        AssetCls asset = (AssetCls) item;
+        long quantity = asset.getQuantity();
+        if (quantity > 0L) {
+            Account owner = item.getOwner();
+            Long assetKey = item.getKey(dcSet);
+            // надо добавить баланс на счет
+            owner.changeBalance(dcSet, false, false, assetKey,
+                    new BigDecimal(quantity).setScale(0), false, false);
 
+            // make HOLD balance
+            owner.changeBalance(dcSet, false, true, assetKey,
+                    new BigDecimal(-quantity).setScale(0), false, false);
+        }
+    }
 
 }
