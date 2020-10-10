@@ -9,6 +9,8 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.exdata.authors.AuthorsPanel;
+import org.erachain.gui.exdata.sources.SourcesModel;
+import org.erachain.gui.exdata.sources.SourcesPanel;
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.*;
@@ -64,6 +66,7 @@ public class ExDataPanel extends JPanel {
     private JLabel jLabel_Title_Message;
     private JPanel jPanel_Attached_Files;
     private AuthorsPanel authorsPanel;
+    private SourcesPanel sourcesPanel;
     private JPanel jPanel_Message;
     private JPanel jPanel_Message_Public;
     private JPanel jPanel_Other_Attached_Files_Work;
@@ -318,6 +321,7 @@ public class ExDataPanel extends JPanel {
         jPanel_Title = new JPanel();
 
         authorsPanel = new AuthorsPanel();
+        sourcesPanel = new SourcesPanel();
         jLabel_Title_Message = new JLabel();
         jTextField_Title_Message = new JTextField();
         jButton_Input_Hashes_From_File_Other_Hashes = new MButton();
@@ -383,6 +387,7 @@ public class ExDataPanel extends JPanel {
 
         jTabbedPane_Type.addTab(Lang.getInstance().translate("Recipients"), multipleRecipientsPanel);
         jTabbedPane_Type.addTab(Lang.getInstance().translate(authorsPanel.getName()),authorsPanel);
+        jTabbedPane_Type.addTab(Lang.getInstance().translate(sourcesPanel.getName()),sourcesPanel);
 
         fill_Template_Panel = new MFillTemplatePanel();
         jTabbedPane_Type.addTab(Lang.getInstance().translate("Template"), fill_Template_Panel);
