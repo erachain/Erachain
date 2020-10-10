@@ -11,6 +11,7 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
 
 public class SourcesPanel extends JPanel {
     public final SourcesModel sourcesModel;
@@ -28,7 +29,7 @@ public class SourcesPanel extends JPanel {
         jButtonAddSources = new JButton();
         jScrollPaneSources = new JScrollPane();
         jButtonRemoveSources = new JButton();
-        jButtonAddSources.setVisible(false);
+        jButtonAddSources.setVisible(true);
         jButtonRemoveSources.setVisible(true);
 
         sourcesModel = new SourcesModel(0);
@@ -58,6 +59,14 @@ public class SourcesPanel extends JPanel {
                 sourcesModel.fireTableDataChanged();
             }
         });
+
+        jButtonAddSources.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sourcesModel.addRow(new Object[]{(int) 0, "", "", ""});
+            }
+        });
+
 
         this.setLayout(new GridBagLayout());
 
