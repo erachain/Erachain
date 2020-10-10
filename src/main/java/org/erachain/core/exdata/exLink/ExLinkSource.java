@@ -20,7 +20,7 @@ public class ExLinkSource extends ExLinkMemo {
         super(data, position);
     }
 
-    public ExLinkSource(byte type, byte flags, int value, long ref, byte[] memoBytes) {
+    public ExLinkSource(byte flags, int value, long ref, byte[] memoBytes) {
         super(ExData.LINK_SOURCE_TYPE, flags, value, ref, memoBytes);
     }
 

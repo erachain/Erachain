@@ -1,9 +1,7 @@
 package org.erachain.gui.exdata.sources;
 
-import org.erachain.controller.Controller;
-import org.erachain.core.exdata.exLink.ExLinkAuthor;
-import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.persons.PersonHuman;
+import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 
@@ -73,25 +71,35 @@ public class SourcesModel extends DefaultTableModel {
     @Override
     public void setValueAt(Object aValue, int row, int column) {
         //IF STRING
-     super.setValueAt(aValue, row, column);
+        super.setValueAt(aValue, row, column);
     }
 
-    public void setAuthors(PersonHuman[] Authors) {
-        clearSources();
+    public ExLinkSource[] getSources() {
+        if (this.getRowCount() == 0)
+            return null;
 
-        for (int i = 0; i < Authors.length; ++i) {
-            addRow(new Object[]{Authors[i].getKey(), 1, Authors[i].getName(), Authors[i].getDescription()});
+        List<ExLinkSource> temp = new ArrayList<>();
+        Iterator iterator = this.dataVector.iterator();
+        while (iterator.hasNext()) {
+            Vector item = (Vector) iterator.next();
+            Long seqNo;
+            try {
+                seqNo = (Long) item.elementAt(KEY_COL);
+                Transaction parentTx = DCSet.getInstance().getTransactionFinalMap().get(seqNo);
+                if (parentTx == null) {
+                    // транзакции такой нет
+                    continue;
+                }
+            } catch (Exception e) {
+                // персоны такой нет
+                continue;
+            }
+
+            temp.add(new ExLinkSource((byte) 0, (Integer) item.elementAt(SHARE_COL),
+                    seqNo, ((String) item.elementAt(MEMO_COL)).getBytes(StandardCharsets.UTF_8)));
         }
-    }
 
-    public void clearSources() {
-        while (getRowCount() > 0) {
-            this.removeRow(getRowCount() - 1);
-        }
-    }
-
-    public String[] getSources() {
-       return null;
+        return temp.toArray(new ExLinkSource[0]);
 
     }
 

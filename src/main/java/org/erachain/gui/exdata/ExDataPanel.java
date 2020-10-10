@@ -9,7 +9,6 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.exdata.authors.AuthorsPanel;
-import org.erachain.gui.exdata.sources.SourcesModel;
 import org.erachain.gui.exdata.sources.SourcesPanel;
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
@@ -811,7 +810,7 @@ public class ExDataPanel extends JPanel {
         boolean signCanOnlyRecipients = multipleRecipientsPanel.signCanRecipientsCheckBox.isSelected();
 
         ExLinkAuthor[] authors = authorsPanel.authorsAuthorsModel.getAuthors();
-        ExLinkSource[] sources = null;
+        ExLinkSource[] sources = sourcesPanel.sourcesModel.getSources();
 
         String tags = docTypeAppendixPanel.tagsField.getText();
 
