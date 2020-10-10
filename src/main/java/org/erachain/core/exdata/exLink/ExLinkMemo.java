@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 
 public abstract class ExLinkMemo extends ExLink {
 
+    public static final byte BASE_LENGTH = ExLink.BASE_LENGTH + 1;
+
     protected final byte[] memoBytes;
     protected String memo;
 
@@ -21,10 +23,10 @@ public abstract class ExLinkMemo extends ExLink {
 
     public ExLinkMemo(byte[] data) {
         super(data);
-        int memoSize = data[BASE_LENGTH];
+        int memoSize = data[BASE_LENGTH - 1];
         if (memoSize > 0) {
             this.memoBytes = new byte[memoSize];
-            System.arraycopy(data, BASE_LENGTH + 1, memoBytes, 0, memoSize);
+            System.arraycopy(data, BASE_LENGTH, memoBytes, 0, memoSize);
         } else {
             memoBytes = null;
         }
@@ -32,10 +34,10 @@ public abstract class ExLinkMemo extends ExLink {
 
     public ExLinkMemo(byte[] data, int position) {
         super(data, position);
-        int memoSize = data[position + BASE_LENGTH];
+        int memoSize = data[position + BASE_LENGTH - 1];
         if (memoSize > 0) {
             this.memoBytes = new byte[memoSize];
-            System.arraycopy(data, position + BASE_LENGTH + 1, memoBytes, 0, memoSize);
+            System.arraycopy(data, position + BASE_LENGTH, memoBytes, 0, memoSize);
         } else {
             memoBytes = null;
         }
@@ -80,15 +82,15 @@ public abstract class ExLinkMemo extends ExLink {
     @Override
     public byte[] toBytes() {
         int memoSize = memoBytes == null ? 0 : memoBytes.length;
-        byte[] data = new byte[BASE_LENGTH + 1 + memoSize];
+        byte[] data = new byte[BASE_LENGTH + memoSize];
         data[0] = type;
         data[1] = flags;
         data[2] = value1;
         data[3] = value2;
         System.arraycopy(Longs.toByteArray(ref), 0, data, 4, Long.BYTES);
-        data[BASE_LENGTH] = (byte) memoSize;
+        data[BASE_LENGTH - 1] = (byte) memoSize;
         if (memoSize > 0)
-            System.arraycopy(memoBytes, 0, data, BASE_LENGTH + 1, memoSize);
+            System.arraycopy(memoBytes, 0, data, BASE_LENGTH, memoSize);
 
         return data;
     }

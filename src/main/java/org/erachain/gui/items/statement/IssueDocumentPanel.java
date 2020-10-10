@@ -254,12 +254,14 @@ public class IssueDocumentPanel extends IconPanel {
         }
 
         Account[] recipients = exData_Panel.multipleRecipientsPanel.recipientsTableModel.getRecipients();
-        for (int i = 0; i < recipients.length; i++) {
-            Account recipient = recipients[i];
-            if (recipient == null) {
-                JOptionPane.showMessageDialog(new JFrame(), "Recipient[" + (i + 1) + "] is wrong",
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                return null;
+        if (recipients != null) {
+            for (int i = 0; i < recipients.length; i++) {
+                Account recipient = recipients[i];
+                if (recipient == null) {
+                    JOptionPane.showMessageDialog(new JFrame(), "Recipient[" + (i + 1) + "] is wrong",
+                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    return null;
+                }
             }
         }
 
