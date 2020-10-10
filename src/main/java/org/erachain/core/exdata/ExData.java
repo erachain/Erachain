@@ -1253,7 +1253,7 @@ public class ExData {
         }
 
         if (authors != null && authors.length > 0) {
-            output.put("Label_authors", Lang.getInstance().translateFromLangObj("Authors", langObj));
+            output.put("Label_Authors", Lang.getInstance().translateFromLangObj("Authors", langObj));
             JSONArray authorsOut = new JSONArray();
             for (ExLinkAuthor author : authors) {
                 authorsOut.add(author.makeJSONforHTML(langObj));
