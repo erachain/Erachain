@@ -24,9 +24,10 @@ public class ExLinkAuthor extends ExLinkMemo {
         super(ExData.LINK_AUTHOR_TYPE, flags, value, ref, memoBytes);
     }
 
-    public JSONObject makeJSONforHTML() {
-        JSONObject json = super.makeJSONforHTML();
+    public JSONObject makeJSONforHTML(JSONObject langObj) {
+        JSONObject json = super.makeJSONforHTML(langObj);
         json.put("name", Controller.getInstance().getPerson(ref).getName());
+        json.put("ref", ref);
 
         return json;
     }

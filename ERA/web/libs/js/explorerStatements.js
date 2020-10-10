@@ -143,7 +143,7 @@ function statement(data) {
         output += '<b>' + data.Label_authors + '</b>:';
         for (i in data.authors) {
             output += '<br>' + i + '. ' + data.authors[i].share + ' x ';
-            output += '<a href=?person=' + data.authors[i].key + get_lang() + '><b>' + data.authors[i].name + '</b></a>';
+            output += '<a href=?person=' + data.authors[i].ref + get_lang() + '><b>' + data.authors[i].name + '</b></a>';
             output += ' - ' + data.authors[i].memo;
         }
         output += '<hr>';
@@ -206,8 +206,7 @@ function statement(data) {
     }
 
     if (data.hasOwnProperty('tags')) {
-        output += '<b>' + data.Label_Tags + '</b>: ' + data.tags;
-        output += '<hr>';
+        output += '<br><b>' + data.Label_Tags + '</b>: ' + data.tags + '<br>';
     }
 
     output += '</div>';

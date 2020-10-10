@@ -2115,4 +2115,8 @@ public abstract class Transaction implements ExplorerJsonLine {
         return viewFullTypeName() + ": " + getTitle();
     }
 
+    public String toStringShortAsCreator() {
+        return viewFullTypeName() + ": " + getTitle() + (creator == null ? "" : " - " + creator.getPersonAsString());
+    }
+
 }

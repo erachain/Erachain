@@ -62,8 +62,8 @@ public abstract class ExLinkMemo extends ExLink {
         return Ints.fromBytes((byte) 0, (byte) 0, value1, value2);
     }
 
-    public JSONObject makeJSONforHTML() {
-        JSONObject json = super.makeJSONforHTML(false);
+    public JSONObject makeJSONforHTML(JSONObject langObj) {
+        JSONObject json = super.makeJSONforHTML(langObj);
         if (getMemo() != null) {
             json.put("memo", memo);
         }
@@ -72,7 +72,7 @@ public abstract class ExLinkMemo extends ExLink {
     }
 
     public JSONObject toJson() {
-        JSONObject json = super.toJson(false);
+        JSONObject json = super.toJson();
         if (getMemo() != null) {
             json.put("memo", memo);
         }

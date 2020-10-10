@@ -515,7 +515,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         if (parentTx == null) {
             exLinkDescription.setText(Lang.getInstance().translate("Not Found") + "!");
         } else {
-            exLinkDescription.setText(parentTx.toStringShort());
+            exLinkDescription.setText(parentTx.toStringShortAsCreator());
         }
     }
 

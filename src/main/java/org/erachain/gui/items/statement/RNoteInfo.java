@@ -252,7 +252,7 @@ public class RNoteInfo extends javax.swing.JPanel {
 
     @SuppressWarnings("unchecked")
     private void viewInfo() {
-        String resultStr = "";
+        String resultStr = "<body>"; // !!! обязательно первый символ < должен быть для HTML
         ExData exData;
 
         exData = statement.getExData();

@@ -138,12 +138,14 @@ public class ExLink {
                 return "InSource";
             case ExData.LINK_SURELY_TYPE:
                 return "Surely";
+            case ExData.LINK_AUTHOR_TYPE:
+                return "Author";
             default:
                 return "Unknown";
         }
     }
 
-    public JSONObject makeJSONforHTML(boolean hasRecipients) {
+    public JSONObject makeJSONforHTML(boolean hasRecipients, JSONObject langObj) {
         JSONObject json = new JSONObject();
         json.put("type", type);
         json.put("typeName", viewTypeName(type, hasRecipients));
@@ -153,6 +155,10 @@ public class ExLink {
         json.put("ref", Transaction.viewDBRef(ref));
 
         return json;
+    }
+
+    public JSONObject makeJSONforHTML(JSONObject langObj) {
+        return makeJSONforHTML(false, langObj);
     }
 
     public JSONObject toJson(boolean hasRecipients) {
@@ -164,6 +170,10 @@ public class ExLink {
         json.put("value2", value2);
         json.put("ref", Transaction.viewDBRef(ref));
         return json;
+    }
+
+    public JSONObject toJson() {
+        return toJson(false);
     }
 
     public byte[] toBytes() {

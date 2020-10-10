@@ -265,7 +265,7 @@ public class DocTypeAppendixPanel extends JPanel {
             }
         }
 
-        parentDetails.setText(parentTx.getCreator().getAddress() + " " + parentTx.getTitle());
+        parentDetails.setText(parentTx.toStringShortAsCreator());
 
         exPanel.updateRecipients();
 

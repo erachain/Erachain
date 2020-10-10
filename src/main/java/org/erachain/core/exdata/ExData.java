@@ -1234,7 +1234,7 @@ public class ExData {
         if (exLink != null) {
             output.put("Label_LinkType", Lang.getInstance().translateFromLangObj("Link Type", langObj));
             output.put("exLink_Name", Lang.getInstance().translateFromLangObj(exLink.viewTypeName(hasRecipients()), langObj));
-            output.put("exLink", exLink.makeJSONforHTML(hasRecipients()));
+            output.put("exLink", exLink.makeJSONforHTML(hasRecipients(), langObj));
             output.put("Label_Parent", Lang.getInstance().translateFromLangObj("for # для", langObj));
 
         }
@@ -1256,7 +1256,7 @@ public class ExData {
             output.put("Label_authors", Lang.getInstance().translateFromLangObj("Authors", langObj));
             JSONArray authorsOut = new JSONArray();
             for (ExLinkAuthor author : authors) {
-                authorsOut.add(author.makeJSONforHTML());
+                authorsOut.add(author.makeJSONforHTML(langObj));
             }
             output.put("authors", authorsOut);
         }
@@ -1265,7 +1265,7 @@ public class ExData {
             output.put("Label_Sources", Lang.getInstance().translateFromLangObj("Sources", langObj));
             JSONArray sourcesOut = new JSONArray();
             for (ExLinkSource source : sources) {
-                sourcesOut.add(source.makeJSONforHTML());
+                sourcesOut.add(source.makeJSONforHTML(langObj));
             }
             output.put("sources", sourcesOut);
         }
