@@ -51,8 +51,8 @@ public class ExLinkSource extends ExLinkMemo {
             return Transaction.INVALID_AMOUNT;
         }
 
-        if (!dcSet.getItemPersonMap().contains(ref))
-            return Transaction.ITEM_PERSON_NOT_EXIST;
+        if (!dcSet.getTransactionFinalMap().contains(ref))
+            return Transaction.TRANSACTION_DOES_NOT_EXIST;
 
         return Transaction.VALIDATE_OK;
     }

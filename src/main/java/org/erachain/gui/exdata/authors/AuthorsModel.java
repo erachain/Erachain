@@ -70,7 +70,6 @@ public class AuthorsModel extends DefaultTableModel {
         //IF STRING
         switch (column) {
             case KEY_COL:
-                PersonHuman result = null;
                 Long personKey = (Long) aValue;
                 Iterator a = this.dataVector.iterator();
                 // find TWINS
@@ -79,11 +78,15 @@ public class AuthorsModel extends DefaultTableModel {
                     if (b.get(0).equals(personKey)) return;
 
                 }
-                result = (PersonHuman) Controller.getInstance().getPerson(personKey);
+                PersonHuman result = (PersonHuman) Controller.getInstance().getPerson(personKey);
                 if (result != null) {
                     super.setValueAt(aValue, row, column);
                     super.setValueAt(result.getName(), row, NAME_COL);
-                    this.addEmpty();
+                    if (getRowCount() - 1 == row)
+                        this.addEmpty();
+
+                } else {
+                    super.setValueAt("", row, NAME_COL);
                 }
                 return;
             case SHARE_COL:

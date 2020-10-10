@@ -58,14 +58,4 @@ public class ExLinkAuthor extends ExLinkMemo {
         return Transaction.VALIDATE_OK;
     }
 
-    @Override
-    public void process(Transaction transaction) {
-        // EMPTY
-    }
-
-    @Override
-    public void orphan(Transaction transaction) {
-        // EMPTY
-    }
-
 }
