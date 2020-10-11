@@ -1,5 +1,6 @@
 package org.erachain.gui.exdata;
 
+
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
@@ -10,6 +11,7 @@ import org.erachain.lang.Lang;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -27,6 +29,7 @@ public class DocTypeAppendixPanel extends JPanel {
         initComponents();
         labelDocType.setText(Lang.getInstance().translate("Parent Document SeqNo or Signature"));
         parentReference.setToolTipText(Lang.getInstance().translate("Example") + ": 1234-12 or r6fas657w12Y65da..");
+
     }
 
     private void initComponents() {
@@ -83,6 +86,7 @@ public class DocTypeAppendixPanel extends JPanel {
                 new java.awt.Dimension(0, 32767));
         labelTitle = new JTextArea();
         labelTitle.setEditable(false);
+        labelTitle.setBackground(this.getBackground());
         //labelTitle.setEnabled(false);
 
         parentDetails = new JLabel();
