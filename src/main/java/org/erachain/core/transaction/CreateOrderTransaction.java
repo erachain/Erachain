@@ -491,7 +491,8 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         if (height < BlockChain.ALL_BALANCES_OK_TO ) {
             ; // NOT CHECK
         } else if (FEE_KEY == haveKey) {
-            if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) < 0) {
+            if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) < 0
+                    && !BlockChain.isFeeEnough(height, creator)) {
                 return NO_BALANCE;
             }
             // VALID if want to BY COMPU by ERA
