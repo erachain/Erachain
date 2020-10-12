@@ -13,10 +13,10 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ public class TransactionV3Tests {
 
 
         RSend messageTransactionV3 = new RSend(
-                maker, FEE_POWER, //	ATFunding
+                maker, exLink, FEE_POWER, //	ATFunding
                 recipient,
                 ERM_KEY,
                 amount,

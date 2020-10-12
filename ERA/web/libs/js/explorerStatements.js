@@ -133,8 +133,21 @@ function statement(data) {
 
     if (data.hasOwnProperty('recipients')) {
         output += '<b>' + data.Label_recipients + '</b>:';
-        for (key in data.recipients) {
-            output += '<br><a href=?address=' + data.recipients[key][0] + get_lang() + '><b>' + data.recipients[key][1] + '</b></a>';
+        for (i in data.recipients) {
+            output += '<br><a href=?address=' + data.recipients[i][0] + get_lang() + '><b>' + data.recipients[i][1] + '</b></a>';
+        }
+        output += '<hr>';
+    }
+
+    if (data.hasOwnProperty('authors')) {
+        output += '<b>' + data.Label_authors + '</b>:';
+        var index = 1;
+        for (i in data.authors) {
+            output += '<br>' + index++ + '. ' + data.authors[i].share + ' x ';
+            output += '<a href=?person=' + data.authors[i].ref + get_lang() + '><b>' + data.authors[i].name + '</b></a>';
+            if (data.authors[i].hasOwnProperty('memo')) {
+                output += ' - ' + data.authors[i].memo;
+            }
         }
         output += '<hr>';
     }
@@ -183,6 +196,23 @@ function statement(data) {
             output += '<br><hr><b>' + data.Label_files + '</b>:<br>' + data.files;
         }
 
+    }
+
+    if (data.hasOwnProperty('sources')) {
+        output += '<b>' + data.Label_sources + '</b>:';
+        var index = 1;
+        for (i in data.sources) {
+            output += '<br>' + index++ + '. ' + data.sources[i].weight + ' x ';
+            output += '<a href=?tx=' + data.sources[i].ref + get_lang() + '><b>' + data.sources[i].name + '</b></a>';
+            if (data.sources[i].hasOwnProperty('memo')) {
+                output += ' - ' + data.sources[i].memo;
+            }
+        }
+        output += '<hr>';
+    }
+
+    if (data.hasOwnProperty('tags')) {
+        output += '<br><b>' + data.Label_Tags + '</b>: ' + data.tags + '<br>';
     }
 
     output += '</div>';

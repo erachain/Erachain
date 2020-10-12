@@ -6,6 +6,8 @@ import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -764,6 +766,7 @@ public class TransactionsResource {
     @GET
     @Path("sendAsset")
     public String sendAsset(@QueryParam("sender") String sender1, @QueryParam("recipient") String recipient1,
+                            @QueryParam("linkTo") Long exLinkRef,
                             @QueryParam("amount") String amount1, @QueryParam("message") String message1,
                             @QueryParam("title") String title1, @QueryParam("asset") int asset1, @QueryParam("password") String pass,
                             @QueryParam("check") String check1) {
@@ -859,11 +862,18 @@ public class TransactionsResource {
             return out.toJSONString();
         }
 
+        ExLink exLink;
+        if (exLinkRef == null) {
+            exLink = null;
+        } else {
+            exLink = new ExLinkSource(exLinkRef, null);
+        }
+
         // CREATE TX MESSAGE
         Transaction transaction;
         try {
             transaction = Controller.getInstance().r_Send(
-                    Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), 0, recip, asset1, amount,
+                    Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, 0, recip, asset1, amount,
                     head, message.getBytes(StandardCharsets.UTF_8), isTextByte, encrypted, 0);
             // test result = new Pair<Transaction, Integer>(null,
             // Transaction.VALIDATE_OK);

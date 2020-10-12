@@ -7,6 +7,8 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
@@ -66,6 +68,10 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
     private JTextField txtRecDetails;
     private JLabel messageLabel;
     private MailSendPanel th;
+    public JTextField exLinkText;
+    public JTextField exLinkDescription;
+    public JLabel exLinkTextLabel;
+    public JLabel exLinkDescriptionLabel;
 
     public MailSendPanel(Account accountFrom, Account accountTo, PersonCls person) {
 
@@ -112,7 +118,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
 
         // COMBOBOX FROM
         GridBagConstraints cbxFromGBC = new GridBagConstraints();
-        cbxFromGBC.gridwidth = 4;
+        cbxFromGBC.gridwidth = 6;
         cbxFromGBC.insets = new Insets(5, 5, 5, 10);
         cbxFromGBC.fill = GridBagConstraints.HORIZONTAL;
         cbxFromGBC.anchor = GridBagConstraints.NORTHWEST;
@@ -139,7 +145,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
 
         // TXT TO
         GridBagConstraints txtToGBC = new GridBagConstraints();
-        txtToGBC.gridwidth = 4;
+        txtToGBC.gridwidth = 6;
         txtToGBC.insets = new Insets(5, 5, 5, 10);
         txtToGBC.fill = GridBagConstraints.HORIZONTAL;
         txtToGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
@@ -155,18 +161,16 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         labelDetailsGBC.insets = new Insets(5, 10, 5, 5);
         labelDetailsGBC.fill = GridBagConstraints.HORIZONTAL;
         labelDetailsGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
-        labelDetailsGBC.weightx = 0;
         labelDetailsGBC.gridx = 0;
         JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details") + ":");
         this.add(recDetailsLabel, labelDetailsGBC);
 
         // RECEIVER DETAILS
         GridBagConstraints txtReceiverGBC = new GridBagConstraints();
-        txtReceiverGBC.gridwidth = 4;
+        txtReceiverGBC.gridwidth = 6;
         txtReceiverGBC.insets = new Insets(5, 5, 5, 10);
         txtReceiverGBC.fill = GridBagConstraints.HORIZONTAL;
         txtReceiverGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
-        txtReceiverGBC.weightx = 0;
         txtReceiverGBC.gridx = 1;
         txtReceiverGBC.gridy = y;
 
@@ -175,10 +179,9 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
 
         // LABEL TITLE
         GridBagConstraints labelMessageGBC = new GridBagConstraints();
-        labelMessageGBC.insets = new Insets(5, 5, 5, 5);
+        labelMessageGBC.insets = new Insets(5, 10, 5, 5);
         labelMessageGBC.fill = GridBagConstraints.HORIZONTAL;
-        labelMessageGBC.anchor = GridBagConstraints.NORTHWEST;
-        labelMessageGBC.weightx = 0;
+        labelMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;
         labelMessageGBC.gridx = 0;
         labelMessageGBC.gridy = ++y;
 
@@ -187,11 +190,10 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
 
         // TXT TITLE
         GridBagConstraints txtMessageGBC = new GridBagConstraints();
-        txtMessageGBC.gridwidth = 4;
+        txtMessageGBC.gridwidth = 6;
         txtMessageGBC.insets = new Insets(5, 5, 5, 10);
         txtMessageGBC.fill = GridBagConstraints.HORIZONTAL;
         txtMessageGBC.anchor = GridBagConstraints.NORTHWEST;
-        txtMessageGBC.weightx = 0;
         txtMessageGBC.gridx = 1;
         txtMessageGBC.gridy = y;
 
@@ -204,7 +206,6 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         labelMessageGBC.insets = new Insets(5, 10, 5, 5);
         labelMessageGBC.fill = GridBagConstraints.HORIZONTAL;
         labelMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
-        labelMessageGBC.weightx = 0;
         labelMessageGBC.gridx = 0;
         labelMessageGBC.gridy = ++y;
 
@@ -212,12 +213,11 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
 
         // TXT MESSAGE
         // GridBagConstraints txtMessageGBC = new GridBagConstraints();
-        txtMessageGBC.gridwidth = 4;
+        txtMessageGBC.gridwidth = 6;
         txtMessageGBC.insets = new Insets(5, 5, 5, 10);
         // txtMessageGBC.fill = GridBagConstraints.HORIZONTAL;
         txtMessageGBC.fill = java.awt.GridBagConstraints.BOTH;
         txtMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
-        txtMessageGBC.weightx = 0;
         txtMessageGBC.gridx = 1;
         txtMessageGBC.gridy = y;
         txtMessageGBC.weighty = 0.2;
@@ -242,7 +242,6 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         labelIsTextGBC.insets = new Insets(5, 5, 5, 5);
         labelIsTextGBC.fill = GridBagConstraints.HORIZONTAL;
         labelIsTextGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
-        labelIsTextGBC.weightx = 0;
         labelIsTextGBC.gridx = 0;
 
         final JLabel isTextLabel = new JLabel(Lang.getInstance().translate("Text Message") + ":");
@@ -254,7 +253,6 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         isChkTextGBC.insets = new Insets(5, 5, 5, 5);
         isChkTextGBC.fill = GridBagConstraints.HORIZONTAL;
         isChkTextGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
-        isChkTextGBC.weightx = 0;
         isChkTextGBC.gridx = 1;
         isChkTextGBC.gridy = y;
 
@@ -267,7 +265,6 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         labelEncGBC.insets = new Insets(5, 5, 5, 5);
         labelEncGBC.fill = GridBagConstraints.HORIZONTAL;
         labelEncGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
-        labelEncGBC.weightx = 0;
         labelEncGBC.gridx = 2;
         labelEncGBC.gridy = y;
 
@@ -280,13 +277,56 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         ChkEncGBC.insets = new Insets(5, 5, 5, 5);
         ChkEncGBC.fill = GridBagConstraints.HORIZONTAL;
         ChkEncGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
-        ChkEncGBC.weightx = 0;
         ChkEncGBC.gridx = 3;
         ChkEncGBC.gridy = y;
 
         encrypted = new JCheckBox();
         encrypted.setSelected(true);
         this.add(encrypted, ChkEncGBC);
+
+
+        //exLink
+        exLinkDescriptionLabel = new JLabel();
+        exLinkTextLabel = new JLabel();
+        exLinkText = new JTextField();
+        exLinkDescription = new JTextField();
+
+        exLinkTextLabel.setText(Lang.getInstance().translate("Append to") + ":");
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = ++y;
+        gridBagConstraints.anchor= GridBagConstraints.LINE_START;
+        gridBagConstraints.insets =  new Insets(5, 10, 5, 10);
+        add(exLinkTextLabel, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 15);
+        add(exLinkText, gridBagConstraints);
+
+        exLinkDescriptionLabel.setText(Lang.getInstance().translate("Parent") + ":");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor= GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 10);
+        add(exLinkDescriptionLabel, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 10);
+        add(exLinkDescription, gridBagConstraints);
+
+        // exlink
+
 
         // LABEL AMOUNT
         GridBagConstraints amountlabelGBC = new GridBagConstraints();
@@ -400,7 +440,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         // ADD BOTTOM SO IT PUSHES TO TOP
         messagesGBC.gridy = ++y;
         messagesGBC.weighty = 4;
-        messagesGBC.gridwidth = 5;
+        messagesGBC.gridwidth = 7;
 
         add(historyScrollPane, messagesGBC);
 
@@ -713,8 +753,14 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
             return;
         }
 
+        ExLink exLink = null;
+        Long linkRef = Transaction.parseDBRef("-");
+        if (linkRef != null) {
+            exLink = new ExLinkSource(linkRef, null);
+        }
+
         // CREATE TX MESSAGE
-        Transaction transaction = Controller.getInstance().r_Send(creator, feePow, recipient, key,
+        Transaction transaction = Controller.getInstance().r_Send(creator, exLink, feePow, recipient, key,
                 amount, head, messageBytes, isTextByte, encrypted, 0);
         // test result = new Pair<Transaction, Integer>(null,
         // Transaction.VALIDATE_OK);

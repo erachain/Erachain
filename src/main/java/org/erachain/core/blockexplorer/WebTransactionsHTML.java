@@ -5,6 +5,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
@@ -35,7 +36,11 @@ import java.util.List;
 public class WebTransactionsHTML {
     private static WebTransactionsHTML instance;
     JSONObject langObj;
+    DCSet dcSet;
 
+    WebTransactionsHTML() {
+        dcSet = DCSet.getInstance();
+    }
 
     public static WebTransactionsHTML getInstance() {
         if (instance == null) {
@@ -48,7 +53,7 @@ public class WebTransactionsHTML {
     public HashMap get_HTML(Transaction transaction, JSONObject langObj) {
         // TODO: надо переделать тут так чтобы на строне клиента HTML собиралось с его локальным временм из timestamp
 
-        transaction.setDC(DCSet.getInstance(), true);
+        transaction.setDC(dcSet, true);
 
         this.langObj = langObj;
         List<Transaction> tt = new ArrayList<Transaction>();
@@ -67,7 +72,7 @@ public class WebTransactionsHTML {
 
         // она и так в заголовке будет
         //out += "<br><b>" + Lang.getInstance().translateFromLangObj("Type", langObj) + ": </b>" + tras_json.get("type_name");
-        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Confirmations", langObj) + ": </b>" + transaction.getConfirmations(DCSet.getInstance());
+        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Confirmations", langObj) + ": </b>" + transaction.getConfirmations(dcSet);
 
         if (!(transaction instanceof RCalculated)) {
             out += "<br><b>" + Lang.getInstance().translateFromLangObj("Size", langObj) + ": </b>" + tras_json.get("size");
@@ -80,6 +85,26 @@ public class WebTransactionsHTML {
             out += "<br> ";
             out += "<b>" + Lang.getInstance().translateFromLangObj("Creator", langObj)
                     + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang() + ">" + tras_json.get("creator") + "</a>";
+        }
+
+        ExLink exLink = transaction.getExLink();
+        if (exLink != null) {
+            out += "<h4>";
+            Object parent = exLink.getParent(dcSet);
+            String parentString;
+            if (parent instanceof PersonCls) {
+                parentString = ((ItemCls) parent).toString(dcSet);
+                out += Lang.getInstance().translateFromLangObj("Author to", langObj)
+                        + ": <a href=?person="
+                        + exLink.getRef() + get_Lang() + ">" + parentString + "</a>";
+            } else {
+                parentString = ((Transaction) parent).toStringShort();
+                out += Lang.getInstance().translateFromLangObj("Appendix to", langObj)
+                        + ": <a href=?tx="
+                        + Transaction.viewDBRef(exLink.getRef()) + get_Lang() + ">" + parentString + "</a>";
+            }
+            out += "</h4>";
+
         }
 
         output.put("head", out);
@@ -184,7 +209,7 @@ public class WebTransactionsHTML {
     }
 
     public String itemNameHTML(ItemCls item) {
-        String out = "<a href=?" + item.getItemTypeName() + "=" + item.getKey(DCSet.getInstance()) + get_Lang() + ">";
+        String out = "<a href=?" + item.getItemTypeName() + "=" + item.getKey(dcSet) + get_Lang() + ">";
         if (item.getKey() >= item.getStartKey()) {
             out += "[" + item.getKey() + "] ";
         }
@@ -313,12 +338,12 @@ public class WebTransactionsHTML {
         // TODO Auto-generated method stub
         String out = "";
         CancelOrderTransaction cancelOrder = (CancelOrderTransaction) transaction;
-        Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(cancelOrder.getorderSignature());
+        Long key = dcSet.getTransactionFinalMapSigns().get(cancelOrder.getorderSignature());
         if (key == null) {
             out += cancelOrder.toJson();
         }
 
-        CreateOrderTransaction createOrder = (CreateOrderTransaction) DCSet.getInstance().getTransactionFinalMap().get(key);
+        CreateOrderTransaction createOrder = (CreateOrderTransaction) dcSet.getTransactionFinalMap().get(key);
 
         out += "</br><h3>" + Lang.getInstance().translateFromLangObj("Order to Cancel", langObj) + "</h3>";
         if (createOrder == null) {
@@ -340,11 +365,11 @@ public class WebTransactionsHTML {
         Long refDB = orderCreation.getDBRef();
         Order order = null;
         String status;
-        if (DCSet.getInstance().getOrderMap().contains(refDB)) {
-            order = DCSet.getInstance().getOrderMap().get(refDB);
+        if (dcSet.getOrderMap().contains(refDB)) {
+            order = dcSet.getOrderMap().get(refDB);
             status = "Active";
-        } else if (DCSet.getInstance().getCompletedOrderMap().contains(refDB)) {
-            order = DCSet.getInstance().getCompletedOrderMap().get(refDB);
+        } else if (dcSet.getCompletedOrderMap().contains(refDB)) {
+            order = dcSet.getCompletedOrderMap().get(refDB);
             if (order.isFulfilled()) {
                 status = "Completed";
             } else {
@@ -484,7 +509,7 @@ public class WebTransactionsHTML {
         // TODO Auto-generated method stub
         String out = "";
         RVouch vouchRecord = (RVouch) transaction;
-        Transaction record = DCSet.getInstance().getTransactionFinalMap().get(vouchRecord.getVouchHeight(),
+        Transaction record = dcSet.getTransactionFinalMap().get(vouchRecord.getVouchHeight(),
                 vouchRecord.getVouchSeqNo());
 		/*out += "<b>" + Lang.getInstance().translateFromLangObj("height-seqNo", langObj) + ":</b> <a href=?tx="
 				+  Base58.encode(record.getSignature()) + get_Lang(langObj) + ">" + vouchRecord.getVouchHeight() + "-"
@@ -651,11 +676,11 @@ public class WebTransactionsHTML {
 
     public String getVouches(Transaction transaction) {
 
-        Fun.Tuple2<BigDecimal, List<Long>> vouchesItem = DCSet.getInstance().getVouchRecordMap().get(transaction.getDBRef());
+        Fun.Tuple2<BigDecimal, List<Long>> vouchesItem = dcSet.getVouchRecordMap().get(transaction.getDBRef());
         if (vouchesItem == null || vouchesItem.b.isEmpty())
             return "";
 
-        TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
+        TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
 
         String out = "<b>" + Lang.getInstance().translateFromLangObj("Certified", langObj) + ":</b> ";
 
@@ -729,6 +754,8 @@ public class WebTransactionsHTML {
 
     public static String getVouchesNew(Transaction transaction, JSONObject langObj) {
 
+        DCSet dcSet = DCSet.getInstance();
+
         Fun.Tuple2<Integer, PersonCls> creatorPersonItem = transaction.getCreator().getPerson();
 
         String personSign;
@@ -741,7 +768,7 @@ public class WebTransactionsHTML {
             ;
         }
 
-        Fun.Tuple2<BigDecimal, List<Long>> vouchesItem = DCSet.getInstance().getVouchRecordMap().get(transaction.getDBRef());
+        Fun.Tuple2<BigDecimal, List<Long>> vouchesItem = dcSet.getVouchRecordMap().get(transaction.getDBRef());
 
         if (vouchesItem == null || vouchesItem.b.isEmpty()) {
             String out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signifier", langObj) + "</center></b> ";
@@ -750,7 +777,7 @@ public class WebTransactionsHTML {
         }
 
 
-        TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
+        TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
         String out;
 
         if (vouchesItem.b.size() == 1) {
@@ -782,16 +809,18 @@ public class WebTransactionsHTML {
 
     public static void getLinks(HashMap output, Transaction parentTx, JSONObject langObj) {
 
+        DCSet dcSet = DCSet.getInstance();
+
         String out = "";
 
-        try (IteratorCloseable<Long> appendixListIterator = DCSet.getInstance().getExLinksMap()
+        try (IteratorCloseable<Long> appendixListIterator = dcSet.getExLinksMap()
                 .getLinksIterator(parentTx.getDBRef(), ExData.LINK_APPENDIX_TYPE, false)) {
             List<Long> appendixes = new ArrayList<>();
             while (appendixListIterator.hasNext()) {
                 appendixes.add(appendixListIterator.next());
             }
             if (!appendixes.isEmpty()) {
-                TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
+                TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
 
                 if (appendixes.size() == 1) {
                     Transaction childTx = map.get(appendixes.get(0));
@@ -799,7 +828,7 @@ public class WebTransactionsHTML {
                     out += "<h2>" + Lang.getInstance().translateFromLangObj("Appendix", langObj)
                             + "</h2><h3>" + childTx.getTitle() + "</h3>";
                     out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
-                            + childTx.viewHeightSeq() + "</a> "
+                            + childTx.viewType() + " " + childTx.viewHeightSeq() + "</a> "
                             + " " + DateTimeFormat.timestamptoString(childTx.getTimestamp()) + " ";
                     out += "<a href=?address="
                             + childTx.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + childTx.getCreator().getPersonAsString()
@@ -830,14 +859,47 @@ public class WebTransactionsHTML {
             output.put("error", e.getMessage());
         }
 
-        try (IteratorCloseable<Long> appendixListIterator = DCSet.getInstance().getExLinksMap()
+        try (IteratorCloseable<Long> appendixListIterator = dcSet.getExLinksMap()
+                .getLinksIterator(parentTx.getDBRef(), ExData.LINK_SOURCE_TYPE, false)) {
+            List<Long> appendixes = new ArrayList<>();
+            while (appendixListIterator.hasNext()) {
+                appendixes.add(appendixListIterator.next());
+            }
+            if (!appendixes.isEmpty()) {
+                TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
+
+                out += "<h2>" + Lang.getInstance().translateFromLangObj("Usage", langObj)
+                        + "</h2>";
+
+                int count = 0;
+                for (Long txKey : appendixes) {
+
+                    Transaction childTx = map.get(txKey);
+                    out += "<h3>" + childTx.getTitle() + "</h3>";
+                    out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
+                            + childTx.viewHeightSeq() + "</a> "
+                            + " " + DateTimeFormat.timestamptoString(childTx.getTimestamp()) + " ";
+                    out += "<a href=?address="
+                            + childTx.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + childTx.getCreator().getPersonAsString()
+                            + "</b></a><br>";
+
+                }
+
+                ///out += "</table>";
+
+            }
+        } catch (IOException e) {
+            output.put("error", e.getMessage());
+        }
+
+        try (IteratorCloseable<Long> appendixListIterator = dcSet.getExLinksMap()
                 .getLinksIterator(parentTx.getDBRef(), ExData.LINK_REPLY_COMMENT_TYPE, false)) {
             List<Long> appendixes = new ArrayList<>();
             while (appendixListIterator.hasNext()) {
                 appendixes.add(appendixListIterator.next());
             }
             if (!appendixes.isEmpty()) {
-                TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
+                TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
 
                 out += "<h2>" + Lang.getInstance().translateFromLangObj("Replays and Comments", langObj)
                         + "</h2>";

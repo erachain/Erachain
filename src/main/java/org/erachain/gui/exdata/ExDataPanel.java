@@ -4,12 +4,13 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
-import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkAppendix;
-import org.erachain.core.exdata.exLink.ExLinkReply;
+import org.erachain.core.exdata.exLink.*;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.exdata.authors.AuthorsPanel;
+import org.erachain.gui.exdata.sources.SourcesModel;
+import org.erachain.gui.exdata.sources.SourcesPanel;
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.*;
@@ -64,6 +65,8 @@ public class ExDataPanel extends JPanel {
     private MButton jButton_Input_Hashes_From_File_Other_Hashes;
     private JLabel jLabel_Title_Message;
     private JPanel jPanel_Attached_Files;
+    private AuthorsPanel authorsPanel;
+    private SourcesPanel sourcesPanel;
     private JPanel jPanel_Message;
     private JPanel jPanel_Message_Public;
     private JPanel jPanel_Other_Attached_Files_Work;
@@ -85,6 +88,7 @@ public class ExDataPanel extends JPanel {
     public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
     public DocTypeAppendixPanel docTypeAppendixPanel;
     public MultiPayOutsPanel multiPayOutsPanel;
+
 
 
     /**
@@ -315,6 +319,9 @@ public class ExDataPanel extends JPanel {
         jButton_Add_Other_Hashes = new MButton();
         jButton_Remove_Other_Hashes = new MButton();
         jPanel_Title = new JPanel();
+
+        authorsPanel = new AuthorsPanel();
+        sourcesPanel = new SourcesPanel();
         jLabel_Title_Message = new JLabel();
         jTextField_Title_Message = new JTextField();
         jButton_Input_Hashes_From_File_Other_Hashes = new MButton();
@@ -379,6 +386,8 @@ public class ExDataPanel extends JPanel {
         }
 
         jTabbedPane_Type.addTab(Lang.getInstance().translate("Recipients"), multipleRecipientsPanel);
+        jTabbedPane_Type.addTab(Lang.getInstance().translate(authorsPanel.getName()),authorsPanel);
+        jTabbedPane_Type.addTab(Lang.getInstance().translate(sourcesPanel.getName()),sourcesPanel);
 
         fill_Template_Panel = new MFillTemplatePanel();
         jTabbedPane_Type.addTab(Lang.getInstance().translate("Template"), fill_Template_Panel);
@@ -801,6 +810,11 @@ public class ExDataPanel extends JPanel {
         Account[] recipients = multipleRecipientsPanel.recipientsTableModel.getRecipients();
         boolean signCanOnlyRecipients = multipleRecipientsPanel.signCanRecipientsCheckBox.isSelected();
 
+        ExLinkAuthor[] authors = authorsPanel.authorsAuthorsModel.getAuthors();
+        ExLinkSource[] sources = null;
+
+        String tags = docTypeAppendixPanel.tagsField.getText();
+
         // hashes StandardCharsets.UTF_8
         HashMap<String, String> hashes_Map = new HashMap<String, String>();
         int hR = hashes_Table_Model.getRowCount();
@@ -837,7 +851,7 @@ public class ExDataPanel extends JPanel {
             }
         }
         return ExData.make(exLink, creator, jTextField_Title_Message.getText(),
-                signCanOnlyRecipients, recipients, isEncrypted,
+                signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
                 (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),
                 fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
                 jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),

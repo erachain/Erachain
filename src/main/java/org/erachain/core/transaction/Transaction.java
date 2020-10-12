@@ -14,6 +14,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
@@ -372,6 +373,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + REFERENCE_LENGTH;
     protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + TIMESTAMP_LENGTH + FEE_LENGTH;
 
+    public static final byte HAS_EXLINK_MASK = 32;
+
     /**
      * Используется для разделения строки поисковых слов для всех трнзакций.<br>
      * % и @ и # - пусть они будут служебные и по ним не делать разделения
@@ -413,7 +416,12 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected Fun.Tuple4<Long, Integer, Integer, Integer> creatorPersonDuration;
     protected PersonCls creatorPerson;
 
+    /**
+     * Для создания поисковых Меток - Тип сущности + номер ее. например @P12 - персона 12
+     */
     protected Object[][] itemsKeys;
+
+    protected ExLink exLink;
 
     /**
      * если да то значит взята из Пула трнзакций и на двойную трату проверялась
@@ -755,6 +763,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         return "";
     }
 
+    public ExLink getExLink() {
+        return exLink;
+    }
+
     public void makeItemsKeys() {
         if (creatorPersonDuration != null) {
             itemsKeys = new Object[][]{
@@ -763,11 +775,21 @@ public abstract class Transaction implements ExplorerJsonLine {
         }
     }
 
-    public static String[] tags(String tags, String words, Object[][] itemsKeys) {
-        if (words != null)
-            tags += " " + words;
+    public static String[] tags(String type, String tags, String words, Object[][] itemsKeys) {
 
-        String[] tagsWords = tags.toLowerCase().split(SPLIT_CHARS);
+        String allTags = "";
+
+        if (type != null)
+            allTags += " " + type;
+
+        if (tags != null)
+            allTags += " " + tags;
+
+
+        if (words != null)
+            allTags += " " + words;
+
+        String[] tagsWords = allTags.toLowerCase().split(SPLIT_CHARS);
 
         if (itemsKeys == null || itemsKeys.length == 0)
             return tagsWords;
@@ -787,6 +809,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         return tagsArray;
     }
 
+    public String getExTags() {
+        return null;
+    }
+
     /**
      * При удалении - транзакция то берется из базы для создания индексов к удалению.
      * И она скелет - нужно базу данных задать и водтянуть номера сущностей и все заново просчитать чтобы правильно удалить метки.
@@ -800,7 +826,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             makeItemsKeys();
 
         try {
-            return tags(viewTypeName(), getTitle(), itemsKeys);
+            return tags(viewTypeName(), getExTags(), getTitle(), itemsKeys);
         } catch (Exception e) {
             LOGGER.error(toString() + " - itemsKeys.len: " + itemsKeys.length);
             throw e;
@@ -1151,6 +1177,14 @@ public abstract class Transaction implements ExplorerJsonLine {
         return false;
     }
 
+    public Fun.Tuple4<Long, Integer, Integer, Integer> getCreatorPersonDuration() {
+        return creatorPersonDuration;
+    }
+
+    public boolean isCreatorPersonalized() {
+        return creatorPersonDuration != null;
+    }
+
     ////
     // VIEW
     public String viewType() {
@@ -1452,6 +1486,10 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         // WRITE CREATOR
         data = Bytes.concat(data, this.creator.getPublicKey());
+
+        if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
+            data = Bytes.concat(data, exLink.toBytes());
+        }
 
         if (forDeal > FOR_PACK) {
             // WRITE FEE POWER
@@ -1931,13 +1969,14 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (BlockChain.FEE_INVITED_DEEP > 0) {
                 long invitedFee = getInvitedFee();
                 if (invitedFee > 0) {
-                    if (BlockChain.CHECK_BUGS > 3 && height == 3104) {
-                        boolean debug = true;
-                    }
                     process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
                             block != null && block.txCalculated != null ?
                                     block.txCalculated : null, "Referal bonus " + "@" + this.viewHeightSeq());
                 }
+            }
+
+            if (exLink != null) {
+                exLink.process(this);
             }
 
             // UPDATE REFERENCE OF SENDER
@@ -1978,6 +2017,10 @@ public abstract class Transaction implements ExplorerJsonLine {
             // set last transaction signature for this ACCOUNT
             this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
+        }
+
+        if (exLink != null) {
+            exLink.orphan(this);
         }
 
         // CLEAR all FOOTPRINTS and empty data
@@ -2063,9 +2106,17 @@ public abstract class Transaction implements ExplorerJsonLine {
     @Override
     public String toString() {
         if (signature == null) {
-            return getClass().getName() + ":" + viewFullTypeName();
+            return getClass().getName() + " : " + viewFullTypeName();
         }
-        return getClass().getName() + ":" + viewFullTypeName() + ":" + Base58.encode(signature);
+        return getClass().getName() + ": " + viewFullTypeName() + " : " + Base58.encode(signature);
+    }
+
+    public String toStringShort() {
+        return viewFullTypeName() + ": " + getTitle();
+    }
+
+    public String toStringShortAsCreator() {
+        return viewFullTypeName() + ": " + getTitle() + (creator == null ? "" : " - " + creator.getPersonAsString());
     }
 
 }

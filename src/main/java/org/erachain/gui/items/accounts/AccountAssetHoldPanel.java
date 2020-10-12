@@ -32,7 +32,7 @@ public class AccountAssetHoldPanel extends AccountAssetActionPanelCls {
         // HOLD on STOCK - with BACKWARD flag
         Transaction transaction = Controller.getInstance().r_Send(
                 (byte) 2, TransactionAmount.BACKWARD_MASK, (byte) 0,
-                Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
+                Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, feePow, recipient,
                 key, BigDecimal.ZERO.subtract(amount),
                 head, messageBytes, isTextByte, encrypted);
         // test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);

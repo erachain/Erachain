@@ -44,6 +44,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     public static final int UNION_TYPE = 6;
     public static final int STATEMENT_TYPE = 7;
     public static final int POLL_TYPE = 8;
+    public static final int AUTHOR_TYPE = 41;
 
     public static final int MAX_ICON_LENGTH = 11000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
     public static final int MAX_IMAGE_LENGTH = 1100000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
@@ -267,14 +268,16 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
                 return "S";
             case ItemCls.TEMPLATE_TYPE:
                 return "T"; // TEMPLATE
+            case ItemCls.AUTHOR_TYPE:
+                return "PA"; // for quick search
             default:
                 return "x";
 
         }
     }
 
-    public static String getItemTypeChar(int itemType, long itemKey) {
-        return "@" + getItemTypeChar(itemType) + itemKey;
+    public static String getItemTypeChar(int itemType, Object itemKey) {
+        return "@" + getItemTypeChar(itemType) + itemKey.toString();
     }
 
     public String getItemTypeChar() {

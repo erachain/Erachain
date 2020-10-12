@@ -6,6 +6,8 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -233,12 +235,16 @@ public class IssueSendPaymentOrder extends IconPanel {
 
         }
 
+        ExLink exLink = null;
+        Long linkRef = Transaction.parseDBRef("");
+        if (linkRef != null) {
+            exLink = new ExLinkSource(linkRef, null);
+        }
+
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(
-                Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), 0, recipient, key,
+                Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, 0, recipient, key,
                 null, head, messageBytes, isTextByte, encrypted, 0);
-        // test result = new Pair<Transaction, Integer>(null,
-        // Transaction.VALIDATE_OK);
 
         String Status_text = "";
         IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,

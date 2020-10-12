@@ -11,8 +11,8 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExData;
-import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkAppendix;
+import org.erachain.core.exdata.exLink.ExLinkAuthor;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapSigns;
@@ -23,6 +23,7 @@ import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -153,20 +154,40 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public void makeItemsKeys() {
-        if (creatorPersonDuration != null && key != 0) {
-            itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
-                    new Object[]{ItemCls.TEMPLATE_TYPE, key}
-            };
-        } else if (creatorPersonDuration != null) {
-            itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a}
-            };
-        } else if (key != 0) {
-            itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.TEMPLATE_TYPE, key}
-            };
+
+        ArrayList<Object> listTags = new ArrayList<>();
+
+        if (creatorPersonDuration != null) {
+            // AS PERSON
+            listTags.add(new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a});
+            // AS AUTHOR
+            listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, creatorPersonDuration.a});
         }
+
+        if (key != 0) {
+            listTags.add(new Object[]{ItemCls.TEMPLATE_TYPE, key});
+        }
+
+        if (extendedData.hasAuthors()) {
+            for (ExLinkAuthor author : extendedData.getAuthors()) {
+                listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, author.getRef()});
+            }
+        }
+
+        itemsKeys = listTags.toArray(new Object[][]{});
+
+    }
+
+    @Override
+    public String getExTags() {
+        if (extendedData != null) {
+            byte[] exTags = extendedData.getTags();
+            if (exTags != null && exTags.length > 0) {
+                return new String(exTags, StandardCharsets.UTF_8);
+            }
+        }
+
+        return null;
     }
 
     public static boolean hasTemplate(byte[] typeBytes) {
@@ -184,6 +205,22 @@ public class RSignNote extends Transaction implements Itemable {
 
     public Account[] getRecipients() {
         return extendedData.getRecipients();
+    }
+
+    public boolean hasAuthors() {
+        return extendedData.hasAuthors();
+    }
+
+    public boolean hasSources() {
+        return extendedData.hasSources();
+    }
+
+    public ExLinkAuthor[] getAuthors() {
+        return extendedData.getAuthors();
+    }
+
+    public ExLinkSource[] getSources() {
+        return extendedData.getSources();
     }
 
     public static int getSignersLength(byte[] typeBytes) {
@@ -630,33 +667,8 @@ public class RSignNote extends Transaction implements Itemable {
             parseDataV2WithoutFiles();
         }
 
-        ExLink exLink = extendedData.getExLink();
-        if (exLink != null) {
-            Transaction parentTx = dcSet.getTransactionFinalMap().get(exLink.getRef());
-            if (parentTx == null) {
-                return INVALID_BLOCK_TRANS_SEQ_ERROR;
-            }
-
-            // проверим запрет на создание Приложений если там ограничено подписание только списком получателей
-            if (parentTx instanceof RSignNote && exLink instanceof ExLinkAppendix) {
-                RSignNote parentRNote = (RSignNote) parentTx;
-                parentRNote.parseDataV2WithoutFiles();
-                if (parentRNote.isCanSignOnlyRecipients()
-                        && !parentRNote.isInvolved(creator)) {
-                    return ACCOUNT_ACCSES_DENIED;
-                }
-            }
-        }
-
-        JSONObject hashes = extendedData.getHashes();
-
-        if (hashes != null) {
-            for (Object hashObject : hashes.keySet()) {
-                if (Base58.isExtraSymbols(hashObject.toString())) {
-                    return INVALID_DATA_FORMAT;
-                }
-            }
-        }
+        result = extendedData.isValid(dcSet, this);
+        if (result != Transaction.VALIDATE_OK) return result;
 
         if (height > BlockChain.VERS_5_01_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого
@@ -716,12 +728,26 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public long calcBaseFee() {
+
+        long fee = calcCommonFee();
         byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
 
-        if (allHashes == null) {
-            return calcCommonFee();
+        if (allHashes != null) {
+            fee += allHashes.length * 100 * BlockChain.FEE_PER_BYTE;
         }
-        return calcCommonFee() + allHashes.length * 100;
+
+        if (exLink != null)
+            fee += 100 * BlockChain.FEE_PER_BYTE;
+
+        if (extendedData.hasAuthors()) {
+            fee += extendedData.getAuthors().length * 100 * BlockChain.FEE_PER_BYTE;
+        }
+
+        if (extendedData.hasSources()) {
+            fee += extendedData.getSources().length * 100 * BlockChain.FEE_PER_BYTE;
+        }
+
+        return fee;
     }
 
     public void parseDataV2WithoutFiles() {
@@ -736,6 +762,7 @@ public class RSignNote extends Transaction implements Itemable {
                 error++;
             }
             extendedData.resolveValues(dcSet);
+            exLink = extendedData.getExLink();
         }
     }
 
@@ -755,6 +782,7 @@ public class RSignNote extends Transaction implements Itemable {
             }
 
             extendedData.resolveValues(dcSet);
+            exLink = extendedData.getExLink();
         }
     }
 

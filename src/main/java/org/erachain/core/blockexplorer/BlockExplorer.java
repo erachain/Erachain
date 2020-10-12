@@ -1694,6 +1694,7 @@ public class BlockExplorer {
 
         output.put("charKey", person.getItemTypeChar());
         output.put("label_Actions", Lang.getInstance().translateFromLangObj("Actions", langObj));
+        output.put("label_Authorship", Lang.getInstance().translateFromLangObj("Authorship", langObj));
 
         Tuple2<Map, Transaction> itemBase = itemBase(person);
         Map output = itemBase.a;

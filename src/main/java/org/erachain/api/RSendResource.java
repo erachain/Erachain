@@ -6,6 +6,8 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -100,7 +102,7 @@ public class RSendResource {
     // @Consumes(MediaType.WILDCARD)
     @Path("{creator}/{recipient}")
     public String sendGet(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
-                          @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
+                          @QueryParam("linkTo") Long exLinkRef, @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
                           @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
                           @QueryParam("message") String message,
                           @QueryParam("encoding") int encoding,
@@ -111,8 +113,15 @@ public class RSendResource {
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();
 
+        ExLink exLink;
+        if (exLinkRef == null) {
+            exLink = null;
+        } else {
+            exLink = new ExLinkSource(exLinkRef, null);
+        }
+
         boolean needAmount = false;
-        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
+        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, exLink, recipientStr, feePowStr,
                 assetKey, true,
                 amount, needAmount,
                 title, message, encoding, encrypt, 0);
@@ -140,13 +149,13 @@ public class RSendResource {
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("{creator}/{recipient}")
     public String sendPost(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
-                           @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
+                           @QueryParam("linkTo") Long exLinkRef, @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
                            @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
                            String message,
                            @QueryParam("encoding") int encoding,
                            @QueryParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
 
-        return sendGet(creatorStr, recipientStr, feePowStr, assetKey, amount, title, message,encoding,encrypt, password);
+        return sendGet(creatorStr, recipientStr, exLinkRef, feePowStr, assetKey, amount, title, message, encoding, encrypt, password);
 
     }
 
@@ -192,6 +201,7 @@ public class RSendResource {
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
+        Long exLinkRef = (Long) jsonObject.getOrDefault("linkTo", null);
         int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
         long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0l).toString());
         BigDecimal amount = new BigDecimal(jsonObject.getOrDefault("amount", 0).toString());
@@ -204,6 +214,7 @@ public class RSendResource {
         return sendGet(
                 creator,
                 recipient,
+                exLinkRef,
                 feePow,
                 assetKey, amount,
                 title, message,
@@ -225,7 +236,7 @@ public class RSendResource {
     //@Produces("text/plain")
     @Path("raw/{creator}/{recipient}")
     public String rawSendGet(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
-                             @QueryParam("feePow") int feePowStr,
+                             @QueryParam("linkTo") Long exLinkRef, @QueryParam("feePow") int feePowStr,
                              @QueryParam("assetKey") long assetKey, @QueryParam("amount") BigDecimal amountStr,
                              @QueryParam("title") String title,
                              @QueryParam("message") String message,
@@ -238,8 +249,15 @@ public class RSendResource {
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();
 
+        ExLink exLink;
+        if (exLinkRef == null) {
+            exLink = null;
+        } else {
+            exLink = new ExLinkSource(exLinkRef, null);
+        }
+
         boolean needAmount = false;
-        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
+        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, exLink, recipientStr, feePowStr,
                 assetKey, true,
                 amountStr, needAmount,
                 title, message, encoding, encrypt, 0);
@@ -288,6 +306,7 @@ public class RSendResource {
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
+        Long exLinkRef = (Long) jsonObject.getOrDefault("linkTo", null);
         int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
         long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0l).toString());
         BigDecimal amount = new BigDecimal(jsonObject.getOrDefault("amount", 0).toString());
@@ -301,6 +320,7 @@ public class RSendResource {
         return rawSendGet(
                 creator,
                 recipient,
+                exLinkRef,
                 feePow,
                 assetKey, amount,
                 title, message, encoding,
@@ -407,64 +427,16 @@ public class RSendResource {
                     String address = creator.getAddress();
                     long counter = counters.get(address);
 
-                    if (false) {
-                        Transaction transaction = cnt.r_Send(creator,
-                                0, recipient,
-                                2l, null, "LoadTest_" + address.substring(1, 5) + " " + counter,
-                                (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
-                                new byte[]{(byte) 1}, 0);
+                    WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, null, (byte) 0, recipient, 2l, null,
+                            "LoadTest_" + address.substring(1, 5) + " " + counter,
+                            (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
+                            new byte[]{(byte) 1}, NTP.getTime(), 0l));
 
-                        if (cnt.isOnStopping())
-                            return;
+                    weakRef.get().sign(creator, Transaction.FOR_NETWORK);
 
-                        Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-                        // CLEAR for HEAP
-                        transaction.resetDCSet();
-
-
-                        // CHECK VALIDATE MESSAGE
-                        if (result == Transaction.VALIDATE_OK) {
-
-                            counters.put(address, counter + 1);
-
-                        } else {
-                            if (result == Transaction.RECEIVER_NOT_PERSONALIZED
-                                    || result == Transaction.CREATOR_NOT_PERSONALIZED
-                                    || result == Transaction.NO_BALANCE
-                                    || result == Transaction.NOT_ENOUGH_FEE
-                                    || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT) {
-
-                                try {
-                                    Thread.sleep(1);
-                                } catch (InterruptedException e) {
-                                    break;
-                                }
-
-                                continue;
-                            }
-
-                            // not work in Threads - logger.info("TEST1: " + OnDealClick.resultMess(result));
-                            try {
-                                Thread.sleep(10000);
-                            } catch (InterruptedException e) {
-                                break;
-                            }
-                            continue;
-                        }
-                    } else {
-
-                        WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, (byte) 0, recipient, 2l, null,
-                                "LoadTest_" + address.substring(1, 5) + " " + counter,
-                                (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
-                                new byte[]{(byte) 1}, NTP.getTime(), 0l));
-
-                        weakRef.get().sign(creator, Transaction.FOR_NETWORK);
-
-                        // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
-                        cnt.transactionsPool.offerMessage(weakRef.get());
-                        cnt.broadcastTransaction(weakRef.get());
-
-                    }
+                    // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
+                    cnt.transactionsPool.offerMessage(weakRef.get());
+                    cnt.broadcastTransaction(weakRef.get());
 
                     try {
                         Thread.sleep(this.test1Delay);
@@ -599,8 +571,8 @@ public class RSendResource {
                     if (false) {
                         // ERA - она еще форжинговые балансы изменяет - поэтому КОМПУ лучше всего
                         Transaction transaction = cnt.r_Send(creator,
-                                0, recipient,
-                                2l, amount, "LoadTestSend_" + address.substring(1, 5) + " " + counter,
+                                null, 0, recipient,
+                                2L, amount, "LoadTestSend_" + address.substring(1, 5) + " " + counter,
                                 (address + counter + "TEST SEND ERA").getBytes(StandardCharsets.UTF_8), encryptMessage,
                                 new byte[]{(byte) 1}, 0);
 
@@ -640,8 +612,8 @@ public class RSendResource {
 
                     } else {
 
-                        WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, (byte) 0, recipient, 2L,
-                                amount, "TEST" + counter, null, isText, encryptMessage, NTP.getTime(), 0l));
+                        WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, null, (byte) 0, recipient, 2L,
+                                amount, "TEST" + counter, null, isText, encryptMessage, NTP.getTime(), 0L));
 
                         weakRef.get().sign(creator, Transaction.FOR_NETWORK);
 
@@ -718,6 +690,7 @@ public class RSendResource {
                             @DefaultValue("0") @QueryParam("amount") BigDecimal amount,
                             @DefaultValue("true") @QueryParam("test") Boolean test,
                             @DefaultValue("true") @QueryParam("selfpay") Boolean selfPay,
+                            @QueryParam("linkTo") Long exLinkRef,
                             @DefaultValue("0") @QueryParam("feePow") Integer feePow,
                             @DefaultValue("-1") @QueryParam("gender") Byte gender,
                             @DefaultValue("0") @QueryParam("activeafter") String activeAfterStr,
@@ -896,8 +869,14 @@ public class RSendResource {
                             resultOne.add(person.toString());
                         }
 
+                        ExLink exLink;
+                        if (exLinkRef == null) {
+                            exLink = null;
+                        } else {
+                            exLink = new ExLinkSource(exLinkRef, null);
+                        }
 
-                        Pair<Integer, Transaction> result = cntr.make_R_Send(null, accountFrom, recipientStr, feePow,
+                        Pair<Integer, Transaction> result = cntr.make_R_Send(null, accountFrom, exLink, recipientStr, feePow,
                                 assetKey, true,
                                 sendAmount, needAmount,
                                 title, null, 0, false, timestampThis++);

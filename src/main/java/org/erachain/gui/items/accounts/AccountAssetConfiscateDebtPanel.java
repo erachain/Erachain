@@ -33,7 +33,7 @@ public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls 
 
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send((byte) 2, TransactionAmount.BACKWARD_MASK,
-                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), feePow,
+                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, feePow,
                 recipient, -key, amount, head, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";

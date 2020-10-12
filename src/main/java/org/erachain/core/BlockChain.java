@@ -253,11 +253,6 @@ public class BlockChain {
     public static final int VERS_5_01_01 = TEST_DB > 0 || CLONE_MODE ? 0 : DEMO_MODE ? 426167 : TEST_MODE ? 0 : 990000;
 
     /**
-     * Включает реферальную систему
-     */
-    public static int REFERAL_BONUS_FOR_PERSON = CLONE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
-
-    /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
      */
     public static final int START_ISSUE_RIGHTS = TEST_DB > 0 || CLONE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
@@ -395,21 +390,26 @@ public class BlockChain {
      */
     public static final HashMap<Long, BigDecimal> ASSET_BURN_PERCENTAGE = new HashMap<>();
 
-    public static final int HOLD_ROYALTY_PERIOD_DAYS = 0; // как часто начисляем? Если = 0 - на начислять
+    public static final int HOLD_ROYALTY_PERIOD_DAYS = 0; // как часто начисляем? Если = 0 - не начислять
     public static final BigDecimal HOLD_ROYALTY_MIN = new BigDecimal("0.0001"); // если меньше то распределение не делаем
     public static Account HOLD_ROYALTY_EMITTER = new Account("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"); // если меньше то распределение не делаем
     public static final long HOLD_ROYALTY_ASSET = AssetCls.ERA_KEY;
 
 
     /**
-     * Multi-level Referal System. Levels for deep
+     * Включает реферальную систему
      */
-    public static final int FEE_INVITED_DEEP = TEST_DB > 0 || MAIN_MODE ? 0 : 3;
+    public static int REFERRAL_BONUS_FOR_PERSON = TEST_DB > 0 || !MAIN_MODE ? 0 : VERS_5_01_01;
+
     /**
-     * Stop referals system on this person Number. Причем рефералка которая должна упать этим персонам
+     * Multi-level Referral System. Levels for deep
+     */
+    public static final int FEE_INVITED_DEEP = TEST_DB > 0 ? 0 : 3;
+    /**
+     * Stop referals system on this person Number. Причем рефералка которая должна упасть этим персонам
      * (с номером ниже заданного) по сути просто сжигается - то есть идет дефляция.
      */
-    public static final long BONUS_STOP_PERSON_KEY = CLONE_MODE || TEST_MODE ? 0 : 13L;
+    public static final long BONUS_STOP_PERSON_KEY = TEST_DB > 0 || !MAIN_MODE ? 0 : 13L;
 
     public static final int FEE_INVITED_SHIFT = 1;
     /**
@@ -558,7 +558,7 @@ public class BlockChain {
                 }
 
                 if (chainParams.containsKey("referalsOn")) {
-                    REFERAL_BONUS_FOR_PERSON = (Boolean) chainParams.get("referalsOn") ? 0 : Integer.MAX_VALUE;
+                    REFERRAL_BONUS_FOR_PERSON = (Boolean) chainParams.get("referalsOn") ? 0 : Integer.MAX_VALUE;
                 }
 
                 if (chainParams.containsKey("allValidBefore")) {
@@ -580,6 +580,14 @@ public class BlockChain {
 
             }
         } else if (DEMO_MODE) {
+
+            if (false) {
+                // это как пример для отладки
+                ASSET_TRANSFER_PERCENTAGE.put(1L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
+                ASSET_TRANSFER_PERCENTAGE.put(2L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
+                ASSET_BURN_PERCENTAGE.put(1L, new BigDecimal("0.5"));
+                ASSET_BURN_PERCENTAGE.put(2L, new BigDecimal("0.5"));
+            }
 
             // GENERAL TRUST
             TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
@@ -603,14 +611,6 @@ public class BlockChain {
 
             ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
         } else {
-
-            if (false) {
-                // это как пример для отладки
-                ASSET_TRANSFER_PERCENTAGE.put(1L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
-                ASSET_TRANSFER_PERCENTAGE.put(2L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
-                ASSET_BURN_PERCENTAGE.put(1L, new BigDecimal("0.5"));
-                ASSET_BURN_PERCENTAGE.put(2L, new BigDecimal("0.5"));
-            }
 
             ////////// WIPED
             // WRONG Issue Person #125
@@ -959,7 +959,7 @@ public class BlockChain {
     }
 
     public static boolean REFERAL_BONUS_FOR_PERSON(int height) {
-        return TEST_DB == 0 && height > REFERAL_BONUS_FOR_PERSON;
+        return height > REFERRAL_BONUS_FOR_PERSON;
     }
 
     public static int getCheckPoint(DCSet dcSet, boolean useDynamic) {
@@ -1129,7 +1129,7 @@ public class BlockChain {
 
         if (forgingBalance < BlockChain.MIN_GENERATING_BALANCE) {
             if (height > ALL_BALANCES_OK_TO)
-                return 0l;
+                return 0L;
             forgingBalance = BlockChain.MIN_GENERATING_BALANCE;
         }
 
@@ -1141,7 +1141,7 @@ public class BlockChain {
 
         int repeatsMin;
 
-        if (height < BlockChain.REPEAT_WIN) {
+        if (height <= BlockChain.REPEAT_WIN) {
             repeatsMin = height - 2;
         } else {
             repeatsMin = BlockChain.GENESIS_ERA_TOTAL / forgingBalance;

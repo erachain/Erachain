@@ -382,7 +382,7 @@ public class TelegramsResource {
 
         try {
             transaction = cntr.r_Send(
-                    account, feePow, recipient, assetKey, amount,
+                    account, null, feePow, recipient, assetKey, amount,
                     title, messageBytes, isTextByte, encrypted, 0);
         } catch (Exception e) {
             out.put("status_code", Transaction.INVALID_RETURN);
@@ -717,10 +717,10 @@ public class TelegramsResource {
                     } while (recipient.equals(creator));
 
                     // MAKE TELEGRAM
-                    Transaction transaction = new RSend(creator, (byte) 0, recipient, 0, null,
+                    Transaction transaction = new RSend(creator, null, (byte) 0, recipient, 0, null,
                             "TEST 1", "TEST TEST TEST".getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
                             new byte[]{(byte) 1},
-                            NTP.getTime(), 0l);
+                            NTP.getTime(), 0L);
                     transaction.sign(creator, Transaction.FOR_NETWORK);
 
                     if (cnt.isOnStopping())

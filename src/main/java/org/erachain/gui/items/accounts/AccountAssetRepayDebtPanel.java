@@ -29,7 +29,7 @@ public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls {
         if (!cheskError()) return;
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(
-                Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, -key,
+                Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, feePow, recipient, -key,
                 amount, head, messageBytes, isTextByte, encrypted, 0);
 
         String Status_text = "";
