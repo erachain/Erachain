@@ -1640,7 +1640,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         // CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
         // CHECK IF CREATOR HAS ENOUGH FEE MONEY
-        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0l
+        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0L
                 && height > BlockChain.ALL_BALANCES_OK_TO
                 && !BlockChain.isFeeEnough(height, creator)
                 && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
