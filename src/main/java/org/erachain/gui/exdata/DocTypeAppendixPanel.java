@@ -64,7 +64,7 @@ public class DocTypeAppendixPanel extends JPanel {
                                 labelTitle.setText(Lang.getInstance().translate("Set parent Document for Appendix")
                                         + ".\n\n" + Lang.getInstance().translate("This will be reset Recipients list to involved accounts list by default")
                                         + ".\n" + Lang.getInstance().translate("But You may edit Recipients list"));
-                                estimationPanel.setVisible(BlockChain.TEST_MODE);
+                                estimationPanel.setVisible(false);
                                 break;
                             case ExData.LINK_REPLY_COMMENT_TYPE:
                                 labelTitle.setText(Lang.getInstance().translate("Set parent Document for Reply")
