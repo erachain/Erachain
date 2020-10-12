@@ -59,26 +59,16 @@ public abstract class ExEstimate {
         return null;
     }
 
-    public static String[8]
-
-    getValues(int type) {
+    public static String[] getValues(int type) {
         switch (type) {
             case LIKE:
-                return new String[8] {
-                "Like"
-            } ;
+                return new String[]{"Like", "", "", "", "", "", "", ""};
             case SCIENTIFIC:
-                return new String[8] {
-                "Like"
-            } ;
+                return new String[]{"Like", "", "", "", "", "", "", ""};
             case FUNNY:
-                return new String[8] {
-                "Like"
-            } ;
+                return new String[]{"Like", "", "", "", "", "", "", ""};
             case USEFUL:
-                return new String[8] {
-                "Like"
-            } ;
+                return new String[]{"Like", "", "", "", "", "", "", ""};
         }
 
         return null;
