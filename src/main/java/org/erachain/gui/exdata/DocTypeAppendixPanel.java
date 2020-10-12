@@ -1,6 +1,7 @@
 package org.erachain.gui.exdata;
 
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
@@ -52,6 +53,7 @@ public class DocTypeAppendixPanel extends JPanel {
                         labelDocType.setVisible(false);
                         parentReference.setVisible(false);
                         parentDetails.setVisible(false);
+                        estimationPanel.setVisible(false);
                     } else {
                         labelTitle.setVisible(true);
                         labelDocType.setVisible(true);
@@ -62,19 +64,19 @@ public class DocTypeAppendixPanel extends JPanel {
                                 labelTitle.setText(Lang.getInstance().translate("Set parent Document for Appendix")
                                         + ".\n\n" + Lang.getInstance().translate("This will be reset Recipients list to involved accounts list by default")
                                         + ".\n" + Lang.getInstance().translate("But You may edit Recipients list"));
-                                estimationPanel.setVisible(true);
+                                estimationPanel.setVisible(BlockChain.TEST_MODE);
                                 break;
                             case ExData.LINK_REPLY_COMMENT_TYPE:
                                 labelTitle.setText(Lang.getInstance().translate("Set parent Document for Reply")
                                         + ".\n\n" + Lang.getInstance().translate("This will be reset Recipients list to involved accounts list by default")
                                         + "\n" + Lang.getInstance().translate("But You may edit Recipients list"));
-                                estimationPanel.setVisible(true);
+                                estimationPanel.setVisible(BlockChain.TEST_MODE);
                                  break;
                             case ExData.LINK_COMMENT_TYPE_FOR_VIEW:
                                 labelTitle.setText(Lang.getInstance().translate("Set parent Document for Comment")
                                         + ".\n\n" + Lang.getInstance().translate("This will erase Recipients list by default")
                                         + ".\n" + Lang.getInstance().translate("But You may edit Recipients list"));
-                                estimationPanel.setVisible(true);
+                                estimationPanel.setVisible(BlockChain.TEST_MODE);
                                 break;
                             default:
                                 labelTitle.setText(Lang.getInstance().translate("Set Parent Document"));
@@ -219,13 +221,14 @@ public class DocTypeAppendixPanel extends JPanel {
 //        gridBagConstraints.weighty = 0.2;
 //        add(filler1, gridBagConstraints);
 //estimation
+
         estimationPanel = new JPanel();
         estimationPanel.setLayout(new GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        estimationPanel.add(new JLabel(Lang.getInstance().translate("Оценка1")+ ":"), gridBagConstraints);
+        estimationPanel.add(new JLabel(Lang.getInstance().translate("Оценка1") + ":"), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -238,7 +241,7 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        estimationPanel.add(new JLabel(Lang.getInstance().translate("Оценка2")+ ":"), gridBagConstraints);
+        estimationPanel.add(new JLabel(Lang.getInstance().translate("Оценка2") + ":"), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
