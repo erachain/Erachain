@@ -1862,7 +1862,6 @@ public abstract class Transaction implements ExplorerJsonLine {
             long percent = diff * koeff;
 
             royaltyBG = BigDecimal.valueOf(percent, BlockChain.FEE_SCALE)
-                    .movePointLeft(3)
                     .multiply(balance)
                     .setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
 
