@@ -903,12 +903,13 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                             if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0L
                                     && !BlockChain.ERA_COMPU_ALL_UP
+                                    && !BlockChain.isFeeEnough(height, creator)
                                     && this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b
                                     .compareTo(this.amount.add(this.fee)) < 0) {
 
                                 /// если это девелоп то не проверяем ниже особые счета
                                 if (BlockChain.CLONE_MODE || BlockChain.TEST_MODE)
-                                    return NO_BALANCE;
+                                    return NOT_ENOUGH_FEE;
 
                                 wrong = true;
                                 for (byte[] valid_item : BlockChain.VALID_BAL) {
@@ -919,7 +920,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 }
 
                                 if (wrong)
-                                    return NO_BALANCE;
+                                    return NOT_ENOUGH_FEE;
                             }
 
                         } else {
