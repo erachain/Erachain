@@ -229,7 +229,7 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 5);
         estimationPanel.add(new JLabel(Lang.getInstance().translate("Estimate") + " 1: "), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
