@@ -20,7 +20,7 @@ public class ExLinkSource extends ExLinkMemo {
         super(data, position);
     }
 
-    public ExLinkSource(byte type, byte flags, int value, long ref, byte[] memoBytes) {
+    public ExLinkSource(byte flags, int value, long ref, byte[] memoBytes) {
         super(ExData.LINK_SOURCE_TYPE, flags, value, ref, memoBytes);
     }
 
@@ -51,8 +51,8 @@ public class ExLinkSource extends ExLinkMemo {
             return Transaction.INVALID_AMOUNT;
         }
 
-        if (!dcSet.getItemPersonMap().contains(ref))
-            return Transaction.ITEM_PERSON_NOT_EXIST;
+        if (!dcSet.getTransactionFinalMap().contains(ref))
+            return Transaction.TRANSACTION_DOES_NOT_EXIST;
 
         return Transaction.VALIDATE_OK;
     }

@@ -103,9 +103,6 @@ public abstract class ExLinkMemo extends ExLink {
         if (memoBytes != null && memoBytes.length > 255)
             return Transaction.INVALID_DATA_LENGTH;
 
-        if (!dcSet.getItemPersonMap().contains(ref))
-            return Transaction.ITEM_PERSON_NOT_EXIST;
-
         return Transaction.VALIDATE_OK;
     }
 
