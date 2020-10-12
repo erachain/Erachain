@@ -215,7 +215,10 @@ function statement(data) {
     }
 
     if (data.hasOwnProperty('tags')) {
-        output += '<br><b>' + data.Label_Tags + '</b>: ' + data.tags + '<br>';
+        output += '<br><b>' + data.Label_Tags + '</b>: ';
+        for (tag of data.tags.split(',')) {
+            output += ' <a href=?q=' + encodeURIComponent(tag) + get_lang() + '&search=transactions><b>' + tag + ',</b></a>';
+        }
     }
 
     output += '</div>';

@@ -53,6 +53,7 @@ public class DocTypeAppendixPanel extends JPanel {
                         labelDocType.setVisible(false);
                         parentReference.setVisible(false);
                         parentDetails.setVisible(false);
+                        estimationPanel.setVisible(false);
                     } else {
                         labelTitle.setVisible(true);
                         labelDocType.setVisible(true);
@@ -63,19 +64,19 @@ public class DocTypeAppendixPanel extends JPanel {
                                 labelTitle.setText(Lang.getInstance().translate("Set parent Document for Appendix")
                                         + ".\n\n" + Lang.getInstance().translate("This will be reset Recipients list to involved accounts list by default")
                                         + ".\n" + Lang.getInstance().translate("But You may edit Recipients list"));
-                                estimationPanel.setVisible(true);
+                                estimationPanel.setVisible(BlockChain.TEST_MODE);
                                 break;
                             case ExData.LINK_REPLY_COMMENT_TYPE:
                                 labelTitle.setText(Lang.getInstance().translate("Set parent Document for Reply")
                                         + ".\n\n" + Lang.getInstance().translate("This will be reset Recipients list to involved accounts list by default")
                                         + "\n" + Lang.getInstance().translate("But You may edit Recipients list"));
-                                estimationPanel.setVisible(true);
+                                estimationPanel.setVisible(BlockChain.TEST_MODE);
                                  break;
                             case ExData.LINK_COMMENT_TYPE_FOR_VIEW:
                                 labelTitle.setText(Lang.getInstance().translate("Set parent Document for Comment")
                                         + ".\n\n" + Lang.getInstance().translate("This will erase Recipients list by default")
                                         + ".\n" + Lang.getInstance().translate("But You may edit Recipients list"));
-                                estimationPanel.setVisible(true);
+                                estimationPanel.setVisible(BlockChain.TEST_MODE);
                                 break;
                             default:
                                 labelTitle.setText(Lang.getInstance().translate("Set Parent Document"));
@@ -289,10 +290,6 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         add(estimationPanel, gridBagConstraints);
-
-        if (!BlockChain.TEST_MODE) {
-            estimationPanel.setVisible(false);
-        }
 
         // botoom
         gridBagConstraints = new java.awt.GridBagConstraints();
