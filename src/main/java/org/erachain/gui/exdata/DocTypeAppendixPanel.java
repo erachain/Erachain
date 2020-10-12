@@ -1,6 +1,7 @@
 package org.erachain.gui.exdata;
 
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
@@ -219,13 +220,14 @@ public class DocTypeAppendixPanel extends JPanel {
 //        gridBagConstraints.weighty = 0.2;
 //        add(filler1, gridBagConstraints);
 //estimation
+
         estimationPanel = new JPanel();
         estimationPanel.setLayout(new GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        estimationPanel.add(new JLabel(Lang.getInstance().translate("Оценка1")+ ":"), gridBagConstraints);
+        estimationPanel.add(new JLabel(Lang.getInstance().translate("Оценка1") + ":"), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -238,7 +240,7 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        estimationPanel.add(new JLabel(Lang.getInstance().translate("Оценка2")+ ":"), gridBagConstraints);
+        estimationPanel.add(new JLabel(Lang.getInstance().translate("Оценка2") + ":"), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -256,6 +258,9 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         add(estimationPanel, gridBagConstraints);
+        if (!BlockChain.TEST_MODE) {
+            estimationPanel.setVisible(false);
+        }
 
         // botoom
         gridBagConstraints = new java.awt.GridBagConstraints();
