@@ -772,7 +772,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         }
 
                         if (height > BlockChain.ALL_BALANCES_OK_TO
-                                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
+                                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0
+                                && !BlockChain.isFeeEnough(height, creator)) {
                             return NOT_ENOUGH_FEE;
                         }
 
@@ -856,7 +857,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         }
 
                         if (height > BlockChain.ALL_BALANCES_OK_TO
-                                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
+                                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0
+                                && !BlockChain.isFeeEnough(height, creator)) {
                             return NOT_ENOUGH_FEE;
                         }
 
@@ -934,7 +936,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             // проверим баланс по КОМПУ
                             if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
                                     && this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b.compareTo(this.fee) < 0
-                                    && !BlockChain.ERA_COMPU_ALL_UP) {
+                                    && !BlockChain.ERA_COMPU_ALL_UP
+                                    && !BlockChain.isFeeEnough(height, creator)) {
                                 if (BlockChain.CLONE_MODE || BlockChain.TEST_MODE)
                                     return NOT_ENOUGH_FEE;
 
@@ -1025,7 +1028,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         }
 
                         // TRY FEE
-                        if (this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b.compareTo(this.fee) < 0) {
+                        if (this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b.compareTo(this.fee) < 0
+                                && !BlockChain.isFeeEnough(height, creator)) {
                             return NOT_ENOUGH_FEE;
                         }
 
@@ -1066,7 +1070,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                         // TRY FEE
                         if (height > BlockChain.ALL_BALANCES_OK_TO
-                                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
+                                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0
+                                && !BlockChain.isFeeEnough(height, creator)) {
                             return NOT_ENOUGH_FEE;
                         }
 
@@ -1109,7 +1114,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             // TODO first org.erachain.records is BAD already ((
             // CHECK IF CREATOR HAS ENOUGH FEE MONEY
             if (height > BlockChain.ALL_BALANCES_OK_TO
-                    && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
+                    && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0
+                    && !BlockChain.isFeeEnough(height, creator)) {
                 return NOT_ENOUGH_FEE;
             }
             

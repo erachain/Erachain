@@ -885,6 +885,23 @@ public class BlockChain {
         return 0;
     }
 
+    public static AssetCls FEE_ASSET;
+
+    /**
+     * Если счет админа и с него можно до бесконечности брать
+     *
+     * @param height
+     * @param account
+     * @return
+     */
+    public static boolean isFeeEnough(int height, Account account) {
+        if (FEE_ASSET == null)
+            FEE_ASSET = Controller.getInstance().getDCSet().getItemAssetMap().get(AssetCls.FEE_KEY);
+
+        return FEE_ASSET.getOwner().equals(account);
+    }
+
+
     public static int BLOCKS_PER_DAY(int height) {
         return 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME(height); // 300 PER DAY
     }
