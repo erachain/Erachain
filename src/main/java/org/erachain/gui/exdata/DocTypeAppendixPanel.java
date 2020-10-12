@@ -98,7 +98,9 @@ public class DocTypeAppendixPanel extends JPanel {
 
         parentReference = new JTextField();
         estimationImportant = new JComboBox<String>(new String[]{ "","Неважно","Бесполезно","Важно","Очень важно"});
+        estimationImportantValue = new JComboBox<String>(new String[]{"1","2"});
         estimationInteresting = new JComboBox<String>(new String[]{"","Жутко","Страшно","Интересно","Весело", "Смешно","Умора"});
+        estimationInterestingValue = new JComboBox<String>(new String[]{"1","2"});
 
         this.parentReference.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -226,7 +228,7 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
         estimationPanel.add(new JLabel(Lang.getInstance().translate("Оценка1") + ":"), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -237,9 +239,24 @@ public class DocTypeAppendixPanel extends JPanel {
         estimationPanel.add(estimationImportant, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 5);
+        estimationPanel.add(new JLabel(Lang.getInstance().translate("Значение 1") + ":"), gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.3;
+        estimationPanel.add(estimationImportantValue, gridBagConstraints);
+
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 5);
         estimationPanel.add(new JLabel(Lang.getInstance().translate("Оценка2") + ":"), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -250,6 +267,20 @@ public class DocTypeAppendixPanel extends JPanel {
         estimationPanel.add(estimationInteresting, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+        estimationPanel.add(new JLabel(Lang.getInstance().translate("Значение2") + ":"), gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.3;
+        estimationPanel.add(estimationInterestingValue, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++dridY;
         gridBagConstraints.gridwidth = 3;
@@ -258,6 +289,7 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         add(estimationPanel, gridBagConstraints);
+
         if (!BlockChain.TEST_MODE) {
             estimationPanel.setVisible(false);
         }
@@ -299,6 +331,8 @@ public class DocTypeAppendixPanel extends JPanel {
 
     public JComboBox <String> estimationImportant ;
     public JComboBox <String> estimationInteresting ;
+    public JComboBox <String> estimationImportantValue ;
+    public JComboBox <String> estimationInterestingValue ;
     public JPanel estimationPanel;
 
     // End of variables declaration
