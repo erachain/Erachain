@@ -1886,7 +1886,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         if (block != null && block.txCalculated != null && !asOrphan) {
             block.txCalculated.add(new RCalculated(account, FEE_KEY, royaltyBG,
-                    "EXO-maining", this.dbRef, 0L));
+                    "EXO-mining", this.dbRef, 0L));
 
         }
 
