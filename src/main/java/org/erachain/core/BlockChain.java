@@ -246,7 +246,7 @@ public class BlockChain {
     public static final long VERS_30SEC_TIME =
             CLONE_MODE || TEST_MODE ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L;
 
-    public static final int VERS_4_21_02 = 684000;
+    public static final int VERS_4_21_02 = !MAIN_MODE ? 0 : 684000;
 
     public static final int VERS_4_23_01 = TEST_DB > 0 || CLONE_MODE || TEST_MODE ? 0 : 800000;
 
