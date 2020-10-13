@@ -250,7 +250,7 @@ public class BlockChain {
 
     public static final int VERS_4_23_01 = TEST_DB > 0 || CLONE_MODE || TEST_MODE ? 0 : 800000;
 
-    public static final int VERS_5_01_01 = TEST_DB > 0 || CLONE_MODE || TEST_MODE ? 0 : 990000;
+    public static final int VERS_5_01_01 = TEST_DB > 0 || CLONE_MODE ? 0 : DEMO_MODE ? 16620 : TEST_MODE ? 0 : 990000;
 
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
@@ -884,6 +884,29 @@ public class BlockChain {
         }
         return 0;
     }
+
+    public static AssetCls FEE_ASSET;
+
+    /**
+     * Если счет админа и с него можно до бесконечности брать
+     *
+     * @param height
+     * @param account
+     * @return
+     */
+    public static boolean isFeeEnough(int height, Account account) {
+        if (true) {
+            // for MAIN NET
+            return false;
+        }
+
+        // FOR CLONES
+        if (FEE_ASSET == null)
+            FEE_ASSET = Controller.getInstance().getDCSet().getItemAssetMap().get(AssetCls.FEE_KEY);
+
+        return FEE_ASSET.getOwner().equals(account);
+    }
+
 
     public static int BLOCKS_PER_DAY(int height) {
         return 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME(height); // 300 PER DAY

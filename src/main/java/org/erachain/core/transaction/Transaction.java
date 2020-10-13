@@ -428,6 +428,8 @@ public abstract class Transaction implements ExplorerJsonLine {
      */
     public boolean checkedByPool;
 
+    public String errorValue;
+
     // need for genesis
     protected Transaction(byte type, String type_name) {
         this.typeBytes = new byte[]{type, 0, 0, 0}; // for GENESIS
@@ -1640,8 +1642,9 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         // CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
         // CHECK IF CREATOR HAS ENOUGH FEE MONEY
-        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0l
+        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0L
                 && height > BlockChain.ALL_BALANCES_OK_TO
+                && !BlockChain.isFeeEnough(height, creator)
                 && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
             return NOT_ENOUGH_FEE;
         }
