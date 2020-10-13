@@ -428,6 +428,8 @@ public abstract class Transaction implements ExplorerJsonLine {
      */
     public boolean checkedByPool;
 
+    public String errorValue;
+
     // need for genesis
     protected Transaction(byte type, String type_name) {
         this.typeBytes = new byte[]{type, 0, 0, 0}; // for GENESIS
