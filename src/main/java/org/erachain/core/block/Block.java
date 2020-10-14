@@ -2323,6 +2323,10 @@ public class Block implements Closeable, ExplorerJsonLine {
             while (iterator.hasNext()) {
                 byte[] key = iterator.next();
                 holder = new Account(ItemAssetBalanceMap.getShortAccountFromKey(key));
+                if (holder.equals(BlockChain.FEE_ASSET_EMITTER)
+                        || holder.equals(asset.getOwner()))
+                    continue;
+
                 balanceHold = map.get(key).a.b;
                 balanceHold = balanceHold.multiply(koeff).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
 
