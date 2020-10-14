@@ -1824,9 +1824,8 @@ public abstract class Transaction implements ExplorerJsonLine {
         } else {
             // это прямое начисление
             BigDecimal balanceEXO;
-            BigDecimal balanceBAL;
+            BigDecimal balanceBAL = null;
             if (BlockChain.ACTION_ROYALTY_PERSONS_ONLY) {
-                // по всем счетам персоны
                 // по всем счетам персоны
                 if (BlockChain.ACTION_ROYALTY_ASSET > 0)
                     balanceBAL = PersonCls.getTotalBalance(dcSet, royaltyID, BlockChain.ACTION_ROYALTY_ASSET, TransactionAmount.ACTION_SEND);
@@ -1837,10 +1836,16 @@ public abstract class Transaction implements ExplorerJsonLine {
                 balanceEXO = account.getBalance(dcSet, AssetCls.FEE_KEY, TransactionAmount.ACTION_SEND).b;
             }
 
-            if (balance == null || balance.signum() <= 0)
+            if (balanceBAL == null)
+                balanceBAL = BigDecimal.ZERO;
+            if (balanceEXO == null)
+                balanceEXO = BigDecimal.ZERO;
+
+            balanceEXO = balanceBAL.min(balanceEXO);
+            if (balanceEXO.signum() <= 0)
                 return;
 
-            Long royaltyBalance = balance.setScale(BlockChain.FEE_SCALE).unscaledValue().longValue();
+            Long royaltyBalance = balanceEXO.setScale(BlockChain.FEE_SCALE).unscaledValue().longValue();
             Tuple3<Long, Long, Long> lastRoyaltyPoint = peekRoyaltyData(royaltyID);
             if (lastRoyaltyPoint == null) {
                 // уще ничего не было - считать нечего
@@ -1870,7 +1875,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             royaltyBG = BigDecimal.valueOf(percent, BlockChain.FEE_SCALE)
                     // 6 от коэфф + (3+3) от процентов И сдвиг выше в valueOf происходит на BlockChain.ACTION_ROYALTY_ASSET_SCALE
                     .movePointLeft(3)
-                    .multiply(balance)
+                    .multiply(balanceEXO)
                     .setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
 
             if (royaltyBG.compareTo(BlockChain.ACTION_ROYALTY_MIN) < 0) {
