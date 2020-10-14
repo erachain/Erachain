@@ -1827,12 +1827,12 @@ public abstract class Transaction implements ExplorerJsonLine {
             BigDecimal balanceBAL = null;
             if (BlockChain.ACTION_ROYALTY_PERSONS_ONLY) {
                 // по всем счетам персоны
-                if (BlockChain.ACTION_ROYALTY_ASSET > 0)
-                    balanceBAL = PersonCls.getTotalBalance(dcSet, royaltyID, BlockChain.ACTION_ROYALTY_ASSET, TransactionAmount.ACTION_SEND);
+                if (BlockChain.ACTION_ROYALTY_ASSET_2 > 0)
+                    balanceBAL = PersonCls.getTotalBalance(dcSet, royaltyID, BlockChain.ACTION_ROYALTY_ASSET_2, TransactionAmount.ACTION_SEND);
                 balanceEXO = PersonCls.getTotalBalance(dcSet, royaltyID, AssetCls.FEE_KEY, TransactionAmount.ACTION_SEND);
             } else {
-                if (BlockChain.ACTION_ROYALTY_ASSET > 0)
-                    balanceBAL = account.getBalance(dcSet, BlockChain.ACTION_ROYALTY_ASSET, TransactionAmount.ACTION_SEND).b;
+                if (BlockChain.ACTION_ROYALTY_ASSET_2 > 0)
+                    balanceBAL = account.getBalance(dcSet, BlockChain.ACTION_ROYALTY_ASSET_2, TransactionAmount.ACTION_SEND).b;
                 balanceEXO = account.getBalance(dcSet, AssetCls.FEE_KEY, TransactionAmount.ACTION_SEND).b;
             }
 
