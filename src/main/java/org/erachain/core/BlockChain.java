@@ -404,7 +404,11 @@ public class BlockChain {
     /**
      * Если не задан то будет взят счет из Генесиз-блока
      */
-    public static Account HOLD_ROYALTY_EMITTER = null; //new Account("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
+    public static Account HOLD_ROYALTY_EMITTER = CLONE_MODE ?
+            new Account(TEST_MODE ?
+                    "7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz" :
+                    (((List) ((List) Settings.genesisJSON.get(2)).get(0)).get(0)).toString())
+            : null;
 
 
     /**
