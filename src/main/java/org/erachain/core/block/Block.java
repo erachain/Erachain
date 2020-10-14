@@ -2097,7 +2097,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         if (emittedFee != 0) {
             // SUBSTRACT from EMISSION (with minus)
-            BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
+            BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
                     new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), true, false);
         }
 
@@ -2306,7 +2306,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             return;
 
         // если сумма малая - не начисляем
-        BigDecimal readyToRoyalty = BlockChain.HOLD_ROYALTY_EMITTER.getBalance(dcSet, BlockChain.FEE_KEY, TransactionAmount.ACTION_DEBT).b.negate();
+        BigDecimal readyToRoyalty = BlockChain.FEE_ASSET_EMITTER.getBalance(dcSet, BlockChain.FEE_KEY, TransactionAmount.ACTION_DEBT).b.negate();
         if (readyToRoyalty.compareTo(BlockChain.HOLD_ROYALTY_MIN) < 0)
             return;
 
@@ -2334,8 +2334,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                 holder.changeCOMPUBonusBalances(dcSet, asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
 
                 // у эмитента снимем
-                BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, !asOrphan, false, BlockChain.FEE_KEY, balanceHold, false, true);
-                BlockChain.HOLD_ROYALTY_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
+                BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, !asOrphan, false, BlockChain.FEE_KEY, balanceHold, false, true);
+                BlockChain.FEE_ASSET_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
 
                 if (this.txCalculated != null) {
                     txCalculated.add(new RCalculated(holder, BlockChain.FEE_KEY, balanceHold,
@@ -2346,12 +2346,12 @@ public class Block implements Closeable, ExplorerJsonLine {
             }
 
             // учтем снятие с начисления для держателей долей
-            BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, asOrphan, false, -BlockChain.FEE_KEY,
+            BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, asOrphan, false, -BlockChain.FEE_KEY,
                     totalPayedRoyalty,
                     true, false);
 
             if (this.txCalculated != null) {
-                txCalculated.add(new RCalculated(BlockChain.HOLD_ROYALTY_EMITTER, BlockChain.FEE_KEY, totalPayedRoyalty.negate(),
+                txCalculated.add(new RCalculated(BlockChain.FEE_ASSET_EMITTER, BlockChain.FEE_KEY, totalPayedRoyalty.negate(),
                         "AS-stacking OUT", txReference, 0L));
             }
 

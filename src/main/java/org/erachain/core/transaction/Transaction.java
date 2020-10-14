@@ -1774,7 +1774,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                 || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY) {
 
             // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
-            BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
+            BlockChain.FEE_ASSET_EMITTER.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
                     BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), true, false);
 
             return;
@@ -1901,11 +1901,11 @@ public abstract class Transaction implements ExplorerJsonLine {
         }
 
         // учтем эмиссию
-        BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
+        BlockChain.FEE_ASSET_EMITTER.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
                 royaltyBG, true, false);
 
         // учтем начисления для держателей долей
-        BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(this.dcSet, !asOrphan, false, -FEE_KEY,
+        BlockChain.FEE_ASSET_EMITTER.changeBalance(this.dcSet, !asOrphan, false, -FEE_KEY,
                 royaltyBG.multiply(BlockChain.ACTION_ROYALTY_TO_HOLD_ROYALTY_PERCENT).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN),
                 true, false);
 
