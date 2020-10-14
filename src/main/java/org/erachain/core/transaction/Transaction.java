@@ -10,6 +10,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
@@ -1798,6 +1799,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     private void calcRoyalty(Block block, Account account, long koeff, boolean asOrphan) {
+
+        if (account.equals(BlockChain.FEE_ASSET_EMITTER)
+                || account.equals(GenesisBlock.CREATOR))
+            return;
 
         Tuple4<Long, Integer, Integer, Integer> personDuration;
         Long royaltyID;
