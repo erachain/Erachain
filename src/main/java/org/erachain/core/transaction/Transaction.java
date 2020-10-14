@@ -1819,7 +1819,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                 return;
             }
 
-            royaltyBG = BigDecimal.valueOf(lastValue.c, BlockChain.FEE_SCALE);
+            royaltyBG = BigDecimal.valueOf(lastValue.c, BlockChain.HOLD_ROYALTY_ASSET_SCALE);
 
         } else {
             // это прямое начисление
@@ -1834,7 +1834,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (balance == null || balance.signum() <= 0)
                 return;
 
-            Long royaltyBalance = balance.setScale(BlockChain.FEE_SCALE).unscaledValue().longValue();
+            Long royaltyBalance = balance.setScale(BlockChain.HOLD_ROYALTY_ASSET_SCALE).unscaledValue().longValue();
             Tuple3<Long, Long, Long> lastRoyaltyPoint = peekRoyaltyData(royaltyID);
             if (lastRoyaltyPoint == null) {
                 // уще ничего не было - считать нечего
@@ -1861,11 +1861,11 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             long percent = diff * koeff;
 
-            royaltyBG = BigDecimal.valueOf(percent, BlockChain.FEE_SCALE)
-                    // 6 от коэфф + (3+3) от процентов И сдвиг выше в valueOf происходит на FEE_SCALE
+            royaltyBG = BigDecimal.valueOf(percent, BlockChain.HOLD_ROYALTY_ASSET_SCALE)
+                    // 6 от коэфф + (3+3) от процентов И сдвиг выше в valueOf происходит на BlockChain.HOLD_ROYALTY_ASSET_SCALE
                     .movePointLeft(3)
                     .multiply(balance)
-                    .setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
+                    .setScale(BlockChain.HOLD_ROYALTY_ASSET_SCALE, RoundingMode.DOWN);
 
             if (royaltyBG.compareTo(BlockChain.ACTION_ROYALTY_MIN) < 0) {
                 pushRoyaltyData(royaltyID, royaltyBalance, 0L);
@@ -1884,7 +1884,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         account.changeCOMPUBonusBalances(dcSet, asOrphan, royaltyBG, Transaction.BALANCE_SIDE_DEBIT);
 
         if (block != null && block.txCalculated != null && !asOrphan) {
-            block.txCalculated.add(new RCalculated(account, FEE_KEY, royaltyBG,
+            block.txCalculated.add(new RCalculated(account, BlockChain.HOLD_ROYALTY_ASSET_SCALE, royaltyBG,
                     "EXO-mining", this.dbRef, 0L));
 
         }
@@ -1895,7 +1895,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         // учтем начисления для держателей долей
         BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(this.dcSet, !asOrphan, false, -BlockChain.ACTION_ROYALTY_ASSET,
-                royaltyBG.multiply(BlockChain.ACTION_ROYALTY_TO_HOLD_ROYALTY_PERCENT).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN),
+                royaltyBG.multiply(BlockChain.ACTION_ROYALTY_TO_HOLD_ROYALTY_PERCENT).setScale(BlockChain.HOLD_ROYALTY_ASSET_SCALE, RoundingMode.DOWN),
                 true, false);
 
 

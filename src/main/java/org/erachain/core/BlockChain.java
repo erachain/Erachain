@@ -397,6 +397,7 @@ public class BlockChain {
      */
     public static Account HOLD_ROYALTY_EMITTER = null; //new Account("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
     public static final long HOLD_ROYALTY_ASSET = AssetCls.ERA_KEY;
+    public static final int HOLD_ROYALTY_ASSET_SCALE = 8;
 
 
     /**
