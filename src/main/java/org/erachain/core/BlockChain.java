@@ -395,11 +395,16 @@ public class BlockChain {
 
     public static final int HOLD_ROYALTY_PERIOD_DAYS = 0; // как часто начисляем? Если = 0 - не начислять
     public static final BigDecimal HOLD_ROYALTY_MIN = new BigDecimal("0.0001"); // если меньше то распределение не делаем
+
+    /**
+     * По какому активу считаем дивиденды
+     */
+    public static final long HOLD_ROYALTY_ASSET = AssetCls.ERA_KEY;
+
     /**
      * Если не задан то будет взят счет из Генесиз-блока
      */
     public static Account HOLD_ROYALTY_EMITTER = null; //new Account("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
-    public static final long HOLD_ROYALTY_ASSET = AssetCls.ERA_KEY;
 
 
     /**
