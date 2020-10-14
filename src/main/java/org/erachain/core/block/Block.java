@@ -2097,7 +2097,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         if (emittedFee != 0) {
             // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
+            BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
                     new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), true, false);
         }
 
@@ -2306,7 +2306,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             return;
 
         // если сумма малая - не начисляем
-        BigDecimal readyToRoyalty = GenesisBlock.CREATOR.getBalance(dcSet, Transaction.FEE_KEY, TransactionAmount.ACTION_DEBT).b.negate();
+        BigDecimal readyToRoyalty = BlockChain.HOLD_ROYALTY_EMITTER.getBalance(dcSet, Transaction.FEE_KEY, TransactionAmount.ACTION_DEBT).b.negate();
         if (readyToRoyalty.compareTo(BlockChain.HOLD_ROYALTY_MIN) < 0)
             return;
 
@@ -2346,12 +2346,12 @@ public class Block implements Closeable, ExplorerJsonLine {
             }
 
             // учтем снятие с начисления для держателей долей
-            GenesisBlock.CREATOR.changeBalance(dcSet, asOrphan, false, -Transaction.FEE_KEY,
+            BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, asOrphan, false, -Transaction.FEE_KEY,
                     totalPayedRoyalty,
                     true, false);
 
             if (this.txCalculated != null) {
-                txCalculated.add(new RCalculated(GenesisBlock.CREATOR, Transaction.FEE_KEY, totalPayedRoyalty.negate(),
+                txCalculated.add(new RCalculated(BlockChain.HOLD_ROYALTY_EMITTER, Transaction.FEE_KEY, totalPayedRoyalty.negate(),
                         "AS-staking OUT", txReference, 0L));
             }
 

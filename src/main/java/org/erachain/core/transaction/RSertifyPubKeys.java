@@ -9,7 +9,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
@@ -633,12 +632,12 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             // EMITTE LIA
             issuer.changeBalance(this.dcSet, false, false, AssetCls.LIA_KEY, BigDecimal.ONE, false, false);
             // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, true, false, AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
+            BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, true, false, AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
 
             // EMITTE LIA
             this.creator.changeBalance(this.dcSet, false, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false, false);
             // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, true, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
+            BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, true, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
 
 
             boolean makeCalculates = false;
@@ -667,7 +666,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 
             // TO EMITTE FEE (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, true, false, FEE_KEY, issued_FEE_BD_total, true, false);
+            BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, true, false, FEE_KEY, issued_FEE_BD_total, true, false);
 
         }
 
@@ -761,12 +760,12 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             // EMITTE LIA
             issuer.changeBalance(this.dcSet, true, false, AssetCls.LIA_KEY, BigDecimal.ONE, false, false);
             // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, false, false, AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
+            BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, false, false, AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
 
             // EMITTE LIA
             this.creator.changeBalance(this.dcSet, true, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false, false);
             // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, false, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
+            BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, false, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true, false);
 
             // BONUSES
 
@@ -783,7 +782,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 
             // ADD to EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, false, false, FEE_KEY, issued_FEE_BD_total, true, false);
+            BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, false, false, FEE_KEY, issued_FEE_BD_total, true, false);
 
         }
 
