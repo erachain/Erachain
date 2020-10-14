@@ -356,6 +356,7 @@ public class BlockChain {
     //public static final int FEE_MIN_BYTES = 200;
     public static final int FEE_PER_BYTE_4_10 = 64;
     public static final int FEE_PER_BYTE = 100;
+    public static final long FEE_KEY = AssetCls.FEE_KEY;
     public static final int FEE_SCALE = 8;
     public static final BigDecimal FEE_RATE = BigDecimal.valueOf(1, FEE_SCALE);
     //public static final BigDecimal MIN_FEE_IN_BLOCK_4_10 = BigDecimal.valueOf(FEE_PER_BYTE_4_10 * 8 * 128, FEE_SCALE);
@@ -372,12 +373,14 @@ public class BlockChain {
     //
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
 
+    /**
+     * FEE_KEY used here
+     */
     public static final int ACTION_ROYALTY_START = 0; // if - 0 - OFF
     public static final int ACTION_ROYALTY_PERCENT = 8400; // x0.001
     public static final BigDecimal ACTION_ROYALTY_MIN = new BigDecimal("0.000001"); // x0.001
     public static final int ACTION_ROYALTY_MAX_DAYS = 30; // x0.001
     public static final BigDecimal ACTION_ROYALTY_TO_HOLD_ROYALTY_PERCENT = new BigDecimal("0.01"); // сколько добавляем к награде
-    public static final long ACTION_ROYALTY_ASSET = AssetCls.FEE_KEY;
     public static final boolean ACTION_ROYALTY_PERSONS_ONLY = false;
 
     /**
@@ -397,7 +400,6 @@ public class BlockChain {
      */
     public static Account HOLD_ROYALTY_EMITTER = null; //new Account("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
     public static final long HOLD_ROYALTY_ASSET = AssetCls.ERA_KEY;
-    public static final int HOLD_ROYALTY_ASSET_SCALE = 8;
 
 
     /**

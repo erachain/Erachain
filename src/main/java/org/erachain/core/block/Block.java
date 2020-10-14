@@ -2306,14 +2306,14 @@ public class Block implements Closeable, ExplorerJsonLine {
             return;
 
         // если сумма малая - не начисляем
-        BigDecimal readyToRoyalty = BlockChain.HOLD_ROYALTY_EMITTER.getBalance(dcSet, BlockChain.HOLD_ROYALTY_ASSET, TransactionAmount.ACTION_DEBT).b.negate();
+        BigDecimal readyToRoyalty = BlockChain.HOLD_ROYALTY_EMITTER.getBalance(dcSet, BlockChain.FEE_KEY, TransactionAmount.ACTION_DEBT).b.negate();
         if (readyToRoyalty.compareTo(BlockChain.HOLD_ROYALTY_MIN) < 0)
             return;
 
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
         AssetCls asset = dcSet.getItemAssetMap().get(BlockChain.HOLD_ROYALTY_ASSET);
         BigDecimal totalHold = asset.getReleased(dcSet);
-        BigDecimal koeff = readyToRoyalty.divide(totalHold, BlockChain.HOLD_ROYALTY_ASSET_SCALE + 5, RoundingMode.DOWN);
+        BigDecimal koeff = readyToRoyalty.divide(totalHold, BlockChain.FEE_SCALE + 5, RoundingMode.DOWN);
         BigDecimal totalPayedRoyalty = BigDecimal.ZERO;
 
         try (IteratorCloseable<byte[]> iterator = map.getIteratorByAsset(BlockChain.HOLD_ROYALTY_ASSET)) {
@@ -2324,21 +2324,21 @@ public class Block implements Closeable, ExplorerJsonLine {
                 byte[] key = iterator.next();
                 holder = new Account(ItemAssetBalanceMap.getShortAccountFromKey(key));
                 balanceHold = map.get(key).a.b;
-                balanceHold = balanceHold.multiply(koeff).setScale(BlockChain.HOLD_ROYALTY_ASSET_SCALE, RoundingMode.DOWN);
+                balanceHold = balanceHold.multiply(koeff).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN);
 
                 if (balanceHold.signum() <= 0)
                     continue;
 
-                holder.changeBalance(dcSet, asOrphan, false, BlockChain.HOLD_ROYALTY_ASSET, balanceHold, false, true);
+                holder.changeBalance(dcSet, asOrphan, false, BlockChain.FEE_KEY, balanceHold, false, true);
                 // учтем что получили бонусы
                 holder.changeCOMPUBonusBalances(dcSet, asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
 
                 // у эмитента снимем
-                BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, !asOrphan, false, BlockChain.HOLD_ROYALTY_ASSET, balanceHold, false, true);
+                BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, !asOrphan, false, BlockChain.FEE_KEY, balanceHold, false, true);
                 BlockChain.HOLD_ROYALTY_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
 
                 if (this.txCalculated != null) {
-                    txCalculated.add(new RCalculated(holder, BlockChain.HOLD_ROYALTY_ASSET, balanceHold,
+                    txCalculated.add(new RCalculated(holder, BlockChain.FEE_KEY, balanceHold,
                             "AS-stacking", txReference, 0L));
                 }
 
@@ -2346,12 +2346,12 @@ public class Block implements Closeable, ExplorerJsonLine {
             }
 
             // учтем снятие с начисления для держателей долей
-            BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, asOrphan, false, -BlockChain.HOLD_ROYALTY_ASSET,
+            BlockChain.HOLD_ROYALTY_EMITTER.changeBalance(dcSet, asOrphan, false, -BlockChain.FEE_KEY,
                     totalPayedRoyalty,
                     true, false);
 
             if (this.txCalculated != null) {
-                txCalculated.add(new RCalculated(BlockChain.HOLD_ROYALTY_EMITTER, BlockChain.HOLD_ROYALTY_ASSET, totalPayedRoyalty.negate(),
+                txCalculated.add(new RCalculated(BlockChain.HOLD_ROYALTY_EMITTER, BlockChain.FEE_KEY, totalPayedRoyalty.negate(),
                         "AS-stacking OUT", txReference, 0L));
             }
 
