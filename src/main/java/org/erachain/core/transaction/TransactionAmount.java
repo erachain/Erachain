@@ -1266,11 +1266,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             if (block != null && block.txCalculated != null) {
                 block.txCalculated.add(new RCalculated(this.creator, absKey,
                         this.assetFee.negate(), "Asset Fee", this.dbRef, 0L));
-
-                if (assetFeeBurn != null && assetFeeBurn.signum() != 0) {
-                    block.txCalculated.add(new RCalculated(asset.getOwner(), absKey,
-                            this.assetFeeBurn, "Asset Burn", this.dbRef, 0L));
-                }
             }
         }
     }
