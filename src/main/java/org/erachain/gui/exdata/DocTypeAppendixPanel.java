@@ -64,7 +64,7 @@ public class DocTypeAppendixPanel extends JPanel {
                                 labelTitle.setText(Lang.getInstance().translate("Set parent Document for Appendix")
                                         + ".\n\n" + Lang.getInstance().translate("This will be reset Recipients list to involved accounts list by default")
                                         + ".\n" + Lang.getInstance().translate("But You may edit Recipients list"));
-                                estimationPanel.setVisible(BlockChain.TEST_MODE);
+                                estimationPanel.setVisible(false);
                                 break;
                             case ExData.LINK_REPLY_COMMENT_TYPE:
                                 labelTitle.setText(Lang.getInstance().translate("Set parent Document for Reply")
@@ -98,8 +98,10 @@ public class DocTypeAppendixPanel extends JPanel {
         parentDetails = new JLabel();
 
         parentReference = new JTextField();
-        estimationImportant = new JComboBox<String>(new String[]{ "","Неважно","Бесполезно","Важно","Очень важно"});
-        estimationInteresting = new JComboBox<String>(new String[]{"","Жутко","Страшно","Интересно","Весело", "Смешно","Умора"});
+        estimateType1 = new JComboBox<String>(new String[]{"", "Неважно", "Бесполезно", "Важно", "Очень важно"});
+        estimateTypeValue1 = new JComboBox<String>(new String[]{"1", "2"});
+        estimateType2 = new JComboBox<String>(new String[]{"", "Жутко", "Страшно", "Интересно", "Весело", "Смешно", "Умора"});
+        estimateTypeValue2 = new JComboBox<String>(new String[]{"1", "2"});
 
         this.parentReference.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -227,28 +229,57 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        estimationPanel.add(new JLabel(Lang.getInstance().translate("Оценка1") + ":"), gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 5);
+        estimationPanel.add(new JLabel(Lang.getInstance().translate("Estimate") + " 1: "), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.3;
-        estimationPanel.add(estimationImportant, gridBagConstraints);
+        estimationPanel.add(estimateType1, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 5);
+        estimationPanel.add(new JLabel(Lang.getInstance().translate("Value") + " 1: "), gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.3;
+        estimationPanel.add(estimateTypeValue1, gridBagConstraints);
+
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        estimationPanel.add(new JLabel(Lang.getInstance().translate("Оценка2") + ":"), gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 5);
+        estimationPanel.add(new JLabel(Lang.getInstance().translate("Estimate") + " 2: "), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.3;
-        estimationPanel.add(estimationInteresting, gridBagConstraints);
+        estimationPanel.add(estimateType2, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+        estimationPanel.add(new JLabel(Lang.getInstance().translate("Value") + " 2: "), gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.3;
+        estimationPanel.add(estimateTypeValue2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -295,8 +326,10 @@ public class DocTypeAppendixPanel extends JPanel {
     private JLabel tagsLabel;
     public JTextField tagsField;
 
-    public JComboBox <String> estimationImportant ;
-    public JComboBox <String> estimationInteresting ;
+    public JComboBox<String> estimateType1;
+    public JComboBox<String> estimateType2;
+    public JComboBox<String> estimateTypeValue1;
+    public JComboBox<String> estimateTypeValue2;
     public JPanel estimationPanel;
 
     // End of variables declaration
