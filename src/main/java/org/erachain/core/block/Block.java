@@ -2125,8 +2125,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                     assetFee = assetFee.add(transaction.assetFee);
                 }
                 if (transaction.assetFeeBurn != null && transaction.assetFeeBurn.signum() != 0) {
-                    assetFee.subtract(transaction.assetFeeBurn);
-                    assetFeeBurn.add(transaction.assetFeeBurn);
+                    assetFee = assetFee.subtract(transaction.assetFeeBurn);
+                    assetFeeBurn = assetFeeBurn.add(transaction.assetFeeBurn);
                 }
 
                 earnedPair = new Tuple2(assetFee, assetFeeBurn);
