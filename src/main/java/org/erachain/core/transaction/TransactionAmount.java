@@ -312,7 +312,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (hasAmount() && getActionType() == ACTION_SEND // только для передачи в собственность!
                 && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
                 && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)
-                && creator != null && creator.equals(asset.getOwner())) {
+                && creator != null && !creator.equals(asset.getOwner())) {
             Fun.Tuple2<BigDecimal, BigDecimal> percItem = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
             assetFee = amount.abs().multiply(percItem.a).setScale(asset.getScale(), RoundingMode.DOWN);
             if (assetFee.compareTo(percItem.b) < 0) {
