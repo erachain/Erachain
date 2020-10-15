@@ -360,7 +360,8 @@ public class IssueDocumentPanel extends IconPanel {
                 return result;
             } else {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(result)),
+                        Lang.getInstance().translate(OnDealClick.resultMess(result))
+                                + (issueDoc.errorValue == null ? "" : ": " + issueDoc.errorValue),
                         Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                 return null;
             }

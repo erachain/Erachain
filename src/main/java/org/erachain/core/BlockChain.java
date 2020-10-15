@@ -246,11 +246,11 @@ public class BlockChain {
     public static final long VERS_30SEC_TIME =
             CLONE_MODE || TEST_MODE ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L;
 
-    public static final int VERS_4_21_02 = 684000;
+    public static final int VERS_4_21_02 = !MAIN_MODE ? 0 : 684000;
 
     public static final int VERS_4_23_01 = TEST_DB > 0 || CLONE_MODE || TEST_MODE ? 0 : 800000;
 
-    public static final int VERS_5_01_01 = TEST_DB > 0 || CLONE_MODE ? 0 : DEMO_MODE ? 426167 : TEST_MODE ? 0 : 990000;
+    public static final int VERS_5_01_01 = TEST_DB > 0 || CLONE_MODE ? 0 : DEMO_MODE ? 22000 : TEST_MODE ? 0 : 990000;
 
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
@@ -356,6 +356,7 @@ public class BlockChain {
     //public static final int FEE_MIN_BYTES = 200;
     public static final int FEE_PER_BYTE_4_10 = 64;
     public static final int FEE_PER_BYTE = 100;
+    public static final long FEE_KEY = AssetCls.FEE_KEY;
     public static final int FEE_SCALE = 8;
     public static final BigDecimal FEE_RATE = BigDecimal.valueOf(1, FEE_SCALE);
     //public static final BigDecimal MIN_FEE_IN_BLOCK_4_10 = BigDecimal.valueOf(FEE_PER_BYTE_4_10 * 8 * 128, FEE_SCALE);
@@ -372,13 +373,16 @@ public class BlockChain {
     //
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
 
+    /**
+     * FEE_KEY used here
+     */
     public static final int ACTION_ROYALTY_START = 0; // if - 0 - OFF
     public static final int ACTION_ROYALTY_PERCENT = 8400; // x0.001
     public static final BigDecimal ACTION_ROYALTY_MIN = new BigDecimal("0.000001"); // x0.001
     public static final int ACTION_ROYALTY_MAX_DAYS = 30; // x0.001
     public static final BigDecimal ACTION_ROYALTY_TO_HOLD_ROYALTY_PERCENT = new BigDecimal("0.01"); // сколько добавляем к награде
-    public static final long ACTION_ROYALTY_ASSET = AssetCls.FEE_KEY;
     public static final boolean ACTION_ROYALTY_PERSONS_ONLY = false;
+    public static final long ACTION_ROYALTY_ASSET_2 = 0L;
 
     /**
      * какие проценты при переводе каких активов - Ключ : процент + минималка.
@@ -392,9 +396,17 @@ public class BlockChain {
 
     public static final int HOLD_ROYALTY_PERIOD_DAYS = 0; // как часто начисляем? Если = 0 - не начислять
     public static final BigDecimal HOLD_ROYALTY_MIN = new BigDecimal("0.0001"); // если меньше то распределение не делаем
-    public static Account HOLD_ROYALTY_EMITTER = new Account("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt"); // если меньше то распределение не делаем
+
+    /**
+     * По какому активу считаем дивиденды
+     */
     public static final long HOLD_ROYALTY_ASSET = AssetCls.ERA_KEY;
 
+    /**
+     * Если не задан то будет взят счет из Генесиз-блока
+     * Если есть начисления бонусов по ROYALTY то надо его задать
+     */
+    public static PublicKeyAccount FEE_ASSET_EMITTER = null;
 
     /**
      * Включает реферальную систему
@@ -481,7 +493,11 @@ public class BlockChain {
     public BlockChain(DCSet dcSet_in) throws Exception {
 
         trustedPeers.addAll(Settings.getInstance().getTrustedPeers());
-        //HOLD_ROYALTY_EMITTER = new Account("q");
+        if (FEE_ASSET_EMITTER == null) {
+            // для учета эмиссии COMPU и других
+            FEE_ASSET_EMITTER = GenesisBlock.CREATOR;
+        }
+
 
         if (TEST_DB > 0 || TEST_MODE && !DEMO_MODE) {
             ;
@@ -884,6 +900,29 @@ public class BlockChain {
         }
         return 0;
     }
+
+    public static AssetCls FEE_ASSET;
+
+    /**
+     * Если счет админа и с него можно до бесконечности брать
+     *
+     * @param height
+     * @param account
+     * @return
+     */
+    public static boolean isFeeEnough(int height, Account account) {
+        if (true) {
+            // for MAIN NET
+            return false;
+        }
+
+        // FOR CLONES
+        if (FEE_ASSET == null)
+            FEE_ASSET = Controller.getInstance().getDCSet().getItemAssetMap().get(AssetCls.FEE_KEY);
+
+        return FEE_ASSET.getOwner().equals(account);
+    }
+
 
     public static int BLOCKS_PER_DAY(int height) {
         return 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME(height); // 300 PER DAY
