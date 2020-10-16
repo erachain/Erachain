@@ -55,11 +55,11 @@ public class ExData {
     private static final int SOURCES_SIZE_LENGTH = 3; // size version part
     private static final int SECRET_LENGTH = Crypto.HASH_LENGTH; // size version part
 
+    /**
+     * flags[1] masks
+     */
     private static final byte HAS_PARENT_MASK = -128;
-
     private static final byte RECIPIENTS_FLAG_MASK = 64;
-    private static final byte RECIPIENTS_FLAG_SING_ONLY_MASK = -128;
-
     private static final byte ENCRYPT_FLAG_MASK = 32;
     private static final byte AUTHORS_FLAG_MASK = 16;
     private static final byte SOURCES_FLAG_MASK = 8;
@@ -95,6 +95,7 @@ public class ExData {
     private HashMap<String, Tuple3<byte[], Boolean, byte[]>> files;
 
     private byte recipientsFlags;
+    private static final byte RECIPIENTS_FLAG_SING_ONLY_MASK = -128;
     private Account[] recipients;
 
     private byte authorsFlags;
