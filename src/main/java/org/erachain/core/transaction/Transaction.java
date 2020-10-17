@@ -2036,6 +2036,9 @@ public abstract class Transaction implements ExplorerJsonLine {
             // set last transaction signature for this ACCOUNT
             this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
+            // CALC ROYALTY
+            processRoyalty(block, true);
+
         }
 
         if (exLink != null) {
