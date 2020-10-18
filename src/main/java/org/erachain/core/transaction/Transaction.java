@@ -1802,8 +1802,8 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     private void calcRoyalty(Block block, Account account, long koeff, boolean asOrphan) {
 
-        if (account.equals(BlockChain.FEE_ASSET_EMITTER)
-                || account.equals(GenesisBlock.CREATOR))
+        if (account.equals(GenesisBlock.CREATOR)
+                || isInvolved(BlockChain.FEE_ASSET_EMITTER))
             return;
 
         Tuple4<Long, Integer, Integer, Integer> personDuration;

@@ -966,6 +966,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height,
                                         true);
 
+                                if (assetFee != null && assetFee.signum() != 0) {
+                                    // учтем что еще процент с актива
+                                    forSale = forSale.add(assetFee);
+                                }
+
                                 if (amount.compareTo(forSale) > 0) {
                                     if (BlockChain.CLONE_MODE || BlockChain.TEST_MODE)
                                         return NO_BALANCE;
