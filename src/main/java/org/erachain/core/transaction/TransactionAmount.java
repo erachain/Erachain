@@ -309,10 +309,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     @Override
     public long calcBaseFee() {
+
         if (hasAmount() && getActionType() == ACTION_SEND // только для передачи в собственность!
                 && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
                 && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)
-                && creator != null && !creator.equals(asset.getOwner())) {
+                && !isInvolved(asset.getOwner())) {
             Fun.Tuple2<BigDecimal, BigDecimal> percItem = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
             assetFee = amount.abs().multiply(percItem.a).setScale(asset.getScale(), RoundingMode.DOWN);
             if (assetFee.compareTo(percItem.b) < 0) {
@@ -902,11 +903,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                         if (absKey == FEE_KEY) {
 
+                            BigDecimal forSale = this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b;
+                            if (assetFee != null && assetFee.signum() != 0) {
+                                // учтем что еще процент с актива
+                                forSale = forSale.subtract(assetFee);
+                            }
+
                             if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0L
                                     && !BlockChain.ERA_COMPU_ALL_UP
                                     && !BlockChain.isFeeEnough(height, creator)
-                                    && this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b
-                                    .compareTo(this.amount.add(this.fee)) < 0) {
+                                    && forSale.compareTo(this.amount.add(this.fee)) < 0) {
 
                                 /// если это девелоп то не проверяем ниже особые счета
                                 if (BlockChain.CLONE_MODE || BlockChain.TEST_MODE)
@@ -968,7 +974,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                                 if (assetFee != null && assetFee.signum() != 0) {
                                     // учтем что еще процент с актива
-                                    forSale = forSale.add(assetFee);
+                                    forSale = forSale.subtract(assetFee);
                                 }
 
                                 if (amount.compareTo(forSale) > 0) {
@@ -1266,7 +1272,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
 
         if (assetFee != null && assetFee.signum() != 0) {
-            // учтем что он еще заплатил коэффицинт с суммы
+            // учтем что он еще заплатил коэффициент с суммы
             this.creator.changeBalance(db, !backward, backward, absKey, this.assetFee, !incomeReverse, false);
             if (block != null && block.txCalculated != null) {
                 block.txCalculated.add(new RCalculated(this.creator, absKey,
