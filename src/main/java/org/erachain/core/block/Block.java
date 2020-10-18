@@ -17,10 +17,7 @@ import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.RCalculated;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.core.transaction.TransactionFactory;
+import org.erachain.core.transaction.*;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
@@ -642,7 +639,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                     // if here is error ArrayIndexOutOfBoundsException - see https://lab.erachain.org/erachain/Erachain/-/issues/1440
                     System.arraycopy(txRAW, 0, rawTransactions, rawPos, transactionLength);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    LOGGER.info("ATTENTION!!! PLEASE remove transaction for Account: " + transaction.toStringShortAsCreator());
+                    LOGGER.info("ATTENTION!!! PLEASE remove transaction for Account: "
+                            + ((GenesisTransferAssetTransaction) transaction).getRecipient().getAddress() + " - " + transaction.toStringShortAsCreator());
                     LOGGER.info("ATTENTION!!! See issue https://lab.erachain.org/erachain/Erachain/-/issues/1440");
                     throw (e);
                 }
