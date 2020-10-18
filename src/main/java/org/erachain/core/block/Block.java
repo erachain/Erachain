@@ -638,6 +638,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 // WRITE TRANSACTION
                 byte[] txRAW = transaction.toBytes(Transaction.FOR_NETWORK, true);
+                // if here is error ArrayIndexOutOfBoundsException - see https://lab.erachain.org/erachain/Erachain/-/issues/1440
                 System.arraycopy(txRAW, 0, rawTransactions, rawPos, transactionLength);
                 rawPos += transactionLength;
 

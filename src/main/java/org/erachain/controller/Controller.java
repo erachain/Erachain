@@ -3934,13 +3934,14 @@ public class Controller extends Observable {
 
             } catch (Exception e) {
 
-                LOGGER.error(e.getMessage(), e);
                 // show error dialog
+                String error = e.toString() + e.getMessage();
+                LOGGER.error(error, e);
                 if (useGui) {
                     if (Settings.getInstance().isGuiEnabled()) {
                         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, null,
                                 Lang.getInstance().translate("STARTUP ERROR") + ": "
-                                        + Lang.getInstance().translate(e.getMessage()), 600, 400, Lang.getInstance().translate(" "));
+                                        + error, 600, 400, Lang.getInstance().translate(" "));
                         dd.jButton1.setVisible(false);
                         dd.jButton2.setText(Lang.getInstance().translate("Cancel"));
                         dd.setLocationRelativeTo(null);
