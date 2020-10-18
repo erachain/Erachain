@@ -1822,7 +1822,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (asOrphan) {
             // это откат - списываем
             Tuple3<Long, Long, Long> lastValue = peekRoyaltyData(royaltyID);
-            if (lastValue.c == 0) {
+            if (lastValue == null || lastValue.c == 0) {
                 return;
             }
 
