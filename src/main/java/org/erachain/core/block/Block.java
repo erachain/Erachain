@@ -638,8 +638,14 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 // WRITE TRANSACTION
                 byte[] txRAW = transaction.toBytes(Transaction.FOR_NETWORK, true);
-                // if here is error ArrayIndexOutOfBoundsException - see https://lab.erachain.org/erachain/Erachain/-/issues/1440
-                System.arraycopy(txRAW, 0, rawTransactions, rawPos, transactionLength);
+                try {
+                    // if here is error ArrayIndexOutOfBoundsException - see https://lab.erachain.org/erachain/Erachain/-/issues/1440
+                    System.arraycopy(txRAW, 0, rawTransactions, rawPos, transactionLength);
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    LOGGER.info("ATTENTION!!! PLEASE remove transaction for Account: " + transaction.toStringShortAsCreator());
+                    LOGGER.info("ATTENTION!!! See issue https://lab.erachain.org/erachain/Erachain/-/issues/1440");
+                    throw (e);
+                }
                 rawPos += transactionLength;
 
                 // ACCUMULATE SINGNs FOR HASH
