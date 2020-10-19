@@ -766,6 +766,9 @@ public class API {
             } else {
                 out.put("error", result.getB());
                 out.put("message", OnDealClick.resultMess(result.getB()));
+                if (result.getA().errorValue != null) {
+                    out.put("value", result.getA().errorValue);
+                }
                 return out;
             }
 
@@ -808,6 +811,9 @@ public class API {
         } else {
             out.put("status", "error");
             out.put("error", OnDealClick.resultMess(status));
+            if (transaction.errorValue != null) {
+                out.put("value", transaction.errorValue);
+            }
         }
         out.put("signature", Base58.encode(transaction.getSignature()));
         return out;
