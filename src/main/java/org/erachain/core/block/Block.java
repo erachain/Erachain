@@ -2543,14 +2543,14 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         long start = System.currentTimeMillis();
 
+        //REMOVE FEE
+        feeProcess(dcSet, true);
+
         //ORPHAN TRANSACTIONS
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2 ORPHAN TRANSACTIONS");
         this.orphanTransactions(dcSet, heightBlock, notStoreTXs);
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2f FEE");
-
-        //REMOVE FEE
-        feeProcess(dcSet, true);
 
         makeHoldRoyalty(dcSet, true);
 
