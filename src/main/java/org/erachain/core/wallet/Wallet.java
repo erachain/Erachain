@@ -661,6 +661,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 						block = null;
 					} catch (java.lang.OutOfMemoryError e) {
 						LOGGER.error(e.getMessage(), e);
+						// внутрення ошибка - выходим для лога
 						Controller.getInstance().stopAll(644);
 						return;
 					}

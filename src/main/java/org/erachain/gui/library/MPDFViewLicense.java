@@ -36,23 +36,22 @@ import java.util.zip.DataFormatException;
  */
 
 /**
- *
  * @author Саша
  */
-public class MPDFView extends javax.swing.JPanel {
+public class MPDFViewLicense extends javax.swing.JPanel {
 
     protected Logger logger;
 
     private PDFFile pdffile;
     /**
-     * Creates new form MPDFView
+     * Creates new form MPDFViewLicense
      */
     private int pages;
     ByteBuffer buf = null;
     private JPanel jPanelBottomTutton;
     private JButton jButtonZoomAdd;
     private JButton jButtonZoomDec;
-    private MPDFView th;
+    private MPDFViewLicense th;
     protected int height;
     protected int width;
     protected double zoomIndex;
@@ -60,7 +59,7 @@ public class MPDFView extends javax.swing.JPanel {
     private int height1;
     int pageNum = 0;
 
-    public MPDFView(String fileName) {
+    public MPDFViewLicense(String fileName) {
         super();
 
         logger = LoggerFactory.getLogger(getClass());
@@ -76,7 +75,7 @@ public class MPDFView extends javax.swing.JPanel {
         initComponents();
 
         try {
-            pdffile = new PDFFile(readPDFFile(fileName));
+            pdffile = new PDFFile(readPDFLicenseOrExit(fileName));
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -212,7 +211,7 @@ public class MPDFView extends javax.swing.JPanel {
         add(jPanelBottom, gridBagConstraints);
     }
 
-    private ByteBuffer readPDFFile() {
+    private ByteBuffer readPDFLicenseOrExit() {
 
         Long langRef = Controller.LICENSE_LANG_REFS.get(Settings.getInstance().getLang());
         if (langRef == null)
@@ -286,10 +285,10 @@ public class MPDFView extends javax.swing.JPanel {
         return buf;
     }
 
-    public ByteBuffer readPDFFile(String fileName) {
+    public ByteBuffer readPDFLicenseOrExit(String fileName) {
 
         if (fileName == null)
-            return readPDFFile();
+            return readPDFLicenseOrExit();
 
         File file;
         file = new File(fileName);
