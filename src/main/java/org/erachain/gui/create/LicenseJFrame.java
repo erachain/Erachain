@@ -3,7 +3,7 @@ package org.erachain.gui.create;
 import com.sun.pdfview.PagePanel;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.gui.library.MPDFView;
+import org.erachain.gui.library.MPDFViewLicense;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 
@@ -152,7 +152,7 @@ public class LicenseJFrame extends JDialog {
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
     //    mainPanel.add(scrollPaneDescription, gridBagConstraints);
-        MPDFView pp = new MPDFView(null);
+        MPDFViewLicense pp = new MPDFViewLicense(null);
         
         mainPanel.add( pp, gridBagConstraints);
         pp.show();

@@ -822,6 +822,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 ctrl.orphanInPipe(block);
                             } catch (Exception e) {
                                 // если ошибка то выход делаем чтобы зарегистрировать ошибку
+                                // так как это наша личная ошибка внутри
                                 LOGGER.error(e.getMessage(), e);
                                 ctrl.stopAll(104);
                                 return;
