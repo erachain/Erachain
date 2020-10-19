@@ -85,7 +85,7 @@ public class APIUtils {
 
     public static String errorMess(int error, String message, Transaction transaction) {
         String errorMsg = "{ \"error\":" + error + ", \"message\": \"" + message + "\"";
-        if (transaction.errorValue != null) {
+        if (transaction != null && transaction.errorValue != null) {
             errorMsg += ", \"value\":\"" + transaction.errorValue + "\"";
         }
         return errorMsg + " }";

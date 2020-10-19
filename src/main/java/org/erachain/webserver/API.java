@@ -509,13 +509,13 @@ public class API {
         JSONObject out = new JSONObject();
 
         //CREATE TRANSACTION FROM RAW
-        Transaction transaction;
+        Transaction transaction = null;
         try {
             transaction = TransactionFactory.getInstance().parse(Base58.decode(raw), Transaction.FOR_NETWORK);
             out = transaction.toJson();
         } catch (Exception e) {
             out.put("error", -1);
-            out.put("message", APIUtils.errorMess(-1, e.toString()));
+            out.put("message", APIUtils.errorMess(-1, e.toString(), transaction));
         }
 
         return Response.status(200)
