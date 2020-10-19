@@ -82,7 +82,15 @@ public class APIUtils {
     public static String errorMess(int error, String message) {
         return "{ \"error\":" + error + ", \"message\": \"" + message + "\" }";
     }
-    
+
+    public static String errorMess(int error, String message, Transaction transaction) {
+        String errorMsg = "{ \"error\":" + error + ", \"message\": \"" + message + "\"";
+        if (transaction.errorValue != null) {
+            errorMsg += ", \"value\":\"" + transaction.errorValue + "\"";
+        }
+        return errorMsg + " }";
+    }
+
     public static void disallowRemote(HttpServletRequest request, String ipAddress) throws WebApplicationException {
 
         // SEE in org.erachain.api.ApiService.ApiService -
