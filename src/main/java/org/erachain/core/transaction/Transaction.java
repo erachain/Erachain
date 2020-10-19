@@ -1802,8 +1802,8 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     private void calcRoyalty(Block block, Account account, long koeff, boolean asOrphan) {
 
-        if (account.equals(BlockChain.FEE_ASSET_EMITTER)
-                || account.equals(GenesisBlock.CREATOR))
+        if (account.equals(GenesisBlock.CREATOR)
+                || getKey() != FEE_KEY)
             return;
 
         Tuple4<Long, Integer, Integer, Integer> personDuration;
@@ -1822,7 +1822,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (asOrphan) {
             // это откат - списываем
             Tuple3<Long, Long, Long> lastValue = peekRoyaltyData(royaltyID);
-            if (lastValue.c == 0) {
+            if (lastValue == null || lastValue.c == 0) {
                 return;
             }
 

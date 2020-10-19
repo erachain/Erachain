@@ -1,5 +1,7 @@
 package org.erachain.utils;
 
+import org.erachain.core.crypto.Base58;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -7,9 +9,13 @@ import java.io.RandomAccessFile;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.erachain.core.crypto.Base58;
-
-
+/**
+ * Быстрый ХЭШ больших файлов через буфер 1 МБ.
+ * Используется только для создания хэшей их файлов как утилита для пользователя при создании ХЭША для JSON ExData - то есть тут вообще любой может быть алгоритм.
+ * А для создания ХЭША на лету из вложенного в ExData файла используется прямой алгоритм. Поэтому важно их не путать: то что задает сам пользователь, даже с помощью этой утилиты - это его дело,
+ * а то что внутри ноды файлы хэшироуются - это другое.
+ * См. https://lab.erachain.org/erachain/Erachain/-/issues/1433
+ */
 public class FileHash  {
     String partOfName;
     String partOfContent;

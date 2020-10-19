@@ -629,18 +629,18 @@ public class Block implements Closeable, ExplorerJsonLine {
 
             //MAKE TRANSACTIONS HASH
             for (Transaction transaction : transactions) {
+
                 //WRITE TRANSACTION LENGTH
                 int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
                 byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
-                transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
                 System.arraycopy(transactionLengthBytes, 0, rawTransactions, rawPos, TRANSACTION_SIZE_LENGTH);
                 rawPos += TRANSACTION_SIZE_LENGTH;
 
-                //WRITE TRANSACTION
+                // WRITE TRANSACTION
                 System.arraycopy(transaction.toBytes(Transaction.FOR_NETWORK, true), 0, rawTransactions, rawPos, transactionLength);
                 rawPos += transactionLength;
 
-                // ACUMULATE SINGNs FOR HASH
+                // ACCUMULATE SINGNs FOR HASH
                 System.arraycopy(transaction.getSignature(), 0, hashData, hashPos, SIGNATURE_LENGTH);
                 hashPos += SIGNATURE_LENGTH;
 
