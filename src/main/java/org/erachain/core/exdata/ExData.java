@@ -994,7 +994,8 @@ public class ExData {
 
     public byte[] getTemplateHash() {
         return Crypto.getInstance().digest(("" + templateKey
-                + params.toJSONString()).getBytes(StandardCharsets.UTF_8));
+                + (params == null ? "" : params.toJSONString()))
+                .getBytes(StandardCharsets.UTF_8));
     }
 
     public byte[] getMessageHash() {

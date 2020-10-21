@@ -1,8 +1,5 @@
 package org.erachain.gui.settings;
 
-import java.awt.*;
-import java.math.BigDecimal;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -13,6 +10,8 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 
 import javax.swing.*;
+import java.awt.*;
+import java.math.BigDecimal;
 
 public class RatesSettingPanel extends javax.swing.JPanel {
 
@@ -50,7 +49,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
 
         int gridy = 0;
         jLabelTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelTitle.setText("<html><h2>" + Lang.getInstance().translate("COMPU Rates for View Fee") + "</h2><html>");
+        jLabelTitle.setText("<html><h2>" + Lang.getInstance().translate("FEE Rates for View") + "</h2><html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy++;
@@ -61,7 +60,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         add(jLabelTitle, gridBagConstraints);
 
         //jLabelCOMPU.setHorizontalAlignment(SwingConstants.RIGHT);
-        jLabelCOMPU.setText(Lang.getInstance().translate("Rate of COMPU") + ":");
+        jLabelCOMPU.setText(Lang.getInstance().translate("Rate") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridwidth = 2;
@@ -118,7 +117,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         add(jExchangeTitle, gridBagConstraints);
 
-        jLabelDefaultAsset.setText(Lang.getInstance().translate("Default Asset for Exchange Pair") + ":");
+        jLabelDefaultAsset.setText(Lang.getInstance().translate("Asset") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridwidth = 3;

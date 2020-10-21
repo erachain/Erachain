@@ -3000,12 +3000,12 @@ public class Controller extends Observable {
 
         // CHECK IF RECORD VALID
         if (!transaction.isSignatureValid(DCSet.getInstance()))
-            return new Pair<Transaction, Integer>(null, Transaction.INVALID_SIGNATURE);
+            return new Pair<Transaction, Integer>(transaction, Transaction.INVALID_SIGNATURE);
 
         // CHECK FOR UPDATES
         int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0l);
         if (valid != Transaction.VALIDATE_OK)
-            return new Pair<Transaction, Integer>(null, valid);
+            return new Pair<Transaction, Integer>(transaction, valid);
 
         return new Pair<Transaction, Integer>(transaction, valid);
 

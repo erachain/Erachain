@@ -378,6 +378,9 @@ public class RSignNote extends Transaction implements Itemable {
         //GET BASE
         JSONObject transaction = this.getJsonBase();
 
+        // если из RAW берется JSON - то надо просчитать все
+        parseDataFull();
+
         //ADD CREATOR/SERVICE/DATA
         if (data != null && data.length > 0) {
 
