@@ -2931,8 +2931,9 @@ public class Controller extends Observable {
 
     public void onTransactionCreate(Transaction transaction) {
         // ADD TO UNCONFIRMED TRANSACTIONS
-        //////this.dcSet.getTransactionTab().add(transaction);
-        /// чтобы не налететь на очистку таблицы - туда передадим
+
+        // очистим мясо со скелета
+        transaction = transaction.copy();
         this.transactionsPool.offerMessage(transaction);
 
         // BROADCAST
@@ -2940,7 +2941,7 @@ public class Controller extends Observable {
 
         if (doesWalletExists() && HARD_WORK < 4) {
             // для всех счетов - может сам себе послал
-            transaction.resetDCSet(); // сбросим назначения после Форкнутой Базы
+            //// transaction.resetDCSet(); // сбросим назначения после Форкнутой Базы
             wallet.processTransaction(transaction);
         }
 
