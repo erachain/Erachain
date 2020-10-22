@@ -897,6 +897,7 @@ public class TransactionCreator {
                 transaction.process(null, forDeal);
 
                 // if it ISSUE - reset key
+                // не надо теперь сбрасывать - Так как дальше скелет передается в onTransactionCreate
                 if (false && transaction instanceof IssueItemRecord) {
                     IssueItemRecord issueItem = (IssueItemRecord) transaction;
                     issueItem.getItem().resetKey();

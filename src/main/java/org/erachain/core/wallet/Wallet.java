@@ -1315,16 +1315,16 @@ public class Wallet extends Observable /*implements Observer*/ {
 		// CHECK TRANSACTIONS
 		int seqNo = 0;
 		for (Transaction transaction : block.getTransactions()) {
+			++seqNo;
 
 			// TODO нужно сделать при закрытии базы чтобы ожидала окончания проходя всего блока тут - пока ОТКАТ
-
 
 			if (transaction.isWiped()) {
 				continue;
 			}
 
 			if (transaction.noDCSet())
-				transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+				transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo, true);
 
 			if (!processTransaction(transaction))
 				continue;

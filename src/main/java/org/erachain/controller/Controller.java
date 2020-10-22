@@ -2940,8 +2940,6 @@ public class Controller extends Observable {
         this.broadcastTransaction(transaction);
 
         if (doesWalletExists() && HARD_WORK < 4) {
-            // для всех счетов - может сам себе послал
-            //// transaction.resetDCSet(); // сбросим назначения после Форкнутой Базы
             wallet.processTransaction(transaction);
         }
 
