@@ -1163,7 +1163,7 @@ public class ExData {
         }
 
         if (isEncrypted) {
-            // случайный пароль и его для всех шифруем
+            // случайный парольmake и его для всех шифруем
             flags[1] = (byte) (flags[1] | ENCRYPT_FLAG_MASK);
 
             byte[][] secrets = new byte[recipients.length + 1][];
