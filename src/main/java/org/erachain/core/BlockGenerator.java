@@ -377,6 +377,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         break;
                     }
 
+                    // сбросим всё мясо которе в КЭШе может быть
+                    // иначе может расчет не пойти так как какие-то данные уже заданы были из кошелька
+                    transaction = transaction.copy();
+
                     if (BlockChain.CHECK_BUGS > 7) {
                         LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()) + " " + transaction.getCreator().getAddress());
                         if (testTime > transaction.getTimestamp()) {

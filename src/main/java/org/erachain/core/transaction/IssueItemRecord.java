@@ -22,7 +22,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
     protected ItemCls item;
-    protected Long key;
+    protected Long key = 0L;
 
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
@@ -122,7 +122,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @Override
     public void sign(PrivateKeyAccount creator, int forDeal) {
         super.sign(creator, forDeal);
-        this.item.setReference(this.signature);
     }
 
     //PARSE CONVERT
@@ -252,6 +251,8 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
         //UPDATE CREATOR
         super.process(block, forDeal);
+
+        this.item.setReference(this.signature);
 
         //INSERT INTO DATABASE
         key = this.item.insertToMap(this.dcSet, this.item.getStartKey());

@@ -338,7 +338,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         ItemMap dbMap = this.getDBMap(db);
         long key = dbMap.getLastKey();
         return key;
-
     }
 
     public void resetKey() {
@@ -361,18 +360,18 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         return this.reference;
     }
 
+    /**
+     * Тут может быть переопределена повторно - если трнзакция валялась в неподтвержденных и была уже проверена
+     * ранее. Это не страшно
+     *
+     * @param signature
+     */
     public void setReference(byte[] signature) {
-        if (BlockChain.CHECK_BUGS > 1 && this.reference != null) {
-            Long error = null;
-            error++;
-        }
         this.reference = signature;
-
     }
 
     public Transaction getIssueTransaction(DCSet dcSet) {
         return dcSet.getTransactionFinalMap().get(this.reference);
-
     }
 
     public boolean isConfirmed() {

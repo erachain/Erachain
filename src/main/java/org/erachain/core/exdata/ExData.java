@@ -1163,7 +1163,7 @@ public class ExData {
         }
 
         if (isEncrypted) {
-            // случайный пароль и его для всех шифруем
+            // случайный парольmake и его для всех шифруем
             flags[1] = (byte) (flags[1] | ENCRYPT_FLAG_MASK);
 
             byte[][] secrets = new byte[recipients.length + 1][];
@@ -1376,7 +1376,7 @@ public class ExData {
         byte[] password;
         int pos = -1;
         if (account.equals((recipient))) {
-            pos = recipients.length; // последлний в Секретах
+            pos = recipients.length; // последний в Секретах
         } else {
             for (int i = 0; i < recipients.length; i++) {
                 if (recipients[i].equals(recipient)) {
@@ -1387,7 +1387,7 @@ public class ExData {
         }
 
         if (pos < 0) {
-            return new Fun.Tuple3<>(pos, null, null);
+            return new Fun.Tuple3<>(pos, "Address not found", null);
         }
 
         try {

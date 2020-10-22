@@ -258,8 +258,8 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         super.setDC(dcSet, false);
 
         if (dcSet != null && dcSet.getItemAssetMap() != null) {
-            this.haveAsset = this.dcSet.getItemAssetMap().get(this.haveKey);
-            this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
+            this.haveAsset = dcSet.getItemAssetMap().get(this.haveKey);
+            this.wantAsset = dcSet.getItemAssetMap().get(this.wantKey);
         }
 
         if (false && andUpdateFromState && !isWiped())
