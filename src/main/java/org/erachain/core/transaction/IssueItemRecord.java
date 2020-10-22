@@ -122,7 +122,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @Override
     public void sign(PrivateKeyAccount creator, int forDeal) {
         super.sign(creator, forDeal);
-        this.item.setReference(this.signature);
     }
 
     //PARSE CONVERT
@@ -252,6 +251,8 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
         //UPDATE CREATOR
         super.process(block, forDeal);
+
+        this.item.setReference(this.signature);
 
         //INSERT INTO DATABASE
         key = this.item.insertToMap(this.dcSet, this.item.getStartKey());

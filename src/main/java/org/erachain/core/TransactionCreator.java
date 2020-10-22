@@ -387,11 +387,11 @@ public class TransactionCreator {
 
         long lastReference;
         if (forIssue) {
-            lastReference = 0l;
-
+            lastReference = 0L;
         } else {
-            lastReference = time - 1000l;
+            lastReference = time - 1000L;
         }
+
         //CREATE ISSUE PLATE TRANSACTION
         IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte) feePow, time, lastReference);
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
