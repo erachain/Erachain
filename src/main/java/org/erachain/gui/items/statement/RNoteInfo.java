@@ -16,17 +16,24 @@ import org.erachain.gui.library.*;
 import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
+import org.erachain.utils.ZipBytes;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.zip.DataFormatException;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -54,7 +61,7 @@ public class RNoteInfo extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel_Title;
     private javax.swing.JPanel jPanel1;
     private MSplitPane jSplitPane1;
-    private MTextPane jTextArea_Body;
+    private JTextPane jTextArea_Body;
 
     Controller cntr;
 
@@ -87,7 +94,10 @@ public class RNoteInfo extends javax.swing.JPanel {
         jSplitPane1 = new MSplitPane();
         jPanel1 = new javax.swing.JPanel();
         new javax.swing.JScrollPane();
-        jTextArea_Body = new MTextPane();
+
+        jTextArea_Body = new JTextPane();
+        jTextArea_Body.setContentType("text/html");
+
         jPanel2 = new javax.swing.JPanel();
         file_Panel = new MAttachedFilesPanel();
         file_Panel.setVisible(false);
@@ -244,6 +254,70 @@ public class RNoteInfo extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         add(jSplitPane1, gridBagConstraints);
+
+        jTextArea_Body.addHyperlinkListener(new HyperlinkListener() {
+
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent arg0) {
+                // TODO Auto-generated method stub
+                String str = null;
+                if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
+
+                String fileName = arg0.getURL().toString();
+
+                FileChooser chooser = new FileChooser();
+                chooser.setDialogTitle(Lang.getInstance().translate("Save File") + ": " + str);
+                //chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
+                chooser.setMultiSelectionEnabled(false);
+                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                //chooser.setAcceptAllFileFilterUsed(false);
+
+                if (chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION) {
+
+                    String pp = chooser.getSelectedFile().getPath() + File.separatorChar + str;
+
+                    File ff = new File(pp);
+                    // if file
+                    if (ff.exists() && ff.isFile()) {
+                        int aaa = JOptionPane.showConfirmDialog(chooser, Lang.getInstance().translate("File") + " " + str + " " + Lang.getInstance().translate("Exists") + "! " + Lang.getInstance().translate("Overwrite") + "?", Lang.getInstance().translate("Message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                        System.out.print("\n gggg " + aaa);
+                        if (aaa != 0) {
+                            return;
+                        }
+                        ff.delete();
+
+                    }
+
+                    try (FileOutputStream fos = new FileOutputStream(pp)) {
+                        ExData exData = statement.getExData();
+                        HashMap<String, Tuple3<byte[], Boolean, byte[]>> items = exData.getFiles();
+                        Tuple3<byte[], Boolean, byte[]> fileItem = items.get(items);
+                        byte[] buffer = fileItem.c;
+                        // if ZIP
+                        if (fileItem.b) {
+                            byte[] buffer1 = null;
+                            try {
+                                buffer1 = ZipBytes.decompress(buffer);
+                            } catch (DataFormatException e1) {
+                                System.out.println(e1.getMessage());
+                            }
+                            fos.write(buffer1, 0, buffer1.length);
+                        } else {
+                            fos.write(buffer, 0, buffer.length);
+                        }
+
+                    } catch (IOException ex) {
+
+                        System.out.println(ex.getMessage());
+                    }
+
+                }
+
+
+            }
+        });
+
     }// </editor-fold>
 
     public void delay_on_Close() {
@@ -252,7 +326,8 @@ public class RNoteInfo extends javax.swing.JPanel {
 
     @SuppressWarnings("unchecked")
     private void viewInfo() {
-        String resultStr = "<body>"; // !!! обязательно первый символ < должен быть для HTML
+
+        String resultStr = "";
         ExData exData;
 
         exData = statement.getExData();
@@ -358,8 +433,9 @@ public class RNoteInfo extends javax.swing.JPanel {
                 while (it_Files.hasNext()) {
                     Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it_Files.next();
                     boolean zip = new Boolean(file.getValue().b);
-                    String name_File = file.getKey();
-                    resultStr += i++ + " " + name_File + " " + (zip ? Lang.getInstance().translate("Ziped") : "") + "<br>";
+                    String fileName = file.getKey();
+                    resultStr += i++ + ". <a href=" + fileName + ">"
+                            + fileName + (zip ? " (" + Lang.getInstance().translate("Zipped") + ")" : "") + "</a><br>";
                 }
                 resultStr += "<br";
             } else {
@@ -401,6 +477,20 @@ public class RNoteInfo extends javax.swing.JPanel {
             resultStr += statement.getExTags();
 
         }
+
+        int fontSize = UIManager.getFont("Label.font").getSize();
+
+        resultStr = "<head><style>"
+                + " h1{ font-size: " + (fontSize + 5) + "px;  } "
+                + " h2{ font-size: " + (fontSize + 3) + "px;  }"
+                + " h3{ font-size: " + (fontSize + 1) + "px;  }"
+                + " h4{ font-size: " + fontSize + "px;  }"
+                + " h5{ font-size: " + (fontSize - 1) + "px;  }"
+                + " body{ font-family:"
+                + UIManager.getFont("Label.font").getFamily() + "; font-size:" + fontSize + "px;"
+                + "word-wrap:break-word;}"
+                + "</style> </head><body>" + resultStr
+                + "</body>";
 
         jTextArea_Body.setText(resultStr);
     }

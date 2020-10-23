@@ -57,17 +57,16 @@ public class MImprintEDITPane extends JTextPane {
 
         out = out.replaceAll("\n", "<br>");
 
-        int font_saze = UIManager.getFont("Label.font").getSize();
-
+        int fontSize = UIManager.getFont("Label.font").getSize();
 
         return "<head><style>"
-                + " h1{ font-size: " + font_saze + "px;  } "
-                + " h2{ font-size: " + font_saze + "px;  }"
-                + " h3{ font-size: " + font_saze + "px;  }"
-                + " h4{ font-size: " + font_saze + "px;  }"
-                + " h5{ font-size: " + font_saze + "px;  }"
+                + " h1{ font-size: " + (fontSize + 5) + "px;  } "
+                + " h2{ font-size: " + (fontSize + 3) + "px;  }"
+                + " h3{ font-size: " + (fontSize + 1) + "px;  }"
+                + " h4{ font-size: " + fontSize + "px;  }"
+                + " h5{ font-size: " + (fontSize - 1) + "px;  }"
                 + " body{ font-family:"
-                + UIManager.getFont("Label.font").getFamily() + "; font-size:" + font_saze + "px;"
+                + UIManager.getFont("Label.font").getFamily() + "; font-size:" + fontSize + "px;"
                 + "word-wrap:break-word;}"
                 + "</style> </head><body>" + out
                 //	+ "<br><a href= 111jcnfkBOTTOM>Bottom</a>"
