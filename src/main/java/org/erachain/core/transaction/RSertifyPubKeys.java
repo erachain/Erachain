@@ -647,14 +647,19 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             }
 
             // GIVE GIFT for this PUB_KEY - to PERSON
+            BigDecimal issued_FEE_BD_total;
             BigDecimal personBonus = BlockChain.BONUS_FOR_PERSON(height);
-            pkAccount.changeBalance(dcSet, false, false, FEE_KEY, personBonus, false, true);
-            pkAccount.changeCOMPUBonusBalances(dcSet, false, personBonus, Transaction.BALANCE_SIDE_DEBIT);
-            if (makeCalculates) {
-                block.txCalculated.add(new RCalculated(pkAccount, FEE_KEY, personBonus,
-                        "enter bonus", this.dbRef, seqNo));
+            if (personBonus.signum() != 0) {
+                pkAccount.changeBalance(dcSet, false, false, FEE_KEY, personBonus, false, true);
+                pkAccount.changeCOMPUBonusBalances(dcSet, false, personBonus, Transaction.BALANCE_SIDE_DEBIT);
+                if (makeCalculates) {
+                    block.txCalculated.add(new RCalculated(pkAccount, FEE_KEY, personBonus,
+                            "enter bonus", this.dbRef, seqNo));
+                }
+                issued_FEE_BD_total = personBonus;
+            } else {
+                issued_FEE_BD_total = BigDecimal.ZERO;
             }
-            BigDecimal issued_FEE_BD_total = personBonus;
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
             issuer.changeBalance(dcSet, false, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
@@ -771,10 +776,16 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             // BONUSES
 
             // GIVE GIFT for this PUB_KEY - to PERSON
+            BigDecimal issued_FEE_BD_total;
             BigDecimal personBonus = BlockChain.BONUS_FOR_PERSON(height);
-            pkAccount.changeBalance(dcSet, true, false, FEE_KEY, personBonus, false, true);
-            pkAccount.changeCOMPUBonusBalances(dcSet, true, personBonus, Transaction.BALANCE_SIDE_DEBIT);
-            BigDecimal issued_FEE_BD_total = personBonus;
+            if (personBonus.signum() != 0) {
+
+                pkAccount.changeBalance(dcSet, true, false, FEE_KEY, personBonus, false, true);
+                pkAccount.changeCOMPUBonusBalances(dcSet, true, personBonus, Transaction.BALANCE_SIDE_DEBIT);
+                issued_FEE_BD_total = personBonus;
+            } else {
+                issued_FEE_BD_total = BigDecimal.ZERO;
+            }
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
             issuer.changeBalance(dcSet, true, false, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRAR_4_11,
