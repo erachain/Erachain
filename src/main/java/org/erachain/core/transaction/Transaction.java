@@ -1017,16 +1017,16 @@ public abstract class Transaction implements ExplorerJsonLine {
     // GET only INVITED FEE
     public long getInvitedFee() {
 
-        if (!BlockChain.REFERAL_BONUS_FOR_PERSON(height)) {
+        if (BlockChain.FEE_INVITED_DEEP <= 0 || !BlockChain.REFERAL_BONUS_FOR_PERSON(height)) {
             // SWITCH OFF REFERRAL
-            return 0l;
+            return 0L;
         }
 
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         if (personDuration == null
                 || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY) {
             // ANONYMOUS or ME
-            return 0l;
+            return 0L;
         }
 
         long fee = this.fee.unscaledValue().longValue();
@@ -1046,27 +1046,6 @@ public abstract class Transaction implements ExplorerJsonLine {
     public BigDecimal feeToBD(int fee) {
         return BigDecimal.valueOf(fee, BlockChain.FEE_SCALE);
     }
-
-    /*
-    public Block getBlock(DCSet db) {
-
-        if (this.block != null)
-            return block;
-
-        if (this.height <= 0) {
-            Long key = db.getTransactionFinalMapSigns().get(this.signature);
-            if (key == null)
-                return null;
-
-            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-            this.height = pair.a;
-        }
-
-        this.block = db.getBlockMap().get(this.height);
-
-        return block;
-    }
-    */
 
     public Tuple2<Integer, Integer> getHeightSeqNo() {
         return new Tuple2<Integer, Integer>(this.height, this.seqNo);
