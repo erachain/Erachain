@@ -439,7 +439,9 @@ public class RNoteInfo extends javax.swing.JPanel {
                     boolean zip = new Boolean(file.getValue().b);
                     String fileName = file.getKey();
                     resultStr += i++ + ". <a href=" + fileName + ">"
-                            + fileName + (zip ? " (" + Lang.getInstance().translate("Zipped") + ")" : "") + "</a><br>";
+                            + fileName + (zip ? " (" + Lang.getInstance().translate("Zipped") + ")" : "")
+                            + "</a>" + " - "
+                            + (file.getValue().c.length > 20000 ? (file.getValue().c.length >> 10) + "kB" : file.getValue().c.length + "B") + "<br>";
                 }
                 resultStr += "<br";
             } else {
