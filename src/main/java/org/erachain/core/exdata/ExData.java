@@ -113,7 +113,6 @@ public class ExData {
     private byte secretsFlags;
     private byte[][] secrets;
     private byte[] encryptedData;
-    private byte[] decryptedData;
 
     /**
      * OLD version 1-2
@@ -1392,7 +1391,9 @@ public class ExData {
 
         try {
             password = Controller.getInstance().decrypt(account, recipient, secrets[pos]);
-            decryptedData = AEScrypto.aesDecrypt(encryptedData, password);
+            LOGGER.info("secrets[pos]: " + Base58.encode(secrets[pos]));
+            LOGGER.info("password: " + Base58.encode(password));
+            byte[] decryptedData = AEScrypto.aesDecrypt(encryptedData, password);
             Fun.Tuple2<JSONObject, HashMap> jsonAndFiles = parseJsonAndFiles(decryptedData, true);
 
             // это уже не зашифрованный - сбросим
