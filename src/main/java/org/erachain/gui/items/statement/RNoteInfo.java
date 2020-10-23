@@ -97,6 +97,8 @@ public class RNoteInfo extends javax.swing.JPanel {
 
         jTextArea_Body = new JTextPane();
         jTextArea_Body.setContentType("text/html");
+        jTextArea_Body.setEditable(false);
+
 
         jPanel2 = new javax.swing.JPanel();
         file_Panel = new MAttachedFilesPanel();
@@ -260,13 +262,12 @@ public class RNoteInfo extends javax.swing.JPanel {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent arg0) {
                 // TODO Auto-generated method stub
-                String str = null;
                 if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
 
-                String fileName = arg0.getURL().toString();
+                String fileName = arg0.getDescription();
 
                 FileChooser chooser = new FileChooser();
-                chooser.setDialogTitle(Lang.getInstance().translate("Save File") + ": " + str);
+                chooser.setDialogTitle(Lang.getInstance().translate("Save File") + ": " + fileName);
                 //chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
                 chooser.setMultiSelectionEnabled(false);
@@ -275,13 +276,16 @@ public class RNoteInfo extends javax.swing.JPanel {
 
                 if (chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION) {
 
-                    String pp = chooser.getSelectedFile().getPath() + File.separatorChar + str;
+                    String pp = chooser.getSelectedFile().getPath() + File.separatorChar + fileName;
 
                     File ff = new File(pp);
                     // if file
                     if (ff.exists() && ff.isFile()) {
-                        int aaa = JOptionPane.showConfirmDialog(chooser, Lang.getInstance().translate("File") + " " + str + " " + Lang.getInstance().translate("Exists") + "! " + Lang.getInstance().translate("Overwrite") + "?", Lang.getInstance().translate("Message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-                        System.out.print("\n gggg " + aaa);
+                        int aaa = JOptionPane.showConfirmDialog(chooser,
+                                Lang.getInstance().translate("File") + " " + fileName
+                                        + " " + Lang.getInstance().translate("Exists") + "! "
+                                        + Lang.getInstance().translate("Overwrite") + "?", Lang.getInstance().translate("Message"),
+                                JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
                         if (aaa != 0) {
                             return;
                         }
@@ -292,7 +296,7 @@ public class RNoteInfo extends javax.swing.JPanel {
                     try (FileOutputStream fos = new FileOutputStream(pp)) {
                         ExData exData = statement.getExData();
                         HashMap<String, Tuple3<byte[], Boolean, byte[]>> items = exData.getFiles();
-                        Tuple3<byte[], Boolean, byte[]> fileItem = items.get(items);
+                        Tuple3<byte[], Boolean, byte[]> fileItem = items.get(fileName);
                         byte[] buffer = fileItem.c;
                         // if ZIP
                         if (fileItem.b) {
