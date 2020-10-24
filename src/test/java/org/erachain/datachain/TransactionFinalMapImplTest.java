@@ -6,6 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.IssueAssetTransaction;
@@ -35,6 +36,8 @@ public class TransactionFinalMapImplTest {
             IDB.DBS_MAP_DB
             //, IDB.DBS_ROCK_DB
     };
+
+    ExLink exLink = null;
 
     byte[] isText = new byte[]{1};
     byte[] enCrypted = new byte[]{0};
@@ -94,12 +97,12 @@ public class TransactionFinalMapImplTest {
 
         // FEE FUND
         accountA.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
-        accountA.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false);
-        accountA.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false);
+        accountA.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false);
+        accountA.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false);
 
         accountB.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
-        accountB.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false);
-        accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false);
+        accountB.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false);
+        accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false);
 
         timestamp = NTP.getTime();
     }

@@ -8,6 +8,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.transaction.GenesisTransferAssetTransaction;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -45,6 +46,8 @@ public class GeneratorTests {
 
     BlockChain blockchain;
     Block genesisBlock;
+
+    ExLink exLink = null;
 
     PrivateKeyAccount generator1;
 
@@ -580,8 +583,8 @@ public class GeneratorTests {
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000), NTP.getTime());
         //transaction.process(databaseSet, false);
         generator.setLastTimestamp(new long[]{genesisBlock.getTimestamp(), 0}, dcSet);
-        generator.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(10000), false, false);
-        generator.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10000), false, false);
+        generator.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(10000), false);
+        generator.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10000), false);
 
         //GENERATE NEXT BLOCK
         BlockGenerator blockGenerator = new BlockGenerator(dcSet, null, false);
@@ -652,8 +655,8 @@ public class GeneratorTests {
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000), NTP.getTime());
         //transaction.process(databaseSet, false);
         generator.setLastTimestamp(new long[]{genesisBlock.getTimestamp(), 0}, dcSet);
-        generator.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(10000), false, false);
-        generator.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(100000), false, false);
+        generator.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(10000), false);
+        generator.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(100000), false);
 
 
         //GENERATE NEXT BLOCK

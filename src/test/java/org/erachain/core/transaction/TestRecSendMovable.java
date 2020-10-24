@@ -6,6 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
@@ -33,8 +34,10 @@ public class TestRecSendMovable {
     long timestamp = NTP.getTime();
 
     byte version = 2;
-    byte prop2 = 0;    
+    byte prop2 = 0;
     byte prop1_backward = org.erachain.core.transaction.TransactionAmount.BACKWARD_MASK;
+
+    ExLink exLink = null;
 
     long flags = 0l;
     Controller cntrl;
@@ -76,10 +79,10 @@ public class TestRecSendMovable {
 
         // FEE FUND
         deliver.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        deliver.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
+        deliver.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false);
 
         producer.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        producer.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
+        producer.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false);
 
         asset = new AssetVenture(deliver, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);
         // set SCALABLE assets ++

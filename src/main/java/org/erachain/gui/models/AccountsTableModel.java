@@ -33,7 +33,7 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
     public AccountsTableModel() {
         super(Controller.getInstance().wallet.database.getAccountMap(),
                 new String[]{"No.", "Account", "Name",
-                        "Balance 1 (OWN)", "Balance 2 (DEBT)", "Balance 3 (HOLD)", "Balance 4 (SPEND)",
+                        "OWN (1)", "DEBT (2)", "HOLD (3)", "SPEND (4)",
                         AssetCls.FEE_NAME},
                 new Boolean[]{true, false, false, false, false, false, false, false}, false, -1000);
 

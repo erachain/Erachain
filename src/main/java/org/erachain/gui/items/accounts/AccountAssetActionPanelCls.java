@@ -103,7 +103,13 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         }
 
         this.account = accountFrom;
+
         recipient = accountTo;
+        // возможно есть счет по умолчанию
+        if (recipient == null && asset != null) {
+            recipient = asset.defaultRecipient(balancePosition, backward);
+        }
+
         this.balancePosition = balancePosition;
 
         initComponents(message);
@@ -278,11 +284,6 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jTextArea_Account_Description.setWrapStyleWord(true);
         jTextArea_Account_Description.setLineWrap(true);
         jScrollPane2.setViewportView(new AssetInfo(asset, false));
-
-        // возможно есть счет по умолчанию
-        if (recipient == null && asset != null) {
-            recipient = asset.defaultRecipient(balancePosition, backward);
-        }
 
         if (recipient == null) {
             jButton_ok.setEnabled(false);
@@ -588,7 +589,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
         add(jLabel_Recive_Detail, gridBagConstraints);
 
-        recipientAddress = new RecipientAddress(this);
+        recipientAddress = new RecipientAddress(this, recipient);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;

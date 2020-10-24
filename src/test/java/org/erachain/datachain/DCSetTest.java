@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.ntp.NTP;
@@ -25,8 +26,9 @@ import static org.junit.Assert.assertEquals;
 @Slf4j
 public class DCSetTest {
     int[] TESTED_DBS = //new int[]{DCSet.DBS_ROCK_DB, DCSet.DBS_MAP_DB, DCSet.DBS_NATIVE_MAP, DCSet.DBS_ROCK_DB}
-                    new int[]{DCSet.DBS_ROCK_DB}
-                ;
+            new int[]{DCSet.DBS_ROCK_DB};
+
+    ExLink exLink = null;
 
 
     String testsPath = Settings.getInstance().getDataTempDir();

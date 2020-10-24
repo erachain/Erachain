@@ -8,9 +8,9 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.nio.BufferUnderflowException;
@@ -473,7 +473,7 @@ public abstract class ATController {
                     totalFees += tx.getAmount();
                 }
                 //sender.setBalance( Transaction.FEE_KEY, sender.getBalance( dcSet, Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( tx.getAmount() ) ) , dcSet );
-                sender.changeBalance(dcSet, true, false, Transaction.FEE_KEY, BigDecimal.valueOf(tx.getAmount()), false, false);
+                sender.changeBalance(dcSet, true, false, Transaction.FEE_KEY, BigDecimal.valueOf(tx.getAmount()), false);
                 LOGGER.trace("Sender:" + sender.getAddress() + " total balance:" + sender.getBalance(dcSet, Transaction.FEE_KEY));
             }
 

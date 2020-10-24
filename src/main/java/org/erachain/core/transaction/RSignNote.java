@@ -393,9 +393,7 @@ public class RSignNote extends Transaction implements Itemable {
             transaction.put("signatures", this.getSignersSignaturesB58());
         }
 
-        if (data != null && data.length > 0 && getVersion() == 0 && this.isText() && !this.isEncrypted()) {
-            transaction.put("message", new String(this.data, StandardCharsets.UTF_8));
-        } else {
+        if (data != null && data.length > 0) {
             transaction.put("data64", Base64.encode(this.data));
         }
 
