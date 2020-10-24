@@ -133,6 +133,13 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_OUTSIDE_BILL_EX = 15;
 
     /**
+     * 🕐🕜🕑🕝🕒🕞🕓🕟🕔🕠🕕🕡🕖🕢🕗🕣🕘🕤🕙🕥🕚🕦🕛🕧
+     * outside WORK TIME - рабочее время, которое можно купить и потребовать потратить и учесть как затрата
+     */
+    public static final int AS_OUTSIDE_WORK_TIME_MINUTES = 34;
+    public static final int AS_OUTSIDE_WORK_TIME_HOURS = 35;
+
+    /**
      * outside CLAIMS
      * +++ требования и обязательства вовне - можно истребовать право и подтвердить его исполнение (ссуда, займ, услуга, право, требование, деньги, билеты и т.д.)
      * <p>
@@ -303,17 +310,18 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType;
     }
 
-     public String charAssetType() {
+    // https://unicode-table.com/ru/#23FC
+    public String charAssetType() {
 
-         if (this.key < 100) {
-             return "";
-         }
+        if (this.key < 100) {
+            return "";
+        }
 
-         switch (this.assetType) {
-             case AS_OUTSIDE_GOODS:
-                 return "▲";
-             case AS_OUTSIDE_IMMOVABLE:
-                 return "▼";
+        switch (this.assetType) {
+            case AS_OUTSIDE_GOODS:
+                return "▲";
+            case AS_OUTSIDE_IMMOVABLE:
+                return "▼";
             case AS_ACCOUNTING:
                 if (this.key == 555l || this.key == 666l || this.key == 777l)
                     return this.name;
@@ -332,10 +340,17 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_ACCESS:
                 return "⛨";
             case AS_INSIDE_SHARE:
-                return "◔";
+                return "◒";
 
 
         }
+
+        if (this.assetType == AS_OUTSIDE_WORK_TIME_HOURS)
+            // 🕐🕜🕑🕝🕒🕞🕓🕟🕔🕠🕕🕡🕖🕢🕗🕣🕘🕤🕙🕥🕚🕦🕛🕧
+            return "◕";
+        if (this.assetType == AS_OUTSIDE_WORK_TIME_MINUTES)
+            // 🕐🕜🕑🕝🕒🕞🕓🕟🕔🕠🕕🕡🕖🕢🕗🕣🕘🕤🕙🕥🕚🕦🕛🕧
+            return "◔";
 
         if (this.assetType >= AS_OUTSIDE_CURRENCY
                 && this.assetType <= AS_OUTSIDE_OTHER_CLAIM)
@@ -632,6 +647,10 @@ public abstract class AssetCls extends ItemCls {
 
             case AS_OUTSIDE_CURRENCY:
                 return "Outside Currency";
+            case AS_OUTSIDE_WORK_TIME_HOURS:
+                return "Work Time [hours]";
+            case AS_OUTSIDE_WORK_TIME_MINUTES:
+                return "Work Time [minutes]";
             case AS_OUTSIDE_SERVICE:
                 return "Outside Service";
             case AS_OUTSIDE_SHARE:
@@ -684,6 +703,10 @@ public abstract class AssetCls extends ItemCls {
                 return "Immovable Goods, Real Estate";
             case AS_OUTSIDE_CURRENCY:
                 return "Outside Currency";
+            case AS_OUTSIDE_WORK_TIME_HOURS:
+                return "Work Time [hours]";
+            case AS_OUTSIDE_WORK_TIME_MINUTES:
+                return "Work Time [minutes]";
             case AS_OUTSIDE_SERVICE:
                 return "Outside Service";
             case AS_OUTSIDE_SHARE:
@@ -737,6 +760,10 @@ public abstract class AssetCls extends ItemCls {
                 return lang.translate("Real estate and other goods and things not subject to delivery. Such things can be taken and given for rent and handed over to the guard");
             case AS_OUTSIDE_CURRENCY:
                 return lang.translate("External money that must be transferred to an external bank account or transferred in cash. The amount on your account shows the right to demand the issuer to transfer such amount of money to your bank account. In order to satisfy the demand it is necessary to set it up for the payment, and after the money has arrived into your account confirm the repayment of this demand. You can also save them for storage, for example, the total amount collected for the ICO to be distributed to the hands of different holders - they must confirm receipt of these mid-transaction \"confirm acceptance in hand\"");
+            case AS_OUTSIDE_WORK_TIME_HOURS:
+                return lang.translate("Рабочее время в часах. Учет как долг перед кем-то. Его можно передать, потребовать исполнить и подтвердить затрату времени");
+            case AS_OUTSIDE_WORK_TIME_MINUTES:
+                return lang.translate("Рабочее время в минутах. Учет как долг перед кем-то. Его можно передать, потребовать исполнить и подтвердить затрату времени");
             case AS_OUTSIDE_SERVICE:
                 return lang.translate("An external service that needs to be provided outside. To notify your wish to provide services you must make demands and then confirm the fulfillment");
             case AS_OUTSIDE_SHARE:
@@ -798,6 +825,19 @@ public abstract class AssetCls extends ItemCls {
                                 : "Потребовать исполнения денежного требоания";
                     case TransactionAmount.ACTION_SPEND:
                         return "Подтвердить возврат денег";
+                    default:
+                        return null;
+                }
+            case AS_OUTSIDE_WORK_TIME_HOURS:
+            case AS_OUTSIDE_WORK_TIME_MINUTES:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передать в собственность время";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Отозвать требование траты рабочего времени"
+                                : "Потребовать потратить рабочее время";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Подтвердить затраты рабочего времени";
                     default:
                         return null;
                 }
