@@ -39,7 +39,7 @@ public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple2<byte
     @SuppressWarnings({"unchecked", "rawtypes"})
     public BalanceFromAddressTableModel() {
         super((DBTabImpl) DCSet.getInstance().getAssetBalanceMap(),
-                new String[]{"key Asset", "Asset", "Balance 1", "Balance 2", "Balance 3", "Balance 4"}, false);
+                new String[]{"key Asset", "Asset", "OWN (1)", "DEBT (2)", "HOLD (3)", "SPEND (4)"}, false);
         Controller.getInstance().addObserver(this);
         List<Account> accounts = Controller.getInstance().getWalletAccounts();
         tableBalance = new ArrayList<>();
