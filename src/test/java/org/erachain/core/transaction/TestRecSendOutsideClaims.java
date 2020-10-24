@@ -6,6 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.wallet.Wallet;
@@ -35,7 +36,9 @@ public class TestRecSendOutsideClaims {
     long timestamp = NTP.getTime();
     byte version = 2;
     byte prop2 = 0;
-    
+
+    ExLink exLink = null;
+
     byte prop1_backward = org.erachain.core.transaction.TransactionAmount.BACKWARD_MASK;
 
     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balanceA;
@@ -84,10 +87,10 @@ public class TestRecSendOutsideClaims {
 
         // FEE FUND
         maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        maker.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false);
-        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
-        recipient.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
-        recipient2.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
+        maker.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(100), false);
+        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false);
+        recipient.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false);
+        recipient2.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false);
 
         assetA = new AssetVenture(maker, "AAA", icon, image, ".", AssetCls.AS_OUTSIDE_OTHER_CLAIM, 2, 0L);
 

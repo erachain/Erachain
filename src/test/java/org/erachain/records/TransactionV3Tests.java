@@ -5,6 +5,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.payment.Payment;
@@ -38,6 +39,8 @@ public class TransactionV3Tests {
     byte[] assetReference = new byte[64];
     long timestamp = NTP.getTime();
 
+    ExLink exLink = null;
+
     long flags = 0l;
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -69,8 +72,8 @@ public class TransactionV3Tests {
 
         // FEE FUND
         maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        maker.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
-        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
     }
 
@@ -155,7 +158,7 @@ public class TransactionV3Tests {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(db, false, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         List<Payment> payments = new ArrayList<Payment>();
         payments.add(new Payment(recipient1, 61l, BigDecimal.valueOf(110).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
@@ -229,7 +232,7 @@ public class TransactionV3Tests {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(db, false, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         List<Payment> payments = new ArrayList<Payment>();
 

@@ -1,19 +1,17 @@
 package org.erachain.core.payment;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Arrays;
-
-import org.json.simple.JSONObject;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
+import org.json.simple.JSONObject;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
 
 public class Payment {
 
@@ -111,20 +109,20 @@ public class Payment {
     public void process(PublicKeyAccount sender, DCSet db) {
         //UPDATE SENDER
         //sender.setBalance(this.asset, sender.getBalance(db, this.asset).subtract(this.amount), db);
-        sender.changeBalance(db, true, false, this.asset, this.amount, true, false);
+        sender.changeBalance(db, true, false, this.asset, this.amount, true);
 
         //UPDATE RECIPIENT
         //this.recipient.setBalance(this.asset, this.recipient.getBalance(db, this.asset).add(this.amount), db);
-        this.recipient.changeBalance(db, false, false, this.asset, this.amount, false, false);
+        this.recipient.changeBalance(db, false, false, this.asset, this.amount, false);
     }
 
     public void orphan(PublicKeyAccount sender, DCSet db) {
         //UPDATE SENDER
         //sender.setBalance(this.asset, sender.getBalance(db, this.asset).add(this.amount), db);
-        sender.changeBalance(db, false, false, this.asset, this.amount, true, false);
+        sender.changeBalance(db, false, false, this.asset, this.amount, true);
 
         //UPDATE RECIPIENT
         //this.recipient.setBalance(this.asset, this.recipient.getBalance(db, this.asset).subtract(this.amount), db);
-        this.recipient.changeBalance(db, true, false, this.asset, this.amount, false, false);
+        this.recipient.changeBalance(db, true, false, this.asset, this.amount, false);
     }
 }

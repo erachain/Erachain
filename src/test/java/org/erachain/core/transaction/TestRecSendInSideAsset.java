@@ -5,6 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
@@ -32,8 +33,10 @@ public class TestRecSendInSideAsset {
     long timestamp = NTP.getTime();
 
     byte version = 2;
-    byte prop2 = 0;    
+    byte prop2 = 0;
     byte prop1_backward = org.erachain.core.transaction.TransactionAmount.BACKWARD_MASK;
+
+    ExLink exLink = null;
 
     Tuple3<String, Long, String> creditKey;
     Tuple3<String, Long, String> creditKeyReverse;
@@ -81,10 +84,10 @@ public class TestRecSendInSideAsset {
 
         // FEE FUND
         creditor.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        creditor.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
+        creditor.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false);
 
         emitter.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        emitter.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
+        emitter.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false);
 
         asset = new AssetVenture(creditor, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);
         // set SCALABLE assets ++

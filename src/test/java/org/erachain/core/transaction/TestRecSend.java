@@ -11,6 +11,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.payment.Payment;
@@ -39,6 +40,8 @@ public class TestRecSend {
     byte FEE_POWER = (byte) 0;
     byte[] assetReference = new byte[64];
     long timestamp = NTP.getTime();
+
+    ExLink exLink = null;
 
     long flags = 0l;
     //CREATE KNOWN ACCOUNT
@@ -78,8 +81,8 @@ public class TestRecSend {
 
         // FEE FUND
         maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        maker.changeBalance(db, false, false, ERA_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
-        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(db, false, false, ERA_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
     }
 
@@ -688,7 +691,7 @@ public class TestRecSend {
 
         // NEGATE for test HOLD ///////////////////
         amount = amount.negate();
-        recipient.changeBalance(db, false, false, -ERA_KEY, amount.negate(), false, false);
+        recipient.changeBalance(db, false, false, -ERA_KEY, amount.negate(), false);
         /// MESSAGE + AMOUNT
         r_SendV3 = new RSend(
                 maker, exLink, FEE_POWER,
@@ -767,7 +770,7 @@ public class TestRecSend {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(db, false, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         List<Payment> payments = new ArrayList<Payment>();
         payments.add(new Payment(recipient1, assetKeyTest, BigDecimal.valueOf(110).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
@@ -843,7 +846,7 @@ public class TestRecSend {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(db, false, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         List<Payment> payments = new ArrayList<Payment>();
 

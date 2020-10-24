@@ -10,6 +10,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -43,6 +44,8 @@ public class TelegramManagerTest {
     TelegramManager telegramer;
 
     DCSet dcSet;
+    ExLink exLink = null;
+
 
     long flags = 0l;
     //CREATE KNOWN ACCOUNT
