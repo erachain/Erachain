@@ -1337,12 +1337,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     this.recipient.changeBalance(db, !backward, backward, key, this.amount, false);
                 }
 
-            } else if (actionType == ACTION_SPEND) {
-                // UPDATE SENDER - OWNABLE + SPEN
-                this.creator.changeBalance(db, false, backward, absKey, this.amount.abs(), true);
-                // UPDATE RECIPIENT - SPENDABLE
-                this.recipient.changeBalance(db, false, backward, key, this.amount, false);
-
             } else {
 
                 // UPDATE SENDER
