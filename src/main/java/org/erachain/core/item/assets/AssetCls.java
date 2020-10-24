@@ -805,7 +805,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_IMMOVABLE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Transfer in own";
+                        return "Transfer to the ownership ";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Confiscate from rent" : "Transfer to rent";
                     case TransactionAmount.ACTION_REPAY_DEBT:
@@ -817,25 +817,36 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_CURRENCY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Передать в собственность денежное требование";
+                        return "Transfer to the ownership of the monetary claim"; // Передать в собственность денежное требование
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать требование исполнения права"
-                                : "Потребовать исполнения денежного требоания";
+                        return backward ? "Withdraw a request to fulfill a monetary claim" // Отозвать требование об исполнении денежного требования
+                                : "Demand execution of a monetary claim"; // Потребовать исполнения денежного требования
                     case TransactionAmount.ACTION_SPEND:
-                        return "Подтвердить возврат денег";
+                        return "Confirm the execution of the monetary claim"; // Подтвердить исполнение денежного требования
                     default:
                         return null;
                 }
             case AS_OUTSIDE_WORK_TIME_HOURS:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Transfer to the ownership of working hours"; // Передать в собственность рабочие часы
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Withdraw a request to fulfill of working hours" // Отозвать требование траты рабочих часов
+                                : "Demand to spend of working hours"; // Потребовать потратить рабочие часы
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Confirm the spend of working hours"; // Подтвердить затраты рабочих часов
+                    default:
+                        return null;
+                }
             case AS_OUTSIDE_WORK_TIME_MINUTES:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Передать в собственность время";
+                        return "Transfer to the ownership of working minutes"; // Передать в собственность рабочие минуты
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать требование траты рабочего времени"
-                                : "Потребовать потратить рабочее время";
+                        return backward ? "Withdraw a request to fulfill of working minutes" // Отозвать требование траты рабочих минут
+                                : "Demand to spend of working minutes"; // Потребовать потратить рабочие минуты
                     case TransactionAmount.ACTION_SPEND:
-                        return "Подтвердить затраты рабочего времени";
+                        return "Confirm the spend of working minutes"; // Подтвердить затраты рабочих минут
                     default:
                         return null;
                 }
