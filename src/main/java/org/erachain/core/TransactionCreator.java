@@ -387,11 +387,11 @@ public class TransactionCreator {
 
         long lastReference;
         if (forIssue) {
-            lastReference = 0l;
-
+            lastReference = 0L;
         } else {
-            lastReference = time - 1000l;
+            lastReference = time - 1000L;
         }
+
         //CREATE ISSUE PLATE TRANSACTION
         IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte) feePow, time, lastReference);
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
@@ -890,9 +890,6 @@ public class TransactionCreator {
         transaction.setDC(this.fork, forDeal, this.blockHeight, ++this.seqNo);
         int valid = transaction.isValid(forDeal, 0L);
 
-        // после проверки в форке - тут сбросим Номер транзакции - для правильно отражения Подтвержденная
-        transaction.resetSeqNo();
-
         if (valid == Transaction.VALIDATE_OK) {
 
             if (forDeal > Transaction.FOR_PACK) {
@@ -900,14 +897,16 @@ public class TransactionCreator {
                 transaction.process(null, forDeal);
 
                 // if it ISSUE - reset key
-                if (transaction instanceof IssueItemRecord) {
+                // не надо теперь сбрасывать - Так как дальше скелет передается в onTransactionCreate
+                if (false && transaction instanceof IssueItemRecord) {
                     IssueItemRecord issueItem = (IssueItemRecord) transaction;
                     issueItem.getItem().resetKey();
                 }
 
-                //CONTROLLER ONTRANSACTION
                 Controller.getInstance().onTransactionCreate(transaction);
             }
+        } else {
+            --this.seqNo;
         }
 
         //RETURN

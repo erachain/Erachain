@@ -55,7 +55,6 @@ public abstract class AddressItemRefs extends Transaction {
     @Override
     public void sign(PrivateKeyAccount creator, int forDeal) {
         super.sign(creator, forDeal);
-        this.item.setReference(this.signature);
     }
 
     //PARSE CONVERT
@@ -138,6 +137,8 @@ public abstract class AddressItemRefs extends Transaction {
     public void process(Block block, int forDeal) {
         //UPDATE CREATOR
         super.process(block, forDeal);
+
+        this.item.setReference(this.signature);
 
         //INSERT INTO DATABASE
         this.item.insertToMap(this.dcSet, START_KEY);

@@ -2,6 +2,7 @@ package org.erachain.gui.library;
 
 
 import org.erachain.controller.Controller;
+import org.erachain.core.account.Account;
 import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
@@ -34,7 +35,10 @@ public class RecipientAddress extends JComboBox {
     private RecipientAddressInterface worker = null;
 
 
-    public RecipientAddress(RecipientAddressInterface item) {
+    public RecipientAddress(RecipientAddressInterface item, Account account) {
+        if (account != null)
+            selectedItem = account.getAddress();
+
         RecipientModel model = new RecipientModel();
         this.setModel(model);
         this.setRenderer(model.getRender());
@@ -44,6 +48,7 @@ public class RecipientAddress extends JComboBox {
 
 // select & edit text account
         comboTextField = (JTextField) this.getEditor().getEditorComponent();
+        comboTextField.setText(selectedItem);
         MenuPopupUtil.installContextMenu(comboTextField);
         comboTextField.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -64,7 +69,11 @@ public class RecipientAddress extends JComboBox {
         });
     }
 
-    private void lifework(DocumentEvent e){
+    public RecipientAddress(RecipientAddressInterface item) {
+        this(item, null);
+    }
+
+    private void lifework(DocumentEvent e) {
         selectedItem = comboTextField.getText();
         if (worker != null) {
             try {

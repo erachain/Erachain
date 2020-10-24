@@ -7,6 +7,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.item.assets.AssetVenture;
@@ -32,6 +33,8 @@ import static org.junit.Assert.*;
 public class TestRecAsset {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestRecAsset.class.getName());
+
+    ExLink exLink = null;
 
     int[] TESTED_DBS = new int[]{
             IDB.DBS_MAP_DB,
@@ -89,7 +92,7 @@ public class TestRecAsset {
 
         // FEE FUND
         maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         maker_1.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
 
@@ -579,7 +582,7 @@ public class TestRecAsset {
                 long timestamp = NTP.getTime();
 
                 //CREATE ASSET TRANSFER
-                maker.changeBalance(db, false, false, key, BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+                maker.changeBalance(db, false, false, key, BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
                 Transaction assetTransfer = new RSend(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db)[0]);
                 assetTransfer.sign(maker, Transaction.FOR_NETWORK);
                 assetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -619,7 +622,7 @@ public class TestRecAsset {
 
                 //CREATE ASSET TRANSFER
                 long key = 1l;
-                maker.changeBalance(db, false, false, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+                maker.changeBalance(db, false, false, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
                 Transaction assetTransfer = new RSend(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db)[0]);
                 assetTransfer.sign(maker, Transaction.FOR_NETWORK);
                 assetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -913,7 +916,7 @@ public class TestRecAsset {
                 long timestamp = NTP.getTime();
 
                 //CREATE ASSET TRANSFER
-                maker.changeBalance(db, false, false, key, BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+                maker.changeBalance(db, false, false, key, BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
                 assertEquals(BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
                 assertEquals(BigDecimal.ZERO, recipient.getBalanceUSE(key, db));
 
@@ -956,7 +959,7 @@ public class TestRecAsset {
                 BigDecimal amountSend = BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
                 BigDecimal bal = maker.getBalanceUSE(key, db);
 
-                maker.changeBalance(db, false, false, key, amountSend, false, false);
+                maker.changeBalance(db, false, false, key, amountSend, false);
                 Transaction messageTransaction = new RSend(maker, exLink, FEE_POWER, recipient, key, amountSend,
                         "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
                         timestamp, maker.getLastTimestamp(db)[0]);

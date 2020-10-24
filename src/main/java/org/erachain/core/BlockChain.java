@@ -1407,6 +1407,7 @@ public class BlockChain {
             }
         } catch (Throwable e) {
             LOGGER.error(e.getMessage(), e);
+            // тут ошибка памяти прилетит - можно выходить
             Controller.getInstance().stopAll(1105);
         }
 

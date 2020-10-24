@@ -1673,13 +1673,13 @@ public class DCSet extends DBASet implements Closeable {
 
             LOGGER.error(e.getMessage(), e);
 
-            // база битая полуяается !? хотя rollback должен сработать
+            // база битая - выходим!! Хотя rollback должен сработать
             Controller.getInstance().stopAll(9613);
             return;
         } catch (Throwable e) {
             LOGGER.error(e.getMessage(), e);
 
-            // база битая полуяается !? хотя rollback должен сработать
+            // база битая - выходим!! Хотя rollback должен сработать
             Controller.getInstance().stopAll(9615);
         }
 

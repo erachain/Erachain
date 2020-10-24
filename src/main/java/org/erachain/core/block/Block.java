@@ -629,18 +629,18 @@ public class Block implements Closeable, ExplorerJsonLine {
 
             //MAKE TRANSACTIONS HASH
             for (Transaction transaction : transactions) {
+
                 //WRITE TRANSACTION LENGTH
                 int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
                 byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
-                transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
                 System.arraycopy(transactionLengthBytes, 0, rawTransactions, rawPos, TRANSACTION_SIZE_LENGTH);
                 rawPos += TRANSACTION_SIZE_LENGTH;
 
-                //WRITE TRANSACTION
+                // WRITE TRANSACTION
                 System.arraycopy(transaction.toBytes(Transaction.FOR_NETWORK, true), 0, rawTransactions, rawPos, transactionLength);
                 rawPos += transactionLength;
 
-                // ACUMULATE SINGNs FOR HASH
+                // ACCUMULATE SINGNs FOR HASH
                 System.arraycopy(transaction.getSignature(), 0, hashData, hashPos, SIGNATURE_LENGTH);
                 hashPos += SIGNATURE_LENGTH;
 
@@ -2058,7 +2058,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 Account richAccount = new Account(rich);
                 richAccount.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
-                        new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), true, true);
+                        new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), true);
             } else {
                 emittedFee = this.blockHead.emittedFee;
             }
@@ -2074,7 +2074,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                 // Авторские начисления на счет Эрачейн от всех комиссий в блоке
                 long blockFeeRoyaltyLong = this.blockHead.totalFee / 20; // 5%
                 BlockChain.CLONE_ROYALTY_ERACHAIN_ACCOUNT.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
-                        new BigDecimal(blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE), false, false);
+                        new BigDecimal(blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE), false);
 
                 forgerEarn = new BigDecimal(this.blockHead.totalFee - blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE)
                         .setScale(BlockChain.FEE_SCALE);
@@ -2083,7 +2083,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             }
 
             this.creator.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
-                    forgerEarn, true, false);
+                    forgerEarn, true);
 
             // учтем что нафоржили
             this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, forgerEarn, Transaction.BALANCE_SIDE_FORGED);
@@ -2098,7 +2098,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (emittedFee != 0) {
             // SUBSTRACT from EMISSION (with minus)
             BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
-                    new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), true, false);
+                    new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), true);
         }
 
         if (transactionCount > 0 && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()) {
@@ -2121,8 +2121,15 @@ public class Block implements Closeable, ExplorerJsonLine {
                     assetFeeBurn = BigDecimal.ZERO;
                 }
 
-                earnedPair = new Tuple2(assetFee.add(transaction.assetFee.subtract(transaction.assetFeeBurn)),
-                        assetFeeBurn.add(transaction.assetFeeBurn));
+                if (transaction.assetFee.signum() != 0) {
+                    assetFee = assetFee.add(transaction.assetFee);
+                }
+                if (transaction.assetFeeBurn != null && transaction.assetFeeBurn.signum() != 0) {
+                    assetFee = assetFee.subtract(transaction.assetFeeBurn);
+                    assetFeeBurn = assetFeeBurn.add(transaction.assetFeeBurn);
+                }
+
+                earnedPair = new Tuple2(assetFee, assetFeeBurn);
                 earnedAllAssets.put(asset, earnedPair);
 
             }
@@ -2131,26 +2138,29 @@ public class Block implements Closeable, ExplorerJsonLine {
             for (AssetCls asset : earnedAllAssets.keySet()) {
                 earnedPair = earnedAllAssets.get(asset);
 
-                // учтем для форжера
-                this.creator.changeBalance(dcSet, asOrphan, false, asset.getKey(),
-                        earnedPair.a, true, false);
+                // учтем для форжера что он нафоржил
+                if (earnedPair.a.signum() != 0) {
+                    this.creator.changeBalance(dcSet, asOrphan, false, asset.getKey(),
+                            earnedPair.a, true);
+                    if (this.txCalculated != null) {
+                        this.txCalculated.add(new RCalculated(this.creator, asset.getKey(),
+                                earnedPair.a, "Asset Total Forged", Transaction.makeDBRef(this.heightBlock, 0), 0L));
+                    }
+                }
 
-                // учтем для эмитента
-                asset.getOwner().changeBalance(dcSet, asOrphan, false, asset.getKey(),
-                        earnedPair.b, true, false);
-
-                if (this.txCalculated != null) {
-                    this.txCalculated.add(new RCalculated(this.creator, asset.getKey(),
-                            earnedPair.a, "Asset Total Forged", Transaction.makeDBRef(this.heightBlock, 0), 0L));
-                    this.txCalculated.add(new RCalculated(asset.getOwner(), asset.getKey(),
-                            earnedPair.b, "Asset Total Burned", Transaction.makeDBRef(this.heightBlock, 0), 0L));
+                // учтем для эмитента что для него сгорело
+                if (earnedPair.b.signum() != 0) {
+                    asset.getOwner().changeBalance(dcSet, asOrphan, false, asset.getKey(),
+                            earnedPair.b, true);
+                    if (this.txCalculated != null) {
+                        this.txCalculated.add(new RCalculated(asset.getOwner(), asset.getKey(),
+                                earnedPair.b, "Asset Total Burned", Transaction.makeDBRef(this.heightBlock, 0), 0L));
+                    }
                 }
 
             }
 
         }
-
-        //logger.debug("<<< core.block.Block.orphan(DLSet) #3");
 
     }
 
@@ -2333,12 +2343,12 @@ public class Block implements Closeable, ExplorerJsonLine {
                 if (balanceHold.signum() <= 0)
                     continue;
 
-                holder.changeBalance(dcSet, asOrphan, false, BlockChain.FEE_KEY, balanceHold, false, true);
+                holder.changeBalance(dcSet, asOrphan, false, BlockChain.FEE_KEY, balanceHold, false);
                 // учтем что получили бонусы
                 holder.changeCOMPUBonusBalances(dcSet, asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
 
                 // у эмитента снимем
-                BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, !asOrphan, false, BlockChain.FEE_KEY, balanceHold, false, true);
+                BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, !asOrphan, false, BlockChain.FEE_KEY, balanceHold, false);
                 BlockChain.FEE_ASSET_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
 
                 if (this.txCalculated != null) {
@@ -2352,7 +2362,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             // учтем снятие с начисления для держателей долей
             BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, asOrphan, false, -BlockChain.FEE_KEY,
                     totalPayedRoyalty,
-                    true, false);
+                    true);
 
             if (this.txCalculated != null) {
                 txCalculated.add(new RCalculated(BlockChain.FEE_ASSET_EMITTER, BlockChain.FEE_KEY, totalPayedRoyalty.negate(),
@@ -2533,14 +2543,14 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         long start = System.currentTimeMillis();
 
+        //REMOVE FEE
+        feeProcess(dcSet, true);
+
         //ORPHAN TRANSACTIONS
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2 ORPHAN TRANSACTIONS");
         this.orphanTransactions(dcSet, heightBlock, notStoreTXs);
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2f FEE");
-
-        //REMOVE FEE
-        feeProcess(dcSet, true);
 
         makeHoldRoyalty(dcSet, true);
 

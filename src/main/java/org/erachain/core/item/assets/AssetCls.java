@@ -133,6 +133,13 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_OUTSIDE_BILL_EX = 15;
 
     /**
+     * 🕐🕜🕑🕝🕒🕞🕓🕟🕔🕠🕕🕡🕖🕢🕗🕣🕘🕤🕙🕥🕚🕦🕛🕧
+     * outside WORK TIME - рабочее время, которое можно купить и потребовать потратить и учесть как затрата
+     */
+    public static final int AS_OUTSIDE_WORK_TIME_MINUTES = 34;
+    public static final int AS_OUTSIDE_WORK_TIME_HOURS = 35;
+
+    /**
      * outside CLAIMS
      * +++ требования и обязательства вовне - можно истребовать право и подтвердить его исполнение (ссуда, займ, услуга, право, требование, деньги, билеты и т.д.)
      * <p>
@@ -303,17 +310,18 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType;
     }
 
-     public String charAssetType() {
+    // https://unicode-table.com/ru/#23FC
+    public String charAssetType() {
 
-         if (this.key < 100) {
-             return "";
-         }
+        if (this.key < 100) {
+            return "";
+        }
 
-         switch (this.assetType) {
-             case AS_OUTSIDE_GOODS:
-                 return "▲";
-             case AS_OUTSIDE_IMMOVABLE:
-                 return "▼";
+        switch (this.assetType) {
+            case AS_OUTSIDE_GOODS:
+                return "▲";
+            case AS_OUTSIDE_IMMOVABLE:
+                return "▼";
             case AS_ACCOUNTING:
                 if (this.key == 555l || this.key == 666l || this.key == 777l)
                     return this.name;
@@ -332,6 +340,11 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_ACCESS:
                 return "⛨";
             case AS_INSIDE_SHARE:
+                return "◒";
+            case AS_OUTSIDE_WORK_TIME_HOURS:
+                // 🕐🕜🕑🕝🕒🕞🕓🕟🕔🕠🕕🕡🕖🕢🕗🕣🕘🕤🕙🕥🕚🕦🕛🕧
+                return "◕";
+            case AS_OUTSIDE_WORK_TIME_MINUTES:
                 return "◔";
 
 
@@ -612,10 +625,14 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public PublicKeyAccount defaultRecipient(int actionType, boolean backward) {
-        if (isOutsideType() && (actionType == TransactionAmount.ACTION_SPEND && !backward
-                || actionType == TransactionAmount.ACTION_DEBT)) {
-            return getOwner();
+
+        if (isOutsideType()) {
+            if (actionType == TransactionAmount.ACTION_SPEND
+                    || actionType == TransactionAmount.ACTION_DEBT) {
+                return getOwner();
+            }
         }
+
         return null;
     }
 
@@ -628,6 +645,10 @@ public abstract class AssetCls extends ItemCls {
 
             case AS_OUTSIDE_CURRENCY:
                 return "Outside Currency";
+            case AS_OUTSIDE_WORK_TIME_HOURS:
+                return "Work Time [hours]";
+            case AS_OUTSIDE_WORK_TIME_MINUTES:
+                return "Work Time [minutes]";
             case AS_OUTSIDE_SERVICE:
                 return "Outside Service";
             case AS_OUTSIDE_SHARE:
@@ -680,6 +701,10 @@ public abstract class AssetCls extends ItemCls {
                 return "Immovable Goods, Real Estate";
             case AS_OUTSIDE_CURRENCY:
                 return "Outside Currency";
+            case AS_OUTSIDE_WORK_TIME_HOURS:
+                return "Work Time [hours]";
+            case AS_OUTSIDE_WORK_TIME_MINUTES:
+                return "Work Time [minutes]";
             case AS_OUTSIDE_SERVICE:
                 return "Outside Service";
             case AS_OUTSIDE_SHARE:
@@ -733,6 +758,10 @@ public abstract class AssetCls extends ItemCls {
                 return lang.translate("Real estate and other goods and things not subject to delivery. Such things can be taken and given for rent and handed over to the guard");
             case AS_OUTSIDE_CURRENCY:
                 return lang.translate("External money that must be transferred to an external bank account or transferred in cash. The amount on your account shows the right to demand the issuer to transfer such amount of money to your bank account. In order to satisfy the demand it is necessary to set it up for the payment, and after the money has arrived into your account confirm the repayment of this demand. You can also save them for storage, for example, the total amount collected for the ICO to be distributed to the hands of different holders - they must confirm receipt of these mid-transaction \"confirm acceptance in hand\"");
+            case AS_OUTSIDE_WORK_TIME_HOURS:
+                return lang.translate("Рабочее время в часах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие часы можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в часах рабочего времени");
+            case AS_OUTSIDE_WORK_TIME_MINUTES:
+                return lang.translate("Рабочее время в минутах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие минуты можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в минутах рабочего времени");
             case AS_OUTSIDE_SERVICE:
                 return lang.translate("An external service that needs to be provided outside. To notify your wish to provide services you must make demands and then confirm the fulfillment");
             case AS_OUTSIDE_SHARE:
@@ -776,7 +805,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_IMMOVABLE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Transfer in own";
+                        return "Transfer to the ownership ";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Confiscate from rent" : "Transfer to rent";
                     case TransactionAmount.ACTION_REPAY_DEBT:
@@ -788,12 +817,36 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_CURRENCY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Передать в собственность денежное требование";
+                        return "Transfer to the ownership of the monetary claim"; // Передать в собственность денежное требование
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать требование исполнения права"
-                                : "Потребовать исполнения денежного требоания";
+                        return backward ? "Withdraw a request to fulfill a monetary claim" // Отозвать требование об исполнении денежного требования
+                                : "Demand execution of a monetary claim"; // Потребовать исполнения денежного требования
                     case TransactionAmount.ACTION_SPEND:
-                        return "Подтвердить возврат денег";
+                        return "Confirm the execution of the monetary claim"; // Подтвердить исполнение денежного требования
+                    default:
+                        return null;
+                }
+            case AS_OUTSIDE_WORK_TIME_HOURS:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Transfer to the ownership of person-hour"; // Передать в собственность рабочие часы
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Decline the demand for person-hour" // Отозвать требование траты рабочих часов
+                                : "Demand to spend person-hour"; // Потребовать потратить рабочие часы
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Confirm the spend of person-hour"; // Подтвердить затраты рабочих часов
+                    default:
+                        return null;
+                }
+            case AS_OUTSIDE_WORK_TIME_MINUTES:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Transfer to the ownership of person-minutes"; // Передать в собственность рабочие минуты
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Decline the demand for person-minutes" // Отозвать требование траты рабочих минут
+                                : "Demand to spend person-minutes"; // Потребовать потратить рабочие минуты
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Confirm the spend of person-minutes"; // Подтвердить затраты рабочих минут
                     default:
                         return null;
                 }

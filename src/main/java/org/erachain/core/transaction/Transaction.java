@@ -1017,16 +1017,16 @@ public abstract class Transaction implements ExplorerJsonLine {
     // GET only INVITED FEE
     public long getInvitedFee() {
 
-        if (!BlockChain.REFERAL_BONUS_FOR_PERSON(height)) {
+        if (BlockChain.FEE_INVITED_DEEP <= 0 || !BlockChain.REFERAL_BONUS_FOR_PERSON(height)) {
             // SWITCH OFF REFERRAL
-            return 0l;
+            return 0L;
         }
 
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         if (personDuration == null
                 || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY) {
             // ANONYMOUS or ME
-            return 0l;
+            return 0L;
         }
 
         long fee = this.fee.unscaledValue().longValue();
@@ -1046,27 +1046,6 @@ public abstract class Transaction implements ExplorerJsonLine {
     public BigDecimal feeToBD(int fee) {
         return BigDecimal.valueOf(fee, BlockChain.FEE_SCALE);
     }
-
-    /*
-    public Block getBlock(DCSet db) {
-
-        if (this.block != null)
-            return block;
-
-        if (this.height <= 0) {
-            Long key = db.getTransactionFinalMapSigns().get(this.signature);
-            if (key == null)
-                return null;
-
-            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-            this.height = pair.a;
-        }
-
-        this.block = db.getBlockMap().get(this.height);
-
-        return block;
-    }
-    */
 
     public Tuple2<Integer, Integer> getHeightSeqNo() {
         return new Tuple2<Integer, Integer>(this.height, this.seqNo);
@@ -1602,15 +1581,19 @@ public abstract class Transaction implements ExplorerJsonLine {
                 /// вообще не проверяем в тесте
                 if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
-                    if (BlockChain.CHECK_BUGS > 0)
-                        LOGGER.debug("diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
+                    if (BlockChain.CHECK_BUGS > 0) {
+                        LOGGER.debug(errorValue);
+                    }
                     return INVALID_TIMESTAMP;
                 }
             } else if (BlockChain.CHECK_DOUBLE_SPEND_DEEP > 0) {
                 if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
-                    if (BlockChain.CHECK_BUGS > 0)
-                        LOGGER.debug("diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
+                    if (BlockChain.CHECK_BUGS > 0) {
+                        LOGGER.debug(errorValue);
+                    }
                     return INVALID_TIMESTAMP;
                 }
 
@@ -1620,12 +1603,12 @@ public abstract class Transaction implements ExplorerJsonLine {
                         && height > BlockChain.VERS_4_11
                 ) {
                     if (BlockChain.TEST_DB == 0) {
+                        errorValue = "INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
+                                + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                                + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height);
                         if (BlockChain.CHECK_BUGS > 1)
-                            LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
-                                    + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
-                                    + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+                            LOGGER.debug(errorValue);
                     }
-
                     return INVALID_TIMESTAMP;
                 }
             }
@@ -1705,7 +1688,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         ) {
             // break loop
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            invitedAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false, true);
+            invitedAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false);
             // учтем что получили бонусы
             invitedAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
 
@@ -1732,7 +1715,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             long fee_gift_get = fee_gift - fee_gift_next;
 
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false, true);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false);
 
             // учтем что получили бонусы
             issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
@@ -1752,7 +1735,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             // GET REST of GIFT
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
             issuerAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY,
-                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false, true);
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
 
             // учтем что получили бонусы
             issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
@@ -1778,7 +1761,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
             BlockChain.FEE_ASSET_EMITTER.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
-                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), true, false);
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), true);
 
             return;
         }
@@ -1802,8 +1785,8 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     private void calcRoyalty(Block block, Account account, long koeff, boolean asOrphan) {
 
-        if (account.equals(BlockChain.FEE_ASSET_EMITTER)
-                || account.equals(GenesisBlock.CREATOR))
+        if (account.equals(GenesisBlock.CREATOR)
+                || getKey() != FEE_KEY)
             return;
 
         Tuple4<Long, Integer, Integer, Integer> personDuration;
@@ -1822,7 +1805,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (asOrphan) {
             // это откат - списываем
             Tuple3<Long, Long, Long> lastValue = peekRoyaltyData(royaltyID);
-            if (lastValue.c == 0) {
+            if (lastValue == null || lastValue.c == 0) {
                 return;
             }
 
@@ -1897,7 +1880,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         }
 
-        account.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, royaltyBG, false, true);
+        account.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, royaltyBG, false);
         // учтем что получили бонусы
         account.changeCOMPUBonusBalances(dcSet, asOrphan, royaltyBG, Transaction.BALANCE_SIDE_DEBIT);
 
@@ -1909,12 +1892,12 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         // учтем эмиссию
         BlockChain.FEE_ASSET_EMITTER.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
-                royaltyBG, true, false);
+                royaltyBG, true);
 
         // учтем начисления для держателей долей
         BlockChain.FEE_ASSET_EMITTER.changeBalance(this.dcSet, !asOrphan, false, -FEE_KEY,
                 royaltyBG.multiply(BlockChain.ACTION_ROYALTY_TO_HOLD_ROYALTY_PERCENT).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN),
-                true, false);
+                true);
 
 
     }
@@ -1979,7 +1962,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, true, false, FEE_KEY, this.fee, true, true);
+                this.creator.changeBalance(this.dcSet, true, false, FEE_KEY, this.fee, true);
                 // учтем траты
                 this.creator.changeCOMPUBonusBalances(this.dcSet, true, this.fee, BALANCE_SIDE_CREDIT);
             }
@@ -2018,7 +2001,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (forDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, false, false, FEE_KEY, this.fee, true, true);
+                this.creator.changeBalance(this.dcSet, false, false, FEE_KEY, this.fee, true);
                 // учтем траты
                 this.creator.changeCOMPUBonusBalances(this.dcSet, false, this.fee, BALANCE_SIDE_CREDIT);
 
@@ -2035,6 +2018,9 @@ public abstract class Transaction implements ExplorerJsonLine {
             // UPDATE REFERENCE OF SENDER
             // set last transaction signature for this ACCOUNT
             this.creator.removeLastTimestamp(this.dcSet, timestamp);
+
+            // CALC ROYALTY
+            processRoyalty(block, true);
 
         }
 

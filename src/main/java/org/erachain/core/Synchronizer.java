@@ -186,6 +186,7 @@ public class Synchronizer extends Thread {
                 lastBlock.orphan(fork, true);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
+                // выход - так как поймали внутреннюю ошибку базы
                 ctrl.stopAll(311);
             }
 
@@ -707,10 +708,12 @@ public class Synchronizer extends Thread {
                                     throw new Exception("on stopping");
                                 }
 
-                                errorMess = "error io isValid! [" + blockFromPeer.heightBlock + "] " + e.getMessage();
+                                errorMess = "error on isValid! [" + blockFromPeer.heightBlock + "] " + e.getMessage();
                                 LOGGER.debug(errorMess, e);
                                 banTime = BAN_BLOCK_TIMES;
-                                ctrl.stopAll(340);
+                                if (BlockChain.CHECK_BUGS > 9) {
+                                    ctrl.stopAll(340);
+                                }
                                 break;
                             } catch (Throwable e) {
                                 errorMess = "error io isValid! [" + blockFromPeer.heightBlock + "] " + e.getMessage();
@@ -1100,7 +1103,7 @@ public class Synchronizer extends Thread {
                             return;
                         }
 
-                        ctrl.stopAll(323);
+                        ////ctrl.stopAll(323); - ниже ошибку наверх кидаем же
 
                         throw error;
 
@@ -1122,8 +1125,6 @@ public class Synchronizer extends Thread {
                         }
 
                         ctrl.stopAll(335);
-
-                        throw new Exception(thrown);
 
                     }
 
@@ -1205,9 +1206,6 @@ public class Synchronizer extends Thread {
                         try {
                             // was BREAK - try ROLLBACK
                             dcSet.rollback();
-                            ctrl.stopAll(345);
-                            return;
-
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
                             ctrl.stopAll(346);
@@ -1217,6 +1215,8 @@ public class Synchronizer extends Thread {
                             ctrl.stopAll(347);
                             return;
                         }
+
+                        throw error;
 
                     } else if (thrown != null) {
 

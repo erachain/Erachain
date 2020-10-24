@@ -377,6 +377,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         break;
                     }
 
+                    // сбросим всё мясо которе в КЭШе может быть
+                    // иначе может расчет не пойти так как какие-то данные уже заданы были из кошелька
+                    transaction = transaction.copy();
+
                     if (BlockChain.CHECK_BUGS > 7) {
                         LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()) + " " + transaction.getCreator().getAddress());
                         if (testTime > transaction.getTimestamp()) {
@@ -729,7 +733,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             for (int nonce = 0; nonce < BlockChain.TEST_DB_ACCOUNTS.length; nonce++) {
                 BlockChain.TEST_DB_ACCOUNTS[nonce] = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce));
                 // SET BALANCES
-                BlockChain.TEST_DB_ACCOUNTS[nonce].changeBalance(dcSet, false, false, 2, balance, true, false);
+                BlockChain.TEST_DB_ACCOUNTS[nonce].changeBalance(dcSet, false, false, 2, balance, true);
             }
         }
 
@@ -822,6 +826,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 ctrl.orphanInPipe(block);
                             } catch (Exception e) {
                                 // если ошибка то выход делаем чтобы зарегистрировать ошибку
+                                // так как это наша личная ошибка внутри
                                 LOGGER.error(e.getMessage(), e);
                                 ctrl.stopAll(104);
                                 return;

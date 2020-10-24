@@ -2,7 +2,7 @@ package org.erachain.gui.create;
 
 import com.sun.pdfview.PagePanel;
 import org.erachain.controller.Controller;
-import org.erachain.gui.library.MPDFView;
+import org.erachain.gui.library.MPDFViewLicense;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 
@@ -149,7 +149,7 @@ public class LicenseDataJFrame extends JDialog {
         gridBagConstraints.insets = new Insets(0, 8, 0, 8);
         //    mainPanel.add(scrollPaneDescription, gridBagConstraints);
 
-        MPDFView pp = new MPDFView(Settings.cloneLicense);
+        MPDFViewLicense pp = new MPDFViewLicense(Settings.cloneLicense);
 
         mainPanel.add(pp, gridBagConstraints);
         pp.show();

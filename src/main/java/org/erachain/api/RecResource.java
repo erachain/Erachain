@@ -522,7 +522,7 @@ public class RecResource {
             if (result.getB() == Transaction.VALIDATE_OK) {
                 return "+";
             } else {
-                return APIUtils.errorMess(result.getB(), OnDealClick.resultMess(result.getB()));
+                return APIUtils.errorMess(result.getB(), OnDealClick.resultMess(result.getB()), result.getA());
             }
 
         } catch (Exception e) {

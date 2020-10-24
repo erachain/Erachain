@@ -2931,16 +2931,15 @@ public class Controller extends Observable {
 
     public void onTransactionCreate(Transaction transaction) {
         // ADD TO UNCONFIRMED TRANSACTIONS
-        //////this.dcSet.getTransactionTab().add(transaction);
-        /// чтобы не налететь на очистку таблицы - туда передадим
+
+        // очистим мясо со скелета
+        transaction = transaction.copy();
         this.transactionsPool.offerMessage(transaction);
 
         // BROADCAST
         this.broadcastTransaction(transaction);
 
         if (doesWalletExists() && HARD_WORK < 4) {
-            // для всех счетов - может сам себе послал
-            transaction.resetDCSet(); // сбросим назначения после Форкнутой Базы
             wallet.processTransaction(transaction);
         }
 
@@ -3000,12 +2999,12 @@ public class Controller extends Observable {
 
         // CHECK IF RECORD VALID
         if (!transaction.isSignatureValid(DCSet.getInstance()))
-            return new Pair<Transaction, Integer>(null, Transaction.INVALID_SIGNATURE);
+            return new Pair<Transaction, Integer>(transaction, Transaction.INVALID_SIGNATURE);
 
         // CHECK FOR UPDATES
         int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0l);
         if (valid != Transaction.VALIDATE_OK)
-            return new Pair<Transaction, Integer>(null, valid);
+            return new Pair<Transaction, Integer>(transaction, valid);
 
         return new Pair<Transaction, Integer>(transaction, valid);
 
@@ -3934,13 +3933,14 @@ public class Controller extends Observable {
 
             } catch (Exception e) {
 
-                LOGGER.error(e.getMessage(), e);
                 // show error dialog
+                String errorMsg = e.toString() + e.getMessage();
+                LOGGER.error(errorMsg, e);
                 if (useGui) {
                     if (Settings.getInstance().isGuiEnabled()) {
                         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, null,
                                 Lang.getInstance().translate("STARTUP ERROR") + ": "
-                                        + Lang.getInstance().translate(e.getMessage()), 600, 400, Lang.getInstance().translate(" "));
+                                        + errorMsg, 600, 400, Lang.getInstance().translate(" "));
                         dd.jButton1.setVisible(false);
                         dd.jButton2.setText(Lang.getInstance().translate("Cancel"));
                         dd.setLocationRelativeTo(null);
@@ -3955,11 +3955,8 @@ public class Controller extends Observable {
                     LOGGER.error(e2.getMessage(), e2);
                 }
 
-                //ERROR STARTING
-                LOGGER.error(Lang.getInstance().translate("STARTUP ERROR") + ": " + e.getMessage());
-
                 if (Gui.isGuiStarted()) {
-                    JOptionPane.showMessageDialog(null, e.getMessage(), Lang.getInstance().translate("Startup Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, errorMsg, Lang.getInstance().translate("Startup Error"), JOptionPane.ERROR_MESSAGE);
 
                 }
 
@@ -3969,7 +3966,7 @@ public class Controller extends Observable {
                     about_frame.dispose();
                 }
                 //FORCE SHUTDOWN
-                System.exit(0);
+                System.exit(3);
             }
         } else {
             Scanner scanner = new Scanner(System.in);

@@ -83,12 +83,12 @@ public class TransactionTests {
 
         // FEE FUND
         maker.setLastTimestamp(new long[]{last_ref, 0}, db);
-        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         new_ref = maker.getLastTimestamp(db)[0];
 
         buyer.setLastTimestamp(new long[]{last_ref, 0}, db);
-        buyer.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
-        buyer.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(2000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false); // for bye
+        buyer.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        buyer.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(2000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false); // for bye
 
 
     }

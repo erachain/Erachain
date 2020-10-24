@@ -314,7 +314,7 @@ public class CancelOrderTransaction extends Transaction {
 
         //UPDATE BALANCE OF CREATOR
         BigDecimal left = order.getAmountHaveLeft();
-        order.getCreator().changeBalance(dcSet, false, false, order.getHaveAssetKey(), left, false, false);
+        order.getCreator().changeBalance(dcSet, false, false, order.getHaveAssetKey(), left, false);
         this.addCalculated(block, this.creator, order.getHaveAssetKey(), left,
                 "Cancel Order @" + Transaction.viewDBRef(order.getId()));
     }
@@ -355,7 +355,7 @@ public class CancelOrderTransaction extends Transaction {
         dcSet.getOrderMap().put(order.getId(), order);
 
         //REMOVE BALANCE OF CREATOR
-        order.getCreator().changeBalance(dcSet, true, false, order.getHaveAssetKey(), order.getAmountHaveLeft(), false, false);
+        order.getCreator().changeBalance(dcSet, true, false, order.getHaveAssetKey(), order.getAmountHaveLeft(), false);
     }
 
     @Override
