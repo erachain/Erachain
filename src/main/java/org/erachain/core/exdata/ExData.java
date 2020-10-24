@@ -1391,8 +1391,6 @@ public class ExData {
 
         try {
             password = Controller.getInstance().decrypt(account, recipient, secrets[pos]);
-            LOGGER.info("secrets[pos]: " + Base58.encode(secrets[pos]));
-            LOGGER.info("password: " + Base58.encode(password));
             byte[] decryptedData = AEScrypto.aesDecrypt(encryptedData, password);
             Fun.Tuple2<JSONObject, HashMap> jsonAndFiles = parseJsonAndFiles(decryptedData, true);
 
