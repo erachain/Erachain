@@ -341,16 +341,14 @@ public abstract class AssetCls extends ItemCls {
                 return "⛨";
             case AS_INSIDE_SHARE:
                 return "◒";
+            case AS_OUTSIDE_WORK_TIME_HOURS:
+                // 🕐🕜🕑🕝🕒🕞🕓🕟🕔🕠🕕🕡🕖🕢🕗🕣🕘🕤🕙🕥🕚🕦🕛🕧
+                return "◕";
+            case AS_OUTSIDE_WORK_TIME_MINUTES:
+                return "◔";
 
 
         }
-
-        if (this.assetType == AS_OUTSIDE_WORK_TIME_HOURS)
-            // 🕐🕜🕑🕝🕒🕞🕓🕟🕔🕠🕕🕡🕖🕢🕗🕣🕘🕤🕙🕥🕚🕦🕛🕧
-            return "◕";
-        if (this.assetType == AS_OUTSIDE_WORK_TIME_MINUTES)
-            // 🕐🕜🕑🕝🕒🕞🕓🕟🕔🕠🕕🕡🕖🕢🕗🕣🕘🕤🕙🕥🕚🕦🕛🕧
-            return "◔";
 
         if (this.assetType >= AS_OUTSIDE_CURRENCY
                 && this.assetType <= AS_OUTSIDE_OTHER_CLAIM)
