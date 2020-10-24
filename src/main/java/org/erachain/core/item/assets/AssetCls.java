@@ -759,9 +759,9 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_CURRENCY:
                 return lang.translate("External money that must be transferred to an external bank account or transferred in cash. The amount on your account shows the right to demand the issuer to transfer such amount of money to your bank account. In order to satisfy the demand it is necessary to set it up for the payment, and after the money has arrived into your account confirm the repayment of this demand. You can also save them for storage, for example, the total amount collected for the ICO to be distributed to the hands of different holders - they must confirm receipt of these mid-transaction \"confirm acceptance in hand\"");
             case AS_OUTSIDE_WORK_TIME_HOURS:
-                return lang.translate("Рабочее время в часах. Учет как долг перед кем-то. Его можно передать, потребовать исполнить и подтвердить затрату времени");
+                return lang.translate("Рабочее время в часах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие часы можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в часах рабочего времени");
             case AS_OUTSIDE_WORK_TIME_MINUTES:
-                return lang.translate("Рабочее время в минутах. Учет как долг перед кем-то. Его можно передать, потребовать исполнить и подтвердить затрату времени");
+                return lang.translate("Рабочее время в минутах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие минуты можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в минутах рабочего времени");
             case AS_OUTSIDE_SERVICE:
                 return lang.translate("An external service that needs to be provided outside. To notify your wish to provide services you must make demands and then confirm the fulfillment");
             case AS_OUTSIDE_SHARE:
@@ -829,24 +829,24 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_WORK_TIME_HOURS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Transfer to the ownership of working hours"; // Передать в собственность рабочие часы
+                        return "Transfer to the ownership of person-hour"; // Передать в собственность рабочие часы
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Withdraw a request to fulfill of working hours" // Отозвать требование траты рабочих часов
-                                : "Demand to spend of working hours"; // Потребовать потратить рабочие часы
+                        return backward ? "Decline the demand for person-hour" // Отозвать требование траты рабочих часов
+                                : "Demand to spend person-hour"; // Потребовать потратить рабочие часы
                     case TransactionAmount.ACTION_SPEND:
-                        return "Confirm the spend of working hours"; // Подтвердить затраты рабочих часов
+                        return "Confirm the spend of person-hour"; // Подтвердить затраты рабочих часов
                     default:
                         return null;
                 }
             case AS_OUTSIDE_WORK_TIME_MINUTES:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Transfer to the ownership of working minutes"; // Передать в собственность рабочие минуты
+                        return "Transfer to the ownership of person-minutes"; // Передать в собственность рабочие минуты
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Withdraw a request to fulfill of working minutes" // Отозвать требование траты рабочих минут
-                                : "Demand to spend of working minutes"; // Потребовать потратить рабочие минуты
+                        return backward ? "Decline the demand for person-minutes" // Отозвать требование траты рабочих минут
+                                : "Demand to spend person-minutes"; // Потребовать потратить рабочие минуты
                     case TransactionAmount.ACTION_SPEND:
-                        return "Confirm the spend of working minutes"; // Подтвердить затраты рабочих минут
+                        return "Confirm the spend of person-minutes"; // Подтвердить затраты рабочих минут
                     default:
                         return null;
                 }
