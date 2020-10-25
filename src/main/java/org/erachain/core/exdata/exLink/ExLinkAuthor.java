@@ -68,7 +68,7 @@ public class ExLinkAuthor extends ExLinkMemo {
         DCSet dcSet = transaction.getDCSet();
         ItemCls person = dcSet.getItemPersonMap().get(ref);
         Transaction issueTX = person.getIssueTransaction(dcSet);
-        dcSet.getExLinksMap().put(this, issueTX.getDBRef());
+        dcSet.getExLinksMap().put(new ExLinkAuthor(flags, getValue(), issueTX.getDBRef(), memoBytes), transaction.getDBRef());
     }
 
     @Override
@@ -79,7 +79,7 @@ public class ExLinkAuthor extends ExLinkMemo {
         DCSet dcSet = transaction.getDCSet();
         ItemCls person = dcSet.getItemPersonMap().get(ref);
         Transaction issueTX = person.getIssueTransaction(dcSet);
-        transaction.getDCSet().getExLinksMap().remove(ref, issueTX.getDBRef());
+        transaction.getDCSet().getExLinksMap().remove(issueTX.getDBRef(), type, transaction.getDBRef());
     }
 
 }

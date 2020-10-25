@@ -257,7 +257,7 @@ public class ExLink {
     }
 
     public void orphan(Transaction transaction) {
-        transaction.getDCSet().getExLinksMap().remove(ref, transaction.getDBRef());
+        transaction.getDCSet().getExLinksMap().remove(ref, type, transaction.getDBRef());
     }
 
 }
