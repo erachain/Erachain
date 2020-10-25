@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.Serializable;
 
 public class ExLinkSerializer implements Serializer<ExLink>, Serializable {
-    private static final long serialVersionUID = -6538913048331349777L;
     static Logger LOGGER = LoggerFactory.getLogger(ExLinkSerializer.class.getName());
 
     @Override
