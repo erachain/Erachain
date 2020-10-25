@@ -1526,6 +1526,12 @@ public class ExData {
         if (exLink != null)
             exLink.process(transaction);
 
+        if (authors != null) {
+            for (ExLinkAuthor author : authors) {
+                author.process(transaction);
+            }
+        }
+
         if (sources != null) {
             for (ExLinkSource source : sources) {
                 source.process(transaction);
@@ -1537,6 +1543,12 @@ public class ExData {
     public void orphan(Transaction transaction) {
         if (exLink != null)
             exLink.orphan(transaction);
+
+        if (authors != null) {
+            for (ExLinkAuthor author : authors) {
+                author.orphan(transaction);
+            }
+        }
 
         if (sources != null) {
             for (ExLinkSource source : sources) {

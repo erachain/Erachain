@@ -3110,10 +3110,7 @@ public class BlockExplorer {
 
         rNote.getExData().makeJSONforHTML(output, block, seqNo, langObj);
 
-        output.put("vouches_table", WebTransactionsHTML.getVouchesNew(rNote, langObj));
-
-        WebTransactionsHTML.getLinks(output, rNote, langObj);
-
+        WebTransactionsHTML.getApps(output, rNote, langObj);
 
         return output;
     }

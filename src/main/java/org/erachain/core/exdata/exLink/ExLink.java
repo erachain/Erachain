@@ -135,7 +135,7 @@ public class ExLink {
             case ExData.LINK_COMMENT_TYPE_FOR_VIEW:
                 return "Comment";
             case ExData.LINK_SOURCE_TYPE:
-                return "InSource";
+                return "Uses";
             case ExData.LINK_SURELY_TYPE:
                 return "Surely";
             case ExData.LINK_AUTHOR_TYPE:
@@ -187,6 +187,7 @@ public class ExLink {
         return data;
     }
 
+    // TODO доледать из JSON
     public static ExLink parse(JSONObject json) throws Exception {
         int type = (int) (long) (Long) json.get("type");
         switch (type) {
@@ -252,11 +253,11 @@ public class ExLink {
     }
 
     public void process(Transaction transaction) {
-        transaction.getDCSet().getExLinksMap().put(transaction.getDBRef(), this);
+        transaction.getDCSet().getExLinksMap().put(this, transaction.getDBRef());
     }
 
     public void orphan(Transaction transaction) {
-        transaction.getDCSet().getExLinksMap().remove(transaction.getDBRef());
+        transaction.getDCSet().getExLinksMap().remove(ref, type, transaction.getDBRef());
     }
 
 }
