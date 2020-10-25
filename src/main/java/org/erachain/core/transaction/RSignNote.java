@@ -719,6 +719,10 @@ public class RSignNote extends Transaction implements Itemable {
             return true;
         }
 
+        if (extendedData == null) {
+            parseDataV2WithoutFiles();
+        }
+
         for (Account item : extendedData.getRecipients()) {
             if (account.equals(item))
                 return true;

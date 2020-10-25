@@ -74,9 +74,6 @@ public class ExData {
     public static final byte LINK_SOURCE_TYPE = 6; // как Источник
     public static final byte LINK_AUTHOR_TYPE = 7; // как Автор
 
-    public static final byte LINK_SOURCE_USE_TYPE = 8; // как Пользователь Источника - обратный
-    public static final byte LINK_AUTHOR_ISSUE_TYPE = 9; // как статья Автора - обратный
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ExData.class);
 
     /**

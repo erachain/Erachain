@@ -834,7 +834,7 @@ public class WebTransactionsHTML {
                     int count = 0;
                     for (Fun.Tuple2<Long, Long> txKey : appendixes) {
 
-                        Transaction childTx = map.get(txKey.b);
+                        Transaction childTx = map.get(txKey.a);
                         out += "<h2>" + Lang.getInstance().translateFromLangObj("Appendix", langObj) + " " + ++count
                                 + "</h2><h3>" + childTx.getTitle() + "</h3>";
                         out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
@@ -855,7 +855,7 @@ public class WebTransactionsHTML {
         }
 
         try (IteratorCloseable<Fun.Tuple2<Long, Long>> appendixListIterator = dcSet.getExLinksMap()
-                .getTXLinksIterator(parentTx.getDBRef(), ExData.LINK_AUTHOR_ISSUE_TYPE, false)) {
+                .getTXLinksIterator(parentTx.getDBRef(), ExData.LINK_AUTHOR_TYPE, false)) {
             List<Fun.Tuple2<Long, Long>> appendixes = new ArrayList<>();
             while (appendixListIterator.hasNext()) {
                 appendixes.add(appendixListIterator.next());
@@ -869,7 +869,7 @@ public class WebTransactionsHTML {
                 int count = 0;
                 for (Fun.Tuple2<Long, Long> txKey : appendixes) {
 
-                    Transaction childTx = map.get(txKey.b);
+                    Transaction childTx = map.get(txKey.a);
                     out += "<h3>" + childTx.getTitle() + "</h3>";
                     out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
                             + childTx.viewHeightSeq() + "</a> "
@@ -888,7 +888,7 @@ public class WebTransactionsHTML {
         }
 
         try (IteratorCloseable<Fun.Tuple2<Long, Long>> appendixListIterator = dcSet.getExLinksMap()
-                .getTXLinksIterator(parentTx.getDBRef(), ExData.LINK_SOURCE_USE_TYPE, false)) {
+                .getTXLinksIterator(parentTx.getDBRef(), ExData.LINK_SOURCE_TYPE, false)) {
             List<Fun.Tuple2<Long, Long>> appendixes = new ArrayList<>();
             while (appendixListIterator.hasNext()) {
                 appendixes.add(appendixListIterator.next());
@@ -902,7 +902,7 @@ public class WebTransactionsHTML {
                 int count = 0;
                 for (Fun.Tuple2<Long, Long> txKey : appendixes) {
 
-                    Transaction childTx = map.get(txKey.b);
+                    Transaction childTx = map.get(txKey.a);
                     out += "<h3>" + childTx.getTitle() + "</h3>";
                     out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
                             + childTx.viewHeightSeq() + "</a> "
@@ -935,7 +935,7 @@ public class WebTransactionsHTML {
                 int count = 0;
                 for (Fun.Tuple2<Long, Long> txKey : appendixes) {
 
-                    Transaction childTx = map.get(txKey.b);
+                    Transaction childTx = map.get(txKey.a);
                     out += "<h3>" + childTx.getTitle() + "</h3>";
                     out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
                             + childTx.viewHeightSeq() + "</a> "

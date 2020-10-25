@@ -87,11 +87,11 @@ public class ExLinksMap extends DCUMap<Tuple2<Long, Long>, ExLink> {
 
     }
 
-    public void put(Long parentRef, ExLink exLink) {
+    public void put(ExLink exLink, Long parentRef) {
         super.put(new Tuple2<>(exLink.getRef(), parentRef), exLink);
     }
 
-    public void remove(Long parentRef, Long exLinkRef) {
+    public void remove(Long exLinkRef, Long parentRef) {
         super.remove(new Tuple2<>(exLinkRef, parentRef));
     }
 }

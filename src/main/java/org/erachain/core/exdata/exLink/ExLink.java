@@ -135,15 +135,11 @@ public class ExLink {
             case ExData.LINK_COMMENT_TYPE_FOR_VIEW:
                 return "Comment";
             case ExData.LINK_SOURCE_TYPE:
-                return "InSource";
-            case ExData.LINK_SOURCE_USE_TYPE:
                 return "Uses";
             case ExData.LINK_SURELY_TYPE:
                 return "Surely";
             case ExData.LINK_AUTHOR_TYPE:
                 return "Author";
-            case ExData.LINK_AUTHOR_ISSUE_TYPE:
-                return "Issue";
             default:
                 return "Unknown";
         }
@@ -212,12 +208,8 @@ public class ExLink {
                 return new ExLinkAppendix(data);
             case ExData.LINK_AUTHOR_TYPE:
                 return new ExLinkAuthor(data);
-            case ExData.LINK_AUTHOR_ISSUE_TYPE:
-                return new ExLinkAuthorIssue(data);
             case ExData.LINK_SOURCE_TYPE:
                 return new ExLinkSource(data);
-            case ExData.LINK_SOURCE_USE_TYPE:
-                return new ExLinkSourceUse(data);
             // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 
@@ -261,11 +253,11 @@ public class ExLink {
     }
 
     public void process(Transaction transaction) {
-        transaction.getDCSet().getExLinksMap().put(transaction.getDBRef(), this);
+        transaction.getDCSet().getExLinksMap().put(this, transaction.getDBRef());
     }
 
     public void orphan(Transaction transaction) {
-        transaction.getDCSet().getExLinksMap().remove(transaction.getDBRef(), ref);
+        transaction.getDCSet().getExLinksMap().remove(ref, transaction.getDBRef());
     }
 
 }
