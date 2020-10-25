@@ -823,7 +823,7 @@ public class WebTransactionsHTML {
                     out += "<h2>" + Lang.getInstance().translateFromLangObj("Appendix", langObj)
                             + "</h2><h3>" + childTx.getTitle() + "</h3>";
                     out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
-                            + childTx.viewType() + " " + childTx.viewHeightSeq() + "</a> "
+                            + childTx.viewFullTypeName() + " " + childTx.viewHeightSeq() + "</a> "
                             + " " + DateTimeFormat.timestamptoString(childTx.getTimestamp()) + " ";
                     out += "<a href=?address="
                             + childTx.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + childTx.getCreator().getPersonAsString()
@@ -838,7 +838,7 @@ public class WebTransactionsHTML {
                         out += "<h2>" + Lang.getInstance().translateFromLangObj("Appendix", langObj) + " " + ++count
                                 + "</h2><h3>" + childTx.getTitle() + "</h3>";
                         out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
-                                + childTx.viewHeightSeq() + "</a> "
+                                + childTx.viewFullTypeName() + " " + childTx.viewHeightSeq() + "</a> "
                                 + " " + DateTimeFormat.timestamptoString(childTx.getTimestamp()) + " ";
                         out += "<a href=?address="
                                 + childTx.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + childTx.getCreator().getPersonAsString()
