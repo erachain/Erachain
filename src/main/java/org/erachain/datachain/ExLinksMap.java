@@ -54,12 +54,17 @@ public class ExLinksMap extends DCUMap<Tuple3<Long, Byte, Long>, ExLink> {
     }
 
     public IteratorCloseable<Tuple3<Long, Byte, Long>> getTXLinksIterator(Long dbRef, Byte type, boolean descending) {
-        NavigableSet<Tuple3<Long, Byte, Long>> keySet = (NavigableSet) (descending ?
-                ((NavigableMap) map).descendingKeySet() : ((NavigableMap) map.keySet()));
+        //keySet = ;
+        if (descending) {
+            return IteratorCloseableImpl.make(((NavigableMap) map).descendingKeySet().subSet(
+                    new Tuple3<Long, Byte, Long>(dbRef, type, Long.MAX_VALUE),
+                    new Tuple3<Long, Byte, Long>(dbRef, type, Long.MIN_VALUE)
+            ).iterator());
+        }
 
-        return IteratorCloseableImpl.make(keySet.subSet(
-                new Tuple3<Long, Byte, Long>(dbRef, type, descending ? Long.MAX_VALUE : Long.MIN_VALUE),
-                new Tuple3<Long, Byte, Long>(dbRef, type, descending ? Long.MIN_VALUE : Long.MAX_VALUE)
+        return IteratorCloseableImpl.make(((NavigableSet) map.keySet()).subSet(
+                new Tuple3<Long, Byte, Long>(dbRef, type, Long.MIN_VALUE),
+                new Tuple3<Long, Byte, Long>(dbRef, type, Long.MAX_VALUE)
         ).iterator());
 
     }
