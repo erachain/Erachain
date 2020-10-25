@@ -194,9 +194,7 @@ public class WebTransactionsHTML {
                 output.put("body", transaction.toJson());
         }
 
-        output.put("vouches", getVouches(transaction));
-
-        getLinks(output, transaction, langObj);
+        getApps(output, transaction, langObj);
 
         return output;
     }
@@ -674,7 +672,7 @@ public class WebTransactionsHTML {
 
     }
 
-    public String getVouches(Transaction transaction) {
+    public String getVouches_old(Transaction transaction) {
 
         Fun.Tuple2<BigDecimal, List<Long>> vouchesItem = dcSet.getVouchRecordMap().get(transaction.getDBRef());
         if (vouchesItem == null || vouchesItem.b.isEmpty())
@@ -682,9 +680,9 @@ public class WebTransactionsHTML {
 
         TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
 
-        String out = "<b>" + Lang.getInstance().translateFromLangObj("Certified", langObj) + ":</b> ";
+        String out = "<b>" + Lang.getInstance().translateFromLangObj("Certified", this.langObj) + ":</b> ";
 
-        out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td>" + Lang.getInstance().translateFromLangObj("Transaction", langObj) + "<td>" + Lang.getInstance().translateFromLangObj("Date", langObj) + "<td>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + "</tr>";
+        out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td>" + Lang.getInstance().translateFromLangObj("Transaction", this.langObj) + "<td>" + Lang.getInstance().translateFromLangObj("Date", this.langObj) + "<td>" + Lang.getInstance().translateFromLangObj("Creator", this.langObj) + "</tr>";
         for (Long txKey : vouchesItem.b) {
 
             transaction = map.get(txKey);
@@ -699,16 +697,16 @@ public class WebTransactionsHTML {
             if (itemPerson != null) {
                 out += "<a href=?person=" + itemPerson.b.getKey() + get_Lang() + "><b>"
                         + itemPerson.b.viewName() + "</b></a> ("
-                        + Lang.getInstance().translateFromLangObj("Public Key", langObj) + ": "
+                        + Lang.getInstance().translateFromLangObj("Public Key", this.langObj) + ": "
                         + Base58.encode(transaction.getCreator().getPublicKey()) + ")<br>";
             } else {
                 out += "<a href=?address=" + transaction.getCreator().getAddress() + get_Lang() + ">" + transaction.getCreator().getAddress()
                         + "</a> ("
-                        + Lang.getInstance().translateFromLangObj("Public Key", langObj) + ": "
+                        + Lang.getInstance().translateFromLangObj("Public Key", this.langObj) + ": "
                         + Base58.encode(transaction.getCreator().getPublicKey()) + ")<br>";
             }
 
-            out += Lang.getInstance().translateFromLangObj("Signature", langObj) + " : "
+            out += Lang.getInstance().translateFromLangObj("Signature", this.langObj) + " : "
                     + "<a href=?tx=" + Base58.encode(transaction.getSignature()) + ">" + transaction.getSignature() + "</a><br>";
 
         }
@@ -752,66 +750,63 @@ public class WebTransactionsHTML {
     }
 
 
-    public static String getVouchesNew(Transaction transaction, JSONObject langObj) {
+    public static void getVouches(HashMap output, Transaction transaction, JSONObject langObj) {
 
         DCSet dcSet = DCSet.getInstance();
 
         Fun.Tuple2<Integer, PersonCls> creatorPersonItem = transaction.getCreator().getPerson();
+        String out;
 
         String personSign;
         if (creatorPersonItem != null) {
             personSign = htmlSignifier(transaction.getTimestamp(), creatorPersonItem.b.getKey(),
                     creatorPersonItem.b.viewName(), transaction.getCreator(), transaction.getSignature(), langObj);
-            ;
         } else {
             personSign = htmlSignifier(0, null, null, transaction.getCreator(), transaction.getSignature(), langObj);
-            ;
         }
 
         Fun.Tuple2<BigDecimal, List<Long>> vouchesItem = dcSet.getVouchRecordMap().get(transaction.getDBRef());
 
         if (vouchesItem == null || vouchesItem.b.isEmpty()) {
-            String out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signifier", langObj) + "</center></b> ";
+            out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signifier", langObj) + "</center></b> ";
             out += personSign;
-            return out;
-        }
-
-
-        TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
-        String out;
-
-        if (vouchesItem.b.size() == 1) {
-            out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signatures of the parties", langObj) + "</center></b> "
-                    + "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " 1:<br>" + personSign;
-
-            Transaction signTransaction = map.get(vouchesItem.b.get(0));
-            out += "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " 2:<br>"
-                    + htmlSignifier(signTransaction, langObj);
-
         } else {
-            out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signatories", langObj) + "</center></b> "
-                    + "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " 1:<br>" + personSign;
 
-            int count = 1;
-            for (Long txKey : vouchesItem.b) {
+            TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
 
-                Transaction signTransaction = map.get(txKey);
-                out += "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " " + ++count
-                        + ":<br>" + htmlSignifier(signTransaction, langObj);
+            if (vouchesItem.b.size() == 1) {
+                out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signatures of the parties", langObj) + "</center></b> "
+                        + "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " 1:<br>" + personSign;
 
+                Transaction signTransaction = map.get(vouchesItem.b.get(0));
+                out += "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " 2:<br>"
+                        + htmlSignifier(signTransaction, langObj);
+
+            } else {
+                out = "<b><center>" + Lang.getInstance().translateFromLangObj("Signatories", langObj) + "</center></b> "
+                        + "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " 1:<br>" + personSign;
+
+                int count = 1;
+                for (Long txKey : vouchesItem.b) {
+
+                    Transaction signTransaction = map.get(txKey);
+                    out += "<b>" + Lang.getInstance().translateFromLangObj("Side", langObj) + " " + ++count
+                            + ":<br>" + htmlSignifier(signTransaction, langObj);
+
+                }
             }
         }
 
         ///out += "</table>";
+        output.put("vouches", out);
 
-        return out;
     }
 
     public static void getLinks(HashMap output, Transaction parentTx, JSONObject langObj) {
 
         DCSet dcSet = DCSet.getInstance();
 
-        String out = "";
+        String out = "<hr>";
 
         try (IteratorCloseable<Long> appendixListIterator = dcSet.getExLinksMap()
                 .getLinksIterator(parentTx.getDBRef(), ExData.LINK_APPENDIX_TYPE, false)) {
@@ -927,6 +922,11 @@ public class WebTransactionsHTML {
 
         output.put("links", out);
 
+    }
+
+    public static void getApps(HashMap output, Transaction transaction, JSONObject langObj) {
+        getVouches(output, transaction, langObj);
+        getLinks(output, transaction, langObj);
     }
 
 }

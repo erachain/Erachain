@@ -223,8 +223,8 @@ function statement(data) {
 
     output += '</div>';
 
-    if (data.hasOwnProperty('vouches_table')) {
-        output += '<hr>' + data.vouches_table;
+    if (data.hasOwnProperty('vouches')) {
+        output += '<hr>' + data.vouches;
     }
 
     if (data.hasOwnProperty('links')) {
