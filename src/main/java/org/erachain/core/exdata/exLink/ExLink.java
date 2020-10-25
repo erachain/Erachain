@@ -136,10 +136,14 @@ public class ExLink {
                 return "Comment";
             case ExData.LINK_SOURCE_TYPE:
                 return "InSource";
+            case ExData.LINK_SOURCE_USE_TYPE:
+                return "Uses";
             case ExData.LINK_SURELY_TYPE:
                 return "Surely";
             case ExData.LINK_AUTHOR_TYPE:
                 return "Author";
+            case ExData.LINK_AUTHOR_ISSUE_TYPE:
+                return "Issue";
             default:
                 return "Unknown";
         }
@@ -187,6 +191,7 @@ public class ExLink {
         return data;
     }
 
+    // TODO доледать из JSON
     public static ExLink parse(JSONObject json) throws Exception {
         int type = (int) (long) (Long) json.get("type");
         switch (type) {
@@ -207,8 +212,12 @@ public class ExLink {
                 return new ExLinkAppendix(data);
             case ExData.LINK_AUTHOR_TYPE:
                 return new ExLinkAuthor(data);
+            case ExData.LINK_AUTHOR_ISSUE_TYPE:
+                return new ExLinkAuthorIssue(data);
             case ExData.LINK_SOURCE_TYPE:
                 return new ExLinkSource(data);
+            case ExData.LINK_SOURCE_USE_TYPE:
+                return new ExLinkSourceUse(data);
             // case ExData.LINK_COMMENT_TYPE_FOR_VIEW: используетс ятолько для Вида и выбора для сброса списка Получателей
         }
 

@@ -58,4 +58,12 @@ public class ExLinkAuthor extends ExLinkMemo {
         return Transaction.VALIDATE_OK;
     }
 
+    public void process(Transaction transaction) {
+        transaction.getDCSet().getExLinksMap().put(ref, new ExLinkAuthorIssue(transaction, this));
+    }
+
+    public void orphan(Transaction transaction) {
+        transaction.getDCSet().getExLinksMap().remove(ref);
+    }
+
 }
