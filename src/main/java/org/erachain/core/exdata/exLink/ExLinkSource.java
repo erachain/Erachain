@@ -59,13 +59,14 @@ public class ExLinkSource extends ExLinkMemo {
 
     @Override
     public void process(Transaction transaction) {
-        //transaction.getDCSet().getExLinksMap().put(ref, new ExLinkSourceUse(transaction, this));
+        super.process(transaction);
         transaction.getDCSet().getExLinksMap().put(ref, new ExLinkSourceUse(transaction, this));
     }
 
     @Override
     public void orphan(Transaction transaction) {
-        transaction.getDCSet().getExLinksMap().remove(ref);
+        super.orphan(transaction);
+        transaction.getDCSet().getExLinksMap().remove(ref, transaction.getDBRef());
     }
 
 }

@@ -808,9 +808,9 @@ public class WebTransactionsHTML {
 
         String out = "<hr>";
 
-        try (IteratorCloseable<Long> appendixListIterator = dcSet.getExLinksMap()
-                .getLinksIterator(parentTx.getDBRef(), ExData.LINK_APPENDIX_TYPE, false)) {
-            List<Long> appendixes = new ArrayList<>();
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> appendixListIterator = dcSet.getExLinksMap()
+                .getTXLinksIterator(parentTx.getDBRef(), ExData.LINK_APPENDIX_TYPE, false)) {
+            List<Fun.Tuple2<Long, Long>> appendixes = new ArrayList<>();
             while (appendixListIterator.hasNext()) {
                 appendixes.add(appendixListIterator.next());
             }
@@ -818,7 +818,7 @@ public class WebTransactionsHTML {
                 TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
 
                 if (appendixes.size() == 1) {
-                    Transaction childTx = map.get(appendixes.get(0));
+                    Transaction childTx = map.get(appendixes.get(0).a);
 
                     out += "<h2>" + Lang.getInstance().translateFromLangObj("Appendix", langObj)
                             + "</h2><h3>" + childTx.getTitle() + "</h3>";
@@ -832,9 +832,9 @@ public class WebTransactionsHTML {
                 } else {
 
                     int count = 0;
-                    for (Long txKey : appendixes) {
+                    for (Fun.Tuple2<Long, Long> txKey : appendixes) {
 
-                        Transaction childTx = map.get(txKey);
+                        Transaction childTx = map.get(txKey.b);
                         out += "<h2>" + Lang.getInstance().translateFromLangObj("Appendix", langObj) + " " + ++count
                                 + "</h2><h3>" + childTx.getTitle() + "</h3>";
                         out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
@@ -854,9 +854,9 @@ public class WebTransactionsHTML {
             output.put("error", e.getMessage());
         }
 
-        try (IteratorCloseable<Long> appendixListIterator = dcSet.getExLinksMap()
-                .getLinksIterator(parentTx.getDBRef(), ExData.LINK_AUTHOR_ISSUE_TYPE, false)) {
-            List<Long> appendixes = new ArrayList<>();
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> appendixListIterator = dcSet.getExLinksMap()
+                .getTXLinksIterator(parentTx.getDBRef(), ExData.LINK_AUTHOR_ISSUE_TYPE, false)) {
+            List<Fun.Tuple2<Long, Long>> appendixes = new ArrayList<>();
             while (appendixListIterator.hasNext()) {
                 appendixes.add(appendixListIterator.next());
             }
@@ -867,9 +867,9 @@ public class WebTransactionsHTML {
                         + "</h2>";
 
                 int count = 0;
-                for (Long txKey : appendixes) {
+                for (Fun.Tuple2<Long, Long> txKey : appendixes) {
 
-                    Transaction childTx = map.get(txKey);
+                    Transaction childTx = map.get(txKey.b);
                     out += "<h3>" + childTx.getTitle() + "</h3>";
                     out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
                             + childTx.viewHeightSeq() + "</a> "
@@ -887,9 +887,9 @@ public class WebTransactionsHTML {
             output.put("error", e.getMessage());
         }
 
-        try (IteratorCloseable<Long> appendixListIterator = dcSet.getExLinksMap()
-                .getLinksIterator(parentTx.getDBRef(), ExData.LINK_SOURCE_USE_TYPE, false)) {
-            List<Long> appendixes = new ArrayList<>();
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> appendixListIterator = dcSet.getExLinksMap()
+                .getTXLinksIterator(parentTx.getDBRef(), ExData.LINK_SOURCE_USE_TYPE, false)) {
+            List<Fun.Tuple2<Long, Long>> appendixes = new ArrayList<>();
             while (appendixListIterator.hasNext()) {
                 appendixes.add(appendixListIterator.next());
             }
@@ -900,9 +900,9 @@ public class WebTransactionsHTML {
                         + "</h2>";
 
                 int count = 0;
-                for (Long txKey : appendixes) {
+                for (Fun.Tuple2<Long, Long> txKey : appendixes) {
 
-                    Transaction childTx = map.get(txKey);
+                    Transaction childTx = map.get(txKey.b);
                     out += "<h3>" + childTx.getTitle() + "</h3>";
                     out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
                             + childTx.viewHeightSeq() + "</a> "
@@ -920,9 +920,9 @@ public class WebTransactionsHTML {
             output.put("error", e.getMessage());
         }
 
-        try (IteratorCloseable<Long> appendixListIterator = dcSet.getExLinksMap()
-                .getLinksIterator(parentTx.getDBRef(), ExData.LINK_REPLY_COMMENT_TYPE, false)) {
-            List<Long> appendixes = new ArrayList<>();
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> appendixListIterator = dcSet.getExLinksMap()
+                .getTXLinksIterator(parentTx.getDBRef(), ExData.LINK_REPLY_COMMENT_TYPE, false)) {
+            List<Fun.Tuple2<Long, Long>> appendixes = new ArrayList<>();
             while (appendixListIterator.hasNext()) {
                 appendixes.add(appendixListIterator.next());
             }
@@ -933,9 +933,9 @@ public class WebTransactionsHTML {
                         + "</h2>";
 
                 int count = 0;
-                for (Long txKey : appendixes) {
+                for (Fun.Tuple2<Long, Long> txKey : appendixes) {
 
-                    Transaction childTx = map.get(txKey);
+                    Transaction childTx = map.get(txKey.b);
                     out += "<h3>" + childTx.getTitle() + "</h3>";
                     out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
                             + childTx.viewHeightSeq() + "</a> "

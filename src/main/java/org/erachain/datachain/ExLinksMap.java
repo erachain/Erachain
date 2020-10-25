@@ -13,20 +13,20 @@ import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
+import org.mapdb.Fun.Tuple2;
 
 import java.util.Map;
 import java.util.NavigableSet;
 
 
 /**
- * Ссылка на другую транзакцию<br><br>
- * Ключ: ссылка на эту транзакцию (с ссылкой).<br>
+ * Ключ: ссылка на эту транзакцию (с ExLink) + ссылка из ExLink.<br>
  * Значение: ExLink
  *
  * @return dcMap
  */
 
-public class ExLinksMap extends DCUMap<Long, ExLink> {
+public class ExLinksMap extends DCUMap<Tuple2<Long, Long>, ExLink> {
 
     @SuppressWarnings("rawtypes")
     private NavigableSet parentLinks;
@@ -47,9 +47,9 @@ public class ExLinksMap extends DCUMap<Long, ExLink> {
     }
 
     //@SuppressWarnings("unchecked")
-    private Map<Long, ExLink> openMap(DB database) {
+    private Map<Tuple2<Long, Long>, ExLink> openMap(DB database) {
 
-        BTreeMap<Long, ExLink> map =
+        BTreeMap<Tuple2<Long, Long>, ExLink> map =
                 database.createTreeMap("ex_links")
                         .valueSerializer(new ExLinkSerializer())
                         .makeOrGet();
@@ -59,17 +59,16 @@ public class ExLinksMap extends DCUMap<Long, ExLink> {
 
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
         Bind.secondaryKey((Bind.MapWithModificationListener) map, this.parentLinks,
-                new Fun.Function2<Fun.Tuple2<Long, Byte>, Long, ExLink>() {
+                new Fun.Function2<Tuple2<Long, Byte>, Tuple2<Long, Long>, ExLink>() {
                     @Override
-                    public Fun.Tuple2<Long, Byte> run(Long key, ExLink exLink) {
-                        return new Fun.Tuple2<Long, Byte>(exLink.getRef(), exLink.getType());
+                    public Tuple2<Long, Byte> run(Tuple2<Long, Long> key, ExLink exLink) {
+                        return new Tuple2<Long, Byte>(key.b, exLink.getType());
                     }
                 });
 
         return map;
 
     }
-
 
     @Override
     public void openMap() {
@@ -82,10 +81,17 @@ public class ExLinksMap extends DCUMap<Long, ExLink> {
         openMap();
     }
 
-    public IteratorCloseable<Long> getLinksIterator(Long dbRef, Byte type, boolean descending) {
+    public IteratorCloseable<Tuple2<Long, Long>> getTXLinksIterator(Long dbRef, Byte type, boolean descending) {
         return IteratorCloseableImpl.make(Fun.filter(descending ? this.parentLinks.descendingSet() : this.parentLinks,
-                new Fun.Tuple2<Long, Byte>(dbRef, type)).iterator());
+                new Tuple2<Long, Byte>(dbRef, type)).iterator());
 
     }
 
+    public void put(Long parentRef, ExLink exLink) {
+        super.put(new Tuple2<>(exLink.getRef(), parentRef), exLink);
+    }
+
+    public void remove(Long parentRef, Long exLinkRef) {
+        super.remove(new Tuple2<>(exLinkRef, parentRef));
+    }
 }

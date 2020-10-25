@@ -59,11 +59,13 @@ public class ExLinkAuthor extends ExLinkMemo {
     }
 
     public void process(Transaction transaction) {
+        super.process(transaction);
         transaction.getDCSet().getExLinksMap().put(ref, new ExLinkAuthorIssue(transaction, this));
     }
 
     public void orphan(Transaction transaction) {
-        transaction.getDCSet().getExLinksMap().remove(ref);
+        super.orphan(transaction);
+        transaction.getDCSet().getExLinksMap().remove(ref, transaction.getDBRef());
     }
 
 }
