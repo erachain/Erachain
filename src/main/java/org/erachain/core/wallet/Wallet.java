@@ -14,6 +14,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.wallet.AccountMap;
 import org.erachain.database.wallet.DWSet;
@@ -1160,8 +1161,12 @@ public class Wallet extends Observable /*implements Observer*/ {
 		// ADD SENDER to FAVORITES
 		if (isInvolved) {
 			PublicKeyAccount creator = transaction.getCreator();
-			if (!accountExists(creator) && !this.database.getAccountMap().exists(creator)) {
+			if (creator != null && !accountExists(creator) && !this.database.getAccountMap().exists(creator)) {
 				String title = transaction.getTitle();
+				Tuple2<Integer, PersonCls> personItem = creator.getPerson();
+				if (personItem != null && personItem.b != null)
+					title = personItem.b.getName() + " - " + title;
+
 				String description = "";
 				if (transaction instanceof RSend) {
 					RSend rSend = (RSend) transaction;
