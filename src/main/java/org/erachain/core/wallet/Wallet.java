@@ -181,8 +181,8 @@ public class Wallet extends Observable /*implements Observer*/ {
 		return this.database.getAccountMap().exists(address);
 	}
 
-	public boolean accountExists(Account address) {
-		return this.database.getAccountMap().exists(address);
+	public boolean accountExists(Account account) {
+		return this.database.getAccountMap().exists(account);
 	}
 
 	public Account getAccount(String address) {
@@ -1155,6 +1155,27 @@ public class Wallet extends Observable /*implements Observer*/ {
 					deal_transaction(account, transaction, false);
 				}
 			}
+		}
+
+		// ADD SENDER to FAVORITES
+		if (isInvolved) {
+			PublicKeyAccount creator = transaction.getCreator();
+			if (!accountExists(creator) && !this.database.getAccountMap().exists(creator)) {
+				String title = transaction.getTitle();
+				String description = "";
+				if (transaction instanceof RSend) {
+					RSend rSend = (RSend) transaction;
+					if (!rSend.isEncrypted() && rSend.isText())
+						description = rSend.viewData();
+				} else if (transaction instanceof RSignNote) {
+					RSignNote rNote = (RSignNote) transaction;
+					if (!rNote.isEncrypted() && rNote.isText())
+						description = rNote.getMessage();
+				}
+				addAddressFavorite(creator.getAddress(), creator.getBase58(),
+						title == null || title.isEmpty() ? "" : title, description);
+			}
+
 		}
 
 		return isInvolved;

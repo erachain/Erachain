@@ -131,12 +131,12 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
         return false;
     }
 
-    public boolean exists(Account address) {
-        if (address == null)
+    public boolean exists(Account account) {
+        if (account == null)
             return false;
 
-        for (Account account : this.accounts) {
-            if (account.equals(address)) return true;
+        for (Account myAaccount : this.accounts) {
+            if (myAaccount.equals(account)) return true;
         }
         return false;
     }
