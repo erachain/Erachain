@@ -1,12 +1,14 @@
 package org.erachain.gui.items.records;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.library.*;
+import org.erachain.gui.library.ASMakeHashMenuItem;
+import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.VouchLibraryPanel;
 import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -26,7 +28,6 @@ import java.awt.event.*;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -39,7 +40,6 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
     public JPanel info_Panel;
     public VouchLibraryPanel voush_Library_Panel;
-    MButton makeHashButton;
     SearchTransactionsTableModel transactionsTableModel;
     JScrollPane jScrollPane4;
     private JTextField searchString;
@@ -88,9 +88,6 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         MenuPopupUtil.installContextMenu(searchString);
         MenuPopupUtil.installContextMenu(this.searchTextFieldSearchToolBarLeftPanelDocument);
-
-        // 	Records_Table_Model records_Model = new Records_Table_Model();
-        // 	this.jTableJScrollPanelLeftPanel = new JTable(records_Model);
 
 
         this.searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
@@ -174,16 +171,9 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         });
         mainMenu.add(setSeeInBlockexplorer);
 
-        // this.jTableJScrollPanelLeftPanel.setComponentPopupMenu(mainMenu);
         TableMenuPopupUtil.installContextMenu(this.jTableJScrollPanelLeftPanel, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
         this.jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
-
-        //TRANSACTIONS SORTER
-        //		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-        //		indexes.put(SearchTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
-        //		CoreRowSorter sorter = new CoreRowSorter(transactionsTableModel, indexes);
-        //		this.jTableJScrollPanelLeftPanel.setRowSorter(sorter);
 
         //TRANSACTION DETAILS
         this.jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
@@ -223,14 +213,13 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             public void mousePressed(MouseEvent e) {
                 Point p = e.getPoint();
                 int row = jTableJScrollPanelLeftPanel.rowAtPoint(p);
-                //	jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
 
                 if (e.getClickCount() == 1 & e.getButton() == MouseEvent.BUTTON1) {
 
                     if (jTableJScrollPanelLeftPanel
                             .getSelectedColumn() == transactionsTableModel.COLUMN_FAVORITE) {
                         row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                        Transaction transaction = (Transaction) transactionsTableModel.getItem(row);
+                        Transaction transaction = transactionsTableModel.getItem(row);
                         favorite_set(transaction);
                     }
                 }
@@ -253,17 +242,11 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
     class search_listener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent arg0) {
-            String dateAlive;
-            String date_birthday;
-            String message;
             // устанавливаем формат даты
-            SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-            //создаем объект персоны
-            UnionCls union;
-            Transaction voting = null;
+            Transaction transaction = null;
             if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
                 try {
-                    voting = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel
+                    transaction = transactionsTableModel.getItem(jTableJScrollPanelLeftPanel
                             .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
                 } catch (Exception e) {
 
@@ -271,7 +254,6 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
                 info_Panel = new JPanel();
                 info_Panel.setLayout(new GridBagLayout());
-                //  panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
                 //TABLE GBC
                 GridBagConstraints tableGBC = new GridBagConstraints();
@@ -281,10 +263,9 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                 tableGBC.weighty = 1;
                 tableGBC.gridx = 0;
                 tableGBC.gridy = 0;
-                //	JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(voting);
-                info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(voting), tableGBC);
+                info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(transaction), tableGBC);
 
-                Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap().get(Transaction.makeDBRef(voting.getBlockHeight(), voting.getSeqNo()));
+                Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap().get(Transaction.makeDBRef(transaction.getBlockHeight(), transaction.getSeqNo()));
                 GridBagConstraints gridBagConstraints = null;
                 if (keys != null) {
 
@@ -306,7 +287,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
                     gridBagConstraints.weightx = 1.0;
                     gridBagConstraints.weighty = 1.0;
-                    voush_Library_Panel = new VouchLibraryPanel(voting);
+                    voush_Library_Panel = new VouchLibraryPanel(transaction);
                     info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
                 }

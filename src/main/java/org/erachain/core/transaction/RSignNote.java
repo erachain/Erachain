@@ -322,6 +322,13 @@ public class RSignNote extends Transaction implements Itemable {
         return this.data;
     }
 
+    public String getMessage() {
+        if (extendedData == null) {
+            parseDataV2WithoutFiles();
+        }
+        return extendedData.getMessage();
+    }
+
     public ExData getExData() {
         return this.extendedData;
     }
