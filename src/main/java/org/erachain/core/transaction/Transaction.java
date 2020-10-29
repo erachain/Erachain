@@ -1628,7 +1628,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if ((flags & NOT_VALIDATE_FLAG_FEE) == 0L
                 && height > BlockChain.ALL_BALANCES_OK_TO
                 && !BlockChain.isFeeEnough(height, creator)
-                && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
+                && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
             return NOT_ENOUGH_FEE;
         }
 

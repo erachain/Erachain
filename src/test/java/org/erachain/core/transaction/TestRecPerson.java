@@ -743,8 +743,6 @@ public class TestRecPerson {
                 // PERSON -> ADDRESS
                 assertEquals(null, dbPA.getItem(personKey, userAddress3));
 
-                BigDecimal oil_amount_diff = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
-
                 //// PROCESS /////
                 r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
                 r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12, 3, true);
@@ -756,7 +754,6 @@ public class TestRecPerson {
                 assertEquals(erm_amount_registrar, registrar.getBalanceUSE(ERM_KEY, dcSet));
                 // CHECK FEE BALANCE - FEE - GIFT
                 assertEquals("0.00062550", r_SertifyPubKeys.getFee().toPlainString());
-                assertEquals("0.00050000", BlockChain.GIFTED_COMPU_AMOUNT_BD.toPlainString());
                 assertEquals(oil_amount_registrar, registrar.getBalanceUSE(FEE_KEY, dcSet));
 
                 //CHECK BALANCE CERTIFIER
@@ -966,10 +963,7 @@ public class TestRecPerson {
                 assertEquals(null, dbPA.getItem(personKey, userAddress3));
 
                 BigDecimal oil_amount_diff;
-                if (false)
-                    oil_amount_diff = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
-                else
-                    oil_amount_diff = BlockChain.BONUS_FOR_PERSON(1);
+                oil_amount_diff = BlockChain.BONUS_FOR_PERSON(1);
 
                 BigDecimal erm_amount = registrar.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount = registrar.getBalanceUSE(FEE_KEY, dcSet);
@@ -1232,10 +1226,7 @@ public class TestRecPerson {
                 assertEquals(null, dbPA.getItem(personKey, userAddress3));
 
                 BigDecimal oil_amount_diff;
-                if (BlockChain.ERA_COMPU_ALL_UP)
-                    oil_amount_diff = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
-                else
-                    oil_amount_diff = BlockChain.BONUS_FOR_PERSON(1);
+                oil_amount_diff = BlockChain.BONUS_FOR_PERSON(1);
 
                 BigDecimal erm_amount = registrar.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount = registrar.getBalanceUSE(FEE_KEY, dcSet);

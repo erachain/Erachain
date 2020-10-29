@@ -651,6 +651,21 @@ public class Account {
         return ownVol;
     }
 
+    /**
+     * с учетом данных в долг средств или выданных
+     *
+     * @param dcSet
+     * @return
+     */
+    public BigDecimal getForFee(DCSet dcSet) {
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = this
+                .getBalance(dcSet, AssetCls.FEE_KEY);
+        BigDecimal ownVol = balance.a.b;
+        BigDecimal inDebt = balance.b.b;
+
+        return ownVol.add(inDebt);
+    }
+
     /*
      * private void updateGeneratingBalance(DBSet db) { //CHECK IF WE NEED TO
      * RECALCULATE if(this.lastBlockSignature == null) { this.lastBlockSignature
