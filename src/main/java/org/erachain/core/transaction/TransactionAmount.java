@@ -647,7 +647,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
 
         // CHECK IF AMOUNT AND ASSET
-        if ((flags & NOT_VALIDATE_FLAG_BALANCE) == 0l
+        if ((flags & NOT_VALIDATE_FLAG_BALANCE) == 0L
                 && this.amount != null) {
 
             int amount_sign = this.amount.signum();
@@ -773,8 +773,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             }
                         }
 
-                        if (height > BlockChain.ALL_BALANCES_OK_TO
-                                && !BlockChain.isFeeEnough(height, creator)
+                        if (!BlockChain.isFeeEnough(height, creator)
                                 && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
                             return NOT_ENOUGH_FEE;
                         }
@@ -810,18 +809,23 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 return NO_DEBT_BALANCE;
                             }
 
+                            if (absKey == FEE_KEY) {
+                                // тут проверим по В ИСПОЛЬЗОВАНИИ сколько мы можем заьратьтак как он мог потратить из forFEE - долговые
+                                if (this.recipient.getBalanceUSE(absKey, this.dcSet)
+                                        .compareTo(this.amount) < 0) {
+                                    return NO_BALANCE;
+                                }
+                            }
+
                         } else {
                             // CREDIT - GIVE CREDIT OR RETURN CREDIT
 
                             if (!asset.isUnlimited(this.creator)) {
 
-                                if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0
-                                        && this.creator.getBalanceUSE(absKey, this.dcSet)
+                                if (this.creator.getBalanceUSE(absKey, this.dcSet)
                                         .compareTo(this.amount) < 0) {
 
-                                    if (height > BlockChain.ALL_BALANCES_OK_TO // в боевой
-                                    )
-                                        return NO_BALANCE;
+                                    return NO_BALANCE;
                                 }
 
                                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
@@ -850,8 +854,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             }
                         }
 
-                        if (height > BlockChain.ALL_BALANCES_OK_TO
-                                && !BlockChain.isFeeEnough(height, creator)
+                        if (!BlockChain.isFeeEnough(height, creator)
                                 && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
                             return NOT_ENOUGH_FEE;
                         }
@@ -901,8 +904,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 forSale = forSale.subtract(assetFee);
                             }
 
-                            if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0L
-                                    && !BlockChain.ERA_COMPU_ALL_UP
+                            if (!BlockChain.ERA_COMPU_ALL_UP
                                     && !BlockChain.isFeeEnough(height, creator)
                                     && forSale.compareTo(this.amount.add(this.fee)) < 0) {
 
@@ -1081,8 +1083,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         }
 
                         // TRY FEE
-                        if (height > BlockChain.ALL_BALANCES_OK_TO
-                                && !BlockChain.isFeeEnough(height, creator)
+                        if (!BlockChain.isFeeEnough(height, creator)
                                 && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
                             return NOT_ENOUGH_FEE;
                         }
