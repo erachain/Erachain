@@ -23,6 +23,8 @@ import java.util.*;
 
 public abstract class PollCls extends ItemCls {
 
+    public static final int TYPE_KEY = ItemCls.POLL_TYPE;
+
     public static final long MIN_START_KEY = 1000L;
 
     public static final int POLL = 1;
@@ -44,7 +46,7 @@ public abstract class PollCls extends ItemCls {
 
     //GETTERS/SETTERS
     public int getItemType() {
-        return ItemCls.POLL_TYPE;
+        return TYPE_KEY;
     }
 
     @Override
@@ -52,12 +54,12 @@ public abstract class PollCls extends ItemCls {
         if (!BlockChain.CLONE_MODE)
             return MIN_START_KEY;
 
-        long startKey = BlockChain.startKeys[ItemCls.ASSET_TYPE];
+        long startKey = BlockChain.startKeys[TYPE_KEY];
 
         if (startKey == 0) {
             return START_KEY;
         } else if (startKey < MIN_START_KEY) {
-            return (BlockChain.startKeys[ItemCls.ASSET_TYPE] = MIN_START_KEY);
+            return (BlockChain.startKeys[TYPE_KEY] = MIN_START_KEY);
         }
         return startKey;
     }

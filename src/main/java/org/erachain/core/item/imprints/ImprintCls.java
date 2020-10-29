@@ -14,6 +14,8 @@ import java.util.Arrays;
 
 public abstract class ImprintCls extends ItemCls {
 
+    public static final int TYPE_KEY = ItemCls.IMPRINT_TYPE;
+
     public static final long MIN_START_KEY = 1000L;
     protected static final int IMPRINT = 1;
     protected static final int CUTTED_REFERENCE_LENGTH = 20;
@@ -31,7 +33,7 @@ public abstract class ImprintCls extends ItemCls {
     //GETTERS/SETTERS
 
     public int getItemType() {
-        return ItemCls.IMPRINT_TYPE;
+        return TYPE_KEY;
     }
 
     @Override
@@ -39,12 +41,12 @@ public abstract class ImprintCls extends ItemCls {
         if (!BlockChain.CLONE_MODE)
             return MIN_START_KEY;
 
-        long startKey = BlockChain.startKeys[ItemCls.ASSET_TYPE];
+        long startKey = BlockChain.startKeys[TYPE_KEY];
 
         if (startKey == 0) {
             return START_KEY;
         } else if (startKey < MIN_START_KEY) {
-            return (BlockChain.startKeys[ItemCls.ASSET_TYPE] = MIN_START_KEY);
+            return (BlockChain.startKeys[TYPE_KEY] = MIN_START_KEY);
         }
         return startKey;
     }
