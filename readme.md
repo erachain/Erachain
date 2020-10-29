@@ -21,6 +21,10 @@ For clone code:
 ### For use start arguments on Mac or by default
 Make in folder file startARGS.txt (see example in z_START_EXAMPLES folder) 
 
+### Set Version
+For set version in JAR application set `String versionEra =` in file `build.gradle`.   
+For set version in running from IDEA application set `controller.Controller.version` 
+
 Описание кдючей запуска приложения в файле:  
 ERA\z_START_EXAMPLES\readme.txt
 

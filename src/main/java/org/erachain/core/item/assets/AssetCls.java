@@ -21,10 +21,12 @@ import java.util.HashMap;
 // 1019 - Movable = true; Divisible = NO; Quantity = 1
 public abstract class AssetCls extends ItemCls {
 
+    public static final int TYPE_KEY = ItemCls.ASSET_TYPE;
+
     public static final long MIN_START_KEY = 1000L;
 
     // CORE KEY
-    public static final long ERA_KEY = 1l;
+    public static final long ERA_KEY = 1L;
     public static final String ERA_ABBREV = "ERA"; // ERA (main rights units)
     public static final String ERA_NAME = "ERA";
     public static final String ERA_DESCR = "Основная учётная единица, мера собственности и управления данной средой - \"правовая\", \"управляющая\"" + ": "
@@ -40,28 +42,28 @@ public abstract class AssetCls extends ItemCls {
             + ".";
 
     // FEE KEY
-    public static final long FEE_KEY = 2l;
+    public static final long FEE_KEY = 2L;
     public static final String FEE_ABBREV = "CMP"; // COMPU (compute units)
     public static final String FEE_NAME = "COMPU";
     public static final String FEE_DESCR = "Основная учётная единица среды, используемая для оплаты комиссий за внесение записей в среду - \"рабочая\", \"оплатная\"" + ": "
             + FEE_NAME + "(" + FEE_ABBREV + "). ";
 
     // TRUST KEY
-    public static final long TRUST_KEY = 3l;
+    public static final long TRUST_KEY = 3L;
     public static final String TRUST_ABBREV = "АЗЫ"; // COMPU (compute units)
     public static final String TRUST_NAME = "АЗЫ";
     public static final String TRUST_DESCR = "Честь, доблесть и доверие" + ": "
             + TRUST_NAME + "(" + TRUST_ABBREV + "). ";
 
     // REAL KEY
-    public static final long REAL_KEY = 4l;
+    public static final long REAL_KEY = 4L;
     public static final String REAL_ABBREV = "ВЕД"; // COMPU (compute units)
     public static final String REAL_NAME = "ВЕДЫ";
     public static final String REAL_DESCR = "Труд, знания, заслуги и польза" + ": "
             + REAL_NAME + "(" + REAL_ABBREV + "). ";
 
     // DEaL KEY
-    public static final long LIA_KEY = 5l;
+    public static final long LIA_KEY = 5L;
     public static final String LIA_ABBREV = "LIA"; //
     public static final String LIA_NAME = "LIA";
     public static final String LIA_DESCR = "Life ID Asset (" + LIA_NAME + ")";
@@ -251,7 +253,7 @@ public abstract class AssetCls extends ItemCls {
 
     @Override
     public int getItemType() {
-        return ItemCls.ASSET_TYPE;
+        return TYPE_KEY;
     }
 
     @Override
@@ -260,12 +262,12 @@ public abstract class AssetCls extends ItemCls {
         if (!BlockChain.CLONE_MODE)
             return MIN_START_KEY;
 
-        long startKey = BlockChain.startKeys[ItemCls.ASSET_TYPE];
+        long startKey = BlockChain.startKeys[TYPE_KEY];
 
         if (startKey == 0) {
             return START_KEY;
         } else if (startKey < MIN_START_KEY) {
-            return (BlockChain.startKeys[ItemCls.ASSET_TYPE] = MIN_START_KEY);
+            return (BlockChain.startKeys[TYPE_KEY] = MIN_START_KEY);
         }
         return startKey;
     }
