@@ -809,12 +809,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 return NO_DEBT_BALANCE;
                             }
 
-                            if (absKey == FEE_KEY) {
-                                // тут проверим по В ИСПОЛЬЗОВАНИИ сколько мы можем заьратьтак как он мог потратить из forFEE - долговые
-                                if (this.recipient.getBalanceUSE(absKey, this.dcSet)
-                                        .compareTo(this.amount) < 0) {
-                                    return NO_BALANCE;
-                                }
+                            // тут проверим и по В ИСПОЛЬЗОВАНИИ сколько мы можем забрать
+                            // так как он мог потратить из forFEE - долговые
+                            if (this.recipient.getBalanceUSE(absKey, this.dcSet)
+                                    .compareTo(this.amount) < 0) {
+                                return NO_BALANCE;
                             }
 
                         } else {
