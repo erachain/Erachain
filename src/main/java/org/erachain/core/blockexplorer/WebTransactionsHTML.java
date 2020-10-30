@@ -754,7 +754,12 @@ public class WebTransactionsHTML {
 
         DCSet dcSet = DCSet.getInstance();
 
-        Fun.Tuple2<Integer, PersonCls> creatorPersonItem = transaction.getCreator().getPerson();
+        PublicKeyAccount creator = transaction.getCreator();
+        if (creator == null) {
+            return;
+        }
+
+        Fun.Tuple2<Integer, PersonCls> creatorPersonItem = creator.getPerson();
         String out;
 
         String personSign;
