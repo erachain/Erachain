@@ -73,7 +73,8 @@ public class API {
 
         help.put("see /apitelegrams", "Help for telegrams API");
         help.put("see /apiexchange", "Help for exchange API");
-        help.put("see /apirecords", "Help for transactions API");
+        help.put("see /api/tx", "Help for transactions API");
+        //help.put("see /apirecords", "Help for transactions API");
         help.put("see /apidocuments", "Help for documents API");
 
         help.put("*** BALANCE SYSTEM ***", "");
