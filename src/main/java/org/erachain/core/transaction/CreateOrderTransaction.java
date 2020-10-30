@@ -492,25 +492,19 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             ; // NOT CHECK
 
         } else if (wantKey == FEE_KEY) {
-            if (haveKey == RIGHTS_KEY) {
-                if (
+            if (haveKey == RIGHTS_KEY
                     // VALID if want to BY COMPU by ERA
-                        amountHave.compareTo(BigDecimal.TEN) >= 0 // минимально меняем 1 ЭРА
-                                && (height < BlockChain.VERS_30SEC || this.creator.getBalance(this.dcSet, RIGHTS_KEY).a.b.compareTo(amountHave) >= 0) // ЭРА есть на счету
-                                && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).compareTo(this.FEE_MIN_1) > 0
-                ) { // на балансе компушки не минус
-                    flags = flags | NOT_VALIDATE_FLAG_FEE;
-                } else {
-                    return NO_BALANCE;
-                }
+                    && amountHave.compareTo(BigDecimal.TEN) >= 0 // минимально меняем 1 ЭРА
+                    && (height < BlockChain.VERS_30SEC || this.creator.getBalance(this.dcSet, RIGHTS_KEY).a.b.compareTo(amountHave) >= 0) // ЭРА есть на счету
+                    && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).compareTo(this.FEE_MIN_1) > 0
+            ) { // на балансе компушки не минус
+                flags = flags | NOT_VALIDATE_FLAG_FEE;
             } else {
                 if (!BlockChain.isFeeEnough(height, creator)
                         && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).compareTo(amountHave.add(this.fee)) < 0) {
                     return NO_BALANCE;
                 }
-                flags = flags | NOT_VALIDATE_FLAG_FEE;
             }
-
         } else {
 
             switch ((int) haveKey) {
