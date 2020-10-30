@@ -53,7 +53,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     private static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
     private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
-    private final BigDecimal FEE_MIN_1 = new BigDecimal("-0.0001");
     private long haveKey;
     private long wantKey;
     private AssetCls haveAsset;
@@ -491,24 +490,18 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         if (height < BlockChain.ALL_BALANCES_OK_TO) {
             ; // NOT CHECK
 
-        } else if (wantKey == FEE_KEY) {
-            if (haveKey == RIGHTS_KEY) {
-                if (
-                    // VALID if want to BY COMPU by ERA
-                        amountHave.compareTo(BigDecimal.TEN) >= 0 // минимально меняем 1 ЭРА
-                                && (height < BlockChain.VERS_30SEC || this.creator.getBalance(this.dcSet, RIGHTS_KEY).a.b.compareTo(amountHave) >= 0) // ЭРА есть на счету
-                                && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).compareTo(this.FEE_MIN_1) > 0
-                ) { // на балансе компушки не минус
-                    flags = flags | NOT_VALIDATE_FLAG_FEE;
-                } else {
-                    return NO_BALANCE;
-                }
-            } else {
-                if (!BlockChain.isFeeEnough(height, creator)
-                        && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).compareTo(amountHave.add(this.fee)) < 0) {
-                    return NO_BALANCE;
-                }
-                flags = flags | NOT_VALIDATE_FLAG_FEE;
+        } else if (wantKey == FEE_KEY
+                && haveKey == RIGHTS_KEY
+                // VALID if want to BY COMPU by ERA
+                && amountHave.compareTo(BigDecimal.TEN) >= 0 // минимально меняем 1 ЭРА
+                && this.creator.getForSale(this.dcSet, RIGHTS_KEY, height, true).compareTo(amountHave) >= 0 // ЭРА есть на счету
+                && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).signum() > 0
+        ) { // на балансе компушки не минус
+            flags = flags | NOT_VALIDATE_FLAG_FEE;
+        } else if (haveKey == FEE_KEY) {
+            if (!BlockChain.isFeeEnough(height, creator)
+                    && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).compareTo(amountHave.add(this.fee)) < 0) {
+                return NO_BALANCE;
             }
 
         } else {
