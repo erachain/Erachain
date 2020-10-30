@@ -14,7 +14,6 @@ import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -35,6 +34,7 @@ public class WebService {
         s.add(API.class);
         s.add(WebResource.class);
         s.add(APITransactionsResource.class);
+        s.add(APITXResource.class);
 
         s.add(APIItemAsset.class);
         s.add(APIItemPerson.class);
