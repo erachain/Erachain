@@ -6,9 +6,11 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
@@ -22,6 +24,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.Map.Entry;
@@ -41,9 +44,9 @@ public class APITXResource {
         help.put("api/tx/{signature}",
                 Lang.getInstance().translate("Get transaction by signature."));
         help.put("api/tx/bynumber/{height-sequence}",
-                "GET transaction by Height and Sequence");
+                "GET transaction by Height and Sequence (SeqNo)");
         help.put("api/tx/signature/{height-sequence}",
-                "GET transaction Signature by Height and Sequence");
+                "GET transaction Signature by Height and Sequence (SeqNo)");
         help.put("api/tx/vouches/{height-sequence}",
                 "GET Vouches of transaction by Height and Sequence");
         help.put("api/tx/incomingfromblock/{address}/{blockStart}?type={type}",
@@ -70,6 +73,13 @@ public class APITXResource {
                 Lang.getInstance().translate("Search transactions by Query. Query=SeqNo|Signature|FilterWords. Result[0-1] - START & END Seq-No for use in paging (see as make it in blockexplorer. Signature as Base58. Set Set FilterWords as preffix words separated by space. Set [seqNo] as 1234-1. For use forge set &useforge=true. For fill full page - use fullpage=true"));
 
         help.put("api/tx/rawbyblock/{height}?forDeal={DEAL}", "Get raw transaction(encoding Base58). forDeal = 1..5 (FOR_MYPACK, FOR_PACK, FOR_NETWORK, FOR_DB_RECORD). By default forDeal is 3(for network)");
+
+        help.put("api/tx/raw64byblock/{height}?forDeal={DEAL}", "Get raw transaction(encoding Base44 - more fast). forDeal = 1..5 (FOR_MYPACK, FOR_PACK, FOR_NETWORK, FOR_DB_RECORD). By default forDeal is 3(for network)");
+
+        help.put("api/tx/links/{height-sequence}",
+                "GET Links of transaction by Height and Sequence (SeqNo)");
+
+
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(StrJSonFine.convert(help)).build();
@@ -106,7 +116,7 @@ public class APITXResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toString())
                 .build();
     }
 
@@ -142,7 +152,7 @@ public class APITXResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toString())
                 .build();
     }
 
@@ -214,7 +224,7 @@ public class APITXResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toString())
                 .build();
     }
 
@@ -281,7 +291,7 @@ public class APITXResource {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toJSONString()).build();
+                .entity(out.toString()).build();
 
     }
 
@@ -334,7 +344,7 @@ public class APITXResource {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(array.toJSONString()).build();
+                .entity(array.toString()).build();
     }
 
     // "api/tx/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}"
@@ -372,7 +382,7 @@ public class APITXResource {
         // Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(out)).build();
+                .header("Access-Control-Allow-Origin", "*").entity(out.toString()).build();
     }
 
     @SuppressWarnings("unchecked")
@@ -388,7 +398,7 @@ public class APITXResource {
             ff.put("Error", "Invalid Address");
             return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(ff.toJSONString()).build();
+                    .entity(ff.toString()).build();
         }
         // SearchTransactionsTableModel a = new SearchTransactionsTableModel();
         // a.findByAddress(address);
@@ -409,7 +419,7 @@ public class APITXResource {
             ff.put("message", "null");
             return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(ff.toJSONString()).build();
+                    .entity(ff.toString()).build();
         }
 
         // 7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC
@@ -441,7 +451,7 @@ public class APITXResource {
         // json.put("transactions", array);
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(new JSONObject(k_Map.subMap(start, end)).toJSONString()).build();
+                .entity(new JSONObject(k_Map.subMap(start, end)).toString()).build();
 
     }
 
@@ -489,7 +499,7 @@ public class APITXResource {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(array.toJSONString()).build();
+                .entity(array.toString()).build();
     }
 
     /**
@@ -526,7 +536,7 @@ public class APITXResource {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(array.toJSONString()).build();
+                .entity(array.toString()).build();
     }
 
     @SuppressWarnings("unchecked")
@@ -540,7 +550,7 @@ public class APITXResource {
             ff.put("error", "block not found");
             return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(ff.toJSONString()).build();
+                    .entity(ff.toString()).build();
         }
 
         List<Transaction> result = block.getTransactions();
@@ -549,7 +559,7 @@ public class APITXResource {
             ff.put("error", "null");
             return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(ff.toJSONString()).build();
+                    .entity(ff.toString()).build();
         }
 
         JSONArray array = new JSONArray();
@@ -559,7 +569,7 @@ public class APITXResource {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(array.toJSONString()).build();
+                .entity(array.toString()).build();
 
     }
 
@@ -614,8 +624,8 @@ public class APITXResource {
     @GET
     @Path("/rawbyblock/{height}")
     @SuppressWarnings("unchecked")
-    public Response getRawTransactionByBlock(@PathParam("height") int height,
-                                             @DefaultValue("3") @QueryParam("forDeal") int forDeal) {
+    public Response getRawByBlock(@PathParam("height") int height,
+                                  @DefaultValue("3") @QueryParam("forDeal") int forDeal) {
         Block block;
 
         if (forDeal > 6 || forDeal < 0) {
@@ -635,7 +645,115 @@ public class APITXResource {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(txs.toJSONString())
+                .entity(txs.toString())
                 .build();
     }
+
+    @GET
+    @Path("/raw64byblock/{height}")
+    @SuppressWarnings("unchecked")
+    public Response getRaw64ByBlock(@PathParam("height") int height,
+                                    @DefaultValue("3") @QueryParam("forDeal") int forDeal) {
+        Block block;
+
+        if (forDeal > 6 || forDeal < 0) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_TRANSACTION_TYPE);
+        }
+
+        JSONArray txs = new JSONArray();
+        block = Controller.getInstance().getBlockByHeight(height);
+        if (block == null) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+        }
+
+        for (Transaction transaction : block.getTransactions()) {
+            String rawTransaction = Base64.getEncoder().encodeToString(transaction.toBytes(forDeal, true));
+            txs.add(rawTransaction);
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(txs.toString())
+                .build();
+    }
+
+    @GET
+    @Path("links/{number}")
+    public Response getLinks(@PathParam("number") String numberStr) {
+
+        Map out = new JSONObject();
+        int step = 1;
+
+        Long dbRef = Transaction.parseDBRef(numberStr);
+        if (dbRef == null) {
+            out.put("error", step);
+            out.put("message", "height-sequence error, use integer-integer value");
+        } else {
+
+            DCSet dcSet = DCSet.getInstance();
+
+            try (IteratorCloseable<Fun.Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
+                    .getTXLinksIterator(dbRef, ExData.LINK_APPENDIX_TYPE, false)) {
+                JSONArray links = new JSONArray();
+                while (iterator.hasNext()) {
+                    links.add(Transaction.viewDBRef(iterator.next().c));
+                }
+                out.put("appendix", links);
+
+            } catch (IOException e) {
+                out.put("error", ++step);
+                out.put("message", "LINK_APPENDIX_TYPE error: " + e.getMessage());
+            }
+
+            step++;
+            try (IteratorCloseable<Fun.Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
+                    .getTXLinksIterator(dbRef, ExData.LINK_AUTHOR_TYPE, false)) {
+                JSONArray links = new JSONArray();
+                while (iterator.hasNext()) {
+                    links.add(Transaction.viewDBRef(iterator.next().c));
+                }
+                out.put("author", links);
+
+            } catch (IOException e) {
+                out.put("error", ++step);
+                out.put("message", "LINK_AUTHOR_TYPE error: " + e.getMessage());
+            }
+
+            step++;
+            try (IteratorCloseable<Fun.Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
+                    .getTXLinksIterator(dbRef, ExData.LINK_SOURCE_TYPE, false)) {
+                JSONArray links = new JSONArray();
+                while (iterator.hasNext()) {
+                    links.add(Transaction.viewDBRef(iterator.next().c));
+                }
+                out.put("source", links);
+
+            } catch (IOException e) {
+                out.put("error", ++step);
+                out.put("message", "LINK_SOURCE_TYPE error: " + e.getMessage());
+            }
+
+            step++;
+            try (IteratorCloseable<Fun.Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
+                    .getTXLinksIterator(dbRef, ExData.LINK_REPLY_COMMENT_TYPE, false)) {
+                JSONArray links = new JSONArray();
+                while (iterator.hasNext()) {
+                    links.add(Transaction.viewDBRef(iterator.next().c));
+                }
+                out.put("comment", links);
+
+            } catch (IOException e) {
+                out.put("error", ++step);
+                out.put("message", "LINK_COMMENT_TYPE error: " + e.getMessage());
+            }
+
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toString())
+                .build();
+    }
+
 }
