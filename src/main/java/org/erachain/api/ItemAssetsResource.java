@@ -11,7 +11,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.dbs.IteratorCloseable;
-import org.erachain.gui.transaction.OnDealClick;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -206,8 +205,7 @@ public class ItemAssetsResource {
             return transaction.toJson().toJSONString();
         else {
             JSONObject out = new JSONObject();
-            out.put("error", validate);
-            out.put("error_message", OnDealClick.resultMess(validate));
+            Transaction.updateMapByErrorSimple(validate, out);
             return out.toJSONString();
         }
     }

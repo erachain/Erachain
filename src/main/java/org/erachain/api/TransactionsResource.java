@@ -882,13 +882,11 @@ public class TransactionsResource {
 
         // CHECK VALIDATE MESSAGE
         if (result != Transaction.VALIDATE_OK) {
-            out.put("status_code", result);
-            out.put("status", "error");
+            Transaction.updateMapByErrorSimple(result, out);
             return out.toJSONString();
 
         }
         out.put("status", "ok");
-        out.put("status_code", Transaction.VALIDATE_OK);
         out.put("signature", Base58.encode(transaction.getSignature()));
         return out.toJSONString();
     }
