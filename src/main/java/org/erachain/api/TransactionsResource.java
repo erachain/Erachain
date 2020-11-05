@@ -768,7 +768,7 @@ public class TransactionsResource {
     public String sendAsset(@QueryParam("sender") String sender1, @QueryParam("recipient") String recipient1,
                             @QueryParam("linkTo") Long exLinkRef,
                             @QueryParam("amount") String amount1, @QueryParam("message") String message1,
-                            @QueryParam("title") String title1, @QueryParam("asset") int asset1, @QueryParam("password") String pass,
+                            @QueryParam("title") String title, @QueryParam("asset") int asset1, @QueryParam("password") String pass,
                             @QueryParam("check") String check1) {
 
         JSONObject out = new JSONObject();
@@ -846,21 +846,6 @@ public class TransactionsResource {
             out.put("status", "Invalid asset");
             return out.toJSONString();
         }
-        // title
-        String head;
-        try {
-            head = title1;
-            if (head == null)
-                head = "";
-            if (head.getBytes(StandardCharsets.UTF_8).length > 256)
-                throw new Exception("");
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            // e.printStackTrace();
-            out.put("status_code", Transaction.INVALID_HEAD_LENGTH);
-            out.put("status", "Invalid Title");
-            return out.toJSONString();
-        }
 
         ExLink exLink;
         if (exLinkRef == null) {
@@ -874,7 +859,7 @@ public class TransactionsResource {
         try {
             transaction = Controller.getInstance().r_Send(
                     Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, 0, recip, asset1, amount,
-                    head, message.getBytes(StandardCharsets.UTF_8), isTextByte, encrypted, 0);
+                    title, message.getBytes(StandardCharsets.UTF_8), isTextByte, encrypted, 0);
             // test result = new Pair<Transaction, Integer>(null,
             // Transaction.VALIDATE_OK);
             if (transaction == null)

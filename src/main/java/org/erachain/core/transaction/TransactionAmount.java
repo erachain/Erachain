@@ -585,6 +585,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 }
                 
                 if (wrong) {
+                    errorValue = this.recipient.getAddress();
                     return INVALID_ADDRESS;
                 }
             }
@@ -598,6 +599,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
                     if (true || BlockChain.CHECK_BUGS > 1)
                         LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
                     return INVALID_TIMESTAMP;
                 }
             } else if (BlockChain.CHECK_DOUBLE_SPEND_DEEP > 0) {
@@ -605,6 +607,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
                     if (BlockChain.CHECK_BUGS > 1)
                         LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
                     return INVALID_TIMESTAMP;
                 }
 
@@ -627,6 +630,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                         + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
                         }
                     }
+                    errorValue = "INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
+                            + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                            + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp);
                     return INVALID_TIMESTAMP;
                 }
             }
@@ -809,9 +815,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 return NO_DEBT_BALANCE;
                             }
 
-                            // тут проверим и по В ИСПОЛЬЗОВАНИИ сколько мы можем забрать
+                            // тут проверим и по [В ИСПОЛЬЗОВАНИИ] сколько мы можем забрать
                             // так как он мог потратить из forFEE - долговые
-                            if (this.recipient.getBalanceUSE(absKey, this.dcSet)
+                            if (!asset.isUnlimited(this.recipient)
+                                    && this.recipient.getBalanceUSE(absKey, this.dcSet)
                                     .compareTo(this.amount) < 0) {
                                 return NO_BALANCE;
                             }

@@ -52,7 +52,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     protected static final int OWNER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
     protected static final int NAME_SIZE_LENGTH = 1;
     //public static final int MIN_NAME_LENGTH = 10;
-    public static final int MAX_NAME_LENGTH = (int) Math.pow(256, NAME_SIZE_LENGTH) - 1;
+    public static final int MAX_NAME_LENGTH = Transaction.MAX_TITLE_BYTES_LENGTH;
     protected static final int ICON_SIZE_LENGTH = 2;
     protected static final int IMAGE_SIZE_LENGTH = 4;
     protected static final int DESCRIPTION_SIZE_LENGTH = 4;

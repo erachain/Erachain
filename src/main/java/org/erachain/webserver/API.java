@@ -517,6 +517,7 @@ public class API {
         } catch (Exception e) {
             out.put("error", -1);
             out.put("message", APIUtils.errorMess(-1, e.toString(), transaction));
+            transaction.updateMapByError(-1, e.toString(), out);
         }
 
         return Response.status(200)
@@ -774,8 +775,7 @@ public class API {
             }
 
         } catch (Exception e) {
-            //logger.error(e.getMessage());
-            out.put("error", APIUtils.errorMess(-1, e.toString() + " on step: " + step));
+            Transaction.updateMapByErrorSimple(-1, e.toString() + " on step: " + step, out);
             return out;
         }
     }
@@ -788,33 +788,28 @@ public class API {
         try {
             transactionBytes = Base58.decode(rawDataBase58);
         } catch (Exception e) {
-            //logger.error(e.getMessage());
-            out.put("error", APIUtils.errorMess(-1, e.toString() + " INVALID_RAW_DATA"));
+            Transaction.updateMapByErrorSimple(-1, e.toString() + " INVALID_RAW_DATA", out);
             return out;
         }
 
         try {
             transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
         } catch (Exception e) {
-            out.put("error", APIUtils.errorMess(-1, e.toString() + " parse ERROR"));
+            Transaction.updateMapByErrorSimple(-1, e.toString() + " parse ERROR", out);
             return out;
         }
 
         // CHECK IF RECORD VALID
         if (!transaction.isSignatureValid(DCSet.getInstance())) {
-            out.put("error", APIUtils.errorMess(-1, " INVALID_SIGNATURE"));
+            transaction.updateMapByError(-1, "INVALID_SIGNATURE", out);
             return out;
         }
 
-        int status = Controller.getInstance().broadcastTelegram(transaction, true);
-        if (status == 0) {
+        int result = Controller.getInstance().broadcastTelegram(transaction, true);
+        if (result == 0) {
             out.put("status", "ok");
         } else {
-            out.put("status", "error");
-            out.put("error", OnDealClick.resultMess(status));
-            if (transaction.errorValue != null) {
-                out.put("value", transaction.errorValue);
-            }
+            transaction.updateMapByError(result, out);
         }
         out.put("signature", Base58.encode(transaction.getSignature()));
         return out;

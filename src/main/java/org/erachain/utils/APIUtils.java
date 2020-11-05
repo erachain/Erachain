@@ -34,7 +34,6 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 //import test.org.erachain.records.TestRecTemplate;
 
 public class APIUtils {
@@ -254,21 +253,7 @@ public class APIUtils {
         boolean istext = true;
         boolean encrypt = false;
         if (jsonObject != null) {
-            if (jsonObject.containsKey("title")) {
-                title = (String) jsonObject.get("title");
-                if (title.getBytes(StandardCharsets.UTF_8).length > 256) {
-                    throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_HEAD_LENGTH);
-                }
-            }
-            
-            if (jsonObject.containsKey("message")) {
-                String message_in = (String) jsonObject.get("message");
-                message = message_in.getBytes(StandardCharsets.UTF_8);
-                if (message.length > BlockChain.MAX_REC_DATA_BYTES) {
-                    throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_DESCRIPTION_LENGTH_MAX);
-                }
-            }
-            
+
             if (jsonObject.containsKey("istext")) {
                 try {
                     istext = (boolean) jsonObject.get("istext");

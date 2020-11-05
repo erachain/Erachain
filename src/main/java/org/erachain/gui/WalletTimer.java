@@ -91,7 +91,7 @@ public class WalletTimer<U> implements Observer {
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
                                     + rSend.getAmount().toPlainString() + " [" + rSend.getAbsKey() + "]\n "
                                     + rSend.getRecipient().getPersonAsString() + "\n"
-                                    + (rSend.getHead() != null ? "\n" + rSend.getHead() : "");
+                                    + (rSend.getTitle() != null ? "\n" + rSend.getTitle() : "");
                         } else {
 
                             if (settings.isSoundReceivePaymentEnabled())
@@ -101,7 +101,7 @@ public class WalletTimer<U> implements Observer {
                             message = rSend.getRecipient().getPersonAsString() + " <- \n "
                                     + rSend.getAmount().toPlainString() + " [" + rSend.getAbsKey() + "]\n "
                                     + rSend.getCreator().getPersonAsString() + "\n"
-                                    + (rSend.getHead() != null ? "\n" + rSend.getHead() : "");
+                                    + (rSend.getTitle() != null ? "\n" + rSend.getTitle() : "");
                         }
                     } else {
                         // MAIL
@@ -113,7 +113,7 @@ public class WalletTimer<U> implements Observer {
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
                                     //+ rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
                                     + rSend.getRecipient().getPersonAsString() + "\n"
-                                    + (rSend.getHead() != null ? "\n" + rSend.getHead() : "");
+                                    + (rSend.getTitle() != null ? "\n" + rSend.getTitle() : "");
                         } else {
                             if (settings.isSoundReceiveMessageEnabled())
                                 sound = "receivemail.wav";
@@ -122,7 +122,7 @@ public class WalletTimer<U> implements Observer {
                             message = rSend.getRecipient().getPersonAsString() + " <- \n "
                                     //+ rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
                                     + rSend.getCreator().getPersonAsString() + "\n"
-                                    + (rSend.getHead() != null ? "\n" + rSend.getHead() : "");
+                                    + (rSend.getTitle() != null ? "\n" + rSend.getTitle() : "");
                         }
 
                     }

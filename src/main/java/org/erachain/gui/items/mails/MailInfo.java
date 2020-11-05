@@ -177,7 +177,7 @@ public class MailInfo extends javax.swing.JPanel {
 
         jTextField_Title.setEditable(false);
         MenuPopupUtil.installContextMenu(jTextField_Title);
-        jTextField_Title.setText(trans.getHead());
+        jTextField_Title.setText(trans.getTitle());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;

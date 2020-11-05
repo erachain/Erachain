@@ -643,8 +643,8 @@ public class WebTransactionsHTML {
                     + itemNameHTML(Controller.getInstance().getAsset(rSend.getAbsKey())) + "</b>";
         }
 
-        if (!rSend.getHead().equals(""))
-            out += "<BR>" + Lang.getInstance().translateFromLangObj("Title", langObj) + ": <b>" + rSend.getHead() + "</b>";
+        if (!rSend.getTitle().equals(""))
+            out += "<BR>" + Lang.getInstance().translateFromLangObj("Title", langObj) + ": <b>" + rSend.getTitle() + "</b>";
 
         return out;
 

@@ -62,7 +62,7 @@ public class Library {
                                 "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
                                         + "Asset Key" + ": " + r_Send.getAbsKey() + ", " + "Amount" + ": "
                                         + r_Send.getAmount().toPlainString()
-                                        + (r_Send.getHead() != null? "\n Title" + ":" + r_Send.getHead() : "")
+                                        + (r_Send.getTitle() != null ? "\n Title" + ":" + r_Send.getTitle() : "")
                                 ,
                                 MessageType.INFO);
 
@@ -72,7 +72,7 @@ public class Library {
 
                         SysTray.getInstance().sendMessage("Message received",
                                 "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
-                                        + (r_Send.getHead() != null? "\n Title" + ":" + r_Send.getHead() : "")
+                                        + (r_Send.getTitle() != null ? "\n Title" + ":" + r_Send.getTitle() : "")
                                 ,
                                 MessageType.INFO);
 
@@ -92,7 +92,7 @@ public class Library {
                                 "From: " + transaction.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
                                         + "Asset Key" + ": " + r_Send.getAbsKey() + ", " + "Amount" + ": "
                                         + r_Send.getAmount().toPlainString()
-                                        + (r_Send.getHead() != null? "\n Title" + ":" + r_Send.getHead() : "")
+                                        + (r_Send.getTitle() != null ? "\n Title" + ":" + r_Send.getTitle() : "")
                                 ,
                                 MessageType.INFO);
 
@@ -103,7 +103,7 @@ public class Library {
 
                         SysTray.getInstance().sendMessage("Message send",
                                 "From: " + transaction.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
-                                        + (r_Send.getHead() != null? "\n Title" + ":" + r_Send.getHead() : "")
+                                        + (r_Send.getTitle() != null ? "\n Title" + ":" + r_Send.getTitle() : "")
                                 ,
                                 MessageType.INFO);
 

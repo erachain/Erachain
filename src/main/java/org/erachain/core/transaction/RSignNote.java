@@ -660,7 +660,8 @@ public class RSignNote extends Transaction implements Itemable {
         if (data == null && key <= 0)
             return INVALID_DATA_LENGTH;
 
-        if (data != null && data.length > BlockChain.MAX_REC_DATA_BYTES) {
+        if (data != null && data.length > MAX_DATA_BYTES_LENGTH) {
+            errorValue = "" + data.length;
             return INVALID_DATA_LENGTH;
         }
 
@@ -676,7 +677,10 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         result = extendedData.isValid(dcSet, this);
-        if (result != Transaction.VALIDATE_OK) return result;
+        if (result != Transaction.VALIDATE_OK) {
+            // errorValue updated in extendedData
+            return result;
+        }
 
         if (height > BlockChain.VERS_5_01_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого

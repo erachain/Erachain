@@ -73,7 +73,7 @@ public class TableModelMails extends WalletTableModel<Transaction> {
                 return transaction.getRecipient().viewPerson();
 
             case COLUMN_HEAD:
-                return transaction.getHead();
+                return transaction.getTitle();
 
             case COLUMN_AMOUNT:
                 if (transaction.hasAmount())
