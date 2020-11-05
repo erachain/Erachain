@@ -315,12 +315,12 @@ public class RSend extends TransactionAmount {
         }
 
         // HEAD LEN
-        int headLen = Byte.toUnsignedInt(data[position]);
+        int titleLen = Byte.toUnsignedInt(data[position]);
         position++;
         // HEAD
-        byte[] headBytes = Arrays.copyOfRange(data, position, position + headLen);
-        String head = new String(headBytes, StandardCharsets.UTF_8);
-        position += headLen;
+        byte[] titleBytes = Arrays.copyOfRange(data, position, position + titleLen);
+        String title = new String(titleBytes, StandardCharsets.UTF_8);
+        position += titleLen;
 
         // DATA +++
         byte[] arbitraryData = null;
@@ -346,10 +346,10 @@ public class RSend extends TransactionAmount {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new RSend(typeBytes, creator, exLink, feePow, recipient, key, amount, head, arbitraryData, isTextByte,
+            return new RSend(typeBytes, creator, exLink, feePow, recipient, key, amount, title, arbitraryData, isTextByte,
                     encryptedByte, timestamp, reference, signatureBytes, seqNo, feeLong);
         } else {
-            return new RSend(typeBytes, creator, exLink, recipient, key, amount, head, arbitraryData, isTextByte,
+            return new RSend(typeBytes, creator, exLink, recipient, key, amount, title, arbitraryData, isTextByte,
                     encryptedByte, reference, signatureBytes);
         }
 

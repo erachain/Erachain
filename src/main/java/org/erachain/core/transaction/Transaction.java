@@ -75,7 +75,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final long NOT_VALIDATE_KEY_COLLISION = 16l;
 
     //
-    public static final int MAX_TITLE_BYTES_LENGTH = 100;
+    public static final int MAX_TITLE_BYTES_LENGTH = 1 << 7 - 1;
     public static final int MAX_DATA_BYTES_LENGTH = BlockChain.MAX_REC_DATA_BYTES;
 
 
