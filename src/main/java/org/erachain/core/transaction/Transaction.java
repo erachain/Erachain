@@ -1683,6 +1683,11 @@ public abstract class Transaction implements ExplorerJsonLine {
         out.put("message", errorMess);
     }
 
+    public static void updateMapByErrorSimple(int error, HashMap out) {
+        out.put("error", error);
+        out.put("message", OnDealClick.resultMess(error));
+    }
+
     public void process_gifts_turn(int level, long fee_gift, Account invitedAccount,
                                    long invitedPersonKey, boolean asOrphan,
                                    List<RCalculated> txCalculated, String message) {
