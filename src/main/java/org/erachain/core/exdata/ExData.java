@@ -114,6 +114,8 @@ public class ExData {
     private byte[][] secrets;
     private byte[] encryptedData;
 
+    public String errorValue;
+
     /**
      * OLD version 1-2
      *

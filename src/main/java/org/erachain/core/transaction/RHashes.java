@@ -37,9 +37,8 @@ public class RHashes extends Transaction {
     private static final String NAME_ID = "Hashes Record";
 
     private static final int URL_SIZE_LENGTH = 1;
-    public static final int MAX_URL_LENGTH = (int) Math.pow(256, URL_SIZE_LENGTH) - 1;
+    public static final int MAX_URL_LENGTH = Transaction.MAX_TITLE_BYTES_LENGTH;
     private static final int HASH_LENGTH = 32;
-
 
     protected static final int LOAD_LENGTH = URL_SIZE_LENGTH + DATA_SIZE_LENGTH;
     protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
@@ -359,14 +358,17 @@ public class RHashes extends Transaction {
 
         //CHECK DATA SIZE
         if (url != null && url.length > MAX_URL_LENGTH) {
+            errorValue = "" + url.length;
             return INVALID_URL_LENGTH;
         }
 
-        if (data.length > 2 * Short.MAX_VALUE - 1) {
+        if (data.length > Transaction.MAX_DATA_BYTES_LENGTH) {
+            errorValue = "" + data.length;
             return INVALID_DATA_LENGTH;
         }
 
         if (hashes.length > 2 * Short.MAX_VALUE - 1) {
+            errorValue = "" + hashes.length;
             return INVALID_PARAMS_LENGTH;
         }
 
@@ -379,6 +381,7 @@ public class RHashes extends Transaction {
                 TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
                 for (byte[] hash : hashes) {
                     if (map.contains(hash)) {
+                        errorValue = Base58.encode(hash);
                         return HASH_ALREDY_EXIST;
                     }
                 }
