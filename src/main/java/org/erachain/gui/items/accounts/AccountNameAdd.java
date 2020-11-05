@@ -94,8 +94,8 @@ public class AccountNameAdd extends javax.swing.JDialog {
             public void actionPerformed(ActionEvent arg0) {
                 String accountName = th.jTextFieldName.getText();
                 String description = th.jTextAreaDescription.getText();
-                if (accountName.trim().length() == 0 || description.trim().length() == 0) {
-                    JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Empty name or description"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                if (accountName.trim().length() == 0) {
+                    JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Empty Name"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 try {

@@ -415,6 +415,7 @@
   "Edit name": "Изменить имя",
   "EQUAL": "РАВНО",
   "Empty Creator in parent transaction": "В родительской транзакции отсутствует Создатель",
+  "Empty Name": "Пустое Имя",
   "Empty name or description": "Не введены имя или описание",
   "Enable/Disable API calls using the given port.": "Включение/Отключение API запросов, используя данный порт.",
   "Enable/Disable decentralized web server. Use \"Access permission\" tab for additional options.": "<html>Включение/Отключение децентрализованного Веб-сервера.<br>Используйте вкладку \"Права доступа\" для дополнительных параметров.</html>",
