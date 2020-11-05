@@ -629,7 +629,7 @@ public class TransactionCreator {
 
         //CREATE MESSAGE TRANSACTION
         //messageTx = new RSend(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
-        messageTx = new RSend(creator, exLink, (byte) feePow, recipient, key, amount, title, message, isText, encryptMessage, timestamp, 0l);
+        messageTx = new RSend(creator, exLink, (byte) feePow, recipient, key, amount, title, message, isText, encryptMessage, timestamp, 0L);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
@@ -649,7 +649,7 @@ public class TransactionCreator {
 
         //CREATE MESSAGE TRANSACTION
         messageTx = new RSend(version, property1, property2, creator, exLink, (byte) feePow, recipient, key, amount, title,
-                message, isText, encryptMessage, timestamp, 0l);
+                message, isText, encryptMessage, timestamp, 0L);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 

@@ -74,6 +74,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final long NOT_VALIDATE_FLAG_BALANCE = 8l;
     public static final long NOT_VALIDATE_KEY_COLLISION = 16l;
 
+    //
+    public static final int MAX_TITLE_BYTES_LENGTH = 100;
+
     // VALIDATION CODE
     public static final int VALIDATE_OK = 1;
     public static final int FUTURE_ABILITY = 2;
@@ -238,7 +241,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_DATA = 389;
     public static final int INVALID_PARAMS_LENGTH = 390;
     public static final int INVALID_URL_LENGTH = 391;
-    public static final int INVALID_HEAD_LENGTH = 392;
+    public static final int INVALID_TITLE_LENGTH = 392;
     public static final int INVALID_DATA_FORMAT = 393;
 
     public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 501;
@@ -1655,6 +1658,27 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         return VALIDATE_OK;
 
+    }
+
+    public void updateMapByError(int error, HashMap out) {
+        out.put("error", error);
+        out.put("message", OnDealClick.resultMess(error));
+        if (errorValue != null) {
+            out.put("value", errorValue);
+        }
+    }
+
+    public void updateMapByError(int error, String errorMess, HashMap out) {
+        out.put("error", error);
+        out.put("message", errorMess);
+        if (errorValue != null) {
+            out.put("value", errorValue);
+        }
+    }
+
+    public static void updateMapByErrorSimple(int error, String errorMess, HashMap out) {
+        out.put("error", error);
+        out.put("message", errorMess);
     }
 
     public void process_gifts_turn(int level, long fee_gift, Account invitedAccount,

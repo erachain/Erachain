@@ -51,7 +51,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
 		}
 		*/
 
-        if (r_Send.getHead() != null) {
+        if (r_Send.getTitle() != null) {
             //LABEL MESSAGE
             ++labelGBC.gridy;
             JLabel title_Label = new JLabel(Lang.getInstance().translate("Title") + ":");
@@ -60,7 +60,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             // ISTEXT
             ++detailGBC.gridy;
             //detailGBC.gridwidth = 2;
-            JTextField head_Text = new JTextField(r_Send.getHead());
+            JTextField head_Text = new JTextField(r_Send.getTitle());
             head_Text.setEditable(false);
             MenuPopupUtil.installContextMenu(head_Text);
             this.add(head_Text, detailGBC);
