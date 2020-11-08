@@ -68,6 +68,8 @@ public abstract class AssetCls extends ItemCls {
     public static final String LIA_NAME = "LIA";
     public static final String LIA_DESCR = "Life ID Asset (" + LIA_NAME + ")";
 
+    public static final long BTC_KEY = 12L;
+
     public static final int UNIQUE = 1;
     public static final int VENTURE = 2;
     public static final int NAME = 3;

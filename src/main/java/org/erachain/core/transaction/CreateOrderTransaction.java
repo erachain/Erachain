@@ -491,11 +491,11 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             ; // NOT CHECK
 
         } else if (wantKey == FEE_KEY
-                && haveKey == RIGHTS_KEY
+                && (haveKey == RIGHTS_KEY || haveKey == BTC_KEY)
                 // VALID if want to BY COMPU by ERA
                 && amountHave.compareTo(BigDecimal.TEN) >= 0 // минимально меняем 1 ЭРА
-                && this.creator.getForSale(this.dcSet, RIGHTS_KEY, height, true).compareTo(amountHave) >= 0 // ЭРА есть на счету
-                && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).signum() >= 0
+                && this.creator.getForSale(this.dcSet, haveKey, height, true).compareTo(amountHave) >= 0 // ЭРА|BTC есть на счету
+                && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).signum() >= 0 // и COMPU не отрицательные
         ) { // на балансе компушки не минус
             flags = flags | NOT_VALIDATE_FLAG_FEE;
         } else if (haveKey == FEE_KEY) {
