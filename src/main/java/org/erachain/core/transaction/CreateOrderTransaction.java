@@ -471,7 +471,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         // CHECK IF AMOUNT POSITIVE
         BigDecimal amountHave = this.amountHave;
         BigDecimal amountWant = this.amountWant;
-        if (amountHave.compareTo(BigDecimal.ZERO) <= 0 || amountWant.compareTo(BigDecimal.ZERO) <= 0) {
+        if (amountHave.signum() <= 0 || amountWant.signum() <= 0) {
             return NEGATIVE_AMOUNT;
         }
 
@@ -495,7 +495,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                 // VALID if want to BY COMPU by ERA
                 && amountHave.compareTo(BigDecimal.TEN) >= 0 // минимально меняем 1 ЭРА
                 && this.creator.getForSale(this.dcSet, RIGHTS_KEY, height, true).compareTo(amountHave) >= 0 // ЭРА есть на счету
-                && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).signum() > 0
+                && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).signum() >= 0
         ) { // на балансе компушки не минус
             flags = flags | NOT_VALIDATE_FLAG_FEE;
         } else if (haveKey == FEE_KEY) {
