@@ -1809,6 +1809,13 @@ public class Controller extends Observable {
         if (!doesWalletExists())
             return;
 
+        if (transactions.isEmpty()
+                // раз в 100 блоков уведомлять что обновиться  надо
+                && (++skipNotify < 30
+                || System.currentTimeMillis() - skipNotifyTime < 200000L
+                || isStatusSynchronizing()))
+            return;
+
         List<Account> accounts = this.wallet.getAccounts();
         List<Integer> seqs = new ArrayList<Integer>();
 
@@ -1829,6 +1836,7 @@ public class Controller extends Observable {
             }
         }
 
+        // Если моих транзакций тоже нету
         if (seqs.isEmpty()
                 // раз в 100 блоков уведомлять что обновиться  надо
                 && (++skipNotify < 10
