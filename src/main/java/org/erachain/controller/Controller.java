@@ -1829,8 +1829,8 @@ public class Controller extends Observable {
         }
 
         if (seqs.isEmpty()
-                // раз в 10 блоков уведомлять что обновиться  надо
-                && ++skipNotify < 10)
+                // раз в 100 блоков уведомлять что обновиться  надо
+                && ++skipNotify < 100)
             return;
 
         skipNotify = 0;
