@@ -1802,6 +1802,7 @@ public class Controller extends Observable {
     }
 
     private int skipNotify = 0;
+    private long skipNotifyTime = 0L;
     // https://127.0.0.1/7pay_in/tools/block_proc/ERA
     public void NotifyWalletIncoming(List<Transaction> transactions) {
 
@@ -1830,10 +1831,13 @@ public class Controller extends Observable {
 
         if (seqs.isEmpty()
                 // раз в 100 блоков уведомлять что обновиться  надо
-                && ++skipNotify < 100)
+                && (++skipNotify < 10
+                || System.currentTimeMillis() - skipNotifyTime < 200000L
+                || isStatusSynchronizing()))
             return;
 
         skipNotify = 0;
+        skipNotifyTime = System.currentTimeMillis();
 
         // SEE -
         // http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
