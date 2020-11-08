@@ -3703,7 +3703,6 @@ public class Controller extends Observable {
         for (String arg : args) {
             if (arg.equals("-cli")) {
                 cli = true;
-                useGui = false;
                 continue;
             }
 
