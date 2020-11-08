@@ -1849,6 +1849,7 @@ public class Controller extends Observable {
             LOGGER.info("NotifyIncoming " + url_string + ": " + res);
 
         } catch (Exception e) {
+            LOGGER.error("try NotifyIncoming: " + url_string);
             LOGGER.error(e.getMessage(), e);
         }
 
