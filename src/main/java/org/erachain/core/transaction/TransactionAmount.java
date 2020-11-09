@@ -761,7 +761,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             }
                         } else {
                             // тут наоборот - у создателя должно хватать
-                            if (actionType != ACTION_SEND || !asset.isUnlimited(creator)) {
+                            if (actionType != ACTION_SEND
+                                    || asset.getQuantity() > 0L // тут Анлимит именно так берем - так как в dyenhb isUnlimited счетные единицы все Анлим
+                            ) {
                                 // если это не Имею и Не Безлимитный
                                 balance = this.creator.getBalance(dcSet, absKey, ACTION_SEND).b.abs(); // in OWN
                                 if (actionType != ACTION_SPEND)
@@ -810,7 +812,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 if (backward) {
                                     // if asset is unlimited and me is creator of this
                                     // asset - for RECIPIENT !
-                                    unLimited = asset.isUnlimited(this.recipient);
+                                    unLimited = asset.isUnlimited(this.recipient, false);
 
                                     if (!unLimited) {
                                         balance = this.recipient.getBalance(dcSet, absKey, actionType).b;
@@ -863,7 +865,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                                     // тут проверим и по [В ИСПОЛЬЗОВАНИИ] сколько мы можем забрать
                                     // так как он мог потратить из forFEE - долговые
-                                    if (!asset.isUnlimited(this.recipient)
+                                    if (!asset.isUnlimited(this.recipient, false)
                                             && this.recipient.getBalanceUSE(absKey, this.dcSet)
                                             .compareTo(this.amount) < 0) {
                                         return NO_BALANCE;
@@ -872,7 +874,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 } else {
                                     // CREDIT - GIVE CREDIT OR RETURN CREDIT
 
-                                    if (!asset.isUnlimited(this.creator)) {
+                                    if (!asset.isUnlimited(this.creator, false)) {
 
                                         if (this.creator.getBalanceUSE(absKey, this.dcSet)
                                                 .compareTo(this.amount) < 0) {
@@ -979,7 +981,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 } else {
 
                                     // if asset is unlimited and me is creator of this asset
-                                    unLimited = asset.isUnlimited(this.creator);
+                                    unLimited = asset.isUnlimited(this.creator, false);
                                     if (unLimited) {
                                         // TRY FEE
                                         if (!BlockChain.isFeeEnough(height, creator)
@@ -1078,7 +1080,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     }
 
                                     // if asset is unlimited and me is creator of this asset
-                                    unLimited = asset.isUnlimited(this.creator);
+                                    unLimited = asset.isUnlimited(this.creator, false);
 
                                     if (!unLimited) {
 
@@ -1120,7 +1122,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                                 // if asset is unlimited and me is creator of this
                                 // asset
-                                unLimited = asset.isUnlimited(this.creator);
+                                unLimited = asset.isUnlimited(this.creator, false);
 
                                 if (!unLimited) {
 

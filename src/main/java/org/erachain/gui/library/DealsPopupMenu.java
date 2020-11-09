@@ -301,7 +301,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
         boolean isCreatorOwner = asset != null && pubKey.equals(asset.getOwner());
         boolean isSelfManaged = asset.isSelfManaged();
-        boolean isUnlimited = isSelfManaged || asset.isUnlimited(pubKey);
+        boolean isUnlimited = isSelfManaged || asset.isUnlimited(pubKey, false);
 
         this.sendAsset.setEnabled(true);
         this.holdAsset.setEnabled(true);

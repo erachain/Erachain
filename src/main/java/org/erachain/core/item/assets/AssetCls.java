@@ -660,10 +660,11 @@ public abstract class AssetCls extends ItemCls {
      * Без ограничений - только если это счетная единица или сам владелец без огрничений
      *
      * @param address
+     * @param notAccounting
      * @return
      */
-    public boolean isUnlimited(Account address) {
-        return isAccounting() || getQuantity() == 0L && owner.equals(address);
+    public boolean isUnlimited(Account address, boolean notAccounting) {
+        return !notAccounting && isAccounting() || getQuantity() == 0L && owner.equals(address);
     }
 
     public BigDecimal defaultAmountAssetType() {
