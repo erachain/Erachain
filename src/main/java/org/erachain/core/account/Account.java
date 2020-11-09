@@ -924,12 +924,18 @@ public class Account {
 
             if (isDirect) amount = amount.negate(); // перевернем если там это НА РУКИ
 
-            // тут сразу обновим баланс ИМЕЮ - уменьшим его в любом случае - когда безлимит (минусовой) и лимит (плюсовой)
             Tuple2<BigDecimal, BigDecimal> ownBalance = balance.a;
-            if (isBackward ^ ownBalance.b.signum() > 0) {
-                ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.subtract(amount));
-            } else {
-                ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.add(amount));
+
+            if (true) {
+                // тут сразу обновим баланс ИМЕЮ - уменьшим его в любом случае - когда безлимит (минусовой) и лимит (плюсовой)
+                ///// НЕ ДЕЛАТЬ изменение - так как в Само Управляемых активов может в минус уйти не тот счет и потом не правильно все считает
+                ///// да и обычных активов тоже не правильно будет если???
+                //// либо надо учет перехода через 0 ловить - даже у самоуправляемых
+                if (!isBackward ^ ownBalance.b.signum() > 0) {
+                    ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.subtract(amount));
+                } else {
+                    ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.add(amount));
+                }
             }
 
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(

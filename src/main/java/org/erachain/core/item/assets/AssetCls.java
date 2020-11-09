@@ -707,10 +707,6 @@ public abstract class AssetCls extends ItemCls {
                 return "Promissory Note";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of exchange";
-            case AS_SELF_MANAGED:
-                return "Self Managed";
-            case AS_ACCOUNTING_LOAN:
-                return "Accounting Loan";
             case AS_MY_DEBT:
                 return "My Debt";
             case AS_OUTSIDE_OTHER_CLAIM:
@@ -741,6 +737,10 @@ public abstract class AssetCls extends ItemCls {
 
             case AS_ACCOUNTING:
                 return "Accounting";
+            case AS_SELF_MANAGED:
+                return "Self Managed";
+            case AS_ACCOUNTING_LOAN:
+                return "Accounting Loan";
         }
         return "unknown";
     }
@@ -769,10 +769,6 @@ public abstract class AssetCls extends ItemCls {
                 return "Promissory Note";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of Exchange";
-            case AS_SELF_MANAGED:
-                return "Self Managed for Accounting";
-            case AS_ACCOUNTING_LOAN:
-                return "Accounting Loan for Debtor";
             case AS_MY_DEBT:
                 return "My Debt to Loaner";
             case AS_OUTSIDE_OTHER_CLAIM:
@@ -803,6 +799,10 @@ public abstract class AssetCls extends ItemCls {
 
             case AS_ACCOUNTING:
                 return "Accounting";
+            case AS_SELF_MANAGED:
+                return "Self Managed for Accounting";
+            case AS_ACCOUNTING_LOAN:
+                return "Accounting Loan for Debtor";
         }
         return "unknown";
     }
