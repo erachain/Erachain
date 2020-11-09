@@ -7,7 +7,6 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -104,8 +103,7 @@ public class ItemPersonsResource {
         Pair<Transaction, Integer> resultGood = (Pair<Transaction, Integer>) result;
         if (resultGood.getB() != Transaction.VALIDATE_OK) {
             JSONObject out = new JSONObject();
-            out.put("error", resultGood.getB());
-            out.put("error_message", OnDealClick.resultMess(resultGood.getB()));
+            Transaction.updateMapByErrorSimple(resultGood.getB(), out);
             return out.toJSONString();
         }
 
@@ -116,8 +114,7 @@ public class ItemPersonsResource {
             return transaction.toJson().toJSONString();
         else {
             JSONObject out = new JSONObject();
-            out.put("error", validate);
-            out.put("error_message", OnDealClick.resultMess(validate));
+            Transaction.updateMapByErrorSimple(validate, out);
             return out.toJSONString();
         }
     }

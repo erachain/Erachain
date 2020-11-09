@@ -310,6 +310,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int DEPLOY_AT_TRANSACTION = 14 + 130;
     // FEE PARAMETERS
     public static final long RIGHTS_KEY = AssetCls.ERA_KEY;
+    public static final long BTC_KEY = AssetCls.ERA_KEY;
 
     // public static final int ACCOUNTING_TRANSACTION = 26;
     // public static final int JSON_TRANSACTION = 27;
@@ -1681,6 +1682,11 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static void updateMapByErrorSimple(int error, String errorMess, HashMap out) {
         out.put("error", error);
         out.put("message", errorMess);
+    }
+
+    public static void updateMapByErrorSimple(int error, HashMap out) {
+        out.put("error", error);
+        out.put("message", OnDealClick.resultMess(error));
     }
 
     public void process_gifts_turn(int level, long fee_gift, Account invitedAccount,

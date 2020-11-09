@@ -188,14 +188,7 @@ public class IssueDocumentPanel extends IconPanel {
     }// </editor-fold>
 
     public Integer makeDeal(int forDeal) {
-        // check title
-        if (exData_Panel.jTextField_Title_Message.getText() == ""
-                || exData_Panel.jTextField_Title_Message.getText().length() < 5) {
-            JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid Title"),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            return null;
 
-        }
         // CHECK IF WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {
             // ASK FOR PASSWORD
@@ -281,12 +274,6 @@ public class IssueDocumentPanel extends IconPanel {
             return null;
         }
         if (messageBytes == null) {
-            return null;
-        } else if (messageBytes.length < 10) {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate("Message is so short"),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-
             return null;
         } else if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
             JOptionPane.showMessageDialog(new JFrame(),
