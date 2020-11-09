@@ -137,10 +137,16 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_OUTSIDE_BILL_EX = 15;
 
     /**
-     * accounting loan
-     * +++ мой займ другому лицу - учетный, бухгалтерский учет
+     * self-managed
      * === Не может управляться ни кем кроме обладателя актива
      * === доступны 4-ре баланса и у каждого работает Возврат - backward
+     */
+    public static final int AS_SELF_MANAGED = 23;
+
+    /**
+     * accounting loan
+     * +++ мой займ другому лицу - учетный, бухгалтерский учет
+     * === подобно AS_SELF_MANAGED
      */
     public static final int AS_ACCOUNTING_LOAN = 25;
 
@@ -627,7 +633,7 @@ public abstract class AssetCls extends ItemCls {
      * @return
      */
     public boolean isSelfManaged() {
-        return assetType == AS_ACCOUNTING_LOAN;
+        return assetType == AS_SELF_MANAGED || assetType == AS_ACCOUNTING_LOAN;
     }
 
     public boolean isAccounting() {
@@ -686,6 +692,8 @@ public abstract class AssetCls extends ItemCls {
                 return "Promissory Note";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of exchange";
+            case AS_SELF_MANAGED:
+                return "Self Managed";
             case AS_ACCOUNTING_LOAN:
                 return "Accounting Loan";
             case AS_MY_DEBT:
@@ -746,6 +754,8 @@ public abstract class AssetCls extends ItemCls {
                 return "Promissory Note";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of Exchange";
+            case AS_SELF_MANAGED:
+                return "Self Managed for Accounting";
             case AS_ACCOUNTING_LOAN:
                 return "Accounting Loan for Debtor";
             case AS_MY_DEBT:
@@ -807,6 +817,8 @@ public abstract class AssetCls extends ItemCls {
                 return lang.translate("A digital promissory note can be called for redemption by external money. You can take it into your hands");
             case AS_OUTSIDE_BILL_EX:
                 return lang.translate("A digital bill of exchange can be called for redemption by external money. You can take it into your hands");
+            case AS_SELF_MANAGED:
+                return lang.translate("AS_SELF_MANAGED-D");
             case AS_ACCOUNTING_LOAN:
                 return lang.translate("AS_ACCOUNTING_LOAN-D");
             case AS_MY_DEBT:
@@ -927,6 +939,21 @@ public abstract class AssetCls extends ItemCls {
                                 : "Потребовать погашения векселя";
                     case TransactionAmount.ACTION_SPEND:
                         return "Подтвердить погашение векселя";
+                    default:
+                        return null;
+                }
+            case AS_SELF_MANAGED:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return backward ? "Списать (сторно)" : "Начислить";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Отозвать требование исполнения"
+                                : "Потребовать исполнения";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Списать хранение (сторно)"
+                                : "Учесть хранение";
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? "Отменить исполнение (сторно)" : "Подтвердить исполнение";
                     default:
                         return null;
                 }
@@ -1156,6 +1183,8 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
             case AS_OUTSIDE_BILL:
             case AS_OUTSIDE_BILL_EX:
+            case AS_SELF_MANAGED:
+                return "Me";
             case AS_ACCOUNTING_LOAN:
                 return "Lender";
             case AS_MY_DEBT:
@@ -1230,6 +1259,8 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
             case AS_OUTSIDE_BILL:
             case AS_OUTSIDE_BILL_EX:
+            case AS_SELF_MANAGED:
+                return "They";
             case AS_ACCOUNTING_LOAN:
                 return "Debtor";
             case AS_MY_DEBT:

@@ -433,8 +433,8 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         if (this.haveAsset == null || this.wantAsset == null)
             return ITEM_ASSET_NOT_EXIST;
 
-        if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting()) {
-
+        if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting()
+                || haveAsset.isSelfManaged() || wantAsset.isSelfManaged()) {
             return INVALID_ACCOUNTING_PAIR;
         }
 

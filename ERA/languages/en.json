@@ -64,6 +64,7 @@
 	"Amount": "Amount",
 	"Anyone who has access to your seed will have access to your e-wallet.": "Anyone who can access your Seed will have access to your e-wallet.",
 	"AS_ACCOUNTING_LOAN-D": "Accounting for my loans to borrowers.\nManaged only from the account of the asset Creator. Used for accounting purposes.",
+	"AS_SELF_MANAGED-D": "A self-managed asset.\nActions can only be performed by the owner of the asset.\nAll types of balances are available: Own, Debt, Hold, Spend",
 	"AS_MY_DEBT-D": "My debt to others.\nThe lender can request to repay the debt by using the \"claim for repayment\" transaction.\nAfter my repayment, the borrower must confirm my repayment with the \"Debt Repaid\" transaction\"",
 	"Asset Details": "Asset details",
 	"Asset Exchange": "Asset exchange",
