@@ -962,10 +962,10 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_SEND:
                         return backward ? "Списать (сторно)" : "Начислить";
                     case TransactionAmount.ACTION_DEBT:
-                        return !backward ? "Отозвать требование исполнения"
+                        return backward ? "Отозвать требование исполнения"
                                 : "Потребовать исполнения";
                     case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Списать хранение (сторно)"
+                        return !backward ? "Списать хранение (сторно)"
                                 : "Учесть хранение";
                     case TransactionAmount.ACTION_SPEND:
                         return backward ? "Отменить исполнение (сторно)" : "Подтвердить исполнение";
