@@ -301,12 +301,23 @@ public class DealsPopupMenu extends JPopupMenu {
     public void init() {
 
         boolean isCreatorOwner = asset != null && pubKey.equals(asset.getOwner());
+        boolean isSelfManaged = asset.isSelfManaged() && isCreatorOwner;
+        boolean isUnlimited = isSelfManaged || asset.isUnlimited(pubKey);
+
         this.sendAsset.setEnabled(true);
         this.holdAsset.setEnabled(true);
         this.debtAsset.setEnabled(true);
         this.debtAssetReturn.setEnabled(true);
         this.debtAssetBackward.setEnabled(true);
         this.spendAsset.setEnabled(true);
+
+        if (isSelfManaged) {
+            this.sendAssetBackward.setEnabled(true);
+            this.holdAssetBackward.setEnabled(true);
+        } else {
+            this.sendAssetBackward.setEnabled(false);
+            this.holdAssetBackward.setEnabled(false);
+        }
 
         this.sendMail.setText(Lang.getInstance().translate("Send Mail"));
 
@@ -318,12 +329,28 @@ public class DealsPopupMenu extends JPopupMenu {
             this.sendAsset.setVisible(true);
         }
 
+        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_SEND, false);
+        if (actionName == null) {
+            this.sendAssetBackward.setVisible(false);
+        } else {
+            this.sendAssetBackward.setText(Lang.getInstance().translate(actionName));
+            this.sendAssetBackward.setVisible(true);
+        }
+
         actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_HOLD, isCreatorOwner);
         if (actionName == null) {
             this.holdAsset.setVisible(false);
         } else {
             this.holdAsset.setText(Lang.getInstance().translate(actionName));
             this.holdAsset.setVisible(true);
+        }
+
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_HOLD, isCreatorOwner);
+        if (actionName == null) {
+            this.holdAssetBackward.setVisible(false);
+        } else {
+            this.holdAssetBackward.setText(Lang.getInstance().translate(actionName));
+            this.holdAssetBackward.setVisible(true);
         }
 
         actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_DEBT, isCreatorOwner);
@@ -358,30 +385,28 @@ public class DealsPopupMenu extends JPopupMenu {
             this.spendAsset.setVisible(true);
         }
 
+        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_SPEND, isCreatorOwner);
+        if (actionName == null) {
+            this.spendAssetBackward.setVisible(false);
+        } else {
+            this.spendAssetBackward.setText(Lang.getInstance().translate(actionName));
+            this.spendAssetBackward.setVisible(true);
+        }
+
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                 balance = pubKey.getBalance(asset.getKey());
 
-        if (balance.a.b.signum() == 0
-                && !asset.isUnlimited(pubKey)) {
+        if (!isUnlimited && balance.a.b.signum() == 0) {
             this.sendAsset.setEnabled(false);
             this.debtAsset.setEnabled(false);
         }
 
-        if (balance.b.b.signum() == 0
-                && !asset.isUnlimited(pubKey)) {
+        if (!isUnlimited && balance.b.b.signum() == 0) {
             this.debtAssetReturn.setEnabled(false);
         }
 
         switch (this.asset.getAssetType()) {
 
-            case AssetCls.AS_SELF_MANAGED:
-                this.holdAsset.setEnabled(true);
-                this.debtAssetReturn.setVisible(false);
-                if (balance.b.b.signum() < 0) {
-                    this.debtAsset.setEnabled(false);
-                } else {
-                    this.debtAssetBackward.setEnabled(false);
-                }
             case AssetCls.AS_BANK_GUARANTEE:
 
                 balance = pubKey.getBalance(asset.getKey());
