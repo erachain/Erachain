@@ -269,7 +269,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
         this.sendMail.setText(Lang.getInstance().translate("Send Mail"));
 
-        String actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SEND);
+        String actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SEND, isCreatorOwner);
         if (actionName == null) {
             this.sendAsset.setVisible(false);
         } else {
@@ -277,7 +277,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.sendAsset.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_HOLD);
+        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_HOLD, isCreatorOwner);
         if (actionName == null) {
             this.holdAsset.setVisible(false);
         } else {
@@ -285,7 +285,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.holdAsset.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_DEBT);
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_DEBT, isCreatorOwner);
         if (actionName == null) {
             this.debtAsset.setVisible(false);
         } else {
@@ -293,7 +293,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.debtAsset.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_REPAY_DEBT);
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_REPAY_DEBT, isCreatorOwner);
         if (actionName == null) {
             this.debtAssetReturn.setVisible(false);
         } else {
@@ -301,7 +301,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.debtAssetReturn.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_DEBT);
+        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_DEBT, isCreatorOwner);
         if (actionName == null) {
             this.debtAssetBackward.setVisible(false);
         } else {
@@ -309,7 +309,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.debtAssetBackward.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SPEND);
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SPEND, isCreatorOwner);
         if (actionName == null) {
             this.spendAsset.setVisible(false);
         } else {

@@ -27,6 +27,10 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
             list.add(new AssetType(AssetCls.AS_OUTSIDE_SHARE));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_BILL));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_BILL_EX));
+
+            list.add(new AssetType(AssetCls.AS_ACCOUNTING_LOAN));
+            list.add(new AssetType(AssetCls.AS_MY_DEBT));
+
             list.add(new AssetType(AssetCls.AS_OUTSIDE_OTHER_CLAIM));
 
             list.add(new AssetType(AssetCls.AS_INSIDE_ASSETS));
@@ -50,6 +54,10 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
             list.add(new AssetType(AssetCls.AS_OUTSIDE_WORK_TIME_HOURS));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_WORK_TIME_MINUTES));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_SHARE));
+
+            list.add(new AssetType(AssetCls.AS_ACCOUNTING_LOAN));
+            list.add(new AssetType(AssetCls.AS_MY_DEBT));
+
             list.add(new AssetType(AssetCls.AS_OUTSIDE_OTHER_CLAIM));
 
             list.add(new AssetType(AssetCls.AS_INSIDE_ASSETS));

@@ -94,11 +94,11 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         // необходимо входящий параметр отделить так как ниже он по событию изменения актива будет как НУЛь вызваться
         // поэтому тут только приватную переменную юзаем дальше
         if (title == null) {
-            this.title = asset.viewAssetTypeActionTitle(backward, balancePosition);
+            this.title = asset.viewAssetTypeActionTitle(backward, balancePosition, isCreatorOwner);
         }
 
         if (panelName == null) {
-            this.panelName = Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition)) + " [" + asset.getKey() + " ]";
+            this.panelName = Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition, isCreatorOwner)) + " [" + asset.getKey() + " ]";
             setName(this.panelName);
         }
 
@@ -117,14 +117,14 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         this.jLabel_Title.setText(Lang.getInstance().translate(this.title).replace("%asset%", asset.viewName()));
 
         // icon.setIcon(null);
-        this.jLabel_Account.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, balancePosition)) + ":");
+        this.jLabel_Account.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, balancePosition, isCreatorOwner)) + ":");
 
         this.jLabel_To.setText(Lang.getInstance().translate(
-                asset.viewAssetTypeTarget(backward, balancePosition) + " " + "Account") + ":");
+                asset.viewAssetTypeTarget(backward, balancePosition, isRecipientOwner) + " " + "Account") + ":");
         this.jLabel_Recive_Detail.setText(Lang.getInstance().translate(
-                asset.viewAssetTypeTarget(backward, balancePosition) + " " + "Details") + ":");
+                asset.viewAssetTypeTarget(backward, balancePosition, isRecipientOwner) + " " + "Details") + ":");
 
-        this.jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition)));
+        this.jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition, isCreatorOwner)));
 
         this.jTextField_Recive_Detail.setText("");
         this.jTextField_Mess_Title.setText("");
@@ -234,7 +234,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                     jLabel_Title.setText((titleLocal == null ? AccountAssetActionPanelCls.this.title : titleLocal).replace("%asset%", asset.viewName()));
 
                     if (panelName == null) {
-                        setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition)) + " ]" + asset.getKey() + " ]");
+                        setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition, isCreatorOwner)) + " ]" + asset.getKey() + " ]");
                     } else {
                         setName(Lang.getInstance().translate(panelName));
                     }

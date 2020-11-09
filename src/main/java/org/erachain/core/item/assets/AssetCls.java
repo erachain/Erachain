@@ -137,6 +137,21 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_OUTSIDE_BILL_EX = 15;
 
     /**
+     * accounting loan
+     * +++ мой займ другому лицу - учетный, бухгалтерский учет
+     * === Не может управляться ни кем кроме обладателя актива
+     * === доступны 4-ре баланса и у каждого работает Возврат - backward
+     */
+    public static final int AS_ACCOUNTING_LOAN = 25;
+
+    /**
+     * my debt
+     * +++ мой долг перед другим лицом - это обязательство
+     * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_MY_DEBT = 26;
+
+    /**
      * 🕐🕜🕑🕝🕒🕞🕓🕟🕔🕠🕕🕡🕖🕢🕗🕣🕘🕤🕙🕥🕚🕦🕛🕧
      * outside WORK TIME - рабочее время, которое можно купить и потребовать потратить и учесть как затрата
      */
@@ -606,8 +621,18 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType == AS_OUTSIDE_OTHER_CLAIM;
     }
 
+    /**
+     * Управлять может только сам обладатель
+     *
+     * @return
+     */
+    public boolean isSelfManaged() {
+        return assetType == AS_ACCOUNTING_LOAN;
+    }
+
     public boolean isAccounting() {
-        return this.assetType == AS_ACCOUNTING;
+        return this.assetType == AS_ACCOUNTING
+                || assetType == AS_ACCOUNTING_LOAN;
     }
 
     /**
@@ -661,6 +686,10 @@ public abstract class AssetCls extends ItemCls {
                 return "Promissory Note";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of exchange";
+            case AS_ACCOUNTING_LOAN:
+                return "Accounting Loan";
+            case AS_MY_DEBT:
+                return "My Debt";
             case AS_OUTSIDE_OTHER_CLAIM:
                 return "Outside Other Claim";
 
@@ -717,8 +746,12 @@ public abstract class AssetCls extends ItemCls {
                 return "Promissory Note";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of Exchange";
+            case AS_ACCOUNTING_LOAN:
+                return "Accounting Loan for Debtor";
+            case AS_MY_DEBT:
+                return "My Debt to Loaner";
             case AS_OUTSIDE_OTHER_CLAIM:
-                return "Оther Outside Right of Claim";
+                return "Other Outside Right of Claim";
 
             case AS_INSIDE_ASSETS:
                 return "Digital Asset";
@@ -774,6 +807,10 @@ public abstract class AssetCls extends ItemCls {
                 return lang.translate("A digital promissory note can be called for redemption by external money. You can take it into your hands");
             case AS_OUTSIDE_BILL_EX:
                 return lang.translate("A digital bill of exchange can be called for redemption by external money. You can take it into your hands");
+            case AS_ACCOUNTING_LOAN:
+                return lang.translate("AS_ACCOUNTING_LOAN-D");
+            case AS_MY_DEBT:
+                return lang.translate("AS_MY_DEBT-D");
             case AS_OUTSIDE_OTHER_CLAIM:
                 return lang.translate("Other external rights, requirements and obligations. Any obligation (as well as other external assets), which can be claimed by the record \"summon\" and discharged by the record \"confirmation of fulfillment\" of this obligation. You can take it into your hands");
             case AS_INSIDE_ASSETS:
@@ -804,7 +841,7 @@ public abstract class AssetCls extends ItemCls {
         return "";
     }
 
-    public String viewAssetTypeAction(boolean backward, int actionType) {
+    public String viewAssetTypeAction(boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
                 switch (actionType) {
@@ -890,6 +927,32 @@ public abstract class AssetCls extends ItemCls {
                                 : "Потребовать погашения векселя";
                     case TransactionAmount.ACTION_SPEND:
                         return "Подтвердить погашение векселя";
+                    default:
+                        return null;
+                }
+            case AS_ACCOUNTING_LOAN:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return backward ? "Списать долг (сторно)" : "Начислить долг";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Отозвать требование погашения долга"
+                                : "Потребовать исполнения долга";
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? "Отменить погашение долга (сторно)" : "Подтвердить погашение долга";
+                    default:
+                        return null;
+                }
+            case AS_MY_DEBT:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return isCreatorOwner ? "Подтвердить свой долг" : "Переуступить займ";
+                    case TransactionAmount.ACTION_DEBT:
+                        return isCreatorOwner ? null // эмитент долга не может делать требования
+                                : backward ? "Отозвать требование погашения займа"
+                                : "Потребовать исполнения займа";
+                    case TransactionAmount.ACTION_SPEND:
+                        return isCreatorOwner ? null // эмитент долга не может делать погашения
+                                : backward ? "Отменить погашения займа (сторно)" : "Подтвердить погашения займа";
                     default:
                         return null;
                 }
@@ -1034,7 +1097,7 @@ public abstract class AssetCls extends ItemCls {
         return null;
     }
 
-    public String viewAssetTypeActionTitle(boolean backward, int actionType) {
+    public String viewAssetTypeActionTitle(boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
             case AS_OUTSIDE_CURRENCY:
@@ -1082,10 +1145,10 @@ public abstract class AssetCls extends ItemCls {
             case AS_ACCOUNTING:
         }
 
-        return viewAssetTypeAction(backward, actionType) + " - %asset%";
+        return viewAssetTypeAction(backward, actionType, isCreatorOwner) + " - %asset%";
     }
 
-    public String viewAssetTypeCreator(boolean backward, int actionType) {
+    public String viewAssetTypeCreator(boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
             case AS_OUTSIDE_CURRENCY:
@@ -1093,6 +1156,19 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
             case AS_OUTSIDE_BILL:
             case AS_OUTSIDE_BILL_EX:
+            case AS_ACCOUNTING_LOAN:
+                return "Lender";
+            case AS_MY_DEBT:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return isCreatorOwner ? "Debtor" : "Lender";
+                    case TransactionAmount.ACTION_DEBT:
+                    case TransactionAmount.ACTION_SPEND:
+                        return isCreatorOwner ? null // эмитент долга не может делать требования
+                                : "Debtor";
+                    default:
+                        return null;
+                }
             case AS_OUTSIDE_OTHER_CLAIM:
             case AS_INSIDE_ASSETS:
             case AS_INSIDE_CURRENCY:
@@ -1146,7 +1222,7 @@ public abstract class AssetCls extends ItemCls {
         return "unknown";
     }
 
-    public String viewAssetTypeTarget(boolean backward, int actionType) {
+    public String viewAssetTypeTarget(boolean backward, int actionType, boolean isRecipientOwner) {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
             case AS_OUTSIDE_CURRENCY:
@@ -1154,6 +1230,20 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
             case AS_OUTSIDE_BILL:
             case AS_OUTSIDE_BILL_EX:
+            case AS_ACCOUNTING_LOAN:
+                return "Debtor";
+            case AS_MY_DEBT:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return isRecipientOwner ? null : "Lender"; // Тут может быть начальная эмиссия к Кредитору и переуступка - тоже кредитору по сути
+                    case TransactionAmount.ACTION_DEBT:
+                    case TransactionAmount.ACTION_SPEND:
+                        return isRecipientOwner ?
+                                "Debtor"
+                                : null; // реципиент только эмитент долга;
+                    default:
+                        return null;
+                }
             case AS_OUTSIDE_OTHER_CLAIM:
             case AS_INSIDE_ASSETS:
             case AS_INSIDE_CURRENCY:
@@ -1210,7 +1300,7 @@ public abstract class AssetCls extends ItemCls {
         return "unknown";
     }
 
-    public String viewAssetTypeActionOK(boolean backward, int actionType) {
+    public String viewAssetTypeActionOK(boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
             case AS_OUTSIDE_CURRENCY:
@@ -1233,7 +1323,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_ACCOUNTING:
         }
 
-        return viewAssetTypeAction(backward, actionType) + " # to";
+        return viewAssetTypeAction(backward, actionType, isCreatorOwner) + " # to";
 
     }
 
@@ -1241,36 +1331,6 @@ public abstract class AssetCls extends ItemCls {
         long total = dcSet.getOrderMap().getCountOrders(key);
         return total;
     }
-    
-	/*
-	public void setMovable(boolean movable) {
-		this.typeBytes[1] = (byte)(this.typeBytes[1] & (movable?1:0));
-	}
-	 */
-
-	/*
-	@Override
-	public byte[] toBytes(boolean includeReference, boolean forOwnerSign)
-	{
-
-		byte[] data = super.toBytes(includeReference, forOwnerSign);
-
-		//WRITE SCALE
-		data = Bytes.concat(data, new byte[]{(byte)this.getScale()});
-
-		//WRITE ASSET TYPE
-		data = Bytes.concat(data, new byte[]{(byte)this.getAssetType()});
-
-		return data;
-	}
-
-	@Override
-	public int getDataLength(boolean includeReference)
-	{
-		return super.getDataLength(includeReference)
-				+ SCALE_LENGTH + ASSET_TYPE_LENGTH;
-	}
-	 */
 
     //OTHER
     @Override
