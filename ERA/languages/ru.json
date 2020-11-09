@@ -135,6 +135,8 @@
   "Authors": "Авторы",
   "Authorship": "Авторство",
   "Back": "Назад",
+  "Backward": "Забрать",
+  "Backward Hold": "Забрать из Хранения",
   "Bad Json value": "Ошибка Json значения",
   "BackUp Database?": "Создать резервную копию?",
   "BackUp datachain": "Создание резервной копии",

@@ -137,11 +137,22 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(holdAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetHoldPanel(asset, pubKey, null, null, backward));
+                        new AccountAssetHoldPanel(asset, pubKey, null, null, true));
 
             }
         });
         this.add(holdAsset);
+
+        holdAssetBackward = new JMenuItem(Lang.getInstance().translate("Backward Hold"));
+        holdAssetBackward.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                MainPanel.getInstance().insertNewTab(holdAssetBackward.getText() + ":" + asset.getKey(),
+                        new AccountAssetHoldPanel(asset, pubKey, null, null, false));
+
+            }
+        });
+        this.add(holdAssetBackward);
 
         this.addSeparator();
 
@@ -150,11 +161,22 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(spendAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetSpendPanel(asset, pubKey, null, null, null));
+                        new AccountAssetSpendPanel(asset, pubKey, null, null, null, false));
 
             }
         });
         this.add(spendAsset);
+
+        spendAssetBackward = new JMenuItem(Lang.getInstance().translate("Backward Spend"));
+        spendAssetBackward.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                MainPanel.getInstance().insertNewTab(spendAssetBackward.getText() + ":" + asset.getKey(),
+                        new AccountAssetSpendPanel(asset, pubKey, null, null, null, true));
+
+            }
+        });
+        this.add(spendAssetBackward);
 
         this.addSeparator();
 

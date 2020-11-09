@@ -149,7 +149,7 @@ public class WithdrawExchange extends IconPanel {
 
             message += ":" + jTextField_Address.getText();
             AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn,
-                    null, new Account(accountTo), null, message, backward);
+                    null, new Account(accountTo), null, message, false);
 
             panel.jComboBox_Asset.setEnabled(false);
             panel.recipientAddress.setEnabled(false);

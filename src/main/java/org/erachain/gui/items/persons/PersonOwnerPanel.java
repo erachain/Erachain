@@ -124,7 +124,7 @@ public class PersonOwnerPanel extends JPanel {
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
-                        null, null, person_Accounts_Model.getItem(row), null, backward));
+                        null, null, person_Accounts_Model.getItem(row), null, false));
 
             }
         });

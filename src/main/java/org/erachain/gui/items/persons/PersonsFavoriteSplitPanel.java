@@ -37,7 +37,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
-                        null, null, (PersonCls) itemTableSelected, null, backward));
+                        null, null, (PersonCls) itemTableSelected, null, false));
 
             }
         });

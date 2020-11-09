@@ -111,7 +111,7 @@ public class PersonWorkDialog extends JDialog {
 
                     } else {
                         MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Asset to Person"), new AccountAssetSendPanel(null,
-                                null, null, person, null, backward));
+                                null, null, person, null, false));
 
                     }
                     dispose();

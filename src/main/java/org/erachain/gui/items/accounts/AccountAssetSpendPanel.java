@@ -14,8 +14,8 @@ public class AccountAssetSpendPanel extends AccountAssetActionPanelCls {
 
     public boolean noRecive;
 
-    public AccountAssetSpendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person, String message) {
-        super(null, null, false, assetIn, TransactionAmount.ACTION_SPEND, accountFrom, accountTo, message);
+    public AccountAssetSpendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person, String message, boolean backward) {
+        super(null, null, backward, assetIn, TransactionAmount.ACTION_SPEND, accountFrom, accountTo, message);
 
         iconName = "AccountAssetSpendPanel";
     }

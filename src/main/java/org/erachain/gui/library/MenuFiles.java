@@ -212,6 +212,7 @@ public class MenuFiles extends JMenu {
                     String head = (String) js.get("head");
                     if (!js.containsKey("amount")) return;
                     String amount = (String) js.get("amount");
+                    Boolean backward = (Boolean) js.get("backward");
                     AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey),
                             ct.getWalletAccountByAddress(creator), ct.getWalletAccountByAddress(recipient), null, null, backward);
                     MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Read Transaction"),
@@ -246,7 +247,7 @@ public class MenuFiles extends JMenu {
                 //AccountSendDialog dd = new AccountSendDialog(null, null, null, null, false);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Write Transaction"),
                         new AccountAssetSendPanel(null,
-                                null, null, null, null, backward));
+                                null, null, null, null, false));
 
 
             }
