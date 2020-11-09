@@ -137,20 +137,6 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_OUTSIDE_BILL_EX = 15;
 
     /**
-     * self-managed
-     * === Не может управляться ни кем кроме обладателя актива
-     * === доступны 4-ре баланса и у каждого работает Возврат - backward
-     */
-    public static final int AS_SELF_MANAGED = 23;
-
-    /**
-     * accounting loan
-     * +++ мой займ другому лицу - учетный, бухгалтерский учет
-     * === подобно AS_SELF_MANAGED
-     */
-    public static final int AS_ACCOUNTING_LOAN = 25;
-
-    /**
      * my debt
      * +++ мой долг перед другим лицом - это обязательство
      * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
@@ -253,6 +239,20 @@ public abstract class AssetCls extends ItemCls {
      * 4 : учетные единицы - не имеет стоимости и не может быть продано (бухгалтерский учет)
      */
     public static final int AS_ACCOUNTING = 123;
+
+    /**
+     * self-managed
+     * === Не может управляться ни кем кроме обладателя актива
+     * === доступны 4-ре баланса и у каждого работает Возврат - backward
+     */
+    public static final int AS_SELF_MANAGED = 124;
+
+    /**
+     * accounting loan
+     * +++ мой займ другому лицу - учетный, бухгалтерский учет
+     * === подобно AS_SELF_MANAGED
+     */
+    public static final int AS_ACCOUNTING_LOAN = 125;
 
     // + or -
     protected int scale;
@@ -652,6 +652,7 @@ public abstract class AssetCls extends ItemCls {
 
     public boolean isAccounting() {
         return this.assetType == AS_ACCOUNTING
+                || assetType == AS_SELF_MANAGED
                 || assetType == AS_ACCOUNTING_LOAN;
     }
 

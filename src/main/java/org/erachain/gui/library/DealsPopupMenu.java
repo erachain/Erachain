@@ -118,7 +118,6 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(debtAssetReturn);
 
-        // asset != null && asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt")
         debtAssetBackward = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
         debtAssetBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -301,7 +300,7 @@ public class DealsPopupMenu extends JPopupMenu {
     public void init() {
 
         boolean isCreatorOwner = asset != null && pubKey.equals(asset.getOwner());
-        boolean isSelfManaged = asset.isSelfManaged() && isCreatorOwner;
+        boolean isSelfManaged = asset.isSelfManaged();
         boolean isUnlimited = isSelfManaged || asset.isUnlimited(pubKey);
 
         this.sendAsset.setEnabled(true);
@@ -312,11 +311,22 @@ public class DealsPopupMenu extends JPopupMenu {
         this.spendAsset.setEnabled(true);
 
         if (isSelfManaged) {
-            this.sendAssetBackward.setEnabled(true);
-            this.holdAssetBackward.setEnabled(true);
+            if (isCreatorOwner) {
+                this.sendAssetBackward.setVisible(true);
+                this.holdAssetBackward.setVisible(true);
+                this.spendAssetBackward.setVisible(true);
+            } else {
+                this.sendAsset.setEnabled(false);
+                this.holdAsset.setEnabled(false);
+                this.debtAsset.setEnabled(false);
+                this.debtAssetReturn.setEnabled(false);
+                this.debtAssetBackward.setEnabled(false);
+                this.spendAsset.setEnabled(false);
+            }
         } else {
-            this.sendAssetBackward.setEnabled(false);
-            this.holdAssetBackward.setEnabled(false);
+            this.sendAssetBackward.setVisible(false);
+            this.holdAssetBackward.setVisible(false);
+            this.spendAssetBackward.setVisible(false);
         }
 
         this.sendMail.setText(Lang.getInstance().translate("Send Mail"));
