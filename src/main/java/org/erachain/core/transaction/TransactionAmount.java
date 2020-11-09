@@ -653,6 +653,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
         }
 
+        if (creatorPerson != null && !creatorPerson.isAlive(this.timestamp)) {
+            return ITEM_PERSON_IS_DEAD;
+        }
+
         // CHECK IF AMOUNT AND ASSET
         if ((flags & NOT_VALIDATE_FLAG_BALANCE) == 0L
                 && this.amount != null) {
@@ -700,6 +704,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     // BACKWARD - CONFISCATE
                     boolean backward = isBackward();
                     boolean isDirect = asset.isDirectBalances();
+                    boolean isSelfManaged = asset.isSelfManaged();
 
                     int actionType = Account.balancePosition(this.key, this.amount, backward, isDirect);
                     int assetType = this.asset.getAssetType();
@@ -740,7 +745,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             break;
                     }
 
-                    if (asset.isSelfManaged()) {
+                    if (isSelfManaged) {
                         // учетная единица - само контролируемая
                         if (!creator.equals(asset.getOwner())) {
                             return CREATOR_NOT_OWNER;
@@ -777,17 +782,23 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 return INVALID_TRANSFER_TYPE;
                             }
 
-                            // if asset is unlimited and me is creator of this
-                            // asset - for RECIPIENT !
-                            unLimited = asset.isUnlimited(this.recipient);
+                            if (backward) {
+                                // if asset is unlimited and me is creator of this
+                                // asset - for RECIPIENT !
+                                unLimited = asset.isUnlimited(this.recipient);
 
-                            if (!unLimited) {
-                                balance = this.recipient.getBalance(dcSet, absKey, actionType).b;
-                                ////BigDecimal amountOWN = this.recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
-                                // amontOWN, balance and amount - is
-                                // negative
-                                if (balance.compareTo(amount) < 0) {
-                                    return NO_HOLD_BALANCE;
+                                if (!unLimited) {
+                                    balance = this.recipient.getBalance(dcSet, absKey, actionType).b;
+                                    ////BigDecimal amountOWN = this.recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
+                                    // amontOWN, balance and amount - is
+                                    // negative
+                                    if (balance.compareTo(amount) < 0) {
+                                        return NO_HOLD_BALANCE;
+                                    }
+                                }
+                            } else {
+                                if (!isSelfManaged) {
+                                    return INVALID_HOLD_DIRECTION;
                                 }
                             }
 
@@ -838,7 +849,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             } else {
                                 // CREDIT - GIVE CREDIT OR RETURN CREDIT
 
-                                if (!asset.isUnlimited(this.creator)) {
+                                if (!isSelfManaged && !asset.isUnlimited(this.creator)) {
 
                                     if (this.creator.getBalanceUSE(absKey, this.dcSet)
                                             .compareTo(this.amount) < 0) {
@@ -944,10 +955,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                             } else {
 
-                                // if asset is unlimited and me is creator of this
-                                // asset
-                                unLimited = asset.isUnlimited(this.creator);
-                                // CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
+                                // if asset is unlimited and me is creator of this asset
+                                unLimited = isSelfManaged || asset.isUnlimited(this.creator);
                                 if (unLimited) {
                                     // TRY FEE
                                     if (!BlockChain.isFeeEnough(height, creator)
@@ -1037,25 +1046,27 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             }
 
                             if (backward) {
-                                // PRODUCE is denied - only SPEND
-                                return INVALID_BACKWARD_ACTION;
-                            }
+                                if (!isSelfManaged) {
+                                    // PRODUCE is denied - only SPEND
+                                    return INVALID_BACKWARD_ACTION;
+                                }
+                            } else {
 
-                            if (asset.isOutsideType() && !this.recipient.equals(this.asset.getOwner())) {
-                                return Transaction.INVALID_RECEIVER;
-                            }
+                                if (asset.isOutsideType() && !this.recipient.equals(this.asset.getOwner())) {
+                                    return Transaction.INVALID_RECEIVER;
+                                }
 
-                            // if asset is unlimited and me is creator of this
-                            // asset
-                            unLimited = asset.isUnlimited(this.creator);
+                                // if asset is unlimited and me is creator of this asset
+                                unLimited = isSelfManaged || asset.isUnlimited(this.creator);
 
-                            if (!unLimited) {
+                                if (!unLimited) {
 
-                                BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height,
-                                        false);
+                                    BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height,
+                                            false);
 
-                                if (amount.abs().compareTo(forSale) > 0) {
-                                    return NO_BALANCE;
+                                    if (amount.abs().compareTo(forSale) > 0) {
+                                        return NO_BALANCE;
+                                    }
                                 }
                             }
 
@@ -1114,7 +1125,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                     // IF send from PERSON to ANONYMOUS
                     // TODO: PERSON RULE 1
-                    if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
+                    if (!isSelfManaged && BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
                             && actionType != ACTION_DEBT && actionType != ACTION_HOLD && actionType != ACTION_SPEND
                             && (absKey < 10 || absKey > asset.getStartKey()) // GATE Assets
                             && assetType != AssetCls.AS_ACCOUNTING
@@ -1160,10 +1171,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0 && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
             // потому что мы ключ урезали до 12 байт - могут быть коллизии
             return KEY_COLLISION;
-        }
-
-        if (creatorPerson != null && !creatorPerson.isAlive(this.timestamp)) {
-            return ITEM_PERSON_IS_DEAD;
         }
 
         return VALIDATE_OK;
