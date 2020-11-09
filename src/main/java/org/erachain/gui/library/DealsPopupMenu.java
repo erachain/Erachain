@@ -310,28 +310,9 @@ public class DealsPopupMenu extends JPopupMenu {
         this.debtAssetBackward.setEnabled(true);
         this.spendAsset.setEnabled(true);
 
-        if (isSelfManaged) {
-            if (isCreatorOwner) {
-                this.sendAssetBackward.setVisible(true);
-                this.holdAssetBackward.setVisible(true);
-                this.spendAssetBackward.setVisible(true);
-            } else {
-                this.sendAsset.setEnabled(false);
-                this.holdAsset.setEnabled(false);
-                this.debtAsset.setEnabled(false);
-                this.debtAssetReturn.setEnabled(false);
-                this.debtAssetBackward.setEnabled(false);
-                this.spendAsset.setEnabled(false);
-            }
-        } else {
-            this.sendAssetBackward.setVisible(false);
-            this.holdAssetBackward.setVisible(false);
-            this.spendAssetBackward.setVisible(false);
-        }
-
         this.sendMail.setText(Lang.getInstance().translate("Send Mail"));
 
-        String actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SEND, false);
+        String actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SEND, isCreatorOwner);
         if (actionName == null) {
             this.sendAsset.setVisible(false);
         } else {
@@ -339,7 +320,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.sendAsset.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_SEND, false);
+        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_SEND, isCreatorOwner);
         if (actionName == null) {
             this.sendAssetBackward.setVisible(false);
         } else {
@@ -487,5 +468,29 @@ public class DealsPopupMenu extends JPopupMenu {
 
             }
         }
+
+        if (isSelfManaged) {
+            if (isCreatorOwner) {
+                this.sendAssetBackward.setVisible(true);
+                this.holdAssetBackward.setVisible(true);
+                this.spendAssetBackward.setVisible(true);
+            } else {
+                this.sendAsset.setEnabled(false);
+                this.holdAsset.setEnabled(false);
+                this.debtAsset.setEnabled(false);
+                this.debtAssetReturn.setEnabled(false);
+                this.debtAssetBackward.setEnabled(false);
+                this.spendAsset.setEnabled(false);
+
+                this.sendAssetBackward.setVisible(false);
+                this.holdAssetBackward.setVisible(false);
+                this.spendAssetBackward.setVisible(false);
+            }
+        } else {
+            this.sendAssetBackward.setVisible(false);
+            this.holdAssetBackward.setVisible(false);
+            this.spendAssetBackward.setVisible(false);
+        }
+
     }
 }

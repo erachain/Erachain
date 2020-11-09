@@ -562,7 +562,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         if (!cheskError()) return;
 
         // CREATE TX MESSAGE
-        Transaction transaction = Controller.getInstance().r_Send((byte) 2, TransactionAmount.BACKWARD_MASK,
+        Transaction transaction = Controller.getInstance().r_Send((byte) 2, backward ? TransactionAmount.BACKWARD_MASK : 0,
                 (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, feePow,
                 recipient, getAssetKey(), getAmount(), head, messageBytes, isTextByte, encrypted);
 

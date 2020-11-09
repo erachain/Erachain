@@ -892,6 +892,7 @@ public class Account {
 
         if (actionType == TransactionAmount.ACTION_SEND) {
             // OWN + property
+            //if (isBackward) amount = amount.negate();
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     substract ? new Tuple2<BigDecimal, BigDecimal>(
                             updateIncomed ? balance.a.a.subtract(amount) : balance.a.a, balance.a.b.subtract(amount))
@@ -909,6 +910,7 @@ public class Account {
                     balance.c, balance.d, balance.e);
         } else if (actionType == TransactionAmount.ACTION_HOLD) {
             // HOLD + STOCK 🕐 🕝
+            //if (!isBackward) amount = amount.negate();
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a, balance.b,
                     substract ? new Tuple2<BigDecimal, BigDecimal>(
@@ -917,6 +919,8 @@ public class Account {
                             balance.c.b.add(amount)),
                     balance.d, balance.e);
         } else if (actionType == TransactionAmount.ACTION_SPEND) {
+            //if (isBackward) amount = amount.negate();
+
             // тут сразу обновим баланс ИМЕЮ - уменьшим его в облом случае - когда безлимит и лимит
             Tuple2<BigDecimal, BigDecimal> ownBalance = balance.a;
             if (ownBalance.b.signum() > 0) {
