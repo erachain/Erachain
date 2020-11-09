@@ -753,7 +753,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             return Transaction.INVALID_ADDRESS;
                         }
 
-                        if (backward || actionType == ACTION_HOLD) {
+                        if (backward ^ actionType == ACTION_HOLD) {
                             // у всех Получателей должно быть не меньше чем мы с них забираем
                             balance = this.recipient.getBalance(dcSet, absKey, actionType).b.abs();
                             if (amount.abs().compareTo(balance) > 0) {
