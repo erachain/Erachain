@@ -340,7 +340,7 @@ public class TelegramSplitPanel extends SplitPanel {
                 Account accountTo = FavoriteAccountsMap.detPublicKeyOrAccount(item.a, item.b);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"),
                         new AccountAssetSendPanel(null,
-                                null, accountTo, null, null));
+                                null, accountTo, null, null, backward));
 
 
             }

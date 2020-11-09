@@ -191,7 +191,7 @@ public class VouchLibraryPanel extends JPanel {
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Asset to Creator"),
                         new AccountAssetSendPanel(null,
-                                null, account, null, null));
+                                null, account, null, null, backward));
 
 
             }

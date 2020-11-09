@@ -154,7 +154,7 @@ public class StatusesLibraryPanel extends JPanel {
                 //new AccountSendDialog(null, null, account, null);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Asset to Creator"),
                         new AccountAssetSendPanel(null,
-                                null, null, person, null));
+                                null, null, person, null, backward));
 
 
             }

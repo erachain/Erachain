@@ -119,7 +119,7 @@ public class CreditsPanel extends JPanel // implements ItemListener
 
                 //new AccountSendDialog(asset, account, null, null);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send") + ":" + asset.getKey(),
-                        new AccountAssetSendPanel(asset, account, null, null, null));
+                        new AccountAssetSendPanel(asset, account, null, null, null, backward));
 
 
             }
@@ -145,7 +145,7 @@ public class CreditsPanel extends JPanel // implements ItemListener
                 Account account = tableModel.getAccount(row);
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate(hold_check_label) + ":" + asset.getKey(),
-                        new AccountAssetHoldPanel(asset, account, null, null));
+                        new AccountAssetHoldPanel(asset, account, null, null, backward));
 
 
             }

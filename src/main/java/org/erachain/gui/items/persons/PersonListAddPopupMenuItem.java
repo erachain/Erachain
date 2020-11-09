@@ -24,7 +24,7 @@ public class PersonListAddPopupMenuItem {
 
                 //new AccountSendDialog(null, null, null, person);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
-                        null, null, person, null));
+                        null, null, person, null, backward));
 
             }
         });

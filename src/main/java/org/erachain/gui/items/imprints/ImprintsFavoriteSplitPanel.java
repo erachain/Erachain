@@ -32,7 +32,7 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
                 //new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"),
                         new AccountAssetSendPanel(null,
-                                null, itemTableSelected.getOwner(), null, null));
+                                null, itemTableSelected.getOwner(), null, null, backward));
 
             }
         });

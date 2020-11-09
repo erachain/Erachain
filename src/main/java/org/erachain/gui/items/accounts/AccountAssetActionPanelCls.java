@@ -12,6 +12,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
@@ -20,10 +21,12 @@ import org.erachain.gui.IconPanel;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.assets.AssetInfo;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
@@ -52,6 +55,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     public BigDecimal amount;
 
+    public boolean backward;
+
     public ExLink exLink;
 
     public int feePow;
@@ -71,7 +76,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
     public byte[] encrypted;
     public Integer result;
 
-    private int balancePosition;
+    public int balancePosition;
+
+    public boolean noReceive;
 
     /**
      * Creates new form AccountAssetActionPanelCls
@@ -88,6 +95,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             this.asset = Controller.getInstance().getAsset(2);
         else
             this.asset = assetIn;
+
+        this.backward = backward;
 
         // необходимо входящий параметр отделить так как ниже он по событию изменения актива будет как НУЛь вызваться
         // поэтому тут только приватную переменную юзаем дальше
@@ -543,7 +552,43 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         refreshReceiverDetails();
     }
 
-    public abstract void onSendClick();
+    protected abstract BigDecimal getAmount();
+
+    protected abstract Long getAssetKey();
+
+    public void onSendClick() {
+
+        // confirm params
+        if (!cheskError()) return;
+
+        // CREATE TX MESSAGE
+        Transaction transaction = Controller.getInstance().r_Send((byte) 2, TransactionAmount.BACKWARD_MASK,
+                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, feePow,
+                recipient, getAssetKey(), getAmount(), head, messageBytes, isTextByte, encrypted);
+
+        String Status_text = "";
+        IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,
+                Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition,
+                        sender != null && sender.equals(asset.getOwner()))),
+                (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
+                Lang.getInstance().translate("Confirmation Transaction"), !noReceive);
+        Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
+
+        dd.jScrollPane1.setViewportView(ww);
+        dd.pack();
+        dd.setLocationRelativeTo(this);
+        dd.setVisible(true);
+
+        // JOptionPane.OK_OPTION
+        if (dd.isConfirm) {
+
+            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+            confirmaftecreatetransaction();
+        }
+        // ENABLE
+        this.jButton_ok.setEnabled(true);
+    }
 
 
     private void initComponents(String message) {

@@ -38,13 +38,20 @@ public class DealsPopupMenu extends JPopupMenu {
     protected PublicKeyAccount pubKey;
     protected MTable table;
 
-    private JMenuItem sendAsset;
     private JMenuItem sendMail;
+
+    private JMenuItem sendAsset;
+    private JMenuItem sendAssetBackward;
+
     private JMenuItem debtAsset;
     private JMenuItem debtAssetReturn;
     private JMenuItem debtAssetBackward;
+
     private JMenuItem holdAsset;
+    private JMenuItem holdAssetBackward;
+
     private JMenuItem spendAsset;
+    private JMenuItem spendAssetBackward;
 
     public DealsPopupMenu(AccountsTableModel tableModel, MTable table, JComboBox<ItemCls> assetSelector) {
 
@@ -70,11 +77,22 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
                 // AccountAssetLendPanel
                 MainPanel.getInstance().insertNewTab(sendAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetSendPanel(asset, pubKey, null, null, null));
+                        new AccountAssetSendPanel(asset, pubKey, null, null, null, false));
 
             }
         });
         this.add(sendAsset);
+
+        sendAssetBackward = new JMenuItem(Lang.getInstance().translate("Backward"));
+        sendAssetBackward.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // AccountAssetLendPanel
+                MainPanel.getInstance().insertNewTab(sendAssetBackward.getText() + ":" + asset.getKey(),
+                        new AccountAssetSendPanel(asset, pubKey, null, null, null, true));
+
+            }
+        });
+        this.add(sendAssetBackward);
 
         this.addSeparator();
 
@@ -119,7 +137,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(holdAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetHoldPanel(asset, pubKey, null, null));
+                        new AccountAssetHoldPanel(asset, pubKey, null, null, backward));
 
             }
         });
@@ -260,7 +278,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
     public void init() {
 
-        boolean isCreatorOwner = pubKey.equals(asset.getOwner());
+        boolean isCreatorOwner = asset != null && pubKey.equals(asset.getOwner());
         this.sendAsset.setEnabled(true);
         this.holdAsset.setEnabled(true);
         this.debtAsset.setEnabled(true);
@@ -334,6 +352,14 @@ public class DealsPopupMenu extends JPopupMenu {
 
         switch (this.asset.getAssetType()) {
 
+            case AssetCls.AS_SELF_MANAGED:
+                this.holdAsset.setEnabled(true);
+                this.debtAssetReturn.setVisible(false);
+                if (balance.b.b.signum() < 0) {
+                    this.debtAsset.setEnabled(false);
+                } else {
+                    this.debtAssetBackward.setEnabled(false);
+                }
             case AssetCls.AS_BANK_GUARANTEE:
 
                 balance = pubKey.getBalance(asset.getKey());

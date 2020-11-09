@@ -78,7 +78,7 @@ public class HyperLinkAccount {
         Send_Coins_Crator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
-                        null, account, null, null));
+                        null, account, null, null, backward));
 
             }
         });

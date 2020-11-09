@@ -169,7 +169,7 @@ public class AccountsLibraryPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Account accountTo = person_Accounts_Model.getAccount(row);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
-                        null, accountTo, person, null));
+                        null, accountTo, person, null, backward));
 
             }
         });

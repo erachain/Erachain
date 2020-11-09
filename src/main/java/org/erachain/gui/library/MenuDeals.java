@@ -40,7 +40,7 @@ public class MenuDeals extends JMenu {
                 //
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send"),
                         new AccountAssetSendPanel(null,
-                                null, null, null, null));
+                                null, null, null, null, backward));
 
             }
         });
@@ -56,7 +56,7 @@ public class MenuDeals extends JMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Take on Hold"),
-                        new AccountAssetHoldPanel(null, null, null, null));
+                        new AccountAssetHoldPanel(null, null, null, null, backward));
             }
         });
         add(dealsMenu_Take_On_Hold);
