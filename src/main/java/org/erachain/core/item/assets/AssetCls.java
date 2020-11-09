@@ -366,6 +366,11 @@ public abstract class AssetCls extends ItemCls {
                 return "⛨";
             case AS_INSIDE_SHARE:
                 return "◒";
+            case AS_SELF_MANAGED:
+            case AS_ACCOUNTING_LOAN:
+                return "±";
+            case AS_MY_DEBT:
+                return "◆";
             case AS_OUTSIDE_WORK_TIME_HOURS:
                 // 🕐🕜🕑🕝🕒🕞🕓🕟🕔🕠🕕🕡🕖🕢🕗🕣🕘🕤🕙🕥🕚🕦🕛🕧
                 return "◕";
