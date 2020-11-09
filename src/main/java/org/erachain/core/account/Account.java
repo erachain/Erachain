@@ -195,8 +195,16 @@ public class Account {
 
     }
 
-    // make TYPE of transactionAmount by signs of KEY and AMOUNT
-    public static int balancePosition(long key, BigDecimal amount, boolean isBackward) {
+    /**
+     * Make TYPE of transactionAmount by signs of KEY and AMOUNT
+     *
+     * @param key
+     * @param amount
+     * @param isBackward
+     * @param isDirect   если задано то номера балансов только 4-ре по минусам - без учета сложной схемы с isBackward
+     * @return
+     */
+    public static int balancePosition(long key, BigDecimal amount, boolean isBackward, boolean isDirect) {
         if (key == 0l || amount == null || amount.signum() == 0)
             return 0;
 
@@ -205,10 +213,10 @@ public class Account {
         if (key > 0) {
             if (amount_sign > 0) {
                 // OWN SEND or PLEDGE
-                type = isBackward ? TransactionAmount.ACTION_PLEDGE : TransactionAmount.ACTION_SEND;
+                type = !isDirect && isBackward ? TransactionAmount.ACTION_PLEDGE : TransactionAmount.ACTION_SEND;
             } else {
                 // HOLD in STOCK or PLEDGE
-                type = isBackward ? TransactionAmount.ACTION_HOLD : TransactionAmount.ACTION_RESERCED_6;
+                type = isDirect || isBackward ? TransactionAmount.ACTION_HOLD : TransactionAmount.ACTION_RESERCED_6;
             }
         } else {
             if (amount_sign > 0) {
@@ -853,9 +861,9 @@ public class Account {
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, boolean isBackward, long key,
-                                                                    BigDecimal amount_in, boolean notUpdateIncomed) {
+                                                                    BigDecimal amount_in, boolean isDirect, boolean notUpdateIncomed) {
 
-        int actionType = balancePosition(key, amount_in, isBackward);
+        int actionType = balancePosition(key, amount_in, isBackward, isDirect);
 
         ItemAssetBalanceMap map = db.getAssetBalanceMap();
 

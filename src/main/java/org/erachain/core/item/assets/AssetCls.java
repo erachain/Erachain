@@ -641,6 +641,15 @@ public abstract class AssetCls extends ItemCls {
         return assetType == AS_SELF_MANAGED || assetType == AS_ACCOUNTING_LOAN;
     }
 
+    /**
+     * Активы у которых есть только 4-ре баланса и каждый из них имеет возможность забрать - backward
+     *
+     * @return
+     */
+    public boolean isDirectBalances() {
+        return assetType == AS_SELF_MANAGED || assetType == AS_ACCOUNTING_LOAN;
+    }
+
     public boolean isAccounting() {
         return this.assetType == AS_ACCOUNTING
                 || assetType == AS_ACCOUNTING_LOAN;

@@ -72,8 +72,8 @@ public class TransactionV3Tests {
 
         // FEE FUND
         maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        maker.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
     }
 
@@ -158,7 +158,7 @@ public class TransactionV3Tests {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         List<Payment> payments = new ArrayList<Payment>();
         payments.add(new Payment(recipient1, 61l, BigDecimal.valueOf(110).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
@@ -232,7 +232,7 @@ public class TransactionV3Tests {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         List<Payment> payments = new ArrayList<Payment>();
 

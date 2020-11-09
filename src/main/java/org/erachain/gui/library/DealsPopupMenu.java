@@ -260,6 +260,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
     public void init() {
 
+        boolean isCreatorOwner = pubKey.equals(asset.getOwner());
         this.sendAsset.setEnabled(true);
         this.holdAsset.setEnabled(true);
         this.debtAsset.setEnabled(true);
@@ -269,7 +270,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
         this.sendMail.setText(Lang.getInstance().translate("Send Mail"));
 
-        String actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SEND, isCreatorOwner);
+        String actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SEND, false);
         if (actionName == null) {
             this.sendAsset.setVisible(false);
         } else {
