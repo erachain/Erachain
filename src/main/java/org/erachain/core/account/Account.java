@@ -910,7 +910,9 @@ public class Account {
                     balance.c, balance.d, balance.e);
         } else if (actionType == TransactionAmount.ACTION_HOLD) {
             // HOLD + STOCK 🕐 🕝
-            //if (!isBackward) amount = amount.negate();
+
+            if (isDirect) amount = amount.negate(); // перевернем если там это НА РУКИ
+
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a, balance.b,
                     substract ? new Tuple2<BigDecimal, BigDecimal>(
@@ -919,11 +921,12 @@ public class Account {
                             balance.c.b.add(amount)),
                     balance.d, balance.e);
         } else if (actionType == TransactionAmount.ACTION_SPEND) {
-            //if (isBackward) amount = amount.negate();
 
-            // тут сразу обновим баланс ИМЕЮ - уменьшим его в облом случае - когда безлимит и лимит
+            if (isDirect) amount = amount.negate(); // перевернем если там это НА РУКИ
+
+            // тут сразу обновим баланс ИМЕЮ - уменьшим его в любом случае - когда безлимит (минусовой) и лимит (плюсовой)
             Tuple2<BigDecimal, BigDecimal> ownBalance = balance.a;
-            if (ownBalance.b.signum() > 0) {
+            if (isBackward ^ ownBalance.b.signum() > 0) {
                 ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.subtract(amount));
             } else {
                 ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.add(amount));
