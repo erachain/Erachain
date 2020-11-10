@@ -252,7 +252,7 @@ public abstract class AssetCls extends ItemCls {
      * +++ мой займ другому лицу - учетный, бухгалтерский учет
      * === подобно AS_SELF_MANAGED
      */
-    public static final int AS_ACCOUNTING_LOAN = 125;
+    public static final int AS_SELF_ACCOUNTING_LOAN = 125;
 
     // + or -
     protected int scale;
@@ -367,7 +367,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_SHARE:
                 return "◒";
             case AS_SELF_MANAGED:
-            case AS_ACCOUNTING_LOAN:
+            case AS_SELF_ACCOUNTING_LOAN:
                 return "±";
             case AS_MY_DEBT:
                 return "◆";
@@ -638,7 +638,7 @@ public abstract class AssetCls extends ItemCls {
      * @return
      */
     public boolean isSelfManaged() {
-        return assetType == AS_SELF_MANAGED || assetType == AS_ACCOUNTING_LOAN;
+        return assetType == AS_SELF_MANAGED || assetType == AS_SELF_ACCOUNTING_LOAN;
     }
 
     /**
@@ -647,13 +647,13 @@ public abstract class AssetCls extends ItemCls {
      * @return
      */
     public boolean isDirectBalances() {
-        return assetType == AS_SELF_MANAGED || assetType == AS_ACCOUNTING_LOAN;
+        return assetType == AS_SELF_MANAGED || assetType == AS_SELF_ACCOUNTING_LOAN;
     }
 
     public boolean isAccounting() {
         return this.assetType == AS_ACCOUNTING
                 || assetType == AS_SELF_MANAGED
-                || assetType == AS_ACCOUNTING_LOAN;
+                || assetType == AS_SELF_ACCOUNTING_LOAN;
     }
 
     /**
@@ -740,7 +740,7 @@ public abstract class AssetCls extends ItemCls {
                 return "Accounting";
             case AS_SELF_MANAGED:
                 return "Self Managed";
-            case AS_ACCOUNTING_LOAN:
+            case AS_SELF_ACCOUNTING_LOAN:
                 return "Accounting Loan";
         }
         return "unknown";
@@ -802,7 +802,7 @@ public abstract class AssetCls extends ItemCls {
                 return "Accounting";
             case AS_SELF_MANAGED:
                 return "Self Managed for Accounting";
-            case AS_ACCOUNTING_LOAN:
+            case AS_SELF_ACCOUNTING_LOAN:
                 return "Accounting Loan for Debtor";
         }
         return "unknown";
@@ -833,12 +833,8 @@ public abstract class AssetCls extends ItemCls {
                 return lang.translate("A digital promissory note can be called for redemption by external money. You can take it into your hands");
             case AS_OUTSIDE_BILL_EX:
                 return lang.translate("A digital bill of exchange can be called for redemption by external money. You can take it into your hands");
-            case AS_SELF_MANAGED:
-                return lang.translate("AS_SELF_MANAGED-D");
-            case AS_ACCOUNTING_LOAN:
-                return lang.translate("AS_ACCOUNTING_LOAN-D");
             case AS_MY_DEBT:
-                return lang.translate("AS_MY_DEBT-D");
+                return lang.translate("AS_MY_DEBT_D");
             case AS_OUTSIDE_OTHER_CLAIM:
                 return lang.translate("Other external rights, requirements and obligations. Any obligation (as well as other external assets), which can be claimed by the record \"summon\" and discharged by the record \"confirmation of fulfillment\" of this obligation. You can take it into your hands");
             case AS_INSIDE_ASSETS:
@@ -864,7 +860,11 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_OTHER_CLAIM:
                 return lang.translate("Other digital rights, requirements and obligations. These assets (as well as other digital assets) can be given in debt and seized by the lender.");
             case AS_ACCOUNTING:
-                return lang.translate("Accounting units #DESC");
+                return lang.translate("AS_ACCOUNTING_D");
+            case AS_SELF_MANAGED:
+                return lang.translate("AS_SELF_MANAGED_D");
+            case AS_SELF_ACCOUNTING_LOAN:
+                return lang.translate("AS_ACCOUNTING_LOAN_D");
         }
         return "";
     }
@@ -958,44 +958,17 @@ public abstract class AssetCls extends ItemCls {
                     default:
                         return null;
                 }
-            case AS_SELF_MANAGED:
-                switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
-                        return backward ? "Списать (сторно)" : "Начислить";
-                    case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать требование исполнения"
-                                : "Потребовать исполнения";
-                    case TransactionAmount.ACTION_HOLD:
-                        return !backward ? "Списать хранение (сторно)"
-                                : "Учесть хранение";
-                    case TransactionAmount.ACTION_SPEND:
-                        return backward ? "Отменить исполнение (сторно)" : "Подтвердить исполнение";
-                    default:
-                        return null;
-                }
-            case AS_ACCOUNTING_LOAN:
-                switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
-                        return backward ? "Списать долг (сторно)" : "Начислить долг";
-                    case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать требование погашения долга"
-                                : "Потребовать исполнения долга";
-                    case TransactionAmount.ACTION_SPEND:
-                        return backward ? "Отменить погашение долга (сторно)" : "Подтвердить погашение долга";
-                    default:
-                        return null;
-                }
             case AS_MY_DEBT:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return isCreatorOwner ? "Подтвердить свой долг" : "Переуступить займ";
+                        return isCreatorOwner ? "AS_MY_DEBT_1B" : "AS_MY_DEBT_1";
                     case TransactionAmount.ACTION_DEBT:
                         return isCreatorOwner ? null // эмитент долга не может делать требования
-                                : backward ? "Отозвать требование погашения займа"
-                                : "Потребовать исполнения займа";
+                                : backward ? "AS_MY_DEBT_2B"
+                                : "AS_MY_DEBT_2";
                     case TransactionAmount.ACTION_SPEND:
                         return isCreatorOwner ? null // эмитент долга не может делать погашения
-                                : backward ? "Отменить погашения займа (сторно)" : "Подтвердить погашения займа";
+                                : backward ? "AS_MY_DEBT_4B" : "AS_MY_DEBT_4";
                     default:
                         return null;
                 }
@@ -1117,6 +1090,30 @@ public abstract class AssetCls extends ItemCls {
             case AS_INDEX:
             case AS_ACCOUNTING:
                 break;
+            case AS_SELF_MANAGED:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return backward ? "AS_SELF_MANAGED_1B" : "AS_SELF_MANAGED_1";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "AS_SELF_MANAGED_2B" : "AS_SELF_MANAGED_2";
+                    case TransactionAmount.ACTION_HOLD:
+                        return !backward ? "AS_SELF_MANAGED_3B" : "AS_SELF_MANAGED_3";
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? "AS_SELF_MANAGED_4B" : "AS_SELF_MANAGED_4";
+                    default:
+                        return null;
+                }
+            case AS_SELF_ACCOUNTING_LOAN:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return backward ? "AS_ACCOUNTING_LOAN_1B" : "AS_ACCOUNTING_LOAN_1";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "AS_ACCOUNTING_LOAN_2B" : "AS_ACCOUNTING_LOAN_2";
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? "AS_ACCOUNTING_LOAN_4B" : "AS_ACCOUNTING_LOAN_4";
+                    default:
+                        return null;
+                }
         }
 
         switch (actionType) {
@@ -1201,7 +1198,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL_EX:
             case AS_SELF_MANAGED:
                 return "Me";
-            case AS_ACCOUNTING_LOAN:
+            case AS_SELF_ACCOUNTING_LOAN:
                 return "Lender";
             case AS_MY_DEBT:
                 switch (actionType) {
@@ -1277,7 +1274,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL_EX:
             case AS_SELF_MANAGED:
                 return "They";
-            case AS_ACCOUNTING_LOAN:
+            case AS_SELF_ACCOUNTING_LOAN:
                 return "Debtor";
             case AS_MY_DEBT:
                 switch (actionType) {
