@@ -1390,6 +1390,8 @@ public abstract class AssetCls extends ItemCls {
         assetJSON.put("scale", this.getScale());
         assetJSON.put("assetTypeKey", this.assetType);
         assetJSON.put("assetTypeName", viewAssetType());
+        assetJSON.put("assetTypeNameFull", viewAssetTypeFull());
+        assetJSON.put("assetTypeDesc", viewAssetTypeDescriptionCls(assetType));
 
         return assetJSON;
     }
@@ -1399,7 +1401,6 @@ public abstract class AssetCls extends ItemCls {
 
         JSONObject json =super.jsonForExplorerPage(langObj);
         json.put("assetTypeKey", this.assetType);
-        json.put("assetTypeName", viewAssetType());
         json.put("assetTypeNameFull", viewAssetTypeFull());
         json.put("quantity", getQuantity());
         json.put("released", getReleased());

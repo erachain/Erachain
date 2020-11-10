@@ -1316,6 +1316,8 @@
   "Type:": "Тип:",
   "Type": "Тип",
   "TYPE": "ВИД",
+  "Type # вид": "Вид",
+  "Type Description": "Описание вида",
   "Type asset key": "Введите номер актива",
   "Type searching words or asset key": "Введите поисковые слова или номер актива",
   "Type searching words or person key": "Введите поисковые слова или номер персоны",
