@@ -761,14 +761,19 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             }
                         } else {
                             // тут наоборот - у создателя должно хватать
-                            if (actionType != ACTION_SEND
-                                    || asset.getQuantity() > 0L // тут Анлимит именно так берем - так как в dyenhb isUnlimited счетные единицы все Анлим
-                            ) {
-                                // если это не Имею и Не Безлимитный
+                            if (actionType != ACTION_SEND) {
+                                // если это не Имею
                                 balance = this.creator.getBalance(dcSet, absKey, ACTION_SEND).b.abs(); // in OWN
                                 if (actionType != ACTION_SPEND)
                                     balance = balance.add(this.creator.getBalance(dcSet, absKey, actionType).b.abs()); // for Action
                                 if (amount.abs().compareTo(balance) > 0) {
+                                    return NO_BALANCE;
+                                }
+                            } else if (
+                                    asset.getQuantity() > 0L // тут Анлимит именно так берем - так как в dyenhb isUnlimited счетные единицы все Анлим
+                            ) {
+                                balance = this.creator.getBalance(dcSet, absKey, ACTION_SEND).b; // in OWN
+                                if (amount.compareTo(balance) > 0) {
                                     return NO_BALANCE;
                                 }
                             }

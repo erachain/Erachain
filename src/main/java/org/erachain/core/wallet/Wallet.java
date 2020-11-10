@@ -1019,6 +1019,8 @@ public class Wallet extends Observable /*implements Observer*/ {
 	}
 
 	private void deal_transaction(Account account, Transaction transaction, boolean asOrphan) {
+
+		transaction.setDC(DCSet.getInstance());
 		// UPDATE UNCONFIRMED BALANCE for ASSET
 		// TODO: fee doubled?
 		long absKey = transaction.getAbsKey();
