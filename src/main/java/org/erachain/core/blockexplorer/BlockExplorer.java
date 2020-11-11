@@ -953,7 +953,7 @@ public class BlockExplorer {
         assetJSON.put("operations", orders.size() + trades.size());
 
         assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
-        assetJSON.put("assetTypeChar", asset.charAssetType());
+        assetJSON.put("assetTypeChar", asset.charAssetType() + asset.viewAssetTypeAbbrev());
 
         assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
         assetJSON.put("assetTypeDesc", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeDescriptionCls(asset.getAssetType()), langObj));

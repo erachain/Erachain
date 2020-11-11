@@ -416,7 +416,7 @@ public abstract class AssetCls extends ItemCls {
             return this.name;
         }
 
-        return charAssetType() + viewAssetTypeAbbrev(this.assetType) + ":" + this.name;
+        return charAssetType() + viewAssetTypeAbbrev() + ":" + this.name;
 
     }
 
@@ -864,6 +864,10 @@ public abstract class AssetCls extends ItemCls {
                 return "AccL";
         }
         return "?";
+    }
+
+    public String viewAssetTypeAbbrev() {
+        return viewAssetTypeAbbrev(assetType);
     }
 
     public String viewAssetTypeFull() {
