@@ -15,7 +15,9 @@ import org.json.simple.JSONObject;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 // 1019 - Movable = true; Divisible = NO; Quantity = 1
@@ -689,8 +691,8 @@ public abstract class AssetCls extends ItemCls {
         return null;
     }
 
-    public static String viewAssetTypeCls(int asset_type) {
-        switch (asset_type) {
+    public static String viewAssetTypeCls(int assetType) {
+        switch (assetType) {
             case AS_OUTSIDE_GOODS:
                 return "Movable";
             case AS_OUTSIDE_IMMOVABLE:
@@ -752,8 +754,8 @@ public abstract class AssetCls extends ItemCls {
         return viewAssetTypeCls(this.assetType);
     }
 
-    public static String viewAssetTypeFullCls(int asset_type) {
-        switch (asset_type) {
+    public static String viewAssetTypeFullCls(int assetType) {
+        switch (assetType) {
             case AS_OUTSIDE_GOODS:
                 return "Movable Goods";
             case AS_OUTSIDE_IMMOVABLE:
@@ -876,9 +878,9 @@ public abstract class AssetCls extends ItemCls {
         return viewAssetTypeFullCls(this.assetType);
     }
 
-    public static String viewAssetTypeDescriptionCls(int asset_type) {
+    public static String viewAssetTypeDescriptionCls(int assetType) {
         Lang lang = Lang.getInstance();
-        switch (asset_type) {
+        switch (assetType) {
             case AS_OUTSIDE_GOODS:
                 return lang.translate("Movable things and goods. These goods can be taken for storage by the storekeeper or for confirmation of delivery. In this case you can see the balances on the accounts of storekeepers and delivery agents");
             case AS_OUTSIDE_IMMOVABLE:
@@ -933,7 +935,7 @@ public abstract class AssetCls extends ItemCls {
         return "";
     }
 
-    public String viewAssetTypeAction(boolean backward, int actionType, boolean isCreatorOwner) {
+    public static String viewAssetTypeAction(int assetType, boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
                 switch (actionType) {
@@ -1199,6 +1201,36 @@ public abstract class AssetCls extends ItemCls {
         }
 
         return null;
+    }
+
+    public String viewAssetTypeAction(boolean backward, int actionType, boolean isCreatorOwner) {
+        return viewAssetTypeAction(assetType, backward, actionType, isCreatorOwner);
+    }
+
+    public static List<String> viewAssetTypeActionsList(int assetType) {
+        List<String> list = new ArrayList<>();
+
+        String actionStr;
+        for (int action = TransactionAmount.ACTION_SEND; action <= TransactionAmount.ACTION_PLEDGE; action++) {
+            actionStr = viewAssetTypeAction(assetType, false, action, true);
+            if (actionStr != null && !list.contains(actionStr))
+                list.add(actionStr);
+            actionStr = viewAssetTypeAction(assetType, false, action, false);
+            if (actionStr != null && !list.contains(actionStr))
+                list.add(actionStr);
+            actionStr = viewAssetTypeAction(assetType, true, action, true);
+            if (actionStr != null && !list.contains(actionStr))
+                list.add(actionStr);
+            actionStr = viewAssetTypeAction(assetType, true, action, false);
+            if (actionStr != null && !list.contains(actionStr))
+                list.add(actionStr);
+        }
+
+        return list;
+    }
+
+    public List<String> viewAssetTypeActionsList() {
+        return viewAssetTypeActionsList(assetType);
     }
 
     public String viewAssetTypeActionTitle(boolean backward, int actionType, boolean isCreatorOwner) {

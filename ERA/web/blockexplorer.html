@@ -987,7 +987,7 @@ button.white-bgc[disabled]:focus,
             }
 
             output += data.asset.label_AssetType + ': <b>(' + data.asset.this.assetTypeChar + ') ' + data.asset.this.assetTypeFull + '</b><br>';
-            output += data.asset.label_AssetType_Desc + ': <b>' + data.asset.this.assetTypeDesc + '</b><br>';
+            output += data.asset.label_AssetType_Desc + ': ' + fformat(data.asset.this.assetTypeDesc) + '<br>';
 
             output += data.asset.label_Quantity + ': <b>' + addCommas(data.asset.this.quantity) + '</b>';
             output += ', ' + data.asset.label_Scale + ': <b>' + data.asset.this.scale + '</b>';

@@ -956,7 +956,13 @@ public class BlockExplorer {
         assetJSON.put("assetTypeChar", asset.charAssetType() + asset.viewAssetTypeAbbrev());
 
         assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
-        assetJSON.put("assetTypeDesc", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeDescriptionCls(asset.getAssetType()), langObj));
+        StringJoiner joiner = new StringJoiner(", ");
+        for (String action : asset.viewAssetTypeActionsList()) {
+            joiner.add(Lang.getInstance().translateFromLangObj(action, langObj));
+        }
+        assetJSON.put("assetTypeDesc", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeDescriptionCls(asset.getAssetType()), langObj)
+                + ".\n" + Lang.getInstance().translateFromLangObj("Acceptable actions", langObj) + ":\n" + joiner.toString()
+        );
 
         output.put("this", assetJSON);
 
