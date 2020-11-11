@@ -414,6 +414,8 @@ public abstract class AssetCls extends ItemCls {
 
         if (this.key < 100) {
             return this.name;
+        } else if (key < getStartKey()) {
+            return charAssetType() + this.name;
         }
 
         return charAssetType() + viewAssetTypeAbbrev() + ":" + this.name;
