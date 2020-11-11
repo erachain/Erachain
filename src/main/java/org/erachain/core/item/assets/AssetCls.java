@@ -245,7 +245,7 @@ public abstract class AssetCls extends ItemCls {
      * === Не может управляться ни кем кроме обладателя актива
      * === доступны 4-ре баланса и у каждого работает Возврат - backward
      */
-    public static final int AS_SELF_MANAGED = 124;
+    public static final int AS_SELF_MANAGED_ACCOUNTING = 124;
 
     /**
      * accounting loan
@@ -366,7 +366,7 @@ public abstract class AssetCls extends ItemCls {
                 return "⛨";
             case AS_INSIDE_SHARE:
                 return "◒";
-            case AS_SELF_MANAGED:
+            case AS_SELF_MANAGED_ACCOUNTING:
             case AS_SELF_ACCOUNTING_LOAN:
                 return "±";
             case AS_MY_DEBT:
@@ -416,7 +416,7 @@ public abstract class AssetCls extends ItemCls {
             return this.name;
         }
 
-        return charAssetType() + this.name;
+        return charAssetType() + viewAssetTypeAbbrev(this.assetType) + ":" + this.name;
 
     }
 
@@ -638,7 +638,7 @@ public abstract class AssetCls extends ItemCls {
      * @return
      */
     public boolean isSelfManaged() {
-        return assetType == AS_SELF_MANAGED || assetType == AS_SELF_ACCOUNTING_LOAN;
+        return assetType == AS_SELF_MANAGED_ACCOUNTING || assetType == AS_SELF_ACCOUNTING_LOAN;
     }
 
     /**
@@ -647,12 +647,12 @@ public abstract class AssetCls extends ItemCls {
      * @return
      */
     public boolean isDirectBalances() {
-        return assetType == AS_SELF_MANAGED || assetType == AS_SELF_ACCOUNTING_LOAN;
+        return assetType == AS_SELF_MANAGED_ACCOUNTING || assetType == AS_SELF_ACCOUNTING_LOAN;
     }
 
     public boolean isAccounting() {
         return this.assetType == AS_ACCOUNTING
-                || assetType == AS_SELF_MANAGED
+                || assetType == AS_SELF_MANAGED_ACCOUNTING
                 || assetType == AS_SELF_ACCOUNTING_LOAN;
     }
 
@@ -738,7 +738,7 @@ public abstract class AssetCls extends ItemCls {
 
             case AS_ACCOUNTING:
                 return "Accounting";
-            case AS_SELF_MANAGED:
+            case AS_SELF_MANAGED_ACCOUNTING:
                 return "Self Managed";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Accounting Loan";
@@ -800,12 +800,70 @@ public abstract class AssetCls extends ItemCls {
 
             case AS_ACCOUNTING:
                 return "Accounting";
-            case AS_SELF_MANAGED:
+            case AS_SELF_MANAGED_ACCOUNTING:
                 return "Self Managed for Accounting";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Accounting Loan for Debtor";
         }
         return "unknown";
+    }
+
+    public static String viewAssetTypeAbbrev(int asset_type) {
+        switch (asset_type) {
+            case AS_OUTSIDE_GOODS:
+                return "OGd";
+            case AS_OUTSIDE_IMMOVABLE:
+                return "UIm";
+            case AS_OUTSIDE_CURRENCY:
+                return "OCr";
+            case AS_OUTSIDE_WORK_TIME_HOURS:
+                return "WH";
+            case AS_OUTSIDE_WORK_TIME_MINUTES:
+                return "WM";
+            case AS_OUTSIDE_SERVICE:
+                return "OSv";
+            case AS_OUTSIDE_SHARE:
+                return "OSh";
+            case AS_OUTSIDE_BILL:
+                return "PNo"; // Promissory Note";
+            case AS_OUTSIDE_BILL_EX:
+                return "BEx"; //Bill of Exchange";
+            case AS_MY_DEBT:
+                return "Dbt"; // Debt to Loaner
+            case AS_OUTSIDE_OTHER_CLAIM:
+                return "OCl";
+
+            case AS_INSIDE_ASSETS:
+                return "Ast";
+            case AS_INSIDE_CURRENCY:
+                return "Cur";
+            case AS_INSIDE_UTILITY:
+                return "Utl";
+            case AS_INSIDE_SHARE:
+                return "Shr";
+            case AS_INSIDE_BONUS:
+                return "Bon";
+            case AS_INSIDE_ACCESS:
+                return "Rit";
+            case AS_INSIDE_VOTE:
+                return "Vte";
+            case AS_BANK_GUARANTEE:
+                return "BGu";
+            case AS_BANK_GUARANTEE_TOTAL:
+                return "BGuT";
+            case AS_INDEX:
+                return "Idx";
+            case AS_INSIDE_OTHER_CLAIM:
+                return "CLM";
+
+            case AS_ACCOUNTING:
+                return "Acc";
+            case AS_SELF_MANAGED_ACCOUNTING:
+                return "SAcc";
+            case AS_SELF_ACCOUNTING_LOAN:
+                return "AccL";
+        }
+        return "?";
     }
 
     public String viewAssetTypeFull() {
@@ -861,7 +919,7 @@ public abstract class AssetCls extends ItemCls {
                 return lang.translate("Other digital rights, requirements and obligations. These assets (as well as other digital assets) can be given in debt and seized by the lender.");
             case AS_ACCOUNTING:
                 return lang.translate("AS_ACCOUNTING_D");
-            case AS_SELF_MANAGED:
+            case AS_SELF_MANAGED_ACCOUNTING:
                 return lang.translate("AS_SELF_MANAGED_D");
             case AS_SELF_ACCOUNTING_LOAN:
                 return lang.translate("AS_ACCOUNTING_LOAN_D");
@@ -1090,7 +1148,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INDEX:
             case AS_ACCOUNTING:
                 break;
-            case AS_SELF_MANAGED:
+            case AS_SELF_MANAGED_ACCOUNTING:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
                         return backward ? "AS_SELF_MANAGED_1B" : "AS_SELF_MANAGED_1";
@@ -1139,21 +1197,6 @@ public abstract class AssetCls extends ItemCls {
 
     public String viewAssetTypeActionTitle(boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
-            case AS_OUTSIDE_IMMOVABLE:
-            case AS_OUTSIDE_CURRENCY:
-            case AS_OUTSIDE_SERVICE:
-            case AS_OUTSIDE_SHARE:
-            case AS_OUTSIDE_BILL:
-            case AS_OUTSIDE_BILL_EX:
-            case AS_OUTSIDE_OTHER_CLAIM:
-            case AS_INSIDE_ASSETS:
-            case AS_INSIDE_CURRENCY:
-            case AS_INSIDE_UTILITY:
-            case AS_INSIDE_SHARE:
-            case AS_INSIDE_BONUS:
-            case AS_INSIDE_ACCESS:
-            case AS_INSIDE_VOTE:
-                break;
             case AS_BANK_GUARANTEE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -1180,6 +1223,20 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_SPEND:
                         return "Погашение учетной банковской гарантии - %asset%";
                 }
+            case AS_OUTSIDE_IMMOVABLE:
+            case AS_OUTSIDE_CURRENCY:
+            case AS_OUTSIDE_SERVICE:
+            case AS_OUTSIDE_SHARE:
+            case AS_OUTSIDE_BILL:
+            case AS_OUTSIDE_BILL_EX:
+            case AS_OUTSIDE_OTHER_CLAIM:
+            case AS_INSIDE_ASSETS:
+            case AS_INSIDE_CURRENCY:
+            case AS_INSIDE_UTILITY:
+            case AS_INSIDE_SHARE:
+            case AS_INSIDE_BONUS:
+            case AS_INSIDE_ACCESS:
+            case AS_INSIDE_VOTE:
             case AS_INDEX:
             case AS_INSIDE_OTHER_CLAIM:
             case AS_ACCOUNTING:
@@ -1190,16 +1247,6 @@ public abstract class AssetCls extends ItemCls {
 
     public String viewAssetTypeCreator(boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
-            case AS_OUTSIDE_IMMOVABLE:
-            case AS_OUTSIDE_CURRENCY:
-            case AS_OUTSIDE_SERVICE:
-            case AS_OUTSIDE_SHARE:
-            case AS_OUTSIDE_BILL:
-            case AS_OUTSIDE_BILL_EX:
-            case AS_SELF_MANAGED:
-                return "Me";
-            case AS_SELF_ACCOUNTING_LOAN:
-                return "Lender";
             case AS_MY_DEBT:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -1211,15 +1258,6 @@ public abstract class AssetCls extends ItemCls {
                     default:
                         return null;
                 }
-            case AS_OUTSIDE_OTHER_CLAIM:
-            case AS_INSIDE_ASSETS:
-            case AS_INSIDE_CURRENCY:
-            case AS_INSIDE_UTILITY:
-            case AS_INSIDE_SHARE:
-            case AS_INSIDE_BONUS:
-            case AS_INSIDE_ACCESS:
-            case AS_INSIDE_VOTE:
-                break;
             case AS_BANK_GUARANTEE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -1243,6 +1281,24 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_SPEND:
                         return "Spender";
                 }
+            case AS_SELF_MANAGED_ACCOUNTING:
+                return "Me";
+            case AS_SELF_ACCOUNTING_LOAN:
+                return "Lender";
+            case AS_OUTSIDE_IMMOVABLE:
+            case AS_OUTSIDE_CURRENCY:
+            case AS_OUTSIDE_SERVICE:
+            case AS_OUTSIDE_SHARE:
+            case AS_OUTSIDE_BILL:
+            case AS_OUTSIDE_BILL_EX:
+            case AS_OUTSIDE_OTHER_CLAIM:
+            case AS_INSIDE_ASSETS:
+            case AS_INSIDE_CURRENCY:
+            case AS_INSIDE_UTILITY:
+            case AS_INSIDE_SHARE:
+            case AS_INSIDE_BONUS:
+            case AS_INSIDE_ACCESS:
+            case AS_INSIDE_VOTE:
             case AS_INDEX:
             case AS_INSIDE_OTHER_CLAIM:
             case AS_ACCOUNTING:
@@ -1266,16 +1322,6 @@ public abstract class AssetCls extends ItemCls {
 
     public String viewAssetTypeTarget(boolean backward, int actionType, boolean isRecipientOwner) {
         switch (assetType) {
-            case AS_OUTSIDE_IMMOVABLE:
-            case AS_OUTSIDE_CURRENCY:
-            case AS_OUTSIDE_SERVICE:
-            case AS_OUTSIDE_SHARE:
-            case AS_OUTSIDE_BILL:
-            case AS_OUTSIDE_BILL_EX:
-            case AS_SELF_MANAGED:
-                return "They";
-            case AS_SELF_ACCOUNTING_LOAN:
-                return "Debtor";
             case AS_MY_DEBT:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -1288,15 +1334,6 @@ public abstract class AssetCls extends ItemCls {
                     default:
                         return null;
                 }
-            case AS_OUTSIDE_OTHER_CLAIM:
-            case AS_INSIDE_ASSETS:
-            case AS_INSIDE_CURRENCY:
-            case AS_INSIDE_UTILITY:
-            case AS_INSIDE_SHARE:
-            case AS_INSIDE_BONUS:
-            case AS_INSIDE_ACCESS:
-            case AS_INSIDE_VOTE:
-                break;
             case AS_BANK_GUARANTEE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -1323,6 +1360,24 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_SPEND:
                         return "Spender";
                 }
+            case AS_SELF_MANAGED_ACCOUNTING:
+                return "They";
+            case AS_SELF_ACCOUNTING_LOAN:
+                return "Debtor";
+            case AS_OUTSIDE_IMMOVABLE:
+            case AS_OUTSIDE_CURRENCY:
+            case AS_OUTSIDE_SERVICE:
+            case AS_OUTSIDE_SHARE:
+            case AS_OUTSIDE_BILL:
+            case AS_OUTSIDE_BILL_EX:
+            case AS_OUTSIDE_OTHER_CLAIM:
+            case AS_INSIDE_ASSETS:
+            case AS_INSIDE_CURRENCY:
+            case AS_INSIDE_UTILITY:
+            case AS_INSIDE_SHARE:
+            case AS_INSIDE_BONUS:
+            case AS_INSIDE_ACCESS:
+            case AS_INSIDE_VOTE:
             case AS_INDEX:
             case AS_INSIDE_OTHER_CLAIM:
             case AS_ACCOUNTING:

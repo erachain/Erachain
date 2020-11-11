@@ -45,7 +45,7 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
             list.add(new AssetType(AssetCls.AS_INDEX));
             list.add(new AssetType(AssetCls.AS_INSIDE_OTHER_CLAIM));
 
-            list.add(new AssetType(AssetCls.AS_SELF_MANAGED));
+            list.add(new AssetType(AssetCls.AS_SELF_MANAGED_ACCOUNTING));
             list.add(new AssetType(AssetCls.AS_ACCOUNTING));
         } else {
             list.add(new AssetType(AssetCls.AS_OUTSIDE_GOODS));
@@ -73,7 +73,7 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
             list.add(new AssetType(AssetCls.AS_INDEX));
             list.add(new AssetType(AssetCls.AS_INSIDE_OTHER_CLAIM));
 
-            list.add(new AssetType(AssetCls.AS_SELF_MANAGED));
+            list.add(new AssetType(AssetCls.AS_SELF_MANAGED_ACCOUNTING));
             list.add(new AssetType(AssetCls.AS_ACCOUNTING));
         }
         
