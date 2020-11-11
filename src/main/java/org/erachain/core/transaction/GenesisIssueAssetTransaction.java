@@ -83,11 +83,11 @@ public class GenesisIssueAssetTransaction extends GenesisIssueItemRecord {
             Long assetKey = item.getKey(dcSet);
             // надо добавить баланс на счет
             owner.changeBalance(dcSet, false, false, assetKey,
-                    new BigDecimal(quantity).setScale(0), false);
+                    new BigDecimal(quantity).setScale(0), false, false);
 
             // make HOLD balance
             owner.changeBalance(dcSet, false, true, assetKey,
-                    new BigDecimal(-quantity).setScale(0), false);
+                    new BigDecimal(-quantity).setScale(0), false, false);
         }
     }
 

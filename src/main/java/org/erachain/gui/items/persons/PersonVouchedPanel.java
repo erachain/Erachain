@@ -180,7 +180,7 @@ public class PersonVouchedPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Account accountTo = (Account) model.getPublicKey(row);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Asset to Person"), new AccountAssetSendPanel(null,
-                        null, accountTo, person, null));
+                        null, accountTo, person, null, false));
 
                 ;
 

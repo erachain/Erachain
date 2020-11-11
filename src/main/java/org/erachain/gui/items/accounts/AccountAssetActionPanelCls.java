@@ -12,6 +12,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
@@ -20,10 +21,12 @@ import org.erachain.gui.IconPanel;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.assets.AssetInfo;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
@@ -41,8 +44,9 @@ import java.nio.charset.StandardCharsets;
 
 public abstract class AccountAssetActionPanelCls extends IconPanel implements RecipientAddress.RecipientAddressInterface {
 
-    // TODO - "A" - &
-    //static String wrongFirstCharOfAddress = "A";
+
+    public Account sender;
+
     public Account recipient;
 
     public String message;
@@ -51,13 +55,13 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     public BigDecimal amount;
 
+    public boolean backward;
+
     public ExLink exLink;
 
     public int feePow;
 
     public boolean isTextB;
-
-    public Account sender;
 
     public AssetCls asset;
 
@@ -71,9 +75,10 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     public byte[] encrypted;
     public Integer result;
-    public Account account;
 
-    private int balancePosition;
+    public int balancePosition;
+
+    public boolean noReceive;
 
     /**
      * Creates new form AccountAssetActionPanelCls
@@ -91,18 +96,22 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         else
             this.asset = assetIn;
 
+        this.backward = backward;
+
         // необходимо входящий параметр отделить так как ниже он по событию изменения актива будет как НУЛь вызваться
         // поэтому тут только приватную переменную юзаем дальше
         if (title == null) {
-            this.title = asset.viewAssetTypeActionTitle(backward, balancePosition);
+            this.title = asset.viewAssetTypeActionTitle(backward, balancePosition,
+                    accountFrom != null && accountFrom.equals(asset.getOwner()));
         }
 
         if (panelName == null) {
-            this.panelName = Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition)) + " [" + asset.getKey() + " ]";
+            this.panelName = Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition,
+                    accountFrom != null && accountFrom.equals(asset.getOwner())) + " [" + asset.getKey() + " ]");
             setName(this.panelName);
         }
 
-        this.account = accountFrom;
+        this.sender = accountFrom;
 
         recipient = accountTo;
         // возможно есть счет по умолчанию
@@ -117,14 +126,15 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         this.jLabel_Title.setText(Lang.getInstance().translate(this.title).replace("%asset%", asset.viewName()));
 
         // icon.setIcon(null);
-        this.jLabel_Account.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, balancePosition)) + ":");
+        this.jLabel_Account.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, balancePosition,
+                accountFrom != null && accountFrom.equals(asset.getOwner())) + ":"));
 
         this.jLabel_To.setText(Lang.getInstance().translate(
-                asset.viewAssetTypeTarget(backward, balancePosition) + " " + "Account") + ":");
+                asset.viewAssetTypeTarget(backward, balancePosition, false) + " " + "Account") + ":");
         this.jLabel_Recive_Detail.setText(Lang.getInstance().translate(
-                asset.viewAssetTypeTarget(backward, balancePosition) + " " + "Details") + ":");
+                asset.viewAssetTypeTarget(backward, balancePosition, false) + " " + "Details") + ":");
 
-        this.jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition)));
+        this.jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition, false)));
 
         this.jTextField_Recive_Detail.setText("");
         this.jTextField_Mess_Title.setText("");
@@ -138,8 +148,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         this.accountsModel = new AccountsComboBoxModel(balancePosition);
         jComboBox_Account.setModel(accountsModel);
 
-        if (account != null) {
-            jComboBox_Account.setSelectedItem(account);
+        if (sender != null) {
+            jComboBox_Account.setSelectedItem(sender);
         }
 
         jComboBox_Account.setRenderer(new AccountRenderer(asset.getKey()));
@@ -195,17 +205,17 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                account = ((Account) jComboBox_Account.getSelectedItem());
+                sender = ((Account) jComboBox_Account.getSelectedItem());
                 if (asset != null) {
                     if (balancePosition == TransactionAmount.ACTION_DEBT || balancePosition == TransactionAmount.ACTION_REPAY_DEBT) {
                         // берем совместно с выданным кредитом
-                        BigDecimal forSale = account.getForSale(DCSet.getInstance(), asset.getKey(), Controller.getInstance().getMyHeight(),
+                        BigDecimal forSale = sender.getForSale(DCSet.getInstance(), asset.getKey(), Controller.getInstance().getMyHeight(),
                                 true);
                         jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
                                 + forSale.toPlainString());
                     } else {
                         jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
-                                + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
+                                + sender.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
                     }
                 }
 
@@ -224,8 +234,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
                 if (asset != null) {
 
-                    account = ((Account) jComboBox_Account.getSelectedItem());
-                    if (account != null) {
+                    sender = ((Account) jComboBox_Account.getSelectedItem());
+                    if (sender != null) {
                         ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(asset.getKey());
                         jComboBox_Account.repaint();
                     }
@@ -234,7 +244,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                     jLabel_Title.setText((titleLocal == null ? AccountAssetActionPanelCls.this.title : titleLocal).replace("%asset%", asset.viewName()));
 
                     if (panelName == null) {
-                        setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition)) + " ]" + asset.getKey() + " ]");
+                        setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition,
+                                sender != null && sender.equals(asset.getOwner())) + " ]" + asset.getKey() + " ]"));
                     } else {
                         setName(Lang.getInstance().translate(panelName));
                     }
@@ -246,9 +257,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                     // jTextArea_Account_Description.setText(asset.getDescription());
                     jScrollPane2.setViewportView(new AssetInfo(asset, false));
 
-                    if (account != null)
+                    if (sender != null)
                         jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
-                                + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
+                                + sender.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
 
                 }
 
@@ -269,9 +280,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         this.jLabel_Asset.setText(Lang.getInstance().translate(asset.viewAssetType()) + ":");
         this.jLabel_Amount.setText(Lang.getInstance().translate("Amount") + ":");
 
-        if (account != null && asset != null) {
+        if (sender != null && asset != null) {
             jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
-                    + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
+                    + sender.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
         }
 
         this.jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
@@ -541,7 +552,43 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         refreshReceiverDetails();
     }
 
-    public abstract void onSendClick();
+    protected abstract BigDecimal getAmount();
+
+    protected abstract Long getAssetKey();
+
+    public void onSendClick() {
+
+        // confirm params
+        if (!cheskError()) return;
+
+        // CREATE TX MESSAGE
+        Transaction transaction = Controller.getInstance().r_Send((byte) 2, backward ? TransactionAmount.BACKWARD_MASK : 0,
+                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, feePow,
+                recipient, getAssetKey(), getAmount(), head, messageBytes, isTextByte, encrypted);
+
+        String Status_text = "";
+        IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,
+                Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition,
+                        sender != null && sender.equals(asset.getOwner()))),
+                (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
+                Lang.getInstance().translate("Confirmation Transaction"), !noReceive);
+        Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
+
+        dd.jScrollPane1.setViewportView(ww);
+        dd.pack();
+        dd.setLocationRelativeTo(this);
+        dd.setVisible(true);
+
+        // JOptionPane.OK_OPTION
+        if (dd.isConfirm) {
+
+            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+            confirmaftecreatetransaction();
+        }
+        // ENABLE
+        this.jButton_ok.setEnabled(true);
+    }
 
 
     private void initComponents(String message) {

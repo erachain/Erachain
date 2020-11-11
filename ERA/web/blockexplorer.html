@@ -986,11 +986,12 @@ button.white-bgc[disabled]:focus,
                 output += '</h4>';
             }
 
-            output += ' ' + data.asset.label_AssetType + ': <b>' + data.asset.this.assetType + ' (' + data.asset.this.assetTypeChar + ')</b>';
+            output += data.asset.label_AssetType + ': <b>(' + data.asset.this.assetTypeChar + ') ' + data.asset.this.assetTypeFull + '</b><br>';
+            output += data.asset.label_AssetType_Desc + ': <b>' + data.asset.this.assetTypeDesc + '</b><br>';
 
-            output += ' , ' + data.asset.label_Quantity + ': <b>' + addCommas(data.asset.this.quantity) + '</b>';
-            output += ' , ' + data.asset.label_Scale + ': <b>' + data.asset.this.scale + '</b>';
-            output += ' , ' + data.asset.label_Released + ': <b>' + addCommas(data.asset.this.released) + '</b>';
+            output += data.asset.label_Quantity + ': <b>' + addCommas(data.asset.this.quantity) + '</b>';
+            output += ', ' + data.asset.label_Scale + ': <b>' + data.asset.this.scale + '</b>';
+            output += ', ' + data.asset.label_Released + ': <b>' + addCommas(data.asset.this.released) + '</b>';
 
             if (data.asset.this.key != 0) {
                 assetUrl = '&asset=' + data.asset.this.key;
@@ -2108,9 +2109,8 @@ button.white-bgc[disabled]:focus,
             output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
                 'class="tiny table table-striped" style="border: 1px solid #ddd;"><tr>';
             output += '<td><b>' + data.label_table_asset_key + ': <b>' + data.label_table_asset_name +
-                '<td><b>' + data.label_table_asset_description + '<td><b>' + data.label_table_asset_owner;
-            output += '<td><b>' + data.label_table_asset_orders + '<td><b>' +
-                data.label_table_asset_type + '<td><b>' + data.label_table_asset_amount
+                '<td><b>' + data.label_table_asset_type + '<td><b>' + data.label_table_asset_owner;
+            output += '<td><b>' + data.label_table_asset_orders + '<td><b>' + data.label_table_asset_amount
                  + '<td><b>' + data.label_table_asset_scale;
 
             //Отображение таблицы элементов активов
@@ -2126,7 +2126,8 @@ button.white-bgc[disabled]:focus,
 
                 output += escapeHtml(item.name);
                 output += '</a>';
-                output += '<td>' + escapeHtml(item.description.substr(0, 60));
+                output += '<td>' + item.assetTypeNameFull;
+                ////output += '<td>' + escapeHtml(item.description.substr(0, 60));
 
                 output += '<td><a href=?address=' + item.owner + get_lang() + '>';
                 if (item.hasOwnProperty('person'))
@@ -2136,7 +2137,6 @@ button.white-bgc[disabled]:focus,
                 output += '</a></td>';
 
                 output += '<td>' + item.orders;
-                output += '<td>' + item.assetTypeName;
                 output += '<td>' + item.quantity;
                 output += '<td>' + item.scale;
 

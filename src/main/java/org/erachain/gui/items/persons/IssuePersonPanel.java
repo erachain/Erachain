@@ -61,7 +61,7 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
     protected JDateChooser txtDeathday;
     protected JComboBox<String> comboBoxGender = new JComboBox<>();
     //protected JTextField textPersonNumber = new JTextField();
-    protected JTextField txtBirthLatitude = new JTextField();
+    protected JTextField txtBirthLatitude = new JTextField("0.0, 0.0");
     protected JTextField txtBirthLongitudeLatitude = new JTextField("0");
     protected JTextField txtSkinColor = new JTextField();
     protected JTextField txtEyeColor = new JTextField();

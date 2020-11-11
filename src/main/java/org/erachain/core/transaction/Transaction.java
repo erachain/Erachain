@@ -1720,7 +1720,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         ) {
             // break loop
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            invitedAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false);
+            invitedAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false, false);
             // учтем что получили бонусы
             invitedAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
 
@@ -1747,7 +1747,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             long fee_gift_get = fee_gift - fee_gift_next;
 
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, giftBG, false, false);
 
             // учтем что получили бонусы
             issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
@@ -1767,7 +1767,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             // GET REST of GIFT
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
             issuerAccount.changeBalance(this.dcSet, asOrphan, false, FEE_KEY,
-                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false, false);
 
             // учтем что получили бонусы
             issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
@@ -1793,7 +1793,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
             BlockChain.FEE_ASSET_EMITTER.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
-                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), true);
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false, true);
 
             return;
         }
@@ -1912,7 +1912,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         }
 
-        account.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, royaltyBG, false);
+        account.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, royaltyBG, false, false);
         // учтем что получили бонусы
         account.changeCOMPUBonusBalances(dcSet, asOrphan, royaltyBG, Transaction.BALANCE_SIDE_DEBIT);
 
@@ -1924,12 +1924,12 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         // учтем эмиссию
         BlockChain.FEE_ASSET_EMITTER.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
-                royaltyBG, true);
+                royaltyBG, false, true);
 
         // учтем начисления для держателей долей
         BlockChain.FEE_ASSET_EMITTER.changeBalance(this.dcSet, !asOrphan, false, -FEE_KEY,
                 royaltyBG.multiply(BlockChain.ACTION_ROYALTY_TO_HOLD_ROYALTY_PERCENT).setScale(BlockChain.FEE_SCALE, RoundingMode.DOWN),
-                true);
+                false, true);
 
 
     }
@@ -1994,7 +1994,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, true, false, FEE_KEY, this.fee, true);
+                this.creator.changeBalance(this.dcSet, true, false, FEE_KEY, this.fee, false, true);
                 // учтем траты
                 this.creator.changeCOMPUBonusBalances(this.dcSet, true, this.fee, BALANCE_SIDE_CREDIT);
             }
@@ -2033,7 +2033,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (forDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, false, false, FEE_KEY, this.fee, true);
+                this.creator.changeBalance(this.dcSet, false, false, FEE_KEY, this.fee, false, true);
                 // учтем траты
                 this.creator.changeCOMPUBonusBalances(this.dcSet, false, this.fee, BALANCE_SIDE_CREDIT);
 

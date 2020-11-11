@@ -636,7 +636,7 @@ public class Order implements Comparable<Order> {
         // REVERT not completed AMOUNT
         BigDecimal left = this.getAmountHaveLeft();
         this.creator.changeBalance(this.dcSet, false,
-                false, this.haveAssetKey, left, false);
+                false, this.haveAssetKey, left, false, false);
         transaction.addCalculated(block, this.creator, this.haveAssetKey, left,
                 "Outprice " + (forTarget ? "close" : "ended") + " Order @" + transaction.viewDBRef(this.id));
 
@@ -688,7 +688,7 @@ public class Order implements Comparable<Order> {
 
         //REMOVE HAVE
         //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
-        this.creator.changeBalance(this.dcSet, true, false, this.haveAssetKey, this.amountHave, true);
+        this.creator.changeBalance(this.dcSet, true, false, this.haveAssetKey, this.amountHave, false, true);
 
         BigDecimal thisPriceReverse = calcPriceReverse();
 
@@ -985,7 +985,7 @@ public class Order implements Comparable<Order> {
                 }
 
                 //TRANSFER FUNDS
-                order.getCreator().changeBalance(this.dcSet, false, false, order.wantAssetKey, tradeAmountForWant, false);
+                order.getCreator().changeBalance(this.dcSet, false, false, order.wantAssetKey, tradeAmountForWant, false, false);
                 transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
                         "Trade Order @" + Transaction.viewDBRef(order.id));
 
@@ -1044,7 +1044,7 @@ public class Order implements Comparable<Order> {
 
         //TRANSFER FUNDS
         if (processedAmountFulfilledWant.signum() > 0) {
-            this.creator.changeBalance(this.dcSet, false, false, this.wantAssetKey, processedAmountFulfilledWant, false);
+            this.creator.changeBalance(this.dcSet, false, false, this.wantAssetKey, processedAmountFulfilledWant, false, false);
             transaction.addCalculated(block, this.creator, this.wantAssetKey, processedAmountFulfilledWant,
                     "Resolve Order @" + Transaction.viewDBRef(this.id));
         }
@@ -1095,7 +1095,7 @@ public class Order implements Comparable<Order> {
                 target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
                 thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
-                target.getCreator().changeBalance(this.dcSet, true, false, target.wantAssetKey, tradeAmountWant, false);
+                target.getCreator().changeBalance(this.dcSet, true, false, target.wantAssetKey, tradeAmountWant, false, false);
 
                 // Учтем что у стороны ордера обновилась форжинговая информация
                 if (target.wantAssetKey == Transaction.RIGHTS_KEY && block != null) {
@@ -1131,9 +1131,9 @@ public class Order implements Comparable<Order> {
         //REMOVE HAVE
         // GET HAVE LEFT - if it CANCELWED by INCREMENT close
         //   - если обработка остановлена по достижению порога Инкремента
-        this.creator.changeBalance(this.dcSet, false, false, this.haveAssetKey, this.getAmountHaveLeft(), true);
+        this.creator.changeBalance(this.dcSet, false, false, this.haveAssetKey, this.getAmountHaveLeft(), false, true);
         //REVERT WANT
-        this.creator.changeBalance(this.dcSet, true, false, this.wantAssetKey, thisAmountFulfilledWant, false);
+        this.creator.changeBalance(this.dcSet, true, false, this.wantAssetKey, thisAmountFulfilledWant, false, false);
     }
 
     @Override
