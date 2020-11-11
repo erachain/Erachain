@@ -1211,7 +1211,7 @@ public abstract class AssetCls extends ItemCls {
         List<String> list = new ArrayList<>();
 
         String actionStr;
-        for (int action = TransactionAmount.ACTION_SEND; action <= TransactionAmount.ACTION_PLEDGE; action++) {
+        for (int action = TransactionAmount.ACTION_SEND; action < TransactionAmount.ACTION_PLEDGE; action++) {
             actionStr = viewAssetTypeAction(assetType, false, action, true);
             if (actionStr != null && !list.contains(actionStr))
                 list.add(actionStr);
