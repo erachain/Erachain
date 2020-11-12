@@ -443,7 +443,7 @@ public class DealsPopupMenu extends JPopupMenu {
         // ALL OUTSIDE ASSETS
         if (asset.isOutsideType()) {
 
-            this.debtAssetReturn.setEnabled(false);
+            this.debtAssetReturn.setVisible(false);
 
             if (pubKey.equals(asset.getOwner())) {
                 this.holdAsset.setEnabled(false);
@@ -465,24 +465,26 @@ public class DealsPopupMenu extends JPopupMenu {
                         this.debtAsset.setEnabled(false);
                     }
                 }
-
             }
         }
 
         if (isSelfManaged) {
+
+            this.debtAssetReturn.setVisible(false);
+
             if (isCreatorOwner) {
                 this.sendAssetBackward.setVisible(true);
+                this.debtAsset.setVisible(true);
                 this.holdAssetBackward.setVisible(true);
                 this.spendAssetBackward.setVisible(true);
             } else {
                 this.sendAsset.setEnabled(false);
-                this.holdAsset.setEnabled(false);
                 this.debtAsset.setEnabled(false);
-                this.debtAssetReturn.setEnabled(false);
-                this.debtAssetBackward.setEnabled(false);
+                this.holdAsset.setEnabled(false);
                 this.spendAsset.setEnabled(false);
 
                 this.sendAssetBackward.setVisible(false);
+                this.debtAssetBackward.setVisible(false);
                 this.holdAssetBackward.setVisible(false);
                 this.spendAssetBackward.setVisible(false);
             }
