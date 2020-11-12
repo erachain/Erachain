@@ -86,6 +86,7 @@
 	"AS_SELF_MANAGED_4": "Accrue waste",
 	"AS_SELF_MANAGED_4B": "to Write off expenditure (reversal)",
 	"AS_MY_DEBT_D": "My debt to others is as their claim to me.\nThe creditor can assign this claim to a third party, demand repayment of the debt, and confirm the repayment of my debt. I am obligated to it till the claim is not repaid",
+	"AS_MY_DEBT_Issue": "",
 	"AS_MY_DEBT_1": "Assign the loan",
 	"AS_MY_DEBT_1B": "Confirm your debt",
 	"AS_MY_DEBT_2": "Request loan execution",

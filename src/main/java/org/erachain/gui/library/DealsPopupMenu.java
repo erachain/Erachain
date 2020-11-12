@@ -486,10 +486,6 @@ public class DealsPopupMenu extends JPopupMenu {
                 this.holdAssetBackward.setVisible(false);
                 this.spendAssetBackward.setVisible(false);
             }
-        } else {
-            this.sendAssetBackward.setVisible(false);
-            this.holdAssetBackward.setVisible(false);
-            this.spendAssetBackward.setVisible(false);
         }
 
     }

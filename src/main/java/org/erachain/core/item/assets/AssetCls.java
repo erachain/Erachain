@@ -955,15 +955,13 @@ public abstract class AssetCls extends ItemCls {
                         return backward ? null // для формирования списка действия надо выдать НУЛЬ
                                 : isCreatorOwner ? "AS_OUTSIDE_CURRENCY_Issue" : "AS_OUTSIDE_CURRENCY_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ?
-                                isCreatorOwner ? null
-                                        : "AS_OUTSIDE_CURRENCY_2B" // Отозвать требование об исполнении денежного требования
-                                : isCreatorOwner ? null
+                        return isCreatorOwner ? null
+                                : backward ? "AS_OUTSIDE_CURRENCY_2B" // Отозвать требование об исполнении денежного требования
                                 : "AS_OUTSIDE_CURRENCY_2"; // Потребовать исполнения денежного требования
                     case TransactionAmount.ACTION_SPEND:
                         return backward ? null
-                                : isCreatorOwner ? "AS_OUTSIDE_CURRENCY_4"
-                                : null; // Подтвердить исполнение денежного требования
+                                : isCreatorOwner ? null
+                                : "AS_OUTSIDE_CURRENCY_4"; // Подтвердить исполнение денежного требования
                     default:
                         return null;
                 }
@@ -1033,7 +1031,8 @@ public abstract class AssetCls extends ItemCls {
             case AS_MY_DEBT:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return isCreatorOwner ? "AS_MY_DEBT_1B" : "AS_MY_DEBT_1";
+                        return backward ? null
+                                : isCreatorOwner ? "AS_MY_DEBT_Issue" : "AS_MY_DEBT_1";
                     case TransactionAmount.ACTION_DEBT:
                         return isCreatorOwner ? null // эмитент долга не может делать требования
                                 : backward ? "AS_MY_DEBT_2B"
