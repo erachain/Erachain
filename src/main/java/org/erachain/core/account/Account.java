@@ -922,7 +922,7 @@ public class Account {
                     balance.d, balance.e);
         } else if (actionType == TransactionAmount.ACTION_SPEND) {
 
-            if (isDirect) amount = amount.negate(); // перевернем если там это НА РУКИ
+            ////if (isDirect) amount = amount.negate(); // перевернем если там это НА РУКИ
 
             Tuple2<BigDecimal, BigDecimal> ownBalance = balance.a;
 
