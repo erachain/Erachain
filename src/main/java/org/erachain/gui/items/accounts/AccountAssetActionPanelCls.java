@@ -65,7 +65,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     public AssetCls asset;
 
-    public String title;
+    //public String title;
 
     public long key;
 
@@ -106,8 +106,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         }
 
         if (panelName == null) {
-            this.panelName = Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition,
-                    accountFrom != null && accountFrom.equals(asset.getOwner())) + " [" + asset.getKey() + " ]");
+            this.panelName = title + " [" + asset.getKey() + " ]";
             setName(this.panelName);
         }
 
@@ -123,7 +122,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         initComponents(message);
 
-        this.jLabel_Title.setText(Lang.getInstance().translate(this.title).replace("%asset%", asset.viewName()));
+        this.jLabel_Title.setText(Lang.getInstance().translate(this.title) + " - " + asset.viewName());
 
         // icon.setIcon(null);
         this.jLabel_Account.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, balancePosition,
@@ -240,21 +239,16 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                         jComboBox_Account.repaint();
                     }
 
-                    String titleLocal = Lang.getInstance().translate(AccountAssetActionPanelCls.this.title);
-                    jLabel_Title.setText((titleLocal == null ? AccountAssetActionPanelCls.this.title : titleLocal).replace("%asset%", asset.viewName()));
+                    String title = Lang.getInstance().translate(asset.viewAssetTypeActionTitle(backward, balancePosition,
+                            accountFrom != null && accountFrom.equals(asset.getOwner())));
+                    jLabel_Title.setText(title + " - " + asset.viewName());
 
-                    if (panelName == null) {
-                        setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, balancePosition,
-                                sender != null && sender.equals(asset.getOwner())) + " ]" + asset.getKey() + " ]"));
-                    } else {
-                        setName(Lang.getInstance().translate(panelName));
-                    }
+                    setName(title + " ]" + asset.getKey() + " ]");
+                    jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition, false)));
 
                     // set scale
-                    int scale = 8;
-                    if (asset != null) scale = asset.getScale();
+                    int scale = asset.getScale();
                     jTextField_Amount.setScale(scale);
-                    // jTextArea_Account_Description.setText(asset.getDescription());
                     jScrollPane2.setViewportView(new AssetInfo(asset, false));
 
                     if (sender != null)

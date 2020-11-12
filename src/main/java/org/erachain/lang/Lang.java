@@ -92,7 +92,7 @@ public class Lang {
 
     public String translate(String message) {
         //COMMENT AFTER # FOR TRANSLATE THAT WOULD BE THE SAME TEXT IN DIFFERENT WAYS TO TRANSLATE
-        String messageWithoutComment = message.replaceFirst("(?<!\\\\)#.*$", "");
+        String messageWithoutComment = message.replaceFirst("(?<!\\\\)#.*$", "").trim();
         messageWithoutComment = messageWithoutComment.replace("\\#", "#");
 
         if (langObj == null) {

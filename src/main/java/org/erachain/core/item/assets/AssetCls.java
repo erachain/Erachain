@@ -1243,28 +1243,28 @@ public abstract class AssetCls extends ItemCls {
             case AS_BANK_GUARANTEE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Передача банковской гарантии - %asset%";
+                        return "Передача банковской гарантии";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отзыв банковской гарантии - %asset%" : "Выдача банковской гарантии - %asset%";
+                        return backward ? "Отзыв банковской гарантии" : "Выдача банковской гарантии";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Возврат банковской гарантии - %asset%";
+                        return "Возврат банковской гарантии";
                     case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Акцептование банковской гарантии - %asset%" : null;
+                        return backward ? "Акцептование банковской гарантии" : null;
                     case TransactionAmount.ACTION_SPEND:
-                        return "Погашение банковской гарантии - %asset%";
+                        return "Погашение банковской гарантии";
                 }
             case AS_BANK_GUARANTEE_TOTAL:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Передача учетной банковской гарантии - %asset%";
+                        return "Передача учетной банковской гарантии";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отзыв учетной банковской гарантии - %asset%" : "Выдача учетной банковской гарантии - %asset%";
+                        return backward ? "Отзыв учетной банковской гарантии" : "Выдача учетной банковской гарантии";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Возврат учетной банковской гарантии - %asset%";
+                        return "Возврат учетной банковской гарантии";
                     case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Акцептование учетной банковской гарантии - %asset%" : null;
+                        return backward ? "Акцептование учетной банковской гарантии" : null;
                     case TransactionAmount.ACTION_SPEND:
-                        return "Погашение учетной банковской гарантии - %asset%";
+                        return "Погашение учетной банковской гарантии";
                 }
             case AS_OUTSIDE_IMMOVABLE:
             case AS_OUTSIDE_CURRENCY:
@@ -1285,7 +1285,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_ACCOUNTING:
         }
 
-        return viewAssetTypeAction(backward, actionType, isCreatorOwner) + " - %asset%";
+        return viewAssetTypeAction(backward, actionType, isCreatorOwner);
     }
 
     public String viewAssetTypeCreator(boolean backward, int actionType, boolean isCreatorOwner) {
