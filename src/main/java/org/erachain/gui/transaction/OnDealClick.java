@@ -80,9 +80,6 @@ public class OnDealClick {
             case Transaction.NO_DEBT_BALANCE:
                 mess = "No debt balance";
                 break;
-            case Transaction.NO_INCLAIM_BALANCE:
-                mess = "No in claims balance";
-                break;
             case Transaction.INVALID_BACKWARD_ACTION:
                 mess = "Invalid backward action";
                 break;
@@ -253,14 +250,17 @@ public class OnDealClick {
                 mess = "Transaction does not exist";
                 break;
 
+            case Transaction.NO_INCLAIM_BALANCE:
+                mess = "No in claims balance";
+                break;
             case Transaction.INVALID_CLAIM_RECIPIENT:
-                mess = "Invalid: claim recipient can not be the CLAIM issuer";
+                mess = "Invalid claim Recipient: can not be the CLAIM Issuer";
                 break;
             case Transaction.INVALID_CLAIM_DEBT_RECIPIENT:
-                mess = "Invalid DEBT Recipient: claim DEBT may be only the CLAIM to issuer";
+                mess = "Invalid claim Recipient: claim may be only the to it Issuer";
                 break;
             case Transaction.INVALID_CLAIM_DEBT_CREATOR:
-                mess = "Invalid DEBT Creator: claim DEBT may be only the CLAIM to issuer";
+                mess = "Invalid claim Creator: claim may be only to it Issuer";
                 break;
 
             case Transaction.INVALID_QUANTITY:
