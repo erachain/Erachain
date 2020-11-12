@@ -792,6 +792,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             // HOLD GOODS, CHECK myself DEBT for CLAIMS
                             case AssetCls.AS_INSIDE_OTHER_CLAIM:
                                 break;
+                            case AssetCls.AS_ACCOUNTING:
+                                if (absKey >= 1000 && !creator.equals(asset.getOwner())) {
+                                    return INVALID_CREATOR;
+                                }
                         }
 
                         boolean unLimited;
@@ -819,7 +823,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     // asset - for RECIPIENT !
                                     unLimited = asset.isUnlimited(this.recipient, false);
 
-                                    if (!unLimited) {
+                                    if (!unLimited && (flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0) {
                                         balance = this.recipient.getBalance(dcSet, absKey, actionType).b;
                                         ////BigDecimal amountOWN = this.recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
                                         // amontOWN, balance and amount - is

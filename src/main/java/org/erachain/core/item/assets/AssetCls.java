@@ -606,6 +606,15 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType == AS_INSIDE_OTHER_CLAIM;
     }
 
+    /**
+     * Их нельзя вернуть из долга самостоятельно
+     *
+     * @return
+     */
+    public boolean isNotReDepted() {
+        return isOutsideType();
+    }
+
     public boolean isOutsideType() {
         return // ?? this.assetType == AS_OUTSIDE_GOODS ||
                 this.assetType >= AS_OUTSIDE_CURRENCY
