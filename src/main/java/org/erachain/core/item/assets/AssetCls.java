@@ -886,7 +886,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_IMMOVABLE:
                 return lang.translate("Real estate and other goods and things not subject to delivery. Such things can be taken and given for rent and handed over to the guard");
             case AS_OUTSIDE_CURRENCY:
-                return lang.translate("External money that must be transferred to an external bank account or transferred in cash. The amount on your account shows the right to demand the issuer to transfer such amount of money to your bank account. In order to satisfy the demand it is necessary to set it up for the payment, and after the money has arrived into your account confirm the repayment of this demand. You can also save them for storage, for example, the total amount collected for the ICO to be distributed to the hands of different holders - they must confirm receipt of these mid-transaction \"confirm acceptance in hand\"");
+                return lang.translate("");
             case AS_OUTSIDE_WORK_TIME_HOURS:
                 return lang.translate("Рабочее время в часах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие часы можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в часах рабочего времени");
             case AS_OUTSIDE_WORK_TIME_MINUTES:
