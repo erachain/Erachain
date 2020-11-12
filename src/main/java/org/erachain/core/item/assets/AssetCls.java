@@ -886,7 +886,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_IMMOVABLE:
                 return lang.translate("Real estate and other goods and things not subject to delivery. Such things can be taken and given for rent and handed over to the guard");
             case AS_OUTSIDE_CURRENCY:
-                return lang.translate("");
+                return lang.translate("AS_OUTSIDE_CURRENCY_D");
             case AS_OUTSIDE_WORK_TIME_HOURS:
                 return lang.translate("Рабочее время в часах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие часы можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в часах рабочего времени");
             case AS_OUTSIDE_WORK_TIME_MINUTES:
@@ -952,12 +952,18 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_CURRENCY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Transfer to the ownership of the monetary claim"; // Передать в собственность денежное требование
+                        return backward ? null // для формирования списка действия надо выдать НУЛЬ
+                                : isCreatorOwner ? "AS_OUTSIDE_CURRENCY_Issue" : "AS_OUTSIDE_CURRENCY_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Withdraw a request to fulfill a monetary claim" // Отозвать требование об исполнении денежного требования
-                                : "Demand execution of a monetary claim"; // Потребовать исполнения денежного требования
+                        return backward ?
+                                isCreatorOwner ? null
+                                        : "AS_OUTSIDE_CURRENCY_2B" // Отозвать требование об исполнении денежного требования
+                                : isCreatorOwner ? null
+                                : "AS_OUTSIDE_CURRENCY_2"; // Потребовать исполнения денежного требования
                     case TransactionAmount.ACTION_SPEND:
-                        return "Confirm the execution of the monetary claim"; // Подтвердить исполнение денежного требования
+                        return backward ? null
+                                : isCreatorOwner ? "AS_OUTSIDE_CURRENCY_4"
+                                : null; // Подтвердить исполнение денежного требования
                     default:
                         return null;
                 }
