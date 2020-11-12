@@ -303,18 +303,27 @@ public class DealsPopupMenu extends JPopupMenu {
         boolean isSelfManaged = asset.isSelfManaged();
         boolean isUnlimited = isSelfManaged || asset.isUnlimited(pubKey, false);
 
-        this.sendAsset.setEnabled(true);
-        this.holdAsset.setEnabled(true);
-        this.debtAsset.setEnabled(true);
-        this.debtAssetReturn.setEnabled(true);
-        this.debtAssetBackward.setEnabled(true);
-        this.spendAsset.setEnabled(true);
+        //this.sendAsset.setEnabled(true);
+        //this.holdAsset.setEnabled(true);
+        //this.debtAsset.setEnabled(true);
+        //this.debtAssetReturn.setEnabled(true);
+        //this.debtAssetBackward.setEnabled(true);
+        //this.spendAsset.setEnabled(true);
 
+        /// MAIL
         this.sendMail.setText(Lang.getInstance().translate("Send Mail"));
-
         String actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SEND, isCreatorOwner);
         if (actionName == null) {
             this.sendAsset.setVisible(false);
+        } else {
+            this.sendAsset.setText(Lang.getInstance().translate(actionName));
+            this.sendAsset.setVisible(true);
+        }
+
+        /// **** SEND
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SEND, isCreatorOwner);
+        if (actionName == null) {
+            this.sendAssetBackward.setVisible(false);
         } else {
             this.sendAsset.setText(Lang.getInstance().translate(actionName));
             this.sendAsset.setVisible(true);
@@ -328,22 +337,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.sendAssetBackward.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_HOLD, isCreatorOwner);
-        if (actionName == null) {
-            this.holdAsset.setVisible(false);
-        } else {
-            this.holdAsset.setText(Lang.getInstance().translate(actionName));
-            this.holdAsset.setVisible(true);
-        }
-
-        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_HOLD, isCreatorOwner);
-        if (actionName == null) {
-            this.holdAssetBackward.setVisible(false);
-        } else {
-            this.holdAssetBackward.setText(Lang.getInstance().translate(actionName));
-            this.holdAssetBackward.setVisible(true);
-        }
-
+        /// **** DEBT
         actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_DEBT, isCreatorOwner);
         if (actionName == null) {
             this.debtAsset.setVisible(false);
@@ -366,6 +360,32 @@ public class DealsPopupMenu extends JPopupMenu {
         } else {
             this.debtAssetBackward.setText(Lang.getInstance().translate(actionName));
             this.debtAssetBackward.setVisible(true);
+        }
+
+        //// **** HOLD
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_HOLD, isCreatorOwner);
+        if (actionName == null) {
+            this.holdAsset.setVisible(false);
+        } else {
+            this.holdAsset.setText(Lang.getInstance().translate(actionName));
+            this.holdAsset.setVisible(true);
+        }
+
+        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_HOLD, isCreatorOwner);
+        if (actionName == null) {
+            this.holdAssetBackward.setVisible(false);
+        } else {
+            this.holdAssetBackward.setText(Lang.getInstance().translate(actionName));
+            this.holdAssetBackward.setVisible(true);
+        }
+
+        //// **** SPEND
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SPEND, isCreatorOwner);
+        if (actionName == null) {
+            this.spendAsset.setVisible(false);
+        } else {
+            this.spendAsset.setText(Lang.getInstance().translate(actionName));
+            this.spendAsset.setVisible(true);
         }
 
         actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SPEND, isCreatorOwner);

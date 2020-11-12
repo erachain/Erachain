@@ -1198,17 +1198,16 @@ public abstract class AssetCls extends ItemCls {
 
         switch (actionType) {
             case TransactionAmount.ACTION_SEND:
-                return "Transfer to the ownership";
+                return backward ? null : "Transfer to the ownership";
             case TransactionAmount.ACTION_DEBT:
                 return backward ? "To confiscate a debt"
                         : "Transfer to debt";
             case TransactionAmount.ACTION_REPAY_DEBT:
                 return "Return debt";
             case TransactionAmount.ACTION_HOLD:
-                return "Confirm acceptance \"in hand\"";
+                return backward ? "Confirm acceptance \"in hand\"" : null;
             case TransactionAmount.ACTION_SPEND:
-                return backward ? "Produce"
-                        : "Spend";
+                return backward ? null : "Spend";
             case TransactionAmount.ACTION_PLEDGE:
                 return backward ? "Re-pledge"
                         : "Pledge";
@@ -1358,18 +1357,18 @@ public abstract class AssetCls extends ItemCls {
 
         switch (actionType) {
             case TransactionAmount.ACTION_SEND:
-                return "Giver";
+                return backward ? null : "Sender";
             case TransactionAmount.ACTION_DEBT:
                 return "Creditor";
             case TransactionAmount.ACTION_REPAY_DEBT:
                 return "Debtor";
             case TransactionAmount.ACTION_HOLD:
-                return "Taker";
+                return backward ? "Taker" : null;
             case TransactionAmount.ACTION_SPEND:
-                return "Spender";
+                return backward ? null : "Spender";
         }
 
-        return "unknown";
+        return null;
     }
 
     public String viewAssetTypeTarget(boolean backward, int actionType, boolean isRecipientOwner) {
