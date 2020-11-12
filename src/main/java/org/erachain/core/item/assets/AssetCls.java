@@ -1343,6 +1343,15 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL:
             case AS_OUTSIDE_BILL_EX:
             case AS_OUTSIDE_OTHER_CLAIM:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return isCreatorOwner ? "Issuer" : "Sender";
+                    case TransactionAmount.ACTION_DEBT:
+                    case TransactionAmount.ACTION_SPEND:
+                        return isCreatorOwner ? null : "Issuer";
+                    default:
+                        return null;
+                }
             case AS_INSIDE_ASSETS:
             case AS_INSIDE_CURRENCY:
             case AS_INSIDE_UTILITY:
@@ -1422,6 +1431,15 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL:
             case AS_OUTSIDE_BILL_EX:
             case AS_OUTSIDE_OTHER_CLAIM:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return isRecipientOwner ? "Issuer" : "Recipient";
+                    case TransactionAmount.ACTION_DEBT:
+                    case TransactionAmount.ACTION_SPEND:
+                        return isRecipientOwner ? "Issuer" : null;
+                    default:
+                        return null;
+                }
             case AS_INSIDE_ASSETS:
             case AS_INSIDE_CURRENCY:
             case AS_INSIDE_UTILITY:
