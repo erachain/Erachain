@@ -861,7 +861,7 @@ public class Account {
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, boolean isBackward, long key,
-                                                                    BigDecimal amount_in, boolean isDirect, boolean notUpdateIncomed) {
+                                                                    BigDecimal amount_in, boolean isDirect, boolean isNotSender, boolean notUpdateIncomed) {
 
         int actionType = balancePosition(key, amount_in, isBackward, isDirect);
 
@@ -911,8 +911,6 @@ public class Account {
         } else if (actionType == TransactionAmount.ACTION_HOLD) {
             // HOLD + STOCK 🕐 🕝
 
-            ///if (isDirect) amount = amount.negate(); // перевернем если там это НА РУКИ
-
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a, balance.b,
                     substract ? new Tuple2<BigDecimal, BigDecimal>(
@@ -922,14 +920,15 @@ public class Account {
                     balance.d, balance.e);
         } else if (actionType == TransactionAmount.ACTION_SPEND) {
 
-            ////if (isDirect) amount = amount.negate(); // перевернем если там это НА РУКИ
-
             Tuple2<BigDecimal, BigDecimal> ownBalance = balance.a;
 
-            if (isBackward) {
-                ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.add(amount));
-            } else {
-                ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.subtract(amount));
+            if (!isNotSender) {
+                // у создателя транзакции так же баланс ИМЕЮ уменьшаем - просто вычитаем - для учета вывода из оборота
+                if (isBackward) {
+                    ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.add(amount));
+                } else {
+                    ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.subtract(amount));
+                }
             }
 
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(

@@ -336,9 +336,9 @@ public class Trade {
 
         //TRANSFER FUNDS
         //initiator.getCreator().setBalance(initiator.getWantAssetKey(), initiator.getCreator().getBalance(db, initiator.getWantAssetKey()).add(this.amountHave), db);
-        initiator.getCreator().changeBalance(db, false, false, initiator.getWantAssetKey(), this.amountHave, false, false);
+        initiator.getCreator().changeBalance(db, false, false, initiator.getWantAssetKey(), this.amountHave, false, false, false);
         //target.getCreator().setBalance(target.getWantAssetKey(), target.getCreator().getBalance(db, target.getWantAssetKey()).add(this.amountWant), db);
-        target.getCreator().changeBalance(db, false, false, target.getWantAssetKey(), this.amountWant, false, false);
+        target.getCreator().changeBalance(db, false, false, target.getWantAssetKey(), this.amountWant, false, false, false);
     }
 
     public void orphan_old(DCSet db) {
@@ -347,9 +347,9 @@ public class Trade {
 
         //REVERSE FUNDS
         //initiator.getCreator().setBalance(initiator.getWantAssetKey(), initiator.getCreator().getBalance(db, initiator.getWantAssetKey()).subtract(this.amountHave), db);
-        initiator.getCreator().changeBalance(db, true, false, initiator.getWantAssetKey(), this.amountHave, false, false);
+        initiator.getCreator().changeBalance(db, true, false, initiator.getWantAssetKey(), this.amountHave, false, false, false);
         //target.getCreator().setBalance(target.getWantAssetKey(), target.getCreator().getBalance(db, target.getWantAssetKey()).subtract(this.amountWant), db);
-        target.getCreator().changeBalance(db, true, false, target.getWantAssetKey(), this.amountWant, false, false);
+        target.getCreator().changeBalance(db, true, false, target.getWantAssetKey(), this.amountWant, false, false, false);
 
         //CHECK IF ORDER IS FULFILLED
         if (initiator.isFulfilled()) {
