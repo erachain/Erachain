@@ -164,7 +164,10 @@ public class RSignNote extends Transaction implements Itemable {
             listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, creatorPersonDuration.a});
         }
 
-        if (key != 0) {
+        if (typeBytes[1] > 1 && extendedData != null && extendedData.getTemplateKey() != 0L) {
+            // если новый порядок - ключ в Данных
+            listTags.add(new Object[]{ItemCls.TEMPLATE_TYPE, extendedData.getTemplateKey()});
+        } else if (key != 0L) {
             listTags.add(new Object[]{ItemCls.TEMPLATE_TYPE, key});
         }
 
@@ -269,6 +272,10 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public long getKey() {
+        if (typeBytes[1] > 1) {
+            // если новый порядок - ключ в Данных
+            return extendedData.getTemplateKey();
+        }
         return this.key;
     }
 
@@ -777,6 +784,7 @@ public class RSignNote extends Transaction implements Itemable {
                 Long error = null;
                 error++;
             }
+
             extendedData.resolveValues(dcSet);
             exLink = extendedData.getExLink();
         }

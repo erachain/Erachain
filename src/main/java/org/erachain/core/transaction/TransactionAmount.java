@@ -439,10 +439,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     public String viewActionType() {
+        if (asset == null)
+            return "mail";
         return viewActionType(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
     }
 
     public String viewActionTypeWas() {
+        if (asset == null)
+            return "mail";
         return viewActionTypeWas(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
     }
 
