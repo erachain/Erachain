@@ -267,14 +267,16 @@ public class WalletUpdater extends MonitoredThread {
                     synchronizeMode = null;
                 }
 
-            } catch (OutOfMemoryError e) {
-                LOGGER.error(e.getMessage(), e);
-                controller.stopAll(686);
-                return;
             } catch (IllegalMonitorStateException e) {
                 break;
             } catch (InterruptedException e) {
                 break;
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            } catch (OutOfMemoryError e) {
+                LOGGER.error(e.getMessage(), e);
+                controller.stopAll(686);
+                return;
             }
 
         }
