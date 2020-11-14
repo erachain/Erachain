@@ -252,7 +252,9 @@ public class ExData {
                     template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, templateKey);
                 }
 
-                if (template != null) {
+                if (template == null) {
+                    valuedText = "ERROR: template [" + templateKey + "] not found!";
+                } else {
                     valuedText = template.viewDescription();
 
                     if (json.containsKey("PR")) {
@@ -275,7 +277,10 @@ public class ExData {
                     if (templateKey != 0) {
                         template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, templateKey);
                     }
-                    if (template != null) {
+
+                    if (template == null) {
+                        valuedText = "ERROR: template [" + templateKey + "] not found!";
+                    } else {
                         valuedText = template.viewDescription();
 
                         if (json.containsKey("Statement_Params")) {
