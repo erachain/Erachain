@@ -181,7 +181,8 @@ public class TelegramSplitPanel extends SplitPanel {
                     rightTelegramPanel.jLabelRecipient.setText("");
                     return;
                 }
-                String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())), accountModel.COLUMN_ADDRESS);
+                String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(
+                        tableFavoriteAccounts.getSelectedRow())), accountModel.COLUMN_ADDRESS);
                 rightTelegramPanel.jLabelRecipient.setText(account);
                 rightTelegramPanel.walletTelegramsFilterTableModel.setReceiver(account);
                 // set settings
@@ -208,7 +209,8 @@ public class TelegramSplitPanel extends SplitPanel {
             rightTelegramPanel.jPanelBottom.setVisible(true);
             leftTelegram.jButtonAddAccount.setVisible(true);
             if (tableFavoriteAccounts.getSelectedRow() >= 0) {
-                String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(tableFavoriteAccounts.getSelectedRow())), accountModel.COLUMN_ADDRESS);
+                String account = (String) accountModel.getValueAt((tableFavoriteAccounts.convertRowIndexToModel(
+                        tableFavoriteAccounts.getSelectedRow())), accountModel.COLUMN_ADDRESS);
                 rightTelegramPanel.jLabelRecipient.setText(account);
                 rightTelegramPanel.walletTelegramsFilterTableModel.setReceiver(account);
             } else {
@@ -340,7 +342,7 @@ public class TelegramSplitPanel extends SplitPanel {
                 Account accountTo = FavoriteAccountsMap.detPublicKeyOrAccount(item.a, item.b);
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"),
                         new AccountAssetSendPanel(null,
-                                null, accountTo, null, null));
+                                null, accountTo, null, null, false));
 
 
             }

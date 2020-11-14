@@ -728,7 +728,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
 
                 }
 
-                String actionName = TransactionAmount.viewActionType(assetKey, amount, backward);
+                String actionName = TransactionAmount.viewActionType(assetKey, amount, backward, false);
                 amountStr = "<b><font size='3'>" + actionName + " "
                         //+ Lang.getInstance().translate("Amount") + ": "
                         + NumberAsString.formatAsString(this.amount) + "</font> "

@@ -37,7 +37,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
-                        null, null, (PersonCls) itemTableSelected, null));
+                        null, null, (PersonCls) itemTableSelected, null, false));
 
             }
         });

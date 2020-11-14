@@ -81,8 +81,8 @@ public class TestRecSend {
 
         // FEE FUND
         maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        maker.changeBalance(db, false, false, ERA_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, false, ERA_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
     }
 
@@ -691,7 +691,7 @@ public class TestRecSend {
 
         // NEGATE for test HOLD ///////////////////
         amount = amount.negate();
-        recipient.changeBalance(db, false, false, -ERA_KEY, amount.negate(), false);
+        recipient.changeBalance(db, false, false, -ERA_KEY, amount.negate(), false, false, false);
         /// MESSAGE + AMOUNT
         r_SendV3 = new RSend(
                 maker, exLink, FEE_POWER,
@@ -770,7 +770,7 @@ public class TestRecSend {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
         List<Payment> payments = new ArrayList<Payment>();
         payments.add(new Payment(recipient1, assetKeyTest, BigDecimal.valueOf(110).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
@@ -846,7 +846,7 @@ public class TestRecSend {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
         List<Payment> payments = new ArrayList<Payment>();
 

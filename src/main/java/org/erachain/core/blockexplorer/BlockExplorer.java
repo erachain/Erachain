@@ -953,9 +953,16 @@ public class BlockExplorer {
         assetJSON.put("operations", orders.size() + trades.size());
 
         assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
-        assetJSON.put("assetTypeChar", asset.charAssetType());
+        assetJSON.put("assetTypeChar", asset.charAssetType() + asset.viewAssetTypeAbbrev());
 
         assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
+        StringJoiner joiner = new StringJoiner(", ");
+        for (String action : asset.viewAssetTypeActionsList()) {
+            joiner.add(Lang.getInstance().translateFromLangObj(action, langObj));
+        }
+        assetJSON.put("assetTypeDesc", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeDescriptionCls(asset.getAssetType()), langObj)
+                + ".\n" + Lang.getInstance().translateFromLangObj("Acceptable actions", langObj) + ":\n" + joiner.toString()
+        );
 
         output.put("this", assetJSON);
 
@@ -1028,7 +1035,8 @@ public class BlockExplorer {
         output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
         output.put("label_Description", Lang.getInstance().translateFromLangObj("Description", langObj));
         output.put("label_Scale", Lang.getInstance().translateFromLangObj("Accuracy", langObj));
-        output.put("label_AssetType", Lang.getInstance().translateFromLangObj("TYPE", langObj));
+        output.put("label_AssetType", Lang.getInstance().translateFromLangObj("Type # вид", langObj));
+        output.put("label_AssetType_Desc", Lang.getInstance().translateFromLangObj("Type Description", langObj));
         output.put("label_Quantity", Lang.getInstance().translateFromLangObj("Quantity", langObj));
         output.put("label_Released", Lang.getInstance().translateFromLangObj("Released", langObj));
         output.put("label_Holders", Lang.getInstance().translateFromLangObj("Holders", langObj));
