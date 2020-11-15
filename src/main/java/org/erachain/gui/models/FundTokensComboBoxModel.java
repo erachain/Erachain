@@ -38,7 +38,7 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
             }
 
             if (deposit) {
-                this.addElement(Controller.getInstance().getAsset(1L));
+                //this.addElement(Controller.getInstance().getAsset(1L));
             } else {
             }
             //this.addElement(Controller.getInstance().getAsset(14)); // ETH

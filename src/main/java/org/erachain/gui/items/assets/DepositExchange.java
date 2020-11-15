@@ -96,6 +96,10 @@ public class DepositExchange extends IconPanel {
             case 95:
                 urlGetDetails += "3/13/" + jTextField_Address.getText() + "/0.1"; // BTC -> eUSD
                 break;
+            case 1114:
+                urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
+                urlGetDetails += "7/15/" + jTextField_Address.getText() + "/10"; // ZEN -> eZEN
+                break;
             default:
                 urlGetDetails += "3/10/" + jTextField_Address.getText() + "/0.1"; // BTC -> COMPU
         }
@@ -170,6 +174,11 @@ public class DepositExchange extends IconPanel {
                                 + " " + Lang.getInstance().translate("by rate") + ": <b>" + rate + "</b>"
                                 + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> " + outcomeAssetName;
                         break;
+                    case 1114:
+                        outcomeAssetName = incomeAssetName = "ZEN";
+                        help = Lang.getInstance().translate("Transfer <b>%1</B> to this address for deposit your account on Exchange")
+                                .replace("%1", incomeAssetName);
+                        break;
                     default:
                         help = Lang.getInstance().translate("Transfer <b>%1</B> to this address for deposit your account on Exchange")
                                 .replace("%1", incomeAssetName);
@@ -177,10 +186,11 @@ public class DepositExchange extends IconPanel {
 
                 if (jsonObject.containsKey("may_pay")) {
                     help += "<br>" + Lang.getInstance().translate("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
-                        + incomeName;
+                            + incomeName;
                 }
 
-                help += "<br>" + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0005");
+                help += "<br>" + Lang.getInstance().translate("Minimal payment in equivalent")
+                        + " <b>" + 0.0025 + " " + incomeName + "</b>" + "<br>";
 
                 jTextField_Details.setText(jsonObject.get("addr_in").toString());
                 jTextField_Details_Check.setText("<html>" + help + "</html>");
@@ -195,7 +205,7 @@ public class DepositExchange extends IconPanel {
         jButton_getDetails.setEnabled(true);
 
         jText_Help.setText("<html><h2>5. " + Lang.getInstance().translate(
-                "Transfer bitcoins to address below") + "</h2></html>");
+                "Transfer Assets to address below") + "</h2></html>");
         jButton_getDetails.setText(Lang.getInstance().translate("Get Payment Details"));
 
     }
@@ -204,7 +214,7 @@ public class DepositExchange extends IconPanel {
 
         AssetCls asset;
         if (asset_in == null) {
-            asset = Controller.getInstance().getAsset(2l);
+            asset = Controller.getInstance().getAsset(2L);
         } else {
             asset = asset_in;
         }
@@ -240,7 +250,7 @@ public class DepositExchange extends IconPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_Title, gridBagConstraints);
-        jText_Title.setText("<html><h1>" + Lang.getInstance().translate("Deposit of Bitcoins to the Exchange") + "</h1></html>");
+        jText_Title.setText("<html><h1>" + Lang.getInstance().translate("Deposit of Assets to the Exchange") + "</h1></html>");
 
         JLabel jText_Help = new JLabel();
 
@@ -364,6 +374,12 @@ public class DepositExchange extends IconPanel {
                                             " " + Lang.getInstance().translate("for buy") + " COMPU",
                                     detailsHead);
                             break;
+                        case 1114:
+                            jLabel_Details.setText(Lang.getInstance().translate("Address for deposit") + " ZEN" + ":");
+                            refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
+                                            " " + Lang.getInstance().translate("for deposit") + " ZEN",
+                                    detailsHead);
+                            break;
                         default:
                             jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for deposit") + ":");
                             refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
@@ -372,7 +388,7 @@ public class DepositExchange extends IconPanel {
                     }
 
                     jText_Help.setText("<html><h2>3. " + Lang.getInstance().translate(
-                            "Click the button '%1' and transfer the bitcoins to the received address")
+                            "Click the button '%1' and transfer the Assets to the received address")
                             .replace("%1", Lang.getInstance().translate("Get Payment Details")) + "</h2></html>");
 
                 }
@@ -425,7 +441,7 @@ public class DepositExchange extends IconPanel {
         gridBagConstraints.insets = new Insets(0, 27, 0, 0);
         add(jLabel_Details, gridBagConstraints);
         jLabel_Details.setHorizontalAlignment(JTextField.LEFT);
-        jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for deposit") + ":");
+        jLabel_Details.setText(Lang.getInstance().translate("Address for deposit") + ":");
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -535,6 +551,9 @@ public class DepositExchange extends IconPanel {
                     break;
                 case 95:
                     urlGetDetails += "@USD/"; // BTC -> eUSD
+                    break;
+                case 1114:
+                    urlGetDetails += "@ZEN/"; // ZEN -> eUSD
                     break;
                 default:
                     urlGetDetails += "COMPU/"; // BTC -> COMPU
