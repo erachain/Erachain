@@ -29,7 +29,7 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
             }
 
         } else {
-            for (Long key: new Long[]{12L, 2L}) {
+            for (Long key : new Long[]{12L, 1114L}) {
                 asset = Controller.getInstance().getAsset(key);
                 if (asset == null)
                     continue;
