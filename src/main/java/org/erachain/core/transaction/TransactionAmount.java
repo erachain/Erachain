@@ -1163,7 +1163,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         // TODO: PERSON RULE 1
                         if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
                                 && actionType != ACTION_DEBT && actionType != ACTION_HOLD && actionType != ACTION_SPEND
-                                && (absKey < 10 || absKey > asset.getStartKey()) // GATE Assets
+                                && (absKey < 1 || absKey > asset.getStartKey()) // GATE Assets
                                 && !asset.isAccounting()
                                 && assetType != AssetCls.AS_INSIDE_BONUS
                                 && assetType != AssetCls.AS_INSIDE_VOTE
