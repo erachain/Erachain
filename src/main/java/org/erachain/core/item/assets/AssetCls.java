@@ -1190,8 +1190,10 @@ public abstract class AssetCls extends ItemCls {
                         return backward ? "AS_ACCOUNTING_LOAN_1B" : "AS_ACCOUNTING_LOAN_1";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "AS_ACCOUNTING_LOAN_2B" : "AS_ACCOUNTING_LOAN_2";
-                    case TransactionAmount.ACTION_SPEND:
-                        return backward ? "AS_ACCOUNTING_LOAN_4B" : "AS_ACCOUNTING_LOAN_4";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "AS_ACCOUNTING_LOAN_3B" : "AS_ACCOUNTING_LOAN_3";
+                    //case TransactionAmount.ACTION_SPEND:
+                    //    return backward ? "AS_ACCOUNTING_LOAN_4B" : "AS_ACCOUNTING_LOAN_4";
                     default:
                         return null;
                 }

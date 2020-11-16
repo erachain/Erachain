@@ -388,14 +388,6 @@ public class DealsPopupMenu extends JPopupMenu {
             this.spendAsset.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SPEND, isCreatorOwner);
-        if (actionName == null) {
-            this.spendAsset.setVisible(false);
-        } else {
-            this.spendAsset.setText(Lang.getInstance().translate(actionName));
-            this.spendAsset.setVisible(true);
-        }
-
         actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_SPEND, isCreatorOwner);
         if (actionName == null) {
             this.spendAssetBackward.setVisible(false);
