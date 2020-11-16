@@ -757,24 +757,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             return Transaction.INVALID_ADDRESS;
                         }
 
-                        // тут наоборот - у создателя должно хватать
-                        if (actionType != ACTION_SEND) {
-                            // если это не Имею
-                            balance = this.creator.getBalance(dcSet, absKey, ACTION_SEND).b.abs(); // in OWN
-                            if (actionType != ACTION_SPEND)
-                                balance = balance.add(this.creator.getBalance(dcSet, absKey, actionType).b.abs()); // for Action
-                            if (amount.abs().compareTo(balance) > 0) {
-                                return NO_BALANCE;
-                            }
-                        } else if (
-                                asset.getQuantity() > 0L // тут Анлимит именно так берем - так как в внутри isUnlimited счетные единицы все Анлим
-                        ) {
-                            balance = this.creator.getBalance(dcSet, absKey, ACTION_SEND).b; // in OWN
-                            if (amount.compareTo(balance) > 0) {
-                                return NO_BALANCE;
-                            }
-                        }
-
                         // TRY FEE
                         if (!BlockChain.isFeeEnough(height, creator)
                                 && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
