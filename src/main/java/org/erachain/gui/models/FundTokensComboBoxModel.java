@@ -29,7 +29,9 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
             }
 
         } else {
-            for (Long key : new Long[]{12L, 1114L}) {
+            for (Long key : new Long[]{AssetCls.BTC_KEY // BTC
+                    //1114L
+            }) {
                 asset = Controller.getInstance().getAsset(key);
                 if (asset == null)
                     continue;
