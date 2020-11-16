@@ -290,8 +290,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         this.jLabel_To.setText(Lang.getInstance().translate(
                 asset.viewAssetTypeTarget(backward, balancePosition, recipientIsOwner) + " " + "Account") + ":");
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate(
-                asset.viewAssetTypeTarget(backward, balancePosition, recipientIsOwner) + " " + "Details") + ":");
+        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Account Details") + ":");
 
         // set scale
         int scale = asset.getScale();

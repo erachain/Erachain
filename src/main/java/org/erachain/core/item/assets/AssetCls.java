@@ -949,15 +949,16 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_IMMOVABLE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Transfer to the ownership ";
+                        return backward ? null : "Transfer to the ownership ";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Confiscate from rent" : "Transfer to rent";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Return from rent";
                     case TransactionAmount.ACTION_HOLD:
-                        return "The employment security/received from security";
+                        return backward ? "The employment security/received from security" : null;
+                    default:
+                        return null;
                 }
-                break;
             case AS_OUTSIDE_CURRENCY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -977,50 +978,50 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_WORK_TIME_HOURS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Transfer to the ownership of person-hour"; // Передать в собственность рабочие часы
+                        return backward ? null : "Transfer to the ownership of person-hour"; // Передать в собственность рабочие часы
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Decline the demand for person-hour" // Отозвать требование траты рабочих часов
                                 : "Demand to spend person-hour"; // Потребовать потратить рабочие часы
                     case TransactionAmount.ACTION_SPEND:
-                        return "Confirm the spend of person-hour"; // Подтвердить затраты рабочих часов
+                        return backward ? null : "Confirm the spend of person-hour"; // Подтвердить затраты рабочих часов
                     default:
                         return null;
                 }
             case AS_OUTSIDE_WORK_TIME_MINUTES:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Transfer to the ownership of person-minutes"; // Передать в собственность рабочие минуты
+                        return backward ? null : "Transfer to the ownership of person-minutes"; // Передать в собственность рабочие минуты
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Decline the demand for person-minutes" // Отозвать требование траты рабочих минут
                                 : "Demand to spend person-minutes"; // Потребовать потратить рабочие минуты
                     case TransactionAmount.ACTION_SPEND:
-                        return "Confirm the spend of person-minutes"; // Подтвердить затраты рабочих минут
+                        return backward ? null : "Confirm the spend of person-minutes"; // Подтвердить затраты рабочих минут
                     default:
                         return null;
                 }
             case AS_OUTSIDE_SERVICE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Transfer Service Requirement";
+                        return backward ? null : "Transfer Service Requirement";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Отозвать требование в предоставлении услуг"
                                 : "To require the provision of services";
                     case TransactionAmount.ACTION_SPEND:
-                        return "Confirm the provision of services";
+                        return backward ? null : "Confirm the provision of services";
                     default:
                         return null;
                 }
             case AS_OUTSIDE_SHARE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "To transfer shares in the property";
+                        return backward ? null : "To transfer shares in the property";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "To reduce the transfer of shares"
                                 : "To require the transfer of shares";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Return debt";
                     case TransactionAmount.ACTION_SPEND:
-                        return "Confirm receipt of shares";
+                        return backward ? null : "Confirm receipt of shares";
                     default:
                         return null;
                 }
@@ -1028,12 +1029,12 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL_EX:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Передать в собственность вексель";
+                        return backward ? null : "Передать в собственность вексель";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Отозвать требование погашения векселя"
                                 : "Потребовать погашения векселя";
                     case TransactionAmount.ACTION_SPEND:
-                        return "Подтвердить погашение векселя";
+                        return backward ? null : "Подтвердить погашение векселя";
                     default:
                         return null;
                 }
@@ -1056,21 +1057,21 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_OTHER_CLAIM:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Передать в собственность требование";
+                        return backward ? null : "Передать в собственность требование";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Отозвать требование исполнения права"
                                 : "Потребовать исполнения своего права";
                     case TransactionAmount.ACTION_SPEND:
-                        return "Подтвердить исполнение своего права";
+                        return backward ? null : "Подтвердить исполнение своего права";
                     default:
                         return null;
                 }
             case AS_INSIDE_CURRENCY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Певести в собственность деньги";
+                        return backward ? null : "Перевести в собственность деньги";
                     case TransactionAmount.ACTION_HOLD:
-                        return "Учесть прием денег на баланс";
+                        return backward ? "Учесть прием денег на баланс" : null;
                     case TransactionAmount.ACTION_SPEND:
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
@@ -1079,9 +1080,9 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_UTILITY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Передать в собственность услугу";
+                        return backward ? null : "Передать в собственность услугу";
                     case TransactionAmount.ACTION_HOLD:
-                        return "Учесть получение услуги";
+                        return backward ? "Учесть получение услуги" : null;
                     case TransactionAmount.ACTION_SPEND:
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
@@ -1090,9 +1091,9 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_SHARE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Передать в собственность акции";
+                        return backward ? null : "Передать в собственность акции";
                     case TransactionAmount.ACTION_HOLD:
-                        return "Take the reception into balance";
+                        return backward ? "Take the reception into balance" : null;
                     case TransactionAmount.ACTION_SPEND:
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
@@ -1101,9 +1102,9 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_BONUS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Transfer bonuses";
+                        return backward ? null : "Transfer bonuses";
                     case TransactionAmount.ACTION_HOLD:
-                        return "Take the reception into balance";
+                        return backward ? "Take the reception into balance" : null;
                     case TransactionAmount.ACTION_SPEND:
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
@@ -1112,14 +1113,14 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_ACCESS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Grant rights";
+                        return backward ? null : "Grant rights";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "To confiscate a delegated rights"
                                 : "Delegate rights";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Return delegate rights";
                     case TransactionAmount.ACTION_HOLD:
-                        return "Take the reception into balance";
+                        return backward ? "Take the reception into balance" : null;
                     case TransactionAmount.ACTION_SPEND:
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
@@ -1128,14 +1129,14 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_VOTE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Grant voice";
+                        return backward ? null : "Grant voice";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "To confiscate a delegated vote"
                                 : "Delegate voice";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Return delegate vote";
                     case TransactionAmount.ACTION_HOLD:
-                        return "Take the reception into balance";
+                        return backward ? "Take the reception into balance" : null;
                     case TransactionAmount.ACTION_SPEND:
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
@@ -1144,7 +1145,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_BANK_GUARANTEE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Передать банковскую гарантию";
+                        return backward ? null : "Передать банковскую гарантию";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Отозвать банковскую гарантию" : "Выдать банковскую гарантию";
                     case TransactionAmount.ACTION_REPAY_DEBT:
@@ -1158,7 +1159,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_BANK_GUARANTEE_TOTAL:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return "Передать учетную банковскую гарантию";
+                        return backward ? null : "Передать учетную банковскую гарантию";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Отозвать учетную банковскую гарантию" : "Выдать учетную банковскую гарантию";
                     case TransactionAmount.ACTION_REPAY_DEBT:
@@ -1177,7 +1178,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "AS_SELF_MANAGED_2B" : "AS_SELF_MANAGED_2";
                     case TransactionAmount.ACTION_HOLD:
-                        return !backward ? "AS_SELF_MANAGED_3B" : "AS_SELF_MANAGED_3";
+                        return backward ? "AS_SELF_MANAGED_3B" : "AS_SELF_MANAGED_3";
                     case TransactionAmount.ACTION_SPEND:
                         return backward ? "AS_SELF_MANAGED_4B" : "AS_SELF_MANAGED_4";
                     default:
@@ -1333,7 +1334,7 @@ public abstract class AssetCls extends ItemCls {
                         return "Spender";
                 }
             case AS_SELF_MANAGED_ACCOUNTING:
-                return "Me";
+                return "Accountant";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Lender";
             case AS_OUTSIDE_IMMOVABLE:
@@ -1421,7 +1422,7 @@ public abstract class AssetCls extends ItemCls {
                         return "Spender";
                 }
             case AS_SELF_MANAGED_ACCOUNTING:
-                return "They";
+                return "Ledger";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Debtor";
             case AS_OUTSIDE_IMMOVABLE:
