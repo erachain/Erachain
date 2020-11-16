@@ -407,12 +407,17 @@ public class DealsPopupMenu extends JPopupMenu {
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                 balance = pubKey.getBalance(asset.getKey());
 
-        if (!isUnlimited && balance.a.b.signum() == 0) {
+        if (isUnlimited || balance.a.b.signum() > 0) {
+            this.sendAsset.setEnabled(true);
+            this.debtAsset.setEnabled(true);
+        } else {
             this.sendAsset.setEnabled(false);
             this.debtAsset.setEnabled(false);
         }
 
-        if (!isUnlimited && balance.b.b.signum() == 0) {
+        if (isUnlimited || balance.b.b.signum() > 0) {
+            this.debtAssetReturn.setEnabled(true);
+        } else {
             this.debtAssetReturn.setEnabled(false);
         }
 
@@ -486,10 +491,7 @@ public class DealsPopupMenu extends JPopupMenu {
                     }
                 }
             }
-        }
-
-        if (isSelfManaged) {
-
+        } else if (isSelfManaged) {
             this.debtAssetReturn.setVisible(false);
 
             this.sendAsset.setEnabled(isCreatorOwner);
