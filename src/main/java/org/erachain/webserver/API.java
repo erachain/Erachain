@@ -1148,10 +1148,15 @@ public class API {
         long previousTarget = Controller.getInstance().blockChain.getTarget(dcSet);
         // previous making blockHeight + previous ForgingH balance + this ForgingH balance
         Tuple3<Integer, Integer, Integer> previousForgingPoint = account.getForgingData(dcSet, height);
-        JSONObject outPoint = new JSONObject();
-        outPoint.put("prevHeight", previousForgingPoint.a);
-        outPoint.put("prevBalance", previousForgingPoint.b);
-        outPoint.put("balance", previousForgingPoint.c);
+        if (previousForgingPoint == null) {
+            out.put("forgingPoint", "null");
+        } else {
+            JSONObject outPoint = new JSONObject();
+            outPoint.put("prevHeight", previousForgingPoint.a);
+            outPoint.put("prevBalance", previousForgingPoint.b);
+            outPoint.put("balance", previousForgingPoint.c);
+            out.put("forgingPoint", outPoint);
+        }
 
         long winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue.intValue(), previousForgingPoint);
         int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
@@ -1160,7 +1165,6 @@ public class API {
         out.put("winValue", winValue);
         out.put("previousTarget", previousTarget);
         out.put("targetedWinValue", targetedWinValue);
-        out.put("forgingPoint", outPoint);
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
