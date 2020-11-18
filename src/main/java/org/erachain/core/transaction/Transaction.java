@@ -957,12 +957,12 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
         }
 
-        if (data == null || data.length == 0)
+        if ((data == null || data.length == 0) && (message == null || message.isEmpty()))
             return false;
 
         if (isText && !isEncrypted) {
             String text = message == null ? new String(data, StandardCharsets.UTF_8) : message;
-            if (text.contains(" ") || text.contains("_"))
+            if ((text.contains(" ") || text.contains("_") || text.contains("-")) && text.length() > 100)
                 return true;
         }
         return false;
