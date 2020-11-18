@@ -938,12 +938,13 @@ public abstract class Transaction implements ExplorerJsonLine {
      * Общий для всех проверка на допуск публичного сообщения
      *
      * @param title
-     * @param message
+     * @param data
      * @param isText
      * @param isEncrypted
+     * @param message
      * @return
      */
-    public static boolean hasPublicText(String title, byte[] message, boolean isText, boolean isEncrypted) {
+    public static boolean hasPublicText(String title, byte[] data, boolean isText, boolean isEncrypted, String message) {
         String[] words = title.split(Transaction.SPLIT_CHARS);
         int length = 0;
         for (String word : words) {
@@ -956,11 +957,11 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
         }
 
-        if (message == null || message.length == 0)
+        if (data == null || data.length == 0)
             return false;
 
         if (isText && !isEncrypted) {
-            String text = new String(message, StandardCharsets.UTF_8);
+            String text = message == null ? new String(data, StandardCharsets.UTF_8) : message;
             if (text.contains(" ") || text.contains("_"))
                 return true;
         }
