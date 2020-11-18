@@ -131,23 +131,23 @@ public class DealsPopupMenu extends JPopupMenu {
 
         this.addSeparator();
 
-        holdAsset = new JMenuItem(Lang.getInstance().translate("Hold"));
+        holdAsset = new JMenuItem(Lang.getInstance().translate("Hold")); /// GIVE
         holdAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(holdAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetHoldPanel(asset, pubKey, null, null, true));
+                        new AccountAssetHoldPanel(asset, pubKey, null, null, false));
 
             }
         });
         this.add(holdAsset);
 
-        holdAssetBackward = new JMenuItem(Lang.getInstance().translate("Backward Hold"));
+        holdAssetBackward = new JMenuItem(Lang.getInstance().translate("Backward Hold")); // TAKE
         holdAssetBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(holdAssetBackward.getText() + ":" + asset.getKey(),
-                        new AccountAssetHoldPanel(asset, pubKey, null, null, false));
+                        new AccountAssetHoldPanel(asset, pubKey, null, null, true));
 
             }
         });
@@ -312,18 +312,13 @@ public class DealsPopupMenu extends JPopupMenu {
 
         /// MAIL
         this.sendMail.setText(Lang.getInstance().translate("Send Mail"));
-        String actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SEND, isCreatorOwner);
-        if (actionName == null) {
-            this.sendAsset.setVisible(false);
-        } else {
-            this.sendAsset.setText(Lang.getInstance().translate(actionName));
-            this.sendAsset.setVisible(true);
-        }
+
+        String actionName;
 
         /// **** SEND
         actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SEND, isCreatorOwner);
         if (actionName == null) {
-            this.sendAssetBackward.setVisible(false);
+            this.sendAsset.setVisible(false);
         } else {
             this.sendAsset.setText(Lang.getInstance().translate(actionName));
             this.sendAsset.setVisible(true);
@@ -388,14 +383,6 @@ public class DealsPopupMenu extends JPopupMenu {
             this.spendAsset.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SPEND, isCreatorOwner);
-        if (actionName == null) {
-            this.spendAsset.setVisible(false);
-        } else {
-            this.spendAsset.setText(Lang.getInstance().translate(actionName));
-            this.spendAsset.setVisible(true);
-        }
-
         actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_SPEND, isCreatorOwner);
         if (actionName == null) {
             this.spendAssetBackward.setVisible(false);
@@ -407,12 +394,17 @@ public class DealsPopupMenu extends JPopupMenu {
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                 balance = pubKey.getBalance(asset.getKey());
 
-        if (!isUnlimited && balance.a.b.signum() == 0) {
+        if (isUnlimited || balance.a.b.signum() > 0) {
+            this.sendAsset.setEnabled(true);
+            this.debtAsset.setEnabled(true);
+        } else {
             this.sendAsset.setEnabled(false);
             this.debtAsset.setEnabled(false);
         }
 
-        if (!isUnlimited && balance.b.b.signum() == 0) {
+        if (isUnlimited || balance.b.b.signum() > 0) {
+            this.debtAssetReturn.setEnabled(true);
+        } else {
             this.debtAssetReturn.setEnabled(false);
         }
 
@@ -486,28 +478,18 @@ public class DealsPopupMenu extends JPopupMenu {
                     }
                 }
             }
-        }
-
-        if (isSelfManaged) {
-
+        } else if (isSelfManaged) {
             this.debtAssetReturn.setVisible(false);
 
-            if (isCreatorOwner) {
-                this.sendAssetBackward.setVisible(true);
-                this.debtAsset.setVisible(true);
-                this.holdAssetBackward.setVisible(true);
-                this.spendAssetBackward.setVisible(true);
-            } else {
-                this.sendAsset.setEnabled(false);
-                this.debtAsset.setEnabled(false);
-                this.holdAsset.setEnabled(false);
-                this.spendAsset.setEnabled(false);
+            this.sendAsset.setEnabled(isCreatorOwner);
+            this.debtAsset.setEnabled(isCreatorOwner);
+            this.holdAsset.setEnabled(isCreatorOwner);
+            this.spendAsset.setEnabled(isCreatorOwner);
 
-                this.sendAssetBackward.setVisible(false);
-                this.debtAssetBackward.setVisible(false);
-                this.holdAssetBackward.setVisible(false);
-                this.spendAssetBackward.setVisible(false);
-            }
+            //this.sendAssetBackward.setVisible(isCreatorOwner);
+            //this.debtAssetBackward.setVisible(isCreatorOwner);
+            //this.holdAssetBackward.setVisible(isCreatorOwner);
+            //this.spendAssetBackward.setVisible(isCreatorOwner);
         }
 
     }

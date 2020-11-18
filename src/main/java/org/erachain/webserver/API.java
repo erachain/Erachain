@@ -114,6 +114,7 @@ public class API {
         help.put("GET Address Asset Balance", "addressassetbalance/{address}/{assetid}");
         help.put("GET Address Assets", "addressassets/{address}");
         help.put("GET Address Public Key", "addresspublickey/{address}");
+        help.put("GET Address Forging Info", "addressforge/{address}");
 
         help.put("*** ASSET ***", "");
         help.put("GET Asset Height", "assetheight");
@@ -1126,6 +1127,50 @@ public class API {
                     .entity(Base58.encode(publicKey))
                     .build();
         }
+    }
+
+
+    @GET
+    @Path("addressforge/{address}")
+    public Response getAddressForge(@PathParam("address") String address) {
+
+        // CHECK IF VALID ADDRESS
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        Account account = result.a;
+        if (account == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    result.b);
+        }
+
+        JSONObject out = new JSONObject();
+        BigDecimal forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet);
+        int height = Controller.getInstance().getMyHeight() + 1;
+        long previousTarget = Controller.getInstance().blockChain.getTarget(dcSet);
+        // previous making blockHeight + previous ForgingH balance + this ForgingH balance
+        Tuple3<Integer, Integer, Integer> previousForgingPoint = account.getForgingData(dcSet, height);
+        if (previousForgingPoint == null) {
+            out.put("forgingPoint", "null");
+        } else {
+            JSONObject outPoint = new JSONObject();
+            outPoint.put("prevHeight", previousForgingPoint.a);
+            outPoint.put("prevBalance", previousForgingPoint.b);
+            outPoint.put("balance", previousForgingPoint.c);
+            out.put("forgingPoint", outPoint);
+        }
+
+        long winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue.intValue(), previousForgingPoint);
+        int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
+        out.put("forgingValue", forgingValue.toPlainString());
+        out.put("height", height);
+        out.put("winValue", winValue);
+        out.put("previousTarget", previousTarget);
+        out.put("targetedWinValue", targetedWinValue);
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(out))
+                .build();
     }
 
     @GET

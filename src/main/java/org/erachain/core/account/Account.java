@@ -934,9 +934,9 @@ public class Account {
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     ownBalance, balance.b, balance.c,
                     substract ? new Tuple2<BigDecimal, BigDecimal>(
-                            updateIncomed ? balance.d.a.add(amount) : balance.d.a, balance.d.b.add(amount))
-                            : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.d.a.subtract(amount) : balance.d.a,
-                            balance.d.b.subtract(amount)),
+                            updateIncomed ? balance.d.a.subtract(amount) : balance.d.a, balance.d.b.subtract(amount))
+                            : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.d.a.add(amount) : balance.d.a,
+                            balance.d.b.add(amount)),
                     balance.e);
         }
 

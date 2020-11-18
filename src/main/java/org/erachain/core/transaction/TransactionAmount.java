@@ -439,10 +439,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     public String viewActionType() {
+        if (asset == null)
+            return "mail";
         return viewActionType(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
     }
 
     public String viewActionTypeWas() {
+        if (asset == null)
+            return "mail";
         return viewActionTypeWas(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
     }
 
@@ -753,32 +757,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             return Transaction.INVALID_ADDRESS;
                         }
 
-                        if (backward ^ actionType == ACTION_HOLD) {
-                            // у всех Получателей должно быть не меньше чем мы с них забираем
-                            balance = this.recipient.getBalance(dcSet, absKey, actionType).b.abs();
-                            if (amount.abs().compareTo(balance) > 0) {
-                                return NO_BALANCE;
-                            }
-                        } else {
-                            // тут наоборот - у создателя должно хватать
-                            if (actionType != ACTION_SEND) {
-                                // если это не Имею
-                                balance = this.creator.getBalance(dcSet, absKey, ACTION_SEND).b.abs(); // in OWN
-                                if (actionType != ACTION_SPEND)
-                                    balance = balance.add(this.creator.getBalance(dcSet, absKey, actionType).b.abs()); // for Action
-                                if (amount.abs().compareTo(balance) > 0) {
-                                    return NO_BALANCE;
-                                }
-                            } else if (
-                                    asset.getQuantity() > 0L // тут Анлимит именно так берем - так как в dyenhb isUnlimited счетные единицы все Анлим
-                            ) {
-                                balance = this.creator.getBalance(dcSet, absKey, ACTION_SEND).b; // in OWN
-                                if (amount.compareTo(balance) > 0) {
-                                    return NO_BALANCE;
-                                }
-                            }
-                        }
-
                         // TRY FEE
                         if (!BlockChain.isFeeEnough(height, creator)
                                 && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
@@ -828,7 +806,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                         ////BigDecimal amountOWN = this.recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
                                         // amontOWN, balance and amount - is
                                         // negative
-                                        if (balance.compareTo(amount) < 0) {
+                                        if (balance.compareTo(amount.abs()) < 0) {
                                             return NO_HOLD_BALANCE;
                                         }
                                     }
@@ -1159,7 +1137,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         // TODO: PERSON RULE 1
                         if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
                                 && actionType != ACTION_DEBT && actionType != ACTION_HOLD && actionType != ACTION_SPEND
-                                && (absKey < 10 || absKey > asset.getStartKey()) // GATE Assets
+                                && (absKey < 1 || absKey > asset.getStartKey()) // GATE Assets
                                 && !asset.isAccounting()
                                 && assetType != AssetCls.AS_INSIDE_BONUS
                                 && assetType != AssetCls.AS_INSIDE_VOTE

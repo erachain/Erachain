@@ -92,7 +92,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         super(panelName, title);
         if (assetIn == null)
-            this.asset = Controller.getInstance().getAsset(2);
+            this.asset = Controller.getInstance().getAsset(2L);
         else
             this.asset = assetIn;
 
@@ -170,16 +170,22 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             this.jTextArea_Account_Description.setText(asset.viewDescription());
         }
 
+        boolean selected = false;
         for (int i = 0; i < jComboBox_Asset.getItemCount(); i++) {
             ItemCls item = jComboBox_Asset.getItemAt(i);
             if (item.getKey() == asset.getKey()) {
                 // not worked jComboBox_Asset.setSelectedItem(asset);
                 jComboBox_Asset.setSelectedIndex(i);
+                selected = true;
                 //    jComboBox_Asset.setEnabled(false);// .setEditable(false);
                 break;
             } else {
                 //    jComboBox_Asset.setEnabled(true);
             }
+        }
+        if (!selected) {
+            jComboBox_Asset.addItem(asset);
+            jComboBox_Asset.setSelectedItem(asset);
         }
 
         this.jComboBox_Fee.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
@@ -284,8 +290,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         this.jLabel_To.setText(Lang.getInstance().translate(
                 asset.viewAssetTypeTarget(backward, balancePosition, recipientIsOwner) + " " + "Account") + ":");
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate(
-                asset.viewAssetTypeTarget(backward, balancePosition, recipientIsOwner) + " " + "Details") + ":");
+        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Account Details") + ":");
 
         // set scale
         int scale = asset.getScale();
