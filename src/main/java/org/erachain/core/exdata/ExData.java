@@ -443,8 +443,7 @@ public class ExData {
     public boolean hasPublicText() {
         if (Transaction.hasPublicText(title, null, false, false)
                 || message != null && !message.isEmpty()
-                || templateKey > 0
-                || hasAuthors()
+                || getTemplateValues() != null
                 || files != null && !files.isEmpty())
             return true;
 
