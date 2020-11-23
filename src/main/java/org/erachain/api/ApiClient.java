@@ -693,7 +693,7 @@ public class ApiClient {
                     },
                     {
                             "GET assets/<key>",
-                            "Returns short information about asset with the given key.",
+                            "Returns information about asset with the given key.",
                             "Errors: 601 - Invalid asset ID."
                     },
                     {
@@ -724,13 +724,13 @@ public class ApiClient {
                     },
                     {
                             "GET persons/<key>",
-                            "Returns short information about person with the given key.",
-                            "Errors: 601 - Invalid asset ID."
+                            "Returns information about person with the given key.",
+                            "Errors: 601 - Invalid ID."
                     },
                     {
-                            "GET assets/types",
-                            "Return array of asset types.",
-                            ""
+                            "GET persons/images/<key>",
+                            "Returns person Images with the given key.",
+                            "Errors: 601 - Invalid asset ID."
                     },
                     {
                             "GET persons/listfrom/{start}", "get list from KEY", ""
@@ -740,13 +740,23 @@ public class ApiClient {
                             "Issue Item Asset.",
                             "Errors: ..."
                     },
+                    // STATUSES
                     {
-                            "GET persons/images/<key>",
-                            "Returns person Images with the given key.",
+                            "*** STATUSES ***",
+                            "", ""
+                    },
+                    {
+                            "GET statuses/<key>",
+                            "Returns information about status with the given key.",
+                            "Errors: 601 - Invalid ID."
+                    },
+                    {
+                            "GET statuses/images/<key>",
+                            "Returns status Images with the given key.",
                             "Errors: 601 - Invalid asset ID."
                     },
                     {
-                            "GET balances/{key}", "get balances for ke", ""
+                            "GET statuses/listfrom/{start}", "get list from KEY", ""
                     },
                     /////// BLOGS
                     {

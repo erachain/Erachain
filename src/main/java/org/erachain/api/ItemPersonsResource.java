@@ -1,15 +1,11 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
@@ -38,7 +34,6 @@ public class ItemPersonsResource {
 
         help.put("persons/{key}", "get by KEY");
         help.put("persons/images/{key}", "get item Images by key");
-        help.put("persons/address/{address}", "get types");
         help.put("persons/listfrom/{start}", "get list from KEY");
 
         help.put("POST persons/issue", "issue");
@@ -46,12 +41,6 @@ public class ItemPersonsResource {
         return StrJSonFine.convert(help);
     }
 
-    /**
-     * Get lite information asset by key asset
-     *
-     * @param key is number asset
-     * @return JSON object. Single asset
-     */
     @GET
     @Path("/{key}")
     public String get(@PathParam("key") String key) {
@@ -64,9 +53,8 @@ public class ItemPersonsResource {
                     Transaction.INVALID_ITEM_KEY);
         }
 
-        if (!DCSet.getInstance().getItemAssetMap().contains(asLong)) {
+        if (!DCSet.getInstance().getItemPersonMap().contains(asLong)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
@@ -87,7 +75,7 @@ public class ItemPersonsResource {
                     Transaction.INVALID_ITEM_KEY);
         }
 
-        if (!DCSet.getInstance().getItemAssetMap().contains(asLong)) {
+        if (!DCSet.getInstance().getItemPersonMap().contains(asLong)) {
             throw ApiErrorFactory.getInstance().createError(
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
@@ -137,35 +125,5 @@ public class ItemPersonsResource {
             return out.toJSONString();
         }
     }
-
-    @SuppressWarnings("unchecked")
-    @GET
-    @Path("/address/{address}")
-    public String getPersons(@PathParam("address") String address) {
-
-        //CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-        }
-
-        //CHECK ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
-        }
-
-        //CHECK ACCOUNT IN WALLET
-        Account account = Controller.getInstance().getWalletAccountByAddress(address);
-        if (account == null) {
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
-        }
-
-        JSONArray array = new JSONArray();
-        for (ItemCls person : Controller.getInstance().getAllItems(ItemCls.PERSON_TYPE, account)) {
-            array.add(((PersonCls) person).toJson());
-        }
-
-        return array.toJSONString();
-    }
-
 
 }
