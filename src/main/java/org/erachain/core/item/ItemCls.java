@@ -686,7 +686,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
 
         ItemMap map = dcSet.getItem_Map(itemType);
         ItemCls element;
-        long size = map.size();
+        long size = map.getLastKey();
 
         if (start < 1 || start > size && size > 0) {
             start = size;
