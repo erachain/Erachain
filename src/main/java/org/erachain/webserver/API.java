@@ -766,7 +766,7 @@ public class API {
             } else {
                 out.put("error", result.getB());
                 out.put("message", OnDealClick.resultMess(result.getB()));
-                if (result.getA().errorValue != null) {
+                if (result.getA() != null && result.getA().errorValue != null) {
                     out.put("value", result.getA().errorValue);
                 }
                 return out;
