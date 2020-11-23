@@ -221,8 +221,8 @@ public class BlockChain {
      * Если задан то это режим синхронизации со стрым протоколом - значит нам нельза генерить блоки и трнзакции
      * и вести себя тихо - ничего не посылать никуда - чтобы не забанили
      */
-    public static int ALL_VALID_BEFORE = TEST_DB > 0 || TEST_MODE ? 0 : 1529000; // see in sidePROTOCOL.json as 'allValidBefore'
-    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : 623904; //260120;
+    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 1529000; // see in sidePROTOCOL.json as 'allValidBefore'
+    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 623904; //260120;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам<bR>
      * !!! ВНИМАНИЕ !!! нельзя изменять походу собранной цепочки - так как съедут цены и индекс не удалится у некоторых ордеров - цена о другая.
@@ -244,18 +244,18 @@ public class BlockChain {
 
     // TODO поидее отрицательное тоже работать будет как надо
     public static final long VERS_30SEC_TIME =
-            CLONE_MODE || TEST_MODE ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L;
+            !MAIN_MODE ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L;
 
     public static final int VERS_4_21_02 = !MAIN_MODE ? 0 : 684000;
 
-    public static final int VERS_4_23_01 = TEST_DB > 0 || CLONE_MODE || TEST_MODE ? 0 : 800000;
+    public static final int VERS_4_23_01 = TEST_DB > 0 || !MAIN_MODE ? 0 : 800000;
 
     public static final int VERS_5_01_01 = TEST_DB > 0 || CLONE_MODE ? 0 : DEMO_MODE ? 22000 : TEST_MODE ? 0 : 990000;
 
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
      */
-    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 || CLONE_MODE || TEST_MODE ? 0 : VERS_5_01_01;
+    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 || !MAIN_MODE ? 0 : VERS_5_01_01;
 
     public static final int START_ITEM_DUPLICATE = TEST_DB > 0 || !MAIN_MODE ? 0 : 800000;
 
@@ -308,7 +308,7 @@ public class BlockChain {
             Base58.decode("4Vo6hmojFGgAJhfjyiN8PNYktpgrdHGF8Bqe12Pk3PvcvcH8tuJTcTnnCqyGChriHTuZX1u5Qwho8BuBPT4FJ53W")
     };
 
-    public static final byte[][] VALID_BAL = TEST_DB > 0 ? new byte[][]{} : CLONE_MODE || TEST_MODE ? new byte[][]{} :
+    public static final byte[][] VALID_BAL = TEST_DB > 0 ? new byte[][]{} : !MAIN_MODE ? new byte[][]{} :
             new byte[][]{
                     //Base58.decode("61Fzu3PhsQ74EoMKrwwxKHMQi3z9fYAU5UeUfxtGdXPRfKbWdgpBQWgAojEnmDHK2LWUKtsmyqWb4WpCEatthdgK"),
             };
@@ -338,11 +338,11 @@ public class BlockChain {
     ///final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("2.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
     final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("0.001");
 
-    public static final int ITEM_POLL_FROM = TEST_DB > 0 ? 0 : CLONE_MODE || TEST_MODE ? 0 : VERS_4_11;
+    public static final int ITEM_POLL_FROM = TEST_DB > 0 ? 0 : !MAIN_MODE ? 0 : VERS_4_11;
 
     public static final int AMOUNT_SCALE_FROM = TEST_DB > 0 || !MAIN_MODE ? 0 : 1033;
     public static final int AMOUNT_DEDAULT_SCALE = 8;
-    public static final int FREEZE_FROM = TEST_DB > 0 ? 0 : CLONE_MODE || TEST_MODE ? 0 : 249222;
+    public static final int FREEZE_FROM = TEST_DB > 0 ? 0 : !MAIN_MODE ? 0 : 249222;
     // только на них можно замороженные средства вернуть из списка FOUNDATION_ADDRESSES (там же и замароженные из-за утраты)
     public static final String[] TRUE_ADDRESSES = TEST_DB > 0 ? new String[]{} : new String[]{
             "7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"
@@ -439,9 +439,9 @@ public class BlockChain {
     public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD_4_10 = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON_4_10, FEE_SCALE);
 
     public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(
-            CLONE_MODE || TEST_MODE ? 0 : 235267,
+            !MAIN_MODE ? 0 : 235267,
             Base58.decode(
-                    CLONE_MODE || TEST_MODE ? ""
+                    !MAIN_MODE ? ""
                             : "2VTp79BBpK5E4aZYV5Tk3dYRS887W1devsrnyJeN6WTBQYQzoe2cTg819DdRs5o9Wh6tsGLsetYTbDu9okgriJce"));
 
     // issue PERSON
@@ -808,7 +808,7 @@ public class BlockChain {
             dcSet = DCSet.getInstance();
         }
 
-        if (TEST_MODE || CLONE_MODE) {
+        if (!MAIN_MODE) {
             LOGGER.info(genesisBlock.getTestNetInfo());
         }
 
@@ -984,7 +984,7 @@ public class BlockChain {
 
     public static BigDecimal BONUS_FOR_PERSON(int height) {
 
-        if (CLONE_MODE || TEST_MODE || START_ISSUE_RIGHTS == 0 || height > START_ISSUE_RIGHTS) {
+        if (!MAIN_MODE || START_ISSUE_RIGHTS == 0 || height > START_ISSUE_RIGHTS) {
             return BigDecimal.valueOf(5000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
         } else {
             return BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
@@ -1306,7 +1306,7 @@ public class BlockChain {
             return this.genesisTimestamp + (long) height * (long) GENERATING_MIN_BLOCK_TIME_MS(height);
         }
 
-        return this.genesisTimestamp + (CLONE_MODE || TEST_MODE ? 0L : 16667L)
+        return this.genesisTimestamp + (!MAIN_MODE ? 0L : 16667L)
                 + (long) VERS_30SEC * (long) GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC)
                 + (long) (height - VERS_30SEC) * (long) GENERATING_MIN_BLOCK_TIME_MS(height);
 
