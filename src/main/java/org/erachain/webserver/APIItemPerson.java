@@ -43,11 +43,11 @@ public class APIItemPerson {
         help.put("apiperson/status/{personKey}/{statusKey}?history=true",
                 "Get Status data for Person Key. JSON ARRAY format: [timeFrom, timeTo, [par1, par2, str1, str2, reference, description], block, txNo]");
 
-        help.put("GET {key}", "GET by ID");
-        help.put("GET find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
+        help.put("GET apiperson/{key}", "GET by ID");
+        help.put("GET apiperson/find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apiperson/image/{key}", "GET Person Image");
         help.put("Get apiperson/icon/{key}", "GET Person Icon");
-        help.put("Get listfrom/{start}?page={pageSize}&showerson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} defaul - true, {descending} - true");
+        help.put("Get apiperson/listfrom/{start}?page={pageSize}&showerson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} defaul - true, {descending} - true");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();

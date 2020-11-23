@@ -708,6 +708,11 @@ public class ApiClient {
                             "Errors: 601 - Invalid asset ID."
                     },
                     {
+                            "GET assets/types",
+                            "Return array of asset types.",
+                            ""
+                    },
+                    {
                             "POST assets/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"scale\": \"<scale>\", \"assetType\": \"<assetType>\", \"quantity\": \"<quantity>\", \"password\": \"<password>\"}",
                             "Issue Item Asset.",
                             "Errors: ..."

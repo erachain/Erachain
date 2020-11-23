@@ -7,6 +7,7 @@ import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
@@ -112,6 +113,12 @@ public class ItemAssetsResource {
         }
 
         return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryItemAsset(assetAsLong));
+    }
+
+    @GET
+    @Path("types")
+    public String getAssetTypes() {
+        return AssetCls.typesJson().toJSONString();
     }
 
     @SuppressWarnings("unchecked")

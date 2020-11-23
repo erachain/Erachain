@@ -39,11 +39,11 @@ public class APIItemPoll {
 
         help.put("apipoll/allPoll", "Get all poll.");
 
-        help.put("GET {key}", "GET by ID");
-        help.put("GET find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
+        help.put("GET apipoll/{key}", "GET by ID");
+        help.put("GET apipoll/find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apipoll/image/{key}", "GET Poll Image");
         help.put("Get apipoll/icon/{key}", "GET Poll Icon");
-        help.put("Get listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} defaul - true, {descending} - true");
+        help.put("Get apipoll/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} defaul - true, {descending} - true");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
