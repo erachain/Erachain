@@ -37,6 +37,7 @@ public class APIItemTemplate {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
+        help.put("GET apitemplate/last", "Get last ID");
         help.put("GET apitemplate/{key}", "GET by ID");
         help.put("GET apitemplate/find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apitemplate/image/{key}", "GET Template Image");
@@ -45,6 +46,18 @@ public class APIItemTemplate {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
+    }
+
+    @GET
+    @Path("last")
+    public Response last() {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity("" + dcSet.getItemTemplateMap().getLastKey())
+                .build();
+
     }
 
     @GET

@@ -44,6 +44,7 @@ public class APIItemStatus {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
+        help.put("GET apistatus/last", "Get last ID");
         help.put("GET apistatus/{key}", "GET by ID");
         help.put("GET apistatus/find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apistatus/image/{key}", "GET Status Image");
@@ -52,6 +53,18 @@ public class APIItemStatus {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
+    }
+
+    @GET
+    @Path("last")
+    public Response last() {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity("" + dcSet.getItemStatusMap().getLastKey())
+                .build();
+
     }
 
     @GET
