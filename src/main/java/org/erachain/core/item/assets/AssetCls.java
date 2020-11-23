@@ -10,6 +10,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -338,20 +339,20 @@ public abstract class AssetCls extends ItemCls {
     }
 
     // https://unicode-table.com/ru/#23FC
-    public String charAssetType() {
+    public static String charAssetType(long key, int assetType) {
 
-        if (this.key < 100) {
+        if (key < 100) {
             return "";
         }
 
-        switch (this.assetType) {
+        switch (assetType) {
             case AS_OUTSIDE_GOODS:
                 return "▲";
             case AS_OUTSIDE_IMMOVABLE:
                 return "▼";
             case AS_ACCOUNTING:
-                if (this.key == 555l || this.key == 666l || this.key == 777l)
-                    return this.name;
+                if (key == 555L || key == 666L || key == 777L)
+                    return "♥";
 
                 return "±";
             case AS_INDEX:
@@ -382,18 +383,22 @@ public abstract class AssetCls extends ItemCls {
 
         }
 
-        if (this.assetType >= AS_OUTSIDE_CURRENCY
-                && this.assetType <= AS_OUTSIDE_OTHER_CLAIM)
+        if (assetType >= AS_OUTSIDE_CURRENCY
+                && assetType <= AS_OUTSIDE_OTHER_CLAIM)
             return "◄";
 
-        if (this.assetType == AS_INSIDE_ASSETS
-                || this.assetType >= AS_INSIDE_CURRENCY
-                && this.assetType <= AS_INSIDE_OTHER_CLAIM)
+        if (assetType == AS_INSIDE_ASSETS
+                || assetType >= AS_INSIDE_CURRENCY
+                && assetType <= AS_INSIDE_OTHER_CLAIM)
             return "►";
 
         // ● ⚫ ◆ █ ▇ ■ ◢ ◤ ◔ ◑ ◕ ⬛ ⬜ ⬤ ⛃
         return "⚫";
 
+    }
+
+    public String charAssetType() {
+        return charAssetType(this.key, this.assetType);
     }
 
     @Override
@@ -756,7 +761,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Accounting Loan";
         }
-        return "unknown";
+        return null;
     }
 
     public String viewAssetType() {
@@ -818,7 +823,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Accounting Loan for Debtor";
         }
-        return "unknown";
+        return null;
     }
 
     public static String viewAssetTypeAbbrev(int asset_type) {
@@ -1504,6 +1509,30 @@ public abstract class AssetCls extends ItemCls {
     }
 
     //OTHER
+
+    public static JSONArray typesJson() {
+
+        JSONArray types = new JSONArray();
+
+        String assetTypeName;
+        for (int i = 0; i < 256; i++) {
+            assetTypeName = viewAssetTypeCls(i);
+            if (assetTypeName == null)
+                continue;
+
+            JSONObject type = new JSONObject();
+            type.put("key", i);
+            type.put("char", charAssetType(1000, i));
+            type.put("abbrev", viewAssetTypeAbbrev(i));
+            type.put("name", assetTypeName);
+            type.put("nameFull", viewAssetTypeFullCls(i));
+            type.put("desc", viewAssetTypeDescriptionCls(i));
+            types.add(type);
+
+        }
+        return types;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public JSONObject toJson() {
@@ -1513,6 +1542,8 @@ public abstract class AssetCls extends ItemCls {
         // ADD DATA
         assetJSON.put("scale", this.getScale());
         assetJSON.put("assetTypeKey", this.assetType);
+        assetJSON.put("assetTypeChar", charAssetType());
+        assetJSON.put("assetTypeAbbrev", viewAssetTypeAbbrev());
         assetJSON.put("assetTypeName", viewAssetType());
         assetJSON.put("assetTypeNameFull", viewAssetTypeFull());
         assetJSON.put("assetTypeDesc", viewAssetTypeDescriptionCls(assetType));

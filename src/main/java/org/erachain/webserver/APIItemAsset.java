@@ -49,11 +49,12 @@ public class APIItemAsset {
         help.put("GET apiasset/balances/[assetKey]?position=POS&offset=OFFSET&limit=LIMIT",
                 "Get balances for assetKey sorted by Own Amount. Balance positions: 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other. Default: POS=1. Balance A - total debit. Balance B - final amount.");
 
-        help.put("GET {key}", "Get by ID");
-        help.put("GET find/{filter_name_string}", "Get by words in Name. Use patterns from 5 chars in words");
-        help.put("Get image/{key}", "Get Asset Image");
-        help.put("Get icon/{key}", "Get Asset Icon");
-        help.put("Get listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} defaul - true, {descending} - true");
+        help.put("GET apiasset/{key}", "Get by ID");
+        help.put("GET apiasset/types", "Return array of asset types.");
+        help.put("GET apiasset/find/{filter_name_string}", "Get by words in Name. Use patterns from 5 chars in words");
+        help.put("Get apiasset/image/{key}", "Get Asset Image");
+        help.put("Get apiasset/icon/{key}", "Get Asset Icon");
+        help.put("Get apiasset/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} defaul - true, {descending} - true");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -76,6 +77,12 @@ public class APIItemAsset {
                 .entity(StrJSonFine.convert(item.toJson()))
                 .build();
 
+    }
+
+    @GET
+    @Path("types")
+    public String getAssetTypes() {
+        return AssetCls.typesJson().toJSONString();
     }
 
     @GET
