@@ -1147,18 +1147,28 @@ public class API {
         int height = Controller.getInstance().getMyHeight() + 1;
         long previousTarget = Controller.getInstance().blockChain.getTarget(dcSet);
         // previous making blockHeight + previous ForgingH balance + this ForgingH balance
-        Tuple3<Integer, Integer, Integer> previousForgingPoint = account.getForgingData(dcSet, height);
-        if (previousForgingPoint == null) {
-            out.put("forgingPoint", "null");
+        Tuple3<Integer, Integer, Integer> lastForgingPoint = account.getLastForgingData(dcSet);
+        if (lastForgingPoint == null) {
+            out.put("lastForgingPoint", "null");
         } else {
-            JSONObject outPoint = new JSONObject();
-            outPoint.put("prevHeight", previousForgingPoint.a);
-            outPoint.put("prevBalance", previousForgingPoint.b);
-            outPoint.put("balance", previousForgingPoint.c);
-            out.put("forgingPoint", outPoint);
+            JSONObject lastForgingPointJSON = new JSONObject();
+            lastForgingPointJSON.put("height", lastForgingPoint.a);
+            lastForgingPointJSON.put("prevBalance", lastForgingPoint.b);
+            lastForgingPointJSON.put("balance", lastForgingPoint.c);
+            out.put("lastPoint", lastForgingPointJSON);
+            Tuple3<Integer, Integer, Integer> forgingPoint = account.getForgingData(dcSet, lastForgingPoint.a);
+            if (forgingPoint == null) {
+                out.put("forgingPoint", "null");
+            } else {
+                JSONObject forgingPointJson = new JSONObject();
+                forgingPointJson.put("prevHeight", forgingPoint.a);
+                forgingPointJson.put("prevBalance", forgingPoint.b);
+                forgingPointJson.put("balance", forgingPoint.c);
+                out.put("forgingPoint", forgingPointJson);
+            }
         }
 
-        long winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue.intValue(), previousForgingPoint);
+        long winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue.intValue(), lastForgingPoint);
         int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
         out.put("forgingValue", forgingValue.toPlainString());
         out.put("height", height);

@@ -441,10 +441,9 @@ public class ExData {
     }
 
     public boolean hasPublicText() {
-        if (Transaction.hasPublicText(title, null, false, false)
-                || message != null && !message.isEmpty()
-                || templateKey > 0
-                || hasAuthors()
+        if (Transaction.hasPublicText(title, null, true, false, message)
+                || hasAuthors() // авторов только удостоверенный счет может назначить
+                || getTemplateValues() != null // в параметрах могут написать что угодно
                 || files != null && !files.isEmpty())
             return true;
 

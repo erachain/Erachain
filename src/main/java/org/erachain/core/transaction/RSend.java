@@ -414,7 +414,7 @@ public class RSend extends TransactionAmount {
 
     @Override
     public boolean hasPublicText() {
-        return hasPublicText(title, data, isText(), isEncrypted());
+        return hasPublicText(title, data, isText(), isEncrypted(), null);
     }
 
     // PARSE/CONVERT
