@@ -42,7 +42,7 @@ public class APIItemTemplate {
         help.put("GET apitemplate/find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apitemplate/image/{key}", "GET Template Image");
         help.put("Get apitemplate/icon/{key}", "GET Template Icon");
-        help.put("Get apitemplate/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} defaul - true, {descending} - true");
+        help.put("Get apitemplate/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();

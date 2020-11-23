@@ -51,7 +51,7 @@ public class APIItemAsset {
         help.put("GET apiasset/find/{filter_name_string}", "Get by words in Name. Use patterns from 5 chars in words");
         help.put("Get apiasset/image/{key}", "Get Asset Image");
         help.put("Get apiasset/icon/{key}", "Get Asset Icon");
-        help.put("Get apiasset/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} defaul - true, {descending} - true");
+        help.put("Get apiasset/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
 
         help.put("GET apiasset/types", "Return array of asset types.");
         help.put("GET apiasset/balances/[assetKey]?position=POS&offset=OFFSET&limit=LIMIT",
