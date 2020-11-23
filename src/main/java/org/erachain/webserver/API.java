@@ -1304,7 +1304,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(BlockExplorer.getInstance().jsonQueryAssetsLite()))
+                .entity(StrJSonFine.convert(BlockExplorer.getInstance().jsonQueryItemsLite()))
                 .build();
 
     }

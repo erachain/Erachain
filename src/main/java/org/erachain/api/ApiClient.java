@@ -688,14 +688,8 @@ public class ApiClient {
                     },
                     // ASSETS
                     {
-                            "GET assets",
-                            "Returns an array of keys of assets with names.",
-                            ""
-                    },
-                    {
-                            "GET assets/full",
-                            "Returns an array of assets with full information.",
-                            ""
+                            "*** ASSETS ***",
+                            "", ""
                     },
                     {
                             "GET assets/<key>",
@@ -703,8 +697,8 @@ public class ApiClient {
                             "Errors: 601 - Invalid asset ID."
                     },
                     {
-                            "GET assets/<key>/full",
-                            "Returns full information about asset with the given key.",
+                            "GET assets/images/<key>",
+                            "Returns asset Images with the given key.",
                             "Errors: 601 - Invalid asset ID."
                     },
                     {
@@ -713,10 +707,48 @@ public class ApiClient {
                             ""
                     },
                     {
+                            "GET assets/listfrom/{start}", "get list from KEY", ""
+                    },
+                    {
                             "POST assets/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"scale\": \"<scale>\", \"assetType\": \"<assetType>\", \"quantity\": \"<quantity>\", \"password\": \"<password>\"}",
                             "Issue Item Asset.",
                             "Errors: ..."
                     },
+                    {
+                            "GET assets/balances/{key}", "get balances for ke", ""
+                    },
+                    // PERSONS
+                    {
+                            "*** PERSONS ***",
+                            "", ""
+                    },
+                    {
+                            "GET persons/<key>",
+                            "Returns short information about person with the given key.",
+                            "Errors: 601 - Invalid asset ID."
+                    },
+                    {
+                            "GET assets/types",
+                            "Return array of asset types.",
+                            ""
+                    },
+                    {
+                            "GET persons/listfrom/{start}", "get list from KEY", ""
+                    },
+                    {
+                            "POST persons/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": \"long\", \"deathday\": \"<long>\", \"gender\": \"<int>\", \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": ,     \"password\": \"<password>\"}",
+                            "Issue Item Asset.",
+                            "Errors: ..."
+                    },
+                    {
+                            "GET persons/images/<key>",
+                            "Returns person Images with the given key.",
+                            "Errors: 601 - Invalid asset ID."
+                    },
+                    {
+                            "GET balances/{key}", "get balances for ke", ""
+                    },
+                    /////// BLOGS
                     {
                             "POST blogpost/<blogname> {\"fee\": \"<fee>\", \"creator\": \"<creator>\", \"author\": \"<author>\", \"title\": \"<title>\", \"body\": \"<body>\", \"share\": \"<share>\", \"delete\": \"<delete>\"}",
                             "Posts to a blog.  <blogname>, \"author\", \"share\", and \"delete\" are optional.",

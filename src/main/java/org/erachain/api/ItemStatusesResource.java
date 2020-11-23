@@ -36,8 +36,8 @@ public class ItemStatusesResource {
      * }
      */
     @GET
-    public String getStatusesLite() {
-        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryStatusesLite());
+    public String hetHelp() {
+        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryItemsLite(ItemCls.STATUS_TYPE, null));
     }
 
     /**

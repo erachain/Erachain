@@ -452,7 +452,7 @@ public class BlockExplorer {
             output.put("type", "assets");
             output.putAll(jsonQueryPages(AssetCls.class, start, pageSize));
         } else if (info.getQueryParameters().containsKey("assetsLite")) {
-            output.put("assetsLite", jsonQueryAssetsLite());
+            output.put("assetsLite", jsonQueryItemsLite());
             // assets list
         } else if (info.getQueryParameters().containsKey("asset")) {
             if (info.getQueryParameters().get("asset").size() == 1) {
@@ -640,14 +640,25 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryAssetsLite() {
+    // ItemCls.ASSET_TYPE
+    public Map jsonQueryItemsLite(int itemType, long fromKey) {
 
         Map output = new LinkedHashMap();
-
-        Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE);
-
-        for (ItemCls item : items) {
-            output.put(item.getKey(), item.viewName());
+        ItemMap itemsMap = Controller.getInstance().getItemMap(itemType);
+        try (IteratorCloseable<Long> iterator = itemsMap.getIteratorFrom(fromKey, true)) {
+            Long key;
+            ItemCls item;
+            int size = 25;
+            while (iterator.hasNext()) {
+                if (--size < 0)
+                    break;
+                key = iterator.next();
+                item = itemsMap.get(key);
+                if (item == null)
+                    continue;
+                output.put(key, item.viewName());
+            }
+        } catch (IOException e) {
         }
 
         return output;
@@ -657,7 +668,7 @@ public class BlockExplorer {
 
         Map output = new LinkedHashMap();
 
-        Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.STATUS_TYPE);
+        Collection<ItemCls> items = Controller.getInstance().getAllItems();
 
         for (ItemCls item : items) {
             output.put(item.getKey(), item.viewName());
@@ -2075,7 +2086,7 @@ public class BlockExplorer {
         output.put("Label_Total_coins_in_the_system",
                 Lang.getInstance().translateFromLangObj("Total asset units in the system", langObj));
 
-        output.put("assets", jsonQueryAssetsLite());
+        output.put("assets", jsonQueryItemsLite());
         return output;
     }
 

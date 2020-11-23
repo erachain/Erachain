@@ -638,8 +638,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         JSONObject itemJSON = new JSONObject();
 
         // ADD DATA
-        itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-        itemJSON.put("image", java.util.Base64.getEncoder().encodeToString(this.getImage()));
+        if (getIcon() != null)
+            itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+        if (getImage() != null)
+            itemJSON.put("image", java.util.Base64.getEncoder().encodeToString(this.getImage()));
 
         return itemJSON;
     }
