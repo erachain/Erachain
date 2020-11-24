@@ -1,15 +1,13 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.Pair;
-import org.json.simple.JSONArray;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Path("persons")
 @Produces(MediaType.APPLICATION_JSON)
@@ -30,50 +29,58 @@ public class ItemPersonsResource {
 
     @SuppressWarnings("unchecked")
     @GET
-    public String getPersons() {
+    public String help() {
+        Map help = new LinkedHashMap();
 
-        //CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-        }
+        help.put("persons/{key}", "get by KEY");
+        help.put("persons/images/{key}", "get item Images by key");
+        help.put("persons/listfrom/{start}", "get list from KEY");
 
-        Collection<ItemCls> persons = Controller.getInstance().getAllItems(ItemCls.PERSON_TYPE);
-        JSONArray array = new JSONArray();
+        help.put("POST persons/issue", "issue");
 
-        for (ItemCls person : persons) {
-            array.add(((PersonCls) person).toJson());
-        }
-
-        return array.toJSONString();
+        return StrJSonFine.convert(help);
     }
 
-    @SuppressWarnings("unchecked")
     @GET
-    @Path("/address/{address}")
-    public String getPersons(@PathParam("address") String address) {
+    @Path("/{key}")
+    public String get(@PathParam("key") String key) {
+        Long asLong = null;
 
-        //CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
         }
 
-        //CHECK ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
+        if (!DCSet.getInstance().getItemPersonMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
-        //CHECK ACCOUNT IN WALLET
-        Account account = Controller.getInstance().getWalletAccountByAddress(address);
-        if (account == null) {
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
+        ItemCls item = Controller.getInstance().getPerson(asLong);
+        return JSONValue.toJSONString(item.toJson());
+    }
+
+    @GET
+    @Path("/images/{key}")
+    public String getImages(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
         }
 
-        JSONArray array = new JSONArray();
-        for (ItemCls person : Controller.getInstance().getAllItems(ItemCls.PERSON_TYPE, account)) {
-            array.add(((PersonCls) person).toJson());
+        if (!DCSet.getInstance().getItemPersonMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
-        return array.toJSONString();
+        return Controller.getInstance().getPerson(asLong).toJsonData().toJSONString();
     }
 
     @SuppressWarnings("unchecked")

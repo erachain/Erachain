@@ -1525,7 +1525,7 @@ public abstract class AssetCls extends ItemCls {
             type.put("char", charAssetType(1000, i));
             type.put("abbrev", viewAssetTypeAbbrev(i));
             type.put("name", assetTypeName);
-            type.put("nameFull", viewAssetTypeFullCls(i));
+            type.put("name_full", viewAssetTypeFullCls(i));
             type.put("desc", viewAssetTypeDescriptionCls(i));
             types.add(type);
 
@@ -1542,11 +1542,14 @@ public abstract class AssetCls extends ItemCls {
         // ADD DATA
         assetJSON.put("scale", this.getScale());
         assetJSON.put("assetTypeKey", this.assetType);
-        assetJSON.put("assetTypeChar", charAssetType());
-        assetJSON.put("assetTypeAbbrev", viewAssetTypeAbbrev());
         assetJSON.put("assetTypeName", viewAssetType());
-        assetJSON.put("assetTypeNameFull", viewAssetTypeFull());
         assetJSON.put("assetTypeDesc", viewAssetTypeDescriptionCls(assetType));
+        assetJSON.put("type_key", this.assetType);
+        assetJSON.put("type_char", charAssetType());
+        assetJSON.put("type_abbrev", viewAssetTypeAbbrev());
+        assetJSON.put("type_name", viewAssetType());
+        assetJSON.put("type_name_full", viewAssetTypeFull());
+        assetJSON.put("type_desc", viewAssetTypeDescriptionCls(assetType));
 
         return assetJSON;
     }

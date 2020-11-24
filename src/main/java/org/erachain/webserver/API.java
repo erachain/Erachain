@@ -7,7 +7,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.crypto.Base32;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
@@ -124,8 +123,6 @@ public class API {
         help.put("GET Asset Icon", "asseticon/{key}");
 
         help.put("*** ASSETS ***", "");
-        help.put("GET Assets", "assets");
-        help.put("GET Assets Full", "assetsfull");
         help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}");
 
         help.put("*** EXCHANGE ***", "");
@@ -769,7 +766,7 @@ public class API {
             } else {
                 out.put("error", result.getB());
                 out.put("message", OnDealClick.resultMess(result.getB()));
-                if (result.getA().errorValue != null) {
+                if (result.getA() != null && result.getA().errorValue != null) {
                     out.put("value", result.getA().errorValue);
                 }
                 return out;
@@ -1298,57 +1295,10 @@ public class API {
      */
 
     @GET
-    @Path("assets")
-    public Response assets() {
-
-        return Response.status(200)
-                .header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(BlockExplorer.getInstance().jsonQueryAssetsLite()))
-                .build();
-
-    }
-
-    @Path("assetsfull")
-    public Response assetsFull() {
-
-        return Response.status(200)
-                .header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(BlockExplorer.getInstance().jsonQueryAssets())
-                .build();
-
-    }
-
-    @GET
     @Path("assetsfilter/{filter_name_string}")
     public Response assetsFilter(@PathParam("filter_name_string") String filter) {
 
-
-        if (filter == null || filter.length() < 3) {
-            return Response.status(501)
-                    .header("Content-Type", "application/json; charset=utf-8")
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity("error - so small filter length")
-                    .build();
-        }
-
-        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
-
-        JSONArray array = new JSONArray();
-
-        if (list != null) {
-            for (ItemCls item : list) {
-                array.add(item.toJson());
-            }
-        }
-
-        return Response.status(200)
-                .header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(array))
-                .build();
+        return APIItemAsset.find(filter);
 
     }
 
