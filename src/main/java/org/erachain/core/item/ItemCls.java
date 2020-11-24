@@ -587,7 +587,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJSON.put("key", this.getKey());
         itemJSON.put("name", this.name);
 
-        if (withIcon)
+        if (withIcon && this.getIcon() != null)
             itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
 
         itemJSON.put("owner", this.owner.getAddress());
@@ -609,17 +609,16 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         JSONObject itemJSON = toJsonLite(false, false);
 
         // ADD DATA
-        //itemJSON.put("item_type", this.getItemTypeName());
+        itemJSON.put("item_type", this.getItemTypeName());
         itemJSON.put("itemType", this.getItemTypeName());
-        //itemJSON.put("item_type_sub", this.getItemSubType());
+        itemJSON.put("item_type_sub", this.getItemSubType());
         itemJSON.put("itemTypeSub", this.getItemSubType());
         itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
         itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
-        //itemJSON.put("key", this.getKey());
-        //itemJSON.put("name", this.name);
         itemJSON.put("description", this.description);
         itemJSON.put("creator", this.owner.getAddress()); // @Deprecated
-        //itemJSON.put("owner_publickey", this.owner.getBase58());
+        itemJSON.put("owner_public_key", this.owner.getBase58());
+        itemJSON.put("owner_publickey", this.owner.getBase58());
         itemJSON.put("ownerPubkey", this.owner.getBase58());
         itemJSON.put("isConfirmed", this.isConfirmed());
         itemJSON.put("reference", Base58.encode(this.reference));
