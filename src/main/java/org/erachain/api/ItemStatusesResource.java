@@ -2,101 +2,75 @@ package org.erachain.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Path("statuses")
 @Produces(MediaType.APPLICATION_JSON)
 @Slf4j
 public class ItemStatusesResource {
-    /**
-     * Get all status type 1
-     *
-     * @return ArrayJSON of all status. request key means key status and name status.
-     * <h2>Example request</h2>
-     * GET statuss
-     * <h2>Example response</h2>
-     * {
-     * "1": "ERA",
-     * "2": "COMPU",
-     * "3": "АЗЫ",
-     * "4": "ВЕДЫ",
-     * "5": "►РА",
-     * "6": "►RUNEURO",
-     * "7": "►ERG",
-     * "8": "►LERG",
-     * "9": "►A"
-     * }
-     */
     @GET
-    public String getStatusesLite() {
-        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryStatusesLite());
+    public String help() {
+        Map help = new LinkedHashMap();
+
+        help.put("statuses/{key}", "get by KEY");
+        help.put("statuses/images/{key}", "get item Images by key");
+        help.put("statuses/listfrom/{start}", "get list from KEY");
+
+        help.put("POST statuses/issue", "issue");
+
+        return StrJSonFine.convert(help);
     }
 
-    /**
-     * Get lite information status by key status
-     *
-     * @param key is number status
-     * @return JSON object. Single status
-     */
     @GET
     @Path("/{key}")
-    public String getStatusLite(@PathParam("key") String key) {
-        Long statusAsLong = null;
+    public String get(@PathParam("key") String key) {
+        Long asLong = null;
 
-        // HAS ASSET NUMBERFORMAT
         try {
-            statusAsLong = Long.valueOf(key);
-
+            asLong = Long.valueOf(key);
         } catch (NumberFormatException e) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_STATUS_NOT_EXIST);
-
+                    Transaction.INVALID_ITEM_KEY);
         }
 
-        // DOES ASSETID EXIST
-        if (!DCSet.getInstance().getItemStatusMap().contains(statusAsLong)) {
+        if (!DCSet.getInstance().getItemStatusMap().contains(asLong)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_STATUS_NOT_EXIST);
-
         }
 
-        return Controller.getInstance().getStatus(statusAsLong).toJson().toJSONString();
+        ItemCls item = Controller.getInstance().getStatus(asLong);
+        return JSONValue.toJSONString(item.toJson());
     }
 
     @GET
-    @Path("/{key}/full")
-    public String getStatus(@PathParam("key") String key) {
-        Long statusAsLong = null;
+    @Path("/images/{key}")
+    public String getImages(@PathParam("key") String key) {
+        Long asLong = null;
 
-        // HAS ASSET NUMBERFORMAT
         try {
-            statusAsLong = Long.valueOf(key);
+            asLong = Long.valueOf(key);
 
         } catch (NumberFormatException e) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_STATUS_NOT_EXIST);
-
+                    Transaction.INVALID_ITEM_KEY);
         }
 
-        // DOES ASSETID EXIST
-        if (!DCSet.getInstance().getItemStatusMap().contains(statusAsLong)) {
+        if (!DCSet.getInstance().getItemStatusMap().contains(asLong)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_STATUS_NOT_EXIST);
         }
 
-        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryItemStatus(statusAsLong));
+        return Controller.getInstance().getStatus(asLong).toJsonData().toJSONString();
     }
 
     @SuppressWarnings("unchecked")

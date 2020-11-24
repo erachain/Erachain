@@ -2805,7 +2805,7 @@ public class Controller extends Observable {
     // ASSETS
 
     public AssetCls getAsset(long key) {
-        return (AssetCls) this.dcSet.getItemAssetMap().get(key);
+        return this.dcSet.getItemAssetMap().get(key);
     }
 
     public PersonCls getPerson(long key) {
@@ -3167,8 +3167,6 @@ public class Controller extends Observable {
             image = java.util.Base64.getDecoder().decode(image64);
         }
 
-        Integer scale = (Integer) jsonObject.getOrDefault("scale", 0);
-        Integer assetType = (Integer) jsonObject.getOrDefault("assetType", 0);
         Long birthday = (Long) jsonObject.getOrDefault("birthday", 0L);
         Long deathday = (Long) jsonObject.getOrDefault("deathday", null);
         Integer gender = (Integer) jsonObject.getOrDefault("gender", 0);

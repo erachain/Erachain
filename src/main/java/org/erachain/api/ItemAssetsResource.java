@@ -3,7 +3,6 @@ package org.erachain.api;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
@@ -12,9 +11,9 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +22,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Path("assets")
 @Produces(MediaType.APPLICATION_JSON)
@@ -33,92 +34,78 @@ public class ItemAssetsResource {
     @Context
     HttpServletRequest request;
 
-    /**
-     * Get all asset type 1
-     *
-     * @return ArrayJSON of all asset. request key means key asset and name asset.
-     * <h2>Example request</h2>
-     * GET assets
-     * <h2>Example response</h2>
-     * {
-     * "1": "ERA",
-     * "2": "COMPU",
-     * "3": "АЗЫ",
-     * "4": "ВЕДЫ",
-     * "5": "►РА",
-     * "6": "►RUNEURO",
-     * "7": "►ERG",
-     * "8": "►LERG",
-     * "9": "►A"
-     * }
-     */
     @GET
-    public String getAssetsLite() {
-        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryAssetsLite());
+    public String help() {
+        Map help = new LinkedHashMap();
+
+        help.put("assets/{key}", "get by KEY");
+        help.put("assets/images/{key}", "get item images by KEY");
+        help.put("assets/types", "get types");
+        help.put("assets/listfrom/{start}", "get list from KEY");
+
+        help.put("assets/balances/{key}", "get balances for key");
+        help.put("POST assets/issue", "issue");
+
+        return StrJSonFine.convert(help);
     }
 
     /**
      * Get lite information asset by key asset
+     *
      * @param key is number asset
      * @return JSON object. Single asset
      */
     @GET
     @Path("/{key}")
-    public String getAssetLite(@PathParam("key") String key) {
-        Long assetAsLong = null;
+    public String get(@PathParam("key") String key) {
+        Long asLong = null;
 
         // HAS ASSET NUMBERFORMAT
         try {
-            assetAsLong = Long.valueOf(key);
+            asLong = Long.valueOf(key);
 
         } catch (NumberFormatException e) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_ASSET_NOT_EXIST);
+                    Transaction.INVALID_ITEM_KEY);
 
         }
 
         // DOES ASSETID EXIST
-        if (!DCSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
+        if (!DCSet.getInstance().getItemAssetMap().contains(asLong)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_ASSET_NOT_EXIST);
 
         }
 
-        return Controller.getInstance().getAsset(assetAsLong).toJson().toJSONString();
+        return Controller.getInstance().getAsset(asLong).toJson().toJSONString();
     }
 
+    /**
+     *
+     */
     @GET
-    @Path("/{key}/full")
-    public String getAsset(@PathParam("key") String key) {
-        Long assetAsLong = null;
+    @Path("/images/{key}")
+    public String getImages(@PathParam("key") String key) {
+        Long asLong = null;
 
         // HAS ASSET NUMBERFORMAT
         try {
-            assetAsLong = Long.valueOf(key);
+            asLong = Long.valueOf(key);
 
         } catch (NumberFormatException e) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_ASSET_NOT_EXIST);
+                    Transaction.INVALID_ITEM_KEY);
 
         }
 
         // DOES ASSETID EXIST
-        if (!DCSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
+        if (!DCSet.getInstance().getItemAssetMap().contains(asLong)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_ASSET_NOT_EXIST);
+
         }
 
-        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryItemAsset(assetAsLong));
-    }
-
-    @GET
-    @Path("types")
-    public String getAssetTypes() {
-        return AssetCls.typesJson().toJSONString();
+        return Controller.getInstance().getAsset(asLong).toJsonData().toJSONString();
     }
 
     @SuppressWarnings("unchecked")
@@ -134,6 +121,35 @@ public class ItemAssetsResource {
 
         return output.toJSONString();
     }
+
+    @POST
+    @Path("/issue")
+    public String issue(String x) {
+
+        Controller cntr = Controller.getInstance();
+        Object result = cntr.issueAsset(request, x);
+        if (result instanceof JSONObject) {
+            return ((JSONObject) result).toJSONString();
+        }
+
+        Transaction transaction = (Transaction) result;
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        if (validate == Transaction.VALIDATE_OK)
+            return transaction.toJson().toJSONString();
+        else {
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByErrorSimple(validate, out);
+            return out.toJSONString();
+        }
+    }
+
+    @GET
+    @Path("types")
+    public String getAssetTypes() {
+        return AssetCls.typesJson().toJSONString();
+    }
+
 
     /**
      * Sorted Array
@@ -193,28 +209,6 @@ public class ItemAssetsResource {
         }
 
         return out.toJSONString();
-    }
-
-    @POST
-    @Path("/issue")
-    public String issue(String x) {
-
-        Controller cntr = Controller.getInstance();
-        Object result = cntr.issueAsset(request, x);
-        if (result instanceof JSONObject) {
-            return ((JSONObject) result).toJSONString();
-        }
-
-        Transaction transaction = (Transaction) result;
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-
-        if (validate == Transaction.VALIDATE_OK)
-            return transaction.toJson().toJSONString();
-        else {
-            JSONObject out = new JSONObject();
-            Transaction.updateMapByErrorSimple(validate, out);
-            return out.toJSONString();
-        }
     }
 
 }

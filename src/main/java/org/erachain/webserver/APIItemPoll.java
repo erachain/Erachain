@@ -18,7 +18,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,40 +32,35 @@ public class APIItemPoll {
     @Context
     HttpServletRequest request;
 
+    private DCSet dcSet = DCSet.getInstance();
+    private Controller cntrl = Controller.getInstance();
+
+
     @GET
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
-        help.put("apipoll/allPoll", "Get all poll.");
-
+        help.put("GET apipoll/last", "Get last ID");
         help.put("GET apipoll/{key}", "GET by ID");
         help.put("GET apipoll/find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apipoll/image/{key}", "GET Poll Image");
         help.put("Get apipoll/icon/{key}", "GET Poll Icon");
-        help.put("Get apipoll/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} defaul - true, {descending} - true");
+        help.put("Get apipoll/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
     }
 
-    /**
-     * Get all poll
-     *
-     * @return all poll in JSON
-     */
     @GET
-    @Path("allPoll")
-    public Response getAllPolls() {
-        Collection<ItemCls> polls = Controller.getInstance().getAllItems(ItemCls.POLL_TYPE);
-        JSONArray array = new JSONArray();
+    @Path("last")
+    public Response last() {
 
-        for (ItemCls poll : polls) {
-            array.add(poll.getName());
-        }
-
-        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(array.toJSONString()).build();
+                .entity("" + dcSet.getItemPollMap().getLastKey())
+                .build();
+
     }
 
     @GET

@@ -2573,8 +2573,8 @@ public class WebResource {
 
             PebbleHelper pebbleHelper = PebbleHelper.getPebbleHelper(
                     "web/blog.html", request, NavbarElements.BlogNavbar);
-            pebbleHelper.getContextMap().put("namestoragemap",
-                    NameStorageWebResource.getInstance());
+            //pebbleHelper.getContextMap().put("namestoragemap",
+            //        NameStorageWebResource.getInstance());
             pebbleHelper.getContextMap().put("postblogurl", "postblog.html");
             pebbleHelper.getContextMap().put("apimessage", messageOpt);
 
@@ -3418,8 +3418,8 @@ public class WebResource {
         FileUtils.writeStringToFile(tmpFile, website, Charsets.UTF_8);
         PebbleHelper pebbleHelper = PebbleHelper.getPebbleHelper(
                 tmpFile.getAbsolutePath(), request);
-        pebbleHelper.getContextMap().put("namestoragemap",
-                NameStorageWebResource.getInstance());
+        //pebbleHelper.getContextMap().put("namestoragemap",
+        //        NameStorageWebResource.getInstance());
         // pebbleHelper.getContextMap().put("atmap",DLSet.getInstance().getATMap());
         // pebbleHelper.getContextMap().put("attxsmap",DLSet.getInstance().getATTransactionMap());
         pebbleHelper.getContextMap().put("ats", ATWebResource.getInstance());
