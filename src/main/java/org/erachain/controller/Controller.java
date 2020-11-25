@@ -3062,12 +3062,18 @@ public class Controller extends Observable {
             image = java.util.Base64.getDecoder().decode(image64);
         }
 
-        Long exLinkRef = (Long) jsonObject.get("exLink");
-        ExLink exLink;
-        if (exLinkRef == null) {
-            exLink = null;
-        } else {
-            exLink = new ExLinkSource(exLinkRef, null);
+        String linkToRefStr = jsonObject.get("linkTo").toString();
+        ExLink linkTo;
+        if (linkToRefStr == null)
+            linkTo = null;
+        else {
+            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
+            if (linkToRef == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+            } else {
+                linkTo = new ExLinkSource(linkToRef, null);
+            }
         }
 
         Integer scale = (Integer) jsonObject.getOrDefault("scale", 0);
@@ -3078,23 +3084,23 @@ public class Controller extends Observable {
         PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
 
         return issueAsset(creatorPrivate,
-                exLink, name, description, icon, image, scale,
+                linkTo, name, description, icon, image, scale,
                 assetType, quantity, feePow);
 
     }
 
-    public Transaction issueAsset(PrivateKeyAccount creator, int feePow, AssetCls asset) {
+    public Transaction issueAsset(PrivateKeyAccount creator, ExLink linkTo, int feePow, AssetCls asset) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueAssetTransaction(creator, null, asset, feePow);
+            return this.transactionCreator.createIssueAssetTransaction(creator, linkTo, asset, feePow);
         }
     }
 
-    public Transaction issueAsset(PrivateKeyAccount creator, ExLink exLink, String name, String description, byte[] icon, byte[] image,
+    public Transaction issueAsset(PrivateKeyAccount creator, ExLink linkTo, String name, String description, byte[] icon, byte[] image,
                                   int scale, int assetType, long quantity, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueAssetTransaction(creator, exLink, name, description, icon, image, scale,
+            return this.transactionCreator.createIssueAssetTransaction(creator, linkTo, name, description, icon, image, scale,
                     assetType, quantity, feePow);
         }
     }
