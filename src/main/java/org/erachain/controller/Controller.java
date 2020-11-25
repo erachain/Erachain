@@ -20,6 +20,7 @@ import org.erachain.core.crypto.Base32;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
@@ -3061,7 +3062,13 @@ public class Controller extends Observable {
             image = java.util.Base64.getDecoder().decode(image64);
         }
 
-        Long exLink = (Long) jsonObject.getOrDefault("exLink");
+        Long exLinkRef = (Long) jsonObject.get("exLink");
+        ExLink exLink;
+        if (exLinkRef == null) {
+            exLink = null;
+        } else {
+            exLink = new ExLinkSource(exLinkRef, null);
+        }
 
         Integer scale = (Integer) jsonObject.getOrDefault("scale", 0);
         Integer assetType = (Integer) jsonObject.getOrDefault("assetType", 0);
@@ -3071,7 +3078,7 @@ public class Controller extends Observable {
         PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
 
         return issueAsset(creatorPrivate,
-                null, name, description, icon, image, scale,
+                exLink, name, description, icon, image, scale,
                 assetType, quantity, feePow);
 
     }
