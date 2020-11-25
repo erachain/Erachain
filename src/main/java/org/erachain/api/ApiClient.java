@@ -30,6 +30,31 @@ public class ApiClient {
     static String[][] helpStrings =
             {
                     {
+                            "GET assets",
+                            "See assets API",
+                            "JSON TEXT"
+                    },
+                    {
+                            "GET persons",
+                            "See persons API",
+                            "JSON TEXT"
+                    },
+                    {
+                            "GET polls",
+                            "See polls API",
+                            "JSON TEXT"
+                    },
+                    {
+                            "GET statuses",
+                            "See statuses API",
+                            "JSON TEXT"
+                    },
+                    {
+                            "GET templates",
+                            "See templates API",
+                            "JSON TEXT"
+                    },
+                    {
                             "GET core",
                             "Returns info of the application.",
                             "JSON"
@@ -887,8 +912,14 @@ public class ApiClient {
         if (command.toLowerCase().equals("help all")) {
             String help = "\n";
 
-            for (String[] strings : helpStrings) {
-                help += strings[0] + "\n\t" + strings[1] + "\n\n";
+            for (String[] helpString : helpStrings) {
+                help += helpString[0] + "\n";
+                if (helpString.length > 1)
+                    help += "\t" + helpString[1] + "\n";
+                if (helpString.length > 2)
+                    help += "\t" + helpString[2] + "\n";
+                if (helpString.length > 3)
+                    help += "\t" + helpString[3] + "\n";
             }
 
             return help;
@@ -919,7 +950,13 @@ public class ApiClient {
                     }
 
                     if (!notallfound) {
-                        help += helpString[0] + "\n\t" + helpString[1] + "\n\t" + helpString[2] + "\n\n";
+                        help += helpString[0] + "\n";
+                        if (helpString.length > 1)
+                            help += "\t" + helpString[1] + "\n";
+                        if (helpString.length > 2)
+                            help += "\t" + helpString[2] + "\n";
+                        if (helpString.length > 3)
+                            help += "\t" + helpString[3] + "\n";
                         found = true;
                         if (helparray.length == args.length - 1) {
                             break;
@@ -934,6 +971,12 @@ public class ApiClient {
                 help = "\n";
                 for (String[] helpString : helpStrings) {
                     help += helpString[0] + "\n";
+                    if (helpString.length > 1)
+                        help += "\t" + helpString[1] + "\n";
+                    if (helpString.length > 2)
+                        help += "\t" + helpString[2] + "\n";
+                    if (helpString.length > 3)
+                        help += "\t" + helpString[3] + "\n";
                 }
             }
 
