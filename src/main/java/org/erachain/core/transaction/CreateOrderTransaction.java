@@ -6,6 +6,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
@@ -181,6 +182,14 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
         PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
         position += CREATOR_LENGTH;
+
+        ExLink exLink;
+        if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
+            exLink = ExLink.parse(data, position);
+            position += exLink.length();
+        } else {
+            exLink = null;
+        }
 
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {

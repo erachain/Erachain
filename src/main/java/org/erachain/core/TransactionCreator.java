@@ -240,7 +240,7 @@ public class TransactionCreator {
     }
 
 
-    public Transaction createIssueAssetTransaction(PrivateKeyAccount creator, AssetCls asset, int feePow) {
+    public Transaction createIssueAssetTransaction(PrivateKeyAccount creator, ExLink exLink, AssetCls asset, int feePow) {
         //CHECK FOR UPDATES
         // all unconfirmed org.erachain.records insert in FORK for calc last account REFERENCE
         this.checkUpdate();
@@ -251,18 +251,18 @@ public class TransactionCreator {
         asset.setKey(this.fork.getItemAssetMap().getLastKey() + 1l);
 
         //CREATE ISSUE ASSET TRANSACTION
-        IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte) feePow, time, 0L);
+        IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, exLink, asset, (byte) feePow, time, 0L);
         issueAssetTransaction.sign(creator, Transaction.FOR_NETWORK);
         issueAssetTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return issueAssetTransaction;
     }
 
-    public Transaction createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description,
+    public Transaction createIssueAssetTransaction(PrivateKeyAccount creator, ExLink exLink, String name, String description,
                                                    byte[] icon, byte[] image,
                                                    int scale, int asset_type, long quantity, int feePow) {
         AssetCls asset = new AssetVenture(creator, name, icon, image, description, asset_type, scale, quantity);
-        return createIssueAssetTransaction(creator, asset, feePow);
+        return createIssueAssetTransaction(creator, exLink, asset, feePow);
     }
 
     public Pair<Transaction, Integer> createIssueImprintTransaction(PrivateKeyAccount creator, String name, String description,

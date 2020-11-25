@@ -3061,6 +3061,8 @@ public class Controller extends Observable {
             image = java.util.Base64.getDecoder().decode(image64);
         }
 
+        Long exLink = (Long) jsonObject.getOrDefault("exLink");
+
         Integer scale = (Integer) jsonObject.getOrDefault("scale", 0);
         Integer assetType = (Integer) jsonObject.getOrDefault("assetType", 0);
         Long quantity = (Long) jsonObject.getOrDefault("quantity", 0L);
@@ -3069,7 +3071,7 @@ public class Controller extends Observable {
         PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
 
         return issueAsset(creatorPrivate,
-                name, description, icon, image, scale,
+                null, name, description, icon, image, scale,
                 assetType, quantity, feePow);
 
     }
@@ -3077,15 +3079,15 @@ public class Controller extends Observable {
     public Transaction issueAsset(PrivateKeyAccount creator, int feePow, AssetCls asset) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueAssetTransaction(creator, asset, feePow);
+            return this.transactionCreator.createIssueAssetTransaction(creator, null, asset, feePow);
         }
     }
 
-    public Transaction issueAsset(PrivateKeyAccount creator, String name, String description, byte[] icon, byte[] image,
+    public Transaction issueAsset(PrivateKeyAccount creator, ExLink exLink, String name, String description, byte[] icon, byte[] image,
                                   int scale, int assetType, long quantity, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueAssetTransaction(creator, name, description, icon, image, scale,
+            return this.transactionCreator.createIssueAssetTransaction(creator, exLink, name, description, icon, image, scale,
                     assetType, quantity, feePow);
         }
     }

@@ -3,6 +3,7 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.statuses.StatusFactory;
 
@@ -18,7 +19,7 @@ public class IssueStatusRecord extends IssueItemRecord {
     private static final String NAME_ID = "Issue Status";
 
     public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, status, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, status, feePow, timestamp, reference);
     }
 
     public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -93,6 +94,14 @@ public class IssueStatusRecord extends IssueItemRecord {
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
         PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
         position += CREATOR_LENGTH;
+
+        ExLink exLink;
+        if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
+            exLink = ExLink.parse(data, position);
+            position += exLink.length();
+        } else {
+            exLink = null;
+        }
 
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {

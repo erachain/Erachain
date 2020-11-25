@@ -3,6 +3,7 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.polls.PollFactory;
 
@@ -14,7 +15,7 @@ public class IssuePollRecord extends IssueItemRecord {
     private static final String NAME_ID = "Issue Poll";
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, poll, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, poll, feePow, timestamp, reference);
     }
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -91,6 +92,14 @@ public class IssuePollRecord extends IssueItemRecord {
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
         PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
         position += CREATOR_LENGTH;
+
+        ExLink exLink;
+        if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
+            exLink = ExLink.parse(data, position);
+            position += exLink.length();
+        } else {
+            exLink = null;
+        }
 
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {

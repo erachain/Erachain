@@ -5,6 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
@@ -31,7 +32,7 @@ public class IssuePersonRecord extends IssueItemRecord {
 
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, person, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, person, feePow, timestamp, reference);
     }
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -116,6 +117,14 @@ public class IssuePersonRecord extends IssueItemRecord {
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
         PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
         position += CREATOR_LENGTH;
+
+        ExLink exLink;
+        if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
+            exLink = ExLink.parse(data, position);
+            position += exLink.length();
+        } else {
+            exLink = null;
+        }
 
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {
