@@ -181,7 +181,7 @@ public class APITXResource {
 
         } catch (Exception e) {
 
-            Map out = new LinkedHashMap();
+            JSONObject out = new JSONObject();
             out.put("error", step);
             if (step == 1)
                 out.put("message", "height-sequence error, use integer-integer value");
@@ -193,7 +193,7 @@ public class APITXResource {
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(StrJSonFine.convert(out))
+                    .entity(out.toJSONString())
                     .build();
         }
     }
