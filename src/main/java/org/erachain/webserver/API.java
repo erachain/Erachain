@@ -182,7 +182,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -191,12 +191,12 @@ public class API {
     public Response lastBlock() {
 
         Block lastBlock = dcSet.getBlockMap().last();
-        Map out = lastBlock.toJson();
+        JSONObject out = lastBlock.toJson();
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -205,12 +205,12 @@ public class API {
     public Response lastBlockHead() {
 
         Block.BlockHead lastBlock = dcSet.getBlocksHeadsMap().last();
-        Map out = lastBlock.toJson();
+        JSONObject out = lastBlock.toJson();
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -219,7 +219,7 @@ public class API {
     public Response getChildBlockSignature(@PathParam("signature") String signature) {
         //DECODE SIGNATURE
         byte[] signatureBytes;
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
 
         int step = 1;
         try {
@@ -246,7 +246,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -255,7 +255,7 @@ public class API {
     public Response getChildBlock(@PathParam("signature") String signature) {
         //DECODE SIGNATURE
         byte[] signatureBytes;
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
 
         int step = 1;
         try {
@@ -281,7 +281,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -289,7 +289,7 @@ public class API {
     @Path("block/{signature}")
     public Response block(@PathParam("signature") String signature) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
 
         int step = 1;
 
@@ -319,7 +319,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -327,7 +327,7 @@ public class API {
     @Path("blockbyheight/{height}")
     public Response blockByHeight(@PathParam("height") String heightStr) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -357,7 +357,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -365,7 +365,7 @@ public class API {
     @Path("blockbyheight2/{height}")
     public Response blockByHeight2(@PathParam("height") String heightStr) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -404,7 +404,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -460,7 +460,7 @@ public class API {
         if (limit > 100)
             limit = 100;
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -491,7 +491,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -521,7 +521,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -537,7 +537,7 @@ public class API {
     @Path("record/{signature}")
     public Response record(@PathParam("signature") String signature) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
 
         int step = 1;
 
@@ -562,7 +562,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -570,7 +570,7 @@ public class API {
     @Path("recordbynumber/{number}")
     public Response recodByNumber(@PathParam("number") String numberStr) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -598,7 +598,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -606,7 +606,7 @@ public class API {
     @Path("recordraw/{signature}")
     public Response recordRaw(@PathParam("signature") String signature) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
 
         int step = 1;
 
@@ -642,7 +642,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -650,7 +650,7 @@ public class API {
     @Path("recordrawbynumber/{number}")
     public Response recodRawByNumber(@PathParam("number") String numberStr) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -680,7 +680,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -688,7 +688,7 @@ public class API {
     @Path("recordrawbynumber/{block}/{seqNo}")
     public Response recodRawBySeqNo(@PathParam("block") int block, @PathParam("seqNo") int seqNo) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
 
         try {
 
@@ -703,7 +703,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -716,7 +716,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(broadcastFromRaw_1(raw)))
+                .entity(broadcastFromRaw_1(raw).toJSONString())
                 .build();
     }
 
@@ -730,7 +730,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(broadcastFromRaw_1(raw)))
+                .entity(broadcastFromRaw_1(raw).toJSONString())
                 .build();
 
     }
@@ -743,7 +743,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(broadcastFromRaw_1(raw)))
+                .entity(broadcastFromRaw_1(raw).toJSONString())
                 .build();
 
     }
@@ -823,7 +823,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(broadcastTelegram_1(raw)))
+                .entity(broadcastTelegram_1(raw).toJSONString())
                 .build();
     }
 
@@ -837,7 +837,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(broadcastTelegram_1(raw)))
+                .entity(broadcastTelegram_1(raw).toJSONString())
                 .build();
 
     }
@@ -850,7 +850,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(broadcastTelegram_1(raw)))
+                .entity(broadcastTelegram_1(raw).toJSONString())
                 .build();
 
     }
@@ -1043,7 +1043,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(array))
+                .entity(array.toJSONString())
                 .build();
     }
 
@@ -1089,7 +1089,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -1176,7 +1176,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -1230,7 +1230,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -1265,7 +1265,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(asset.toJson()))
+                .entity(asset.toJson().toJSONString())
                 .build();
 
     }
@@ -1285,7 +1285,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(asset.toJsonData()))
+                .entity(asset.toJsonData().toJSONString())
                 .build();
 
     }
@@ -1394,9 +1394,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                //.entity(StrJSonFine.convert(itemJSON))
                 .entity(itemJSON.toJSONString())
-                //.entity(itemJSON.toString())
                 .build();
 
     }
@@ -1436,7 +1434,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(person.toJson()))
+                .entity(person.toJson().toJSONString())
                 .build();
 
     }
@@ -1564,7 +1562,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(person.toJsonData()))
+                .entity(person.toJsonData().toJSONString())
                 .build();
 
     }
@@ -1670,7 +1668,7 @@ public class API {
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(StrJSonFine.convert(answer))
+                    .entity(answer.toJSONString())
                     .build();
         }
     }
@@ -1710,7 +1708,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(person.toJson()))
+                .entity(person.toJson().toJSONString())
                 .build();
 
     }
@@ -1752,7 +1750,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(person.toJson()))
+                .entity(person.toJson().toJSONString())
                 .build();
     }
 
@@ -1789,7 +1787,7 @@ public class API {
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(StrJSonFine.convert(person.toJson()))
+                    .entity(person.toJson().toJSONString())
                     .build();
         }
     }
@@ -1807,7 +1805,7 @@ public class API {
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(StrJSonFine.convert(answer))
+                    .entity(answer.toJSONString())
                     .build();
         }
     }
@@ -1852,7 +1850,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(array))
+                .entity(array.toJSONString())
                 .build();
 
     }

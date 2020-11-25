@@ -75,7 +75,7 @@ public class PersonWorkDialog extends JDialog {
 
 
                 @SuppressWarnings("unused")
-                PersonConfirmDialog fm = new PersonConfirmDialog(person, person.getOwner());
+                PersonCertifyPubKeysDialog fm = new PersonCertifyPubKeysDialog(person, person.getOwner());
                 dispose();
             }
         });

@@ -2,7 +2,7 @@ package org.erachain.gui.items.persons;
 
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.core.transaction.RSertifyPubKeys;
+import org.erachain.core.transaction.RCertifyPubKeys;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class PersonVouchFromTableModel extends TimerTableModelCls<RSertifyPubKeys> implements Observer {
+public class PersonVouchFromTableModel extends TimerTableModelCls<RCertifyPubKeys> implements Observer {
 
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_CREATOR = 1;
@@ -36,8 +36,8 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RSertifyPubKey
     }
 
     public PublicKeyAccount getPublicKey(int row) {
-        RSertifyPubKeys transaction = this.list.get(row);
-        return transaction.getSertifiedPublicKeys().get(0);
+        RCertifyPubKeys transaction = this.list.get(row);
+        return transaction.getCertifiedPublicKeys().get(0);
 
     }
 
@@ -60,7 +60,7 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RSertifyPubKey
     public Object getValueAt(int row, int column) {
         if (this.list == null || this.list.isEmpty()) return null;
 
-        RSertifyPubKeys transaction = this.list.get(row);
+        RCertifyPubKeys transaction = this.list.get(row);
         if (transaction == null)
             return null;
 
@@ -71,7 +71,7 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RSertifyPubKey
 
             case COLUMN_CREATOR:
 
-                return transaction.getSertifiedPublicKeys().get(0).getPersonAsString();
+                return transaction.getCertifiedPublicKeys().get(0).getPersonAsString();
 
             case COLUMN_HEIGHT:
 
@@ -101,7 +101,7 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RSertifyPubKey
                 }
 
                 Fun.Tuple3<Integer, Integer, Integer> itemTransaction = stack.peek();
-                RSertifyPubKeys transaction = (RSertifyPubKeys)mapTransactions.get(itemTransaction.b, itemTransaction.c);
+                RCertifyPubKeys transaction = (RCertifyPubKeys) mapTransactions.get(itemTransaction.b, itemTransaction.c);
                 if (transaction != null) {
                     list.add(transaction);
                 }
@@ -112,7 +112,7 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RSertifyPubKey
         } else if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE) {
             Transaction transaction = (Transaction) message.getValue();
             if (transaction.getType() == Transaction.CERTIFY_PUB_KEYS_TRANSACTION) {
-                RSertifyPubKeys rSertify = (RSertifyPubKeys) transaction;
+                RCertifyPubKeys rSertify = (RCertifyPubKeys) transaction;
                 Tuple2<Integer, PersonCls> personRes = rSertify.getCreator().getPerson();
                 if (personRes != null && personRes.b.getKey() == person.getKey()) {
                     if (!this.list.contains(rSertify)) {
@@ -125,7 +125,7 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RSertifyPubKey
         } else if (message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE) {
             Transaction transaction = (Transaction) message.getValue();
             if (transaction.getType() == Transaction.CERTIFY_PUB_KEYS_TRANSACTION) {
-                RSertifyPubKeys rSertify = (RSertifyPubKeys) transaction;
+                RCertifyPubKeys rSertify = (RCertifyPubKeys) transaction;
                 Tuple2<Integer, PersonCls> personRes = rSertify.getCreator().getPerson();
                 if (personRes != null && personRes.b.getKey() == person.getKey()) {
                     if (this.list.contains(rSertify)) {

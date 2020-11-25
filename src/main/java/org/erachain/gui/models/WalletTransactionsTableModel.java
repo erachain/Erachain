@@ -67,9 +67,9 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
         } else if (transaction instanceof GenesisIssueItemRecord) {
             GenesisIssueItemRecord transIssue = (GenesisIssueItemRecord) transaction;
             item = transIssue.getItem();
-        } else if (transaction instanceof RSertifyPubKeys) {
-            RSertifyPubKeys sertifyPK = (RSertifyPubKeys) transaction;
-            item = dcSet.getItemPersonMap().get(sertifyPK.getAbsKey());
+        } else if (transaction instanceof RCertifyPubKeys) {
+            RCertifyPubKeys certifyPK = (RCertifyPubKeys) transaction;
+            item = dcSet.getItemPersonMap().get(certifyPK.getAbsKey());
         } else {
 
         }

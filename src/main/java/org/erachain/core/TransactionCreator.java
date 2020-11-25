@@ -15,6 +15,7 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.item.imprints.ImprintCls;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.Status;
@@ -239,9 +240,7 @@ public class TransactionCreator {
     }
 
 
-    public Transaction createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description,
-                                                   byte[] icon, byte[] image,
-                                                   int scale, int asset_type, long quantity, int feePow) {
+    public Transaction createIssueAssetTransaction(PrivateKeyAccount creator, AssetCls asset, int feePow) {
         //CHECK FOR UPDATES
         // all unconfirmed org.erachain.records insert in FORK for calc last account REFERENCE
         this.checkUpdate();
@@ -249,15 +248,21 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        AssetCls asset = new AssetVenture(creator, name, icon, image, description, asset_type, scale, quantity);
         asset.setKey(this.fork.getItemAssetMap().getLastKey() + 1l);
 
         //CREATE ISSUE ASSET TRANSACTION
-        IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte) feePow, time, 0l);
+        IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte) feePow, time, 0L);
         issueAssetTransaction.sign(creator, Transaction.FOR_NETWORK);
         issueAssetTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return issueAssetTransaction;
+    }
+
+    public Transaction createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description,
+                                                   byte[] icon, byte[] image,
+                                                   int scale, int asset_type, long quantity, int feePow) {
+        AssetCls asset = new AssetVenture(creator, name, icon, image, description, asset_type, scale, quantity);
+        return createIssueAssetTransaction(creator, asset, feePow);
     }
 
     public Pair<Transaction, Integer> createIssueImprintTransaction(PrivateKeyAccount creator, String name, String description,
@@ -322,26 +327,6 @@ public class TransactionCreator {
 		return issueImprintRecord;
 	}
 */
-
-    public Transaction createIssueTemplateTransaction(PrivateKeyAccount creator, String name, String description,
-                                                      byte[] icon, byte[] image,
-                                                      int feePow) {
-        //CHECK FOR UPDATES
-        this.checkUpdate();
-
-        //TIME
-        long time = NTP.getTime();
-
-        TemplateCls template = new Template(creator, name, icon, image, description);
-
-        //CREATE ISSUE PLATE TRANSACTION
-        IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(creator, template, (byte) feePow, time, 0l);
-        issueTemplateRecord.sign(creator, Transaction.FOR_NETWORK);
-        issueTemplateRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
-
-        //VALIDATE AND PROCESS
-        return issueTemplateRecord;
-    }
 
     public Pair<Transaction, Integer> createIssuePersonTransaction(
             boolean forIssue,
@@ -418,8 +403,8 @@ public class TransactionCreator {
         }
     }
 
-    public Pair<Transaction, Integer> createIssuePersonHumanTransaction(
-            PrivateKeyAccount creator, int feePow, PersonHuman human) {
+    public Pair<Transaction, Integer> createIssuePersonTransaction(
+            PrivateKeyAccount creator, int feePow, PersonCls person) {
         //CHECK FOR UPDATES
         this.checkUpdate();
 
@@ -430,7 +415,7 @@ public class TransactionCreator {
         lastReference = 0l;
 
         //CREATE ISSUE PLATE TRANSACTION
-        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, human, (byte) feePow, time, lastReference);
+        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte) feePow, time, lastReference);
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
         issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
@@ -440,23 +425,41 @@ public class TransactionCreator {
 
         //VALIDATE AND PROCESS
         boolean asPack = false;
-        return new Pair<Transaction, Integer>(issuePersonRecord, 1);
+        return new Pair<Transaction, Integer>(issuePersonRecord, Transaction.VALIDATE_OK);
 
     }
 
-    public Transaction createIssuePollTransaction(PrivateKeyAccount creator, String name, String description,
-                                                  byte[] icon, byte[] image,
-                                                  List<String> options, int feePow) {
+    public Transaction createIssuePollTransaction(PrivateKeyAccount creator, int feePow, PollCls poll) {
         //CHECK FOR UPDATES
         this.checkUpdate();
 
         //TIME
         long time = NTP.getTime();
 
-        PollCls status = new org.erachain.core.item.polls.Poll(creator, name, icon, image, description, options);
+        //CREATE ISSUE PLATE TRANSACTION
+        IssuePollRecord issueStatusRecord = new IssuePollRecord(creator, poll, (byte) feePow, time, 0L);
+        issueStatusRecord.sign(creator, Transaction.FOR_NETWORK);
+        issueStatusRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
+
+        return issueStatusRecord;
+    }
+
+    public Transaction createIssuePollTransaction(PrivateKeyAccount creator, String name, String description,
+                                                  byte[] icon, byte[] image,
+                                                  List<String> options, int feePow) {
+        PollCls poll = new org.erachain.core.item.polls.Poll(creator, name, icon, image, description, options);
+        return createIssuePollTransaction(creator, feePow, poll);
+    }
+
+    public Transaction createIssueStatusTransaction(PrivateKeyAccount creator, int feePow, StatusCls status) {
+        //CHECK FOR UPDATES
+        this.checkUpdate();
+
+        //TIME
+        long time = NTP.getTime();
 
         //CREATE ISSUE PLATE TRANSACTION
-        IssuePollRecord issueStatusRecord = new IssuePollRecord(creator, status, (byte) feePow, time, 0l);
+        IssueStatusRecord issueStatusRecord = new IssueStatusRecord(creator, status, (byte) feePow, time, 0l);
         issueStatusRecord.sign(creator, Transaction.FOR_NETWORK);
         issueStatusRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
@@ -466,20 +469,31 @@ public class TransactionCreator {
     public Transaction createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description,
                                                     byte[] icon, byte[] image,
                                                     boolean unique, int feePow) {
+        StatusCls status = new Status(creator, name, icon, image, description, unique);
+        return createIssueStatusTransaction(creator, feePow, status);
+    }
+
+    public Transaction createIssueTemplateTransaction(PrivateKeyAccount creator, int feePow, TemplateCls template) {
         //CHECK FOR UPDATES
         this.checkUpdate();
 
         //TIME
         long time = NTP.getTime();
 
-        StatusCls status = new Status(creator, name, icon, image, description, unique);
-
         //CREATE ISSUE PLATE TRANSACTION
-        IssueStatusRecord issueStatusRecord = new IssueStatusRecord(creator, status, (byte) feePow, time, 0l);
-        issueStatusRecord.sign(creator, Transaction.FOR_NETWORK);
-        issueStatusRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
+        IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(creator, template, (byte) feePow, time, 0L);
+        issueTemplateRecord.sign(creator, Transaction.FOR_NETWORK);
+        issueTemplateRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
-        return issueStatusRecord;
+        //VALIDATE AND PROCESS
+        return issueTemplateRecord;
+    }
+
+    public Transaction createIssueTemplateTransaction(PrivateKeyAccount creator, String name, String description,
+                                                      byte[] icon, byte[] image,
+                                                      int feePow) {
+        TemplateCls template = new Template(creator, name, icon, image, description);
+        return createIssueTemplateTransaction(creator, feePow, template);
     }
 
     public Transaction createIssueUnionTransaction(PrivateKeyAccount creator, String name, long birthday, long parent, String description,
@@ -676,10 +690,10 @@ public class TransactionCreator {
 
     }
 
-    public Transaction r_SertifyPerson(int version, int forDeal,
-                                       PrivateKeyAccount creator, int feePow, long key,
-                                       List<PublicKeyAccount> userAccounts,
-                                       int add_day) {
+    public Transaction r_CertifyPubKeysPerson(int version, int forDeal,
+                                              PrivateKeyAccount creator, int feePow, long key,
+                                              List<PublicKeyAccount> userAccounts,
+                                              int add_day) {
 
         this.checkUpdate();
 
@@ -689,7 +703,7 @@ public class TransactionCreator {
 
         //CREATE SERTIFY PERSON TRANSACTION
         //int version = 5; // without user sign
-        record = new RSertifyPubKeys(version, creator, (byte) feePow, key,
+        record = new RCertifyPubKeys(version, creator, (byte) feePow, key,
                 userAccounts,
                 add_day, timestamp, 0l);
         record.sign(creator, forDeal);

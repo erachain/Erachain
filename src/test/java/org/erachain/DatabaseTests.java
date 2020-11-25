@@ -76,7 +76,7 @@ public class DatabaseTests {
         // GET RIGHTS TO CERTIFIER
         byte gender = 1;
         long birthDay = timestamp - 12345678;
-        personGeneral = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich as sertifier", birthDay, birthDay - 1,
+        personGeneral = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
