@@ -591,31 +591,15 @@ public class ApiClient {
                             "Used to purchase the given name. Returns the transaction in JSON when successful.",
                             "Errors: 1 - Json error. 2 - Not enough balance. 102 - Invalid address. 105 - Invalid fee. 108 - Invalid name length. 111 - Invalid buyer. 201 - Wallet does not exist. 203 - Wallet is locked. 401 - Name does not exist. 410 - Name is not for sale. 411 - Buyer is already the owner."
                     },
-                    {
-                            "GET polls",
-                            "Returns an array of all the polls created by your accounts.",
-                            "Errors: 201 - Wallet does not exist."
-                    },
+
+
+                    //////////////
                     {
                             "GET polls/address/<address>",
                             "Returns an array of all the polls owned by a specific address in your wallet.",
                             "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet."
                     },
-                    {
-                            "GET polls/<name>",
-                            "Return details about the poll with the given name.",
-                            "Errors: 501 - Poll does not exist."
-                    },
-                    {
-                            "GET polls network",
-                            "Returns an array of all the polls. For performance this array only contains the names of the polls and not the details.",
-                            ""
-                    },
-                    {
-                            "POST polls {\"creator\":\"<creatorAddress>\", \"name\":\"<name>\", \"description\":\"<description>\", \"options\": [<optionOne>, <optionTwo>], \"fee\":\"<fee>\"}",
-                            "Used to create a new poll. Returns the transaction in JSON when successful.",
-                            "Errors: 1 - Json error. 2 - Not enough balance. 3 - Not yet released. 102 - Invalid address. 105 - Invalid fee. 108 - Invalid name length. 109 - Invalid description length. 113 - Invalid options length. 114 - Invalid option length. 201 - Wallet does not exist. 202 - Address does not exist in wallet. 203 - Wallet is locked. 404 - Name must be lowercase. 502 - Poll already exists. 503 - Duplicate option."
-                    },
+
                     {
                             "POST polls/vote/<name> {\"voter\":\"<voterAddress>\", \"option\": \"<optionOne>\", \"fee\":\"<fee>\"}",
                             "Used to vote on a poll with the given name. Returns the transaction in JSON when successful.",
