@@ -3074,6 +3074,13 @@ public class Controller extends Observable {
 
     }
 
+    public Transaction issueAsset(PrivateKeyAccount creator, AssetCls asset, int feePow) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssueAssetTransaction(creator, asset, feePow);
+        }
+    }
+
     public Transaction issueAsset(PrivateKeyAccount creator, String name, String description, byte[] icon, byte[] image,
                                   int scale, int assetType, long quantity, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
