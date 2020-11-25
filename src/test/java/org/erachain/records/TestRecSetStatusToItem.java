@@ -88,7 +88,7 @@ public class TestRecSetStatusToItem {
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
         //CREATE ISSUE PERSON TRANSACTION
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0], null);
         issuePersonTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
         person = (PersonCls) issuePersonTransaction.getItem();

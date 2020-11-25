@@ -31,8 +31,8 @@ public class IssuePersonRecord extends IssueItemRecord {
     public static final int MAX_DESCRIPTION_LENGTH = 1 << 15;
 
 
-    public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, person, feePow, timestamp, reference);
+    public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, NAME_ID, creator, linkTo, person, feePow, timestamp, reference);
     }
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -59,12 +59,12 @@ public class IssuePersonRecord extends IssueItemRecord {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, person, (byte) 0, 0l, null, signature);
     }
 
-    public IssuePersonRecord(PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, person, feePow, timestamp, reference);
+    public IssuePersonRecord(PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, person, feePow, timestamp, reference);
     }
 
     public IssuePersonRecord(PublicKeyAccount creator, PersonCls person) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, person, (byte) 0, 0l, null);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, person, (byte) 0, 0l, null);
     }
 
     //GETTERS/SETTERS

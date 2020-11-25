@@ -378,7 +378,7 @@ public class TransactionCreator {
         }
 
         //CREATE ISSUE PLATE TRANSACTION
-        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte) feePow, time, lastReference);
+        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte) feePow, time, lastReference, null);
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
         issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
@@ -404,7 +404,7 @@ public class TransactionCreator {
     }
 
     public Pair<Transaction, Integer> createIssuePersonTransaction(
-            PrivateKeyAccount creator, int feePow, PersonCls person) {
+            PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonCls person) {
         //CHECK FOR UPDATES
         this.checkUpdate();
 
@@ -412,10 +412,10 @@ public class TransactionCreator {
         long time = NTP.getTime();
 
         long lastReference;
-        lastReference = 0l;
+        lastReference = 0L;
 
         //CREATE ISSUE PLATE TRANSACTION
-        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte) feePow, time, lastReference);
+        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, linkTo, person, (byte) feePow, time, lastReference);
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
         issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 

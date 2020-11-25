@@ -47,9 +47,9 @@ public class ItemPersonsResource {
         help.put("persons/images/{key}", "get item Images by key");
         help.put("persons/listfrom/{start}", "get list from KEY");
         help.put("POST persons/issue {\"linkTo\": \"<SeqNo>\", \"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": \"long\", \"deathday\": \"<long>\", \"gender\": \"<int>\", \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": , \"password\": \"<password>\"}", "issue");
-        help.put("POST persons/issueraw/{creator}?feePow=<int>&password=<String> ", "Issue Person by Base58 RAW in POST body");
+        help.put("POST persons/issueraw/{creator}?linkTo=<SeqNo>&feePow=<int>&password=<String> ", "Issue Person by Base58 RAW in POST body");
 
-        help.put("persons/certify/{creator}/{personKey}?pubkey=<Base58>&feePow=<int>&linkTo=<long>&days<int>&password=<String>", "Certify some public key for Person by it key. Default: pubKey is owner from Person, feePow=0, days=1");
+        help.put("persons/certify/{creator}/{personKey}?pubkey=<Base58>&feePow=<int>&linkTo=<SeqNo>&days<int>&password=<String>", "Certify some public key for Person by it key. Default: pubKey is owner from Person, feePow=0, days=1");
 
 
         return StrJSonFine.convert(help);
@@ -140,7 +140,7 @@ public class ItemPersonsResource {
     }
 
     @POST
-    @Path("/issue")
+    @Path("issue")
     public String issue(String x) {
 
         Controller cntr = Controller.getInstance();
@@ -171,6 +171,7 @@ public class ItemPersonsResource {
     @POST
     @Path("issueraw/{creator}")
     public String issueRAW(String x, @PathParam("creator") String creator,
+                           @QueryParam("linkTo") String exLinkRefStr,
                            @DefaultValue("0") @QueryParam("feePow") String feePowStr,
                            @QueryParam("password") String password) {
 
@@ -184,7 +185,20 @@ public class ItemPersonsResource {
                     e.getMessage());
         }
 
-        Pair<Transaction, Integer> transactionResult = cntr.issuePerson(result.a, result.b, item);
+        ExLink linkTo;
+        if (exLinkRefStr == null)
+            linkTo = null;
+        else {
+            Long exLinkRef = Transaction.parseDBRef(exLinkRefStr);
+            if (exLinkRef == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+            } else {
+                linkTo = new ExLinkSource(exLinkRef, null);
+            }
+        }
+
+        Pair<Transaction, Integer> transactionResult = cntr.issuePerson(result.a, linkTo, result.b, item);
         if (transactionResult.getB() != Transaction.VALIDATE_OK) {
             throw ApiErrorFactory.getInstance().createError(
                     transactionResult.getB());

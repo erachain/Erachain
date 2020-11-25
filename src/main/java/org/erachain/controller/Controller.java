@@ -3148,16 +3148,16 @@ public class Controller extends Observable {
         }
 
         String exLinkRefStr = jsonObject.get("linkTo").toString();
-        ExLink exLink;
+        ExLink linkTo;
         if (exLinkRefStr == null)
-            exLink = null;
+            linkTo = null;
         else {
             Long exLinkRef = Transaction.parseDBRef(exLinkRefStr);
             if (exLinkRef == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
             } else {
-                exLink = new ExLinkSource(exLinkRef, null);
+                linkTo = new ExLinkSource(exLinkRef, null);
             }
         }
 
@@ -3211,14 +3211,14 @@ public class Controller extends Observable {
                 skinColor, eyeColor, hairСolor, height, icon, image, description,
                 ownerSignature);
 
-        return issuePerson(creatorPrivate, feePow, person);
+        return issuePerson(creatorPrivate, linkTo, feePow, person);
 
     }
 
-    public Pair<Transaction, Integer> issuePerson(PrivateKeyAccount creator, int feePow, PersonCls person) {
+    public Pair<Transaction, Integer> issuePerson(PrivateKeyAccount creator, ExLink exLink, int feePow, PersonCls person) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssuePersonTransaction(creator, feePow, person);
+            return this.transactionCreator.createIssuePersonTransaction(creator, exLink, feePow, person);
         }
     }
 
