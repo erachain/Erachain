@@ -97,7 +97,7 @@ public class APIItemAsset {
 
     @GET
     @Path("raw/{key}")
-    public String getRAW(@PathParam("key") String key) {
+    public Response getRAW(@PathParam("key") String key) {
         Long asLong = null;
 
         try {
@@ -114,7 +114,12 @@ public class APIItemAsset {
 
         ItemCls item = Controller.getInstance().getAsset(asLong);
         byte[] issueBytes = item.toBytes(false, false);
-        return Base58.encode(issueBytes);
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(Base58.encode(issueBytes))
+                .build();
+
     }
 
     @GET
