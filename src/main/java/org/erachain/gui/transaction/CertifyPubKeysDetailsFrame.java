@@ -3,7 +3,7 @@ package org.erachain.gui.transaction;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.core.transaction.RSertifyPubKeys;
+import org.erachain.core.transaction.RCertifyPubKeys;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 import org.slf4j.Logger;
@@ -12,12 +12,12 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class SertifyPubKeysDetailsFrame extends RecDetailsFrame {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SertifyPubKeysDetailsFrame.class);
+public class CertifyPubKeysDetailsFrame extends RecDetailsFrame {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CertifyPubKeysDetailsFrame.class);
     private JTextField messageText;
 
-    public SertifyPubKeysDetailsFrame(final RSertifyPubKeys sertifyPubKeysRecord) {
-        super(sertifyPubKeysRecord, true);
+    public CertifyPubKeysDetailsFrame(final RCertifyPubKeys certifyPubKeysRecord) {
+        super(certifyPubKeysRecord, true);
 
         //LABEL PERSON
         ++labelGBC.gridy;
@@ -27,7 +27,7 @@ public class SertifyPubKeysDetailsFrame extends RecDetailsFrame {
         // PERSON
         ++detailGBC.gridy;
         JTextField person;
-        PersonCls personItem = Controller.getInstance().getPerson(sertifyPubKeysRecord.getKey());
+        PersonCls personItem = Controller.getInstance().getPerson(certifyPubKeysRecord.getKey());
         if (personItem == null)
             person = new JTextField("not found");
         else
@@ -44,13 +44,13 @@ public class SertifyPubKeysDetailsFrame extends RecDetailsFrame {
 
         //ens DAYS
         ++detailGBC.gridy;
-        JTextField amount = new JTextField("" + sertifyPubKeysRecord.getAddDay());
+        JTextField amount = new JTextField("" + certifyPubKeysRecord.getAddDay());
         amount.setEditable(false);
         MenuPopupUtil.installContextMenu(amount);
         this.add(amount, detailGBC);
 
         int i = 0;
-        for (String address : sertifyPubKeysRecord.getSertifiedPublicKeysB58()) {
+        for (String address : certifyPubKeysRecord.getCertifiedPublicKeysB58()) {
             ++labelGBC.gridy;
             JLabel lbl = new JLabel(++i + " :");
             this.add(lbl, labelGBC);

@@ -105,7 +105,7 @@ public class TransactionFactory {
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
 
                 //PARSE CERTIFY PERSON TRANSACTION
-                return RSertifyPubKeys.Parse(data, forDeal);
+                return RCertifyPubKeys.Parse(data, forDeal);
 
             case Transaction.ISSUE_ASSET_TRANSACTION:
 

@@ -87,18 +87,18 @@ public class UnionSetStatusDialog extends JDialog {
             }
         }
 
-        List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
+        List<PublicKeyAccount> certifiedPublicKeys = new ArrayList<PublicKeyAccount>();
         if (pubKey1Txt.getText().length() == 30) {
             PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText()));
-            if (userAccount1.isValid()) sertifiedPublicKeys.add(userAccount1);
+            if (userAccount1.isValid()) certifiedPublicKeys.add(userAccount1);
         }
         if (pubKey2Txt.getText().length() > 30) {
             PublicKeyAccount userAccount2 = new PublicKeyAccount(Base58.decode(pubKey2Txt.getText()));
-            if (userAccount2.isValid()) sertifiedPublicKeys.add(userAccount2);
+            if (userAccount2.isValid()) certifiedPublicKeys.add(userAccount2);
         }
         if (pubKey3Txt.getText().length() > 30) {
             PublicKeyAccount userAccount3 = new PublicKeyAccount(Base58.decode(pubKey3Txt.getText()));
-            if (userAccount3.isValid()) sertifiedPublicKeys.add(userAccount3);
+            if (userAccount3.isValid()) certifiedPublicKeys.add(userAccount3);
         }
 
         //Account authenticator =  new Account(address);
@@ -111,9 +111,6 @@ public class UnionSetStatusDialog extends JDialog {
         }
 
         Pair<Transaction, Integer> result = null;
-        //Controller.getInstance().r_SertifyUnion(version, false, authenticator,
-        //		feePow, union.getKey(),
-        //		sertifiedPublicKeys, toDate);
 
         //CHECK VALIDATE MESSAGE
         if (result.getB() == Transaction.VALIDATE_OK) {

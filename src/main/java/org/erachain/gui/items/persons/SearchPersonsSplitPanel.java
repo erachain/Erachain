@@ -79,7 +79,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
 
                 @SuppressWarnings("unused")
-                PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) itemTableSelected, itemTableSelected.getOwner());
+                PersonCertifyPubKeysDialog fm = new PersonCertifyPubKeysDialog((PersonCls) itemTableSelected, itemTableSelected.getOwner());
 
             }
         });

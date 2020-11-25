@@ -180,13 +180,13 @@ public class TransactionDetailsFactory {
                 return vouchingDetailsFrame;
 
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
-                RSertifyPubKeys sertifyPubKeysRecord = (RSertifyPubKeys) transaction;
-                SertifyPubKeysDetailsFrame sertifyPubKeysDetailsFrame = new SertifyPubKeysDetailsFrame(
-                        sertifyPubKeysRecord);
-                gridBagConstraints.gridy = sertifyPubKeysDetailsFrame.labelGBC.gridy + 1;
-                sertifyPubKeysDetailsFrame.add(jLabel9, gridBagConstraints);
+                RCertifyPubKeys certifyPubKeysRecord = (RCertifyPubKeys) transaction;
+                CertifyPubKeysDetailsFrame certifyPubKeysDetailsFrame = new CertifyPubKeysDetailsFrame(
+                        certifyPubKeysRecord);
+                gridBagConstraints.gridy = certifyPubKeysDetailsFrame.labelGBC.gridy + 1;
+                certifyPubKeysDetailsFrame.add(jLabel9, gridBagConstraints);
 
-                return sertifyPubKeysDetailsFrame;
+                return certifyPubKeysDetailsFrame;
 
             case Transaction.HASHES_RECORD:
                 RHashes r_Hashes = (RHashes) transaction;

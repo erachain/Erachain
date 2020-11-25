@@ -1862,7 +1862,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                 } else {
 
                     // for some TRANSACTIONS need add to FINAL MAP etc.
-                    // RSertifyPubKeys - in same BLOCK with IssuePersonRecord
+                    // RCertifyPubKeys - in same BLOCK with IssuePersonRecord
 
                     processTimingLocal = System.nanoTime();
                     Long key = Transaction.makeDBRef(this.heightBlock, seqNo);

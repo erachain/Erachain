@@ -30,9 +30,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class RSertifyPubKeysTest {
+public class RCertifyPubKeysTest {
 
-    static Logger LOGGER = LoggerFactory.getLogger(RSertifyPubKeysTest.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(RCertifyPubKeysTest.class.getName());
 
     int[] TESTED_DBS = new int[]{
             IDB.DBS_MAP_DB
@@ -71,14 +71,14 @@ public class RSertifyPubKeysTest {
     byte[] accountSeed3 = Wallet.generateAccountSeed(seed, nonce++);
     PrivateKeyAccount userAccount3 = new PrivateKeyAccount(accountSeed3);
     String userAddress3 = userAccount3.getAddress();
-    List<PrivateKeyAccount> sertifiedPrivateKeys = new ArrayList<PrivateKeyAccount>();
-    List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
+    List<PrivateKeyAccount> certifiedPrivateKeys = new ArrayList<PrivateKeyAccount>();
+    List<PublicKeyAccount> certifiedPublicKeys = new ArrayList<PublicKeyAccount>();
     PersonCls personGeneral;
     PersonCls person;
     long genesisPersonKey = -1;
     long personKey = -1;
     IssuePersonRecord issuePersonTransaction;
-    RSertifyPubKeys r_SertifyPubKeys;
+    RCertifyPubKeys r_CertifyPubKeys;
     KKPersonStatusMap dbPS;
     PersonAddressMap dbPA;
     AddressPersonMap dbAP;
@@ -172,7 +172,7 @@ public class RSertifyPubKeysTest {
         ownerSignature[1] = (byte) -1;
 
         // GET RIGHTS TO CERTIFIER
-        personGeneral = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich as sertifier", birthDay, birthDay - 1,
+        personGeneral = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
         //personGeneral.setKey(genesisPersonKey);
@@ -195,16 +195,16 @@ public class RSertifyPubKeysTest {
         //CREATE ISSUE PERSON TRANSACTION
         issuePersonTransaction = new IssuePersonRecord(registrar, person, FEE_POWER, timestamp, registrar.getLastTimestamp(dcSet)[0]);
 
-        if (sertifiedPrivateKeys.isEmpty()) {
-            sertifiedPrivateKeys.add(userAccount1);
-            sertifiedPrivateKeys.add(userAccount2);
-            sertifiedPrivateKeys.add(userAccount3);
+        if (certifiedPrivateKeys.isEmpty()) {
+            certifiedPrivateKeys.add(userAccount1);
+            certifiedPrivateKeys.add(userAccount2);
+            certifiedPrivateKeys.add(userAccount3);
         }
 
-        if (sertifiedPublicKeys.isEmpty()) {
-            sertifiedPublicKeys.add(new PublicKeyAccount(userAccount1.getPublicKey()));
-            sertifiedPublicKeys.add(new PublicKeyAccount(userAccount2.getPublicKey()));
-            sertifiedPublicKeys.add(new PublicKeyAccount(userAccount3.getPublicKey()));
+        if (certifiedPublicKeys.isEmpty()) {
+            certifiedPublicKeys.add(new PublicKeyAccount(userAccount1.getPublicKey()));
+            certifiedPublicKeys.add(new PublicKeyAccount(userAccount2.getPublicKey()));
+            certifiedPublicKeys.add(new PublicKeyAccount(userAccount3.getPublicKey()));
         }
 
     }
@@ -230,8 +230,8 @@ public class RSertifyPubKeysTest {
 
         //CREATE PERSONALIZE REcORD
         timestamp += 100;
-        r_SertifyPubKeys = new RSertifyPubKeys(version, certifier, FEE_POWER, personKey,
-                sertifiedPublicKeys,
+        r_CertifyPubKeys = new RCertifyPubKeys(version, certifier, FEE_POWER, personKey,
+                certifiedPublicKeys,
                 timestamp, registrar.getLastTimestamp(dcSet)[0]);
 
     }
@@ -246,8 +246,8 @@ public class RSertifyPubKeysTest {
 
             assertEquals(registrar.getLastTimestamp(dcSet), null);
 
-            RSertifyPubKeys certPubKey = new RSertifyPubKeys(0, registrar, FEE_POWER,
-                    person.getKey(dcSet), sertifiedPublicKeys, timestamp, 0L);
+            RCertifyPubKeys certPubKey = new RCertifyPubKeys(0, registrar, FEE_POWER,
+                    person.getKey(dcSet), certifiedPublicKeys, timestamp, 0L);
             certPubKey.setDC(dcSet, Transaction.FOR_NETWORK, 3, 5, true);
             certPubKey.process(null, Transaction.FOR_NETWORK);
 

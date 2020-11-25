@@ -155,7 +155,7 @@ public class WebTransactionsHTML {
                 output.put("body", vouch_HTML(transaction));
                 break;
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
-                output.put("body", sertify_Pub_Key_HTML(transaction));
+                output.put("body", certify_Pub_Key_HTML(transaction));
                 break;
             case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
                 output.put("body", set_Status_HTML(transaction));
@@ -486,10 +486,10 @@ public class WebTransactionsHTML {
         return out;
     }
 
-    private String sertify_Pub_Key_HTML(Transaction transaction) {
+    private String certify_Pub_Key_HTML(Transaction transaction) {
         // TODO Auto-generated method stub
         String out = "";
-        RSertifyPubKeys record = (RSertifyPubKeys) transaction;
+        RCertifyPubKeys record = (RCertifyPubKeys) transaction;
         PersonCls person;
         person = Controller.getInstance().getPerson(record.getKey());
         out += Lang.getInstance().translateFromLangObj("Name", langObj) + ": <b>"
@@ -497,7 +497,7 @@ public class WebTransactionsHTML {
         out += "<b>" + Lang.getInstance().translateFromLangObj("End Days", langObj) + ":</b> "
                 + record.getAddDay() + "<br>";
         int i = 0;
-        for (String address : record.getSertifiedPublicKeysB58()) {
+        for (String address : record.getCertifiedPublicKeysB58()) {
             out += "<b>   " + Lang.getInstance().translateFromLangObj("Key", langObj) + " " + ++i + ":</b> " + address + "<br>";
         }
         return out;

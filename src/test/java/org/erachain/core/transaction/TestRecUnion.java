@@ -57,8 +57,8 @@ public class TestRecUnion {
     byte[] accountSeed3 = Wallet.generateAccountSeed(seed, nonce++);
     PrivateKeyAccount userAccount3 = new PrivateKeyAccount(accountSeed3);
     String userAddress3 = userAccount3.getAddress();
-    List<PrivateKeyAccount> sertifiedPrivateKeys = new ArrayList<PrivateKeyAccount>();
-    List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
+    List<PrivateKeyAccount> certifiedPrivateKeys = new ArrayList<PrivateKeyAccount>();
+    List<PublicKeyAccount> certifiedPublicKeys = new ArrayList<PublicKeyAccount>();
     UnionCls unionGeneral;
     UnionCls union;
     long unionKey = -1;
@@ -110,13 +110,13 @@ public class TestRecUnion {
         //CREATE ISSUE UNION TRANSACTION
         issueUnionTransaction = new IssueUnionRecord(certifier, union, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0]);
 
-        sertifiedPrivateKeys.add(userAccount1);
-        sertifiedPrivateKeys.add(userAccount2);
-        sertifiedPrivateKeys.add(userAccount3);
+        certifiedPrivateKeys.add(userAccount1);
+        certifiedPrivateKeys.add(userAccount2);
+        certifiedPrivateKeys.add(userAccount3);
 
-        sertifiedPublicKeys.add(new PublicKeyAccount(userAccount1.getPublicKey()));
-        sertifiedPublicKeys.add(new PublicKeyAccount(userAccount2.getPublicKey()));
-        sertifiedPublicKeys.add(new PublicKeyAccount(userAccount3.getPublicKey()));
+        certifiedPublicKeys.add(new PublicKeyAccount(userAccount1.getPublicKey()));
+        certifiedPublicKeys.add(new PublicKeyAccount(userAccount2.getPublicKey()));
+        certifiedPublicKeys.add(new PublicKeyAccount(userAccount3.getPublicKey()));
 
     }
 

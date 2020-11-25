@@ -690,10 +690,10 @@ public class TransactionCreator {
 
     }
 
-    public Transaction r_SertifyPerson(int version, int forDeal,
-                                       PrivateKeyAccount creator, int feePow, long key,
-                                       List<PublicKeyAccount> userAccounts,
-                                       int add_day) {
+    public Transaction r_CertifyPubKeysPerson(int version, int forDeal,
+                                              PrivateKeyAccount creator, int feePow, long key,
+                                              List<PublicKeyAccount> userAccounts,
+                                              int add_day) {
 
         this.checkUpdate();
 
@@ -703,7 +703,7 @@ public class TransactionCreator {
 
         //CREATE SERTIFY PERSON TRANSACTION
         //int version = 5; // without user sign
-        record = new RSertifyPubKeys(version, creator, (byte) feePow, key,
+        record = new RCertifyPubKeys(version, creator, (byte) feePow, key,
                 userAccounts,
                 add_day, timestamp, 0l);
         record.sign(creator, forDeal);
