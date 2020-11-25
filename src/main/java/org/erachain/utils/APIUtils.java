@@ -434,7 +434,7 @@ public class APIUtils {
         }
 
         // TRY UNLOCK
-        askAPICallAllowed(password, x, request, true);
+        askAPICallAllowed(password, "", request, true);
 
         // CHECK WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {

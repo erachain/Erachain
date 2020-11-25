@@ -2,15 +2,22 @@ package org.erachain.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.statuses.StatusCls;
+import org.erachain.core.item.statuses.StatusFactory;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.utils.APIUtils;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,6 +26,10 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 @Slf4j
 public class ItemStatusesResource {
+
+    @Context
+    HttpServletRequest request;
+
     @GET
     public String help() {
         Map help = new LinkedHashMap();
@@ -28,6 +39,7 @@ public class ItemStatusesResource {
         help.put("statuses/raw/{key}", "Returns RAW in Base58 of status with the given key.");
         help.put("statuses/images/{key}", "get item Images by key");
         help.put("statuses/listfrom/{start}", "get list from KEY");
+        help.put("POST statuses/issueraw/{creator}?feePow=<int>&password=<String> ", "Issue Status by Base58 RAW in POST body");
 
         //help.put("POST statuses/issue", "issue");
 
@@ -116,6 +128,34 @@ public class ItemStatusesResource {
         ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.STATUS_TYPE, start, page, output, showPerson, descending);
 
         return output.toJSONString();
+    }
+
+    @POST
+    @Path("issueraw/{creator}")
+    public String issueRAW(String x, @PathParam("creator") String creator,
+                           @DefaultValue("0") @QueryParam("feePow") String feePowStr,
+                           @QueryParam("password") String password) {
+
+        Controller cntr = Controller.getInstance();
+        Fun.Tuple3<PrivateKeyAccount, Integer, byte[]> result = APIUtils.postIssueRawItem(request, x, creator, feePowStr, password);
+        StatusCls item;
+        try {
+            item = StatusFactory.getInstance().parse(result.c, false);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    e.getMessage());
+        }
+
+        Transaction transaction = cntr.issueStatus(result.a, result.b, item);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        if (validate == Transaction.VALIDATE_OK)
+            return transaction.toJson().toJSONString();
+        else {
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByErrorSimple(validate, out);
+            return out.toJSONString();
+        }
     }
 
 }

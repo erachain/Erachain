@@ -1,14 +1,19 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +44,7 @@ public class ItemPersonsResource {
         help.put("persons/images/{key}", "get item Images by key");
         help.put("persons/listfrom/{start}", "get list from KEY");
         help.put("POST persons/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": \"long\", \"deathday\": \"<long>\", \"gender\": \"<int>\", \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": ,     \"password\": \"<password>\"}", "issue");
+        help.put("POST persons/issueraw/{creator}?feePow=<int>&password=<String> ", "Issue Person by Base58 RAW in POST body");
 
         return StrJSonFine.convert(help);
     }
@@ -155,5 +161,40 @@ public class ItemPersonsResource {
             return out.toJSONString();
         }
     }
+
+    @POST
+    @Path("issueraw/{creator}")
+    public String issueRAW(String x, @PathParam("creator") String creator,
+                           @DefaultValue("0") @QueryParam("feePow") String feePowStr,
+                           @QueryParam("password") String password) {
+
+        Controller cntr = Controller.getInstance();
+        Fun.Tuple3<PrivateKeyAccount, Integer, byte[]> result = APIUtils.postIssueRawItem(request, x, creator, feePowStr, password);
+        PersonCls item;
+        try {
+            item = PersonFactory.getInstance().parse(result.c, false);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    e.getMessage());
+        }
+
+        Pair<Transaction, Integer> transactionResult = cntr.issuePerson(result.a, result.b, item);
+        if (transactionResult.getB() != Transaction.VALIDATE_OK) {
+            throw ApiErrorFactory.getInstance().createError(
+                    transactionResult.getB());
+        }
+
+        Transaction transaction = transactionResult.getA();
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        if (validate == Transaction.VALIDATE_OK)
+            return transaction.toJson().toJSONString();
+        else {
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByErrorSimple(validate, out);
+            return out.toJSONString();
+        }
+    }
+
 
 }

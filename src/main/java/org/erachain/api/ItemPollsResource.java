@@ -8,6 +8,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.polls.PollCls;
+import org.erachain.core.item.polls.PollFactory;
 import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -16,6 +17,7 @@ import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +51,8 @@ public class ItemPollsResource {
         help.put("polls/listfrom/{start}", "get list from KEY");
         help.put("GET polls/issue {\"creator\":\"<creatorAddress>\", \"name\":\"<name>\", \"description\":\"<description>\", \"options\": [<optionOne>, <optionTwo>], \"feePow\":\"<feePow>\"}", "issue");
         help.put("POST polls/issue {\"creator\":\"<creatorAddress>\", \"name\":\"<name>\", \"description\":\"<description>\", \"options\": [<optionOne>, <optionTwo>], \"feePow\":\"<feePow>\"}", "Used to create a new poll. Returns the transaction in JSON when successful.");
+        help.put("POST polls/issueraw/{creator}?feePow=<int>&password=<String> ", "Issue Poll by Base58 RAW in POST body");
+
         help.put("polls/vote/{key}/{option}/{voter}?feePow=feePow", "Used to vote on a poll with the given KEY. Returns the transaction in JSON when successful.");
         help.put("POST polls/vote/{key} {\"voter\":\"<voterAddress>\", \"option\": \"<optionOne>\", \"feePow\":\"<feePow>\"}", "Used to vote on a poll with the given KEY. Returns the transaction in JSON when successful.");
 
@@ -312,6 +316,34 @@ public class ItemPollsResource {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(result).build();
+    }
+
+    @POST
+    @Path("issueraw/{creator}")
+    public String issueRAW(String x, @PathParam("creator") String creator,
+                           @DefaultValue("0") @QueryParam("feePow") String feePowStr,
+                           @QueryParam("password") String password) {
+
+        Controller cntr = Controller.getInstance();
+        Fun.Tuple3<PrivateKeyAccount, Integer, byte[]> result = APIUtils.postIssueRawItem(request, x, creator, feePowStr, password);
+        PollCls item;
+        try {
+            item = PollFactory.getInstance().parse(result.c, false);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    e.getMessage());
+        }
+
+        Transaction transaction = cntr.issuePoll(result.a, result.b, item);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        if (validate == Transaction.VALIDATE_OK)
+            return transaction.toJson().toJSONString();
+        else {
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByErrorSimple(validate, out);
+            return out.toJSONString();
+        }
     }
 
     @POST

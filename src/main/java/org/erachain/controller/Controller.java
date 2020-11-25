@@ -3074,7 +3074,7 @@ public class Controller extends Observable {
 
     }
 
-    public Transaction issueAsset(PrivateKeyAccount creator, AssetCls asset, int feePow) {
+    public Transaction issueAsset(PrivateKeyAccount creator, int feePow, AssetCls asset) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createIssueAssetTransaction(creator, asset, feePow);
@@ -3104,15 +3104,6 @@ public class Controller extends Observable {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createIssueImprintTransaction1(creator, name, description, icon, image,
-                    feePow);
-        }
-    }
-
-    public Transaction issueTemplate(PrivateKeyAccount creator, String name, String description, byte[] icon,
-                                     byte[] image, int feePow) {
-        // CREATE ONLY ONE TRANSACTION AT A TIME
-        synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueTemplateTransaction(creator, name, description, icon, image,
                     feePow);
         }
     }
@@ -3197,14 +3188,21 @@ public class Controller extends Observable {
                 skinColor, eyeColor, hairСolor, height, icon, image, description,
                 ownerSignature);
 
-        return issuePersonHuman(creatorPrivate, feePow, person);
+        return issuePerson(creatorPrivate, feePow, person);
 
     }
 
-    public Pair<Transaction, Integer> issuePersonHuman(PrivateKeyAccount creator, int feePow, PersonHuman human) {
+    public Pair<Transaction, Integer> issuePerson(PrivateKeyAccount creator, int feePow, PersonCls person) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssuePersonHumanTransaction(creator, feePow, human);
+            return this.transactionCreator.createIssuePersonTransaction(creator, feePow, person);
+        }
+    }
+
+    public Transaction issuePoll(PrivateKeyAccount creator, int feePow, PollCls poll) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssuePollTransaction(creator, feePow, poll);
         }
     }
 
@@ -3217,11 +3215,34 @@ public class Controller extends Observable {
         }
     }
 
+    public Transaction issueStatus(PrivateKeyAccount creator, int feePow, StatusCls status) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssueStatusTransaction(creator, feePow, status);
+        }
+    }
+
     public Transaction issueStatus(PrivateKeyAccount creator, String name, String description, boolean unique,
                                    byte[] icon, byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createIssueStatusTransaction(creator, name, description, icon, image, unique,
+                    feePow);
+        }
+    }
+
+    public Transaction issueTemplate(PrivateKeyAccount creator, int feePow, TemplateCls template) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssueTemplateTransaction(creator, feePow, template);
+        }
+    }
+
+    public Transaction issueTemplate(PrivateKeyAccount creator, String name, String description, byte[] icon,
+                                     byte[] image, int feePow) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssueTemplateTransaction(creator, name, description, icon, image,
                     feePow);
         }
     }
