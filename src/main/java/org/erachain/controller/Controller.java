@@ -3453,10 +3453,10 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction r_SertifyPerson(int version, int forDeal, PrivateKeyAccount creator, int feePow, long key,
-                                       List<PublicKeyAccount> userAccounts, int add_day) {
+    public Transaction r_CertifyPubKeysPerson(int version, int forDeal, PrivateKeyAccount creator, int feePow, long key,
+                                              List<PublicKeyAccount> userAccounts, int add_day) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_SertifyPerson(version, forDeal, creator, feePow, key, userAccounts,
+            return this.transactionCreator.r_CertifyPubKeysPerson(version, forDeal, creator, feePow, key, userAccounts,
                     add_day);
         }
     }

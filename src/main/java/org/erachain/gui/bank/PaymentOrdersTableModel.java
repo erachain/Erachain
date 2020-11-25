@@ -78,10 +78,10 @@ public class PaymentOrdersTableModel extends WalletTableModel<Transaction> imple
                 return null;
 
             itemName = item.getShort();
-        } else if (transaction instanceof RSertifyPubKeys) {
-            RSertifyPubKeys sertifyPK = (RSertifyPubKeys) transaction;
+        } else if (transaction instanceof RCertifyPubKeys) {
+            RCertifyPubKeys certifyPK = (RCertifyPubKeys) transaction;
             //recipient = transAmo.getRecipient();
-            ItemCls item = DCSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
+            ItemCls item = DCSet.getInstance().getItemPersonMap().get(certifyPK.getAbsKey());
             if (item == null)
                 return null;
 

@@ -9,7 +9,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.core.transaction.RSertifyPubKeys;
+import org.erachain.core.transaction.RCertifyPubKeys;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
@@ -17,8 +17,8 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
+import org.erachain.gui.transaction.CertifyPubKeysDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
-import org.erachain.gui.transaction.SertifyPubKeysDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Pair;
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
-public class PersonConfirmDialog extends JDialog {
+public class PersonCertifyPubKeysDialog extends JDialog {
 
     // private JComboBox<Account> accountLBox;
 
@@ -64,7 +64,7 @@ public class PersonConfirmDialog extends JDialog {
     private javax.swing.JTextField jTextField_Address2;
     private javax.swing.JTextField jTextField_Address3;
 
-    public PersonConfirmDialog(PersonCls person, PublicKeyAccount publicKey) {
+    public PersonCertifyPubKeysDialog(PersonCls person, PublicKeyAccount publicKey) {
         super();
 
         // ICON
@@ -182,24 +182,24 @@ public class PersonConfirmDialog extends JDialog {
             toDate = toDateResult.getB();
         }
 
-        List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
+        List<PublicKeyAccount> certifiedPublicKeys = new ArrayList<PublicKeyAccount>();
         if (pubKey1Txt.getText().length() > 30) {
             PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText()));
             if (userAccount1.isValid())
-                sertifiedPublicKeys.add(userAccount1);
+                certifiedPublicKeys.add(userAccount1);
         }
         if (pubKey2Txt.getText().length() > 30) {
             PublicKeyAccount userAccount2 = new PublicKeyAccount(Base58.decode(pubKey2Txt.getText()));
             if (userAccount2.isValid())
-                sertifiedPublicKeys.add(userAccount2);
+                certifiedPublicKeys.add(userAccount2);
         }
         if (pubKey3Txt.getText().length() > 30) {
             PublicKeyAccount userAccount3 = new PublicKeyAccount(Base58.decode(pubKey3Txt.getText()));
             if (userAccount3.isValid())
-                sertifiedPublicKeys.add(userAccount3);
+                certifiedPublicKeys.add(userAccount3);
         }
 
-        if (sertifiedPublicKeys.isEmpty()) {
+        if (certifiedPublicKeys.isEmpty()) {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Nothing to personalize"),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
@@ -219,14 +219,14 @@ public class PersonConfirmDialog extends JDialog {
 
         int version = 0; // without user signs
 
-        Transaction transaction = Controller.getInstance().r_SertifyPerson(version, Transaction.FOR_NETWORK, authenticator, feePow,
-                person.getKey(), sertifiedPublicKeys, toDate);
+        Transaction transaction = Controller.getInstance().r_CertifyPubKeysPerson(version, Transaction.FOR_NETWORK, authenticator, feePow,
+                person.getKey(), certifiedPublicKeys, toDate);
 
         String Status_text = "";
         IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Certification of Account"), (int) (this.getWidth() / 1.2),
                 (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
-        SertifyPubKeysDetailsFrame ww = new SertifyPubKeysDetailsFrame((RSertifyPubKeys) transaction);
+        CertifyPubKeysDetailsFrame ww = new CertifyPubKeysDetailsFrame((RCertifyPubKeys) transaction);
         dd.jScrollPane1.setViewportView(ww);
         dd.setLocationRelativeTo(this);
         dd.pack();

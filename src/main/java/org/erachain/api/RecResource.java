@@ -219,7 +219,7 @@ public class RecResource {
                 case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
 
                     //PARSE CERTIFY PERSON TRANSACTION
-                    //return RSertifyPubKeys.Parse(data, releaserReference);
+                    //return RCertifyPubKeys.Parse(data, releaserReference);
                     break;
 
                 case Transaction.ISSUE_ASSET_TRANSACTION:

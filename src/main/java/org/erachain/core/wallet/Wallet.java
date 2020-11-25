@@ -1372,8 +1372,8 @@ public class Wallet extends Observable /*implements Observer*/ {
 			}
 
 			// CHECK IF SERTIFY PErSON
-			else if (transaction instanceof RSertifyPubKeys) {
-				this.processSertifyPerson((RSertifyPubKeys) transaction, height);
+			else if (transaction instanceof RCertifyPubKeys) {
+				this.processSertifyPerson((RCertifyPubKeys) transaction, height);
 			}
 
 			// CHECK IF ORDER CREATION
@@ -1435,8 +1435,8 @@ public class Wallet extends Observable /*implements Observer*/ {
 			}
 
 			// CHECK IF SERTIFY PErSON
-			else if (transaction instanceof RSertifyPubKeys) {
-				this.orphanSertifyPerson((RSertifyPubKeys) transaction, height);
+			else if (transaction instanceof RCertifyPubKeys) {
+				this.orphanSertifyPerson((RCertifyPubKeys) transaction, height);
 			}
 
 			// CHECK IF ORDER CREATION
@@ -1513,23 +1513,23 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 	}
 
-	private void processSertifyPerson(RSertifyPubKeys sertifyPubKeys, int height) {
+	private void processSertifyPerson(RCertifyPubKeys certifyPubKeys, int height) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
 		}
 
 		// CHECK IF WE ARE OWNER
-		Account creator = sertifyPubKeys.getCreator();
+		Account creator = certifyPubKeys.getCreator();
 		if (creator == null)
 			return;
 
-        addOwnerInFavorites(sertifyPubKeys);
+		addOwnerInFavorites(certifyPubKeys);
 
-        DCSet db = DCSet.getInstance();
+		DCSet db = DCSet.getInstance();
 
 		boolean personalized = false;
-		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = db.getPersonAddressMap().getItems(sertifyPubKeys.getKey());
+		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = db.getPersonAddressMap().getItems(certifyPubKeys.getKey());
 		if (personalisedData == null || personalisedData.isEmpty()) {
 			personalized = true;
 		}
@@ -1538,7 +1538,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 			// IT IS NOT VOUCHED PERSON
 
 			// FIND person
-			ItemCls person = db.getItemPersonMap().get(sertifyPubKeys.getKey());
+			ItemCls person = db.getItemPersonMap().get(certifyPubKeys.getKey());
 			if (person != null) {
 				// FIND issue record
 				Transaction transPersonIssue = db.getTransactionFinalMap().get(person.getReference());
@@ -1559,7 +1559,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 					this.database.getAccountMap().changeBalance(creator.getAddress(), false, FEE_KEY, issued_FEE_BD, false, false);
 				}
 
-				PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
+				PublicKeyAccount pkAccount = certifyPubKeys.getCertifiedPublicKeys().get(0);
 				if (this.accountExists(pkAccount)) {
 					this.database.getAccountMap().changeBalance(pkAccount.getAddress(), false, FEE_KEY, issued_FEE_BD, false, false);
 				}
@@ -1567,25 +1567,25 @@ public class Wallet extends Observable /*implements Observer*/ {
 		}
 	}
 
-    private void addOwnerInFavorites(RSertifyPubKeys sertifyPubKeys) {
-        List<PublicKeyAccount> sertifiedPublicKeys = sertifyPubKeys.getSertifiedPublicKeys();
+	private void addOwnerInFavorites(RCertifyPubKeys certifyPubKeys) {
+		List<PublicKeyAccount> certifiedPublicKeys = certifyPubKeys.getCertifiedPublicKeys();
 
-        for (PublicKeyAccount key : sertifiedPublicKeys) {
+		for (PublicKeyAccount key : certifiedPublicKeys) {
 			if (this.accountExists(key)) {
-				long personKey = sertifyPubKeys.getKey();
+				long personKey = certifyPubKeys.getKey();
 				this.database.getPersonFavoritesSet().add(personKey);
 				break;
 			}
-        }
-    }
+		}
+	}
 
-    private void orphanSertifyPerson(RSertifyPubKeys sertifyPubKeys, int height) {
+	private void orphanSertifyPerson(RCertifyPubKeys certifyPubKeys, int height) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
 		}
 
-		Account creator = sertifyPubKeys.getCreator();
+		Account creator = certifyPubKeys.getCreator();
 		if (creator == null)
 			return;
 
@@ -1593,7 +1593,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 		DCSet db = DCSet.getInstance();
 
 		boolean personalized = false;
-		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = db.getPersonAddressMap().getItems(sertifyPubKeys.getKey());
+		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = db.getPersonAddressMap().getItems(certifyPubKeys.getKey());
 		if (personalisedData == null || personalisedData.isEmpty()) {
 			personalized = true;
 		}
@@ -1602,7 +1602,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 			// IT IS NOT VOUCHED PERSON
 
 			// FIND person
-			ItemCls person = db.getItemPersonMap().get(sertifyPubKeys.getKey());
+			ItemCls person = db.getItemPersonMap().get(certifyPubKeys.getKey());
 			if (person == null)
 				return;
 
@@ -1625,7 +1625,7 @@ public class Wallet extends Observable /*implements Observer*/ {
 				this.database.getAccountMap().changeBalance(creator.getAddress(), true, FEE_KEY, issued_FEE_BD, false, false);
 			}
 
-			PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
+			PublicKeyAccount pkAccount = certifyPubKeys.getCertifiedPublicKeys().get(0);
 			if (this.accountExists(creator)) {
 				this.database.getAccountMap().changeBalance(pkAccount.getAddress(), true, FEE_KEY, issued_FEE_BD, false, false);
 			}

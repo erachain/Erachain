@@ -433,7 +433,7 @@ public class BlockChain {
      */
     public static final int FEE_INVITED_SHIFT_IN_LEVEL = 1;
 
-    // GIFTS for RSertifyPubKeys
+    // GIFTS for RCertifyPubKeys
     public static final int GIFTED_COMPU_AMOUNT_4_10 = FEE_PER_BYTE_4_10 << 8;
     public static final int GIFTED_COMPU_AMOUNT_FOR_PERSON_4_10 = GIFTED_COMPU_AMOUNT_4_10 << 3;
     public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD_4_10 = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON_4_10, FEE_SCALE);

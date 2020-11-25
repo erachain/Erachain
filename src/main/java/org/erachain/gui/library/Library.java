@@ -532,7 +532,7 @@ public class Library {
             break;
 
         case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
-            jsonString = ((RSertifyPubKeys) trans).toJson().toJSONString();
+            jsonString = ((RCertifyPubKeys) trans).toJson().toJSONString();
             break;
 
         case Transaction.HASHES_RECORD:
