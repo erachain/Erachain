@@ -1019,15 +1019,19 @@ public class ApiClient {
                 stream = connection.getInputStream();
             }
 
-            InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
-            BufferedReader br = new BufferedReader(isReader);
-            String result = br.readLine(); //TODO READ ALL OR HARDCODE HELP
+            String inputText = "";
 
+            InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(isReader);
+            String inputLine;
+            while ((inputLine = bufferedReader.readLine()) != null)
+                inputText += inputLine;
+            bufferedReader.close();
 
             try {
-                return StrJSonFine.convert(result);
+                return StrJSonFine.convert(inputText);
             } catch (Exception e) {
-                return result;
+                return inputText;
             }
 
         } catch (Exception ioe) {
