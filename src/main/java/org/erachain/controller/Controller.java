@@ -3147,6 +3147,20 @@ public class Controller extends Observable {
             return new Fun.Tuple2<>(error, OnDealClick.resultMess(error));
         }
 
+        String exLinkRefStr = jsonObject.get("linkTo").toString();
+        ExLink exLink;
+        if (exLinkRefStr == null)
+            exLink = null;
+        else {
+            Long exLinkRef = Transaction.parseDBRef(exLinkRefStr);
+            if (exLinkRef == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+            } else {
+                exLink = new ExLinkSource(exLinkRef, null);
+            }
+        }
+
         String name = (String) jsonObject.getOrDefault("name", null);
         String description = (String) jsonObject.getOrDefault("description", null);
 

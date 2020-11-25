@@ -46,7 +46,7 @@ public class ItemPersonsResource {
         help.put("persons/raw/{key}", "Returns RAW in Base58 of person with the given key.");
         help.put("persons/images/{key}", "get item Images by key");
         help.put("persons/listfrom/{start}", "get list from KEY");
-        help.put("POST persons/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": \"long\", \"deathday\": \"<long>\", \"gender\": \"<int>\", \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": ,     \"password\": \"<password>\"}", "issue");
+        help.put("POST persons/issue {\"linkTo\": \"<SeqNo>\", \"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": \"long\", \"deathday\": \"<long>\", \"gender\": \"<int>\", \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": , \"password\": \"<password>\"}", "issue");
         help.put("POST persons/issueraw/{creator}?feePow=<int>&password=<String> ", "Issue Person by Base58 RAW in POST body");
 
         help.put("persons/certify/{creator}/{personKey}?pubkey=<Base58>&feePow=<int>&linkTo=<long>&days<int>&password=<String>", "Certify some public key for Person by it key. Default: pubKey is owner from Person, feePow=0, days=1");
@@ -210,7 +210,7 @@ public class ItemPersonsResource {
                                 @PathParam("person") Long personKey,
                                 @QueryParam("pubkey") String pubkeyStr,
                                 @DefaultValue("1") @QueryParam("days") Integer addDays,
-                                @QueryParam("linkTo") Long exLinkRef,
+                                @QueryParam("linkTo") String exLinkRefStr,
                                 @DefaultValue("0") @QueryParam("feePow") int feePow,
                                 @QueryParam("password") String password) {
 
@@ -222,10 +222,16 @@ public class ItemPersonsResource {
         }
 
         ExLink exLink;
-        if (exLinkRef == null) {
+        if (exLinkRefStr == null)
             exLink = null;
-        } else {
-            exLink = new ExLinkSource(exLinkRef, null);
+        else {
+            Long exLinkRef = Transaction.parseDBRef(exLinkRefStr);
+            if (exLinkRef == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+            } else {
+                exLink = new ExLinkSource(exLinkRef, null);
+            }
         }
 
         PublicKeyAccount pubKey;
