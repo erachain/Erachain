@@ -2,101 +2,118 @@ package org.erachain.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.blockexplorer.BlockExplorer;
+import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.statuses.StatusCls;
+import org.erachain.core.item.statuses.StatusFactory;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.utils.APIUtils;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Path("statuses")
 @Produces(MediaType.APPLICATION_JSON)
 @Slf4j
 public class ItemStatusesResource {
-    /**
-     * Get all status type 1
-     *
-     * @return ArrayJSON of all status. request key means key status and name status.
-     * <h2>Example request</h2>
-     * GET statuss
-     * <h2>Example response</h2>
-     * {
-     * "1": "ERA",
-     * "2": "COMPU",
-     * "3": "АЗЫ",
-     * "4": "ВЕДЫ",
-     * "5": "►РА",
-     * "6": "►RUNEURO",
-     * "7": "►ERG",
-     * "8": "►LERG",
-     * "9": "►A"
-     * }
-     */
+
+    @Context
+    HttpServletRequest request;
+
     @GET
-    public String getStatusesLite() {
-        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryStatusesLite());
+    public String help() {
+        Map help = new LinkedHashMap();
+
+        help.put("statuses/last", "Get last key");
+        help.put("statuses/{key}", "Returns information about status with the given key.");
+        help.put("statuses/raw/{key}", "Returns RAW in Base58 of status with the given key.");
+        help.put("statuses/images/{key}", "get item Images by key");
+        help.put("statuses/listfrom/{start}", "get list from KEY");
+        help.put("POST statuses/issueraw/{creator}?feePow=<int>&password=<String> ", "Issue Status by Base58 RAW in POST body");
+
+        //help.put("POST statuses/issue", "issue");
+
+        return StrJSonFine.convert(help);
     }
 
-    /**
-     * Get lite information status by key status
-     *
-     * @param key is number status
-     * @return JSON object. Single status
-     */
+    @GET
+    @Path("last")
+    public String last() {
+        return "" + DCSet.getInstance().getItemStatusMap().getLastKey();
+    }
+
     @GET
     @Path("/{key}")
-    public String getStatusLite(@PathParam("key") String key) {
-        Long statusAsLong = null;
+    public String get(@PathParam("key") String key) {
+        Long asLong = null;
 
-        // HAS ASSET NUMBERFORMAT
         try {
-            statusAsLong = Long.valueOf(key);
-
+            asLong = Long.valueOf(key);
         } catch (NumberFormatException e) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_STATUS_NOT_EXIST);
-
+                    Transaction.INVALID_ITEM_KEY);
         }
 
-        // DOES ASSETID EXIST
-        if (!DCSet.getInstance().getItemStatusMap().contains(statusAsLong)) {
+        if (!DCSet.getInstance().getItemStatusMap().contains(asLong)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_STATUS_NOT_EXIST);
-
         }
 
-        return Controller.getInstance().getStatus(statusAsLong).toJson().toJSONString();
+        ItemCls item = Controller.getInstance().getStatus(asLong);
+        return JSONValue.toJSONString(item.toJson());
     }
 
     @GET
-    @Path("/{key}/full")
-    public String getStatus(@PathParam("key") String key) {
-        Long statusAsLong = null;
+    @Path("raw/{key}")
+    public String getRAW(@PathParam("key") String key) {
+        Long asLong = null;
 
-        // HAS ASSET NUMBERFORMAT
         try {
-            statusAsLong = Long.valueOf(key);
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemStatusMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_STATUS_NOT_EXIST);
+        }
+
+        ItemCls item = Controller.getInstance().getStatus(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Base58.encode(issueBytes);
+    }
+
+    @GET
+    @Path("/images/{key}")
+    public String getImages(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
 
         } catch (NumberFormatException e) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_STATUS_NOT_EXIST);
-
+                    Transaction.INVALID_ITEM_KEY);
         }
 
-        // DOES ASSETID EXIST
-        if (!DCSet.getInstance().getItemStatusMap().contains(statusAsLong)) {
+        if (!DCSet.getInstance().getItemStatusMap().contains(asLong)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_STATUS_NOT_EXIST);
         }
 
-        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryItemStatus(statusAsLong));
+        return Controller.getInstance().getStatus(asLong).toJsonData().toJSONString();
     }
 
     @SuppressWarnings("unchecked")
@@ -111,6 +128,34 @@ public class ItemStatusesResource {
         ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.STATUS_TYPE, start, page, output, showPerson, descending);
 
         return output.toJSONString();
+    }
+
+    @POST
+    @Path("issueraw/{creator}")
+    public String issueRAW(String x, @PathParam("creator") String creator,
+                           @DefaultValue("0") @QueryParam("feePow") String feePowStr,
+                           @QueryParam("password") String password) {
+
+        Controller cntr = Controller.getInstance();
+        Fun.Tuple3<PrivateKeyAccount, Integer, byte[]> result = APIUtils.postIssueRawItem(request, x, creator, feePowStr, password);
+        StatusCls item;
+        try {
+            item = StatusFactory.getInstance().parse(result.c, false);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    e.getMessage());
+        }
+
+        Transaction transaction = cntr.issueStatus(result.a, result.b, item);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        if (validate == Transaction.VALIDATE_OK)
+            return transaction.toJson().toJSONString();
+        else {
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByErrorSimple(validate, out);
+            return out.toJSONString();
+        }
     }
 
 }

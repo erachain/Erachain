@@ -26,6 +26,10 @@ ERA\z_START_EXAMPLES\readme.txt
 
 Так же можно задавать ключи запуска в файле startARGS.txt - смотри пример в startARGS_example.txt
 
+### Set Version
+For set version in JAR application set `String versionEra =` in file `build.gradle`.   
+For set version in running from IDEA application set `controller.Controller.version` 
+
 ## Java
 Для корректной работы MapDB нужна именно Java 1.8 (vers 8) и проект собирается и тестируется именно с этой версией.
  Иначе бедет вызывать ошибка при коммите и закрывании базы:

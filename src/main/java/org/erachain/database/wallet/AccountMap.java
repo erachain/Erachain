@@ -131,12 +131,12 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
         return false;
     }
 
-    public boolean exists(Account address) {
-        if (address == null)
+    public boolean exists(Account account) {
+        if (account == null)
             return false;
 
-        for (Account account : this.accounts) {
-            if (account.equals(address)) return true;
+        for (Account myAaccount : this.accounts) {
+            if (myAaccount.equals(account)) return true;
         }
         return false;
     }
@@ -163,9 +163,9 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
     }
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
-    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(String address, boolean subtract, long key, BigDecimal amount, boolean isBackward) {
+    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(String address, boolean subtract, long key, BigDecimal amount, boolean isBackward, boolean isDirect) {
 
-        int actionType = Account.balancePosition(key, amount, isBackward);
+        int actionType = Account.balancePosition(key, amount, isBackward, isDirect);
         long absKey;
         if (key > 0) {
             absKey = key;

@@ -139,38 +139,47 @@ public class Start {
             JSONArray timeArray = (JSONArray) Settings.genesisJSON.get(1);
             Settings.genesisStamp = new Long(timeArray.get(0).toString());
 
-            // если там пустой список то включаем "у всех все есть"
-            JSONArray holders = (JSONArray) Settings.genesisJSON.get(2);
-            if (holders.isEmpty()) {
-                Settings.ERA_COMPU_ALL_UP = true;
-            } else {
-                // CHECK VALID
-                for (int i = 0; i < holders.size(); i++) {
-                    JSONArray holder = (JSONArray) holders.get(i);
-                    // SEND FONDs
-                    Fun.Tuple2<Account, String> accountItem = Account.tryMakeAccount(holder.get(0).toString());
-                    if (accountItem.a == null) {
-                        String error = accountItem.b + " - " + holder.get(0).toString();
-                        LOGGER.error(error);
-                        System.exit(4);
-                    }
-
-                    // DEBTORS
-                    JSONArray debtors = (JSONArray) holder.get(3);
-                    BigDecimal totalCredit = BigDecimal.ZERO;
-                    for (int j = 0; j < debtors.size(); j++) {
-                        JSONArray debtor = (JSONArray) debtors.get(j);
-
-                        accountItem = Account.tryMakeAccount(debtor.get(1).toString());
+            try {
+                // если там пустой список то включаем "у всех все есть"
+                JSONArray holders = (JSONArray) Settings.genesisJSON.get(2);
+                if (holders.isEmpty()) {
+                    Settings.ERA_COMPU_ALL_UP = true;
+                } else {
+                    // CHECK VALID
+                    for (int i = 0; i < holders.size(); i++) {
+                        JSONArray holder = (JSONArray) holders.get(i);
+                        // SEND FONDs
+                        Fun.Tuple2<Account, String> accountItem = Account.tryMakeAccount(holder.get(0).toString());
                         if (accountItem.a == null) {
-                            String error = accountItem.b + " - " + debtor.get(1).toString();
+                            String error = accountItem.b + " - " + holder.get(0).toString();
                             LOGGER.error(error);
                             System.exit(4);
                         }
-                    }
-                }
 
+                        if (holder.size() > 3) {
+                            // DEBTORS
+                            JSONArray debtors = (JSONArray) holder.get(3);
+                            BigDecimal totalCredit = BigDecimal.ZERO;
+                            for (int j = 0; j < debtors.size(); j++) {
+                                JSONArray debtor = (JSONArray) debtors.get(j);
+
+                                accountItem = Account.tryMakeAccount(debtor.get(1).toString());
+                                if (accountItem.a == null) {
+                                    String error = accountItem.b + " - " + debtor.get(1).toString();
+                                    LOGGER.error(error);
+                                    System.exit(4);
+                                }
+                            }
+                        }
+                    }
+
+                }
+            } catch (Exception e) {
+                LOGGER.info("Error while parse JSON " + file.getAbsolutePath() + " - " + e.getMessage());
+                LOGGER.error(e.getMessage(), e);
+                System.exit(3);
             }
+
 
             Settings.NET_MODE = Settings.NET_MODE_CLONE;
 

@@ -2,6 +2,7 @@ package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSetStatusToItem;
@@ -38,21 +39,79 @@ public class APIItemPerson {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
+        help.put("GET apiperson/last", "Get last ID");
+        help.put("GET apiperson/{key}", "GET by ID");
+        help.put("GET apiperson/raw/{key}", "Returns RAW in Base58 of person with the given key.");
+        help.put("GET apiperson/find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
+        help.put("Get apiperson/image/{key}", "GET Person Image");
+        help.put("Get apiperson/icon/{key}", "GET Person Icon");
+        help.put("Get apiperson/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
+
         help.put("apiperson/balance/{personKey}/{assetKey}/{position}?side=[]side",
                 "Get Asset Key balance in Position [1..5] for Person Key. Balance Side =0 - total debit; =1 - left; =2 - total credit");
         help.put("apiperson/status/{personKey}/{statusKey}?history=true",
                 "Get Status data for Person Key. JSON ARRAY format: [timeFrom, timeTo, [par1, par2, str1, str2, reference, description], block, txNo]");
 
-        help.put("GET {key}", "GET by ID");
-        help.put("GET find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
-        help.put("Get apiperson/image/{key}", "GET Person Image");
-        help.put("Get apiperson/icon/{key}", "GET Person Icon");
-        help.put("Get listfrom/{start}?page={pageSize}&showerson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} defaul - true, {descending} - true");
-
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
     }
 
+    @GET
+    @Path("last")
+    public Response last() {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity("" + dcSet.getItemPersonMap().getLastKey())
+                .build();
+
+    }
+
+    @GET
+    @Path("{key}")
+    public Response item(@PathParam("key") long key) {
+
+        ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
+
+        ItemCls item = map.get(key);
+        if (item == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
+        }
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(item.toJson().toJSONString())
+                .build();
+
+    }
+
+    @GET
+    @Path("raw/{key}")
+    public Response getRAW(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemPersonMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
+        }
+
+        ItemCls item = Controller.getInstance().getPerson(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(Base58.encode(issueBytes))
+                .build();
+    }
 
     /**
      * @param personKey
@@ -144,25 +203,6 @@ public class APIItemPerson {
     }
 
     @GET
-    @Path("{key}")
-    public Response item(@PathParam("key") long key) {
-
-        ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
-
-        ItemCls item = map.get(key);
-        if (item == null) {
-            throw ApiErrorFactory.getInstance().createError(
-                    Transaction.ITEM_PERSON_NOT_EXIST);
-        }
-        return Response.status(200)
-                .header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(item.toJson()))
-                .build();
-
-    }
-
-    @GET
     @Path("find/{filter_name_string}")
     public Response find(@PathParam("filter_name_string") String filter) {
 
@@ -188,7 +228,7 @@ public class APIItemPerson {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(array))
+                .entity(array.toJSONString())
                 .build();
 
     }

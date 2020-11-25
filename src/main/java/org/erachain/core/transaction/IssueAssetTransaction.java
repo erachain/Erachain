@@ -112,6 +112,10 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     @Override
     public boolean hasPublicText() {
+
+        if (BlockChain.ANONIM_SERT_USE)
+            return false;
+
         if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
             return false;
         }
@@ -281,17 +285,17 @@ public class IssueAssetTransaction extends IssueItemRecord {
         long quantity = asset.getQuantity();
         if (quantity > 0) {
             creator.changeBalance(dcSet, false, false, asset.getKey(dcSet),
-                    new BigDecimal(quantity).setScale(0), false);
+                    new BigDecimal(quantity).setScale(0), false, false, false);
 
             // make HOLD balance
             creator.changeBalance(dcSet, false, true, asset.getKey(dcSet),
-                    new BigDecimal(-quantity).setScale(0), false);
+                    new BigDecimal(-quantity).setScale(0), false, false, false);
 
         } else if (quantity == 0) {
             // безразмерные - нужно баланс в таблицу нулевой записать чтобы в блокэксплорере он отображался у счета
             // см. https://lab.erachain.org/erachain/Erachain/issues/1103
             this.creator.changeBalance(this.dcSet, false, false, asset.getKey(this.dcSet),
-                    BigDecimal.ZERO.setScale(0), false);
+                    BigDecimal.ZERO.setScale(0), false, false, false);
 
         }
 
@@ -307,11 +311,11 @@ public class IssueAssetTransaction extends IssueItemRecord {
         long quantity = asset.getQuantity();
         if (quantity > 0) {
             this.creator.changeBalance(this.dcSet, true, true, asset.getKey(this.dcSet),
-                    new BigDecimal(quantity).setScale(0), false);
+                    new BigDecimal(quantity).setScale(0), false, false, false);
 
             // на балансе На Руках - добавляем тоже
             creator.changeBalance(dcSet, true, false, asset.getKey(dcSet),
-                    new BigDecimal(-quantity).setScale(0), false);
+                    new BigDecimal(-quantity).setScale(0), false, false, false);
         }
     }
 

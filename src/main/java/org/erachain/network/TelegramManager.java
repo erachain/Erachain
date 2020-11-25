@@ -138,7 +138,7 @@ public class TelegramManager extends Thread {
                             continue;
 
                         if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                            String head = ((RSend) transaction).getHead();
+                            String head = ((RSend) transaction).getTitle();
                             if (!filter.equals(head))
                                 continue;
                         }
@@ -180,7 +180,7 @@ public class TelegramManager extends Thread {
                     continue;
 
                 if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                    String head = ((RSend) transaction).getHead();
+                    String head = ((RSend) transaction).getTitle();
                     if (!filter.equals(head))
                         continue;
                 }
@@ -297,7 +297,7 @@ public class TelegramManager extends Thread {
                     continue;
 
                 if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                    String head = ((RSend) transaction).getHead();
+                    String head = ((RSend) transaction).getTitle();
                     if (!filter.equals(head))
                         continue;
                 }
@@ -337,7 +337,7 @@ public class TelegramManager extends Thread {
                 continue;
 
             if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                String head = ((RSend) transaction).getHead();
+                String head = ((RSend) transaction).getTitle();
                 if (!filter.equals(head))
                     continue;
             }

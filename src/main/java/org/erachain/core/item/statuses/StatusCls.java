@@ -15,10 +15,12 @@ import java.util.*;
 
 public abstract class StatusCls extends ItemCls {
 
+    public static final int TYPE_KEY = ItemCls.STATUS_TYPE;
+
     public static final long MIN_START_KEY = 0L;
 
-    public static final Long RIGHTS_KEY = 1l;
-    public static final Long MEMBER_KEY = 2l;
+    public static final Long RIGHTS_KEY = 1L;
+    public static final Long MEMBER_KEY = 2L;
     public static final int STATUS = 1;
     public static final int TITLE = 2;
     public static final int POSITION = 3;
@@ -38,7 +40,7 @@ public abstract class StatusCls extends ItemCls {
 
     //GETTERS/SETTERS
     public int getItemType() {
-        return ItemCls.STATUS_TYPE;
+        return TYPE_KEY;
     }
 
     @Override
@@ -46,12 +48,12 @@ public abstract class StatusCls extends ItemCls {
         if (!BlockChain.CLONE_MODE)
             return MIN_START_KEY;
 
-        long startKey = BlockChain.startKeys[ItemCls.ASSET_TYPE];
+        long startKey = BlockChain.startKeys[TYPE_KEY];
 
         if (startKey == 0) {
             return START_KEY;
         } else if (startKey < MIN_START_KEY) {
-            return (BlockChain.startKeys[ItemCls.ASSET_TYPE] = MIN_START_KEY);
+            return (BlockChain.startKeys[TYPE_KEY] = MIN_START_KEY);
         }
         return startKey;
     }

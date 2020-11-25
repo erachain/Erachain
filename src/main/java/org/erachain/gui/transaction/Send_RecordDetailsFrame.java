@@ -51,7 +51,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
 		}
 		*/
 
-        if (r_Send.getHead() != null) {
+        if (r_Send.getTitle() != null) {
             //LABEL MESSAGE
             ++labelGBC.gridy;
             JLabel title_Label = new JLabel(Lang.getInstance().translate("Title") + ":");
@@ -60,7 +60,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             // ISTEXT
             ++detailGBC.gridy;
             //detailGBC.gridwidth = 2;
-            JTextField head_Text = new JTextField(r_Send.getHead());
+            JTextField head_Text = new JTextField(r_Send.getTitle());
             head_Text.setEditable(false);
             MenuPopupUtil.installContextMenu(head_Text);
             this.add(head_Text, detailGBC);
@@ -72,7 +72,8 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
 
             String sendType;
             if (asset != null) {
-                sendType = Lang.getInstance().translate(asset.viewAssetTypeAction(r_Send.isBackward(), r_Send.getActionType()));
+                sendType = Lang.getInstance().translate(asset.viewAssetTypeAction(r_Send.isBackward(), r_Send.getActionType(),
+                        r_Send.getCreator() != null && r_Send.getAsset().getOwner().equals(r_Send.getCreator())));
             } else {
                 sendType = "???";
             }

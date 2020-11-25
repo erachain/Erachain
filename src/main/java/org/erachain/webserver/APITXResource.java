@@ -6,9 +6,11 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
@@ -22,13 +24,14 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.Map.Entry;
 
-@Path("apirecords")
+@Path("api/tx")
 @Produces(MediaType.APPLICATION_JSON)
-public class APITransactionsResource {
+public class APITXResource {
 
     @Context
     HttpServletRequest request;
@@ -38,38 +41,45 @@ public class APITransactionsResource {
 
         Map<String, String> help = new LinkedHashMap<String, String>();
 
-        help.put("apirecords/get/{signature}",
-                Lang.getInstance().translate("Get Record by sigmature."));
-        help.put("apirecords/getbynumber/{height-sequence}",
-                "GET Record by Height and Sequence");
-        help.put("apirecords/getsignature/{height-sequence}",
-                "GET Record Signature by Height and Sequence");
-        help.put("apirecords/getvouches/{height-sequence}",
-                "GET Vouches of Record by Height and Sequence");
-        help.put("apirecords/incomingfromblock/{address}/{blockStart}?type={type}",
-                Lang.getInstance().translate("Get Incoming Records for Address from {blockStart}. Filter by type. Limit checked blocks = 2000 or 100 found records. If blocks not end at height - NEXT parameter was set."));
-        help.put("apirecords/getbyaddress?address={address}&asset={asset}&recordType={recordType}&unconfirmed=true",
-                Lang.getInstance().translate("Get all Records (and Unconfirmed) for Address & Asset Key by record type. recordType is option parameter"));
-        help.put("apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}&unconfirmed=true",
-                "Get last Records (and Unconfirmed) from Unix Timestamp milisec(1512777600000)");
-        help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",
-                Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
+        help.put("api/tx/{signature}",
+                Lang.getInstance().translate("Get transaction by signature."));
+        help.put("api/tx/bynumber/{height-sequence}",
+                "GET transaction by Height and Sequence (SeqNo)");
+        help.put("api/tx/signature/{height-sequence}",
+                "GET transaction Signature by Height and Sequence (SeqNo)");
+        help.put("api/tx/vouches/{height-sequence}",
+                "GET Vouches of transaction by Height and Sequence");
+        help.put("api/tx/incomingfromblock/{address}/{blockStart}?type={type}",
+                Lang.getInstance().translate("Get Incoming transactions for Address from {blockStart}. Filter by type. Limit checked blocks = 2000 or 100 found transactions. If blocks not end at height - NEXT parameter was set."));
+        help.put("api/tx/byaddress?address={address}&asset={asset}&txType={txType}&unconfirmed=true",
+                Lang.getInstance().translate("Get all transactions (and Unconfirmed) for Address & Asset Key by transaction type. Here txType is option parameter"));
+        help.put("api/tx/lastbyaddress/{address}?timestamp={Timestamp}&limit={Limit}&unconfirmed=true",
+                "Get last transactions (and Unconfirmed) from Unix Timestamp milisec(1512777600000)");
+        help.put("api/tx/byaddressfrom/{address}?asset={asset}&start={start tx}&end={end tx}&type={type Transaction}&sort={des/asc}",
+                Lang.getInstance().translate("Get all transactions for Address & Asset Key from Start to End"));
 
-        help.put("apirecords/unconfirmed?address={address}&type={type}&from={from}&count={count}&descending=true",
+        help.put("api/tx/unconfirmed?address={address}&type={type}&from={from}&count={count}&descending=true",
                 Lang.getInstance().translate("Get all incoming unconfirmed transaction by address, type transaction, timestamp limited by count"));
 
-        help.put("apirecords/unconfirmedincomes/{address}?type={type}&from={from}&count={count}&descending=true",
-                Lang.getInstance().translate("Get all unconfirmed Records for Address from Start at Count filtered by Type"));
+        help.put("api/tx/unconfirmedincomes/{address}?type={type}&from={from}&count={count}&descending=true",
+                Lang.getInstance().translate("Get all unconfirmed transactions for Address from Start at Count filtered by Type"));
 
-        help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
+        help.put("api/tx/byblock/{height}", Lang.getInstance().translate("Get all transactions from Block"));
 
-        help.put("apirecords/find?address={address}&creator={creator}&recipient={recipient}&from=[seqNo]&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={false}&offset={offset}&limit={limit}&unconfirmed=false&count=false",
-                Lang.getInstance().translate("Find Records. Set [seqNo] as 1234-1"));
+        help.put("api/tx/find?address={address}&creator={creator}&recipient={recipient}&from=[seqNo]&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={false}&offset={offset}&limit={limit}&unconfirmed=false&count=false",
+                Lang.getInstance().translate("Find transactions. Set [seqNo] as 1234-1"));
 
-        help.put("apirecords/search?q={query}&from=[seqNo]&useforge={false}&offset={offset}&limit={limit}&fullpage={false}",
-                Lang.getInstance().translate("Search Records by Query. Query=SeqNo|Signature|FilterWords. Result[0-1] - START & END Seq-No for use in paging (see as make it in blockexplorer. Signature as Base58. Set Set FilterWords as preffix words separated by space. Set [seqNo] as 1234-1. For use forge set &useforge=true. For fill full page - use fullpage=true"));
+        help.put("api/tx/search?q={query}&from=[seqNo]&useforge={false}&offset={offset}&limit={limit}&fullpage={false}",
+                Lang.getInstance().translate("Search transactions by Query. Query=SeqNo|Signature|FilterWords. Result[0-1] - START & END Seq-No for use in paging (see as make it in blockexplorer. Signature as Base58. Set Set FilterWords as preffix words separated by space. Set [seqNo] as 1234-1. For use forge set &useforge=true. For fill full page - use fullpage=true"));
 
-        help.put("apirecords/rawTransactionsByBlock/{height}?param", "Get raw transaction(encoding Base58). By default param is 3(for network)");
+        help.put("api/tx/rawbyblock/{height}?forDeal={DEAL}", "Get raw transaction(encoding Base58). forDeal = 1..5 (FOR_MYPACK, FOR_PACK, FOR_NETWORK, FOR_DB_RECORD). By default forDeal is 3(for network)");
+
+        help.put("api/tx/raw64byblock/{height}?forDeal={DEAL}", "Get raw transaction(encoding Base44 - more fast). forDeal = 1..5 (FOR_MYPACK, FOR_PACK, FOR_NETWORK, FOR_DB_RECORD). By default forDeal is 3(for network)");
+
+        help.put("api/tx/links/{height-sequence}",
+                "GET Links of transaction by Height and Sequence (SeqNo)");
+
+
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(StrJSonFine.convert(help)).build();
@@ -78,10 +88,10 @@ public class APITransactionsResource {
 
 
     @GET
-    @Path("get/{signature}")
+    @Path("{signature}")
     public Response getBySign(@PathParam("signature") String signature) {
 
-        JSONObject out = new JSONObject();
+        Map out = new LinkedHashMap();
 
         int step = 1;
 
@@ -89,8 +99,8 @@ public class APITransactionsResource {
             byte[] key = Base58.decode(signature);
 
             ++step;
-            Transaction record = Controller.getInstance().getTransaction(key, DCSet.getInstance());
-            out = record.toJson();
+            Transaction transaction = Controller.getInstance().getTransaction(key, DCSet.getInstance());
+            out = transaction.toJson();
 
         } catch (Exception e) {
 
@@ -98,7 +108,7 @@ public class APITransactionsResource {
             if (step == 1)
                 out.put("message", "signature error, use Base58 value");
             else if (step == 2)
-                out.put("message", "record not found");
+                out.put("message", "Transaction not found");
             else
                 out.put("message", e.getMessage());
         }
@@ -106,15 +116,15 @@ public class APITransactionsResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toJSONString())
+                .entity(out.toString())
                 .build();
     }
 
     @GET
-    @Path("getbynumber/{number}")
+    @Path("bynumber/{number}")
     public Response getByNumber(@PathParam("number") String numberStr) {
 
-        JSONObject out = new JSONObject();
+        Map out = new LinkedHashMap();
         int step = 1;
 
         try {
@@ -124,8 +134,8 @@ public class APITransactionsResource {
             int seq = Integer.parseInt(strA[1]);
 
             ++step;
-            Transaction record = DCSet.getInstance().getTransactionFinalMap().get(height, seq);
-            out = record.toJson();
+            Transaction transaction = DCSet.getInstance().getTransactionFinalMap().get(height, seq);
+            out = transaction.toJson();
 
         } catch (Exception e) {
 
@@ -133,7 +143,7 @@ public class APITransactionsResource {
             if (step == 1)
                 out.put("message", "height-sequence error, use integer-integer value");
             else if (step == 2)
-                out.put("message", "record not found");
+                out.put("message", "Transaction not found");
             else
                 out.put("message", e.getMessage());
         }
@@ -142,14 +152,14 @@ public class APITransactionsResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toJSONString())
+                .entity(out.toString())
                 .build();
     }
 
 
     // getsignature
     @GET
-    @Path("getsignature/{number}")
+    @Path("signature/{number}")
     public Response getSignByNumber(@PathParam("number") String numberStr) {
 
         int step = 1;
@@ -161,12 +171,12 @@ public class APITransactionsResource {
             int seq = Integer.parseInt(strA[1]);
 
             ++step;
-            Transaction record = DCSet.getInstance().getTransactionFinalMap().get(height, seq);
+            Transaction transaction = DCSet.getInstance().getTransactionFinalMap().get(height, seq);
 
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(record.viewSignature())
+                    .entity(transaction.viewSignature())
                     .build();
 
         } catch (Exception e) {
@@ -176,7 +186,7 @@ public class APITransactionsResource {
             if (step == 1)
                 out.put("message", "height-sequence error, use integer-integer value");
             else if (step == 2)
-                out.put("message", "record not found");
+                out.put("message", "Transaction not found");
             else
                 out.put("message", e.getMessage());
 
@@ -189,10 +199,10 @@ public class APITransactionsResource {
     }
 
     @GET
-    @Path("getvouches/{number}")
+    @Path("vouches/{number}")
     public Response getVouches(@PathParam("number") String numberStr) {
 
-        JSONObject out = new JSONObject();
+        Map out = new LinkedHashMap();
         int step = 1;
 
         Long dbRef = Transaction.parseDBRef(numberStr);
@@ -214,7 +224,7 @@ public class APITransactionsResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toJSONString())
+                .entity(out.toString())
                 .build();
     }
 
@@ -281,15 +291,15 @@ public class APITransactionsResource {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toJSONString()).build();
+                .entity(out.toString()).build();
 
     }
 
     @SuppressWarnings("unchecked")
     @GET
-    @Path("getbyaddress")
-    public Response getByAddress(@QueryParam("address") String address, @QueryParam("asset") Long asset,
-                                 @QueryParam("recordType") String recordType, @QueryParam("unconfirmed") boolean unconfirmed) {
+    @Path("byaddress/{address}")
+    public Response getByAddress(@PathParam("address") String address, @QueryParam("asset") Long asset,
+                                 @QueryParam("txType") String txType, @QueryParam("unconfirmed") boolean unconfirmed) {
 
         Account account;
         if (address == null) {
@@ -311,8 +321,8 @@ public class APITransactionsResource {
 
         JSONArray array = new JSONArray();
         for (Transaction transaction : result) {
-            if (recordType != null) {
-                if (transaction.viewTypeName().toUpperCase().equals(recordType.toUpperCase())) {
+            if (txType != null) {
+                if (transaction.viewTypeName().toUpperCase().equals(txType.toUpperCase())) {
                     if (asset != null) {
                         if (asset.equals(transaction.getAbsKey()))
                             array.add(transaction.toJson());
@@ -334,13 +344,13 @@ public class APITransactionsResource {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(array.toJSONString()).build();
+                .entity(array.toString()).build();
     }
 
-    // "apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}"
+    // "api/tx/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}"
     @GET
-    @Path("getlastbyaddress")
-    public Response getLastByAddress(@QueryParam("address") String address, @QueryParam("timestamp") Long timestamp,
+    @Path("lastbyaddress/{address}")
+    public Response getLastByAddress(@PathParam("address") String address, @QueryParam("timestamp") Long timestamp,
                                      @QueryParam("limit") Integer limit, @QueryParam("unconfirmed") boolean unconfirmed) {
         JSONObject out = new JSONObject();
         if (timestamp == null)
@@ -372,14 +382,13 @@ public class APITransactionsResource {
         // Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toJSONString()).build();
+                .header("Access-Control-Allow-Origin", "*").entity(out.toString()).build();
     }
 
     @SuppressWarnings("unchecked")
     @GET
-    @Path("getbyaddressfromtransactionlimit")
-    public Response getByAddressLimit(@QueryParam("address") String address, @QueryParam("asset") Long asset,
+    @Path("byaddressfrom/{address}")
+    public Response getByAddressLimit(@PathParam("address") String address, @QueryParam("asset") Long asset,
                                       @QueryParam("start") long start, @QueryParam("end") long end, @QueryParam("type") String type1,
                                       @QueryParam("sort") String sort) {
         List<Transaction> result;
@@ -389,7 +398,7 @@ public class APITransactionsResource {
             ff.put("Error", "Invalid Address");
             return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(ff.toJSONString()).build();
+                    .entity(ff.toString()).build();
         }
         // SearchTransactionsTableModel a = new SearchTransactionsTableModel();
         // a.findByAddress(address);
@@ -410,7 +419,7 @@ public class APITransactionsResource {
             ff.put("message", "null");
             return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(ff.toJSONString()).build();
+                    .entity(ff.toString()).build();
         }
 
         // 7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC
@@ -442,7 +451,7 @@ public class APITransactionsResource {
         // json.put("transactions", array);
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(new JSONObject(k_Map.subMap(start, end)).toJSONString()).build();
+                .entity(new JSONObject(k_Map.subMap(start, end)).toString()).build();
 
     }
 
@@ -457,7 +466,7 @@ public class APITransactionsResource {
      * @return JSON list of transaction
      *
      * <h2>Example request</h2>
-     * http://127.0.0.1:9067/apirecords/unconfirmed?address=7R5m1NKAL3c2p3B7jMQXMsdqNaqCktS4h9?from=23&count=13&descending=true&timestamp=1535966134229&type=36
+     * http://127.0.0.1:9067/api/tx/unconfirmed?address=7R5m1NKAL3c2p3B7jMQXMsdqNaqCktS4h9?from=23&count=13&descending=true&timestamp=1535966134229&type=36
      */
     @SuppressWarnings("unchecked")
     @GET
@@ -481,16 +490,16 @@ public class APITransactionsResource {
                 account = result.a;
             }
         }
-        List<Transaction> transaction = dcSet.getTransactionTab().getTransactions(account, type,
+        List<Transaction> transactions = dcSet.getTransactionTab().getTransactions(account, type,
                 timestamp, count, descending);
 
-        for (Transaction record : transaction) {
-            array.add(record.toJson());
+        for (Transaction transaction : transactions) {
+            array.add(transaction.toJson());
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(array.toJSONString()).build();
+                .entity(array.toString()).build();
     }
 
     /**
@@ -504,7 +513,7 @@ public class APITransactionsResource {
      * @return JSON list of transaction
      *
      * <h2>Example request</h2>
-     * http://127.0.0.1:9067/apirecords/unconfirmedincomes/
+     * http://127.0.0.1:9067/api/tx/unconfirmedincomes/
      * 7R5m1NKAL3c2p3B7jMQXMsdqNaqCktS4h9?from=23&count=13&descending=true&timestamp=1535966134229&type=36
      */
     @SuppressWarnings("unchecked")
@@ -518,22 +527,22 @@ public class APITransactionsResource {
         JSONArray array = new JSONArray();
         DCSet dcSet = DCSet.getInstance();
 
-        List<Transaction> transaction = dcSet.getTransactionTab().getIncomedTransactions(address, type,
+        List<Transaction> transactions = dcSet.getTransactionTab().getIncomedTransactions(address, type,
                 timestamp, count, descending);
 
-        for (Transaction record : transaction) {
-            array.add(record.toJson());
+        for (Transaction transaction : transactions) {
+            array.add(transaction.toJson());
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(array.toJSONString()).build();
+                .entity(array.toString()).build();
     }
 
     @SuppressWarnings("unchecked")
     @GET
-    @Path("getbyblock")
-    public Response getByBlock(@QueryParam("block") int blockNo) {
+    @Path("byblock/{block}")
+    public Response getByBlock(@PathParam("block") int blockNo) {
         JSONObject ff = new JSONObject();
 
         Block block = DCSet.getInstance().getBlockMap().getAndProcess(blockNo);
@@ -541,7 +550,7 @@ public class APITransactionsResource {
             ff.put("error", "block not found");
             return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(ff.toJSONString()).build();
+                    .entity(ff.toString()).build();
         }
 
         List<Transaction> result = block.getTransactions();
@@ -550,7 +559,7 @@ public class APITransactionsResource {
             ff.put("error", "null");
             return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(ff.toJSONString()).build();
+                    .entity(ff.toString()).build();
         }
 
         JSONArray array = new JSONArray();
@@ -560,7 +569,7 @@ public class APITransactionsResource {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(array.toJSONString()).build();
+                .entity(array.toString()).build();
 
     }
 
@@ -613,39 +622,138 @@ public class APITransactionsResource {
     }
 
     @GET
-    @Path("/rawTransactionsByBlock/{height}")
+    @Path("/rawbyblock/{height}")
     @SuppressWarnings("unchecked")
-    public Response getRawTransactionByBlock(@PathParam("height") int height,
-                                             @DefaultValue("3") @QueryParam("param") int paramTransaction) {
+    public Response getRawByBlock(@PathParam("height") int height,
+                                  @DefaultValue("3") @QueryParam("forDeal") int forDeal) {
         Block block;
 
-        if (paramTransaction > 6 || paramTransaction < 0) {
+        if (forDeal > 6 || forDeal < 0) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_TRANSACTION_TYPE);
         }
 
-        JSONObject jsonObject = new JSONObject();
-        JSONObject jsonObjectTransactions = new JSONObject();
-        try {
-            block = Controller.getInstance().getBlockByHeight(height);
-            int i = 1;
-            for (Transaction transaction : block.getTransactions()) {
-                String rawTransaction = Base58.encode(transaction.toBytes(paramTransaction, true));
-                jsonObjectTransactions.put(i, rawTransaction);
-                i++;
-            }
-            jsonObject.put("transactions", jsonObjectTransactions);
-
-
-            if (block == null) {
-                throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
-            }
-        } catch (Exception e) {
+        JSONArray txs = new JSONArray();
+        block = Controller.getInstance().getBlockByHeight(height);
+        if (block == null) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+        }
+
+        for (Transaction transaction : block.getTransactions()) {
+            String rawTransaction = Base58.encode(transaction.toBytes(forDeal, true));
+            txs.add(rawTransaction);
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(jsonObject.toJSONString())
+                .entity(txs.toString())
                 .build();
     }
+
+    @GET
+    @Path("/raw64byblock/{height}")
+    @SuppressWarnings("unchecked")
+    public Response getRaw64ByBlock(@PathParam("height") int height,
+                                    @DefaultValue("3") @QueryParam("forDeal") int forDeal) {
+        Block block;
+
+        if (forDeal > 6 || forDeal < 0) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_TRANSACTION_TYPE);
+        }
+
+        JSONArray txs = new JSONArray();
+        block = Controller.getInstance().getBlockByHeight(height);
+        if (block == null) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+        }
+
+        for (Transaction transaction : block.getTransactions()) {
+            String rawTransaction = Base64.getEncoder().encodeToString(transaction.toBytes(forDeal, true));
+            txs.add(rawTransaction);
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(txs.toString())
+                .build();
+    }
+
+    @GET
+    @Path("links/{number}")
+    public Response getLinks(@PathParam("number") String numberStr) {
+
+        Map out = new JSONObject();
+        int step = 1;
+
+        Long dbRef = Transaction.parseDBRef(numberStr);
+        if (dbRef == null) {
+            out.put("error", step);
+            out.put("message", "height-sequence error, use integer-integer value");
+        } else {
+
+            DCSet dcSet = DCSet.getInstance();
+
+            try (IteratorCloseable<Fun.Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
+                    .getTXLinksIterator(dbRef, ExData.LINK_APPENDIX_TYPE, false)) {
+                JSONArray links = new JSONArray();
+                while (iterator.hasNext()) {
+                    links.add(Transaction.viewDBRef(iterator.next().c));
+                }
+                out.put("appendix", links);
+
+            } catch (IOException e) {
+                out.put("error", ++step);
+                out.put("message", "LINK_APPENDIX_TYPE error: " + e.getMessage());
+            }
+
+            step++;
+            try (IteratorCloseable<Fun.Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
+                    .getTXLinksIterator(dbRef, ExData.LINK_AUTHOR_TYPE, false)) {
+                JSONArray links = new JSONArray();
+                while (iterator.hasNext()) {
+                    links.add(Transaction.viewDBRef(iterator.next().c));
+                }
+                out.put("author", links);
+
+            } catch (IOException e) {
+                out.put("error", ++step);
+                out.put("message", "LINK_AUTHOR_TYPE error: " + e.getMessage());
+            }
+
+            step++;
+            try (IteratorCloseable<Fun.Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
+                    .getTXLinksIterator(dbRef, ExData.LINK_SOURCE_TYPE, false)) {
+                JSONArray links = new JSONArray();
+                while (iterator.hasNext()) {
+                    links.add(Transaction.viewDBRef(iterator.next().c));
+                }
+                out.put("source", links);
+
+            } catch (IOException e) {
+                out.put("error", ++step);
+                out.put("message", "LINK_SOURCE_TYPE error: " + e.getMessage());
+            }
+
+            step++;
+            try (IteratorCloseable<Fun.Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
+                    .getTXLinksIterator(dbRef, ExData.LINK_REPLY_COMMENT_TYPE, false)) {
+                JSONArray links = new JSONArray();
+                while (iterator.hasNext()) {
+                    links.add(Transaction.viewDBRef(iterator.next().c));
+                }
+                out.put("comment", links);
+
+            } catch (IOException e) {
+                out.put("error", ++step);
+                out.put("message", "LINK_COMMENT_TYPE error: " + e.getMessage());
+            }
+
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toString())
+                .build();
+    }
+
 }

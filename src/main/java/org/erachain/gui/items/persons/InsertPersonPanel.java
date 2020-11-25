@@ -237,7 +237,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
                 return;
             }
 
-            Pair<Transaction, Integer> result = Controller.getInstance().issuePersonHuman(creator, feePow, person);
+            Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(creator, feePow, person);
 
             // CHECK VALIDATE MESSAGE
             if (result.getB() == Transaction.VALIDATE_OK) {

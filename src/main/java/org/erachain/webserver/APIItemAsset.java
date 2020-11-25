@@ -8,6 +8,7 @@ package org.erachain.webserver;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.ItemAssetsResource;
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
@@ -46,17 +47,33 @@ public class APIItemAsset {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
+        help.put("GET apiasset/last", "Get last ID");
+        help.put("GET apiasset/{key}", "Get by ID");
+        help.put("GET apiasset/raw/{key}", "Returns RAW in Base58 of asset with the given key.");
+        help.put("GET apiasset/find/{filter_name_string}", "Get by words in Name. Use patterns from 5 chars in words");
+        help.put("Get apiasset/image/{key}", "Get Asset Image");
+        help.put("Get apiasset/icon/{key}", "Get Asset Icon");
+        help.put("Get apiasset/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
+
+        help.put("GET apiasset/types", "Return array of asset types.");
         help.put("GET apiasset/balances/[assetKey]?position=POS&offset=OFFSET&limit=LIMIT",
                 "Get balances for assetKey sorted by Own Amount. Balance positions: 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other. Default: POS=1. Balance A - total debit. Balance B - final amount.");
 
-        help.put("GET {key}", "Get by ID");
-        help.put("GET find/{filter_name_string}", "Get by words in Name. Use patterns from 5 chars in words");
-        help.put("Get image/{key}", "Get Asset Image");
-        help.put("Get icon/{key}", "Get Asset Icon");
-        help.put("Get listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} defaul - true, {descending} - true");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
+    }
+
+    @GET
+    @Path("last")
+    public Response last() {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity("" + dcSet.getItemAssetMap().getLastKey())
+                .build();
+
     }
 
     @GET
@@ -73,14 +90,47 @@ public class APIItemAsset {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(item.toJson()))
+                .entity(item.toJson().toJSONString())
                 .build();
 
     }
 
     @GET
+    @Path("raw/{key}")
+    public Response getRAW(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemAssetMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        ItemCls item = Controller.getInstance().getAsset(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(Base58.encode(issueBytes))
+                .build();
+
+    }
+
+    @GET
+    @Path("types")
+    public String getAssetTypes() {
+        return AssetCls.typesJson().toJSONString();
+    }
+
+    @GET
     @Path("find/{filter_name_string}")
-    public Response find(@PathParam("filter_name_string") String filter) {
+    public static Response find(@PathParam("filter_name_string") String filter) {
 
         if (filter == null || filter.isEmpty()) {
             return Response.status(501)
@@ -104,7 +154,7 @@ public class APIItemAsset {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(array))
+                .entity(array.toJSONString())
                 .build();
 
     }
@@ -183,24 +233,6 @@ public class APIItemAsset {
                 .build();
     }
 
-
-    @GET
-    @Path("balances/{key}")
-    public Response getBalances(@PathParam("key") Long assetKey, @DefaultValue("0") @QueryParam("offset") Integer offset,
-                                @DefaultValue("1") @QueryParam("position") Integer position,
-                                @DefaultValue("50") @QueryParam("limit") Integer limit) {
-
-        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limit > 200)
-                limit = 200;
-        }
-
-        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(ItemAssetsResource.getBalances(assetKey, offset, position, limit))
-                .build();
-    }
-
     @GET
     @Path("listfrom/{start}")
     public Response getList(@PathParam("start") long start,
@@ -218,6 +250,23 @@ public class APIItemAsset {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(output.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("balances/{key}")
+    public Response getBalances(@PathParam("key") Long assetKey, @DefaultValue("0") @QueryParam("offset") Integer offset,
+                                @DefaultValue("1") @QueryParam("position") Integer position,
+                                @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 200)
+                limit = 200;
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(ItemAssetsResource.getBalances(assetKey, offset, position, limit))
                 .build();
     }
 

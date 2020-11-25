@@ -29,7 +29,9 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
             }
 
         } else {
-            for (Long key: new Long[]{12L, 2L}) {
+            for (Long key : new Long[]{AssetCls.BTC_KEY // BTC
+                    //1114L
+            }) {
                 asset = Controller.getInstance().getAsset(key);
                 if (asset == null)
                     continue;
@@ -38,7 +40,7 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
             }
 
             if (deposit) {
-                this.addElement(Controller.getInstance().getAsset(1L));
+                //this.addElement(Controller.getInstance().getAsset(1L));
             } else {
             }
             //this.addElement(Controller.getInstance().getAsset(14)); // ETH

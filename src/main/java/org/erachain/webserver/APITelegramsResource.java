@@ -75,7 +75,7 @@ public class APITelegramsResource {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(telegram.toJson().toJSONString())).build();
+                .entity(telegram.toJson().toJSONString()).build();
     }
 
     /**
@@ -109,7 +109,8 @@ public class APITelegramsResource {
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(array.toJSONString())).build();
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(array.toJSONString()).build();
     }
 
     @GET
@@ -128,7 +129,8 @@ public class APITelegramsResource {
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(array.toJSONString())).build();
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(array.toJSONString()).build();
     }
 
     /**
@@ -163,7 +165,8 @@ public class APITelegramsResource {
         else
             jsonObject.put("check", true);
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(jsonObject.toJSONString())).build();
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(jsonObject.toJSONString()).build();
 
     }
 }

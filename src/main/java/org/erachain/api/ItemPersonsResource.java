@@ -1,16 +1,19 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Crypto;
+import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
-import org.json.simple.JSONArray;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Path("persons")
 @Produces(MediaType.APPLICATION_JSON)
@@ -31,50 +35,88 @@ public class ItemPersonsResource {
 
     @SuppressWarnings("unchecked")
     @GET
-    public String getPersons() {
+    public String help() {
+        Map help = new LinkedHashMap();
 
-        //CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-        }
+        help.put("persons/last", "Get last key");
+        help.put("persons/{key}", "Returns information about person with the given key.");
+        help.put("persons/raw/{key}", "Returns RAW in Base58 of person with the given key.");
+        help.put("persons/images/{key}", "get item Images by key");
+        help.put("persons/listfrom/{start}", "get list from KEY");
+        help.put("POST persons/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": \"long\", \"deathday\": \"<long>\", \"gender\": \"<int>\", \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": ,     \"password\": \"<password>\"}", "issue");
+        help.put("POST persons/issueraw/{creator}?feePow=<int>&password=<String> ", "Issue Person by Base58 RAW in POST body");
 
-        Collection<ItemCls> persons = Controller.getInstance().getAllItems(ItemCls.PERSON_TYPE);
-        JSONArray array = new JSONArray();
-
-        for (ItemCls person : persons) {
-            array.add(((PersonCls) person).toJson());
-        }
-
-        return array.toJSONString();
+        return StrJSonFine.convert(help);
     }
 
-    @SuppressWarnings("unchecked")
     @GET
-    @Path("/address/{address}")
-    public String getPersons(@PathParam("address") String address) {
+    @Path("last")
+    public String last() {
+        return "" + DCSet.getInstance().getItemPersonMap().getLastKey();
+    }
 
-        //CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+    @GET
+    @Path("/{key}")
+    public String get(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
         }
 
-        //CHECK ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
+        if (!DCSet.getInstance().getItemPersonMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
-        //CHECK ACCOUNT IN WALLET
-        Account account = Controller.getInstance().getWalletAccountByAddress(address);
-        if (account == null) {
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
+        ItemCls item = Controller.getInstance().getPerson(asLong);
+        return JSONValue.toJSONString(item.toJson());
+    }
+
+    @GET
+    @Path("raw/{key}")
+    public String getRAW(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
         }
 
-        JSONArray array = new JSONArray();
-        for (ItemCls person : Controller.getInstance().getAllItems(ItemCls.PERSON_TYPE, account)) {
-            array.add(((PersonCls) person).toJson());
+        if (!DCSet.getInstance().getItemPersonMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
-        return array.toJSONString();
+        ItemCls item = Controller.getInstance().getPerson(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Base58.encode(issueBytes);
+    }
+
+    @GET
+    @Path("/images/{key}")
+    public String getImages(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemPersonMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
+        }
+
+        return Controller.getInstance().getPerson(asLong).toJsonData().toJSONString();
     }
 
     @SuppressWarnings("unchecked")
@@ -104,8 +146,7 @@ public class ItemPersonsResource {
         Pair<Transaction, Integer> resultGood = (Pair<Transaction, Integer>) result;
         if (resultGood.getB() != Transaction.VALIDATE_OK) {
             JSONObject out = new JSONObject();
-            out.put("error", resultGood.getB());
-            out.put("error_message", OnDealClick.resultMess(resultGood.getB()));
+            Transaction.updateMapByErrorSimple(resultGood.getB(), out);
             return out.toJSONString();
         }
 
@@ -116,10 +157,44 @@ public class ItemPersonsResource {
             return transaction.toJson().toJSONString();
         else {
             JSONObject out = new JSONObject();
-            out.put("error", validate);
-            out.put("error_message", OnDealClick.resultMess(validate));
+            Transaction.updateMapByErrorSimple(validate, out);
             return out.toJSONString();
         }
     }
+
+    @POST
+    @Path("issueraw/{creator}")
+    public String issueRAW(String x, @PathParam("creator") String creator,
+                           @DefaultValue("0") @QueryParam("feePow") String feePowStr,
+                           @QueryParam("password") String password) {
+
+        Controller cntr = Controller.getInstance();
+        Fun.Tuple3<PrivateKeyAccount, Integer, byte[]> result = APIUtils.postIssueRawItem(request, x, creator, feePowStr, password);
+        PersonCls item;
+        try {
+            item = PersonFactory.getInstance().parse(result.c, false);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    e.getMessage());
+        }
+
+        Pair<Transaction, Integer> transactionResult = cntr.issuePerson(result.a, result.b, item);
+        if (transactionResult.getB() != Transaction.VALIDATE_OK) {
+            throw ApiErrorFactory.getInstance().createError(
+                    transactionResult.getB());
+        }
+
+        Transaction transaction = transactionResult.getA();
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        if (validate == Transaction.VALIDATE_OK)
+            return transaction.toJson().toJSONString();
+        else {
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByErrorSimple(validate, out);
+            return out.toJSONString();
+        }
+    }
+
 
 }

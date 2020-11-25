@@ -17,8 +17,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import static org.erachain.core.BlockChain.MAX_REC_DATA_BYTES;
-
 /*
 
 ## typeBytes
@@ -69,13 +67,13 @@ public class RSend extends TransactionAmount {
 
     private static final byte TYPE_ID = (byte) Transaction.SEND_ASSET_TRANSACTION;
     private static final String NAME_ID = "Send";
-    protected String head;
+    protected String title;
     protected byte[] data;
     protected byte[] encrypted;
     protected byte[] isText;
 
     public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, byte feePow, Account recipient, long key,
-                 BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
+                 BigDecimal amount, String title, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
                  Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
 
@@ -84,9 +82,9 @@ public class RSend extends TransactionAmount {
         if (encrypted != null)
             assert (encrypted.length == 1);
 
-        this.head = head;
-        if (head == null)
-            this.head = "";
+        this.title = title;
+        if (title == null)
+            this.title = "";
 
         if (data == null || data.length == 0) {
             // set version byte
@@ -111,9 +109,9 @@ public class RSend extends TransactionAmount {
     }
 
     public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, byte feePow, Account recipient, long key,
-                 BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
+                 BigDecimal amount, String title, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
                  Long reference, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, exLink, feePow, recipient, key, amount, head, data, isText, encrypted, timestamp, reference);
+        this(typeBytes, creator, exLink, feePow, recipient, key, amount, title, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -123,35 +121,35 @@ public class RSend extends TransactionAmount {
 
     // as pack
     public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, Account recipient, long key, BigDecimal amount,
-                 String head, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
-        this(typeBytes, creator, exLink, (byte) 0, recipient, key, amount, head, data, isText, encrypted, 0l, reference);
+                 String title, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
+        this(typeBytes, creator, exLink, (byte) 0, recipient, key, amount, title, data, isText, encrypted, 0l, reference);
         this.signature = signature;
     }
 
     // FOR BACKWARDS - CONFISCATE CREDIT
     public RSend(byte version, byte property1, byte property2, PublicKeyAccount creator, ExLink exLink, byte feePow,
-                 Account recipient, long key, BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted,
+                 Account recipient, long key, BigDecimal amount, String title, byte[] data, byte[] isText, byte[] encrypted,
                  long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, version, property1, property2}, creator, exLink, feePow, recipient, key, amount, head, data,
+        this(new byte[]{TYPE_ID, version, property1, property2}, creator, exLink, feePow, recipient, key, amount, title, data,
                 isText, encrypted, timestamp, reference);
     }
 
-    public RSend(PublicKeyAccount creator, ExLink exLink, byte feePow, Account recipient, long key, BigDecimal amount, String head,
+    public RSend(PublicKeyAccount creator, ExLink exLink, byte feePow, Account recipient, long key, BigDecimal amount, String title,
                  byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, exLink, feePow, recipient, key, amount, head, data, isText, encrypted,
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, exLink, feePow, recipient, key, amount, title, data, isText, encrypted,
                 timestamp, reference);
     }
 
-    public RSend(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, String head,
+    public RSend(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, String title,
                  byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, head, data, isText, encrypted,
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, title, data, isText, encrypted,
                 timestamp, reference, signature);
     }
 
     // as pack
-    public RSend(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, String head, byte[] data,
+    public RSend(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, String title, byte[] data,
                  byte[] isText, byte[] encrypted, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, (byte) 0, recipient, key, amount, head, data, isText, encrypted,
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, (byte) 0, recipient, key, amount, title, data, isText, encrypted,
                 0L, reference);
     }
 
@@ -160,7 +158,7 @@ public class RSend extends TransactionAmount {
                  BigDecimal amount, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
         // typeBytes[3] = (byte)(typeBytes[3] & (byte)-128);
-        this.head = "";
+        this.title = "";
         typeBytes[3] = (byte) (typeBytes[3] | (byte) -128);
 
     }
@@ -317,12 +315,12 @@ public class RSend extends TransactionAmount {
         }
 
         // HEAD LEN
-        int headLen = Byte.toUnsignedInt(data[position]);
+        int titleLen = Byte.toUnsignedInt(data[position]);
         position++;
         // HEAD
-        byte[] headBytes = Arrays.copyOfRange(data, position, position + headLen);
-        String head = new String(headBytes, StandardCharsets.UTF_8);
-        position += headLen;
+        byte[] titleBytes = Arrays.copyOfRange(data, position, position + titleLen);
+        String title = new String(titleBytes, StandardCharsets.UTF_8);
+        position += titleLen;
 
         // DATA +++
         byte[] arbitraryData = null;
@@ -348,10 +346,10 @@ public class RSend extends TransactionAmount {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new RSend(typeBytes, creator, exLink, feePow, recipient, key, amount, head, arbitraryData, isTextByte,
+            return new RSend(typeBytes, creator, exLink, feePow, recipient, key, amount, title, arbitraryData, isTextByte,
                     encryptedByte, timestamp, reference, signatureBytes, seqNo, feeLong);
         } else {
-            return new RSend(typeBytes, creator, exLink, recipient, key, amount, head, arbitraryData, isTextByte,
+            return new RSend(typeBytes, creator, exLink, recipient, key, amount, title, arbitraryData, isTextByte,
                     encryptedByte, reference, signatureBytes);
         }
 
@@ -359,11 +357,7 @@ public class RSend extends TransactionAmount {
 
     @Override
     public String getTitle() {
-        return this.head;
-    }
-
-    public String getHead() {
-        return this.head;
+        return this.title;
     }
 
     public byte[] getData() {
@@ -420,7 +414,7 @@ public class RSend extends TransactionAmount {
 
     @Override
     public boolean hasPublicText() {
-        return hasPublicText(head, data, isText(), isEncrypted());
+        return hasPublicText(title, data, isText(), isEncrypted(), null);
     }
 
     // PARSE/CONVERT
@@ -431,8 +425,8 @@ public class RSend extends TransactionAmount {
         // GET BASE
         JSONObject transaction = this.getJsonBase();
 
-        if (head.length() > 0) {
-            transaction.put("title", this.head);
+        if (title.length() > 0) {
+            transaction.put("title", this.title);
         }
 
         if (data != null && data.length > 0) {
@@ -456,7 +450,7 @@ public class RSend extends TransactionAmount {
         byte[] data = super.toBytes(forDeal, withSignature);
 
         // WRITE HEAD
-        byte[] headBytes = this.head.getBytes(StandardCharsets.UTF_8);
+        byte[] headBytes = this.title.getBytes(StandardCharsets.UTF_8);
         // HEAD SIZE
         data = Bytes.concat(data, new byte[]{(byte) headBytes.length});
         // HEAD
@@ -483,7 +477,7 @@ public class RSend extends TransactionAmount {
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
 
-        int dataLen = super.getDataLength(forDeal, withSignature) + 1 + head.getBytes(StandardCharsets.UTF_8).length;
+        int dataLen = super.getDataLength(forDeal, withSignature) + 1 + title.getBytes(StandardCharsets.UTF_8).length;
         if (exLink != null)
             dataLen += exLink.length();
 
@@ -501,12 +495,15 @@ public class RSend extends TransactionAmount {
             return VALIDATE_OK;
         }
 
-        if (head.getBytes(StandardCharsets.UTF_8).length > 255)
-            return INVALID_HEAD_LENGTH;
+        if (title != null && title.getBytes(StandardCharsets.UTF_8).length > MAX_TITLE_BYTES_LENGTH) {
+            errorValue = "bytes: " + title.getBytes(StandardCharsets.UTF_8).length;
+            return INVALID_TITLE_LENGTH;
+        }
 
         if (this.data != null) {
             // CHECK DATA SIZE
-            if (data.length > MAX_REC_DATA_BYTES) {
+            if (data.length > MAX_DATA_BYTES_LENGTH) {
+                errorValue = "bytes: " + data.length;
                 return INVALID_DATA_LENGTH;
             }
         }

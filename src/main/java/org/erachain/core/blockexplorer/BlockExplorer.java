@@ -447,13 +447,9 @@ public class BlockExplorer {
             // top 100
         } else if (info.getQueryParameters().containsKey("top")) {
             output.putAll(jsonQueryTopRichest(info));
-            // asset lite
         } else if (info.getQueryParameters().containsKey("assets")) {
             output.put("type", "assets");
             output.putAll(jsonQueryPages(AssetCls.class, start, pageSize));
-        } else if (info.getQueryParameters().containsKey("assetsLite")) {
-            output.put("assetsLite", jsonQueryAssetsLite());
-            // assets list
         } else if (info.getQueryParameters().containsKey("asset")) {
             if (info.getQueryParameters().get("asset").size() == 1) {
                 try {
@@ -572,7 +568,6 @@ public class BlockExplorer {
         help.put("Block", "blockexplorer.json?block={block}[&page={page}]");
         help.put("Blocks List", "blockexplorer.json?blocks[&start={height}]");
         help.put("Assets List", "blockexplorer.json?assets");
-        help.put("Assets List Lite", "blockexplorer.json?assetsLite");
         help.put("Asset", "blockexplorer.json?asset={asset}");
         help.put("Asset Trade", "blockexplorer.json?asset={assetHave}&asset={assetWant}");
         help.put("Polls List", "blockexplorer.json?polls");
@@ -640,40 +635,25 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryAssetsLite() {
+    // ItemCls.ASSET_TYPE
+    public Map jsonQueryItemsLite(int itemType, Long fromKey) {
 
         Map output = new LinkedHashMap();
-
-        Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE);
-
-        for (ItemCls item : items) {
-            output.put(item.getKey(), item.viewName());
-        }
-
-        return output;
-    }
-
-    public Map jsonQueryStatusesLite() {
-
-        Map output = new LinkedHashMap();
-
-        Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.STATUS_TYPE);
-
-        for (ItemCls item : items) {
-            output.put(item.getKey(), item.viewName());
-        }
-
-        return output;
-    }
-
-    public Map jsonQueryTemplatesLite() {
-
-        Map output = new LinkedHashMap();
-
-        Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.TEMPLATE_TYPE);
-
-        for (ItemCls item : items) {
-            output.put(item.getKey(), item.viewName());
+        ItemMap itemsMap = Controller.getInstance().getItemMap(itemType);
+        try (IteratorCloseable<Long> iterator = itemsMap.getIteratorFrom(fromKey, true)) {
+            Long key;
+            ItemCls item;
+            int size = 25;
+            while (iterator.hasNext()) {
+                if (--size < 0)
+                    break;
+                key = iterator.next();
+                item = itemsMap.get(key);
+                if (item == null)
+                    continue;
+                output.put(key, item.viewName());
+            }
+        } catch (IOException e) {
         }
 
         return output;
@@ -953,9 +933,16 @@ public class BlockExplorer {
         assetJSON.put("operations", orders.size() + trades.size());
 
         assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
-        assetJSON.put("assetTypeChar", asset.charAssetType());
+        assetJSON.put("assetTypeChar", asset.charAssetType() + asset.viewAssetTypeAbbrev());
 
         assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
+        StringJoiner joiner = new StringJoiner(", ");
+        for (String action : asset.viewAssetTypeActionsList()) {
+            joiner.add(Lang.getInstance().translateFromLangObj(action, langObj));
+        }
+        assetJSON.put("assetTypeDesc", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeDescriptionCls(asset.getAssetType()), langObj)
+                + ".\n" + Lang.getInstance().translateFromLangObj("Acceptable actions", langObj) + ":\n" + joiner.toString()
+        );
 
         output.put("this", assetJSON);
 
@@ -1028,7 +1015,8 @@ public class BlockExplorer {
         output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
         output.put("label_Description", Lang.getInstance().translateFromLangObj("Description", langObj));
         output.put("label_Scale", Lang.getInstance().translateFromLangObj("Accuracy", langObj));
-        output.put("label_AssetType", Lang.getInstance().translateFromLangObj("TYPE", langObj));
+        output.put("label_AssetType", Lang.getInstance().translateFromLangObj("Type # вид", langObj));
+        output.put("label_AssetType_Desc", Lang.getInstance().translateFromLangObj("Type Description", langObj));
         output.put("label_Quantity", Lang.getInstance().translateFromLangObj("Quantity", langObj));
         output.put("label_Released", Lang.getInstance().translateFromLangObj("Released", langObj));
         output.put("label_Holders", Lang.getInstance().translateFromLangObj("Holders", langObj));
@@ -1645,18 +1633,6 @@ public class BlockExplorer {
         return output;
     }
 
-    //todo Gleb for future убрать duplicateCodeAssets. Проблема в ключе.  заменит на assetsJSON
-    public Map jsonQueryAssets() {
-        output.put("type", "assets");
-
-        Map output = new LinkedHashMap();
-        Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE);
-        for (ItemCls item : items) {
-            duplicateCodeAssets(output, (AssetCls) item);
-        }
-        return output;
-    }
-
     private void duplicateCodeAssets(Map assetsJSON, AssetCls asset) {
         Map assetJSON = new LinkedHashMap();
 
@@ -2067,7 +2043,6 @@ public class BlockExplorer {
         output.put("Label_Total_coins_in_the_system",
                 Lang.getInstance().translateFromLangObj("Total asset units in the system", langObj));
 
-        output.put("assets", jsonQueryAssetsLite());
         return output;
     }
 
@@ -3110,10 +3085,7 @@ public class BlockExplorer {
 
         rNote.getExData().makeJSONforHTML(output, block, seqNo, langObj);
 
-        output.put("vouches_table", WebTransactionsHTML.getVouchesNew(rNote, langObj));
-
-        WebTransactionsHTML.getLinks(output, rNote, langObj);
-
+        WebTransactionsHTML.getApps(output, rNote, langObj);
 
         return output;
     }

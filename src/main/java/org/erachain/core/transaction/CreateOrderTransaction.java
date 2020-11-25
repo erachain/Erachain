@@ -53,7 +53,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     private static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
     private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
-    private final BigDecimal FEE_MIN_1 = new BigDecimal("-0.0001");
     private long haveKey;
     private long wantKey;
     private AssetCls haveAsset;
@@ -434,8 +433,8 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         if (this.haveAsset == null || this.wantAsset == null)
             return ITEM_ASSET_NOT_EXIST;
 
-        if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting()) {
-
+        if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting()
+                || haveAsset.isSelfManaged() || wantAsset.isSelfManaged()) {
             return INVALID_ACCOUNTING_PAIR;
         }
 
@@ -472,7 +471,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         // CHECK IF AMOUNT POSITIVE
         BigDecimal amountHave = this.amountHave;
         BigDecimal amountWant = this.amountWant;
-        if (amountHave.compareTo(BigDecimal.ZERO) <= 0 || amountWant.compareTo(BigDecimal.ZERO) <= 0) {
+        if (amountHave.signum() <= 0 || amountWant.signum() <= 0) {
             return NEGATIVE_AMOUNT;
         }
 
@@ -488,21 +487,23 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         }
 
         // CHECK IF SENDER HAS ENOUGH ASSET BALANCE
-        if (height < BlockChain.ALL_BALANCES_OK_TO ) {
+        if (height < BlockChain.ALL_BALANCES_OK_TO) {
             ; // NOT CHECK
-        } else if (FEE_KEY == haveKey) {
-            if (!BlockChain.isFeeEnough(height, creator)
-                    && this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) < 0) {
-                return NO_BALANCE;
-            }
-            flags = flags | NOT_VALIDATE_FLAG_FEE;
 
-        } else if (wantKey == FEE_KEY && haveKey == RIGHTS_KEY
+        } else if (wantKey == FEE_KEY
+                && (haveKey == RIGHTS_KEY || haveKey == BTC_KEY)
                 // VALID if want to BY COMPU by ERA
                 && amountHave.compareTo(BigDecimal.TEN) >= 0 // минимально меняем 1 ЭРА
-                && (height < BlockChain.VERS_30SEC || this.creator.getBalance(this.dcSet, RIGHTS_KEY).a.b.compareTo(amountHave) >= 0) // ЭРА есть на счету
-                && this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.FEE_MIN_1) > 0) { // на балансе компушки не минус
+                && this.creator.getForSale(this.dcSet, haveKey, height, true).compareTo(amountHave) >= 0 // ЭРА|BTC есть на счету
+                && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).signum() >= 0 // и COMPU не отрицательные
+        ) { // на балансе компушки не минус
             flags = flags | NOT_VALIDATE_FLAG_FEE;
+        } else if (haveKey == FEE_KEY) {
+            if (!BlockChain.isFeeEnough(height, creator)
+                    && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).compareTo(amountHave.add(this.fee)) < 0) {
+                return NO_BALANCE;
+            }
+
         } else {
 
             switch ((int) haveKey) {
@@ -525,7 +526,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             ///}
 
             // if asset is unlimited and me is creator of this asset
-            boolean unLimited = haveAsset.isUnlimited(this.creator);
+            boolean unLimited = haveAsset.isUnlimited(this.creator, false);
 
             if (!unLimited) {
 

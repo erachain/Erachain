@@ -2,101 +2,118 @@ package org.erachain.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.blockexplorer.BlockExplorer;
+import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.templates.TemplateCls;
+import org.erachain.core.item.templates.TemplateFactory;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.utils.APIUtils;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Path("templates")
 @Produces(MediaType.APPLICATION_JSON)
 @Slf4j
 public class ItemTemplatesResource {
-    /**
-     * Get all template type 1
-     *
-     * @return ArrayJSON of all template. request key means key template and name template.
-     * <h2>Example request</h2>
-     * GET templates
-     * <h2>Example response</h2>
-     * {
-     * "1": "ERA",
-     * "2": "COMPU",
-     * "3": "АЗЫ",
-     * "4": "ВЕДЫ",
-     * "5": "►РА",
-     * "6": "►RUNEURO",
-     * "7": "►ERG",
-     * "8": "►LERG",
-     * "9": "►A"
-     * }
-     */
+
+    @Context
+    HttpServletRequest request;
+
     @GET
-    public String getTemplateesLite() {
-        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryTemplatesLite());
+    public String help() {
+        Map help = new LinkedHashMap();
+
+        help.put("templates/last", "Get last key");
+        help.put("templates/{key}", "get by KEY");
+        help.put("templates/raw/{key}", "Returns RAW in Base58 of template with the given key.");
+        help.put("templates/images/{key}", "get item Images by key");
+        help.put("templates/listfrom/{start}", "get list from KEY");
+        help.put("POST templates/issueraw/{creator}?feePow=<int>&password=<String> ", "Issue Template by Base58 RAW in POST body");
+
+        //help.put("POST templates/issue", "issue");
+
+        return StrJSonFine.convert(help);
     }
 
-    /**
-     * Get lite information template by key template
-     *
-     * @param key is number template
-     * @return JSON object. Single template
-     */
+    @GET
+    @Path("last")
+    public String last() {
+        return "" + DCSet.getInstance().getItemTemplateMap().getLastKey();
+    }
+
     @GET
     @Path("/{key}")
-    public String getTemplateLite(@PathParam("key") String key) {
-        Long templateAsLong = null;
+    public String get(@PathParam("key") String key) {
+        Long asLong = null;
 
-        // HAS ASSET NUMBERFORMAT
         try {
-            templateAsLong = Long.valueOf(key);
-
+            asLong = Long.valueOf(key);
         } catch (NumberFormatException e) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_TEMPLATE_NOT_EXIST);
-
+                    Transaction.INVALID_ITEM_KEY);
         }
 
-        // DOES ASSETID EXIST
-        if (!DCSet.getInstance().getItemTemplateMap().contains(templateAsLong)) {
+        if (!DCSet.getInstance().getItemTemplateMap().contains(asLong)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_TEMPLATE_NOT_EXIST);
-
         }
 
-        return Controller.getInstance().getTemplate(templateAsLong).toJson().toJSONString();
+        ItemCls item = Controller.getInstance().getTemplate(asLong);
+        return JSONValue.toJSONString(item.toJson());
     }
 
     @GET
-    @Path("/{key}/full")
-    public String getTemplate(@PathParam("key") String key) {
-        Long templateAsLong = null;
+    @Path("raw/{key}")
+    public String getRAW(@PathParam("key") String key) {
+        Long asLong = null;
 
-        // HAS ASSET NUMBERFORMAT
         try {
-            templateAsLong = Long.valueOf(key);
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemTemplateMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_TEMPLATE_NOT_EXIST);
+        }
+
+        ItemCls item = Controller.getInstance().getTemplate(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Base58.encode(issueBytes);
+    }
+
+    @GET
+    @Path("/images/{key}")
+    public String getImages(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
 
         } catch (NumberFormatException e) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_TEMPLATE_NOT_EXIST);
-
+                    Transaction.INVALID_ITEM_KEY);
         }
 
-        // DOES ASSETID EXIST
-        if (!DCSet.getInstance().getItemTemplateMap().contains(templateAsLong)) {
+        if (!DCSet.getInstance().getItemTemplateMap().contains(asLong)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_TEMPLATE_NOT_EXIST);
         }
 
-        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryItemTemplate(templateAsLong));
+        return Controller.getInstance().getTemplate(asLong).toJsonData().toJSONString();
     }
 
     @SuppressWarnings("unchecked")
@@ -111,6 +128,34 @@ public class ItemTemplatesResource {
         ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, start, page, output, showPerson, descending);
 
         return output.toJSONString();
+    }
+
+    @POST
+    @Path("issueraw/{creator}")
+    public String issueRAW(String x, @PathParam("creator") String creator,
+                           @DefaultValue("0") @QueryParam("feePow") String feePowStr,
+                           @QueryParam("password") String password) {
+
+        Controller cntr = Controller.getInstance();
+        Fun.Tuple3<PrivateKeyAccount, Integer, byte[]> result = APIUtils.postIssueRawItem(request, x, creator, feePowStr, password);
+        TemplateCls item;
+        try {
+            item = TemplateFactory.getInstance().parse(result.c, false);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    e.getMessage());
+        }
+
+        Transaction transaction = cntr.issueTemplate(result.a, result.b, item);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        if (validate == Transaction.VALIDATE_OK)
+            return transaction.toJson().toJSONString();
+        else {
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByErrorSimple(validate, out);
+            return out.toJSONString();
+        }
     }
 
 }

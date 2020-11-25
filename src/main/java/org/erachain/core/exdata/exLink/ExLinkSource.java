@@ -57,13 +57,18 @@ public class ExLinkSource extends ExLinkMemo {
         return Transaction.VALIDATE_OK;
     }
 
+    /*
+    @Override
     public void process(Transaction transaction) {
-        // создадим связь в базе - как источник / пользователи + потребители + получатели +
-        transaction.getDCSet().getExLinksMap().put(transaction.getDBRef(), new ExLink(ExData.LINK_SOURCE_TYPE, ref));
+        super.process(transaction);
+        transaction.getDCSet().getExLinksMap().put(ref, new ExLinkSourceUse(transaction, this));
     }
 
+    @Override
     public void orphan(Transaction transaction) {
-        transaction.getDCSet().getExLinksMap().remove(transaction.getDBRef());
+        super.orphan(transaction);
+        transaction.getDCSet().getExLinksMap().remove(ref, transaction.getDBRef());
     }
+     */
 
 }

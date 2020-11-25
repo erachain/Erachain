@@ -94,7 +94,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.1 beta a3";
+    public static String version = "5.1.01";
     public static String buildTime = "2020-10-09 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -1802,6 +1802,7 @@ public class Controller extends Observable {
     }
 
     private int skipNotify = 0;
+    private long skipNotifyTime = 0L;
     // https://127.0.0.1/7pay_in/tools/block_proc/ERA
     public void NotifyWalletIncoming(List<Transaction> transactions) {
 
@@ -1828,12 +1829,16 @@ public class Controller extends Observable {
             }
         }
 
+        // Если моих транзакций нету
         if (seqs.isEmpty()
-                // раз в 10 блоков уведомлять что обновиться  надо
-                && ++skipNotify < 10)
+                // раз в 100 блоков уведомлять что обновиться  надо
+                && (++skipNotify < 10
+                || System.currentTimeMillis() - skipNotifyTime < 200000L
+                || isStatusSynchronizing()))
             return;
 
         skipNotify = 0;
+        skipNotifyTime = System.currentTimeMillis();
 
         // SEE -
         // http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
@@ -1849,6 +1854,7 @@ public class Controller extends Observable {
             LOGGER.info("NotifyIncoming " + url_string + ": " + res);
 
         } catch (Exception e) {
+            LOGGER.error("try NotifyIncoming: " + url_string);
             LOGGER.error(e.getMessage(), e);
         }
 
@@ -2799,7 +2805,7 @@ public class Controller extends Observable {
     // ASSETS
 
     public AssetCls getAsset(long key) {
-        return (AssetCls) this.dcSet.getItemAssetMap().get(key);
+        return this.dcSet.getItemAssetMap().get(key);
     }
 
     public PersonCls getPerson(long key) {
@@ -3068,6 +3074,13 @@ public class Controller extends Observable {
 
     }
 
+    public Transaction issueAsset(PrivateKeyAccount creator, int feePow, AssetCls asset) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssueAssetTransaction(creator, asset, feePow);
+        }
+    }
+
     public Transaction issueAsset(PrivateKeyAccount creator, String name, String description, byte[] icon, byte[] image,
                                   int scale, int assetType, long quantity, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
@@ -3091,15 +3104,6 @@ public class Controller extends Observable {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createIssueImprintTransaction1(creator, name, description, icon, image,
-                    feePow);
-        }
-    }
-
-    public Transaction issueTemplate(PrivateKeyAccount creator, String name, String description, byte[] icon,
-                                     byte[] image, int feePow) {
-        // CREATE ONLY ONE TRANSACTION AT A TIME
-        synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueTemplateTransaction(creator, name, description, icon, image,
                     feePow);
         }
     }
@@ -3161,8 +3165,6 @@ public class Controller extends Observable {
             image = java.util.Base64.getDecoder().decode(image64);
         }
 
-        Integer scale = (Integer) jsonObject.getOrDefault("scale", 0);
-        Integer assetType = (Integer) jsonObject.getOrDefault("assetType", 0);
         Long birthday = (Long) jsonObject.getOrDefault("birthday", 0L);
         Long deathday = (Long) jsonObject.getOrDefault("deathday", null);
         Integer gender = (Integer) jsonObject.getOrDefault("gender", 0);
@@ -3186,14 +3188,21 @@ public class Controller extends Observable {
                 skinColor, eyeColor, hairСolor, height, icon, image, description,
                 ownerSignature);
 
-        return issuePersonHuman(creatorPrivate, feePow, person);
+        return issuePerson(creatorPrivate, feePow, person);
 
     }
 
-    public Pair<Transaction, Integer> issuePersonHuman(PrivateKeyAccount creator, int feePow, PersonHuman human) {
+    public Pair<Transaction, Integer> issuePerson(PrivateKeyAccount creator, int feePow, PersonCls person) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssuePersonHumanTransaction(creator, feePow, human);
+            return this.transactionCreator.createIssuePersonTransaction(creator, feePow, person);
+        }
+    }
+
+    public Transaction issuePoll(PrivateKeyAccount creator, int feePow, PollCls poll) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssuePollTransaction(creator, feePow, poll);
         }
     }
 
@@ -3206,11 +3215,34 @@ public class Controller extends Observable {
         }
     }
 
+    public Transaction issueStatus(PrivateKeyAccount creator, int feePow, StatusCls status) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssueStatusTransaction(creator, feePow, status);
+        }
+    }
+
     public Transaction issueStatus(PrivateKeyAccount creator, String name, String description, boolean unique,
                                    byte[] icon, byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createIssueStatusTransaction(creator, name, description, icon, image, unique,
+                    feePow);
+        }
+    }
+
+    public Transaction issueTemplate(PrivateKeyAccount creator, int feePow, TemplateCls template) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssueTemplateTransaction(creator, feePow, template);
+        }
+    }
+
+    public Transaction issueTemplate(PrivateKeyAccount creator, String name, String description, byte[] icon,
+                                     byte[] image, int feePow) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssueTemplateTransaction(creator, name, description, icon, image,
                     feePow);
         }
     }
@@ -3703,6 +3735,7 @@ public class Controller extends Observable {
         for (String arg : args) {
             if (arg.equals("-cli")) {
                 cli = true;
+                useGui = false;
                 continue;
             }
 

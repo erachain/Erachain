@@ -164,7 +164,10 @@ public class RSignNote extends Transaction implements Itemable {
             listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, creatorPersonDuration.a});
         }
 
-        if (key != 0) {
+        if (typeBytes[1] > 1 && extendedData != null && extendedData.getTemplateKey() != 0L) {
+            // если новый порядок - ключ в Данных
+            listTags.add(new Object[]{ItemCls.TEMPLATE_TYPE, extendedData.getTemplateKey()});
+        } else if (key != 0L) {
             listTags.add(new Object[]{ItemCls.TEMPLATE_TYPE, key});
         }
 
@@ -269,6 +272,10 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public long getKey() {
+        if (this.key == 0 && typeBytes[1] > 1) {
+            // если новый порядок - ключ в Данных
+            return extendedData.getTemplateKey();
+        }
         return this.key;
     }
 
@@ -320,6 +327,13 @@ public class RSignNote extends Transaction implements Itemable {
 
     public byte[] getData() {
         return this.data;
+    }
+
+    public String getMessage() {
+        if (extendedData == null) {
+            parseDataV2WithoutFiles();
+        }
+        return extendedData.getMessage();
     }
 
     public ExData getExData() {
@@ -405,12 +419,12 @@ public class RSignNote extends Transaction implements Itemable {
 
         byte[] data = super.toBytes(forDeal, withSignature);
 
-        if (typeBytes[1] < 3 && this.key > 0) {
+        if (forDeal == FOR_DB_RECORD
+                || typeBytes[1] < 3 && this.key > 0) {
             //WRITE KEY
             byte[] keyBytes = Longs.toByteArray(this.key);
             keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
             data = Bytes.concat(data, keyBytes);
-
         }
 
         if (this.data != null) {
@@ -506,7 +520,8 @@ public class RSignNote extends Transaction implements Itemable {
         //////// local parameters
 
         long key = 0L;
-        if (typeBytes[1] < 3 && hasTemplate(typeBytes)) {
+        if (forDeal == FOR_DB_RECORD
+                || typeBytes[1] < 3 && hasTemplate(typeBytes)) {
             //READ KEY
             byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
             key = Longs.fromByteArray(keyBytes);
@@ -635,7 +650,8 @@ public class RSignNote extends Transaction implements Itemable {
                 add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH + this.data.length;
             }
 
-        if (this.key > 0 && getVersion() < 3)
+        if (forDeal == FOR_DB_RECORD
+                || this.key > 0 && getVersion() < 3)
             add_len += KEY_LENGTH;
 
         return base_len + add_len;
@@ -653,7 +669,8 @@ public class RSignNote extends Transaction implements Itemable {
         if (data == null && key <= 0)
             return INVALID_DATA_LENGTH;
 
-        if (data != null && data.length > BlockChain.MAX_REC_DATA_BYTES) {
+        if (data != null && data.length > MAX_DATA_BYTES_LENGTH) {
+            errorValue = "" + data.length;
             return INVALID_DATA_LENGTH;
         }
 
@@ -669,7 +686,10 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         result = extendedData.isValid(dcSet, this);
-        if (result != Transaction.VALIDATE_OK) return result;
+        if (result != Transaction.VALIDATE_OK) {
+            // errorValue updated in extendedData
+            return result;
+        }
 
         if (height > BlockChain.VERS_5_01_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого
@@ -719,6 +739,10 @@ public class RSignNote extends Transaction implements Itemable {
             return true;
         }
 
+        if (extendedData == null) {
+            parseDataV2WithoutFiles();
+        }
+
         for (Account item : extendedData.getRecipients()) {
             if (account.equals(item))
                 return true;
@@ -762,6 +786,7 @@ public class RSignNote extends Transaction implements Itemable {
                 Long error = null;
                 error++;
             }
+
             extendedData.resolveValues(dcSet);
             exLink = extendedData.getExLink();
         }

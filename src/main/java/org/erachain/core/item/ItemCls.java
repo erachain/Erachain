@@ -52,7 +52,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     protected static final int OWNER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
     protected static final int NAME_SIZE_LENGTH = 1;
     //public static final int MIN_NAME_LENGTH = 10;
-    public static final int MAX_NAME_LENGTH = (int) Math.pow(256, NAME_SIZE_LENGTH) - 1;
+    public static final int MAX_NAME_LENGTH = Transaction.MAX_TITLE_BYTES_LENGTH;
     protected static final int ICON_SIZE_LENGTH = 2;
     protected static final int IMAGE_SIZE_LENGTH = 4;
     protected static final int DESCRIPTION_SIZE_LENGTH = 4;
@@ -587,7 +587,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJSON.put("key", this.getKey());
         itemJSON.put("name", this.name);
 
-        if (withIcon)
+        if (withIcon && this.getIcon() != null)
             itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
 
         itemJSON.put("owner", this.owner.getAddress());
@@ -610,16 +610,18 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
 
         // ADD DATA
         itemJSON.put("item_type", this.getItemTypeName());
+        //itemJSON.put("itemType", this.getItemTypeName());
         itemJSON.put("item_type_sub", this.getItemSubType());
+        //itemJSON.put("itemTypeSub", this.getItemSubType());
         itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
         itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
-        //itemJSON.put("key", this.getKey());
-        //itemJSON.put("name", this.name);
         itemJSON.put("description", this.description);
         itemJSON.put("creator", this.owner.getAddress()); // @Deprecated
-        itemJSON.put("owner_publick_key", this.owner.getBase58());
+        itemJSON.put("owner_public_key", this.owner.getBase58());
         itemJSON.put("owner_publickey", this.owner.getBase58());
+        //itemJSON.put("ownerPubkey", this.owner.getBase58());
         itemJSON.put("isConfirmed", this.isConfirmed());
+        itemJSON.put("is_confirmed", this.isConfirmed());
         itemJSON.put("reference", Base58.encode(this.reference));
 
         Transaction txReference = Controller.getInstance().getTransaction(this.reference);
@@ -636,8 +638,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         JSONObject itemJSON = new JSONObject();
 
         // ADD DATA
-        itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-        itemJSON.put("image", java.util.Base64.getEncoder().encodeToString(this.getImage()));
+        if (getIcon() != null)
+            itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+        if (getImage() != null)
+            itemJSON.put("image", java.util.Base64.getEncoder().encodeToString(this.getImage()));
 
         return itemJSON;
     }
@@ -682,7 +686,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
 
         ItemMap map = dcSet.getItem_Map(itemType);
         ItemCls element;
-        long size = map.size();
+        long size = map.getLastKey();
 
         if (start < 1 || start > size && size > 0) {
             start = size;

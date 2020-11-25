@@ -137,12 +137,12 @@ public class TestRecPerson {
         last_ref = gb.getTimestamp();
 
         registrar.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
-        registrar.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        registrar.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        registrar.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+        registrar.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
         certifier.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
-        certifier.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        certifier.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        certifier.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+        certifier.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
         byte gender = 0;
         long birthDay = timestamp - 12345678;
@@ -286,7 +286,7 @@ public class TestRecPerson {
                 //issuePersonTransaction.sign(registrar, Transaction.FOR_NETWORK);
 
                 // ADD FEE
-                userAccount1.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+                userAccount1.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
                 //CHECK IF ISSUE PERSON IS VALID
                 assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
@@ -505,7 +505,7 @@ public class TestRecPerson {
 
                 assertEquals(Transaction.VALIDATE_OK, r_SertifyPubKeys.isValid(Transaction.FOR_NETWORK, flags));
 
-                certifier.changeBalance(this.dcSet, true, false, AssetCls.ERA_KEY, new BigDecimal("1000"), false);
+                certifier.changeBalance(this.dcSet, true, false, AssetCls.ERA_KEY, new BigDecimal("1000"), false, false, false);
                 assertEquals(Transaction.NOT_ENOUGH_ERA_USE_100, r_SertifyPubKeys.isValid(Transaction.FOR_NETWORK, flags | Transaction.NOT_VALIDATE_FLAG_PERSONAL));
 
                 //r_SertifyPerson.sign(maker, false);
@@ -533,13 +533,13 @@ public class TestRecPerson {
                 personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 1, 5, true);
 
                 //CREATE INVALID ISSUE PERSON - NOT FEE
-                userAccount2.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+                userAccount2.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
                 assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags | Transaction.NOT_VALIDATE_FLAG_PERSONAL));
                 // ADD FEE
-                userAccount2.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+                userAccount2.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
                 assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
                 // ADD RIGHTS
-                userAccount1.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+                userAccount1.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
                 assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
 
                 List<PublicKeyAccount> sertifiedPublicKeys011 = new ArrayList<PublicKeyAccount>();
@@ -743,8 +743,6 @@ public class TestRecPerson {
                 // PERSON -> ADDRESS
                 assertEquals(null, dbPA.getItem(personKey, userAddress3));
 
-                BigDecimal oil_amount_diff = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
-
                 //// PROCESS /////
                 r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
                 r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12, 3, true);
@@ -756,7 +754,6 @@ public class TestRecPerson {
                 assertEquals(erm_amount_registrar, registrar.getBalanceUSE(ERM_KEY, dcSet));
                 // CHECK FEE BALANCE - FEE - GIFT
                 assertEquals("0.00062550", r_SertifyPubKeys.getFee().toPlainString());
-                assertEquals("0.00050000", BlockChain.GIFTED_COMPU_AMOUNT_BD.toPlainString());
                 assertEquals(oil_amount_registrar, registrar.getBalanceUSE(FEE_KEY, dcSet));
 
                 //CHECK BALANCE CERTIFIER
@@ -966,10 +963,7 @@ public class TestRecPerson {
                 assertEquals(null, dbPA.getItem(personKey, userAddress3));
 
                 BigDecimal oil_amount_diff;
-                if (false)
-                    oil_amount_diff = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
-                else
-                    oil_amount_diff = BlockChain.BONUS_FOR_PERSON(1);
+                oil_amount_diff = BlockChain.BONUS_FOR_PERSON(1);
 
                 BigDecimal erm_amount = registrar.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount = registrar.getBalanceUSE(FEE_KEY, dcSet);
@@ -1232,10 +1226,7 @@ public class TestRecPerson {
                 assertEquals(null, dbPA.getItem(personKey, userAddress3));
 
                 BigDecimal oil_amount_diff;
-                if (BlockChain.ERA_COMPU_ALL_UP)
-                    oil_amount_diff = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
-                else
-                    oil_amount_diff = BlockChain.BONUS_FOR_PERSON(1);
+                oil_amount_diff = BlockChain.BONUS_FOR_PERSON(1);
 
                 BigDecimal erm_amount = registrar.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount = registrar.getBalanceUSE(FEE_KEY, dcSet);

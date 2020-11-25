@@ -195,8 +195,16 @@ public class Account {
 
     }
 
-    // make TYPE of transactionAmount by signs of KEY and AMOUNT
-    public static int balancePosition(long key, BigDecimal amount, boolean isBackward) {
+    /**
+     * Make TYPE of transactionAmount by signs of KEY and AMOUNT
+     *
+     * @param key
+     * @param amount
+     * @param isBackward
+     * @param isDirect   если задано то номера балансов только 4-ре по минусам - без учета сложной схемы с isBackward
+     * @return
+     */
+    public static int balancePosition(long key, BigDecimal amount, boolean isBackward, boolean isDirect) {
         if (key == 0l || amount == null || amount.signum() == 0)
             return 0;
 
@@ -205,10 +213,10 @@ public class Account {
         if (key > 0) {
             if (amount_sign > 0) {
                 // OWN SEND or PLEDGE
-                type = isBackward ? TransactionAmount.ACTION_PLEDGE : TransactionAmount.ACTION_SEND;
+                type = !isDirect && isBackward ? TransactionAmount.ACTION_PLEDGE : TransactionAmount.ACTION_SEND;
             } else {
                 // HOLD in STOCK or PLEDGE
-                type = isBackward ? TransactionAmount.ACTION_HOLD : TransactionAmount.ACTION_RESERCED_6;
+                type = isDirect || isBackward ? TransactionAmount.ACTION_HOLD : TransactionAmount.ACTION_RESERCED_6;
             }
         } else {
             if (amount_sign > 0) {
@@ -651,6 +659,21 @@ public class Account {
         return ownVol;
     }
 
+    /**
+     * с учетом данных в долг средств или выданных
+     *
+     * @param dcSet
+     * @return
+     */
+    public BigDecimal getForFee(DCSet dcSet) {
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = this
+                .getBalance(dcSet, AssetCls.FEE_KEY);
+        BigDecimal ownVol = balance.a.b;
+        BigDecimal inDebt = balance.b.b;
+
+        return ownVol.add(inDebt);
+    }
+
     /*
      * private void updateGeneratingBalance(DBSet db) { //CHECK IF WE NEED TO
      * RECALCULATE if(this.lastBlockSignature == null) { this.lastBlockSignature
@@ -838,9 +861,9 @@ public class Account {
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, boolean isBackward, long key,
-                                                                    BigDecimal amount_in, boolean notUpdateIncomed) {
+                                                                    BigDecimal amount_in, boolean isDirect, boolean isNotSender, boolean notUpdateIncomed) {
 
-        int actionType = balancePosition(key, amount_in, isBackward);
+        int actionType = balancePosition(key, amount_in, isBackward, isDirect);
 
         ItemAssetBalanceMap map = db.getAssetBalanceMap();
 
@@ -869,6 +892,7 @@ public class Account {
 
         if (actionType == TransactionAmount.ACTION_SEND) {
             // OWN + property
+            //if (isBackward) amount = amount.negate();
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     substract ? new Tuple2<BigDecimal, BigDecimal>(
                             updateIncomed ? balance.a.a.subtract(amount) : balance.a.a, balance.a.b.subtract(amount))
@@ -886,6 +910,7 @@ public class Account {
                     balance.c, balance.d, balance.e);
         } else if (actionType == TransactionAmount.ACTION_HOLD) {
             // HOLD + STOCK 🕐 🕝
+
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a, balance.b,
                     substract ? new Tuple2<BigDecimal, BigDecimal>(
@@ -894,20 +919,24 @@ public class Account {
                             balance.c.b.add(amount)),
                     balance.d, balance.e);
         } else if (actionType == TransactionAmount.ACTION_SPEND) {
-            // тут сразу обновим баланс ИМЕЮ - уменьшим его в облом случае - когда безлимит и лимит
+
             Tuple2<BigDecimal, BigDecimal> ownBalance = balance.a;
-            if (ownBalance.b.signum() > 0) {
-                ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.subtract(amount));
-            } else {
-                ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.add(amount));
+
+            if (!isNotSender) {
+                // у создателя транзакции так же баланс ИМЕЮ уменьшаем - просто вычитаем - для учета вывода из оборота
+                if (isBackward) {
+                    ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.add(amount));
+                } else {
+                    ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.subtract(amount));
+                }
             }
 
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     ownBalance, balance.b, balance.c,
                     substract ? new Tuple2<BigDecimal, BigDecimal>(
-                            updateIncomed ? balance.d.a.add(amount) : balance.d.a, balance.d.b.add(amount))
-                            : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.d.a.subtract(amount) : balance.d.a,
-                            balance.d.b.subtract(amount)),
+                            updateIncomed ? balance.d.a.subtract(amount) : balance.d.a, balance.d.b.subtract(amount))
+                            : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.d.a.add(amount) : balance.d.a,
+                            balance.d.b.add(amount)),
                     balance.e);
         }
 

@@ -114,6 +114,8 @@ public class ExData {
     private byte[][] secrets;
     private byte[] encryptedData;
 
+    public String errorValue;
+
     /**
      * OLD version 1-2
      *
@@ -250,7 +252,9 @@ public class ExData {
                     template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, templateKey);
                 }
 
-                if (template != null) {
+                if (template == null) {
+                    valuedText = "ERROR: template [" + templateKey + "] not found!";
+                } else {
                     valuedText = template.viewDescription();
 
                     if (json.containsKey("PR")) {
@@ -273,7 +277,10 @@ public class ExData {
                     if (templateKey != 0) {
                         template = (TemplateCls) ItemCls.getItem(dcSet, ItemCls.TEMPLATE_TYPE, templateKey);
                     }
-                    if (template != null) {
+
+                    if (template == null) {
+                        valuedText = "ERROR: template [" + templateKey + "] not found!";
+                    } else {
                         valuedText = template.viewDescription();
 
                         if (json.containsKey("Statement_Params")) {
@@ -434,10 +441,9 @@ public class ExData {
     }
 
     public boolean hasPublicText() {
-        if (Transaction.hasPublicText(title, null, false, false)
-                || message != null && !message.isEmpty()
-                || templateKey > 0
-                || hasAuthors()
+        if (Transaction.hasPublicText(title, null, true, false, message)
+                || hasAuthors() // авторов только удостоверенный счет может назначить
+                || getTemplateValues() != null // в параметрах могут написать что угодно
                 || files != null && !files.isEmpty())
             return true;
 
@@ -1526,6 +1532,12 @@ public class ExData {
         if (exLink != null)
             exLink.process(transaction);
 
+        if (authors != null) {
+            for (ExLinkAuthor author : authors) {
+                author.process(transaction);
+            }
+        }
+
         if (sources != null) {
             for (ExLinkSource source : sources) {
                 source.process(transaction);
@@ -1537,6 +1549,12 @@ public class ExData {
     public void orphan(Transaction transaction) {
         if (exLink != null)
             exLink.orphan(transaction);
+
+        if (authors != null) {
+            for (ExLinkAuthor author : authors) {
+                author.orphan(transaction);
+            }
+        }
 
         if (sources != null) {
             for (ExLinkSource source : sources) {

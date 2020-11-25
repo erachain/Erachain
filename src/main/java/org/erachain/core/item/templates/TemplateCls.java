@@ -15,15 +15,17 @@ import java.util.regex.Pattern;
 
 public abstract class TemplateCls extends ItemCls {
 
+    public static final int TYPE_KEY = ItemCls.TEMPLATE_TYPE;
+
     public static final long MIN_START_KEY = 1000L;
 
     // PERS KEY
-    public static final long EMPTY_KEY = 1l;
-    public static final long LICENSE_KEY = 2l;
-    public static final long MARRIAGE_KEY = 3l;
-    public static final long UNMARRIAGE_KEY = 4l;
-    public static final long HIRING_KEY = 5l;
-    public static final long UNHIRING_KEY = 6l;
+    public static final long EMPTY_KEY = 1L;
+    public static final long LICENSE_KEY = 2L;
+    public static final long MARRIAGE_KEY = 3L;
+    public static final long UNMARRIAGE_KEY = 4L;
+    public static final long HIRING_KEY = 5L;
+    public static final long UNHIRING_KEY = 6L;
     public static final int INITIAL_FAVORITES = 10;
     protected static final int PLATE = 1;
     protected static final int SAMPLE = 2;
@@ -44,7 +46,7 @@ public abstract class TemplateCls extends ItemCls {
     //GETTERS/SETTERS
 
     public int getItemType() {
-        return ItemCls.TEMPLATE_TYPE;
+        return TYPE_KEY;
     }
 
     @Override
@@ -52,12 +54,12 @@ public abstract class TemplateCls extends ItemCls {
         if (!BlockChain.CLONE_MODE)
             return MIN_START_KEY;
 
-        long startKey = BlockChain.startKeys[ItemCls.ASSET_TYPE];
+        long startKey = BlockChain.startKeys[TYPE_KEY];
 
         if (startKey == 0) {
             return START_KEY;
         } else if (startKey < MIN_START_KEY) {
-            return (BlockChain.startKeys[ItemCls.ASSET_TYPE] = MIN_START_KEY);
+            return (BlockChain.startKeys[TYPE_KEY] = MIN_START_KEY);
         }
         return startKey;
     }

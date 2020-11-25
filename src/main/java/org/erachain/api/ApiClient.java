@@ -30,6 +30,26 @@ public class ApiClient {
     static String[][] helpStrings =
             {
                     {
+                            "GET assets",
+                            "See assets API",
+                    },
+                    {
+                            "GET persons",
+                            "See persons API",
+                    },
+                    {
+                            "GET polls",
+                            "See polls API",
+                    },
+                    {
+                            "GET statuses",
+                            "See statuses API",
+                    },
+                    {
+                            "GET templates",
+                            "See templates API",
+                    },
+                    {
                             "GET core",
                             "Returns info of the application.",
                             "JSON"
@@ -475,6 +495,8 @@ public class ApiClient {
                                     + "selfPay=true - if set pay to self address too. Default = true"
                                     + " title=, onlyperson - get only personalized addresses, password="},
 
+                    /*
+
                     {
                             "(deprecated) GET rec_payment/{feePow}/{sender}/{assetKey}/{amount}/{recipient}?password={password}",
                             "Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
@@ -567,36 +589,6 @@ public class ApiClient {
                             "Errors: 1 - Json error. 2 - Not enough balance. 102 - Invalid address. 105 - Invalid fee. 108 - Invalid name length. 111 - Invalid buyer. 201 - Wallet does not exist. 203 - Wallet is locked. 401 - Name does not exist. 410 - Name is not for sale. 411 - Buyer is already the owner."
                     },
                     {
-                            "GET polls",
-                            "Returns an array of all the polls created by your accounts.",
-                            "Errors: 201 - Wallet does not exist."
-                    },
-                    {
-                            "GET polls/address/<address>",
-                            "Returns an array of all the polls owned by a specific address in your wallet.",
-                            "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet."
-                    },
-                    {
-                            "GET polls/<name>",
-                            "Return details about the poll with the given name.",
-                            "Errors: 501 - Poll does not exist."
-                    },
-                    {
-                            "GET polls network",
-                            "Returns an array of all the polls. For performance this array only contains the names of the polls and not the details.",
-                            ""
-                    },
-                    {
-                            "POST polls {\"creator\":\"<creatorAddress>\", \"name\":\"<name>\", \"description\":\"<description>\", \"options\": [<optionOne>, <optionTwo>], \"fee\":\"<fee>\"}",
-                            "Used to create a new poll. Returns the transaction in JSON when successful.",
-                            "Errors: 1 - Json error. 2 - Not enough balance. 3 - Not yet released. 102 - Invalid address. 105 - Invalid fee. 108 - Invalid name length. 109 - Invalid description length. 113 - Invalid options length. 114 - Invalid option length. 201 - Wallet does not exist. 202 - Address does not exist in wallet. 203 - Wallet is locked. 404 - Name must be lowercase. 502 - Poll already exists. 503 - Duplicate option."
-                    },
-                    {
-                            "POST polls/vote/<name> {\"voter\":\"<voterAddress>\", \"option\": \"<optionOne>\", \"fee\":\"<fee>\"}",
-                            "Used to vote on a poll with the given name. Returns the transaction in JSON when successful.",
-                            "Errors: 1 - Json error. 2 - Not enough balance. 3 - Not yet released. 102 - Invalid address. 105 - Invalid fee. 108 - Invalid name length. 114 - Invalid option length. 201 - Wallet does not exist. 202 - Address does not exist in wallet. 203 - Wallet is locked. 404 - Name must be lowercase. 501 - Poll does not exist. 504 - Polloption does not exist. 505 - Already voted for that option."
-                    },
-                    {
                             "POST arbitrarytransactions {\"creator\":\"<creatorAddress>\", \"data\":\"<dataBase58>\", \"service\": <service>, \"fee\":\"<fee>\"}",
                             "Used to send an arbitrary transaction. The data of the arbitrary transaction must be base58 encoded and must be between 1-4000 bytes. Returns the transaction in JSON when successful. Also supports multipayments.",
                             "Errors: 1 - Json error. 2 - Not enough balance. 3 - Not yet released. 102 - Invalid address. 105 - Invalid fee. 115 - Invalid data. 116 - Invalid data length. 201 - Wallet does not exist. 202 - Address does not exist in wallet. 203 - Wallet is locked."
@@ -686,32 +678,7 @@ public class ApiClient {
                             "Record HASHes. \"url\" link to files. \"message\" short description. \"hashes\" - String of HASHes delimited by \" \".",
                             ""
                     },
-                    // ASSETS
-                    {
-                            "GET assets",
-                            "Returns an array of keys of assets with names.",
-                            ""
-                    },
-                    {
-                            "GET assets/full",
-                            "Returns an array of assets with full information.",
-                            ""
-                    },
-                    {
-                            "GET assets/<key>",
-                            "Returns short information about asset with the given key.",
-                            "Errors: 601 - Invalid asset ID."
-                    },
-                    {
-                            "GET assets/<key>/full",
-                            "Returns full information about asset with the given key.",
-                            "Errors: 601 - Invalid asset ID."
-                    },
-                    {
-                            "POST assets/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"scale\": \"<scale>\", \"assetType\": \"<assetType>\", \"quantity\": \"<quantity>\", \"password\": \"<password>\"}",
-                            "Issue Item Asset.",
-                            "Errors: ..."
-                    },
+                    /////// BLOGS
                     {
                             "POST blogpost/<blogname> {\"fee\": \"<fee>\", \"creator\": \"<creator>\", \"author\": \"<author>\", \"title\": \"<title>\", \"body\": \"<body>\", \"share\": \"<share>\", \"delete\": \"<delete>\"}",
                             "Posts to a blog.  <blogname>, \"author\", \"share\", and \"delete\" are optional.",
@@ -762,6 +729,8 @@ public class ApiClient {
                             "Send a new multipayment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: ERA).",
                             "Errors: 1 - Json error. 104 - Invalid amount. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
                     },
+                     */
+
                     /// telegrams
                     {
                             "GET telegrams",
@@ -840,8 +809,14 @@ public class ApiClient {
         if (command.toLowerCase().equals("help all")) {
             String help = "\n";
 
-            for (String[] strings : helpStrings) {
-                help += strings[0] + "\n\t" + strings[1] + "\n\n";
+            for (String[] helpString : helpStrings) {
+                help += helpString[0] + "\n";
+                if (helpString.length > 1)
+                    help += "\t" + helpString[1] + "\n";
+                if (helpString.length > 2)
+                    help += "\t" + helpString[2] + "\n";
+                if (helpString.length > 3)
+                    help += "\t" + helpString[3] + "\n";
             }
 
             return help;
@@ -872,7 +847,13 @@ public class ApiClient {
                     }
 
                     if (!notallfound) {
-                        help += helpString[0] + "\n\t" + helpString[1] + "\n\t" + helpString[2] + "\n\n";
+                        help += helpString[0] + "\n";
+                        if (helpString.length > 1)
+                            help += "\t" + helpString[1] + "\n";
+                        if (helpString.length > 2)
+                            help += "\t" + helpString[2] + "\n";
+                        if (helpString.length > 3)
+                            help += "\t" + helpString[3] + "\n";
                         found = true;
                         if (helparray.length == args.length - 1) {
                             break;
@@ -887,6 +868,12 @@ public class ApiClient {
                 help = "\n";
                 for (String[] helpString : helpStrings) {
                     help += helpString[0] + "\n";
+                    if (helpString.length > 1)
+                        help += "\t" + helpString[1] + "\n";
+                    if (helpString.length > 2)
+                        help += "\t" + helpString[2] + "\n";
+                    if (helpString.length > 3)
+                        help += "\t" + helpString[3] + "\n";
                 }
             }
 
@@ -972,15 +959,19 @@ public class ApiClient {
                 stream = connection.getInputStream();
             }
 
-            InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
-            BufferedReader br = new BufferedReader(isReader);
-            String result = br.readLine(); //TODO READ ALL OR HARDCODE HELP
+            String inputText = "";
 
+            InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(isReader);
+            String inputLine;
+            while ((inputLine = bufferedReader.readLine()) != null)
+                inputText += inputLine;
+            bufferedReader.close();
 
             try {
-                return StrJSonFine.convert(result);
+                return StrJSonFine.convert(inputText);
             } catch (Exception e) {
-                return result;
+                return inputText;
             }
 
         } catch (Exception ioe) {

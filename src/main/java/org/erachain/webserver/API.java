@@ -7,7 +7,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.crypto.Base32;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
@@ -73,7 +72,8 @@ public class API {
 
         help.put("see /apitelegrams", "Help for telegrams API");
         help.put("see /apiexchange", "Help for exchange API");
-        help.put("see /apirecords", "Help for transactions API");
+        help.put("see /api/tx", "Help for transactions API");
+        //help.put("see /apirecords", "Help for transactions API");
         help.put("see /apidocuments", "Help for documents API");
 
         help.put("*** BALANCE SYSTEM ***", "");
@@ -113,6 +113,7 @@ public class API {
         help.put("GET Address Asset Balance", "addressassetbalance/{address}/{assetid}");
         help.put("GET Address Assets", "addressassets/{address}");
         help.put("GET Address Public Key", "addresspublickey/{address}");
+        help.put("GET Address Forging Info", "addressforge/{address}");
 
         help.put("*** ASSET ***", "");
         help.put("GET Asset Height", "assetheight");
@@ -122,8 +123,6 @@ public class API {
         help.put("GET Asset Icon", "asseticon/{key}");
 
         help.put("*** ASSETS ***", "");
-        help.put("GET Assets", "assets");
-        help.put("GET Assets Full", "assetsfull");
         help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}");
 
         help.put("*** EXCHANGE ***", "");
@@ -183,7 +182,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -192,12 +191,12 @@ public class API {
     public Response lastBlock() {
 
         Block lastBlock = dcSet.getBlockMap().last();
-        Map out = lastBlock.toJson();
+        JSONObject out = lastBlock.toJson();
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -206,12 +205,12 @@ public class API {
     public Response lastBlockHead() {
 
         Block.BlockHead lastBlock = dcSet.getBlocksHeadsMap().last();
-        Map out = lastBlock.toJson();
+        JSONObject out = lastBlock.toJson();
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -220,7 +219,7 @@ public class API {
     public Response getChildBlockSignature(@PathParam("signature") String signature) {
         //DECODE SIGNATURE
         byte[] signatureBytes;
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
 
         int step = 1;
         try {
@@ -247,7 +246,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -256,7 +255,7 @@ public class API {
     public Response getChildBlock(@PathParam("signature") String signature) {
         //DECODE SIGNATURE
         byte[] signatureBytes;
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
 
         int step = 1;
         try {
@@ -282,7 +281,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -290,7 +289,7 @@ public class API {
     @Path("block/{signature}")
     public Response block(@PathParam("signature") String signature) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
 
         int step = 1;
 
@@ -320,7 +319,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -328,7 +327,7 @@ public class API {
     @Path("blockbyheight/{height}")
     public Response blockByHeight(@PathParam("height") String heightStr) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -358,7 +357,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -366,7 +365,7 @@ public class API {
     @Path("blockbyheight2/{height}")
     public Response blockByHeight2(@PathParam("height") String heightStr) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -405,7 +404,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -461,7 +460,7 @@ public class API {
         if (limit > 100)
             limit = 100;
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -492,7 +491,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -516,12 +515,13 @@ public class API {
         } catch (Exception e) {
             out.put("error", -1);
             out.put("message", APIUtils.errorMess(-1, e.toString(), transaction));
+            transaction.updateMapByError(-1, e.toString(), out);
         }
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -537,7 +537,7 @@ public class API {
     @Path("record/{signature}")
     public Response record(@PathParam("signature") String signature) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
 
         int step = 1;
 
@@ -562,7 +562,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -570,7 +570,7 @@ public class API {
     @Path("recordbynumber/{number}")
     public Response recodByNumber(@PathParam("number") String numberStr) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -598,7 +598,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -606,7 +606,7 @@ public class API {
     @Path("recordraw/{signature}")
     public Response recordRaw(@PathParam("signature") String signature) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
 
         int step = 1;
 
@@ -642,7 +642,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -650,7 +650,7 @@ public class API {
     @Path("recordrawbynumber/{number}")
     public Response recodRawByNumber(@PathParam("number") String numberStr) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -680,7 +680,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -688,7 +688,7 @@ public class API {
     @Path("recordrawbynumber/{block}/{seqNo}")
     public Response recodRawBySeqNo(@PathParam("block") int block, @PathParam("seqNo") int seqNo) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
 
         try {
 
@@ -703,7 +703,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -716,7 +716,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(broadcastFromRaw_1(raw)))
+                .entity(broadcastFromRaw_1(raw).toJSONString())
                 .build();
     }
 
@@ -730,7 +730,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(broadcastFromRaw_1(raw)))
+                .entity(broadcastFromRaw_1(raw).toJSONString())
                 .build();
 
     }
@@ -743,7 +743,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(broadcastFromRaw_1(raw)))
+                .entity(broadcastFromRaw_1(raw).toJSONString())
                 .build();
 
     }
@@ -766,15 +766,14 @@ public class API {
             } else {
                 out.put("error", result.getB());
                 out.put("message", OnDealClick.resultMess(result.getB()));
-                if (result.getA().errorValue != null) {
+                if (result.getA() != null && result.getA().errorValue != null) {
                     out.put("value", result.getA().errorValue);
                 }
                 return out;
             }
 
         } catch (Exception e) {
-            //logger.error(e.getMessage());
-            out.put("error", APIUtils.errorMess(-1, e.toString() + " on step: " + step));
+            Transaction.updateMapByErrorSimple(-1, e.toString() + " on step: " + step, out);
             return out;
         }
     }
@@ -787,33 +786,28 @@ public class API {
         try {
             transactionBytes = Base58.decode(rawDataBase58);
         } catch (Exception e) {
-            //logger.error(e.getMessage());
-            out.put("error", APIUtils.errorMess(-1, e.toString() + " INVALID_RAW_DATA"));
+            Transaction.updateMapByErrorSimple(-1, e.toString() + " INVALID_RAW_DATA", out);
             return out;
         }
 
         try {
             transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
         } catch (Exception e) {
-            out.put("error", APIUtils.errorMess(-1, e.toString() + " parse ERROR"));
+            Transaction.updateMapByErrorSimple(-1, e.toString() + " parse ERROR", out);
             return out;
         }
 
         // CHECK IF RECORD VALID
         if (!transaction.isSignatureValid(DCSet.getInstance())) {
-            out.put("error", APIUtils.errorMess(-1, " INVALID_SIGNATURE"));
+            transaction.updateMapByError(-1, "INVALID_SIGNATURE", out);
             return out;
         }
 
-        int status = Controller.getInstance().broadcastTelegram(transaction, true);
-        if (status == 0) {
+        int result = Controller.getInstance().broadcastTelegram(transaction, true);
+        if (result == 0) {
             out.put("status", "ok");
         } else {
-            out.put("status", "error");
-            out.put("error", OnDealClick.resultMess(status));
-            if (transaction.errorValue != null) {
-                out.put("value", transaction.errorValue);
-            }
+            transaction.updateMapByError(result, out);
         }
         out.put("signature", Base58.encode(transaction.getSignature()));
         return out;
@@ -829,7 +823,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(broadcastTelegram_1(raw)))
+                .entity(broadcastTelegram_1(raw).toJSONString())
                 .build();
     }
 
@@ -843,7 +837,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(broadcastTelegram_1(raw)))
+                .entity(broadcastTelegram_1(raw).toJSONString())
                 .build();
 
     }
@@ -856,7 +850,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(broadcastTelegram_1(raw)))
+                .entity(broadcastTelegram_1(raw).toJSONString())
                 .build();
 
     }
@@ -1049,7 +1043,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(array))
+                .entity(array.toJSONString())
                 .build();
     }
 
@@ -1095,7 +1089,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -1130,6 +1124,60 @@ public class API {
                     .entity(Base58.encode(publicKey))
                     .build();
         }
+    }
+
+
+    @GET
+    @Path("addressforge/{address}")
+    public Response getAddressForge(@PathParam("address") String address) {
+
+        // CHECK IF VALID ADDRESS
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        Account account = result.a;
+        if (account == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    result.b);
+        }
+
+        JSONObject out = new JSONObject();
+        BigDecimal forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet);
+        int height = Controller.getInstance().getMyHeight() + 1;
+        long previousTarget = Controller.getInstance().blockChain.getTarget(dcSet);
+        // previous making blockHeight + previous ForgingH balance + this ForgingH balance
+        Tuple3<Integer, Integer, Integer> lastForgingPoint = account.getLastForgingData(dcSet);
+        if (lastForgingPoint == null) {
+            out.put("lastForgingPoint", "null");
+        } else {
+            JSONObject lastForgingPointJSON = new JSONObject();
+            lastForgingPointJSON.put("height", lastForgingPoint.a);
+            lastForgingPointJSON.put("prevBalance", lastForgingPoint.b);
+            lastForgingPointJSON.put("balance", lastForgingPoint.c);
+            out.put("lastPoint", lastForgingPointJSON);
+            Tuple3<Integer, Integer, Integer> forgingPoint = account.getForgingData(dcSet, lastForgingPoint.a);
+            if (forgingPoint == null) {
+                out.put("forgingPoint", "null");
+            } else {
+                JSONObject forgingPointJson = new JSONObject();
+                forgingPointJson.put("prevHeight", forgingPoint.a);
+                forgingPointJson.put("prevBalance", forgingPoint.b);
+                forgingPointJson.put("balance", forgingPoint.c);
+                out.put("forgingPoint", forgingPointJson);
+            }
+        }
+
+        long winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue.intValue(), lastForgingPoint);
+        int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
+        out.put("forgingValue", forgingValue.toPlainString());
+        out.put("height", height);
+        out.put("winValue", winValue);
+        out.put("previousTarget", previousTarget);
+        out.put("targetedWinValue", targetedWinValue);
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
+                .build();
     }
 
     @GET
@@ -1182,7 +1230,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -1217,7 +1265,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(asset.toJson()))
+                .entity(asset.toJson().toJSONString())
                 .build();
 
     }
@@ -1237,7 +1285,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(asset.toJsonData()))
+                .entity(asset.toJsonData().toJSONString())
                 .build();
 
     }
@@ -1247,57 +1295,10 @@ public class API {
      */
 
     @GET
-    @Path("assets")
-    public Response assets() {
-
-        return Response.status(200)
-                .header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(BlockExplorer.getInstance().jsonQueryAssetsLite()))
-                .build();
-
-    }
-
-    @Path("assetsfull")
-    public Response assetsFull() {
-
-        return Response.status(200)
-                .header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(BlockExplorer.getInstance().jsonQueryAssets())
-                .build();
-
-    }
-
-    @GET
     @Path("assetsfilter/{filter_name_string}")
     public Response assetsFilter(@PathParam("filter_name_string") String filter) {
 
-
-        if (filter == null || filter.length() < 3) {
-            return Response.status(501)
-                    .header("Content-Type", "application/json; charset=utf-8")
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity("error - so small filter length")
-                    .build();
-        }
-
-        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
-
-        JSONArray array = new JSONArray();
-
-        if (list != null) {
-            for (ItemCls item : list) {
-                array.add(item.toJson());
-            }
-        }
-
-        return Response.status(200)
-                .header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(array))
-                .build();
+        return APIItemAsset.find(filter);
 
     }
 
@@ -1393,9 +1394,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                //.entity(StrJSonFine.convert(itemJSON))
                 .entity(itemJSON.toJSONString())
-                //.entity(itemJSON.toString())
                 .build();
 
     }
@@ -1435,7 +1434,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(person.toJson()))
+                .entity(person.toJson().toJSONString())
                 .build();
 
     }
@@ -1563,7 +1562,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(person.toJsonData()))
+                .entity(person.toJsonData().toJSONString())
                 .build();
 
     }
@@ -1669,7 +1668,7 @@ public class API {
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(StrJSonFine.convert(answer))
+                    .entity(answer.toJSONString())
                     .build();
         }
     }
@@ -1709,7 +1708,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(person.toJson()))
+                .entity(person.toJson().toJSONString())
                 .build();
 
     }
@@ -1751,7 +1750,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(person.toJson()))
+                .entity(person.toJson().toJSONString())
                 .build();
     }
 
@@ -1788,7 +1787,7 @@ public class API {
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(StrJSonFine.convert(person.toJson()))
+                    .entity(person.toJson().toJSONString())
                     .build();
         }
     }
@@ -1806,7 +1805,7 @@ public class API {
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(StrJSonFine.convert(answer))
+                    .entity(answer.toJSONString())
                     .build();
         }
     }
@@ -1851,7 +1850,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(array))
+                .entity(array.toJSONString())
                 .build();
 
     }

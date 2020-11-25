@@ -11,7 +11,6 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.TelegramMessage;
@@ -286,9 +285,7 @@ public class TelegramsResource {
             if (sender.getAddress() == null)
                 throw new Exception("");
         } catch (Exception e1) {
-            out.put("error", Transaction.INVALID_CREATOR);
-            out.put("error_message", "Invalid Sender");
-            out.put("status", "invalid");
+            Transaction.updateMapByErrorSimple(Transaction.INVALID_CREATOR, out);
             return out.toJSONString();
         }
 
@@ -299,9 +296,7 @@ public class TelegramsResource {
             if (recipient.getAddress() == null)
                 throw new Exception("");
         } catch (Exception e1) {
-            out.put("error", Transaction.INVALID_ADDRESS);
-            out.put("error_message", "Invalid Recipient Address");
-            out.put("status", "invalid");
+            Transaction.updateMapByErrorSimple(Transaction.INVALID_ADDRESS, out);
             return out.toJSONString();
         }
 
@@ -322,10 +317,7 @@ public class TelegramsResource {
                         messageBytes = Base64.getDecoder().decode(message);
                     }
                 } catch (Exception e) {
-                    //throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MESSAGE_FORMAT);
-                    out.put("error", Transaction.INVALID_MESSAGE_FORMAT);
-                    out.put("error_message", "Invalid Message Format");
-                    out.put("status", "invalid");
+                    Transaction.updateMapByErrorSimple(Transaction.INVALID_MESSAGE_FORMAT, out);
                     return out.toJSONString();
                 }
             }
@@ -347,10 +339,8 @@ public class TelegramsResource {
         }
 
         // title
-        if (title != null && title.getBytes(StandardCharsets.UTF_8).length > 256) {
-            out.put("error", Transaction.INVALID_TITLE_LENGTH_MAX);
-            out.put("error_message", "Invalid Title");
-            out.put("status", "invalid");
+        if (title != null && title.getBytes(StandardCharsets.UTF_8).length > Transaction.MAX_TITLE_BYTES_LENGTH) {
+            Transaction.updateMapByErrorSimple(Transaction.INVALID_TITLE_LENGTH_MAX, out);
             return out.toJSONString();
         }
 
@@ -358,10 +348,7 @@ public class TelegramsResource {
         Transaction transaction;
         PrivateKeyAccount account = cntr.getWalletPrivateKeyAccountByAddress(sender.getAddress());
         if (account == null) {
-            //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
-            out.put("error", ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
-            out.put("error_message", "Wallet Address Not Exists");
-            out.put("status", "invalid");
+            Transaction.updateMapByErrorSimple(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS, out);
             return out.toJSONString();
         }
 
@@ -369,9 +356,7 @@ public class TelegramsResource {
             //recipient
             byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
             if (publicKey == null) {
-                out.put("error", Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT);
-                out.put("error_message", OnDealClick.resultMess(Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT));
-                out.put("status", "invalid");
+                Transaction.updateMapByErrorSimple(Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT, out);
                 return out.toJSONString();
             }
 
@@ -385,25 +370,15 @@ public class TelegramsResource {
                     account, null, feePow, recipient, assetKey, amount,
                     title, messageBytes, isTextByte, encrypted, 0);
         } catch (Exception e) {
-            out.put("status_code", Transaction.INVALID_RETURN);
-            out.put("error_message", e.getMessage());
-            out.put("status", "failed");
+            Transaction.updateMapByErrorSimple(Transaction.INVALID_RETURN, e.getMessage(), out);
             return out.toJSONString();
         }
 
-        if (transaction == null) {
-            out.put("error", Transaction.INVALID_TRANSFER_TYPE);
-            out.put("error_message", "transaction is null");
-            out.put("status", "failed");
-            return out.toJSONString();
-        }
-
-        int status = Controller.getInstance().broadcastTelegram(transaction, true);
-        if (status == 0) {
+        int result = Controller.getInstance().broadcastTelegram(transaction, true);
+        if (result == 0) {
             out.put("status", "ok");
         } else {
-            out.put("status", "error");
-            out.put("error", OnDealClick.resultMess(status));
+            Transaction.updateMapByErrorSimple(result, out);
         }
         out.put("signature", Base58.encode(transaction.getSignature()));
         return out.toJSONString();

@@ -75,11 +75,11 @@ public class WithdrawExchange extends IconPanel {
         String urlGetHistory = "https://api.face2face.cash/apipay/history.json/ERA/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
         String urlGetDetails2 = "https://api.face2face.cash/apipay/get_uri_in.json/2/10/9/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
 
-        JSONObject jsonObject;
+        JSONObject jsonObject = null;
         String inputText = "";
         String accountTo;
         String message = "";
-
+        String rate = null;
         AssetCls assetIn = null;
         try {
 
@@ -98,6 +98,11 @@ public class WithdrawExchange extends IconPanel {
                 case 94:
                     urlGetDetails += "14/3/" + address + "/100"; // eEUR -> BTC
                     message += "BTC";
+                    break;
+                case 1114:
+                    urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
+                    urlGetDetails += "15/7/" + address + "/10"; // eZEN -> ZEN
+                    message += "ZEN";
                     break;
                 default:
                     urlGetDetails += "10/3/" + address + "/1"; // COMPU -> BTC
@@ -137,30 +142,38 @@ public class WithdrawExchange extends IconPanel {
             LOGGER.debug(StrJSonFine.convert(jsonObject));
 
             accountTo = jsonObject.get("addr_in").toString();
+            rate = jsonObject.get("rate").toString();
 
         } catch (Exception e) {
+            if (jsonObject != null && jsonObject.containsKey("wrong")) {
+                jLabelAdressCheck.setText(jsonObject.get("wrong").toString());
+            } else {
+                jLabelAdressCheck.setText(inputText + " " + e.getMessage());
+            }
             jsonObject = null;
             accountTo = null;
-            jLabelAdressCheck.setText(inputText);
-            inputText = "";
         }
 
-        if (assetIn != null && accountTo != null) {
+        if (assetIn != null && accountTo != null && rate != null) {
 
             message += ":" + jTextField_Address.getText();
             AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn,
-                    null, new Account(accountTo), null, message);
+                    null, new Account(accountTo), null, message, false);
 
+            panel.jTextField_Mess_Title.setEnabled(false);
             panel.jComboBox_Asset.setEnabled(false);
             panel.recipientAddress.setEnabled(false);
             panel.jTextArea_Description.setEnabled(false);
-            String rate = jsonObject.get("rate").toString();
+            jLabelAdressCheck.setText("");
+            rate = jsonObject.get("rate").toString();
             String bal = jsonObject.get("bal").toString();
 
             String formTitle;
             String incomeAssetName = assetIn.getName();
             switch ((int) assetIn.getKey()) {
                 case 12:
+                case 1114:
+                    incomeAssetName = "ZEN";
                     formTitle = Lang.getInstance().translate("Withdraw %1 to").replace("%1", incomeAssetName) + " " + accountTo;
                     break;
                 default:
@@ -190,7 +203,7 @@ public class WithdrawExchange extends IconPanel {
     private void initComponents(AssetCls assetIn, Account account) {
 
         if (assetIn == null) {
-            asset = Controller.getInstance().getAsset(1l);
+            asset = Controller.getInstance().getAsset(2L);
         } else {
             asset = assetIn;
         }
@@ -224,7 +237,7 @@ public class WithdrawExchange extends IconPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_Title, gridBagConstraints);
-        jText_Title.setText("<html><h1>" + Lang.getInstance().translate("Withdraw of Bitcoins from the Exchange") + "</h1></html>");
+        jText_Title.setText("<html><h1>" + Lang.getInstance().translate("Withdraw from the Exchange") + "</h1></html>");
 
         JLabel jText_Help = new JLabel();
 
@@ -236,13 +249,15 @@ public class WithdrawExchange extends IconPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_Help, gridBagConstraints);
+        String cryto = "BTC";
         jText_Help.setText("<html><h2>1. " + Lang.getInstance().translate("Select the Asset that you want to withdraw") + "</h2>"
                 + "<h3>2. " + Lang.getInstance().translate("Set the address for bitcoins where you want to withdraw")
                 + ". " + Lang.getInstance().translate("And click button '%1' to open the panel for payment").replace("%1",
                 Lang.getInstance().translate("Withdraw"))
                 + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
                 + ".</h3>"
-                + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1", "0.0025") + "<br>"
+                + Lang.getInstance().translate("Minimal payment in equivalent")
+                + " <b>" + 0.0025 + " " + cryto + "</b>" + "<br>"
                 //+ Lang.getInstance().translate("Service will take commission fee approx - %1%").replace("%1","2.75")
                 + Lang.getInstance().translate("Service will have some commission")
                 + "</html>");
@@ -275,12 +290,23 @@ public class WithdrawExchange extends IconPanel {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     asset = (AssetCls) cbxAssets.getSelectedItem();
 
-                    jText_Help.setText("<html><h3>2. " + Lang.getInstance().translate("Set the address for bitcoins where you want to withdraw")
+                    String cryto;
+                    switch ((int) asset.getKey()) {
+                        case 1114:
+                            cryto = "ZEN";
+                            break;
+                        default:
+                            cryto = "BTC";
+                    }
+
+
+                    jText_Help.setText("<html><h3>2. " + Lang.getInstance().translate("Set the address for %1 where you want to withdraw").replace("%1", cryto)
                             + ". " + Lang.getInstance().translate("And click button '%1' to open the panel for payment").replace("%1",
                             Lang.getInstance().translate("Next"))
                             + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
                             + ".</h3>"
-                            + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1", "0.0025") + "<br>"
+                            + Lang.getInstance().translate("Minimal payment in equivalent")
+                            + " <b>" + 0.0025 + " " + cryto + "</b>" + "<br>"
                             //+ Lang.getInstance().translate("Service will take commission fee approx - %1%").replace("%1","2.75")
                             + Lang.getInstance().translate("Service will have some commission")
                     );
