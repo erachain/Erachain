@@ -32,11 +32,10 @@ public class ItemPersonsResource {
     public String help() {
         Map help = new LinkedHashMap();
 
-        help.put("persons/{key}", "get by KEY");
+        help.put("persons/{key}", "Returns information about person with the given key.");
         help.put("persons/images/{key}", "get item Images by key");
         help.put("persons/listfrom/{start}", "get list from KEY");
-
-        help.put("POST persons/issue", "issue");
+        help.put("POST persons/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": \"long\", \"deathday\": \"<long>\", \"gender\": \"<int>\", \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": ,     \"password\": \"<password>\"}", "issue");
 
         return StrJSonFine.convert(help);
     }

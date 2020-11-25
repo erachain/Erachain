@@ -38,13 +38,13 @@ public class ItemAssetsResource {
     public String help() {
         Map help = new LinkedHashMap();
 
-        help.put("assets/{key}", "get by KEY");
+        help.put("assets/{key}", "Returns information about asset with the given key.");
         help.put("assets/images/{key}", "get item images by KEY");
-        help.put("assets/types", "get types");
         help.put("assets/listfrom/{start}", "get list from KEY");
+        help.put("POST assets/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"scale\": \"<scale>\", \"assetType\": \"<assetType>\", \"quantity\": \"<quantity>\", \"password\": \"<password>\"}", "Issue Asset");
 
+        help.put("assets/types", "get types");
         help.put("assets/balances/{key}", "get balances for key");
-        help.put("POST assets/issue", "issue");
 
         return StrJSonFine.convert(help);
     }

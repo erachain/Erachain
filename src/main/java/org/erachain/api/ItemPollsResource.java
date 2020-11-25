@@ -11,6 +11,7 @@ import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.APIUtils;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -22,9 +23,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Path("polls")
 @Produces(MediaType.APPLICATION_JSON)
@@ -34,6 +33,18 @@ public class ItemPollsResource {
 
     @Context
     HttpServletRequest request;
+
+    @GET
+    public String help() {
+        Map help = new LinkedHashMap();
+
+        help.put("persons/{key}", "Returns information about person with the given key.");
+        help.put("persons/images/{key}", "get item Images by key");
+        help.put("persons/listfrom/{start}", "get list from KEY");
+        help.put("POST persons/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": \"long\", \"deathday\": \"<long>\", \"gender\": \"<int>\", \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": ,     \"password\": \"<password>\"}", "issue");
+
+        return StrJSonFine.convert(help);
+    }
 
     /**
      * Create new poll.
@@ -48,6 +59,7 @@ public class ItemPollsResource {
 
     @POST
     @Consumes(MediaType.WILDCARD)
+    @Path("issue")
     public String createPoll(String poll) {
 
         String password = null;
