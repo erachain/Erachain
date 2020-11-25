@@ -11,6 +11,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAuthor;
 import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
@@ -179,6 +180,12 @@ public class RSignNote extends Transaction implements Itemable {
 
         itemsKeys = listTags.toArray(new Object[][]{});
 
+    }
+
+    @Override
+    public ExLink getExLink() {
+        // нельзя использовать внутренюю от Трнзакции - так как она начнет по другому байт-код делать и парсить
+        return extendedData.getExLink();
     }
 
     @Override
@@ -491,6 +498,10 @@ public class RSignNote extends Transaction implements Itemable {
         PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
         position += CREATOR_LENGTH;
 
+        //
+        // Transaction.exLink not USED here
+        //
+
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
@@ -761,7 +772,7 @@ public class RSignNote extends Transaction implements Itemable {
             fee += allHashes.length * 100 * BlockChain.FEE_PER_BYTE;
         }
 
-        if (exLink != null)
+        if (getExLink() != null)
             fee += 100 * BlockChain.FEE_PER_BYTE;
 
         if (extendedData.hasAuthors()) {
@@ -788,7 +799,6 @@ public class RSignNote extends Transaction implements Itemable {
             }
 
             extendedData.resolveValues(dcSet);
-            exLink = extendedData.getExLink();
         }
     }
 
@@ -808,7 +818,6 @@ public class RSignNote extends Transaction implements Itemable {
             }
 
             extendedData.resolveValues(dcSet);
-            exLink = extendedData.getExLink();
         }
     }
 
