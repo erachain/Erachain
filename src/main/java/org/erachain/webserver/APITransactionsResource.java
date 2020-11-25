@@ -81,7 +81,7 @@ public class APITransactionsResource {
     @Path("get/{signature}")
     public Response getBySign(@PathParam("signature") String signature) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
 
         int step = 1;
 
@@ -106,7 +106,7 @@ public class APITransactionsResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -114,7 +114,7 @@ public class APITransactionsResource {
     @Path("getbynumber/{number}")
     public Response getByNumber(@PathParam("number") String numberStr) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -142,7 +142,7 @@ public class APITransactionsResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -171,7 +171,7 @@ public class APITransactionsResource {
 
         } catch (Exception e) {
 
-            Map out = new LinkedHashMap();
+            JSONObject out = new JSONObject();
             out.put("error", step);
             if (step == 1)
                 out.put("message", "height-sequence error, use integer-integer value");
@@ -183,7 +183,7 @@ public class APITransactionsResource {
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(StrJSonFine.convert(out))
+                    .entity(out.toJSONString())
                     .build();
         }
     }
@@ -192,7 +192,7 @@ public class APITransactionsResource {
     @Path("getvouches/{number}")
     public Response getVouches(@PathParam("number") String numberStr) {
 
-        Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         Long dbRef = Transaction.parseDBRef(numberStr);
@@ -214,7 +214,7 @@ public class APITransactionsResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toJSONString())
                 .build();
     }
 
@@ -372,7 +372,8 @@ public class APITransactionsResource {
         // Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(out)).build();
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString()).build();
     }
 
     @SuppressWarnings("unchecked")

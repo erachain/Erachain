@@ -6,6 +6,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
@@ -386,15 +387,68 @@ public class APIUtils {
             if (account == null) {
                 throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
             }
-            
+
             return new Tuple3<JSONObject, PrivateKeyAccount, Integer>(jsonObject, account, feePow);
-            
+
         } catch (NullPointerException | ClassCastException e) {
             // JSON EXCEPTION
             // logger.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
-        
+
+    }
+
+    public static Tuple3<PrivateKeyAccount, Integer, byte[]> postIssueRawItem(HttpServletRequest request, String x,
+                                                                              String creator, String feePowStr, String password) {
+
+        int feePow;
+        // PARSE FEE POWER
+        try {
+            feePow = Integer.parseInt(feePowStr);
+        } catch (Exception e0) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_FEE_POWER);
+        }
+
+        byte[] raw;
+        try {
+            raw = Base58.decode(x);
+        } catch (Exception e0) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_RAW_DATA);
+        }
+
+        if (raw == null)
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_RAW_DATA);
+
+        // CHECK ADDRESS
+        if (!Crypto.getInstance().isValidAddress(creator)) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
+        }
+
+        // check this up here to avoid leaking wallet information to remote
+        // user
+        // full check is later to prompt user with calculated fee
+
+        // CHECK IF WALLET EXISTS
+        if (!Controller.getInstance().doesWalletExists()) {
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+        }
+
+        // TRY UNLOCK
+        askAPICallAllowed(password, "", request, true);
+
+        // CHECK WALLET UNLOCKED
+        if (!Controller.getInstance().isWalletUnlocked()) {
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
+        }
+
+        // GET ACCOUNT
+        PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator);
+        if (account == null) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
+        }
+
+        return new Tuple3<>(account, feePow, raw);
+
     }
 
     /**
@@ -404,8 +458,8 @@ public class APIUtils {
      * потом этот блок откатился ситемой и заново пересобрался и все норм стало
      */
     public static boolean testTxSigns(int heightBlock, int seqNo, String signatureStr) {
-            String peerIP = Controller.getInstance().getSynchronizer().getPeer().getAddress().getHostName();
-            String txStr = APIUtils.openUrl(
+        String peerIP = Controller.getInstance().getSynchronizer().getPeer().getAddress().getHostName();
+        String txStr = APIUtils.openUrl(
                     //"http://138.68.225.51:9047/apirecords/getbynumber/"
                     "http://" + peerIP + ":" + Settings.getInstance().getWebPort() + "/apirecords/getbynumber/"
                             + heightBlock + "-" + seqNo);

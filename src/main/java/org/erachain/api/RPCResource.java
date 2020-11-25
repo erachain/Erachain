@@ -18,8 +18,14 @@ public class RPCResource {
     @GET
     public String getHelp() {
         String help = "";
-        for (String[] strings : ApiClient.helpStrings) {
-            help += strings[0] + "\n\t" + strings[1] + "\n\n";
+        for (String[] helpString : ApiClient.helpStrings) {
+            help += helpString[0] + "\n";
+            if (helpString.length > 1)
+                help += "\t" + helpString[1] + "\n";
+            if (helpString.length > 2)
+                help += "\t" + helpString[2] + "\n";
+            if (helpString.length > 3)
+                help += "\t" + helpString[3] + "\n";
         }
         return help;
     }

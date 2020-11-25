@@ -3,14 +3,17 @@ package org.erachain.api;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.utils.APIUtils;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -38,15 +41,24 @@ public class ItemAssetsResource {
     public String help() {
         Map help = new LinkedHashMap();
 
-        help.put("assets/{key}", "get by KEY");
+        help.put("assets/last", "Get last key");
+        help.put("assets/{key}", "Returns information about asset with the given key.");
+        help.put("assets/raw/{key}", "Returns RAW in Base58 of asset with the given key.");
         help.put("assets/images/{key}", "get item images by KEY");
-        help.put("assets/types", "get types");
         help.put("assets/listfrom/{start}", "get list from KEY");
+        help.put("POST assets/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"scale\": \"<scale>\", \"assetType\": \"<assetType>\", \"quantity\": \"<quantity>\", \"password\": \"<password>\"}", "Issue Asset");
+        help.put("POST assets/issueraw/{creator}?feePow=<int>&password=<String> ", "Issue Asset by Base58 RAW in POST body");
 
+        help.put("assets/types", "get types");
         help.put("assets/balances/{key}", "get balances for key");
-        help.put("POST assets/issue", "issue");
 
         return StrJSonFine.convert(help);
+    }
+
+    @GET
+    @Path("last")
+    public String last() {
+        return "" + DCSet.getInstance().getItemAssetMap().getLastKey();
     }
 
     /**
@@ -56,7 +68,7 @@ public class ItemAssetsResource {
      * @return JSON object. Single asset
      */
     @GET
-    @Path("/{key}")
+    @Path("{key}")
     public String get(@PathParam("key") String key) {
         Long asLong = null;
 
@@ -80,11 +92,33 @@ public class ItemAssetsResource {
         return Controller.getInstance().getAsset(asLong).toJson().toJSONString();
     }
 
+    @GET
+    @Path("raw/{key}")
+    public String getRAW(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemAssetMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        ItemCls item = Controller.getInstance().getAsset(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Base58.encode(issueBytes);
+    }
+
     /**
      *
      */
     @GET
-    @Path("/images/{key}")
+    @Path("images/{key}")
     public String getImages(@PathParam("key") String key) {
         Long asLong = null;
 
@@ -123,7 +157,7 @@ public class ItemAssetsResource {
     }
 
     @POST
-    @Path("/issue")
+    @Path("issue")
     public String issue(String x) {
 
         Controller cntr = Controller.getInstance();
@@ -133,6 +167,34 @@ public class ItemAssetsResource {
         }
 
         Transaction transaction = (Transaction) result;
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        if (validate == Transaction.VALIDATE_OK)
+            return transaction.toJson().toJSONString();
+        else {
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByErrorSimple(validate, out);
+            return out.toJSONString();
+        }
+    }
+
+    @POST
+    @Path("issueraw/{creator}")
+    public String issueRAW(String x, @PathParam("creator") String creator,
+                           @DefaultValue("0") @QueryParam("feePow") String feePowStr,
+                           @QueryParam("password") String password) {
+
+        Controller cntr = Controller.getInstance();
+        Fun.Tuple3<PrivateKeyAccount, Integer, byte[]> result = APIUtils.postIssueRawItem(request, x, creator, feePowStr, password);
+        AssetCls item;
+        try {
+            item = AssetFactory.getInstance().parse(result.c, false);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    e.getMessage());
+        }
+
+        Transaction transaction = cntr.issueAsset(result.a, result.b, item);
         int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
         if (validate == Transaction.VALIDATE_OK)

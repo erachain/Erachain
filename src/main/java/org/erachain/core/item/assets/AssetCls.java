@@ -9,7 +9,6 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
-import org.erachain.lang.Lang;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -893,58 +892,57 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public static String viewAssetTypeDescriptionCls(int assetType) {
-        Lang lang = Lang.getInstance();
         switch (assetType) {
             case AS_OUTSIDE_GOODS:
-                return lang.translate("Movable things and goods. These goods can be taken for storage by the storekeeper or for confirmation of delivery. In this case you can see the balances on the accounts of storekeepers and delivery agents");
+                return "Movable things and goods. These goods can be taken for storage by the storekeeper or for confirmation of delivery. In this case you can see the balances on the accounts of storekeepers and delivery agents";
             case AS_OUTSIDE_IMMOVABLE:
-                return lang.translate("Real estate and other goods and things not subject to delivery. Such things can be taken and given for rent and handed over to the guard");
+                return "Real estate and other goods and things not subject to delivery. Such things can be taken and given for rent and handed over to the guard";
             case AS_OUTSIDE_CURRENCY:
-                return lang.translate("AS_OUTSIDE_CURRENCY_D");
+                return "AS_OUTSIDE_CURRENCY_D";
             case AS_OUTSIDE_WORK_TIME_HOURS:
-                return lang.translate("Рабочее время в часах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие часы можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в часах рабочего времени");
+                return "Рабочее время в часах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие часы можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в часах рабочего времени";
             case AS_OUTSIDE_WORK_TIME_MINUTES:
-                return lang.translate("Рабочее время в минутах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие минуты можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в минутах рабочего времени");
+                return "Рабочее время в минутах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие минуты можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в минутах рабочего времени";
             case AS_OUTSIDE_SERVICE:
-                return lang.translate("An external service that needs to be provided outside. To notify your wish to provide services you must make demands and then confirm the fulfillment");
+                return "An external service that needs to be provided outside. To notify your wish to provide services you must make demands and then confirm the fulfillment";
             case AS_OUTSIDE_SHARE:
-                return lang.translate("External shares which have to be transferred to an external depository. The depositary can be notified by presenting the claim and then confirm the shares transfer");
+                return "External shares which have to be transferred to an external depository. The depositary can be notified by presenting the claim and then confirm the shares transfer";
             case AS_OUTSIDE_BILL:
-                return lang.translate("A digital promissory note can be called for redemption by external money. You can take it into your hands");
+                return "A digital promissory note can be called for redemption by external money. You can take it into your hands";
             case AS_OUTSIDE_BILL_EX:
-                return lang.translate("A digital bill of exchange can be called for redemption by external money. You can take it into your hands");
+                return "A digital bill of exchange can be called for redemption by external money. You can take it into your hands";
             case AS_MY_DEBT:
-                return lang.translate("AS_MY_DEBT_D");
+                return "AS_MY_DEBT_D";
             case AS_OUTSIDE_OTHER_CLAIM:
-                return lang.translate("Other external rights, requirements and obligations. Any obligation (as well as other external assets), which can be claimed by the record \"summon\" and discharged by the record \"confirmation of fulfillment\" of this obligation. You can take it into your hands");
+                return "Other external rights, requirements and obligations. Any obligation (as well as other external assets), which can be claimed by the record \"summon\" and discharged by the record \"confirmation of fulfillment\" of this obligation. You can take it into your hands";
             case AS_INSIDE_ASSETS:
-                return lang.translate("Internal (digital) asset. It does not require any external additional actions when transferring between accounts inside Erachain");
+                return "Internal (digital) asset. It does not require any external additional actions when transferring between accounts inside Erachain";
             case AS_INSIDE_CURRENCY:
-                return lang.translate("Digital money");
+                return "Digital money";
             case AS_INSIDE_UTILITY:
-                return lang.translate("Digital service or a cost is something that can be used inside Erachain nvironment, for example as a payment for external services");
+                return "Digital service or a cost is something that can be used inside Erachain nvironment, for example as a payment for external services";
             case AS_INSIDE_SHARE:
-                return lang.translate("Digital share. The share of ownership of an external or internal enterpris, the possession of which establishes the right to own the corresponding share of the enterprise without the need to take any external actions");
+                return "Digital share. The share of ownership of an external or internal enterpris, the possession of which establishes the right to own the corresponding share of the enterprise without the need to take any external actions";
             case AS_INSIDE_BONUS:
-                return lang.translate("Digital loyalty points, bonuses, awards, discount points (bonus). It has no generally accepted value and can not be exchanged for other types of assets inside the Erachain environment. The exchange for other bonuses and rewards are allowed");
+                return "Digital loyalty points, bonuses, awards, discount points (bonus). It has no generally accepted value and can not be exchanged for other types of assets inside the Erachain environment. The exchange for other bonuses and rewards are allowed";
             case AS_INSIDE_ACCESS:
-                return lang.translate("Digital rights of access and control, membership, pass");
+                return "Digital rights of access and control, membership, pass";
             case AS_INSIDE_VOTE:
-                return lang.translate("A digital voice for voting");
+                return "A digital voice for voting";
             case AS_BANK_GUARANTEE:
-                return lang.translate("A digital bank guarantee.");
+                return "A digital bank guarantee.";
             case AS_BANK_GUARANTEE_TOTAL:
-                return lang.translate("A digital bank guarantee total accounting.");
+                return "A digital bank guarantee total accounting.";
             case AS_INDEX:
-                return lang.translate("Index on foreign and domestic assets, for example currencies on FOREX");
+                return "Index on foreign and domestic assets, for example currencies on FOREX";
             case AS_INSIDE_OTHER_CLAIM:
-                return lang.translate("Other digital rights, requirements and obligations. These assets (as well as other digital assets) can be given in debt and seized by the lender.");
+                return "Other digital rights, requirements and obligations. These assets (as well as other digital assets) can be given in debt and seized by the lender.";
             case AS_ACCOUNTING:
-                return lang.translate("AS_ACCOUNTING_D");
+                return "AS_ACCOUNTING_D";
             case AS_SELF_MANAGED_ACCOUNTING:
-                return lang.translate("AS_SELF_MANAGED_D");
+                return "AS_SELF_MANAGED_D";
             case AS_SELF_ACCOUNTING_LOAN:
-                return lang.translate("AS_ACCOUNTING_LOAN_D");
+                return "AS_ACCOUNTING_LOAN_D";
         }
         return "";
     }

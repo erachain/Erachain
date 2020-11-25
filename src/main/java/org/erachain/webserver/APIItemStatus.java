@@ -7,6 +7,7 @@ package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.Transaction;
@@ -46,6 +47,7 @@ public class APIItemStatus {
 
         help.put("GET apistatus/last", "Get last ID");
         help.put("GET apistatus/{key}", "GET by ID");
+        help.put("GET apistatus/raw/{key}", "Returns RAW in Base58 of status with the given key.");
         help.put("GET apistatus/find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apistatus/image/{key}", "GET Status Image");
         help.put("Get apistatus/icon/{key}", "GET Status Icon");
@@ -81,9 +83,35 @@ public class APIItemStatus {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(item.toJson()))
+                .entity(item.toJson())
                 .build();
 
+    }
+
+    @GET
+    @Path("raw/{key}")
+    public Response getRAW(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemStatusMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_STATUS_NOT_EXIST);
+        }
+
+        ItemCls item = Controller.getInstance().getStatus(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(Base58.encode(issueBytes))
+                .build();
     }
 
     @GET
@@ -112,7 +140,7 @@ public class APIItemStatus {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(array))
+                .entity(array.toJSONString())
                 .build();
 
     }

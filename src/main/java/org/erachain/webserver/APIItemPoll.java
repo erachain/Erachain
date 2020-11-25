@@ -2,6 +2,7 @@ package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.transaction.Transaction;
@@ -42,6 +43,7 @@ public class APIItemPoll {
 
         help.put("GET apipoll/last", "Get last ID");
         help.put("GET apipoll/{key}", "GET by ID");
+        help.put("GET apipoll/raw/{key}", "Returns RAW in Base58 of poll with the given key.");
         help.put("GET apipoll/find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apipoll/image/{key}", "GET Poll Image");
         help.put("Get apipoll/icon/{key}", "GET Poll Icon");
@@ -77,9 +79,35 @@ public class APIItemPoll {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(item.toJson()))
+                .entity(item.toJson().toJSONString())
                 .build();
 
+    }
+
+    @GET
+    @Path("raw/{key}")
+    public Response getRAW(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemPollMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_POLL_NOT_EXIST);
+        }
+
+        ItemCls item = Controller.getInstance().getPoll(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(Base58.encode(issueBytes))
+                .build();
     }
 
     @GET
@@ -108,7 +136,7 @@ public class APIItemPoll {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(array))
+                .entity(array.toJSONString())
                 .build();
 
     }
