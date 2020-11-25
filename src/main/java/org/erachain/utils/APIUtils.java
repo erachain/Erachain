@@ -22,6 +22,7 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -481,4 +482,33 @@ public class APIUtils {
         return true;
 
     }
+
+    public static PrivateKeyAccount getPrivateKeyCreator(String creator) {
+
+        // CHECK ADDRESS
+        Fun.Tuple2<Account, String> result = Account.tryMakeAccount(creator);
+
+        if (result.a == null) {
+            throw ApiErrorFactory.getInstance().createError(result.b);
+        }
+
+        // CHECK IF WALLET EXISTS
+        if (!Controller.getInstance().doesWalletExists()) {
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+        }
+
+        // CHECK WALLET UNLOCKED
+        if (!Controller.getInstance().isWalletUnlocked()) {
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
+        }
+
+        // GET ACCOUNT
+        PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator);
+        if (account == null) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_WALLET_ADDRESS);
+        }
+
+        return account;
+    }
+
 }

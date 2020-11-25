@@ -57,7 +57,7 @@ public class RSetStatusToItem extends Transaction {
                             Long beg_date, Long end_date,
                             long value_1, long value_2, byte[] data_1, byte[] data_2, long ref_to_parent, byte[] description,
                             long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
 
         this.key = key;
         this.itemType = itemType;

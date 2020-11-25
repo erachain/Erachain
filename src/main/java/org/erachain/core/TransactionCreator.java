@@ -705,9 +705,30 @@ public class TransactionCreator {
         //int version = 5; // without user sign
         record = new RCertifyPubKeys(version, creator, (byte) feePow, key,
                 userAccounts,
-                add_day, timestamp, 0l);
+                add_day, timestamp, 0L);
         record.sign(creator, forDeal);
         record.setDC(this.fork, forDeal, this.blockHeight, ++this.seqNo, false);
+
+        return record;
+    }
+
+    public Transaction r_CertifyPubKeysPerson(int version, PrivateKeyAccount creator, ExLink exLink, int feePow, long key,
+                                              PublicKeyAccount pubKey, int add_day) {
+
+        this.checkUpdate();
+
+        Transaction record;
+
+        long timestamp = NTP.getTime();
+
+        List<PublicKeyAccount> pubKeys = new ArrayList<>();
+        pubKeys.add(pubKey);
+
+        //CREATE SERTIFY PERSON TRANSACTION
+        record = new RCertifyPubKeys(version, creator, exLink, (byte) feePow, key,
+                pubKeys, add_day, timestamp, 0L);
+        record.sign(creator, Transaction.FOR_NETWORK);
+        record.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo, false);
 
         return record;
     }

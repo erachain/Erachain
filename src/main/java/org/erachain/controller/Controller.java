@@ -3453,6 +3453,14 @@ public class Controller extends Observable {
         }
     }
 
+    public Transaction r_CertifyPubKeysPerson(int version, PrivateKeyAccount creator, ExLink exLink,
+                                              int feePow, long key, PublicKeyAccount publicKey, int add_day) {
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.r_CertifyPubKeysPerson(version, creator, exLink, feePow, key, publicKey,
+                    add_day);
+        }
+    }
+
     public Transaction r_CertifyPubKeysPerson(int version, int forDeal, PrivateKeyAccount creator, int feePow, long key,
                                               List<PublicKeyAccount> userAccounts, int add_day) {
         synchronized (this.transactionCreator) {

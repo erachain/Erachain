@@ -95,10 +95,6 @@ public class RSend extends TransactionAmount {
             this.isText = isText;
         }
 
-        if (exLink != null) {
-            typeBytes[2] = (byte) (typeBytes[2] | HAS_EXLINK_MASK);
-            this.exLink = exLink;
-        }
     }
 
     public RSend(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key,

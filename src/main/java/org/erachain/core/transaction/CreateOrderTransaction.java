@@ -63,7 +63,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
         this.haveKey = haveKey;
         this.wantKey = wantKey;
 

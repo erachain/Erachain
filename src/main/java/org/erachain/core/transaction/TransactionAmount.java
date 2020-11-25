@@ -125,7 +125,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     // need for calculate fee by feePow into GUI
     protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient,
                                 BigDecimal amount, long key, long timestamp, Long reference) {
-        super(typeBytes, name, creator, feePow, timestamp, reference);
+        super(typeBytes, name, creator, null, feePow, timestamp, reference);
         this.recipient = recipient;
 
         if (amount == null || amount.equals(BigDecimal.ZERO)) {
