@@ -32,27 +32,22 @@ public class ApiClient {
                     {
                             "GET assets",
                             "See assets API",
-                            "JSON TEXT"
                     },
                     {
                             "GET persons",
                             "See persons API",
-                            "JSON TEXT"
                     },
                     {
                             "GET polls",
                             "See polls API",
-                            "JSON TEXT"
                     },
                     {
                             "GET statuses",
                             "See statuses API",
-                            "JSON TEXT"
                     },
                     {
                             "GET templates",
                             "See templates API",
-                            "JSON TEXT"
                     },
                     {
                             "GET core",
@@ -500,6 +495,8 @@ public class ApiClient {
                                     + "selfPay=true - if set pay to self address too. Default = true"
                                     + " title=, onlyperson - get only personalized addresses, password="},
 
+                    /*
+
                     {
                             "(deprecated) GET rec_payment/{feePow}/{sender}/{assetKey}/{amount}/{recipient}?password={password}",
                             "Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
@@ -591,20 +588,6 @@ public class ApiClient {
                             "Used to purchase the given name. Returns the transaction in JSON when successful.",
                             "Errors: 1 - Json error. 2 - Not enough balance. 102 - Invalid address. 105 - Invalid fee. 108 - Invalid name length. 111 - Invalid buyer. 201 - Wallet does not exist. 203 - Wallet is locked. 401 - Name does not exist. 410 - Name is not for sale. 411 - Buyer is already the owner."
                     },
-
-
-                    //////////////
-                    {
-                            "GET polls/address/<address>",
-                            "Returns an array of all the polls owned by a specific address in your wallet.",
-                            "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet."
-                    },
-
-                    {
-                            "POST polls/vote/<name> {\"voter\":\"<voterAddress>\", \"option\": \"<optionOne>\", \"fee\":\"<fee>\"}",
-                            "Used to vote on a poll with the given name. Returns the transaction in JSON when successful.",
-                            "Errors: 1 - Json error. 2 - Not enough balance. 3 - Not yet released. 102 - Invalid address. 105 - Invalid fee. 108 - Invalid name length. 114 - Invalid option length. 201 - Wallet does not exist. 202 - Address does not exist in wallet. 203 - Wallet is locked. 404 - Name must be lowercase. 501 - Poll does not exist. 504 - Polloption does not exist. 505 - Already voted for that option."
-                    },
                     {
                             "POST arbitrarytransactions {\"creator\":\"<creatorAddress>\", \"data\":\"<dataBase58>\", \"service\": <service>, \"fee\":\"<fee>\"}",
                             "Used to send an arbitrary transaction. The data of the arbitrary transaction must be base58 encoded and must be between 1-4000 bytes. Returns the transaction in JSON when successful. Also supports multipayments.",
@@ -695,24 +678,6 @@ public class ApiClient {
                             "Record HASHes. \"url\" link to files. \"message\" short description. \"hashes\" - String of HASHes delimited by \" \".",
                             ""
                     },
-                    // STATUSES
-                    {
-                            "*** STATUSES ***",
-                            "", ""
-                    },
-                    {
-                            "GET statuses/<key>",
-                            "Returns information about status with the given key.",
-                            "Errors: 601 - Invalid ID."
-                    },
-                    {
-                            "GET statuses/images/<key>",
-                            "Returns status Images with the given key.",
-                            "Errors: 601 - Invalid asset ID."
-                    },
-                    {
-                            "GET statuses/listfrom/{start}", "get list from KEY", ""
-                    },
                     /////// BLOGS
                     {
                             "POST blogpost/<blogname> {\"fee\": \"<fee>\", \"creator\": \"<creator>\", \"author\": \"<author>\", \"title\": \"<title>\", \"body\": \"<body>\", \"share\": \"<share>\", \"delete\": \"<delete>\"}",
@@ -764,6 +729,8 @@ public class ApiClient {
                             "Send a new multipayment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: ERA).",
                             "Errors: 1 - Json error. 104 - Invalid amount. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
                     },
+                     */
+
                     /// telegrams
                     {
                             "GET telegrams",

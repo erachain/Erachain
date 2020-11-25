@@ -22,11 +22,11 @@ public class ItemStatusesResource {
     public String help() {
         Map help = new LinkedHashMap();
 
-        help.put("statuses/{key}", "get by KEY");
+        help.put("statuses/{key}", "Returns information about status with the given key.");
         help.put("statuses/images/{key}", "get item Images by key");
         help.put("statuses/listfrom/{start}", "get list from KEY");
 
-        help.put("POST statuses/issue", "issue");
+        //help.put("POST statuses/issue", "issue");
 
         return StrJSonFine.convert(help);
     }

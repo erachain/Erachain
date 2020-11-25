@@ -49,7 +49,7 @@ public class ItemPollsResource {
         help.put("polls/vote/{key}/{option}/{voter}?feePow=feePow", "Used to vote on a poll with the given KEY. Returns the transaction in JSON when successful.");
         help.put("POST polls/vote/{key} {\"voter\":\"<voterAddress>\", \"option\": \"<optionOne>\", \"feePow\":\"<feePow>\"}", "Used to vote on a poll with the given KEY. Returns the transaction in JSON when successful.");
 
-        help.put("polls/address/{address}", "get list of polls for creator");
+        help.put("polls/address/{address}", "Returns an array of all the polls owned by a specific address in your wallet.");
 
         return StrJSonFine.convert(help);
     }
