@@ -3,6 +3,7 @@ package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
@@ -39,6 +40,7 @@ public class APIItemTemplate {
 
         help.put("GET apitemplate/last", "Get last ID");
         help.put("GET apitemplate/{key}", "GET by ID");
+        help.put("GET apitemplate/raw/{key}", "Returns RAW in Base58 of template with the given key.");
         help.put("GET apitemplate/find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apitemplate/image/{key}", "GET Template Image");
         help.put("Get apitemplate/icon/{key}", "GET Template Icon");
@@ -77,6 +79,28 @@ public class APIItemTemplate {
                 .entity(item.toJson().toJSONString())
                 .build();
 
+    }
+
+    @GET
+    @Path("raw/{key}")
+    public String getRAW(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemTemplateMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_TEMPLATE_NOT_EXIST);
+        }
+
+        ItemCls item = Controller.getInstance().getTemplate(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Base58.encode(issueBytes);
     }
 
     @GET

@@ -8,6 +8,7 @@ package org.erachain.webserver;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.ItemAssetsResource;
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
@@ -48,6 +49,7 @@ public class APIItemAsset {
 
         help.put("GET apiasset/last", "Get last ID");
         help.put("GET apiasset/{key}", "Get by ID");
+        help.put("GET apiasset/raw/{key}", "Returns RAW in Base58 of asset with the given key.");
         help.put("GET apiasset/find/{filter_name_string}", "Get by words in Name. Use patterns from 5 chars in words");
         help.put("Get apiasset/image/{key}", "Get Asset Image");
         help.put("Get apiasset/icon/{key}", "Get Asset Icon");
@@ -91,6 +93,28 @@ public class APIItemAsset {
                 .entity(item.toJson().toJSONString())
                 .build();
 
+    }
+
+    @GET
+    @Path("raw/{key}")
+    public String getRAW(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemAssetMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        ItemCls item = Controller.getInstance().getAsset(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Base58.encode(issueBytes);
     }
 
     @GET

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.polls.PollCls;
@@ -41,7 +42,9 @@ public class ItemPollsResource {
     public String help() {
         Map help = new LinkedHashMap();
 
-        help.put("polls/{key}", "Returns information about person with the given key.");
+        help.put("polls/last", "Get last key");
+        help.put("polls/{key}", "Returns information about poll with the given key.");
+        help.put("polls/raw/{key}", "Returns RAW in Base58 of poll with the given key.");
         help.put("polls/images/{key}", "get item Images by key");
         help.put("polls/listfrom/{start}", "get list from KEY");
         help.put("GET polls/issue {\"creator\":\"<creatorAddress>\", \"name\":\"<name>\", \"description\":\"<description>\", \"options\": [<optionOne>, <optionTwo>], \"feePow\":\"<feePow>\"}", "issue");
@@ -52,6 +55,12 @@ public class ItemPollsResource {
         help.put("polls/address/{address}", "Returns an array of all the polls owned by a specific address in your wallet.");
 
         return StrJSonFine.convert(help);
+    }
+
+    @GET
+    @Path("last")
+    public String last() {
+        return "" + DCSet.getInstance().getItemPollMap().getLastKey();
     }
 
     /**
@@ -81,6 +90,28 @@ public class ItemPollsResource {
         }
 
         return Controller.getInstance().getPoll(asLong).toJson().toJSONString();
+    }
+
+    @GET
+    @Path("raw/{key}")
+    public String getRAW(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemPollMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_POLL_NOT_EXIST);
+        }
+
+        ItemCls item = Controller.getInstance().getPoll(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Base58.encode(issueBytes);
     }
 
     /**

@@ -2,6 +2,7 @@ package org.erachain.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -22,13 +23,20 @@ public class ItemTemplatesResource {
     public String help() {
         Map help = new LinkedHashMap();
 
+        help.put("templates/last", "Get last key");
         help.put("templates/{key}", "get by KEY");
+        help.put("templates/raw/{key}", "Returns RAW in Base58 of template with the given key.");
         help.put("templates/images/{key}", "get item Images by key");
         help.put("templates/listfrom/{start}", "get list from KEY");
 
         //help.put("POST templates/issue", "issue");
 
         return StrJSonFine.convert(help);
+    }
+
+    @GET
+    public String last() {
+        return "" + DCSet.getInstance().getItemTemplateMap().getLastKey();
     }
 
     @GET
@@ -50,6 +58,28 @@ public class ItemTemplatesResource {
 
         ItemCls item = Controller.getInstance().getTemplate(asLong);
         return JSONValue.toJSONString(item.toJson());
+    }
+
+    @GET
+    @Path("raw/{key}")
+    public String getRAW(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemTemplateMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_TEMPLATE_NOT_EXIST);
+        }
+
+        ItemCls item = Controller.getInstance().getTemplate(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Base58.encode(issueBytes);
     }
 
     @GET

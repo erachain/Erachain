@@ -38,7 +38,9 @@ public class ItemAssetsResource {
     public String help() {
         Map help = new LinkedHashMap();
 
+        help.put("assets/last", "Get last key");
         help.put("assets/{key}", "Returns information about asset with the given key.");
+        help.put("assets/raw/{key}", "Returns RAW in Base58 of asset with the given key.");
         help.put("assets/images/{key}", "get item images by KEY");
         help.put("assets/listfrom/{start}", "get list from KEY");
         help.put("POST assets/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"scale\": \"<scale>\", \"assetType\": \"<assetType>\", \"quantity\": \"<quantity>\", \"password\": \"<password>\"}", "Issue Asset");
@@ -47,6 +49,12 @@ public class ItemAssetsResource {
         help.put("assets/balances/{key}", "get balances for key");
 
         return StrJSonFine.convert(help);
+    }
+
+    @GET
+    @Path("last")
+    public String last() {
+        return "" + DCSet.getInstance().getItemAssetMap().getLastKey();
     }
 
     /**
@@ -78,6 +86,28 @@ public class ItemAssetsResource {
         }
 
         return Controller.getInstance().getAsset(asLong).toJson().toJSONString();
+    }
+
+    @GET
+    @Path("raw/{key}")
+    public String getRAW(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemAssetMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        ItemCls item = Controller.getInstance().getAsset(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Base58.encode(issueBytes);
     }
 
     /**

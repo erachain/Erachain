@@ -1,6 +1,7 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -32,12 +33,20 @@ public class ItemPersonsResource {
     public String help() {
         Map help = new LinkedHashMap();
 
+        help.put("persons/last", "Get last key");
         help.put("persons/{key}", "Returns information about person with the given key.");
+        help.put("persons/raw/{key}", "Returns RAW in Base58 of person with the given key.");
         help.put("persons/images/{key}", "get item Images by key");
         help.put("persons/listfrom/{start}", "get list from KEY");
         help.put("POST persons/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": \"long\", \"deathday\": \"<long>\", \"gender\": \"<int>\", \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": ,     \"password\": \"<password>\"}", "issue");
 
         return StrJSonFine.convert(help);
+    }
+
+    @GET
+    @Path("last")
+    public String last() {
+        return "" + DCSet.getInstance().getItemPersonMap().getLastKey();
     }
 
     @GET
@@ -59,6 +68,28 @@ public class ItemPersonsResource {
 
         ItemCls item = Controller.getInstance().getPerson(asLong);
         return JSONValue.toJSONString(item.toJson());
+    }
+
+    @GET
+    @Path("raw/{key}")
+    public String getRAW(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        if (!DCSet.getInstance().getItemPersonMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
+        }
+
+        ItemCls item = Controller.getInstance().getPerson(asLong);
+        byte[] issueBytes = item.toBytes(false, false);
+        return Base58.encode(issueBytes);
     }
 
     @GET
