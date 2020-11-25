@@ -650,7 +650,8 @@ public class RSignNote extends Transaction implements Itemable {
                 add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH + this.data.length;
             }
 
-        if (this.key > 0 && getVersion() < 3)
+        if (forDeal == FOR_DB_RECORD
+                || this.key > 0 && getVersion() < 3)
             add_len += KEY_LENGTH;
 
         return base_len + add_len;

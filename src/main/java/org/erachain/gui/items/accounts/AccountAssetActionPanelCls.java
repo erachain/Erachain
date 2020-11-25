@@ -286,7 +286,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         setName(title + " ]" + asset.getKey() + " ]");
         jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition, senderIsOwner)));
 
-        this.jLabel_Account.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, balancePosition, senderIsOwner) + ":"));
+        this.jLabel_Account.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, balancePosition, senderIsOwner)) + ":");
 
         this.jLabel_To.setText(Lang.getInstance().translate(
                 asset.viewAssetTypeTarget(backward, balancePosition, recipientIsOwner) + " " + "Account") + ":");
