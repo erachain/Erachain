@@ -81,7 +81,7 @@ public class APIItemStatus {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(item.toJson()))
+                .entity(item.toJson())
                 .build();
 
     }
@@ -112,7 +112,7 @@ public class APIItemStatus {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(array))
+                .entity(array.toJSONString())
                 .build();
 
     }

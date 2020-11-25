@@ -272,7 +272,7 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public long getKey() {
-        if (typeBytes[1] > 1) {
+        if (this.key == 0 && typeBytes[1] > 1) {
             // если новый порядок - ключ в Данных
             return extendedData.getTemplateKey();
         }
@@ -419,12 +419,12 @@ public class RSignNote extends Transaction implements Itemable {
 
         byte[] data = super.toBytes(forDeal, withSignature);
 
-        if (typeBytes[1] < 3 && this.key > 0) {
+        if (forDeal == FOR_DB_RECORD
+                || typeBytes[1] < 3 && this.key > 0) {
             //WRITE KEY
             byte[] keyBytes = Longs.toByteArray(this.key);
             keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
             data = Bytes.concat(data, keyBytes);
-
         }
 
         if (this.data != null) {
@@ -520,7 +520,8 @@ public class RSignNote extends Transaction implements Itemable {
         //////// local parameters
 
         long key = 0L;
-        if (typeBytes[1] < 3 && hasTemplate(typeBytes)) {
+        if (forDeal == FOR_DB_RECORD
+                || typeBytes[1] < 3 && hasTemplate(typeBytes)) {
             //READ KEY
             byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
             key = Longs.fromByteArray(keyBytes);

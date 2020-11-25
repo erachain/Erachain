@@ -74,7 +74,7 @@ public class APIItemTemplate {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(item.toJson()))
+                .entity(item.toJson().toJSONString())
                 .build();
 
     }
@@ -105,7 +105,7 @@ public class APIItemTemplate {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(array))
+                .entity(array.toJSONString())
                 .build();
 
     }

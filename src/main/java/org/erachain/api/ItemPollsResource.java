@@ -11,6 +11,7 @@ import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.APIUtils;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -23,8 +24,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Path("polls")
 @Produces(MediaType.APPLICATION_JSON)
@@ -34,6 +36,92 @@ public class ItemPollsResource {
 
     @Context
     HttpServletRequest request;
+
+    @GET
+    public String help() {
+        Map help = new LinkedHashMap();
+
+        help.put("polls/{key}", "Returns information about person with the given key.");
+        help.put("polls/images/{key}", "get item Images by key");
+        help.put("polls/listfrom/{start}", "get list from KEY");
+        help.put("GET polls/issue {\"creator\":\"<creatorAddress>\", \"name\":\"<name>\", \"description\":\"<description>\", \"options\": [<optionOne>, <optionTwo>], \"feePow\":\"<feePow>\"}", "issue");
+        help.put("POST polls/issue {\"creator\":\"<creatorAddress>\", \"name\":\"<name>\", \"description\":\"<description>\", \"options\": [<optionOne>, <optionTwo>], \"feePow\":\"<feePow>\"}", "Used to create a new poll. Returns the transaction in JSON when successful.");
+        help.put("polls/vote/{key}/{option}/{voter}?feePow=feePow", "Used to vote on a poll with the given KEY. Returns the transaction in JSON when successful.");
+        help.put("POST polls/vote/{key} {\"voter\":\"<voterAddress>\", \"option\": \"<optionOne>\", \"feePow\":\"<feePow>\"}", "Used to vote on a poll with the given KEY. Returns the transaction in JSON when successful.");
+
+        help.put("polls/address/{address}", "Returns an array of all the polls owned by a specific address in your wallet.");
+
+        return StrJSonFine.convert(help);
+    }
+
+    /**
+     * Get lite information poll by key poll
+     *
+     * @param key is number poll
+     * @return JSON object. Single poll
+     */
+    @GET
+    @Path("/{key}")
+    public String get(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+
+        }
+
+        if (!DCSet.getInstance().getItemPollMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_POLL_NOT_EXIST);
+
+        }
+
+        return Controller.getInstance().getPoll(asLong).toJson().toJSONString();
+    }
+
+    /**
+     *
+     */
+    @GET
+    @Path("/images/{key}")
+    public String getImages(@PathParam("key") String key) {
+        Long asLong = null;
+
+        try {
+            asLong = Long.valueOf(key);
+
+        } catch (NumberFormatException e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+
+        }
+
+        if (!DCSet.getInstance().getItemPollMap().contains(asLong)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_POLL_NOT_EXIST);
+
+        }
+
+        return Controller.getInstance().getPoll(asLong).toJsonData().toJSONString();
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("listfrom/{start}")
+    public String getList(@PathParam("start") long start,
+                          @DefaultValue("20") @QueryParam("page") int page,
+                          @DefaultValue("true") @QueryParam("showperson") boolean showPerson,
+                          @DefaultValue("true") @QueryParam("desc") boolean descending) {
+
+        JSONObject output = new JSONObject();
+        ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.POLL_TYPE, start, page, output, showPerson, descending);
+
+        return output.toJSONString();
+    }
 
     /**
      * Create new poll.
@@ -48,7 +136,8 @@ public class ItemPollsResource {
 
     @POST
     @Consumes(MediaType.WILDCARD)
-    public String createPoll(String poll) {
+    @Path("issue")
+    public String issuePoll(String poll) {
 
         String password = null;
         APIUtils.askAPICallAllowed(password, "POST polls " + poll, request, true);
@@ -132,8 +221,8 @@ public class ItemPollsResource {
      */
 
     @GET
-    @Path("create")
-    public Response createPollGet(@QueryParam("poll") String poll) {
+    @Path("issue")
+    public Response issuePollGet(@QueryParam("poll") String poll) {
 
         String password = null;
         APIUtils.askAPICallAllowed(password, "GET polls " + poll, request, true);
@@ -279,9 +368,11 @@ public class ItemPollsResource {
      * @return
      */
     @GET
-    @Path("vote/{voter}")
-    public Response createPollVoteGet(@PathParam("voter") String voter, @QueryParam("feePow") Integer feePow,
-                                      @QueryParam("poll") long pollKey, @QueryParam("option") int option) {
+    @Path("vote/{key}/{option}/{voter}")
+    public Response createPollVoteGet(@PathParam("key") long pollKey, @PathParam("option") int option,
+                                      @PathParam("voter") String voter,
+                                      @QueryParam("feePow") Integer feePow
+    ) {
 
         String password = null;
         APIUtils.askAPICallAllowed(password, "GET polls/vote/" + pollKey + "\n", request, true);
@@ -321,39 +412,6 @@ public class ItemPollsResource {
         } else
             throw ApiErrorFactory.getInstance().createError(result);
 
-    }
-
-    @SuppressWarnings("unchecked")
-    @GET
-    @Path("listfrom/{start}")
-    public String getList(@PathParam("start") long start,
-                          @DefaultValue("20") @QueryParam("page") int page,
-                          @DefaultValue("true") @QueryParam("showperson") boolean showPerson,
-                          @DefaultValue("true") @QueryParam("desc") boolean descending) {
-
-        JSONObject output = new JSONObject();
-        ItemCls.makeJsonLitePage(DCSet.getInstance(), ItemCls.POLL_TYPE, start, page, output, showPerson, descending);
-
-        return output.toJSONString();
-    }
-
-    @SuppressWarnings("unchecked")
-    @GET
-    public String getPolls() {
-
-        //CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-        }
-
-        Collection<ItemCls> polls = Controller.getInstance().getAllItems(ItemCls.POLL_TYPE);
-        JSONArray array = new JSONArray();
-
-        for (ItemCls poll : polls) {
-            array.add(((PollCls) poll).toJson());
-        }
-
-        return array.toJSONString();
     }
 
     @SuppressWarnings("unchecked")

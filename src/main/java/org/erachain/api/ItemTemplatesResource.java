@@ -26,7 +26,7 @@ public class ItemTemplatesResource {
         help.put("templates/images/{key}", "get item Images by key");
         help.put("templates/listfrom/{start}", "get list from KEY");
 
-        help.put("POST templates/issue", "issue");
+        //help.put("POST templates/issue", "issue");
 
         return StrJSonFine.convert(help);
     }
