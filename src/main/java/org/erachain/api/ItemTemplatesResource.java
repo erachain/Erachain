@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.templates.TemplateFactory;
@@ -39,7 +41,7 @@ public class ItemTemplatesResource {
         help.put("templates/raw/{key}", "Returns RAW in Base58 of template with the given key.");
         help.put("templates/images/{key}", "get item Images by key");
         help.put("templates/listfrom/{start}", "get list from KEY");
-        help.put("POST templates/issueraw/{creator}?feePow=<int>&password=<String> ", "Issue Template by Base58 RAW in POST body");
+        help.put("POST templates/issueraw/{creator}?linkTo=<SeqNo>&feePow=<int>&password=<String> ", "Issue Template by Base58 RAW in POST body");
 
         //help.put("POST templates/issue", "issue");
 
@@ -133,6 +135,7 @@ public class ItemTemplatesResource {
     @POST
     @Path("issueraw/{creator}")
     public String issueRAW(String x, @PathParam("creator") String creator,
+                           @QueryParam("linkTo") String linkToRefStr,
                            @DefaultValue("0") @QueryParam("feePow") String feePowStr,
                            @QueryParam("password") String password) {
 
@@ -146,7 +149,20 @@ public class ItemTemplatesResource {
                     e.getMessage());
         }
 
-        Transaction transaction = cntr.issueTemplate(result.a, result.b, item);
+        ExLink linkTo;
+        if (linkToRefStr == null)
+            linkTo = null;
+        else {
+            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
+            if (linkToRef == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+            } else {
+                linkTo = new ExLinkSource(linkToRef, null);
+            }
+        }
+
+        Transaction transaction = cntr.issueTemplate(result.a, linkTo, result.b, item);
         int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
         if (validate == Transaction.VALIDATE_OK)

@@ -224,7 +224,7 @@ public class ItemPersonsResource {
                                 @PathParam("person") Long personKey,
                                 @QueryParam("pubkey") String pubkeyStr,
                                 @DefaultValue("1") @QueryParam("days") Integer addDays,
-                                @QueryParam("linkTo") String exLinkRefStr,
+                                @QueryParam("linkTo") String linkToRefStr,
                                 @DefaultValue("0") @QueryParam("feePow") int feePow,
                                 @QueryParam("password") String password) {
 
@@ -235,16 +235,16 @@ public class ItemPersonsResource {
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
-        ExLink exLink;
-        if (exLinkRefStr == null)
-            exLink = null;
+        ExLink linkTo;
+        if (linkToRefStr == null)
+            linkTo = null;
         else {
-            Long exLinkRef = Transaction.parseDBRef(exLinkRefStr);
-            if (exLinkRef == null) {
+            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
+            if (linkToRef == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
             } else {
-                exLink = new ExLinkSource(exLinkRef, null);
+                linkTo = new ExLinkSource(linkToRef, null);
             }
         }
 
@@ -264,7 +264,7 @@ public class ItemPersonsResource {
         APIUtils.askAPICallAllowed(password, "GET certify\n ", request, true);
         PrivateKeyAccount creator = APIUtils.getPrivateKeyCreator(creatorStr);
 
-        Transaction transaction = cntr.r_CertifyPubKeysPerson(0, creator, exLink, feePow, personKey, pubKey, addDays);
+        Transaction transaction = cntr.r_CertifyPubKeysPerson(0, creator, linkTo, feePow, personKey, pubKey, addDays);
         Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
         // CHECK VALIDATE MESSAGE

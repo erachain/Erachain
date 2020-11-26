@@ -14,8 +14,8 @@ public class IssuePollRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_POLL_TRANSACTION;
     private static final String NAME_ID = "Issue Poll";
 
-    public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, poll, feePow, timestamp, reference);
+    public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, NAME_ID, creator, linkTo, poll, feePow, timestamp, reference);
     }
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -42,12 +42,12 @@ public class IssuePollRecord extends IssueItemRecord {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, (byte) 0, 0l, null, signature);
     }
 
-    public IssuePollRecord(PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, feePow, timestamp, reference);
+    public IssuePollRecord(PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, poll, feePow, timestamp, reference);
     }
 
     public IssuePollRecord(PublicKeyAccount creator, PollCls poll) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, (byte) 0, 0l, null);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, poll, (byte) 0, 0l, null);
     }
 
     //GETTERS/SETTERS

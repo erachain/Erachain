@@ -121,7 +121,7 @@ public class TestRecPoll {
         poll = new Poll(certifier, "РСФСР", icon, image, "Россия", options);
 
         //CREATE ISSUE POLL TRANSACTION
-        issuePollTransaction = new IssuePollRecord(certifier, poll, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0]);
+        issuePollTransaction = new IssuePollRecord(certifier, null, poll, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0]);
         issuePollTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
 

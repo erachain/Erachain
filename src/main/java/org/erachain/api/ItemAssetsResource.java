@@ -183,7 +183,7 @@ public class ItemAssetsResource {
     @POST
     @Path("issueraw/{creator}")
     public String issueRAW(String x, @PathParam("creator") String creator,
-                           @QueryParam("linkTo") String exLinkRefStr,
+                           @QueryParam("linkTo") String linkToRefStr,
                            @DefaultValue("0") @QueryParam("feePow") String feePowStr,
                            @QueryParam("password") String password) {
 
@@ -200,15 +200,15 @@ public class ItemAssetsResource {
         }
 
         ExLink linkTo;
-        if (exLinkRefStr == null)
+        if (linkToRefStr == null)
             linkTo = null;
         else {
-            Long exLinkRef = Transaction.parseDBRef(exLinkRefStr);
-            if (exLinkRef == null) {
+            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
+            if (linkToRef == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
             } else {
-                linkTo = new ExLinkSource(exLinkRef, null);
+                linkTo = new ExLinkSource(linkToRef, null);
             }
         }
 

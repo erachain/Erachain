@@ -17,8 +17,8 @@ public class IssueTemplateRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_TEMPLATE_TRANSACTION;
     private static final String NAME_ID = "Issue Template";
 
-    public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, template, feePow, timestamp, reference);
+    public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, NAME_ID, creator, linkTo, template, feePow, timestamp, reference);
     }
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -45,12 +45,12 @@ public class IssueTemplateRecord extends IssueItemRecord {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, template, (byte) 0, 0l, null, signature);
     }
 
-    public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, template, feePow, timestamp, reference);
+    public IssueTemplateRecord(PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, template, feePow, timestamp, reference);
     }
 
     public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, template, (byte) 0, 0l, null);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, (byte) 0, 0l, null);
     }
 
     //GETTERS/SETTERS
