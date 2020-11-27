@@ -52,22 +52,6 @@ public class MyBalanceTab extends SplitPanel {
         //POLLS SORTER
         RowSorter sorter = new TableRowSorter(balancesModel);
         table.setRowSorter(sorter);
-//	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-//	CoreRowSorter sorter = new CoreRowSorter(assetsModel, indexes);
-//	table.setRowSorter(sorter);
-
-        //CHECKBOX FOR DIVISIBLE
-//	TableColumn divisibleColumn = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_DIVISIBLE);
-//	divisibleColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-
-        //CHECKBOX FOR CONFIRMED
-//	TableColumn confirmedColumn = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_CONFIRMED);
-//	confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-
-        //CHECKBOX FOR FAVORITE
-//	TableColumn favoriteColumn = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_FAVORITE);
-//	favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-
 
         // column #1
         TableColumn column0 = table.getColumnModel().getColumn(BalanceFromAddressTableModel.COLUMN_ASSET_NAME);//.COLUMN_CONFIRMED);
@@ -201,19 +185,17 @@ public class MyBalanceTab extends SplitPanel {
 
         });
 
-
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
         sell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = balancesModel.getAsset(row);
-                String account = balancesModel.getAccount(row);
+                //String account = balancesModel.getAccount(row);
                 MainPanel.getInstance().insertTab(
-                        new ExchangePanel(asset, null, "To sell", account));
+                        new ExchangePanel(asset, null, "To sell", null));
 
 
             }
         });
-
 
         JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
         excahge.addActionListener(new ActionListener() {
@@ -225,7 +207,6 @@ public class MyBalanceTab extends SplitPanel {
             }
         });
         assetsMenu.add(excahge);
-
 
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
@@ -266,47 +247,20 @@ public class MyBalanceTab extends SplitPanel {
                                                 row = table.convertRowIndexToModel(row);
                                                 Class<? extends Object> order = balancesModel.getColumnClass(row);
 
-                                                //IF ASSET CONFIRMED AND NOT ERM
-			/*
-				favorite.setVisible(true);
-				//CHECK IF FAVORITES
-				if(Controller.getInstance().isItemFavorite(order))
-				{
-					favorite.setText(Lang.getInstance().translate("Remove Favorite"));
-				}
-				else
-				{
-					favorite.setText(Lang.getInstance().translate("Add Favorite"));
-				}
-				/*	
-				//this.favoritesButton.setPreferredSize(new Dimension(200, 25));
-				this.favoritesButton.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						onFavoriteClick();
-					}
-				});	
-				this.add(this.favoritesButton, labelGBC);
-				*/
-
-
                                             }
 
                                         }
 
         );
 
-
         JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
         details.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                //		AssetCls asset = assetsModel.getAsset(row);
-//			new AssetFrame(asset);
             }
         });
-//	assetsMenu.add(details);
+
+        //	assetsMenu.add(details);
         JMenuItem dividend = new JMenuItem(Lang.getInstance().translate("Pay dividend"));
         dividend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -316,7 +270,7 @@ public class MyBalanceTab extends SplitPanel {
             }
         });
         assetsMenu.add(dividend);
-     //   table.setComponentPopupMenu(assetsMenu);
+        //   table.setComponentPopupMenu(assetsMenu);
         TableMenuPopupUtil.installContextMenu(table, assetsMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
 
@@ -336,28 +290,6 @@ public class MyBalanceTab extends SplitPanel {
                 Point p = e.getPoint();
                 int row = table.rowAtPoint(p);
                 table.setRowSelectionInterval(row, row);
-	/*		
-			if(e.getClickCount() == 2)
-			{
-				row = table.convertRowIndexToModel(row);
-				AssetCls asset = assetsModel.getAsset(row);
-				new AssetFrame(asset);
-			}
-			if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
-			{
-				
-				if (table.getSelectedColumn() == WalletItemAssetsTableModel.COLUMN_FAVORITE){
-					row = table.convertRowIndexToModel(row);
-					AssetCls asset = orderModel.getAsset(row);
-					favoriteSet( table);
-					
-					
-					
-				}
-				
-				
-			}
-			*/
             }
         });
 
@@ -383,28 +315,6 @@ public class MyBalanceTab extends SplitPanel {
         int row = assetsTable.getSelectedRow();
         row = assetsTable.convertRowIndexToModel(row);
 
-//Order order = ordersModel.getOrder(row);
-//new AssetPairSelect(asset.getKey());
-/*
-if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
-{
-	//CHECK IF FAVORITES
-	if(Controller.getInstance().isItemFavorite(asset))
-	{
-		
-		Controller.getInstance().removeItemFavorite(asset);
-	}
-	else
-	{
-		
-		Controller.getInstance().addItemFavorite(asset);
-	}
-		
-
-	assetsTable.repaint();
-
-}
-*/
     }
 
     //listener select row
@@ -415,14 +325,10 @@ if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
             if (table.getSelectedRow() >= 0)
                 asset = balancesModel.getAsset(table.convertRowIndexToModel(table.getSelectedRow()));
             if (asset == null) return;
-            //AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
-            //info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
             int div = jSplitPanel.getDividerLocation();
             int or = jSplitPanel.getOrientation();
             AssetInfo info_panel = new AssetInfo(asset, false);
-            //info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
-            //jSplitPanel.setRightComponent(info_panel);
             jSplitPanel.setDividerLocation(div);
             jSplitPanel.setOrientation(or);
 
