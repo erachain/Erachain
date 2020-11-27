@@ -57,7 +57,6 @@ public abstract class IssueItemPanel extends IconPanel {
                 0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL);
         addLogoIconLabel.setBorder(null);
 //
-        initComponents();
         titleJLabel.setFont(FONT_TITLE);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);

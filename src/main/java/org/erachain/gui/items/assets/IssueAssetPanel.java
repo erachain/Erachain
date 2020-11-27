@@ -70,7 +70,6 @@ public class IssueAssetPanel extends IssueItemPanel {
 
     }
 
-
     protected void initComponents() {
 
         super.initComponents();
@@ -81,14 +80,12 @@ public class IssueAssetPanel extends IssueItemPanel {
         layout.rowHeights = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
         setLayout(layout);
 
-
         typeJLabel.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         add(typeJLabel, gridBagConstraints);
-
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
@@ -100,13 +97,11 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(assetTypeJComboBox, gridBagConstraints);
 
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 14;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         add(quantityJLabel, gridBagConstraints);
-
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 22;
@@ -114,7 +109,6 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(4, 0, 0, 0);
         add(scaleJLabel, gridBagConstraints);
-
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
@@ -135,13 +129,11 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 7);
         add(textScale, gridBagConstraints);
 
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 12;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         add(jLabelItem1, gridBagConstraints);
-
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
@@ -152,13 +144,11 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(jTextFieldItem1, gridBagConstraints);
 
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 16;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         add(jLabelReference, gridBagConstraints);
-
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
