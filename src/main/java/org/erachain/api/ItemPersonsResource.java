@@ -2,7 +2,10 @@ package org.erachain.api;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
@@ -43,8 +46,11 @@ public class ItemPersonsResource {
         help.put("persons/raw/{key}", "Returns RAW in Base58 of person with the given key.");
         help.put("persons/images/{key}", "get item Images by key");
         help.put("persons/listfrom/{start}", "get list from KEY");
-        help.put("POST persons/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": \"long\", \"deathday\": \"<long>\", \"gender\": \"<int>\", \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": ,     \"password\": \"<password>\"}", "issue");
-        help.put("POST persons/issueraw/{creator}?feePow=<int>&password=<String> ", "Issue Person by Base58 RAW in POST body");
+        help.put("POST persons/issue {\"linkTo\": \"<SeqNo>\", \"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": \"long\", \"deathday\": \"<long>\", \"gender\": \"<int>\", \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": , \"password\": \"<password>\"}", "issue");
+        help.put("POST persons/issueraw/{creator}?linkTo=<SeqNo>&feePow=<int>&password=<String> ", "Issue Person by Base58 RAW in POST body");
+
+        help.put("persons/certify/{creator}/{personKey}?pubkey=<Base58>&feePow=<int>&linkTo=<SeqNo>&days<int>&password=<String>", "Certify some public key for Person by it key. Default: pubKey is owner from Person, feePow=0, days=1");
+
 
         return StrJSonFine.convert(help);
     }
@@ -134,7 +140,7 @@ public class ItemPersonsResource {
     }
 
     @POST
-    @Path("/issue")
+    @Path("issue")
     public String issue(String x) {
 
         Controller cntr = Controller.getInstance();
@@ -165,6 +171,7 @@ public class ItemPersonsResource {
     @POST
     @Path("issueraw/{creator}")
     public String issueRAW(String x, @PathParam("creator") String creator,
+                           @QueryParam("linkTo") String linkToRefStr,
                            @DefaultValue("0") @QueryParam("feePow") String feePowStr,
                            @QueryParam("password") String password) {
 
@@ -178,7 +185,20 @@ public class ItemPersonsResource {
                     e.getMessage());
         }
 
-        Pair<Transaction, Integer> transactionResult = cntr.issuePerson(result.a, result.b, item);
+        ExLink linkTo;
+        if (linkToRefStr == null)
+            linkTo = null;
+        else {
+            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
+            if (linkToRef == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+            } else {
+                linkTo = new ExLinkSource(linkToRef, null);
+            }
+        }
+
+        Pair<Transaction, Integer> transactionResult = cntr.issuePerson(result.a, linkTo, result.b, item);
         if (transactionResult.getB() != Transaction.VALIDATE_OK) {
             throw ApiErrorFactory.getInstance().createError(
                     transactionResult.getB());
@@ -194,6 +214,66 @@ public class ItemPersonsResource {
             Transaction.updateMapByErrorSimple(validate, out);
             return out.toJSONString();
         }
+    }
+
+    @GET
+    // @Consumes(MediaType.WILDCARD)
+    //@Produces("text/plain")
+    @Path("certify/{creator}/{person}")
+    public String certifyPubkey(@PathParam("creator") String creatorStr,
+                                @PathParam("person") Long personKey,
+                                @QueryParam("pubkey") String pubkeyStr,
+                                @DefaultValue("1") @QueryParam("days") Integer addDays,
+                                @QueryParam("linkTo") String linkToRefStr,
+                                @DefaultValue("0") @QueryParam("feePow") int feePow,
+                                @QueryParam("password") String password) {
+
+        Controller cntr = Controller.getInstance();
+
+        if (!DCSet.getInstance().getItemPersonMap().contains(personKey)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
+        }
+
+        ExLink linkTo;
+        if (linkToRefStr == null)
+            linkTo = null;
+        else {
+            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
+            if (linkToRef == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+            } else {
+                linkTo = new ExLinkSource(linkToRef, null);
+            }
+        }
+
+        PublicKeyAccount pubKey;
+        if (pubkeyStr == null) {
+            // by Default - from Person
+            PersonCls person = cntr.getPerson(personKey);
+            pubKey = person.getOwner();
+        } else {
+            if (!PublicKeyAccount.isValidPublicKey(pubkeyStr)) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.INVALID_PUBLIC_KEY);
+            }
+            pubKey = new PublicKeyAccount(pubkeyStr);
+        }
+
+        APIUtils.askAPICallAllowed(password, "GET certify\n ", request, true);
+        PrivateKeyAccount creator = APIUtils.getPrivateKeyCreator(creatorStr);
+
+        Transaction transaction = cntr.r_CertifyPubKeysPerson(0, creator, linkTo, feePow, personKey, pubKey, addDays);
+        Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+
+        // CHECK VALIDATE MESSAGE
+        if (result == Transaction.VALIDATE_OK) {
+            return transaction.toJson().toJSONString();
+        }
+
+        return transaction.makeErrorJSON(result).toJSONString();
+
     }
 
 

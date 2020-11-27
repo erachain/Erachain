@@ -193,7 +193,7 @@ public class RCertifyPubKeysTest {
 
         //person.setKey(genesisPersonKey + 1);
         //CREATE ISSUE PERSON TRANSACTION
-        issuePersonTransaction = new IssuePersonRecord(registrar, person, FEE_POWER, timestamp, registrar.getLastTimestamp(dcSet)[0]);
+        issuePersonTransaction = new IssuePersonRecord(registrar, person, FEE_POWER, timestamp, registrar.getLastTimestamp(dcSet)[0], null);
 
         if (certifiedPrivateKeys.isEmpty()) {
             certifiedPrivateKeys.add(userAccount1);

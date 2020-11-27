@@ -319,7 +319,7 @@ public class IssueAssetPanel extends IconPanel {
             int assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
 
             IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
-                    creator, textName.getText(), textAreaDescription.getText(), addLogoIconLabel.getImgBytes(),
+                    creator, null, textName.getText(), textAreaDescription.getText(), addLogoIconLabel.getImgBytes(),
                     addImageLabel.getImgBytes(), scale, assetType, quantity, feePow);
 
             AssetCls asset = (AssetCls) issueAssetTransaction.getItem();

@@ -4,6 +4,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.datachain.DCSet;
@@ -23,8 +24,8 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     //private AssetCls asset;
 
-    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference);
+    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, AssetCls asset, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, NAME_ID, creator, exLink, asset, feePow, timestamp, reference);
     }
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -53,8 +54,8 @@ public class IssueAssetTransaction extends IssueItemRecord {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, asset, (byte) 0, 0l, reference, signature);
     }
 
-    public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, asset, feePow, timestamp, reference);
+    public IssueAssetTransaction(PublicKeyAccount creator, ExLink exLink, AssetCls asset, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, exLink, asset, feePow, timestamp, reference);
     }
 
     //GETTERS/SETTERS
@@ -209,6 +210,14 @@ public class IssueAssetTransaction extends IssueItemRecord {
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
         PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
         position += CREATOR_LENGTH;
+
+        ExLink exLink;
+        if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
+            exLink = ExLink.parse(data, position);
+            position += exLink.length();
+        } else {
+            exLink = null;
+        }
 
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {

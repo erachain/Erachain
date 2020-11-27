@@ -8,6 +8,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
@@ -123,9 +124,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     protected AssetCls asset;
 
     // need for calculate fee by feePow into GUI
-    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient,
+    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, byte feePow, Account recipient,
                                 BigDecimal amount, long key, long timestamp, Long reference) {
-        super(typeBytes, name, creator, feePow, timestamp, reference);
+        super(typeBytes, name, creator, exLink, feePow, timestamp, reference);
         this.recipient = recipient;
 
         if (amount == null || amount.equals(BigDecimal.ZERO)) {
@@ -143,7 +144,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     // need for calculate fee
     protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient,
                                 BigDecimal amount, long key, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, name, creator, feePow, recipient, amount, key, timestamp, reference);
+        this(typeBytes, name, creator, null, feePow, recipient, amount, key, timestamp, reference);
         this.signature = signature;
     }
 

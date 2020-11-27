@@ -88,7 +88,7 @@ public class TestRecTemplate {
         template = new Template(maker, "test132", icon, image, "12345678910strontje");
 
         //CREATE ISSUE PLATE TRANSACTION
-        issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
+        issueTemplateRecord = new IssueTemplateRecord(maker, null, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueTemplateRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueTemplateRecord.sign(maker, Transaction.FOR_NETWORK);
         if (process) {
@@ -134,7 +134,7 @@ public class TestRecTemplate {
         assertEquals(raw.length, template.getDataLength(false));
 
         //CREATE ISSUE PLATE TRANSACTION
-        IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
+        IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, null, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueTemplateRecord.sign(maker, Transaction.FOR_NETWORK);
         issueTemplateRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueTemplateRecord.process(gb, Transaction.FOR_NETWORK);
@@ -192,7 +192,7 @@ public class TestRecTemplate {
         Template template = new Template(maker, "test", icon, image, "strontje");
 
         //CREATE ISSUE PLATE TRANSACTION
-        IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
+        IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, null, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueTemplateRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(Transaction.FOR_NETWORK, flags));
 
@@ -207,7 +207,7 @@ public class TestRecTemplate {
         assertEquals(true, templateMap.contains(key));
 
         TemplateCls template_2 = new Template(maker, "test132_2", icon, image, "2_12345678910strontje");
-        IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, template_2, FEE_POWER, timestamp + 10, maker.getLastTimestamp(db)[0]);
+        IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, null, template_2, FEE_POWER, timestamp + 10, maker.getLastTimestamp(db)[0]);
         issueTemplateTransaction_2.sign(maker, Transaction.FOR_NETWORK);
         issueTemplateTransaction_2.process(gb, Transaction.FOR_NETWORK);
         LOGGER.info("template_2 KEY: " + template_2.getKey(db));
@@ -233,7 +233,7 @@ public class TestRecTemplate {
         Template template = new Template(maker, "test", icon, image, "strontje");
 
         //CREATE ISSUE PLATE TRANSACTION
-        IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
+        IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, null, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueTemplateRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueTemplateRecord.sign(maker, Transaction.FOR_NETWORK);
         issueTemplateRecord.process(gb, Transaction.FOR_NETWORK);

@@ -20,6 +20,7 @@ import org.erachain.core.crypto.Base32;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
@@ -3061,6 +3062,20 @@ public class Controller extends Observable {
             image = java.util.Base64.getDecoder().decode(image64);
         }
 
+        String linkToRefStr = jsonObject.get("linkTo").toString();
+        ExLink linkTo;
+        if (linkToRefStr == null)
+            linkTo = null;
+        else {
+            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
+            if (linkToRef == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+            } else {
+                linkTo = new ExLinkSource(linkToRef, null);
+            }
+        }
+
         Integer scale = (Integer) jsonObject.getOrDefault("scale", 0);
         Integer assetType = (Integer) jsonObject.getOrDefault("assetType", 0);
         Long quantity = (Long) jsonObject.getOrDefault("quantity", 0L);
@@ -3069,23 +3084,23 @@ public class Controller extends Observable {
         PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
 
         return issueAsset(creatorPrivate,
-                name, description, icon, image, scale,
+                linkTo, name, description, icon, image, scale,
                 assetType, quantity, feePow);
 
     }
 
-    public Transaction issueAsset(PrivateKeyAccount creator, int feePow, AssetCls asset) {
+    public Transaction issueAsset(PrivateKeyAccount creator, ExLink linkTo, int feePow, AssetCls asset) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueAssetTransaction(creator, asset, feePow);
+            return this.transactionCreator.createIssueAssetTransaction(creator, linkTo, asset, feePow);
         }
     }
 
-    public Transaction issueAsset(PrivateKeyAccount creator, String name, String description, byte[] icon, byte[] image,
+    public Transaction issueAsset(PrivateKeyAccount creator, ExLink linkTo, String name, String description, byte[] icon, byte[] image,
                                   int scale, int assetType, long quantity, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueAssetTransaction(creator, name, description, icon, image, scale,
+            return this.transactionCreator.createIssueAssetTransaction(creator, linkTo, name, description, icon, image, scale,
                     assetType, quantity, feePow);
         }
     }
@@ -3138,6 +3153,20 @@ public class Controller extends Observable {
             return new Fun.Tuple2<>(error, OnDealClick.resultMess(error));
         }
 
+        String linkToRefStr = jsonObject.get("linkTo").toString();
+        ExLink linkTo;
+        if (linkToRefStr == null)
+            linkTo = null;
+        else {
+            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
+            if (linkToRef == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+            } else {
+                linkTo = new ExLinkSource(linkToRef, null);
+            }
+        }
+
         String name = (String) jsonObject.getOrDefault("name", null);
         String description = (String) jsonObject.getOrDefault("description", null);
 
@@ -3188,37 +3217,37 @@ public class Controller extends Observable {
                 skinColor, eyeColor, hairСolor, height, icon, image, description,
                 ownerSignature);
 
-        return issuePerson(creatorPrivate, feePow, person);
+        return issuePerson(creatorPrivate, linkTo, feePow, person);
 
     }
 
-    public Pair<Transaction, Integer> issuePerson(PrivateKeyAccount creator, int feePow, PersonCls person) {
+    public Pair<Transaction, Integer> issuePerson(PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonCls person) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssuePersonTransaction(creator, feePow, person);
+            return this.transactionCreator.createIssuePersonTransaction(creator, linkTo, feePow, person);
         }
     }
 
-    public Transaction issuePoll(PrivateKeyAccount creator, int feePow, PollCls poll) {
+    public Transaction issuePoll(PrivateKeyAccount creator, ExLink linkTo, int feePow, PollCls poll) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssuePollTransaction(creator, feePow, poll);
+            return this.transactionCreator.createIssuePollTransaction(creator, linkTo, feePow, poll);
         }
     }
 
-    public Transaction issuePoll(PrivateKeyAccount creator, String name, String description, List<String> options,
+    public Transaction issuePoll(PrivateKeyAccount creator, ExLink linkTo, String name, String description, List<String> options,
                                  byte[] icon, byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssuePollTransaction(creator, name, description, icon, image, options,
+            return this.transactionCreator.createIssuePollTransaction(creator, linkTo, name, description, icon, image, options,
                     feePow);
         }
     }
 
-    public Transaction issueStatus(PrivateKeyAccount creator, int feePow, StatusCls status) {
+    public Transaction issueStatus(PrivateKeyAccount creator, ExLink linkTo, int feePow, StatusCls status) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueStatusTransaction(creator, feePow, status);
+            return this.transactionCreator.createIssueStatusTransaction(creator, linkTo, feePow, status);
         }
     }
 
@@ -3231,10 +3260,10 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction issueTemplate(PrivateKeyAccount creator, int feePow, TemplateCls template) {
+    public Transaction issueTemplate(PrivateKeyAccount creator, ExLink linkTo, int feePow, TemplateCls template) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueTemplateTransaction(creator, feePow, template);
+            return this.transactionCreator.createIssueTemplateTransaction(creator, linkTo, feePow, template);
         }
     }
 
@@ -3306,7 +3335,7 @@ public class Controller extends Observable {
         }
     }
 
-    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink exLink, String recipientStr,
+    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink linkTo, String recipientStr,
                                                   int feePow, long assetKey, boolean checkAsset, BigDecimal amount, boolean needAmount,
                                                   String title, String message, int messagecode, boolean encrypt, long timestamp) {
 
@@ -3421,26 +3450,26 @@ public class Controller extends Observable {
         }
 
         // CREATE RSend
-        return new Pair<Integer, Transaction>(Transaction.VALIDATE_OK, this.r_Send(privateKeyAccount, exLink, feePow, recipient,
+        return new Pair<Integer, Transaction>(Transaction.VALIDATE_OK, this.r_Send(privateKeyAccount, linkTo, feePow, recipient,
                 assetKey, amount, title, messageBytes, isTextByte, encrypted, timestamp));
 
     }
 
-    public Transaction r_Send(PrivateKeyAccount sender, ExLink exLink, int feePow,
+    public Transaction r_Send(PrivateKeyAccount sender, ExLink linkTo, int feePow,
                               Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage, long timestamp) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Send(sender, exLink, recipient, key, amount, feePow, title, message, isText,
+            return this.transactionCreator.r_Send(sender, linkTo, recipient, key, amount, feePow, title, message, isText,
                     encryptMessage, timestamp);
         }
     }
 
     public Transaction r_Send(byte version, byte property1, byte property2,
-                              PrivateKeyAccount sender, ExLink exLink, int feePow,
+                              PrivateKeyAccount sender, ExLink linkTo, int feePow,
                               Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount, exLink, feePow,
+            return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount, linkTo, feePow,
                     title, message, isText, encryptMessage);
         }
     }
@@ -3450,6 +3479,14 @@ public class Controller extends Observable {
         synchronized (this.transactionCreator) {
             return this.transactionCreator.r_SignNote(version, property1, property2, forDeal, sender, feePow, key,
                     message);
+        }
+    }
+
+    public Transaction r_CertifyPubKeysPerson(int version, PrivateKeyAccount creator, ExLink linkTo,
+                                              int feePow, long key, PublicKeyAccount publicKey, int add_day) {
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.r_CertifyPubKeysPerson(version, creator, linkTo, feePow, key, publicKey,
+                    add_day);
         }
     }
 

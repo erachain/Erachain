@@ -3,6 +3,7 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.statuses.StatusFactory;
 
@@ -17,8 +18,8 @@ public class IssueStatusRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_STATUS_TRANSACTION;
     private static final String NAME_ID = "Issue Status";
 
-    public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, status, feePow, timestamp, reference);
+    public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, StatusCls status, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, NAME_ID, creator, linkTo, status, feePow, timestamp, reference);
     }
 
     public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -42,15 +43,15 @@ public class IssueStatusRecord extends IssueItemRecord {
     }
 
     public IssueStatusRecord(PublicKeyAccount creator, StatusCls status, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, status, (byte) 0, 0l, null, signature);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, status, (byte) 0, 0L, null, signature);
     }
 
-    public IssueStatusRecord(PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, status, feePow, timestamp, reference);
+    public IssueStatusRecord(PublicKeyAccount creator, ExLink linkTo, StatusCls status, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, status, feePow, timestamp, reference);
     }
 
     public IssueStatusRecord(PublicKeyAccount creator, StatusCls status) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, status, (byte) 0, 0l, null);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, status, (byte) 0, 0L, null);
     }
 
     //GETTERS/SETTERS
@@ -93,6 +94,14 @@ public class IssueStatusRecord extends IssueItemRecord {
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
         PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
         position += CREATOR_LENGTH;
+
+        ExLink exLink;
+        if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
+            exLink = ExLink.parse(data, position);
+            position += exLink.length();
+        } else {
+            exLink = null;
+        }
 
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {
