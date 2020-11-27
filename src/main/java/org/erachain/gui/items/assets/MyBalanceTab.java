@@ -365,7 +365,8 @@ public class MyBalanceTab extends SplitPanel {
     }
 
     public void onIssueClick() {
-        new IssueAssetFrame();
+        MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Issue Asset"),
+                new IssueAssetPanel());
     }
 
     public void onAllClick() {
