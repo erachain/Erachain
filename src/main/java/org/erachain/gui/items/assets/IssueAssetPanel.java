@@ -36,16 +36,11 @@ public class IssueAssetPanel extends IssueItemPanel {
     private JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
     private JComboBox<String> textScale = new JComboBox<>();
 
-    // description asset type
     private JTextArea textareasAssetTypeDescription = new JTextArea();
     private MDecimalFormatedTextField textQuantity = new MDecimalFormatedTextField();
 
     private AssetTypesComboBoxModel assetTypesComboBoxModel;
-    private javax.swing.JTextField jTextFieldReference = new JTextField();
-    private javax.swing.JLabel jLabelReference = new JLabel(Lang.getInstance().translate("Reference") + ":");
-    private javax.swing.JTextField jTextFieldItem1 = new JTextField();
-    private javax.swing.JLabel jLabelItem1 = new JLabel(Lang.getInstance().translate("item1") + ":");
-    // description asset type
+
 
 
     public IssueAssetPanel() {
@@ -76,97 +71,85 @@ public class IssueAssetPanel extends IssueItemPanel {
     protected void initComponents() {
 
         super.initComponents();
+
         // insert asset issue info
         // grid x - 4...26
         // y -  3 ....29
-
-
-       /*
         GridBagConstraints gridBagConstraints;
-        java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
-        layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
-        layout.rowHeights = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
-        setLayout(layout);
-
-        typeJLabel.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        add(typeJLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 19;
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanelMain.add(typeJLabel, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 20;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.4;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        add(assetTypeJComboBox, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
+        jPanelMain.add(assetTypeJComboBox, gridBagConstraints);
+
+        JScrollPane scrollPaneAssetTypeDescription = new JScrollPane();
+
+        textareasAssetTypeDescription.setColumns(20);
+        textareasAssetTypeDescription.setRows(5);
+        textareasAssetTypeDescription.setLineWrap(true);
+        scrollPaneAssetTypeDescription.setViewportView(textareasAssetTypeDescription);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        add(quantityJLabel, gridBagConstraints);
+        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 20;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.4;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
+        jPanelMain.add(textareasAssetTypeDescription, gridBagConstraints);
+
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 22;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(4, 0, 0, 0);
-        add(scaleJLabel, gridBagConstraints);
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanelMain.add(quantityJLabel, gridBagConstraints);
+
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 9;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        add(textQuantity, gridBagConstraints);
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanelMain.add(textQuantity, gridBagConstraints);
+
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 24;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 7);
-        add(textScale, gridBagConstraints);
+        gridBagConstraints.gridx = 17;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanelMain.add(scaleJLabel, gridBagConstraints);
+
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 12;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        add(jLabelItem1, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 12;
-        gridBagConstraints.gridwidth = 19;
+        gridBagConstraints.gridx = 19;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        add(jTextFieldItem1, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
+        jPanelMain.add(textScale, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 16;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        add(jLabelReference, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 16;
-        gridBagConstraints.gridwidth = 19;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        add(jTextFieldReference, gridBagConstraints);
-        */
     }
 
     public void onIssueClick() {
