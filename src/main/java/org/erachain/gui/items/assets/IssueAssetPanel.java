@@ -45,6 +45,8 @@ public class IssueAssetPanel extends IssueItemPanel {
     private javax.swing.JLabel jLabelReference = new JLabel(Lang.getInstance().translate("Reference") + ":");
     private javax.swing.JTextField jTextFieldItem1 = new JTextField();
     private javax.swing.JLabel jLabelItem1 = new JLabel(Lang.getInstance().translate("item1") + ":");
+    // description asset type
+
 
     public IssueAssetPanel() {
         super(NAME, TITLE);
@@ -54,6 +56,7 @@ public class IssueAssetPanel extends IssueItemPanel {
         textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
         textScale.setSelectedIndex(8);
 //
+
         initComponents();
         textQuantity.setMaskType(textQuantity.maskLong);
         textQuantity.setText("0");
@@ -73,7 +76,12 @@ public class IssueAssetPanel extends IssueItemPanel {
     protected void initComponents() {
 
         super.initComponents();
+        // insert asset issue info
+        // grid x - 4...26
+        // y -  3 ....29
 
+
+       /*
         GridBagConstraints gridBagConstraints;
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
         layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
@@ -158,6 +166,7 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(jTextFieldReference, gridBagConstraints);
+        */
     }
 
     public void onIssueClick() {
