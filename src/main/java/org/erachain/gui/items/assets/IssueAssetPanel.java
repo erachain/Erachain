@@ -85,7 +85,6 @@ public class IssueAssetPanel extends IconPanel {
         // set start text area asset type
         textareasAssetTypeDescription.setText(((AssetType) assetTypesComboBoxModel.getSelectedItem()).getDescription());
 
-
     }
 
     private void initComponents() {
