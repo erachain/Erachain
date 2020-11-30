@@ -94,7 +94,7 @@ public class TestRecSendMovable {
         if (withIssue) {
     
             //CREATE ISSUE ASSET TRANSACTION
-            IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(producer, assetMovable, FEE_POWER, ++timestamp, 0l);
+            IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(producer, null, assetMovable, FEE_POWER, ++timestamp, 0l);
             issueAssetTransaction.sign(producer, Transaction.FOR_NETWORK);
             issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
             issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);

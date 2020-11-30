@@ -99,7 +99,7 @@ public class TestRecSendInSideAsset {
         if (withIssue) {
     
             //CREATE ISSUE ASSET TRANSACTION
-            IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(emitter, assetInSide, FEE_POWER, ++timestamp, 0l);
+            IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(emitter, null, assetInSide, FEE_POWER, ++timestamp, 0l);
             issueAssetTransaction.sign(emitter, Transaction.FOR_NETWORK);
             issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
             issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);

@@ -958,7 +958,7 @@ public class OrderTestsMy {
 
                 assetA = new AssetVenture(new GenesisBlock().getCreator(), "Erachain.org", icon, image,
                         "This is the simulated ERM asset.", 0, 8, 10L);
-                Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, ++timeStamp, 0l);
+                Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, null, assetA, (byte) 0, ++timeStamp, 0l);
                 issueAssetTransaction.sign(accountA, Transaction.FOR_NETWORK);
                 issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
@@ -1806,7 +1806,7 @@ public class OrderTestsMy {
                 assetA = new AssetVenture(accountA, "a", icon, image, "a", 0, 8, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
-                Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l);
+                Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, null, assetA, (byte) 0, timestamp++, 0l);
                 issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 issueAssetTransaction.sign(accountA, Transaction.FOR_NETWORK);
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
@@ -2326,7 +2326,7 @@ public class OrderTestsMy {
                 assetA = new AssetVenture(accountA, "a", icon, image, "a", 0, 8, 100l);
 
                 // CREATE ISSUE ASSET TRANSACTION
-                Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l);
+                Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, null, assetA, (byte) 0, timestamp++, 0l);
                 issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 issueAssetTransaction.sign(accountA, Transaction.FOR_NETWORK);
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
@@ -2335,7 +2335,7 @@ public class OrderTestsMy {
                 assetB = new AssetVenture(accountB, "b", icon, image, "b", 0, 8, 1000000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
-                issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
+                issueAssetTransaction = new IssueAssetTransaction(accountB, null, assetB, (byte) 0, timestamp++,
                         accountB.getLastTimestamp(dcSet)[0]);
                 issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 issueAssetTransaction.sign(accountB, Transaction.FOR_NETWORK);
@@ -3387,7 +3387,7 @@ public class OrderTestsMy {
                 AssetCls assetA = new AssetVenture(accountA, "a", icon, image, "a", 0, 8, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
-                Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l);
+                Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, null, assetA, (byte) 0, timestamp++, 0l);
                 issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 issueAssetTransaction.sign(accountA, Transaction.FOR_NETWORK);
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
@@ -3401,7 +3401,7 @@ public class OrderTestsMy {
                 AssetCls assetB = new AssetVenture(accountB, "b", icon, image, "b", 0, 8, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
-                issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
+                issueAssetTransaction = new IssueAssetTransaction(accountB, null, assetB, (byte) 0, timestamp++,
                         accountB.getLastTimestamp(dcSet)[0]);
                 issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 issueAssetTransaction.sign(accountA, Transaction.FOR_NETWORK);

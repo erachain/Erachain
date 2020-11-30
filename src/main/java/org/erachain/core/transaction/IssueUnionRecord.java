@@ -3,6 +3,7 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.item.unions.UnionFactory;
 
@@ -17,7 +18,7 @@ public class IssueUnionRecord extends IssueItemRecord {
     private static final String NAME_ID = "Issue Union";
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, union, feePow, timestamp, reference);
     }
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -93,6 +94,14 @@ public class IssueUnionRecord extends IssueItemRecord {
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
         PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
         position += CREATOR_LENGTH;
+
+        ExLink exLink;
+        if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
+            exLink = ExLink.parse(data, position);
+            position += exLink.length();
+        } else {
+            exLink = null;
+        }
 
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {

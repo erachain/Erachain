@@ -55,11 +55,11 @@ public class RSendResource {
                 "make and broadcast SEND asset amount and mail");
         help.put("POST r_send/{creator}/{recipient} {feePowfeePow}&assetKey={assetKey}&amount={amount}&title={title}&encoding={encoding}&encrypt=true&password={password} (message)",
                 "make and broadcast SEND asset amount and mail in body");
-        help.put("GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&encoding={encoding}&encrypt=true&password={password}",
+        help.put("GET r_send/raw/{creator}/{recipient}?linkTo=<SeqNo>&feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&encoding={encoding}&encrypt=true&password={password}",
                 "make RAW for SEND asset amount and mail");
-        help.put("POST r_send {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": <encoding>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
+        help.put("POST r_send {\"linkTo\": \"<SeqNo>\", \"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": <encoding>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
                 "make and broadcast SEND asset amount and mail");
-        help.put("POST r_send/raw {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": <encoding>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
+        help.put("POST r_send/raw {\"linkTo\": \"<SeqNo>\", \"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": <encoding>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
                 "make RAW for SEND asset amount and mail");
         help.put("GET r_send/test1/{delay}?password={password}",
                 "Start test; dekay = 0 - stop");
@@ -201,12 +201,23 @@ public class RSendResource {
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
-        Long exLinkRef = (Long) jsonObject.getOrDefault("linkTo", null);
+        String linkToRefStr = jsonObject.get("linkTo").toString();
+        Long linkToRef;
+        if (linkToRefStr == null)
+            linkToRef = null;
+        else {
+            linkToRef = Transaction.parseDBRef(linkToRefStr);
+            if (linkToRef == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+            }
+        }
+
         int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
         long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0l).toString());
         BigDecimal amount = new BigDecimal(jsonObject.getOrDefault("amount", 0).toString());
         String title = (String) jsonObject.getOrDefault("title", null);
-        String message = (String) jsonObject.getOrDefault("message",null);
+        String message = (String) jsonObject.getOrDefault("message", null);
         int encoding = Integer.valueOf(jsonObject.getOrDefault("encoding", 0).toString());
         boolean encrypt = Boolean.valueOf((boolean) jsonObject.getOrDefault("encrypt", false));
         String password = (String) jsonObject.getOrDefault("password", null);
@@ -214,7 +225,7 @@ public class RSendResource {
         return sendGet(
                 creator,
                 recipient,
-                exLinkRef,
+                linkToRef,
                 feePow,
                 assetKey, amount,
                 title, message,
@@ -306,12 +317,22 @@ public class RSendResource {
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
-        Long exLinkRef = (Long) jsonObject.getOrDefault("linkTo", null);
+        String linkToRefStr = jsonObject.get("linkTo").toString();
+        Long linkToRef;
+        if (linkToRefStr == null)
+            linkToRef = null;
+        else {
+            linkToRef = Transaction.parseDBRef(linkToRefStr);
+            if (linkToRef == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+            }
+        }
         int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
         long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0l).toString());
         BigDecimal amount = new BigDecimal(jsonObject.getOrDefault("amount", 0).toString());
         String title = (String) jsonObject.getOrDefault("title", null);
-        String message = (String) jsonObject.getOrDefault("message",null);
+        String message = (String) jsonObject.getOrDefault("message", null);
         int encoding = Integer.valueOf(jsonObject.getOrDefault("encoding", 0).toString());
         boolean encrypt = Boolean.valueOf((boolean) jsonObject.getOrDefault("encrypt", false));
         int rawbase = Integer.valueOf(jsonObject.getOrDefault("rawbase", 58).toString());
@@ -320,7 +341,7 @@ public class RSendResource {
         return rawSendGet(
                 creator,
                 recipient,
-                exLinkRef,
+                linkToRef,
                 feePow,
                 assetKey, amount,
                 title, message, encoding,

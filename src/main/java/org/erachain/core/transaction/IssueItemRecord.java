@@ -7,6 +7,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -24,21 +25,21 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     protected ItemCls item;
     protected Long key = 0L;
 
-    public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
+    public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ExLink exLink, ItemCls item, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, NAME_ID, creator, exLink, feePow, timestamp, reference);
         this.item = item;
         if (item.getKey() != 0)
             key = item.getKey();
     }
 
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, NAME_ID, creator, item, feePow, timestamp, reference);
+        this(typeBytes, NAME_ID, creator, null, item, feePow, timestamp, reference);
         this.signature = signature;
         this.item.setReference(signature);
     }
 
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) {
-        this(typeBytes, NAME_ID, creator, item, (byte) 0, 0L, null);
+        this(typeBytes, NAME_ID, creator, null, item, (byte) 0, 0L, null);
         this.signature = signature;
         this.item.setReference(signature);
     }

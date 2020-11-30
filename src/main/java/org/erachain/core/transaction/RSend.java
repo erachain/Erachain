@@ -75,7 +75,7 @@ public class RSend extends TransactionAmount {
     public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, byte feePow, Account recipient, long key,
                  BigDecimal amount, String title, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
                  Long reference) {
-        super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, exLink, feePow, recipient, amount, key, timestamp, reference);
 
         if (isText != null)
             assert (isText.length == 1);
@@ -95,10 +95,6 @@ public class RSend extends TransactionAmount {
             this.isText = isText;
         }
 
-        if (exLink != null) {
-            typeBytes[2] = (byte) (typeBytes[2] | HAS_EXLINK_MASK);
-            this.exLink = exLink;
-        }
     }
 
     public RSend(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key,
@@ -156,7 +152,7 @@ public class RSend extends TransactionAmount {
     ////////////////////////// SHOR -text DATA
     public RSend(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key,
                  BigDecimal amount, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, feePow, recipient, amount, key, timestamp, reference);
         // typeBytes[3] = (byte)(typeBytes[3] & (byte)-128);
         this.title = "";
         typeBytes[3] = (byte) (typeBytes[3] | (byte) -128);

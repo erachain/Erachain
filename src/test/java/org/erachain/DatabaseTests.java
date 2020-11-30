@@ -94,7 +94,7 @@ public class DatabaseTests {
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
         //CREATE ISSUE PERSON TRANSACTION
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet)[0]);
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet)[0], null);
 
     }
 
@@ -106,11 +106,11 @@ public class DatabaseTests {
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet)[0]);
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet)[0], null);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet)[0]);
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet)[0], null);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
@@ -120,11 +120,11 @@ public class DatabaseTests {
         //CREATE FORK
         DCSet fork = dcSet.fork(this.toString());
 
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork)[0]);
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork)[0], null);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork)[0]);
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork)[0], null);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
@@ -229,7 +229,7 @@ public class DatabaseTests {
         init();
 
         AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, 8, 50000l);
-        Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet)[0]);
+        Transaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet)[0]);
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
         //logger.info(asset.toString() + " getQuantity " + asset.getQuantity());
