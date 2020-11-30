@@ -1731,7 +1731,7 @@
   "Item does not exist": "Запись не существует",
   "Owner Account is not personalized": "Счет владельца не персонализирован",
   "Creator Account is not personalized": "Счет создателя не персонализирован",
-  "Not Self personalization": "Персонализация самого себя",
+  "Public Key already certified to another Person": "Открытый ключ уже сертифицирован на другого Человека",
   "public key is OK": "публичный ключ годный",
   "Public Key is not personalized": "Открытый ключ не персонализирован",
   "Receiver Account is not personalized": "Счет получателя не персонализирован",

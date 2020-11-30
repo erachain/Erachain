@@ -255,7 +255,7 @@ public class IssuePollPanel extends IconPanel {
         }
 
         IssuePollRecord issuePoll = (IssuePollRecord) Controller.getInstance().issuePoll(creator,
-                txtName.getText(), txtareaDescription.getText(),
+                null, txtName.getText(), txtareaDescription.getText(),
                 optionsTableModel.getOptions(), icon, image, feePow);
 
         String text = "<HTML><body>";

@@ -6,6 +6,8 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
@@ -46,8 +48,8 @@ public class ItemAssetsResource {
         help.put("assets/raw/{key}", "Returns RAW in Base58 of asset with the given key.");
         help.put("assets/images/{key}", "get item images by KEY");
         help.put("assets/listfrom/{start}", "get list from KEY");
-        help.put("POST assets/issue {\"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"scale\": \"<scale>\", \"assetType\": \"<assetType>\", \"quantity\": \"<quantity>\", \"password\": \"<password>\"}", "Issue Asset");
-        help.put("POST assets/issueraw/{creator}?feePow=<int>&password=<String> ", "Issue Asset by Base58 RAW in POST body");
+        help.put("POST assets/issue {\"linkTo\": \"<SeqNo>\", \"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"scale\": \"<scale>\", \"assetType\": \"<assetType>\", \"quantity\": \"<quantity>\", \"password\": \"<password>\"}", "Issue Asset");
+        help.put("POST assets/issueraw/{creator}?linkTo=<SeqNo>&feePow=<int>&password=<String> ", "Issue Asset by Base58 RAW in POST body");
 
         help.put("assets/types", "get types");
         help.put("assets/balances/{key}", "get balances for key");
@@ -181,11 +183,14 @@ public class ItemAssetsResource {
     @POST
     @Path("issueraw/{creator}")
     public String issueRAW(String x, @PathParam("creator") String creator,
+                           @QueryParam("linkTo") String linkToRefStr,
                            @DefaultValue("0") @QueryParam("feePow") String feePowStr,
                            @QueryParam("password") String password) {
 
         Controller cntr = Controller.getInstance();
+
         Fun.Tuple3<PrivateKeyAccount, Integer, byte[]> result = APIUtils.postIssueRawItem(request, x, creator, feePowStr, password);
+
         AssetCls item;
         try {
             item = AssetFactory.getInstance().parse(result.c, false);
@@ -194,7 +199,20 @@ public class ItemAssetsResource {
                     e.getMessage());
         }
 
-        Transaction transaction = cntr.issueAsset(result.a, result.b, item);
+        ExLink linkTo;
+        if (linkToRefStr == null)
+            linkTo = null;
+        else {
+            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
+            if (linkToRef == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+            } else {
+                linkTo = new ExLinkSource(linkToRef, null);
+            }
+        }
+
+        Transaction transaction = cntr.issueAsset(result.a, linkTo, result.b, item);
         int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
         if (validate == Transaction.VALIDATE_OK)

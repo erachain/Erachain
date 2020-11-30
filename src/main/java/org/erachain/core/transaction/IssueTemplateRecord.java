@@ -3,6 +3,7 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.templates.TemplateFactory;
 
@@ -16,8 +17,8 @@ public class IssueTemplateRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_TEMPLATE_TRANSACTION;
     private static final String NAME_ID = "Issue Template";
 
-    public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, template, feePow, timestamp, reference);
+    public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, NAME_ID, creator, linkTo, template, feePow, timestamp, reference);
     }
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -44,12 +45,12 @@ public class IssueTemplateRecord extends IssueItemRecord {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, template, (byte) 0, 0l, null, signature);
     }
 
-    public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, template, feePow, timestamp, reference);
+    public IssueTemplateRecord(PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, template, feePow, timestamp, reference);
     }
 
     public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, template, (byte) 0, 0l, null);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, (byte) 0, 0l, null);
     }
 
     //GETTERS/SETTERS
@@ -92,6 +93,14 @@ public class IssueTemplateRecord extends IssueItemRecord {
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
         PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
         position += CREATOR_LENGTH;
+
+        ExLink exLink;
+        if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
+            exLink = ExLink.parse(data, position);
+            position += exLink.length();
+        } else {
+            exLink = null;
+        }
 
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {

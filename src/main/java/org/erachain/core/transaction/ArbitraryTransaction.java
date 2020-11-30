@@ -36,11 +36,11 @@ public abstract class ArbitraryTransaction extends Transaction {
     protected List<Payment> payments;
 
     public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
     }
 
     public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, feePow, timestamp, reference, signature);
+        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference, signature);
     }
 	/*
 	public ArbitraryTransaction(PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference) {
