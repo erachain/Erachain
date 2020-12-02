@@ -8,73 +8,54 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetType;
 import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.Gui;
-import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.items.TypeOfImage;
-import org.erachain.gui.library.AddImageLabel;
+import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MDecimalFormatedTextField;
-import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import java.awt.*;
 
-import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 /**
  * @author Саша
  */
-public class IssueAssetPanel extends IconPanel {
+public class IssueAssetPanel extends IssueItemPanel {
 
     public static String NAME = "IssueAssetPanel";
     public static String TITLE = "Issue Asset";
 
-    private JLabel titleJLabel = new JLabel();
-    private JLabel accountJLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
-    private JLabel descriptionJLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
-    private JLabel feeJLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
     private JLabel scaleJLabel = new JLabel(Lang.getInstance().translate("Scale") + ":");
-    private JLabel nameJLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
     private JLabel quantityJLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
     private JLabel typeJLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
 
-    private JComboBox<String> textFeePow = new JComboBox<>();
-    private JComboBox<Account> fromJComboBox = new JComboBox<>(new AccountsComboBoxModel());
     private JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
     private JComboBox<String> textScale = new JComboBox<>();
-    private JButton issueJButton = new JButton(Lang.getInstance().translate("Issue"));
-    private JScrollPane jScrollPane1 = new JScrollPane();
-    private JTextField textName = new JTextField("");
-    private JTextArea textAreaDescription = new JTextArea("");
-    // description asset type
+
     private JTextArea textareasAssetTypeDescription = new JTextArea();
     private MDecimalFormatedTextField textQuantity = new MDecimalFormatedTextField();
 
-    private AddImageLabel addImageLabel;
-    private AddImageLabel addLogoIconLabel;
     private AssetTypesComboBoxModel assetTypesComboBoxModel;
+
+
 
     public IssueAssetPanel() {
         super(NAME, TITLE);
+// init
+        assetTypesComboBoxModel = new AssetTypesComboBoxModel();
+        assetTypeJComboBox.setModel(assetTypesComboBoxModel);
+        textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
+        textScale.setSelectedIndex(8);
+//
+
         initComponents();
-        titleJLabel.setFont(FONT_TITLE);
-        titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-        titleJLabel.setText(Lang.getInstance().translate(TITLE));
-        textAreaDescription.setLineWrap(true);
         textQuantity.setMaskType(textQuantity.maskLong);
         textQuantity.setText("0");
-        textFeePow.setSelectedItem("0");
 
-        feeJLabel.setVisible(Gui.SHOW_FEE_POWER);
-        textFeePow.setVisible(Gui.SHOW_FEE_POWER);
-
-        issueJButton.addActionListener(arg0 -> onIssueClick());
         // select combobox Asset type
         assetTypeJComboBox.addActionListener(e -> {
             JComboBox source = (JComboBox) e.getSource();
@@ -87,191 +68,88 @@ public class IssueAssetPanel extends IconPanel {
 
     }
 
-    private void initComponents() {
-        setLayout(new GridBagLayout());
+    protected void initComponents() {
+
+        super.initComponents();
+
+        // insert asset issue info
+        // grid x - 4...26
+        // y -  3 ....29
         GridBagConstraints gridBagConstraints;
+        gridBagConstraints = new java.awt.GridBagConstraints();
 
-        addImageLabel = new AddImageLabel(
-                Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG,
-                0, ItemCls.MAX_IMAGE_LENGTH, WIDTH_IMAGE_INITIAL, HEIGHT_IMAGE_INITIAL);
-
-        addLogoIconLabel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
-                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
-                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL);
-
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 8;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new Insets(8, 6, 6, 9);
-        add(titleJLabel, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = 5;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-//        gridBagConstraints.insets = new Insets(0, 12, 8, 8);
-        add(addImageLabel, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridheight = 4;
-        add(addLogoIconLabel, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 0, 6, 7);
-        add(accountJLabel, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 0, 6, 7);
-        add(nameJLabel, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(0, 0, 7, 7);
-        add(descriptionJLabel, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 0, 7, 7);
-        add(typeJLabel, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 0, 7, 7);
-        add(quantityJLabel, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 9;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-        add(feeJLabel, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(0, 0, 6, 8);
-        add(fromJComboBox, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(0, 0, 6, 0);
-        add(textName, gridBagConstraints);
-
-        textAreaDescription.setColumns(20);
-        textAreaDescription.setRows(3);
-        jScrollPane1.setViewportView(textAreaDescription);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.gridheight = 3;
-        gridBagConstraints.weighty = 0.1;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(0, 0, 6, 8);
-        add(jScrollPane1, gridBagConstraints);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanelMain.add(typeJLabel, gridBagConstraints);
 
-        assetTypesComboBoxModel = new AssetTypesComboBoxModel();
-        assetTypeJComboBox.setModel(assetTypesComboBoxModel);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(0, 0, 6, 8);
-        add(assetTypeJComboBox, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 20;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.4;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
+        jPanelMain.add(assetTypeJComboBox, gridBagConstraints);
 
-        textareasAssetTypeDescription.setLineWrap(true);
-        textareasAssetTypeDescription.setWrapStyleWord(true);
-        textareasAssetTypeDescription.setEditable(false);
-        textareasAssetTypeDescription.setEnabled(false);
+        JScrollPane scrollPaneAssetTypeDescription = new JScrollPane();
+
         textareasAssetTypeDescription.setColumns(20);
         textareasAssetTypeDescription.setRows(5);
+        textareasAssetTypeDescription.setLineWrap(true);
+        scrollPaneAssetTypeDescription.setViewportView(textareasAssetTypeDescription);
 
-        JScrollPane jScrollPane2 = new JScrollPane();
-        jScrollPane2.setViewportView(textareasAssetTypeDescription);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.insets = new Insets(0, 0, 6, 8);
-        add(jScrollPane2, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 20;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.4;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
+        jPanelMain.add(textareasAssetTypeDescription, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.insets = new Insets(0, 0, 7, 10);
-        add(textQuantity, gridBagConstraints);
 
-        textFeePow.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(9)));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanelMain.add(quantityJLabel, gridBagConstraints);
+
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 9;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanelMain.add(textQuantity, gridBagConstraints);
+
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 17;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanelMain.add(scaleJLabel, gridBagConstraints);
+
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 19;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 8;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(0, 0, 10, 10);
-        add(textFeePow, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-        add(issueJButton, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
+        jPanelMain.add(textScale, gridBagConstraints);
 
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 9;
-        gridBagConstraints.insets = new Insets(0, 0, 7, 7);
-        add(scaleJLabel, gridBagConstraints);
-
-        textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
-        textScale.setSelectedIndex(8);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 9;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(0, 0, 7, 0);
-        add(textScale, gridBagConstraints);
-
-
-    }
-
-    private String[] fillAndReceiveStringArray(int size) {
-        String[] modelTextScale = new String[size];
-        for (int i = 0; i < modelTextScale.length; i++) {
-            modelTextScale[i] = i + "";
-        }
-        return modelTextScale;
     }
 
     public void onIssueClick() {

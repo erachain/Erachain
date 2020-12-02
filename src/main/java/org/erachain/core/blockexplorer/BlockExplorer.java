@@ -2104,7 +2104,8 @@ public class BlockExplorer {
 
 
                     if (BlockChain.ERA_COMPU_ALL_UP && side == Transaction.BALANCE_SIDE_LEFT) {
-                        bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side).add(account.addDEVAmount(assetKey)));
+                        bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side)
+                                .add(account.addDEVAmount(assetKey)));
                     } else {
                         bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side));
                     }

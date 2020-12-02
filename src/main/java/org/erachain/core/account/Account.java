@@ -731,17 +731,23 @@ public class Account {
 
 
     // Добавляем величины для тестовых режимов
-    public BigDecimal addDEVAmount(long key) {
+    public static BigDecimal addDEVAmount(long key, byte[] shortAddressBytes) {
         if (BlockChain.ERA_COMPU_ALL_UP && key == 1)
-            return BigDecimal.valueOf(( 512000 + 500 * this.getShortAddressBytes()[10]) >> 6);
+            return BigDecimal.valueOf((512000 + 500 * shortAddressBytes[10]) >> 6);
         else if (BlockChain.ERA_COMPU_ALL_UP && key == 2)
             return new BigDecimal("100.0");
 
         return BigDecimal.ZERO;
 
     }
+
+    public BigDecimal addDEVAmount(long key) {
+        return addDEVAmount(key, shortBytes);
+
+    }
+
     public Tuple2<BigDecimal, BigDecimal> balAaddDEVAmount(long key, Tuple2<BigDecimal, BigDecimal> balA) {
-        BigDecimal addAmount = addDEVAmount(key);
+        BigDecimal addAmount = addDEVAmount(key, shortBytes);
         if (addAmount.signum() == 0)
             return balA;
 
@@ -752,7 +758,7 @@ public class Account {
     public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
         balanceAddDEVAmount(long key, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                             balance) {
-        BigDecimal addAmount = addDEVAmount(key);
+        BigDecimal addAmount = addDEVAmount(key, this.getShortAddressBytes());
         if (addAmount.signum() == 0)
             return balance;
 
@@ -784,7 +790,7 @@ public class Account {
 
         if (actionType == TransactionAmount.ACTION_SEND) {
             if (BlockChain.ERA_COMPU_ALL_UP ) {
-                return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key)));
+                return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key, this.getShortAddressBytes())));
             }
 
             return balance.a;
