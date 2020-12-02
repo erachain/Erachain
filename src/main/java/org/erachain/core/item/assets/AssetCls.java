@@ -25,6 +25,7 @@ public abstract class AssetCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.ASSET_TYPE;
 
+    public final static long START_KEY = ItemCls.START_KEY;
     public static final long MIN_START_KEY = 1000L;
 
     // CORE KEY
@@ -279,6 +280,11 @@ public abstract class AssetCls extends ItemCls {
     @Override
     public int getItemType() {
         return TYPE_KEY;
+    }
+
+    @Override
+    public long START_KEY() {
+        return START_KEY;
     }
 
     @Override
@@ -639,7 +645,7 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public static boolean isUnHoldable(long key, int assetType) {
-        if (key < getStartKey()
+        if (key < getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY, AssetCls.MIN_START_KEY)
                 || assetType > AssetCls.AS_OUTSIDE_OTHER_CLAIM
                 && assetType <= AssetCls.AS_INSIDE_OTHER_CLAIM
         ) {
@@ -649,13 +655,7 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public boolean isUnHoldable() {
-        if (key < getStartKey()
-                || assetType > AssetCls.AS_OUTSIDE_OTHER_CLAIM
-                && assetType <= AssetCls.AS_INSIDE_OTHER_CLAIM
-        ) {
-            return true;
-        }
-        return false;
+        return isUnHoldable(key, assetType);
     }
 
     /**
@@ -1211,7 +1211,8 @@ public abstract class AssetCls extends ItemCls {
             case TransactionAmount.ACTION_REPAY_DEBT:
                 return "Return debt";
             case TransactionAmount.ACTION_HOLD:
-                return backward ? "Confirm acceptance \"in hand\"" : null;
+                return isUnHoldable(assetKey, assetType) ? null
+                        : backward ? "Confirm acceptance \"in hand\"" : null;
             case TransactionAmount.ACTION_SPEND:
                 return backward ? null : "Spend";
             case TransactionAmount.ACTION_PLEDGE:
@@ -1223,10 +1224,10 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public String viewAssetTypeAction(boolean backward, int actionType, boolean isCreatorOwner) {
-        return viewAssetTypeAction(assetKey, assetType, backward, actionType, isCreatorOwner);
+        return viewAssetTypeAction(key, assetType, backward, actionType, isCreatorOwner);
     }
 
-    public static List<String> viewAssetTypeActionsList(int assetType) {
+    public static List<String> viewAssetTypeActionsList(long assetKey, int assetType) {
         List<String> list = new ArrayList<>();
 
         String actionStr;
@@ -1249,7 +1250,7 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public List<String> viewAssetTypeActionsList() {
-        return viewAssetTypeActionsList(assetType);
+        return viewAssetTypeActionsList(key, assetType);
     }
 
     public String viewAssetTypeActionTitle(boolean backward, int actionType, boolean isCreatorOwner) {

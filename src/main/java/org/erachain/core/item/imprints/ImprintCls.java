@@ -37,6 +37,11 @@ public abstract class ImprintCls extends ItemCls {
     }
 
     @Override
+    public long START_KEY() {
+        return START_KEY;
+    }
+
+    @Override
     public long MIN_START_KEY() {
         return MIN_START_KEY;
     }
