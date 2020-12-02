@@ -1041,12 +1041,12 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL_EX:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : isCreatorOwner ? "Issue" : "Передать в собственность вексель";
+                        return backward ? null : "AS_OUTSIDE_BILL_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать требование погашения векселя"
-                                : "Потребовать погашения векселя";
+                        return backward ? "AS_OUTSIDE_BILL_2B"
+                                : "AS_OUTSIDE_BILL_2";
                     case TransactionAmount.ACTION_SPEND:
-                        return backward ? null : "Подтвердить погашение векселя";
+                        return backward ? null : "AS_OUTSIDE_BILL_4";
                     default:
                         return null;
                 }
