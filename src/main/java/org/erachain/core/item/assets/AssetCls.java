@@ -1113,39 +1113,43 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_ACCESS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : isCreatorOwner ? "Issue rights" : "Grant rights";
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_ACCESS_Issue" : "AS_INSIDE_ACCESS_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "To confiscate a delegated rights"
-                                : "Delegate rights";
+                        return backward ? "AS_INSIDE_ACCESS_2B"
+                                : "AS_INSIDE_ACCESS_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Return delegate rights";
+                        return "AS_INSIDE_ACCESS_2R";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "AS_INSIDE_ACCESS_4";
                     default:
                         return null;
                 }
             case AS_INSIDE_VOTE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : isCreatorOwner ? "Issue voices" : "Grant voice";
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_VOTE_Issue" : "AS_INSIDE_VOTE_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "To confiscate a delegated vote"
-                                : "Delegate voice";
+                        return backward ? "AS_INSIDE_VOTE_2B"
+                                : "AS_INSIDE_VOTE_12";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Return delegate vote";
+                        return "AS_INSIDE_VOTE_2R";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "AS_INSIDE_VOTE_4";
                     default:
                         return null;
                 }
             case AS_BANK_GUARANTEE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : isCreatorOwner ? "Issue" : "Передать банковскую гарантию";
+                        return backward ? null : isCreatorOwner ? "AS_BANK_GUARANTEE_Issue" : "AS_BANK_GUARANTEE_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать банковскую гарантию" : "Выдать банковскую гарантию";
+                        return backward ? "AS_BANK_GUARANTEE_2B" : "AS_BANK_GUARANTEE_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Вернуть банковскую гарантию";
+                        return "AS_BANK_GUARANTEE_2R";
                     case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Акцептовать банковскую гарантию" : null;
+                        return backward ? "AS_BANK_GUARANTEE_3" : null;
                     case TransactionAmount.ACTION_SPEND:
-                        return backward ? null : "Раскрыть банковскую гарантию";
+                        return backward ? null : "AS_BANK_GUARANTEE_4";
                     default:
                         return null;
                 }
