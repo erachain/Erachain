@@ -990,12 +990,12 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_WORK_TIME_HOURS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Transfer to the ownership of person-hour"; // Передать в собственность рабочие часы
+                        return backward ? null : "AS_OUTSIDE_WORK_TIME_HOURS_1"; // Передать в собственность рабочие часы
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Decline the demand for person-hour" // Отозвать требование траты рабочих часов
-                                : "Demand to spend person-hour"; // Потребовать потратить рабочие часы
+                        return backward ? "AS_OUTSIDE_WORK_TIME_HOURS_2B" // Отозвать требование траты рабочих часов
+                                : "AS_OUTSIDE_WORK_TIME_HOURS_2"; // Потребовать потратить рабочие часы
                     case TransactionAmount.ACTION_SPEND:
-                        return backward ? null : "Confirm the spend of person-hour"; // Подтвердить затраты рабочих часов
+                        return backward ? null : "AS_OUTSIDE_WORK_TIME_HOURS_4"; // Подтвердить затраты рабочих часов
                     default:
                         return null;
                 }
@@ -1041,7 +1041,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL_EX:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Передать в собственность вексель";
+                        return backward ? null : isCreatorOwner ? "Issue" : "Передать в собственность вексель";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Отозвать требование погашения векселя"
                                 : "Потребовать погашения векселя";
@@ -1232,9 +1232,12 @@ public abstract class AssetCls extends ItemCls {
 
         String actionStr;
         for (int action = TransactionAmount.ACTION_SEND; action < TransactionAmount.ACTION_PLEDGE; action++) {
-            actionStr = viewAssetTypeAction(assetKey, assetType, false, action, true);
-            if (actionStr != null && !list.contains(actionStr))
-                list.add(actionStr);
+            if (action != TransactionAmount.ACTION_SEND) {
+                // не писать что выпуск доступен и так понятно
+                actionStr = viewAssetTypeAction(assetKey, assetType, false, action, true);
+                if (actionStr != null && !list.contains(actionStr))
+                    list.add(actionStr);
+            }
             actionStr = viewAssetTypeAction(assetKey, assetType, false, action, false);
             if (actionStr != null && !list.contains(actionStr))
                 list.add(actionStr);
