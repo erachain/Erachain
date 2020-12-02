@@ -1068,41 +1068,45 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_OTHER_CLAIM:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : isCreatorOwner ? "Выпустить требование ко мне"
-                                : "Передать в собственность требование";
+                        return backward ? null : isCreatorOwner ? "AS_OUTSIDE_OTHER_CLAIM_Issue"
+                                : "AS_OUTSIDE_OTHER_CLAIM_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать требование исполнения права"
-                                : "Потребовать исполнения своего права";
+                        return backward ? "AS_OUTSIDE_OTHER_CLAIM_2B"
+                                : "AS_OUTSIDE_OTHER_CLAIM_2";
                     case TransactionAmount.ACTION_SPEND:
-                        return backward ? null : "Подтвердить исполнение своего права";
+                        return backward ? null : "AS_OUTSIDE_OTHER_CLAIM_4";
                     default:
                         return null;
                 }
             case AS_INSIDE_CURRENCY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : isCreatorOwner ? "Issue currency" : "Перевести в собственность деньги";
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_CURRENCY_Issue"
+                                : "AS_INSIDE_CURRENCY_1";
                     default:
                         return null;
                 }
             case AS_INSIDE_UTILITY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : isCreatorOwner ? "Issue utility" : "Передать в собственность услугу";
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_UTILITY_Issue"
+                                : "AS_INSIDE_UTILITY_1";
                     default:
                         return null;
                 }
             case AS_INSIDE_SHARE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : isCreatorOwner ? "Issue share" : "Передать в собственность акции";
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_SHARE_Issue"
+                                : "AS_INSIDE_SHARE_1";
                     default:
                         return null;
                 }
             case AS_INSIDE_BONUS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : isCreatorOwner ? "Issue bonuses" : "Transfer bonuses";
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_BONUS_Issue"
+                                : "AS_INSIDE_BONUS_1";
                     default:
                         return null;
                 }
