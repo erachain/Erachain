@@ -22,9 +22,8 @@ public class AssetType {
             joiner.add(Lang.getInstance().translate(action));
         }
 
-        this.description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(assetType)
-                + ".\n" + Lang.getInstance().translate("Acceptable actions") + ":\n" + joiner.toString()
-        );
+        this.description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(assetType))
+                + ".\n" + Lang.getInstance().translate("Acceptable actions") + ":\n" + joiner.toString();
 
     }
 

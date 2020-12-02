@@ -1156,13 +1156,13 @@ public abstract class AssetCls extends ItemCls {
             case AS_BANK_GUARANTEE_TOTAL:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : isCreatorOwner ? "Issue" : "Передать учетную банковскую гарантию";
+                        return backward ? null : isCreatorOwner ? "AS_BANK_GUARANTEE_TOTAL_Issue" : "AS_BANK_GUARANTEE_TOTAL_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать учетную банковскую гарантию" : "Выдать учетную банковскую гарантию";
+                        return backward ? "AS_BANK_GUARANTEE_TOTAL_2B" : "AS_BANK_GUARANTEE_TOTAL_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Вернуть учетную банковскую гарантию";
+                        return "AS_BANK_GUARANTEE_TOTAL_2R";
                     case TransactionAmount.ACTION_SPEND:
-                        return backward ? null : "Раскрыть учетную банковскую гарантию";
+                        return backward ? null : "AS_BANK_GUARANTEE_TOTAL_4";
                     default:
                         return null;
                 }
@@ -1171,12 +1171,12 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_OTHER_CLAIM:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : isCreatorOwner ? "Issue claim to Me" : "Передать в собственность требование";
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_OTHER_CLAIM_Issue" : "AS_INSIDE_OTHER_CLAIM_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать требование исполнения права"
-                                : "Потребовать исполнения своего права";
+                        return backward ? "AS_INSIDE_OTHER_CLAIM_2B"
+                                : "AS_INSIDE_OTHER_CLAIM_2";
                     case TransactionAmount.ACTION_SPEND:
-                        return backward ? null : "Подтвердить исполнение своего права";
+                        return backward ? null : "AS_INSIDE_OTHER_CLAIM_4";
                     default:
                         return null;
                 }
@@ -1235,10 +1235,27 @@ public abstract class AssetCls extends ItemCls {
         return viewAssetTypeAction(key, assetType, backward, actionType, isCreatorOwner);
     }
 
+    public static String viewAssetTypeAdditionAction(long assetKey, int assetType, boolean backward, int actionType, boolean isCreatorOwner) {
+        switch (assetType) {
+            case AS_SELF_MANAGED_ACCOUNTING:
+            case AS_SELF_ACCOUNTING_LOAN:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "AS_SELF_SEND_ADDITIONAL_ACT_DEBT";
+                }
+        }
+        return null;
+    }
+
+    public String viewAssetTypeAdditionAction(boolean backward, int actionType, boolean isCreatorOwner) {
+        return viewAssetTypeAdditionAction(key, assetType, backward, actionType, isCreatorOwner);
+    }
+
     public static List<String> viewAssetTypeActionsList(long assetKey, int assetType) {
         List<String> list = new ArrayList<>();
 
         String actionStr;
+        String addActionStr;
         for (int action = TransactionAmount.ACTION_SEND; action < TransactionAmount.ACTION_PLEDGE; action++) {
             if (action != TransactionAmount.ACTION_SEND) {
                 // не писать что выпуск доступен и так понятно
@@ -1247,8 +1264,13 @@ public abstract class AssetCls extends ItemCls {
                     list.add(actionStr);
             }
             actionStr = viewAssetTypeAction(assetKey, assetType, false, action, false);
-            if (actionStr != null && !list.contains(actionStr))
+            if (actionStr != null && !list.contains(actionStr)) {
+                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, false, action, false);
+                if (addActionStr != null) {
+                    list.add(addActionStr);
+                }
                 list.add(actionStr);
+            }
             actionStr = viewAssetTypeAction(assetKey, assetType, true, action, true);
             if (actionStr != null && !list.contains(actionStr))
                 list.add(actionStr);
@@ -1267,31 +1289,7 @@ public abstract class AssetCls extends ItemCls {
     public String viewAssetTypeActionTitle(boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
             case AS_BANK_GUARANTEE:
-                switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
-                        return "Передача банковской гарантии";
-                    case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отзыв банковской гарантии" : "Выдача банковской гарантии";
-                    case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Возврат банковской гарантии";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Акцептование банковской гарантии" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                        return "Погашение банковской гарантии";
-                }
             case AS_BANK_GUARANTEE_TOTAL:
-                switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
-                        return "Передача учетной банковской гарантии";
-                    case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отзыв учетной банковской гарантии" : "Выдача учетной банковской гарантии";
-                    case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Возврат учетной банковской гарантии";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Акцептование учетной банковской гарантии" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                        return "Погашение учетной банковской гарантии";
-                }
             case AS_OUTSIDE_IMMOVABLE:
             case AS_OUTSIDE_CURRENCY:
             case AS_OUTSIDE_SERVICE:
