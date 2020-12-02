@@ -211,15 +211,15 @@ public abstract class AssetCls extends ItemCls {
 
     /**
      * bank guarantee - банковская гарантия
-     * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого
+     * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого - так как не требует действий 2-й стороны - скорее бухгалтерская единица?
      */
+
     public static final int AS_BANK_GUARANTEE = 60;
     /**
-     * bank guarantee total - банковская гарантия общая сумма
+     * bank guarantee total - банковская гарантия общая сумма - так как не требует действий 2-й стороны - скорее бухгалтерская единица?
      * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_BANK_GUARANTEE_TOTAL = 61;
-
 
     /**
      * INDEXES (FOREX etc.)
@@ -282,19 +282,8 @@ public abstract class AssetCls extends ItemCls {
     }
 
     @Override
-    public long getStartKey() {
-
-        if (!BlockChain.CLONE_MODE)
-            return MIN_START_KEY;
-
-        long startKey = BlockChain.startKeys[TYPE_KEY];
-
-        if (startKey == 0) {
-            return START_KEY;
-        } else if (startKey < MIN_START_KEY) {
-            return (BlockChain.startKeys[TYPE_KEY] = MIN_START_KEY);
-        }
-        return startKey;
+    public long MIN_START_KEY() {
+        return MIN_START_KEY;
     }
 
     @Override
@@ -649,6 +638,26 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType == AS_OUTSIDE_OTHER_CLAIM;
     }
 
+    public static boolean isUnHoldable(long key, int assetType) {
+        if (key < getStartKey()
+                || assetType > AssetCls.AS_OUTSIDE_OTHER_CLAIM
+                && assetType <= AssetCls.AS_INSIDE_OTHER_CLAIM
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isUnHoldable() {
+        if (key < getStartKey()
+                || assetType > AssetCls.AS_OUTSIDE_OTHER_CLAIM
+                && assetType <= AssetCls.AS_INSIDE_OTHER_CLAIM
+        ) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Управлять может только сам обладатель
      *
@@ -947,7 +956,7 @@ public abstract class AssetCls extends ItemCls {
         return "";
     }
 
-    public static String viewAssetTypeAction(int assetType, boolean backward, int actionType, boolean isCreatorOwner) {
+    public static String viewAssetTypeAction(long assetKey, int assetType, boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
                 switch (actionType) {
@@ -1057,10 +1066,10 @@ public abstract class AssetCls extends ItemCls {
                         return null;
                 }
             case AS_OUTSIDE_OTHER_CLAIM:
-            case AS_INSIDE_OTHER_CLAIM:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Передать в собственность требование";
+                        return backward ? null : isCreatorOwner ? "Выпустить требование ко мне"
+                                : "Передать в собственность требование";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Отозвать требование исполнения права"
                                 : "Потребовать исполнения своего права";
@@ -1072,83 +1081,59 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_CURRENCY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Перевести в собственность деньги";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Учесть прием денег на баланс" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                        return backward ? null : isCreatorOwner ? "Issue currency" : "Перевести в собственность деньги";
+                    default:
                         return null;
                 }
-                break;
             case AS_INSIDE_UTILITY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Передать в собственность услугу";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Учесть получение услуги" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                        return backward ? null : isCreatorOwner ? "Issue utility" : "Передать в собственность услугу";
+                    default:
                         return null;
                 }
-                break;
             case AS_INSIDE_SHARE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Передать в собственность акции";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Take the reception into balance" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                        return backward ? null : isCreatorOwner ? "Issue share" : "Передать в собственность акции";
+                    default:
                         return null;
                 }
-                break;
             case AS_INSIDE_BONUS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Transfer bonuses";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Take the reception into balance" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                        return backward ? null : isCreatorOwner ? "Issue bonuses" : "Transfer bonuses";
+                    default:
                         return null;
                 }
-                break;
             case AS_INSIDE_ACCESS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Grant rights";
+                        return backward ? null : isCreatorOwner ? "Issue rights" : "Grant rights";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "To confiscate a delegated rights"
                                 : "Delegate rights";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Return delegate rights";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Take the reception into balance" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                    default:
                         return null;
                 }
-                break;
             case AS_INSIDE_VOTE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Grant voice";
+                        return backward ? null : isCreatorOwner ? "Issue voices" : "Grant voice";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "To confiscate a delegated vote"
                                 : "Delegate voice";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Return delegate vote";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Take the reception into balance" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                    default:
                         return null;
                 }
-                break;
             case AS_BANK_GUARANTEE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Передать банковскую гарантию";
+                        return backward ? null : isCreatorOwner ? "Issue" : "Передать банковскую гарантию";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Отозвать банковскую гарантию" : "Выдать банковскую гарантию";
                     case TransactionAmount.ACTION_REPAY_DEBT:
@@ -1156,22 +1141,37 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_HOLD:
                         return backward ? "Акцептовать банковскую гарантию" : null;
                     case TransactionAmount.ACTION_SPEND:
+                        return backward ? null : "Раскрыть банковскую гарантию";
+                    default:
                         return null;
                 }
-                break;
             case AS_BANK_GUARANTEE_TOTAL:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Передать учетную банковскую гарантию";
+                        return backward ? null : isCreatorOwner ? "Issue" : "Передать учетную банковскую гарантию";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "Отозвать учетную банковскую гарантию" : "Выдать учетную банковскую гарантию";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Вернуть учетную банковскую гарантию";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Hold" : null;
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? null : "Раскрыть учетную банковскую гарантию";
+                    default:
+                        return null;
                 }
-                break;
             case AS_INDEX:
+                break;
+            case AS_INSIDE_OTHER_CLAIM:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return backward ? null : isCreatorOwner ? "Issue claim to Me" : "Передать в собственность требование";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Отозвать требование исполнения права"
+                                : "Потребовать исполнения своего права";
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? null : "Подтвердить исполнение своего права";
+                    default:
+                        return null;
+                }
             case AS_ACCOUNTING:
                 break;
             case AS_SELF_MANAGED_ACCOUNTING:
@@ -1223,7 +1223,7 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public String viewAssetTypeAction(boolean backward, int actionType, boolean isCreatorOwner) {
-        return viewAssetTypeAction(assetType, backward, actionType, isCreatorOwner);
+        return viewAssetTypeAction(assetKey, assetType, backward, actionType, isCreatorOwner);
     }
 
     public static List<String> viewAssetTypeActionsList(int assetType) {
@@ -1231,16 +1231,16 @@ public abstract class AssetCls extends ItemCls {
 
         String actionStr;
         for (int action = TransactionAmount.ACTION_SEND; action < TransactionAmount.ACTION_PLEDGE; action++) {
-            actionStr = viewAssetTypeAction(assetType, false, action, true);
+            actionStr = viewAssetTypeAction(assetKey, assetType, false, action, true);
             if (actionStr != null && !list.contains(actionStr))
                 list.add(actionStr);
-            actionStr = viewAssetTypeAction(assetType, false, action, false);
+            actionStr = viewAssetTypeAction(assetKey, assetType, false, action, false);
             if (actionStr != null && !list.contains(actionStr))
                 list.add(actionStr);
-            actionStr = viewAssetTypeAction(assetType, true, action, true);
+            actionStr = viewAssetTypeAction(assetKey, assetType, true, action, true);
             if (actionStr != null && !list.contains(actionStr))
                 list.add(actionStr);
-            actionStr = viewAssetTypeAction(assetType, true, action, false);
+            actionStr = viewAssetTypeAction(assetKey, assetType, true, action, false);
             if (actionStr != null && !list.contains(actionStr))
                 list.add(actionStr);
         }

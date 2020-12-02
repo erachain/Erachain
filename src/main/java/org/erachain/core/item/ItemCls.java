@@ -134,12 +134,25 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         return db.getItem_Map(type).get(key);
     }
 
-    // RETURN START KEY in not GENESIS
-    public abstract long getStartKey();
+    public abstract int getItemType();
+
+    public abstract long MIN_START_KEY();
+
+    public long getStartKey() {
+        if (!BlockChain.CLONE_MODE)
+            return MIN_START_KEY();
+
+        long startKey = BlockChain.startKeys[getItemType()];
+
+        if (startKey == 0) {
+            return START_KEY;
+        } else if (startKey < MIN_START_KEY()) {
+            return (BlockChain.startKeys[getItemType()] = MIN_START_KEY());
+        }
+        return startKey;
+    }
 
     public abstract int getMinNameLen();
-
-    public abstract int getItemType();
 
     public abstract String getItemTypeName();
     //public abstract FavoriteItemMap getDBFavoriteMap();

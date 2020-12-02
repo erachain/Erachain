@@ -783,18 +783,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             // HOLD GOODS, CHECK myself DEBT for CLAIMS
                             case ACTION_HOLD:
 
-                                if (absKey == FEE_KEY
-                                        || absKey == AssetCls.ERA_KEY
-                                        || assetType == AssetCls.AS_INDEX
-                                        || assetType == AssetCls.AS_INSIDE_ACCESS
-                                        || assetType == AssetCls.AS_INSIDE_BONUS
-                                ) {
-                                    if (height > BlockChain.HOLD_VALID_START)
-                                        return NOT_HOLDABLE_ASSET;
-                                }
-
-                                if (asset.isOutsideType()) {
-                                    return INVALID_TRANSFER_TYPE;
+                                if (asset.isUnHoldable()) {
+                                    return NOT_HOLDABLE_ASSET;
                                 }
 
                                 if (backward) {
