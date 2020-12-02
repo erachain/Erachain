@@ -150,7 +150,7 @@
 	"AS_MY_DEBT_2B": "Withdraw the loan repayment request",
 	"AS_MY_DEBT_4": "Confirm loan repayment",
 	"AS_MY_DEBT_4B": "Cancel loan repayment (reverse)",
-	"AS_SELF_SEND_ADDITIONAL_ACT_DEBT": "'Set Off' Action Update Debt balance",
+	"AS_SELF_SEND_ADDITIONAL_ACT_DEBT": "Action on 'Own' balance update 'Debt' balance",
 	"Asset Details": "Asset details",
 	"Asset Exchange": "Asset exchange",
 	"Asset issue has been sent!": "Asset has been sent!",

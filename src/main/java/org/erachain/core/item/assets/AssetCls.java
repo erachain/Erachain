@@ -939,13 +939,13 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_VOTE:
                 return "A digital voice for voting";
             case AS_BANK_GUARANTEE:
-                return "A digital bank guarantee.";
+                return "A digital bank guarantee";
             case AS_BANK_GUARANTEE_TOTAL:
-                return "A digital bank guarantee total accounting.";
+                return "A digital bank guarantee total accounting";
             case AS_INDEX:
                 return "Index on foreign and domestic assets, for example currencies on FOREX";
             case AS_INSIDE_OTHER_CLAIM:
-                return "Other digital rights, requirements and obligations. These assets (as well as other digital assets) can be given in debt and seized by the lender.";
+                return "Other digital rights, requirements and obligations. These assets (as well as other digital assets) can be given in debt and seized by the lender";
             case AS_ACCOUNTING:
                 return "AS_ACCOUNTING_D";
             case AS_SELF_MANAGED_ACCOUNTING:
@@ -1130,7 +1130,7 @@ public abstract class AssetCls extends ItemCls {
                         return backward ? null : isCreatorOwner ? "AS_INSIDE_VOTE_Issue" : "AS_INSIDE_VOTE_1";
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "AS_INSIDE_VOTE_2B"
-                                : "AS_INSIDE_VOTE_12";
+                                : "AS_INSIDE_VOTE_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "AS_INSIDE_VOTE_2R";
                     case TransactionAmount.ACTION_SPEND:
