@@ -1523,6 +1523,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_ACCOUNTING_CASH_FUND:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
+                    case TransactionAmount.ACTION_DEBT:
                         return "Participant";
                     case TransactionAmount.ACTION_SPEND:
                         return "Recipient";
