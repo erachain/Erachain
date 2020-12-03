@@ -1268,7 +1268,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // STANDARD ACTION PROCESS
         processAction(dcSet, false, creator, recipient, actionType, absKey, key, amount, backward, isDirect, incomeReverse);
 
-        if (asset.isChangeDebtBySendActions()) {
+        if (asset.isChangeDebtBySendActions() && actionType == ACTION_SEND) {
             // если это актив который должен поменять и балансы Долговые то
             processAction(dcSet, false, creator, recipient, ACTION_DEBT,
                     absKey, -key, amount, backward, isDirect, incomeReverse);
@@ -1312,7 +1312,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // STANDARD ACTION ORPHAN
         processAction(dcSet, true, creator, recipient, actionType, absKey, key, amount, backward, isDirect, incomeReverse);
 
-        if (asset.isChangeDebtBySendActions()) {
+        if (asset.isChangeDebtBySendActions() && actionType == ACTION_SEND) {
             // если это актив который должен поменять и балансы Долговые то
             processAction(dcSet, true, creator, recipient, ACTION_DEBT,
                     absKey, -key, amount, backward, isDirect, incomeReverse);
