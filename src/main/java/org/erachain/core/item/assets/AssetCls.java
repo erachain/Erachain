@@ -779,7 +779,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_BANK_GUARANTEE:
                 return "Bank Guarantee";
             case AS_BANK_GUARANTEE_TOTAL:
-                return "Bank Guarantee Total";
+                return "Accounting Bank Guarantee";
             case AS_INDEX:
                 return "Index";
             case AS_INSIDE_OTHER_CLAIM:
@@ -792,9 +792,9 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Accounting Loan";
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
-                return "Accounting Mutual Aid Fund";
+                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_NF";
             case AS_SELF_ACCOUNTING_CASH_FUND:
-                return "Accounting Cash Fund";
+                return "AS_SELF_ACCOUNTING_CASH_FUND_NF";
 
         }
         return null;
@@ -846,7 +846,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_BANK_GUARANTEE:
                 return "Bank Guarantee";
             case AS_BANK_GUARANTEE_TOTAL:
-                return "Bank Guarantee Total";
+                return "Accounting Bank Guarantee";
             case AS_INDEX:
                 return "Digital Index";
             case AS_INSIDE_OTHER_CLAIM:
@@ -859,9 +859,9 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Accounting Loan for Debtor";
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
-                return "Accounting Mutual Aid Fund for Donators";
+                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_NF";
             case AS_SELF_ACCOUNTING_CASH_FUND:
-                return "Accounting Cash Fund for Participants";
+                return "AS_SELF_ACCOUNTING_CASH_FUND_NF";
 
         }
         return null;
@@ -946,9 +946,9 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_CURRENCY:
                 return "AS_OUTSIDE_CURRENCY_D";
             case AS_OUTSIDE_WORK_TIME_HOURS:
-                return "Рабочее время в часах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие часы можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в часах рабочего времени";
+                return "AS_OUTSIDE_WORK_TIME_HOURS_D";
             case AS_OUTSIDE_WORK_TIME_MINUTES:
-                return "Рабочее время в минутах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие минуты можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в минутах рабочего времени";
+                return "AS_OUTSIDE_WORK_TIME_MINUTES_D";
             case AS_OUTSIDE_SERVICE:
                 return "An external service that needs to be provided outside. To notify your wish to provide services you must make demands and then confirm the fulfillment";
             case AS_OUTSIDE_SHARE:
@@ -978,7 +978,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_BANK_GUARANTEE:
                 return "A digital bank guarantee";
             case AS_BANK_GUARANTEE_TOTAL:
-                return "A digital bank guarantee total accounting";
+                return "A digital accounting bank guarantee";
             case AS_INDEX:
                 return "Index on foreign and domestic assets, for example currencies on FOREX";
             case AS_INSIDE_OTHER_CLAIM:
@@ -1044,12 +1044,12 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_WORK_TIME_MINUTES:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Transfer to the ownership of person-minutes"; // Передать в собственность рабочие минуты
+                        return backward ? null : "AS_OUTSIDE_WORK_TIME_MINUTES_1"; // Передать в собственность рабочие минуты
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Decline the demand for person-minutes" // Отозвать требование траты рабочих минут
-                                : "Demand to spend person-minutes"; // Потребовать потратить рабочие минуты
+                        return backward ? "AS_OUTSIDE_WORK_TIME_MINUTES_2B" // Отозвать требование траты рабочих минут
+                                : "AS_OUTSIDE_WORK_TIME_MINUTES_2"; // Потребовать потратить рабочие минуты
                     case TransactionAmount.ACTION_SPEND:
-                        return backward ? null : "Confirm the spend of person-minutes"; // Подтвердить затраты рабочих минут
+                        return backward ? null : "AS_OUTSIDE_WORK_TIME_MINUTES_4"; // Подтвердить затраты рабочих минут
                     default:
                         return null;
                 }
@@ -1058,7 +1058,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_SEND:
                         return backward ? null : "Transfer Service Requirement";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать требование в предоставлении услуг"
+                        return backward ? "To reduce the provision of services" // Отозвать требование в предоставлении услуг
                                 : "To require the provision of services";
                     case TransactionAmount.ACTION_SPEND:
                         return backward ? null : "Confirm the provision of services";
@@ -1103,7 +1103,7 @@ public abstract class AssetCls extends ItemCls {
                                 : "AS_MY_DEBT_2";
                     case TransactionAmount.ACTION_SPEND:
                         return isCreatorOwner ? null // эмитент долга не может делать погашения
-                                : backward ? "AS_MY_DEBT_4B" : "AS_MY_DEBT_4";
+                                : backward ? null : "AS_MY_DEBT_4";
                     default:
                         return null;
                 }
