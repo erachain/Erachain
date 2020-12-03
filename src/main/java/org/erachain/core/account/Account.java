@@ -866,7 +866,7 @@ public class Account {
      */
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
-    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, boolean isBackward, long key,
+    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean subtract, boolean isBackward, long key,
                                                                     BigDecimal amount_in, boolean isDirect, boolean isNotSender, boolean notUpdateIncomed) {
 
         int actionType = balancePosition(key, amount_in, isBackward, isDirect);
@@ -900,7 +900,7 @@ public class Account {
             // OWN + property
             //if (isBackward) amount = amount.negate();
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                    substract ? new Tuple2<BigDecimal, BigDecimal>(
+                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
                             updateIncomed ? balance.a.a.subtract(amount) : balance.a.a, balance.a.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.a.a.add(amount) : balance.a.a,
                             balance.a.b.add(amount)),
@@ -909,7 +909,7 @@ public class Account {
             // DEBT + CREDIT
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a,
-                    substract ? new Tuple2<BigDecimal, BigDecimal>(
+                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
                             updateIncomed ? balance.b.a.subtract(amount) : balance.b.a, balance.b.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.b.a.add(amount) : balance.b.a,
                             balance.b.b.add(amount)),
@@ -919,7 +919,7 @@ public class Account {
 
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a, balance.b,
-                    substract ? new Tuple2<BigDecimal, BigDecimal>(
+                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
                             updateIncomed ? balance.c.a.subtract(amount) : balance.c.a, balance.c.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.c.a.add(amount) : balance.c.a,
                             balance.c.b.add(amount)),
@@ -939,7 +939,7 @@ public class Account {
 
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     ownBalance, balance.b, balance.c,
-                    substract ? new Tuple2<BigDecimal, BigDecimal>(
+                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
                             updateIncomed ? balance.d.a.subtract(amount) : balance.d.a, balance.d.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.d.a.add(amount) : balance.d.a,
                             balance.d.b.add(amount)),
