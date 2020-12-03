@@ -253,9 +253,23 @@ public abstract class AssetCls extends ItemCls {
     /**
      * accounting loan
      * +++ мой займ другому лицу - учетный, бухгалтерский учет
-     * === подобно AS_SELF_MANAGED
+     * === подобно AS_SELF_MANAGED_ACCOUNTING - но долговой баланс - отражает требование к оплате
      */
     public static final int AS_SELF_ACCOUNTING_LOAN = 125;
+
+    /**
+     * mutual aid fund
+     * +++ фонд взаимопомощи - учетный, бухгалтерский учет
+     * === подобно AS_SELF_MANAGED_ACCOUNTING - поидее тут без требований к оплате
+     */
+    public static final int AS_SELF_ACCOUNTING_MUTUAL_AID_FUND = 126;
+
+    /**
+     * cash fund
+     * +++ денежный фонд - для учета взносов ТСЖ например - учетный, бухгалтерский учет
+     * === подобно AS_SELF_MANAGED_ACCOUNTING - c требованиями к оплате и с автоматическим снятием требования (DEBT) при погашении
+     */
+    public static final int AS_SELF_ACCOUNTING_CASH_FUND = 127;
 
     // + or -
     protected int scale;
@@ -365,6 +379,8 @@ public abstract class AssetCls extends ItemCls {
                 return "◒";
             case AS_SELF_MANAGED_ACCOUNTING:
             case AS_SELF_ACCOUNTING_LOAN:
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+            case AS_SELF_ACCOUNTING_CASH_FUND:
                 return "±";
             case AS_MY_DEBT:
                 return "◆";
@@ -664,7 +680,7 @@ public abstract class AssetCls extends ItemCls {
      * @return
      */
     public boolean isSelfManaged() {
-        return assetType == AS_SELF_MANAGED_ACCOUNTING || assetType == AS_SELF_ACCOUNTING_LOAN;
+        return assetType >= AS_SELF_MANAGED_ACCOUNTING;
     }
 
     /**
@@ -673,13 +689,20 @@ public abstract class AssetCls extends ItemCls {
      * @return
      */
     public boolean isDirectBalances() {
-        return assetType == AS_SELF_MANAGED_ACCOUNTING || assetType == AS_SELF_ACCOUNTING_LOAN;
+        return assetType >= AS_SELF_MANAGED_ACCOUNTING;
     }
 
     public boolean isAccounting() {
-        return this.assetType == AS_ACCOUNTING
-                || assetType == AS_SELF_MANAGED_ACCOUNTING
-                || assetType == AS_SELF_ACCOUNTING_LOAN;
+        return this.assetType >= AS_SELF_MANAGED_ACCOUNTING;
+    }
+
+    /**
+     * Actions on OWN balance will update DEBT balance too
+     *
+     * @return
+     */
+    public boolean isChangeDebtBySendActions() {
+        return this.assetType == AS_SELF_ACCOUNTING_CASH_FUND;
     }
 
     /**
@@ -768,6 +791,11 @@ public abstract class AssetCls extends ItemCls {
                 return "Self Managed";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Accounting Loan";
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+                return "Accounting Mutual Aid Fund";
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                return "Accounting Cash Fund";
+
         }
         return null;
     }
@@ -830,6 +858,11 @@ public abstract class AssetCls extends ItemCls {
                 return "Self Managed for Accounting";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Accounting Loan for Debtor";
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+                return "Accounting Mutual Aid Fund for Donators";
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                return "Accounting Cash Fund for Participants";
+
         }
         return null;
     }
@@ -888,6 +921,10 @@ public abstract class AssetCls extends ItemCls {
                 return "SAcc";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "AccL";
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+                return "AccAF";
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                return "AccCF";
         }
         return "?";
     }
@@ -952,6 +989,11 @@ public abstract class AssetCls extends ItemCls {
                 return "AS_SELF_MANAGED_D";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "AS_ACCOUNTING_LOAN_D";
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_D";
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                return "AS_SELF_ACCOUNTING_CASH_FUND_D";
+
         }
         return "";
     }
@@ -1208,6 +1250,27 @@ public abstract class AssetCls extends ItemCls {
                     default:
                         return null;
                 }
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return backward ? "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_1B" : "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_1";
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_4B" : "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_4";
+                    default:
+                        return null;
+                }
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return backward ? "AS_SELF_ACCOUNTING_CASH_FUND_1B" : "AS_SELF_ACCOUNTING_CASH_FUND_1";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "AS_SELF_ACCOUNTING_CASH_FUND_2B" : "AS_SELF_ACCOUNTING_CASH_FUND_2";
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? "AS_SELF_ACCOUNTING_CASH_FUND_4B" : "AS_SELF_ACCOUNTING_CASH_FUND_4";
+                    default:
+                        return null;
+                }
+
         }
 
         switch (actionType) {
@@ -1237,8 +1300,7 @@ public abstract class AssetCls extends ItemCls {
 
     public static String viewAssetTypeAdditionAction(long assetKey, int assetType, boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
-            case AS_SELF_MANAGED_ACCOUNTING:
-            case AS_SELF_ACCOUNTING_LOAN:
+            case AS_SELF_ACCOUNTING_CASH_FUND:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
                         return "AS_SELF_SEND_ADDITIONAL_ACT_DEBT";
@@ -1247,6 +1309,14 @@ public abstract class AssetCls extends ItemCls {
         return null;
     }
 
+    /**
+     * isMirrorDebtBySend - same
+     *
+     * @param backward
+     * @param actionType
+     * @param isCreatorOwner
+     * @return
+     */
     public String viewAssetTypeAdditionAction(boolean backward, int actionType, boolean isCreatorOwner) {
         return viewAssetTypeAdditionAction(key, assetType, backward, actionType, isCreatorOwner);
     }
@@ -1352,6 +1422,9 @@ public abstract class AssetCls extends ItemCls {
                 return "Accountant";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Lender";
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                return "Cashier";
             case AS_OUTSIDE_IMMOVABLE:
             case AS_OUTSIDE_CURRENCY:
             case AS_OUTSIDE_SERVICE:
@@ -1440,6 +1513,20 @@ public abstract class AssetCls extends ItemCls {
                 return "Ledger";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Debtor";
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Benefactor";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Recipient";
+                }
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Participant";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Recipient";
+                }
             case AS_OUTSIDE_IMMOVABLE:
             case AS_OUTSIDE_CURRENCY:
             case AS_OUTSIDE_SERVICE:
