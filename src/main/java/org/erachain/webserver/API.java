@@ -1003,19 +1003,19 @@ public class API {
     public Response getAddressAssetBalance(@PathParam("address") String address,
                                            @PathParam("assetid") String assetid) {
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
 
         }
 
-        Long assetAsLong = null;
+        Long assetAsLong;
 
         // HAS ASSET NUMBERFORMAT
         try {
             assetAsLong = Long.valueOf(assetid);
-
         } catch (NumberFormatException e) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
@@ -1027,11 +1027,11 @@ public class API {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_ASSET_NOT_EXIST);
-
         }
 
+
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
-                = dcSet.getAssetBalanceMap().get(Account.makeShortBytes(address), assetAsLong);
+                = result.a.getBalance(assetAsLong);
         JSONArray array = new JSONArray();
 
         array.add(setJSONArray(balance.a));

@@ -780,9 +780,9 @@ public class RSendResource {
 
             Fun.Tuple2<Account, String> accResult = Account.tryMakeAccount(fromAddress);
             if (accResult.b != null) {
-                out.put("error", -123);
-                out.put("error_message", accResult);
-                return out.toJSONString();
+                throw ApiErrorFactory.getInstance().createError(
+                        //ApiErrorFactory.ERROR_INVALID_ADDRESS);
+                        Transaction.INVALID_ADDRESS);
             }
 
             Account accountFrom = accResult.a;
@@ -794,7 +794,6 @@ public class RSendResource {
             TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
 
             byte[] key;
-            Crypto crypto = Crypto.getInstance();
             Fun.Tuple2<BigDecimal, BigDecimal> balance;
 
             int count = 0;
