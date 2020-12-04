@@ -55,12 +55,19 @@ public class AddImageLabel extends JPanel {
                 }
             }
         });
+
+
         JPopupMenu menu = new JPopupMenu();
         JMenuItem resetMenu = new JMenuItem(Lang.getInstance().translate("Reset"));
         resetMenu.addActionListener(e -> reset());
         menu.add(resetMenu);
         setComponentPopupMenu(menu);
         validate();
+    }
+
+    public void setImageHorizontalAlignment(int alig){
+        mainLabel.setHorizontalAlignment(alig);
+        label.setHorizontalAlignment(alig);
     }
 
     private ImageIcon createImageIcon(Color color, int width, int height) {

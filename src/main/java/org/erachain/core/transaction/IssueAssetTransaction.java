@@ -297,8 +297,10 @@ public class IssueAssetTransaction extends IssueItemRecord {
                     new BigDecimal(quantity).setScale(0), false, false, false);
 
             // make HOLD balance
-            creator.changeBalance(dcSet, false, true, asset.getKey(dcSet),
-                    new BigDecimal(-quantity).setScale(0), false, false, false);
+            if (!asset.isUnHoldable()) {
+                creator.changeBalance(dcSet, false, true, asset.getKey(dcSet),
+                        new BigDecimal(-quantity).setScale(0), false, false, false);
+            }
 
         } else if (quantity == 0) {
             // безразмерные - нужно баланс в таблицу нулевой записать чтобы в блокэксплорере он отображался у счета
@@ -323,8 +325,10 @@ public class IssueAssetTransaction extends IssueItemRecord {
                     new BigDecimal(quantity).setScale(0), false, false, false);
 
             // на балансе На Руках - добавляем тоже
-            creator.changeBalance(dcSet, true, false, asset.getKey(dcSet),
-                    new BigDecimal(-quantity).setScale(0), false, false, false);
+            if (!asset.isUnHoldable()) {
+                creator.changeBalance(dcSet, true, false, asset.getKey(dcSet),
+                        new BigDecimal(-quantity).setScale(0), false, false, false);
+            }
         }
     }
 

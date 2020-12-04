@@ -25,6 +25,7 @@ public abstract class AssetCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.ASSET_TYPE;
 
+    public final static long START_KEY = ItemCls.START_KEY;
     public static final long MIN_START_KEY = 1000L;
 
     // CORE KEY
@@ -211,15 +212,15 @@ public abstract class AssetCls extends ItemCls {
 
     /**
      * bank guarantee - банковская гарантия
-     * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого
+     * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого - так как не требует действий 2-й стороны - скорее бухгалтерская единица?
      */
+
     public static final int AS_BANK_GUARANTEE = 60;
     /**
-     * bank guarantee total - банковская гарантия общая сумма
+     * bank guarantee total - банковская гарантия общая сумма - так как не требует действий 2-й стороны - скорее бухгалтерская единица?
      * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_BANK_GUARANTEE_TOTAL = 61;
-
 
     /**
      * INDEXES (FOREX etc.)
@@ -252,9 +253,23 @@ public abstract class AssetCls extends ItemCls {
     /**
      * accounting loan
      * +++ мой займ другому лицу - учетный, бухгалтерский учет
-     * === подобно AS_SELF_MANAGED
+     * === подобно AS_SELF_MANAGED_ACCOUNTING - но долговой баланс - отражает требование к оплате
      */
     public static final int AS_SELF_ACCOUNTING_LOAN = 125;
+
+    /**
+     * mutual aid fund
+     * +++ фонд взаимопомощи - учетный, бухгалтерский учет
+     * === подобно AS_SELF_MANAGED_ACCOUNTING - поидее тут без требований к оплате
+     */
+    public static final int AS_SELF_ACCOUNTING_MUTUAL_AID_FUND = 126;
+
+    /**
+     * cash fund
+     * +++ денежный фонд - для учета взносов ТСЖ например - учетный, бухгалтерский учет
+     * === подобно AS_SELF_MANAGED_ACCOUNTING - c требованиями к оплате и с автоматическим снятием требования (DEBT) при погашении
+     */
+    public static final int AS_SELF_ACCOUNTING_CASH_FUND = 127;
 
     // + or -
     protected int scale;
@@ -282,19 +297,13 @@ public abstract class AssetCls extends ItemCls {
     }
 
     @Override
-    public long getStartKey() {
+    public long START_KEY() {
+        return START_KEY;
+    }
 
-        if (!BlockChain.CLONE_MODE)
-            return MIN_START_KEY;
-
-        long startKey = BlockChain.startKeys[TYPE_KEY];
-
-        if (startKey == 0) {
-            return START_KEY;
-        } else if (startKey < MIN_START_KEY) {
-            return (BlockChain.startKeys[TYPE_KEY] = MIN_START_KEY);
-        }
-        return startKey;
+    @Override
+    public long MIN_START_KEY() {
+        return MIN_START_KEY;
     }
 
     @Override
@@ -370,6 +379,8 @@ public abstract class AssetCls extends ItemCls {
                 return "◒";
             case AS_SELF_MANAGED_ACCOUNTING:
             case AS_SELF_ACCOUNTING_LOAN:
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+            case AS_SELF_ACCOUNTING_CASH_FUND:
                 return "±";
             case AS_MY_DEBT:
                 return "◆";
@@ -649,13 +660,27 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType == AS_OUTSIDE_OTHER_CLAIM;
     }
 
+    public static boolean isUnHoldable(long key, int assetType) {
+        if (key < getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY, AssetCls.MIN_START_KEY)
+                || assetType > AssetCls.AS_OUTSIDE_OTHER_CLAIM
+                && assetType <= AssetCls.AS_INSIDE_OTHER_CLAIM
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isUnHoldable() {
+        return isUnHoldable(key, assetType);
+    }
+
     /**
      * Управлять может только сам обладатель
      *
      * @return
      */
     public boolean isSelfManaged() {
-        return assetType == AS_SELF_MANAGED_ACCOUNTING || assetType == AS_SELF_ACCOUNTING_LOAN;
+        return assetType >= AS_SELF_MANAGED_ACCOUNTING;
     }
 
     /**
@@ -664,13 +689,20 @@ public abstract class AssetCls extends ItemCls {
      * @return
      */
     public boolean isDirectBalances() {
-        return assetType == AS_SELF_MANAGED_ACCOUNTING || assetType == AS_SELF_ACCOUNTING_LOAN;
+        return assetType >= AS_SELF_MANAGED_ACCOUNTING;
     }
 
     public boolean isAccounting() {
-        return this.assetType == AS_ACCOUNTING
-                || assetType == AS_SELF_MANAGED_ACCOUNTING
-                || assetType == AS_SELF_ACCOUNTING_LOAN;
+        return this.assetType >= AS_SELF_MANAGED_ACCOUNTING;
+    }
+
+    /**
+     * Actions on OWN balance will update DEBT balance too
+     *
+     * @return
+     */
+    public boolean isChangeDebtBySendActions() {
+        return this.assetType == AS_SELF_ACCOUNTING_CASH_FUND;
     }
 
     /**
@@ -747,7 +779,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_BANK_GUARANTEE:
                 return "Bank Guarantee";
             case AS_BANK_GUARANTEE_TOTAL:
-                return "Bank Guarantee Total";
+                return "Accounting Bank Guarantee";
             case AS_INDEX:
                 return "Index";
             case AS_INSIDE_OTHER_CLAIM:
@@ -759,6 +791,11 @@ public abstract class AssetCls extends ItemCls {
                 return "Self Managed";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Accounting Loan";
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_NF";
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                return "AS_SELF_ACCOUNTING_CASH_FUND_NF";
+
         }
         return null;
     }
@@ -809,7 +846,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_BANK_GUARANTEE:
                 return "Bank Guarantee";
             case AS_BANK_GUARANTEE_TOTAL:
-                return "Bank Guarantee Total";
+                return "Accounting Bank Guarantee";
             case AS_INDEX:
                 return "Digital Index";
             case AS_INSIDE_OTHER_CLAIM:
@@ -821,6 +858,11 @@ public abstract class AssetCls extends ItemCls {
                 return "Self Managed for Accounting";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Accounting Loan for Debtor";
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_NF";
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                return "AS_SELF_ACCOUNTING_CASH_FUND_NF";
+
         }
         return null;
     }
@@ -879,6 +921,10 @@ public abstract class AssetCls extends ItemCls {
                 return "SAcc";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "AccL";
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+                return "AccAF";
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                return "AccCF";
         }
         return "?";
     }
@@ -900,9 +946,9 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_CURRENCY:
                 return "AS_OUTSIDE_CURRENCY_D";
             case AS_OUTSIDE_WORK_TIME_HOURS:
-                return "Рабочее время в часах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие часы можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в часах рабочего времени";
+                return "AS_OUTSIDE_WORK_TIME_HOURS_D";
             case AS_OUTSIDE_WORK_TIME_MINUTES:
-                return "Рабочее время в минутах. Учет ведется как ваш долг перед кем-то потратить на него свое рабочее время. Рабочие минуты можно передать тому кому вы должны свою работу, можно потребовать исполнить работу и можно подтвердить что работа была сделана, выразив эти действия в минутах рабочего времени";
+                return "AS_OUTSIDE_WORK_TIME_MINUTES_D";
             case AS_OUTSIDE_SERVICE:
                 return "An external service that needs to be provided outside. To notify your wish to provide services you must make demands and then confirm the fulfillment";
             case AS_OUTSIDE_SHARE:
@@ -930,24 +976,29 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_VOTE:
                 return "A digital voice for voting";
             case AS_BANK_GUARANTEE:
-                return "A digital bank guarantee.";
+                return "A digital bank guarantee";
             case AS_BANK_GUARANTEE_TOTAL:
-                return "A digital bank guarantee total accounting.";
+                return "A digital accounting bank guarantee";
             case AS_INDEX:
                 return "Index on foreign and domestic assets, for example currencies on FOREX";
             case AS_INSIDE_OTHER_CLAIM:
-                return "Other digital rights, requirements and obligations. These assets (as well as other digital assets) can be given in debt and seized by the lender.";
+                return "Other digital rights, requirements and obligations. These assets (as well as other digital assets) can be given in debt and seized by the lender";
             case AS_ACCOUNTING:
                 return "AS_ACCOUNTING_D";
             case AS_SELF_MANAGED_ACCOUNTING:
                 return "AS_SELF_MANAGED_D";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "AS_ACCOUNTING_LOAN_D";
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_D";
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                return "AS_SELF_ACCOUNTING_CASH_FUND_D";
+
         }
         return "";
     }
 
-    public static String viewAssetTypeAction(int assetType, boolean backward, int actionType, boolean isCreatorOwner) {
+    public static String viewAssetTypeAction(long assetKey, int assetType, boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
                 switch (actionType) {
@@ -981,24 +1032,24 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_WORK_TIME_HOURS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Transfer to the ownership of person-hour"; // Передать в собственность рабочие часы
+                        return backward ? null : "AS_OUTSIDE_WORK_TIME_HOURS_1"; // Передать в собственность рабочие часы
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Decline the demand for person-hour" // Отозвать требование траты рабочих часов
-                                : "Demand to spend person-hour"; // Потребовать потратить рабочие часы
+                        return backward ? "AS_OUTSIDE_WORK_TIME_HOURS_2B" // Отозвать требование траты рабочих часов
+                                : "AS_OUTSIDE_WORK_TIME_HOURS_2"; // Потребовать потратить рабочие часы
                     case TransactionAmount.ACTION_SPEND:
-                        return backward ? null : "Confirm the spend of person-hour"; // Подтвердить затраты рабочих часов
+                        return backward ? null : "AS_OUTSIDE_WORK_TIME_HOURS_4"; // Подтвердить затраты рабочих часов
                     default:
                         return null;
                 }
             case AS_OUTSIDE_WORK_TIME_MINUTES:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Transfer to the ownership of person-minutes"; // Передать в собственность рабочие минуты
+                        return backward ? null : "AS_OUTSIDE_WORK_TIME_MINUTES_1"; // Передать в собственность рабочие минуты
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Decline the demand for person-minutes" // Отозвать требование траты рабочих минут
-                                : "Demand to spend person-minutes"; // Потребовать потратить рабочие минуты
+                        return backward ? "AS_OUTSIDE_WORK_TIME_MINUTES_2B" // Отозвать требование траты рабочих минут
+                                : "AS_OUTSIDE_WORK_TIME_MINUTES_2"; // Потребовать потратить рабочие минуты
                     case TransactionAmount.ACTION_SPEND:
-                        return backward ? null : "Confirm the spend of person-minutes"; // Подтвердить затраты рабочих минут
+                        return backward ? null : "AS_OUTSIDE_WORK_TIME_MINUTES_4"; // Подтвердить затраты рабочих минут
                     default:
                         return null;
                 }
@@ -1007,7 +1058,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_SEND:
                         return backward ? null : "Transfer Service Requirement";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать требование в предоставлении услуг"
+                        return backward ? "To reduce the provision of services" // Отозвать требование в предоставлении услуг
                                 : "To require the provision of services";
                     case TransactionAmount.ACTION_SPEND:
                         return backward ? null : "Confirm the provision of services";
@@ -1032,12 +1083,12 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL_EX:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Передать в собственность вексель";
+                        return backward ? null : "AS_OUTSIDE_BILL_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать требование погашения векселя"
-                                : "Потребовать погашения векселя";
+                        return backward ? "AS_OUTSIDE_BILL_2B"
+                                : "AS_OUTSIDE_BILL_2";
                     case TransactionAmount.ACTION_SPEND:
-                        return backward ? null : "Подтвердить погашение векселя";
+                        return backward ? null : "AS_OUTSIDE_BILL_4";
                     default:
                         return null;
                 }
@@ -1052,126 +1103,125 @@ public abstract class AssetCls extends ItemCls {
                                 : "AS_MY_DEBT_2";
                     case TransactionAmount.ACTION_SPEND:
                         return isCreatorOwner ? null // эмитент долга не может делать погашения
-                                : backward ? "AS_MY_DEBT_4B" : "AS_MY_DEBT_4";
+                                : backward ? null : "AS_MY_DEBT_4";
                     default:
                         return null;
                 }
             case AS_OUTSIDE_OTHER_CLAIM:
-            case AS_INSIDE_OTHER_CLAIM:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Передать в собственность требование";
+                        return backward ? null : isCreatorOwner ? "AS_OUTSIDE_OTHER_CLAIM_Issue"
+                                : "AS_OUTSIDE_OTHER_CLAIM_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать требование исполнения права"
-                                : "Потребовать исполнения своего права";
+                        return backward ? "AS_OUTSIDE_OTHER_CLAIM_2B"
+                                : "AS_OUTSIDE_OTHER_CLAIM_2";
                     case TransactionAmount.ACTION_SPEND:
-                        return backward ? null : "Подтвердить исполнение своего права";
+                        return backward ? null : "AS_OUTSIDE_OTHER_CLAIM_4";
                     default:
                         return null;
                 }
             case AS_INSIDE_CURRENCY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Перевести в собственность деньги";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Учесть прием денег на баланс" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_CURRENCY_Issue"
+                                : "AS_INSIDE_CURRENCY_1";
+                    default:
                         return null;
                 }
-                break;
             case AS_INSIDE_UTILITY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Передать в собственность услугу";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Учесть получение услуги" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_UTILITY_Issue"
+                                : "AS_INSIDE_UTILITY_1";
+                    default:
                         return null;
                 }
-                break;
             case AS_INSIDE_SHARE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Передать в собственность акции";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Take the reception into balance" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_SHARE_Issue"
+                                : "AS_INSIDE_SHARE_1";
+                    default:
                         return null;
                 }
-                break;
             case AS_INSIDE_BONUS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Transfer bonuses";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Take the reception into balance" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_BONUS_Issue"
+                                : "AS_INSIDE_BONUS_1";
+                    default:
                         return null;
                 }
-                break;
             case AS_INSIDE_ACCESS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Grant rights";
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_ACCESS_Issue" : "AS_INSIDE_ACCESS_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "To confiscate a delegated rights"
-                                : "Delegate rights";
+                        return backward ? "AS_INSIDE_ACCESS_2B"
+                                : "AS_INSIDE_ACCESS_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Return delegate rights";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Take the reception into balance" : null;
+                        return "AS_INSIDE_ACCESS_2R";
                     case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                        return "AS_INSIDE_ACCESS_4";
+                    default:
                         return null;
                 }
-                break;
             case AS_INSIDE_VOTE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Grant voice";
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_VOTE_Issue" : "AS_INSIDE_VOTE_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "To confiscate a delegated vote"
-                                : "Delegate voice";
+                        return backward ? "AS_INSIDE_VOTE_2B"
+                                : "AS_INSIDE_VOTE_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Return delegate vote";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Take the reception into balance" : null;
+                        return "AS_INSIDE_VOTE_2R";
                     case TransactionAmount.ACTION_SPEND:
-                    case TransactionAmount.ACTION_PLEDGE:
+                        return "AS_INSIDE_VOTE_4";
+                    default:
                         return null;
                 }
-                break;
             case AS_BANK_GUARANTEE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Передать банковскую гарантию";
+                        return backward ? null : isCreatorOwner ? "AS_BANK_GUARANTEE_Issue" : "AS_BANK_GUARANTEE_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать банковскую гарантию" : "Выдать банковскую гарантию";
+                        return backward ? "AS_BANK_GUARANTEE_2B" : "AS_BANK_GUARANTEE_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Вернуть банковскую гарантию";
+                        return "AS_BANK_GUARANTEE_2R";
                     case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Акцептовать банковскую гарантию" : null;
+                        return backward ? "AS_BANK_GUARANTEE_3" : null;
                     case TransactionAmount.ACTION_SPEND:
+                        return backward ? null : "AS_BANK_GUARANTEE_4";
+                    default:
                         return null;
                 }
-                break;
             case AS_BANK_GUARANTEE_TOTAL:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? null : "Передать учетную банковскую гарантию";
+                        return backward ? null : isCreatorOwner ? "AS_BANK_GUARANTEE_TOTAL_Issue" : "AS_BANK_GUARANTEE_TOTAL_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозвать учетную банковскую гарантию" : "Выдать учетную банковскую гарантию";
+                        return backward ? "AS_BANK_GUARANTEE_TOTAL_2B" : "AS_BANK_GUARANTEE_TOTAL_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Вернуть учетную банковскую гарантию";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Hold" : null;
+                        return "AS_BANK_GUARANTEE_TOTAL_2R";
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? null : "AS_BANK_GUARANTEE_TOTAL_4";
+                    default:
+                        return null;
                 }
-                break;
             case AS_INDEX:
+                break;
+            case AS_INSIDE_OTHER_CLAIM:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return backward ? null : isCreatorOwner ? "AS_INSIDE_OTHER_CLAIM_Issue" : "AS_INSIDE_OTHER_CLAIM_1";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "AS_INSIDE_OTHER_CLAIM_2B"
+                                : "AS_INSIDE_OTHER_CLAIM_2";
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? null : "AS_INSIDE_OTHER_CLAIM_4";
+                    default:
+                        return null;
+                }
             case AS_ACCOUNTING:
                 break;
             case AS_SELF_MANAGED_ACCOUNTING:
@@ -1194,12 +1244,32 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_DEBT:
                         return backward ? "AS_ACCOUNTING_LOAN_2B" : "AS_ACCOUNTING_LOAN_2";
                     case TransactionAmount.ACTION_HOLD:
+                        // SPEND нельзя брать так как он Баланс Мой изменит у меня
                         return backward ? "AS_ACCOUNTING_LOAN_3B" : "AS_ACCOUNTING_LOAN_3";
-                    //case TransactionAmount.ACTION_SPEND:
-                    //    return backward ? "AS_ACCOUNTING_LOAN_4B" : "AS_ACCOUNTING_LOAN_4";
                     default:
                         return null;
                 }
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return backward ? "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_1B" : "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_1";
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_4B" : "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_4";
+                    default:
+                        return null;
+                }
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return backward ? "AS_SELF_ACCOUNTING_CASH_FUND_1B" : "AS_SELF_ACCOUNTING_CASH_FUND_1";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "AS_SELF_ACCOUNTING_CASH_FUND_2B" : "AS_SELF_ACCOUNTING_CASH_FUND_2";
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? "AS_SELF_ACCOUNTING_CASH_FUND_4B" : "AS_SELF_ACCOUNTING_CASH_FUND_4";
+                    default:
+                        return null;
+                }
+
         }
 
         switch (actionType) {
@@ -1211,7 +1281,8 @@ public abstract class AssetCls extends ItemCls {
             case TransactionAmount.ACTION_REPAY_DEBT:
                 return "Return debt";
             case TransactionAmount.ACTION_HOLD:
-                return backward ? "Confirm acceptance \"in hand\"" : null;
+                return isUnHoldable(assetKey, assetType) ? null
+                        : backward ? "Confirm acceptance \"in hand\"" : null;
             case TransactionAmount.ACTION_SPEND:
                 return backward ? null : "Spend";
             case TransactionAmount.ACTION_PLEDGE:
@@ -1223,24 +1294,56 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public String viewAssetTypeAction(boolean backward, int actionType, boolean isCreatorOwner) {
-        return viewAssetTypeAction(assetType, backward, actionType, isCreatorOwner);
+        return viewAssetTypeAction(key, assetType, backward, actionType, isCreatorOwner);
     }
 
-    public static List<String> viewAssetTypeActionsList(int assetType) {
+    public static String viewAssetTypeAdditionAction(long assetKey, int assetType, boolean backward, int actionType, boolean isCreatorOwner) {
+        switch (assetType) {
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "AS_SELF_SEND_ADDITIONAL_ACT_DEBT";
+                }
+        }
+        return null;
+    }
+
+    /**
+     * isMirrorDebtBySend - same
+     *
+     * @param backward
+     * @param actionType
+     * @param isCreatorOwner
+     * @return
+     */
+    public String viewAssetTypeAdditionAction(boolean backward, int actionType, boolean isCreatorOwner) {
+        return viewAssetTypeAdditionAction(key, assetType, backward, actionType, isCreatorOwner);
+    }
+
+    public static List<String> viewAssetTypeActionsList(long assetKey, int assetType) {
         List<String> list = new ArrayList<>();
 
         String actionStr;
+        String addActionStr;
         for (int action = TransactionAmount.ACTION_SEND; action < TransactionAmount.ACTION_PLEDGE; action++) {
-            actionStr = viewAssetTypeAction(assetType, false, action, true);
+            if (action != TransactionAmount.ACTION_SEND) {
+                // не писать что выпуск доступен и так понятно
+                actionStr = viewAssetTypeAction(assetKey, assetType, false, action, true);
+                if (actionStr != null && !list.contains(actionStr))
+                    list.add(actionStr);
+            }
+            actionStr = viewAssetTypeAction(assetKey, assetType, false, action, false);
+            if (actionStr != null && !list.contains(actionStr)) {
+                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, false, action, false);
+                if (addActionStr != null) {
+                    list.add(addActionStr);
+                }
+                list.add(actionStr);
+            }
+            actionStr = viewAssetTypeAction(assetKey, assetType, true, action, true);
             if (actionStr != null && !list.contains(actionStr))
                 list.add(actionStr);
-            actionStr = viewAssetTypeAction(assetType, false, action, false);
-            if (actionStr != null && !list.contains(actionStr))
-                list.add(actionStr);
-            actionStr = viewAssetTypeAction(assetType, true, action, true);
-            if (actionStr != null && !list.contains(actionStr))
-                list.add(actionStr);
-            actionStr = viewAssetTypeAction(assetType, true, action, false);
+            actionStr = viewAssetTypeAction(assetKey, assetType, true, action, false);
             if (actionStr != null && !list.contains(actionStr))
                 list.add(actionStr);
         }
@@ -1249,37 +1352,13 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public List<String> viewAssetTypeActionsList() {
-        return viewAssetTypeActionsList(assetType);
+        return viewAssetTypeActionsList(key, assetType);
     }
 
     public String viewAssetTypeActionTitle(boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
             case AS_BANK_GUARANTEE:
-                switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
-                        return "Передача банковской гарантии";
-                    case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отзыв банковской гарантии" : "Выдача банковской гарантии";
-                    case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Возврат банковской гарантии";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Акцептование банковской гарантии" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                        return "Погашение банковской гарантии";
-                }
             case AS_BANK_GUARANTEE_TOTAL:
-                switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
-                        return "Передача учетной банковской гарантии";
-                    case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отзыв учетной банковской гарантии" : "Выдача учетной банковской гарантии";
-                    case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Возврат учетной банковской гарантии";
-                    case TransactionAmount.ACTION_HOLD:
-                        return backward ? "Акцептование учетной банковской гарантии" : null;
-                    case TransactionAmount.ACTION_SPEND:
-                        return "Погашение учетной банковской гарантии";
-                }
             case AS_OUTSIDE_IMMOVABLE:
             case AS_OUTSIDE_CURRENCY:
             case AS_OUTSIDE_SERVICE:
@@ -1342,6 +1421,9 @@ public abstract class AssetCls extends ItemCls {
                 return "Accountant";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Lender";
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                return "Cashier";
             case AS_OUTSIDE_IMMOVABLE:
             case AS_OUTSIDE_CURRENCY:
             case AS_OUTSIDE_SERVICE:
@@ -1430,6 +1512,21 @@ public abstract class AssetCls extends ItemCls {
                 return "Ledger";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Debtor";
+            case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Benefactor";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Recipient";
+                }
+            case AS_SELF_ACCOUNTING_CASH_FUND:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                    case TransactionAmount.ACTION_DEBT:
+                        return "Participant";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Recipient";
+                }
             case AS_OUTSIDE_IMMOVABLE:
             case AS_OUTSIDE_CURRENCY:
             case AS_OUTSIDE_SERVICE:

@@ -36,6 +36,7 @@ import java.util.Map;
 public abstract class ItemCls implements Iconable, ExplorerJsonLine {
 
     protected final static long START_KEY = 1L << 14;
+
     public static final int ASSET_TYPE = 1;
     public static final int IMPRINT_TYPE = 2;
     public static final int TEMPLATE_TYPE = 3;
@@ -134,12 +135,31 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         return db.getItem_Map(type).get(key);
     }
 
-    // RETURN START KEY in not GENESIS
-    public abstract long getStartKey();
+    public abstract int getItemType();
+
+    public abstract long START_KEY();
+
+    public abstract long MIN_START_KEY();
+
+    public static long getStartKey(int itemType, long startKey, long minStartKey) {
+        if (!BlockChain.CLONE_MODE)
+            return minStartKey;
+
+        long startKeyUser = BlockChain.startKeys[itemType];
+
+        if (startKeyUser == 0) {
+            return startKey;
+        } else if (startKeyUser < minStartKey) {
+            return (BlockChain.startKeys[itemType] = minStartKey);
+        }
+        return startKeyUser;
+    }
+
+    public long getStartKey() {
+        return getStartKey(getItemType(), START_KEY(), MIN_START_KEY());
+    }
 
     public abstract int getMinNameLen();
-
-    public abstract int getItemType();
 
     public abstract String getItemTypeName();
     //public abstract FavoriteItemMap getDBFavoriteMap();

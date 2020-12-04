@@ -1,5 +1,6 @@
 package org.erachain.core.item.assets;
 
+import org.erachain.core.item.ItemCls;
 import org.erachain.lang.Lang;
 
 import java.util.StringJoiner;
@@ -15,13 +16,14 @@ public class AssetType {
         this.name = Lang.getInstance().translate(AssetCls.viewAssetTypeCls(assetType));
         this.nameFull = Lang.getInstance().translate(AssetCls.viewAssetTypeFullCls(assetType));
         StringJoiner joiner = new StringJoiner(", ");
-        for (String action : AssetCls.viewAssetTypeActionsList(assetType)) {
+        for (String action : AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
+                AssetCls.ASSET_TYPE, AssetCls.START_KEY, AssetCls.MIN_START_KEY),
+                assetType)) {
             joiner.add(Lang.getInstance().translate(action));
         }
 
-        this.description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(assetType)
-                + ".\n" + Lang.getInstance().translate("Acceptable actions") + ":\n" + joiner.toString()
-        );
+        this.description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(assetType))
+                + ".\n" + Lang.getInstance().translate("Acceptable actions") + ":\n" + joiner.toString();
 
     }
 
