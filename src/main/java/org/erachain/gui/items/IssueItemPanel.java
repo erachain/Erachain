@@ -160,13 +160,52 @@ public abstract class IssueItemPanel extends IconPanel {
 
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 20;
+        gridBagConstraints.gridwidth = 19;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
         jPanelMain.add(fromJComboBox, gridBagConstraints);
+
+
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanelMain.add(exLinkTextLabel, gridBagConstraints);
+
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanelMain.add(exLinkText, gridBagConstraints);
+
+        exLinkDescriptionLabel.setText(Lang.getInstance().translate("Parent") + ":");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 13;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanelMain.add(exLinkDescriptionLabel, gridBagConstraints);
+
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 15;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridwidth = 12;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.9;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
+        jPanelMain.add(exLinkDescription, gridBagConstraints);
 
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -179,51 +218,15 @@ public abstract class IssueItemPanel extends IconPanel {
 
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 20;
+        gridBagConstraints.gridwidth = 19;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
         jPanelMain.add(textName, gridBagConstraints);
 
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        jPanelMain.add(exLinkTextLabel, gridBagConstraints);
-
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 7;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
-        jPanelMain.add(exLinkText, gridBagConstraints);
-
-        exLinkDescriptionLabel.setText(Lang.getInstance().translate("Parent") + ":");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 17;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        jPanelMain.add(exLinkDescriptionLabel, gridBagConstraints);
-
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 19;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelMain.add(exLinkDescription, gridBagConstraints);
 
 
         return y;
@@ -247,9 +250,9 @@ public abstract class IssueItemPanel extends IconPanel {
         jScrollPane1.setViewportView(textAreaDescription);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 20;
+        gridBagConstraints.gridwidth = 19;
        // gridBagConstraints.gridheight = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.4;
@@ -268,20 +271,20 @@ public abstract class IssueItemPanel extends IconPanel {
 
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 0);
         jPanelMain.add(textFeePow, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 12;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.gridwidth = 23;
+     //   gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+     //   gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 5, 8);
         jPanelMain.add(issueJButton, gridBagConstraints);
 
