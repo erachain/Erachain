@@ -687,7 +687,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 }
 
                 // for PARSE and toBYTES need only AMOUNT_LENGTH bytes
-                if (true || this.getAbsKey() > BlockChain.AMOUNT_SCALE_FROM) {
+                if (absKey > BlockChain.AMOUNT_SCALE_FROM) {
                     byte[] amountBytes = this.amount.unscaledValue().toByteArray();
                     if (amountBytes.length > AMOUNT_LENGTH) {
                         return AMOUNT_LENGHT_SO_LONG;
@@ -695,11 +695,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     // SCALE wrong
                     int scale = this.amount.scale();
                     if (scale < minSCALE
-                            || scale > maxSCALE) {
-                        return AMOUNT_SCALE_WRONG;
-                    }
-                    scale = this.amount.stripTrailingZeros().scale();
-                    if (scale > asset.getScale()) {
+                            || scale > maxSCALE
+                            || scale > asset.getScale()) {
                         return AMOUNT_SCALE_WRONG;
                     }
                 }
