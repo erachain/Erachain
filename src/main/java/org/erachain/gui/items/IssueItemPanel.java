@@ -250,7 +250,7 @@ public abstract class IssueItemPanel extends IconPanel {
         gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 20;
-        gridBagConstraints.gridheight = 7;
+       // gridBagConstraints.gridheight = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.weighty = 0.5;

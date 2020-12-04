@@ -69,9 +69,9 @@ public class IssueAssetPanel extends IssueItemPanel {
     }
 
     protected void initComponents() {
-        // намтройка панели
+        // намтройка панелей
         super.initComponents();
-        // вывод верхнгей панели
+        // вывод верхней панели
         int y = super.initTopArea();
 
         // insert asset issue info
