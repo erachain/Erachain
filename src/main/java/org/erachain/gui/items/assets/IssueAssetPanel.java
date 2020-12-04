@@ -69,8 +69,10 @@ public class IssueAssetPanel extends IssueItemPanel {
     }
 
     protected void initComponents() {
-
+        // намтройка панели
         super.initComponents();
+        // вывод верхнгей панели
+        int y = super.initTopArea();
 
         // insert asset issue info
         // grid x - 4...26
@@ -80,7 +82,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
@@ -88,7 +90,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 7;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 20;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
@@ -104,7 +106,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 7;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 20;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
@@ -114,7 +116,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
@@ -123,7 +125,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 7;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 9;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
@@ -133,7 +135,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 17;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
@@ -142,14 +144,15 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 19;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
         jPanelMain.add(textScale, gridBagConstraints);
 
-
+        // вывод подвала
+        super.initBottom(y);
     }
 
     public void onIssueClick() {
