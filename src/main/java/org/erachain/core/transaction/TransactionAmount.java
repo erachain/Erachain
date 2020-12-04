@@ -933,8 +933,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                         forSale = forSale.subtract(assetFee);
                                     }
 
-                                    if (!BlockChain.ERA_COMPU_ALL_UP
-                                            && !BlockChain.isFeeEnough(height, creator)
+                                    if (!BlockChain.isFeeEnough(height, creator)
                                             && forSale.compareTo(this.amount.add(this.fee)) < 0) {
 
                                         /// если это девелоп то не проверяем ниже особые счета

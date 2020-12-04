@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.core.item.assets.AssetCls;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -126,13 +125,6 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         if (key < 0)
             key = -key;
 
-        if (true && BlockChain.CHECK_BUGS > 1) {
-            DCSet dcSet = (DCSet) getDBSet();
-            AssetCls asset = dcSet.getItemAssetMap().get(key);
-            if (asset.getScale() < value.a.b.scale()) {
-                boolean debug = true;
-            }
-        }
         this.put(Bytes.concat(address, Longs.toByteArray(key)), value);
     }
 
