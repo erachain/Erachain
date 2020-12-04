@@ -89,9 +89,9 @@ public class IssueAssetPanel extends IssueItemPanel {
         jPanelMain.add(typeJLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 20;
+        gridBagConstraints.gridwidth = 19;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
@@ -105,9 +105,9 @@ public class IssueAssetPanel extends IssueItemPanel {
         scrollPaneAssetTypeDescription.setViewportView(textareasAssetTypeDescription);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 20;
+        gridBagConstraints.gridwidth = 27;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
@@ -115,26 +115,26 @@ public class IssueAssetPanel extends IssueItemPanel {
 
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
         jPanelMain.add(quantityJLabel, gridBagConstraints);
 
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 9;
+        gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
         jPanelMain.add(textQuantity, gridBagConstraints);
 
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 17;
+        gridBagConstraints.gridx = 13;
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -143,11 +143,11 @@ public class IssueAssetPanel extends IssueItemPanel {
 
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 19;
+        gridBagConstraints.gridx = 15;
         gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
+     //   gridBagConstraints.gridwidth = 4;
+     //   gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+     //   gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
         jPanelMain.add(textScale, gridBagConstraints);
 
