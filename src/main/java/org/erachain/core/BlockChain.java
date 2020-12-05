@@ -221,7 +221,7 @@ public class BlockChain {
      * Если задан то это режим синхронизации со стрым протоколом - значит нам нельза генерить блоки и трнзакции
      * и вести себя тихо - ничего не посылать никуда - чтобы не забанили
      */
-    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 1537000; // see in sidePROTOCOL.json as 'allValidBefore'
+    public static int ALL_VALID_BEFORE = DEMO_MODE ? 167400 : TEST_DB > 0 || !MAIN_MODE ? 0 : 1537000; // see in sidePROTOCOL.json as 'allValidBefore'
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 623904; //260120;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам<bR>
@@ -234,6 +234,7 @@ public class BlockChain {
     /**
      * {@link LEFT_PRICE_HEIGHT} as SeqNo
      */
+    
     public static final long LEFT_PRICE_HEIGHT_SEQ = Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
 
     public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 44666;

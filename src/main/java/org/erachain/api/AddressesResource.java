@@ -365,19 +365,19 @@ public class AddressesResource {
     public String getAssetBalance(@PathParam("assetid") String assetid,
                                   @PathParam("address") String address) {
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
 
         }
 
-        Long assetAsLong = null;
+        Long assetAsLong;
 
         // HAS ASSET NUMBERFORMAT
         try {
             assetAsLong = Long.valueOf(assetid);
-
         } catch (NumberFormatException e) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
@@ -393,7 +393,7 @@ public class AddressesResource {
         }
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
-                = DCSet.getInstance().getAssetBalanceMap().get(Account.makeShortBytes(address), assetAsLong);
+                = result.a.getBalance(assetAsLong);
 
         return tuple5_toJson(balance).toJSONString();
     }
@@ -403,7 +403,8 @@ public class AddressesResource {
     public String getAssetBalanceOwn(@PathParam("assetid") String assetid,
                                      @PathParam("address") String address) {
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
@@ -441,7 +442,8 @@ public class AddressesResource {
     public String getAssetBalanceIncomedOwn(@PathParam("assetid") String assetid,
                                             @PathParam("address") String address) {
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
@@ -479,18 +481,18 @@ public class AddressesResource {
     @Path("assets/{address}")
     public String getAssetBalance(@PathParam("address") String address) {
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
-
         }
 
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
         List<Tuple2<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> assetsBalances
-                = map.getBalancesList(new Account(address));
+                = map.getBalancesList(result.a);
 
         JSONObject assetsBalancesJSON = new JSONObject();
 

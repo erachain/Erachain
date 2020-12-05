@@ -858,20 +858,21 @@ public class API {
     /*
      * ********** ADDRESS **********
      */
-    // TODO перименовать бы LastTimestamp - так более понятно
+    // TODO переименовать бы LastTimestamp - так более понятно
     @GET
     @Path("addresslastreference/{address}")
     public Response getAddressLastReference(@PathParam("address") String address) {
 
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
         }
 
         // GET ACCOUNT
-        Account account = new Account(address);
+        Account account = result.a;
 
         long[] lastTimestamp = account.getLastTimestamp();
 
@@ -898,14 +899,15 @@ public class API {
         // сейчас этот поиск делается по другому и он не нужен вообще для создания транзакций а следовательно закроем его
         /*
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
         }
 
         // GET ACCOUNT
-        Account account = new Account(address);
+        Account account = result.a;
 
         HashSet<byte[]> isSomeoneReference = new HashSet<byte[]>();
 
@@ -980,14 +982,15 @@ public class API {
     public Response getAddressGeneratingBalanceOfAddress(
             @PathParam("address") String address) {
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
 
         }
 
-        Account account = new Account(address);
+        Account account = result.a;
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -1003,19 +1006,19 @@ public class API {
     public Response getAddressAssetBalance(@PathParam("address") String address,
                                            @PathParam("assetid") String assetid) {
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
 
         }
 
-        Long assetAsLong = null;
+        Long assetAsLong;
 
         // HAS ASSET NUMBERFORMAT
         try {
             assetAsLong = Long.valueOf(assetid);
-
         } catch (NumberFormatException e) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
@@ -1027,11 +1030,11 @@ public class API {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_ASSET_NOT_EXIST);
-
         }
 
+
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
-                = dcSet.getAssetBalanceMap().get(Account.makeShortBytes(address), assetAsLong);
+                = result.a.getBalance(assetAsLong);
         JSONArray array = new JSONArray();
 
         array.add(setJSONArray(balance.a));
@@ -1051,14 +1054,15 @@ public class API {
     @Path("addressassets/{address}")
     public Response getAddressAssetBalance(@PathParam("address") String address) {
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
 
         }
 
-        Account account = new Account(address);
+        Account account = result.a;
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
         List<Tuple2<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
@@ -1105,7 +1109,7 @@ public class API {
     public Response getPublicKey(@PathParam("address") String address) {
 
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        if (PublicKeyAccount.isValidPublicKey(address)) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
@@ -1185,7 +1189,8 @@ public class API {
     public Response getPersonKey(@PathParam("address") String address) {
 
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
@@ -1572,7 +1577,8 @@ public class API {
     public Response getPersonKeyByAddres(@PathParam("address") String address) {
 
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
@@ -1679,7 +1685,8 @@ public class API {
     public Response personByAddress(@PathParam("address") String address) {
 
         // CHECK IF VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
                     //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);

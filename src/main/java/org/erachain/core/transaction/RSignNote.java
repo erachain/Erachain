@@ -281,6 +281,9 @@ public class RSignNote extends Transaction implements Itemable {
     public long getKey() {
         if (this.key == 0 && typeBytes[1] > 1) {
             // если новый порядок - ключ в Данных
+            if (extendedData == null) {
+                parseDataV2WithoutFiles();
+            }
             return extendedData.getTemplateKey();
         }
         return this.key;

@@ -1,6 +1,5 @@
 package org.erachain.core.item.statements;
 
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
@@ -28,23 +27,20 @@ public abstract class StatementCls extends ItemCls {
     }
 
     //GETTERS/SETTERS
+
+    @Override
     public int getItemType() {
         return TYPE_KEY;
     }
 
     @Override
-    public long getStartKey() {
-        if (!BlockChain.CLONE_MODE)
-            return MIN_START_KEY;
+    public long START_KEY() {
+        return START_KEY;
+    }
 
-        long startKey = BlockChain.startKeys[TYPE_KEY];
-
-        if (startKey == 0) {
-            return START_KEY;
-        } else if (startKey < MIN_START_KEY) {
-            return (BlockChain.startKeys[TYPE_KEY] = MIN_START_KEY);
-        }
-        return startKey;
+    @Override
+    public long MIN_START_KEY() {
+        return MIN_START_KEY;
     }
 
     public String getItemTypeName() {
