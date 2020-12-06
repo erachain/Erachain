@@ -706,6 +706,15 @@ public abstract class AssetCls extends ItemCls {
     }
 
     /**
+     * Если обратный Послать то в меню местами меняем
+     *
+     * @return
+     */
+    public boolean isReverseSend() {
+        return this.assetType == AS_SELF_ACCOUNTING_CASH_FUND;
+    }
+
+    /**
      * Без ограничений - только если это счетная единица или сам владелец без огрничений
      *
      * @param address
