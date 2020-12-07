@@ -395,6 +395,9 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
             }
         });*/
 
+        // вывод подвала
+        super.initBottom(y);
+
     }
 
 
