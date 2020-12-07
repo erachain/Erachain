@@ -1,26 +1,17 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetType;
 import org.erachain.core.transaction.IssueAssetTransaction;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.IssueItemPanel;
-import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MDecimalFormatedTextField;
-import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import java.awt.*;
-
-import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 /**
  * @author Саша
@@ -154,89 +145,60 @@ public class IssueAssetPanel extends IssueItemPanel {
         super.initBottom(y);
     }
 
-    public void onIssueClick() {
-        // DISABLE
-        issueJButton.setEnabled(false);
-        if (checkWalletUnlock(issueJButton)) {
-            return;
-        }
+    int scale;
+    long quantity;
+    int assetType;
 
-        // READ CREATOR
-        Account sender = (Account) fromJComboBox.getSelectedItem();
+    protected boolean checkValues() {
 
-        ExLink exLink = null;
-        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
-        if (linkRef != null) {
-            exLink = new ExLinkAppendix(linkRef);
-        }
-
-        int parsestep = 0;
-        int feePow;
-        byte scale;
-        long quantity;
-        int forDeal = Transaction.FOR_NETWORK;
-
+        int parseStep = 0;
         try {
-            // READ FEE POW
-            feePow = Integer.parseInt((String) textFeePow.getSelectedItem());
 
             // READ SCALE
-            parsestep++;
             scale = Byte.parseByte((String) textScale.getSelectedItem());
 
-
             // READ QUANTITY
-            parsestep++;
+            parseStep++;
             quantity = Long.parseLong(textQuantity.getText());
 
         } catch (Exception e) {
-            switch (parsestep) {
+            switch (parseStep) {
                 case 0:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Invalid Fee Power!"), Lang.getInstance().translate("Error"),
-                            JOptionPane.ERROR_MESSAGE);
-                    break;
-                case 1:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
                             Lang.getInstance().translate("Invalid Scale!"), Lang.getInstance().translate("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     break;
-                case 2:
+                case 1:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
                             Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     break;
             }
-
-            // ENABLE
-            issueJButton.setEnabled(true);
-            return;
+            return false;
         }
 
-        // SCALE, ASSET_TYPE, QUANTITY
-        PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
-        if (creator == null) {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            // ENABLE
-            issueJButton.setEnabled(true);
-            return;
-        }
+        assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
 
+        return true;
+    }
 
-        int assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
+    protected void makeTransaction() {
 
-        IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
-                creator, exLink, textName.getText(), textAreaDescription.getText(), addLogoIconLabel.getImgBytes(),
-                addImageLabel.getImgBytes(), scale, assetType, quantity, feePow);
+        transaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
+                creator, exLink, textName.getText(), textAreaDescription.getText(),
+                addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
+                scale, assetType, quantity, feePow);
 
-        AssetCls asset = (AssetCls) issueAssetTransaction.getItem();
+    }
+
+    protected String makeTransactionView() {
+
+        AssetCls asset = (AssetCls) transaction.getItem();
 
         String text = "<HTML><body><h2>";
         text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
                 + Lang.getInstance().translate("Issue Asset") + "</h2>"
-                + Lang.getInstance().translate("Creator") + ":&nbsp;<b>" + issueAssetTransaction.getCreator() + "</b><br>"
+                + Lang.getInstance().translate("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
                 + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
                 + "[" + asset.getKey() + "]" + Lang.getInstance().translate("Name") + ":&nbsp;" + asset.viewName() + "<br>"
                 + Lang.getInstance().translate("Quantity") + ":&nbsp;" + asset.getQuantity() + "<br>"
@@ -249,28 +211,9 @@ public class IssueAssetPanel extends IssueItemPanel {
         } else {
             text += Library.to_HTML(asset.viewDescription()) + "<br>";
         }
-        String statusText = "";
 
-        IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(),
-                true, issueAssetTransaction,
-                text, (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
-                Lang.getInstance().translate("Confirmation Transaction"));
-        confirmDialog.setLocationRelativeTo(this);
-        confirmDialog.setVisible(true);
+        return text;
 
-        // JOptionPane.OK_OPTION
-        if (confirmDialog.isConfirm) {
-            // VALIDATE AND PROCESS
-            int result = Controller.getInstance().getTransactionCreator().afterCreate(issueAssetTransaction, forDeal);
-            // CHECK VALIDATE MESSAGE
-            if (result != Transaction.VALIDATE_OK) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(result)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        // ENABLE
-        issueJButton.setEnabled(true);
     }
 
 }

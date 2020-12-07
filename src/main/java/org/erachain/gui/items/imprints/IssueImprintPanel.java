@@ -1,24 +1,14 @@
 package org.erachain.gui.items.imprints;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.transaction.IssueImprintRecord;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.IssueItemPanel;
-import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
-import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import java.awt.*;
-
-import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 
 @SuppressWarnings("serial")
@@ -166,112 +156,36 @@ public class IssueImprintPanel extends IssueItemPanel {
         this.setVisible(true);
     }
 
-    public void onIssueClick() {
-        // DISABLE
-        issueJButton.setEnabled(false);
-        if (checkWalletUnlock(issueJButton)) {
-            return;
-        }
+    String name_total;
 
-        // READ CREATOR
-        Account sender = (Account) fromJComboBox.getSelectedItem();
-
-        ExLink exLink = null;
-        Long linkRef = null; //Transaction.parseDBRef(exLinkText.getText());
-        if (linkRef != null) {
-            exLink = new ExLinkAppendix(linkRef);
-        }
+    protected boolean checkValues() {
 
         long parse = 0;
-        try {
 
-            //READ FEE POW
-            int feePow = Integer.parseInt((String) this.textFeePow.getSelectedItem());
-            // READ AMOUNT
-            //float amount = Float.parseFloat(this.txtAmount.getText());
+        // NAME TOTAL
+        name_total = this.txtNumber.getText().trim() + this.txtDate.getText().trim()
+                + this.txtDebitor.getText().trim() + this.txtCreditor.getText().trim() + this.txtAmount.getText().trim();
 
-            // NAME TOTAL
-            String name_total = this.txtNumber.getText().trim() + this.txtDate.getText().trim()
-                    + this.txtDebitor.getText().trim() + this.txtCreditor.getText().trim() + this.txtAmount.getText().trim();
+        // CUT BYTES LEN
+        name_total = Imprint.hashNameToBase58(name_total);
+        return true;
+    }
 
-            // CUT BYTES LEN
-            name_total = Imprint.hashNameToBase58(name_total);
-            String description = this.txtDescription.getText();
+    protected void makeTransaction() {
 
-            byte[] icon = null;
-            byte[] image = null;
-            //CREATE IMPRINT
-            PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
-            if (creator == null) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+        transaction = (IssueImprintRecord) Controller.getInstance().issueImprint1(creator, exLink, name_total,
+                textAreaDescription.getText(),
+                addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
+                feePow);
+    }
 
-            IssueImprintRecord imprint = (IssueImprintRecord) Controller.getInstance().issueImprint1(creator, exLink, name_total, description,
-                    icon, image, feePow);
+    protected String makeTransactionView() {
 
-            //Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
-            String text = "<HTML><body>";
-            text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;" + Lang.getInstance().translate("Issue Imprint") + "<br><br><br>";
-            text += Lang.getInstance().translate("Creator") + ":&nbsp;" + imprint.getCreator() + "<br>";
-            text += Library.to_HTML(imprint.getItem().getDescription()) + "<br>";
+        String text = "<HTML><body>";
+        text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;" + Lang.getInstance().translate("Issue Imprint") + "<br><br><br>";
+        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>";
+        text += Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
 
-            String Status_text = "";
-
-            //	  System.out.print("\n"+ text +"\n");
-            //	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
-            //	    UIManager.put("OptionPane.okButtonText", "Готово");
-
-            //	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
-
-            IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, imprint,
-                    text, (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
-            dd.setLocationRelativeTo(this);
-            dd.setVisible(true);
-
-            //	JOptionPane.OK_OPTION
-            if (!dd.isConfirm) { //s!= JOptionPane.OK_OPTION)	{
-
-                issueButton.setEnabled(true);
-
-                return;
-            }
-
-
-            int result = Controller.getInstance().getTransactionCreator().afterCreate(imprint, Transaction.FOR_NETWORK);
-
-
-            //CHECK VALIDATE MESSAGE
-            if (result == Transaction.VALIDATE_OK) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Imprint issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-                //			this.dispose();
-
-                //this.txtAmount.setText("");
-                //this.txtCreditor.setText("");
-                //this.txtDate.setText("");
-                //this.txtFeePow.setSelectedItem("0");
-                //this.txtNumber.setText("");
-                //this.txtDebitor.setText("");
-                //this.cbxFrom.setSelectedIndex(0);
-
-
-            } else {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(result)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            }
-
-        } catch (Exception e) {
-            if (parse == 0) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            }
-        }
-
-        //ENABLE
-        this.issueButton.setEnabled(true);
+        return text;
     }
 }
