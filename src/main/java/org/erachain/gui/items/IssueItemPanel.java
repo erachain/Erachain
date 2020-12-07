@@ -1,15 +1,18 @@
 package org.erachain.gui.items;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.library.AddImageLabel;
-import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 
 import static org.erachain.gui.items.utils.GUIConstants.*;
@@ -71,6 +74,36 @@ public abstract class IssueItemPanel extends IconPanel {
         feeJLabel.setVisible(Gui.SHOW_FEE_POWER);
         textFeePow.setVisible(Gui.SHOW_FEE_POWER);
         issueJButton.addActionListener(arg0 -> onIssueClick());
+
+        exLinkDescription.setEditable(false);
+        exLinkText.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                viewLinkParent();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                viewLinkParent();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                viewLinkParent();
+            }
+        });
+
+    }
+
+    private void viewLinkParent() {
+        String refStr = exLinkText.getText();
+        Transaction parentTx = Controller.getInstance().getTransaction(refStr);
+        if (parentTx == null) {
+            exLinkDescription.setText(Lang.getInstance().translate("Not Found") + "!");
+        } else {
+            exLinkDescription.setText(parentTx.toStringShortAsCreator());
+        }
     }
 
     protected void initComponents() {

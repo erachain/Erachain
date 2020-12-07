@@ -3,6 +3,8 @@ package org.erachain.gui.items.assets;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetType;
@@ -165,6 +167,12 @@ public class IssueAssetPanel extends IssueItemPanel {
         // READ CREATOR
         Account sender = (Account) fromJComboBox.getSelectedItem();
 
+        ExLink exLink = null;
+        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
+        if (linkRef != null) {
+            exLink = new ExLinkAppendix(linkRef);
+        }
+
         int parsestep = 0;
         try {
 
@@ -199,15 +207,16 @@ public class IssueAssetPanel extends IssueItemPanel {
             int assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
 
             IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
-                    creator, null, textName.getText(), textAreaDescription.getText(), addLogoIconLabel.getImgBytes(),
+                    creator, exLink, textName.getText(), textAreaDescription.getText(), addLogoIconLabel.getImgBytes(),
                     addImageLabel.getImgBytes(), scale, assetType, quantity, feePow);
 
             AssetCls asset = (AssetCls) issueAssetTransaction.getItem();
 
-            String text = "<HTML><body>";
+            String text = "<HTML><body><h2>";
             text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
-                    + Lang.getInstance().translate("Issue Asset") + "<br><br><br>"
-                    + Lang.getInstance().translate("Creator") + ":&nbsp;" + issueAssetTransaction.getCreator() + "<br>"
+                    + Lang.getInstance().translate("Issue Asset") + "</h2>"
+                    + Lang.getInstance().translate("Creator") + ":&nbsp;<b>" + issueAssetTransaction.getCreator() + "</b><br>"
+                    + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
                     + "[" + asset.getKey() + "]" + Lang.getInstance().translate("Name") + ":&nbsp;" + asset.viewName() + "<br>"
                     + Lang.getInstance().translate("Quantity") + ":&nbsp;" + asset.getQuantity() + "<br>"
                     + Lang.getInstance().translate("Asset Type") + ":&nbsp;"
