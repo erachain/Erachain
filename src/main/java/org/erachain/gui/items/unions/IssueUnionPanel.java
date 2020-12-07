@@ -207,7 +207,7 @@ public class IssueUnionPanel extends IssueItemPanel {
         txtFeePow.setSelectedItem("0");
     }
 
-    private void initComponents() {
+    protected void initComponents() {
         setLayout(new GridBagLayout());
         GridBagConstraints gridBagConstraints;
 

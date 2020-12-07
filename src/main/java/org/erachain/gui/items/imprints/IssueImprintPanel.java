@@ -8,13 +8,10 @@ import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.transaction.IssueImprintRecord;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
-import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 
@@ -22,8 +19,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
+
+import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 
 @SuppressWarnings("serial")
@@ -32,8 +29,6 @@ public class IssueImprintPanel extends IssueItemPanel {
     public static String NAME = "IssueImprintPanel";
     public static String TITLE = "Issue Unique Hash";
 
-    private JComboBox<Account> cbxFrom;
-    private JComboBox<String> txtFeePow;
     private JTextField txtNumber;
     private JTextField txtDate;
     private JTextField txtDebitor;
@@ -45,18 +40,10 @@ public class IssueImprintPanel extends IssueItemPanel {
     public IssueImprintPanel() {
         super(NAME, TITLE);
 
-        //ICON
-        List<Image> icons = new ArrayList<Image>();
-        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
+        initComponents();
 
-        //LAYOUT
-        this.setLayout(new GridBagLayout());
-
-        //PADDING
-//		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
+        // вывод верхней панели
+        int y = initTopArea();
 
         //LABEL GBC
         GridBagConstraints labelGBC = new GridBagConstraints();
@@ -97,34 +84,7 @@ public class IssueImprintPanel extends IssueItemPanel {
 
         buttonGBC.gridx = 2;
 
-        int gridy = 0;
-        //LABEL FROM
-        labelGBC.gridy = gridy++;
-
-        labelGBC.gridwidth = 3;
-
-
-        JLabel label1 = new JLabel("      " + Lang.getInstance().translate("Issue Imprint"));
-        label1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        label1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        label1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-
-
-        this.add(label1, labelGBC);
-
-        labelGBC.gridwidth = 1;
-
-
-        //LABEL FROM
-        labelGBC.gridy = gridy;
-
-        JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
-        this.add(fromLabel, labelGBC);
-
-        //COMBOBOX FROM
-        txtGBC.gridy = gridy++;
-        this.cbxFrom = new JComboBox<Account>(new AccountsComboBoxModel());
-        this.add(this.cbxFrom, txtGBC);
+        int gridy = y;
 
         //LABEL NUMBER
         labelGBC.gridy = gridy;
@@ -191,41 +151,6 @@ public class IssueImprintPanel extends IssueItemPanel {
         this.txtAmount = new JTextField();
         this.add(this.txtAmount, txtGBC);
 
-        //this.txtareaDescription.setText("");
-        /*
-        //LABEL DESCRIPTION
-      	labelGBC.gridy = gridy;
-      	JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
-      	this.add(descriptionLabel, labelGBC);
-      		
-      	//TXTAREA DESCRIPTION
-      	txtGBC.gridy = gridy++;
-      	this.txtareaDescription = new JTextArea();
-       	
-      	this.txtareaDescription.setRows(6);
-      	this.txtareaDescription.setColumns(20);
-      	this.txtareaDescription.setBorder(this.txtNumber.getBorder());
-
-      	JScrollPane scrollDescription = new JScrollPane(this.txtareaDescription);
-      	scrollDescription.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-      	scrollDescription.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-      	this.add(scrollDescription, txtGBC);
-
-      	*/
-
-        //LABEL FEE POW
-        labelGBC.gridy = gridy;
-        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
-        feeLabel.setVisible(Gui.SHOW_FEE_POWER);
-        this.add(feeLabel, labelGBC);
-
-        //TXT FEE
-        txtGBC.gridy = gridy++;
-        txtFeePow = new JComboBox<String>();
-        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
-        txtFeePow.setSelectedIndex(0);
-        txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
-        this.add(this.txtFeePow, txtGBC);
 
         //BUTTON Register
         buttonGBC.gridy = gridy;
@@ -241,7 +166,6 @@ public class IssueImprintPanel extends IssueItemPanel {
 
         //BUTTON GBC
 
-
         buttonGBC.fill = GridBagConstraints.NONE;
         buttonGBC.anchor = GridBagConstraints.NORTHWEST;
         buttonGBC.gridwidth = 2;
@@ -250,47 +174,21 @@ public class IssueImprintPanel extends IssueItemPanel {
         JLabel labBootom = new JLabel("");
         this.add(labBootom, buttonGBC);
 
+        // вывод подвала
+        initBottom(gridy);
 
-        //   	this.setModal(true);
-        //PACK
-//		this.pack();
-//        this.setResizable(false);
-//        this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
 
     public void onIssueClick() {
-        //DISABLE
-        this.issueButton.setEnabled(false);
-
-        //CHECK IF NETWORK OK
-        if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
-            //NETWORK NOT OK
-            JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-
-            //ENABLE
-            this.issueButton.setEnabled(true);
-
+        // DISABLE
+        issueJButton.setEnabled(false);
+        if (checkWalletUnlock(issueJButton)) {
             return;
         }
 
-        //CHECK IF WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            //ASK FOR PASSWORD
-            String password = PasswordPane.showUnlockWalletDialog(this);
-            if (!Controller.getInstance().unlockWallet(password)) {
-                //WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-
-                //ENABLE
-                this.issueButton.setEnabled(true);
-
-                return;
-            }
-        }
-
-        //READ CREATOR
-        Account sender = (Account) this.cbxFrom.getSelectedItem();
+        // READ CREATOR
+        Account sender = (Account) fromJComboBox.getSelectedItem();
 
         ExLink exLink = null;
         Long linkRef = null; //Transaction.parseDBRef(exLinkText.getText());
@@ -302,7 +200,7 @@ public class IssueImprintPanel extends IssueItemPanel {
         try {
 
             //READ FEE POW
-            int feePow = Integer.parseInt((String) this.txtFeePow.getSelectedItem());
+            int feePow = Integer.parseInt((String) this.textFeePow.getSelectedItem());
             // READ AMOUNT
             //float amount = Float.parseFloat(this.txtAmount.getText());
 

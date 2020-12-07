@@ -56,12 +56,13 @@ public class IssueTemplatePanel extends IssueItemPanel {
 
     public void onIssueClick() {
         // DISABLE
-        jButtonCreate.setEnabled(false);
-        if (checkWalletUnlock(jButtonCreate)) {
+        issueJButton.setEnabled(false);
+        if (checkWalletUnlock(issueJButton)) {
             return;
         }
+
         // READ CREATOR
-        Account sender = (Account) jComboBoxAccountCreator.getSelectedItem();
+        Account sender = (Account) fromJComboBox.getSelectedItem();
 
         ExLink exLink = null;
         Long linkRef = Transaction.parseDBRef(exLinkText.getText());

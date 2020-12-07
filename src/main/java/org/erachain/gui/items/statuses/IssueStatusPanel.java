@@ -184,12 +184,14 @@ public class IssueStatusPanel extends IssueItemPanel {
 
     public void onIssueClick() {
         // DISABLE
-        issueButton.setEnabled(false);
-        if (checkWalletUnlock(issueButton)) {
+        issueJButton.setEnabled(false);
+        if (checkWalletUnlock(issueJButton)) {
             return;
         }
+
         // READ CREATOR
-        Account sender = (Account) cbxFrom.getSelectedItem();
+        Account sender = (Account) fromJComboBox.getSelectedItem();
+
         ExLink exLink = null;
         Long linkRef = Transaction.parseDBRef(exLinkText.getText());
         if (linkRef != null) {

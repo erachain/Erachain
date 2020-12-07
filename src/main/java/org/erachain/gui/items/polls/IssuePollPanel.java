@@ -34,11 +34,6 @@ public class IssuePollPanel extends IssueItemPanel {
     public static String NAME = "IssuePollPanel";
     public static String TITLE = "Issue Poll";
 
-    private JComboBox<Account> cbxFrom;
-    private JComboBox<String> txtFee = new JComboBox<>();
-    private JTextField txtName = new JTextField();
-    private JTextArea txtareaDescription = new JTextArea();
-    private JButton createButton;
     private CreateOptionsTableModel optionsTableModel;
     private AddImageLabel addImageLabel;
     private AddImageLabel addLogoIconLabel;
@@ -47,6 +42,8 @@ public class IssuePollPanel extends IssueItemPanel {
 
     public IssuePollPanel() {
         super(NAME, TITLE);
+
+        initComponents();
 
         setLayout(new GridBagLayout());
         optionsTableModel = new CreateOptionsTableModel(new Object[]{Lang.getInstance().translate("Name")}, 0);
@@ -209,15 +206,15 @@ public class IssuePollPanel extends IssueItemPanel {
         setVisible(true);
     }
 
-    public void onRegisterClick() {
+    public void onIssueClick() {
         // DISABLE
-        createButton.setEnabled(false);
-        if (checkWalletUnlock(createButton)) {
+        issueJButton.setEnabled(false);
+        if (checkWalletUnlock(issueJButton)) {
             return;
         }
 
         // READ CREATOR
-        Account sender = (Account) cbxFrom.getSelectedItem();
+        Account sender = (Account) fromJComboBox.getSelectedItem();
 
         ExLink exLink = null;
         Long linkRef = Transaction.parseDBRef(exLinkText.getText());
@@ -228,7 +225,7 @@ public class IssuePollPanel extends IssueItemPanel {
         int feePow;
         try {
             // READ FEE POWER
-            feePow = Integer.parseInt((String) txtFee.getSelectedItem());
+            feePow = Integer.parseInt((String) textFeePow.getSelectedItem());
         } catch (Exception e) {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee Power!"),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
