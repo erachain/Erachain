@@ -17,8 +17,6 @@ import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
@@ -150,18 +148,6 @@ public class IssueImprintPanel extends IssueItemPanel {
         txtGBC.gridy = gridy++;
         this.txtAmount = new JTextField();
         this.add(this.txtAmount, txtGBC);
-
-
-        //BUTTON Register
-        buttonGBC.gridy = gridy;
-        this.issueButton = new JButton(Lang.getInstance().translate("Issue"));
-        this.issueButton.setPreferredSize(new Dimension(170, 25));
-        this.issueButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onIssueClick();
-            }
-        });
-        this.add(this.issueButton, buttonGBC);
 
 
         //BUTTON GBC

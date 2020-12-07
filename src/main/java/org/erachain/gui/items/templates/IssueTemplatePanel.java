@@ -9,22 +9,16 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.IssueTemplateRecord;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.IssueItemPanel;
-import org.erachain.gui.items.TypeOfImage;
-import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
-import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssueTemplateDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
-import java.awt.*;
 
-import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
@@ -32,20 +26,6 @@ public class IssueTemplatePanel extends IssueItemPanel {
 
     public static String NAME = "IssueTemplatePanel";
     public static String TITLE = "Issue Template";
-
-    private JComboBox<Account> jComboBoxAccountCreator = new JComboBox<>(new AccountsComboBoxModel());
-    private JButton jButtonCreate = new JButton();
-    private JLabel jLabelAccountCreator = new JLabel();
-    private JLabel jLabelContent = new JLabel();
-    private JLabel jLabelFee = new JLabel();
-    private JLabel jLabelIssueTemplate = new JLabel();
-    private JLabel jLabelTitle = new JLabel();
-    private JScrollPane jScrollPane1 = new JScrollPane();
-    private JTextArea jTextAreaContent = new JTextArea();
-    private JComboBox<String> txtFeePow = new JComboBox<>();
-    private JTextField jTextFieldTitle = new JTextField();
-    private AddImageLabel addImageLabel;
-    private AddImageLabel addLogoIconPanel;
 
     public IssueTemplatePanel() {
         super(NAME, TITLE);
@@ -73,16 +53,16 @@ public class IssueTemplatePanel extends IssueItemPanel {
         int feePow;
         try {
             // READ FEE POW
-            feePow = Integer.parseInt((String) txtFeePow.getSelectedItem());
+            feePow = Integer.parseInt((String) textFeePow.getSelectedItem());
         } catch (Exception e) {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             // ENABLE
-            jButtonCreate.setEnabled(true);
+            issueJButton.setEnabled(true);
             return;
         }
 
-        byte[] icon = addLogoIconPanel.getImgBytes();
+        byte[] icon = addLogoIconLabel.getImgBytes();
         byte[] image = addImageLabel.getImgBytes();
 
         // CREATE PLATE
@@ -95,7 +75,7 @@ public class IssueTemplatePanel extends IssueItemPanel {
         }
 
         IssueTemplateRecord issueTemplate = (IssueTemplateRecord) Controller.getInstance().issueTemplate(creator,
-                exLink, jTextFieldTitle.getText(), jTextAreaContent.getText(), icon, image, feePow);
+                exLink, textName.getText(), textAreaDescription.getText(), icon, image, feePow);
 
         String text = "<HTML><body>";
         text += Lang.getInstance().translate("Confirmation transaction issue template") + "<br><br><br>";
@@ -114,7 +94,7 @@ public class IssueTemplatePanel extends IssueItemPanel {
         issueConfirmDialog.setVisible(true);
         // JOptionPane.OK_OPTION
         if (!issueConfirmDialog.isConfirm) {
-            jButtonCreate.setEnabled(true);
+            issueJButton.setEnabled(true);
             return;
         }
         // VALIDATE AND PROCESS
@@ -166,146 +146,10 @@ public class IssueTemplatePanel extends IssueItemPanel {
         }
 
         // ENABLE
-        jButtonCreate.setEnabled(true);
+        issueJButton.setEnabled(true);
     }
 
-    private void initComponents() {
-        setLayout(new GridBagLayout());
-        GridBagConstraints gridBagConstraints;
-
-        jLabelIssueTemplate.setHorizontalAlignment(SwingConstants.CENTER);
-        jLabelIssueTemplate.setText(Lang.getInstance().translate("Issue Template"));
-        jLabelIssueTemplate.setFont(FONT_TITLE);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 8;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new Insets(12, 15, 5, 15);
-        add(jLabelIssueTemplate, gridBagConstraints);
-
-        addImageLabel = new AddImageLabel(
-                Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG,
-                0, ItemCls.MAX_IMAGE_LENGTH, WIDTH_IMAGE_INITIAL, HEIGHT_IMAGE_INITIAL);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(0, 12, 8, 8);
-        add(addImageLabel, gridBagConstraints);
-
-        addLogoIconPanel = new AddImageLabel(Lang.getInstance().translate("Add Logo"),
-                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
-                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        add(addLogoIconPanel, gridBagConstraints);
-
-        jLabelAccountCreator.setText(Lang.getInstance().translate("Account Creator") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
-        gridBagConstraints.insets = new Insets(0, 15, 5, 5);
-        add(jLabelAccountCreator, gridBagConstraints);
-
-        jLabelTitle.setText(Lang.getInstance().translate("Title") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 15, 5, 5);
-        add(jLabelTitle, gridBagConstraints);
-
-        jLabelContent.setText(Lang.getInstance().translate("Content") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(0, 15, 5, 5);
-        add(jLabelContent, gridBagConstraints);
-
-        jLabelFee.setText(Lang.getInstance().translate("Fee Power") + ":");
-        jLabelFee.setVisible(Gui.SHOW_FEE_POWER);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new Insets(0, 15, 5, 5);
-        add(jLabelFee, gridBagConstraints);
-
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.SOUTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 15);
-        add(jComboBoxAccountCreator, gridBagConstraints);
-
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 15);
-        add(jTextFieldTitle, gridBagConstraints);
-
-
-        jTextAreaContent.setColumns(20);
-        jTextAreaContent.setLineWrap(true);
-        jTextAreaContent.setRows(18);
-        jTextAreaContent.setAlignmentY(1F);
-        jScrollPane1.setViewportView(jTextAreaContent);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.gridheight = 3;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.7;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 15);
-        add(jScrollPane1, gridBagConstraints);
-
-
-        txtFeePow.setToolTipText("Level of FEE Power");
-        txtFeePow.setModel(new DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
-        txtFeePow.setSelectedIndex(0);
-        txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
-        txtFeePow.setPreferredSize(new Dimension(80, 20));
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.insets = new Insets(0, 0, 5, 5);
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        add(txtFeePow, gridBagConstraints);
-
-        jButtonCreate.setText(Lang.getInstance().translate("Create"));
-        jButtonCreate.setRequestFocusEnabled(false);
-        jButtonCreate.addActionListener(e -> onIssueClick());
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 15);
-        add(jButtonCreate, gridBagConstraints);
+    protected void initComponents() {
     }
 
 }
