@@ -5,6 +5,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.item.imprints.ImprintCls;
@@ -28,6 +29,8 @@ import static org.junit.Assert.fail;
 public class TestRecImprint {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestRecImprint.class.getName());
+
+    ExLink exLink = null;
 
     int asPack = Transaction.FOR_NETWORK;
     long FEE_KEY = AssetCls.FEE_KEY;

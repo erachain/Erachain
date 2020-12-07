@@ -3,13 +3,15 @@ package org.erachain.gui.items.templates;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.IssueTemplateRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
-import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
+import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -26,7 +28,7 @@ import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
-public class IssueTemplatePanel extends IconPanel {
+public class IssueTemplatePanel extends IssueItemPanel {
 
     public static String NAME = "IssueTemplatePanel";
     public static String TITLE = "Issue Template";
@@ -61,6 +63,12 @@ public class IssueTemplatePanel extends IconPanel {
         // READ CREATOR
         Account sender = (Account) jComboBoxAccountCreator.getSelectedItem();
 
+        ExLink exLink = null;
+        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
+        if (linkRef != null) {
+            exLink = new ExLinkAppendix(linkRef);
+        }
+
         int feePow;
         try {
             // READ FEE POW
@@ -86,7 +94,7 @@ public class IssueTemplatePanel extends IconPanel {
         }
 
         IssueTemplateRecord issueTemplate = (IssueTemplateRecord) Controller.getInstance().issueTemplate(creator,
-                jTextFieldTitle.getText(), jTextAreaContent.getText(), icon, image, feePow);
+                exLink, jTextFieldTitle.getText(), jTextAreaContent.getText(), icon, image, feePow);
 
         String text = "<HTML><body>";
         text += Lang.getInstance().translate("Confirmation transaction issue template") + "<br><br><br>";

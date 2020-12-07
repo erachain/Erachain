@@ -66,25 +66,25 @@ public class IssueStatementRecord extends Transaction {
 
 
     // asPack
-    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
-        this(typeBytes, creator, linkTo, (byte) 0, templateKey, data, isText, encrypted, 0l, reference);
+    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, long templateKey, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
+        this(typeBytes, creator, linkTo, (byte) 0, templateKey, data, isText, encrypted, 0L, reference);
         this.signature = signature;
         // not need this.calcFee();
     }
 
-    public IssueStatementRecord(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
+    public IssueStatementRecord(PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
         // set props
         this.setTypeBytes();
     }
 
-    public IssueStatementRecord(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
+    public IssueStatementRecord(PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference);
         // set props
         this.setTypeBytes();
     }
 
-    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
+    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data,
                                 byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
         this.signers = signers;
@@ -92,7 +92,7 @@ public class IssueStatementRecord extends Transaction {
         this.setTypeBytes();
     }
 
-    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
+    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data,
                                 byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures,
                                 long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
@@ -105,15 +105,15 @@ public class IssueStatementRecord extends Transaction {
     }
 
     // as Pack
-    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data,
+    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, long templateKey, byte[] data,
                                 byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, Long reference, byte[] signature) {
-        this(typeBytes, creator, templateKey, data, isText, encrypted, reference, signature);
+        this(typeBytes, creator, linkTo, templateKey, data, isText, encrypted, reference, signature);
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
     }
 
-    public IssueStatementRecord(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
+    public IssueStatementRecord(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
         this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference);
     }
 
@@ -260,14 +260,14 @@ public class IssueStatementRecord extends Transaction {
                 return new IssueStatementRecord(typeBytes, creator, linkTo, feePow, key, arbitraryData, isTextByte, encryptedByte,
                         timestamp, reference, signatureBytes, seqNo, feeLong);
             } else {
-                return new IssueStatementRecord(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
+                return new IssueStatementRecord(typeBytes, creator, linkTo, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
             }
         } else {
             if (forDeal > Transaction.FOR_MYPACK) {
-                return new IssueStatementRecord(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte,
+                return new IssueStatementRecord(typeBytes, creator, linkTo, feePow, key, arbitraryData, isTextByte, encryptedByte,
                         signers, signatures, timestamp, reference, signatureBytes, seqNo, feeLong);
             } else {
-                return new IssueStatementRecord(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, reference, signatureBytes);
+                return new IssueStatementRecord(typeBytes, creator, linkTo, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, reference, signatureBytes);
             }
 
         }

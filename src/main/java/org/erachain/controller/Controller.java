@@ -3251,11 +3251,11 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction issueStatus(PrivateKeyAccount creator, String name, String description, boolean unique,
+    public Transaction issueStatus(PrivateKeyAccount creator, ExLink linkTo, String name, String description, boolean unique,
                                    byte[] icon, byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueStatusTransaction(creator, name, description, icon, image, unique,
+            return this.transactionCreator.createIssueStatusTransaction(creator, linkTo, name, description, icon, image, unique,
                     feePow);
         }
     }
@@ -3267,20 +3267,20 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction issueTemplate(PrivateKeyAccount creator, String name, String description, byte[] icon,
+    public Transaction issueTemplate(PrivateKeyAccount creator, ExLink linkTo, String name, String description, byte[] icon,
                                      byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueTemplateTransaction(creator, name, description, icon, image,
+            return this.transactionCreator.createIssueTemplateTransaction(creator, linkTo, name, description, icon, image,
                     feePow);
         }
     }
 
-    public Transaction issueUnion(PrivateKeyAccount creator, String name, long birthday, long parent,
+    public Transaction issueUnion(PrivateKeyAccount creator, ExLink linkTo, String name, long birthday, long parent,
                                   String description, byte[] icon, byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueUnionTransaction(creator, name, birthday, parent, description,
+            return this.transactionCreator.createIssueUnionTransaction(creator, linkTo, name, birthday, parent, description,
                     icon, image, feePow);
         }
     }

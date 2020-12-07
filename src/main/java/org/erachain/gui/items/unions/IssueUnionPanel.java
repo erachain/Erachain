@@ -3,14 +3,16 @@ package org.erachain.gui.items.unions;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.IssueUnionRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.Gui;
-import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
+import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -36,7 +38,7 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 //import org.erachain.settings.Settings;
 
 @SuppressWarnings("serial")
-public class IssueUnionPanel extends IconPanel {
+public class IssueUnionPanel extends IssueItemPanel {
 
     public static String NAME = "IssueUnionPanel";
     public static String TITLE = "Issue Union";
@@ -104,6 +106,11 @@ public class IssueUnionPanel extends IconPanel {
 
         //READ CREATOR
         Account sender = (Account) this.cbxFrom.getSelectedItem();
+        ExLink exLink = null;
+        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
+        if (linkRef != null) {
+            exLink = new ExLinkAppendix(linkRef);
+        }
 
         int parse = 0;
         int feePow;
@@ -155,7 +162,7 @@ public class IssueUnionPanel extends IconPanel {
         }
 
         IssueUnionRecord issue_Union = (IssueUnionRecord) Controller.getInstance().issueUnion(
-                creator, this.txtName.getText(), birthday, parent, txtareaDescription.getText(),
+                creator, exLink, this.txtName.getText(), birthday, parent, txtareaDescription.getText(),
                 addLogoLabel.getImgBytes(), image,
                 feePow);
         //Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);

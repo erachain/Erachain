@@ -3,12 +3,14 @@ package org.erachain.gui.items.polls;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
-import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
+import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -27,7 +29,7 @@ import java.util.List;
 import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
-public class IssuePollPanel extends IconPanel {
+public class IssuePollPanel extends IssueItemPanel {
 
     public static String NAME = "IssuePollPanel";
     public static String TITLE = "Issue Poll";
@@ -216,6 +218,13 @@ public class IssuePollPanel extends IconPanel {
 
         // READ CREATOR
         Account sender = (Account) cbxFrom.getSelectedItem();
+
+        ExLink exLink = null;
+        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
+        if (linkRef != null) {
+            exLink = new ExLinkAppendix(linkRef);
+        }
+
         int feePow;
         try {
             // READ FEE POWER
@@ -255,7 +264,7 @@ public class IssuePollPanel extends IconPanel {
         }
 
         IssuePollRecord issuePoll = (IssuePollRecord) Controller.getInstance().issuePoll(creator,
-                null, txtName.getText(), txtareaDescription.getText(),
+                exLink, txtName.getText(), txtareaDescription.getText(),
                 optionsTableModel.getOptions(), icon, image, feePow);
 
         String text = "<HTML><body>";

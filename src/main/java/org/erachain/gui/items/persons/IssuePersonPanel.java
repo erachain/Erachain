@@ -8,6 +8,8 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
@@ -420,6 +422,12 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         // READ CREATOR
         Account sender = (Account) this.fromJComboBox.getSelectedItem();
 
+        ExLink exLink = null;
+        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
+        if (linkRef != null) {
+            exLink = new ExLinkAppendix(linkRef);
+        }
+
         int parse = 0;
         int feePow;
         byte gender;
@@ -495,7 +503,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         }
 
         Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, creator,
-                linkTo, textName.getText(), feePow, birthday, deathday, gender,
+                exLink, textName.getText(), feePow, birthday, deathday, gender,
                 "", //textPersonNumber.getText(),
                 birthLatitude,
                 birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),

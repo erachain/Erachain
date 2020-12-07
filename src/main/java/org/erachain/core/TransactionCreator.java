@@ -466,11 +466,11 @@ public class TransactionCreator {
         return issueStatusRecord;
     }
 
-    public Transaction createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description,
+    public Transaction createIssueStatusTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                     byte[] icon, byte[] image,
                                                     boolean unique, int feePow) {
         StatusCls status = new Status(creator, name, icon, image, description, unique);
-        return createIssueStatusTransaction(creator, null, feePow, status);
+        return createIssueStatusTransaction(creator, linkTo, feePow, status);
     }
 
     public Transaction createIssueTemplateTransaction(PrivateKeyAccount creator, ExLink linkTo, int feePow, TemplateCls template) {
@@ -489,14 +489,14 @@ public class TransactionCreator {
         return issueTemplateRecord;
     }
 
-    public Transaction createIssueTemplateTransaction(PrivateKeyAccount creator, String name, String description,
+    public Transaction createIssueTemplateTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                       byte[] icon, byte[] image,
                                                       int feePow) {
         TemplateCls template = new Template(creator, name, icon, image, description);
-        return createIssueTemplateTransaction(creator, null, feePow, template);
+        return createIssueTemplateTransaction(creator, linkTo, feePow, template);
     }
 
-    public Transaction createIssueUnionTransaction(PrivateKeyAccount creator, String name, long birthday, long parent, String description,
+    public Transaction createIssueUnionTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, long birthday, long parent, String description,
                                                    byte[] icon, byte[] image,
                                                    int feePow) {
         //CHECK FOR UPDATES
@@ -508,7 +508,7 @@ public class TransactionCreator {
         UnionCls union = new Union(creator, name, birthday, parent, icon, image, description);
 
         //CREATE ISSUE PLATE TRANSACTION
-        IssueUnionRecord issueUnionRecord = new IssueUnionRecord(creator, union, (byte) feePow, time, 0l);
+        IssueUnionRecord issueUnionRecord = new IssueUnionRecord(creator, linkTo, union, (byte) feePow, time, 0l);
         issueUnionRecord.sign(creator, Transaction.FOR_NETWORK);
         issueUnionRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 

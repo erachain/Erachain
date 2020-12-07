@@ -9,9 +9,9 @@ import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.transaction.IssueImprintRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
-import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.models.AccountsComboBoxModel;
@@ -27,7 +27,7 @@ import java.util.List;
 
 
 @SuppressWarnings("serial")
-public class IssueImprintPanel extends IconPanel {
+public class IssueImprintPanel extends IssueItemPanel {
 
     public static String NAME = "IssueImprintPanel";
     public static String TITLE = "Issue Unique Hash";

@@ -3,13 +3,15 @@ package org.erachain.gui.items.statuses;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.IssueStatusRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
-import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
+import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -24,7 +26,7 @@ import java.awt.*;
 import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
-public class IssueStatusPanel extends IconPanel {
+public class IssueStatusPanel extends IssueItemPanel {
 
     public static String NAME = "IssueStatusPanel";
     public static String TITLE = "Issue Status";
@@ -188,6 +190,11 @@ public class IssueStatusPanel extends IconPanel {
         }
         // READ CREATOR
         Account sender = (Account) cbxFrom.getSelectedItem();
+        ExLink exLink = null;
+        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
+        if (linkRef != null) {
+            exLink = new ExLinkAppendix(linkRef);
+        }
 
         int feePow;
         try {
@@ -211,7 +218,7 @@ public class IssueStatusPanel extends IconPanel {
         }
 
         IssueStatusRecord issueStatus = (IssueStatusRecord) Controller.getInstance().issueStatus(creator,
-                txtName.getText(), txtareaDescription.getText(), unique, icon, image, feePow);
+                exLink, txtName.getText(), txtareaDescription.getText(), unique, icon, image, feePow);
         String text = "<HTML><body>";
         text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
                 + Lang.getInstance().translate("Create Status") + "<br><br><br>";
