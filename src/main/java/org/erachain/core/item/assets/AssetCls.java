@@ -711,7 +711,7 @@ public abstract class AssetCls extends ItemCls {
      * @return
      */
     public boolean isReverseSend() {
-        return this.assetType == AS_SELF_ACCOUNTING_CASH_FUND;
+        return this.assetType >= AS_ACCOUNTING;
     }
 
     /**
