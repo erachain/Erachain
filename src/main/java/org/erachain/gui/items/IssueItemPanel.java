@@ -108,7 +108,6 @@ public abstract class IssueItemPanel extends IconPanel {
 
     protected void initComponents() {
 
-
         setLayout(new java.awt.BorderLayout());
 
         mainJScrollPane.setBorder(null);

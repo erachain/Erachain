@@ -71,8 +71,8 @@ public class IssueAssetPanel extends IssueItemPanel {
     }
 
     protected void initComponents() {
-        // намтройка панелей
         super.initComponents();
+
         // вывод верхней панели
         int y = super.initTopArea();
 
@@ -80,7 +80,6 @@ public class IssueAssetPanel extends IssueItemPanel {
         // grid x - 4...26
         // y -  3 ....29
         GridBagConstraints gridBagConstraints;
-        gridBagConstraints = new java.awt.GridBagConstraints();
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;

@@ -86,16 +86,16 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtBirthLatitude.setText("");
         txtBirthLongitudeLatitude.setText("");
         txtHeight.setText("");
-        txtFeePow.setSelectedItem("0");
-        txtName.setEditable(false);
-        txtareaDescription.setEditable(false);
+        textFeePow.setSelectedItem("0");
+        textName.setEditable(false);
+        textAreaDescription.setEditable(false);
         txtBirthday.setVisible(false);
-        txtDeathday.setVisible(false);
+        txtDeathDay.setVisible(false);
         txtBirthdayTxt.setEditable(false);
         txtDeathdayTxt.setVisible(false);
         txtDeathdayTxt.setEditable(false);
 
-        jLabelRegistratorAddress.setVisible(false);
+        jLabelRegistrarAddress.setVisible(false);
         registrarAddress.setVisible(false);
         registrarAddressDesc.setVisible(false);
 
@@ -117,7 +117,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         gridBagConstraints.gridy = 17;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(0, 18, 0, 0);
-        mainPanel.add(labelSign, gridBagConstraints);
+        jPanelMain.add(labelSign, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 17;
@@ -127,14 +127,14 @@ public class InsertPersonPanel extends IssuePersonPanel {
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new Insets(0, 0, 0, 1);
         txtSign.setEditable(false);
-        mainPanel.add(txtSign, gridBagConstraints);
+        jPanelMain.add(txtSign, gridBagConstraints);
 
         labelPublicKey.setText(Lang.getInstance().translate("Public key") + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 18;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(0, 18, 0, 0);
-        mainPanel.add(labelPublicKey, gridBagConstraints);
+        jPanelMain.add(labelPublicKey, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 18;
@@ -143,7 +143,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new Insets(0, 0, 0, 1);
-        mainPanel.add(txtPublicKey, gridBagConstraints);
+        jPanelMain.add(txtPublicKey, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -152,7 +152,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
-        mainPanel.add(txtGenderTxt, gridBagConstraints);
+        jPanelMain.add(txtGenderTxt, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -161,7 +161,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
-        mainPanel.add(txtBirthdayTxt, gridBagConstraints);
+        jPanelMain.add(txtBirthdayTxt, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 8;
@@ -170,7 +170,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new Insets(0, 0, 0, 16);
-        mainPanel.add(txtDeathdayTxt, gridBagConstraints);
+        jPanelMain.add(txtDeathdayTxt, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -201,7 +201,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         gridBagConstraints1.gridy = 19;
         gridBagConstraints1.anchor = GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints1.insets = new Insets(20, 0, 0, 0);
-        mainPanel.add(pasteButton, gridBagConstraints1);
+        jPanelMain.add(pasteButton, gridBagConstraints1);
 
         transformButton = new MButton(Lang.getInstance().translate("Check person and insert"), 2);
 
@@ -214,12 +214,12 @@ public class InsertPersonPanel extends IssuePersonPanel {
             }
 
             // READ CREATOR
-            Account creatorAccount = (Account) cbxFrom.getSelectedItem();
+            Account creatorAccount = (Account) fromJComboBox.getSelectedItem();
 
             int feePow;
             try {
                 // READ FEE POW
-                feePow = Integer.parseInt((String) txtFeePow.getSelectedItem());
+                feePow = Integer.parseInt((String) textFeePow.getSelectedItem());
             } catch (Exception e) {
                 String mess = "Invalid fee power 0..6";
                 JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(mess),
@@ -280,7 +280,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         gridBagConstraints1.gridy = 19;
         gridBagConstraints1.anchor = GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints1.insets = new Insets(20, 0, 0, 16);
-        mainPanel.add(transformButton, gridBagConstraints1);
+        jPanelMain.add(transformButton, gridBagConstraints1);
 
     }
 
@@ -294,7 +294,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
-        txtName.setText(person.viewName());
+        textName.setText(person.viewName());
         ImageIcon image = new ImageIcon(person.getImage());
         int x = image.getIconWidth();
         int y = image.getIconHeight();
@@ -317,7 +317,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         }
         TimeZone.setDefault(TimeZone.getDefault());
 
-        txtareaDescription.setText(person.getDescription() == null ? "" : person.getDescription());
+        textAreaDescription.setText(person.getDescription() == null ? "" : person.getDescription());
 
         comboBoxGender.setSelectedIndex(person.getGender());
         txtGenderTxt.setText(comboBoxGender.getSelectedItem().toString());
@@ -346,9 +346,9 @@ public class InsertPersonPanel extends IssuePersonPanel {
     }
 
     private void eraseFields() {
-        txtFeePow.setSelectedItem("0");
-        txtName.setText("");
-        txtareaDescription.setText("");
+        textFeePow.setSelectedItem("0");
+        textName.setText("");
+        textAreaDescription.setText("");
         txtGenderTxt.setText("");
         txtBirthLatitude.setText("");
         txtBirthLongitudeLatitude.setText("");
