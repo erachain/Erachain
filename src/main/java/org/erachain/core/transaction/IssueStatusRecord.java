@@ -23,19 +23,19 @@ public class IssueStatusRecord extends IssueItemRecord {
     }
 
     public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, status, feePow, timestamp, reference, signature);
+        super(typeBytes, NAME_ID, creator, exLink, status, feePow, timestamp, reference, signature);
     }
 
     public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp,
                              Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, NAME_ID, creator, status, feePow, timestamp, reference, signature);
+        super(typeBytes, NAME_ID, creator, exLink, status, feePow, timestamp, reference, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
     }
 
     public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, status, (byte) 0, 0l, null, signature);
+        super(typeBytes, NAME_ID, creator, exLink, status, (byte) 0, 0l, null, signature);
     }
 
     public IssueStatusRecord(PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference, byte[] signature) {

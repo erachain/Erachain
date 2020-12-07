@@ -40,7 +40,7 @@ public class IssueStatementRecord extends Transaction {
     protected PublicKeyAccount[] signers; // for all it need ecnrypt
     protected byte[][] signatures; // - multi sign
 
-    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
+    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 
         super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
 
@@ -50,14 +50,14 @@ public class IssueStatementRecord extends Transaction {
         this.isText = isText;
     }
 
-    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
+    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
+        this(typeBytes, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
     }
 
-    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
+    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data,
                                 byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
+        this(typeBytes, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
@@ -67,26 +67,26 @@ public class IssueStatementRecord extends Transaction {
 
     // asPack
     public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
-        this(typeBytes, creator, (byte) 0, templateKey, data, isText, encrypted, 0l, reference);
+        this(typeBytes, creator, linkTo, (byte) 0, templateKey, data, isText, encrypted, 0l, reference);
         this.signature = signature;
         // not need this.calcFee();
     }
 
     public IssueStatementRecord(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
         // set props
         this.setTypeBytes();
     }
 
     public IssueStatementRecord(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference);
         // set props
         this.setTypeBytes();
     }
 
     public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
                                 byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
+        this(typeBytes, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
@@ -95,7 +95,7 @@ public class IssueStatementRecord extends Transaction {
     public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
                                 byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures,
                                 long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
+        this(typeBytes, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
@@ -114,7 +114,7 @@ public class IssueStatementRecord extends Transaction {
     }
 
     public IssueStatementRecord(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
+        this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference);
     }
 
     public static boolean hasTemplate(byte[] typeBytes) {
@@ -168,12 +168,12 @@ public class IssueStatementRecord extends Transaction {
         PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
         position += CREATOR_LENGTH;
 
-        ExLink exLink;
+        ExLink linkTo;
         if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
-            exLink = ExLink.parse(data, position);
-            position += exLink.length();
+            linkTo = ExLink.parse(data, position);
+            position += linkTo.length();
         } else {
-            exLink = null;
+            linkTo = null;
         }
 
         byte feePow = 0;
@@ -204,7 +204,7 @@ public class IssueStatementRecord extends Transaction {
 
         //////// local parameters
 
-        long key = 0l;
+        long key = 0L;
         if (hasTemplate(typeBytes)) {
             //READ KEY
             byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
@@ -257,7 +257,7 @@ public class IssueStatementRecord extends Transaction {
 
         if (signersLen == 0) {
             if (forDeal > Transaction.FOR_MYPACK) {
-                return new IssueStatementRecord(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte,
+                return new IssueStatementRecord(typeBytes, creator, linkTo, feePow, key, arbitraryData, isTextByte, encryptedByte,
                         timestamp, reference, signatureBytes, seqNo, feeLong);
             } else {
                 return new IssueStatementRecord(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);

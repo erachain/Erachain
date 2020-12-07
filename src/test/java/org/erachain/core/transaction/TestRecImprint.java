@@ -85,7 +85,7 @@ public class TestRecImprint {
         assertEquals(name_total, Base58.encode(reference));
 
         //CREATE ISSUE IMPRINT TRANSACTION
-        IssueImprintRecord issueImprintTransaction = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
+        IssueImprintRecord issueImprintTransaction = new IssueImprintRecord(maker, exLink, imprint, FEE_POWER, timestamp);
         issueImprintTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE IMPRINT TRANSACTION IS VALID
@@ -112,7 +112,7 @@ public class TestRecImprint {
         assertEquals(raw.length, imprint.getDataLength(false));
 
         //CREATE ISSUE IMPRINT TRANSACTION
-        IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
+        IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, exLink, imprint, FEE_POWER, timestamp);
         issueImprintRecord.sign(maker, asPack);
         //issueImprintRecord.process(db, false);
 
@@ -166,7 +166,7 @@ public class TestRecImprint {
         init();
 
         //CREATE ISSUE IMPRINT TRANSACTION
-        IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
+        IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, exLink, imprint, FEE_POWER, timestamp);
         issueImprintRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(issueImprintRecord.getItem().getName(), Base58.encode(imprint.getCuttedReference()));
         issueImprintRecord.sign(maker, Transaction.FOR_NETWORK);
@@ -184,7 +184,7 @@ public class TestRecImprint {
         assertEquals(true, db.getItemImprintMap().contains(key));
 
         ImprintCls imprint_2 = new Imprint(maker, Imprint.hashNameToBase58("test132_2"), icon, image, "e");
-        IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, imprint_2, FEE_POWER, timestamp + 10);
+        IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, exLink, imprint_2, FEE_POWER, timestamp + 10);
         issueImprintTransaction_2.sign(maker, Transaction.FOR_NETWORK);
         issueImprintTransaction_2.setDC(db, Transaction.FOR_NETWORK, 1, 2, true);
         issueImprintTransaction_2.process(gb, Transaction.FOR_NETWORK);
@@ -208,7 +208,7 @@ public class TestRecImprint {
         init();
 
         //CREATE ISSUE IMPRINT TRANSACTION
-        IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
+        IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, exLink, imprint, FEE_POWER, timestamp);
         issueImprintRecord.sign(maker, Transaction.FOR_NETWORK);
         issueImprintRecord.setDC(db, Transaction.FOR_NETWORK, 1, 2, true);
         issueImprintRecord.process(gb, Transaction.FOR_NETWORK);

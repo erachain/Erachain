@@ -3105,31 +3105,31 @@ public class Controller extends Observable {
         }
     }
 
-    public Pair<Transaction, Integer> issueImprint(PrivateKeyAccount creator, String name, String description,
+    public Pair<Transaction, Integer> issueImprint(PrivateKeyAccount creator, ExLink exLink, String name, String description,
                                                    byte[] icon, byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueImprintTransaction(creator, name, description, icon, image,
+            return this.transactionCreator.createIssueImprintTransaction(creator, exLink, name, description, icon, image,
                     feePow);
         }
     }
 
-    public Transaction issueImprint1(PrivateKeyAccount creator, String name, String description, byte[] icon,
+    public Transaction issueImprint1(PrivateKeyAccount creator, ExLink exLink, String name, String description, byte[] icon,
                                      byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueImprintTransaction1(creator, name, description, icon, image,
+            return this.transactionCreator.createIssueImprintTransaction1(creator, exLink, name, description, icon, image,
                     feePow);
         }
     }
 
-    public Pair<Transaction, Integer> issuePerson(boolean forIssue, PrivateKeyAccount creator, String fullName,
+    public Pair<Transaction, Integer> issuePerson(boolean forIssue, PrivateKeyAccount creator, ExLink linkTo, String fullName,
                                                   int feePow, long birthday, long deathday, byte gender, String race, float birthLatitude,
                                                   float birthLongitude, String skinColor, String eyeColor, String hairСolor, int height, byte[] icon,
                                                   byte[] image, String description, PublicKeyAccount owner, byte[] ownerSignature) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssuePersonTransaction(forIssue, creator, fullName, feePow, birthday,
+            return this.transactionCreator.createIssuePersonTransaction(forIssue, creator, linkTo, fullName, feePow, birthday,
                     deathday, gender, race, birthLatitude, birthLongitude, skinColor, eyeColor, hairСolor, height, icon,
                     image, description, owner, ownerSignature);
         }

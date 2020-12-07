@@ -24,38 +24,38 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     //private AssetCls asset;
 
-    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, AssetCls asset, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, exLink, asset, feePow, timestamp, reference);
+    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, NAME_ID, creator, linkTo, asset, feePow, timestamp, reference);
     }
 
-    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference, signature);
+    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
+        super(typeBytes, NAME_ID, creator, linkTo, asset, feePow, timestamp, reference, signature);
     }
 
-    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow,
+    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow,
                                  long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference, signature);
+        super(typeBytes, NAME_ID, creator, linkTo, asset, feePow, timestamp, reference, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
     }
 
     // as pack
-    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, asset, (byte) 0, 0l, null, signature);
+    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte[] signature) {
+        super(typeBytes, NAME_ID, creator, linkTo, asset, (byte) 0, 0L, null, signature);
     }
 
     public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, asset, feePow, timestamp, reference, signature);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, asset, feePow, timestamp, reference, signature);
     }
 
     // as pack
     public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, asset, (byte) 0, 0l, reference, signature);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, asset, (byte) 0, 0L, reference, signature);
     }
 
-    public IssueAssetTransaction(PublicKeyAccount creator, ExLink exLink, AssetCls asset, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, exLink, asset, feePow, timestamp, reference);
+    public IssueAssetTransaction(PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, asset, feePow, timestamp, reference);
     }
 
     //GETTERS/SETTERS
@@ -211,12 +211,12 @@ public class IssueAssetTransaction extends IssueItemRecord {
         PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
         position += CREATOR_LENGTH;
 
-        ExLink exLink;
+        ExLink linkTo;
         if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
-            exLink = ExLink.parse(data, position);
-            position += exLink.length();
+            linkTo = ExLink.parse(data, position);
+            position += linkTo.length();
         } else {
-            exLink = null;
+            linkTo = null;
         }
 
         byte feePow = 0;
@@ -261,9 +261,9 @@ public class IssueAssetTransaction extends IssueItemRecord {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new IssueAssetTransaction(typeBytes, creator, asset, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
+            return new IssueAssetTransaction(typeBytes, creator, linkTo, asset, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
         } else {
-            return new IssueAssetTransaction(typeBytes, creator, asset, signatureBytes);
+            return new IssueAssetTransaction(typeBytes, creator, linkTo, asset, signatureBytes);
         }
     }
 

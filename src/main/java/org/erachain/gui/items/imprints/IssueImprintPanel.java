@@ -3,6 +3,8 @@ package org.erachain.gui.items.imprints;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.transaction.IssueImprintRecord;
 import org.erachain.core.transaction.Transaction;
@@ -290,6 +292,12 @@ public class IssueImprintPanel extends IconPanel {
         //READ CREATOR
         Account sender = (Account) this.cbxFrom.getSelectedItem();
 
+        ExLink exLink = null;
+        Long linkRef = null; //Transaction.parseDBRef(exLinkText.getText());
+        if (linkRef != null) {
+            exLink = new ExLinkAppendix(linkRef);
+        }
+
         long parse = 0;
         try {
 
@@ -317,7 +325,7 @@ public class IssueImprintPanel extends IconPanel {
                 return;
             }
 
-            IssueImprintRecord imprint = (IssueImprintRecord) Controller.getInstance().issueImprint1(creator, name_total, description,
+            IssueImprintRecord imprint = (IssueImprintRecord) Controller.getInstance().issueImprint1(creator, exLink, name_total, description,
                     icon, image, feePow);
 
             //Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);

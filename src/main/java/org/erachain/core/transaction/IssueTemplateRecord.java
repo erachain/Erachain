@@ -22,19 +22,19 @@ public class IssueTemplateRecord extends IssueItemRecord {
     }
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, template, feePow, timestamp, reference, signature);
+        super(typeBytes, NAME_ID, creator, exLink, template, feePow, timestamp, reference, signature);
     }
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow,
                                long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, NAME_ID, creator, template, feePow, timestamp, reference, signature);
+        super(typeBytes, NAME_ID, creator, exLink, template, feePow, timestamp, reference, signature);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, template, (byte) 0, 0l, null, signature);
+        super(typeBytes, NAME_ID, creator, exLink, template, (byte) 0, 0l, null, signature);
     }
 
     public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) {

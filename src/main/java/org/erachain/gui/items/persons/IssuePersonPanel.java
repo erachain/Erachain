@@ -495,7 +495,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         }
 
         Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, creator,
-                textName.getText(), feePow, birthday, deathday, gender,
+                linkTo, textName.getText(), feePow, birthday, deathday, gender,
                 "", //textPersonNumber.getText(),
                 birthLatitude,
                 birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),

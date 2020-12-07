@@ -22,19 +22,19 @@ public class IssueUnionRecord extends IssueItemRecord {
     }
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference, signature);
+        super(typeBytes, NAME_ID, creator, exLink, union, feePow, timestamp, reference, signature);
     }
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp,
                             Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference, signature);
+        super(typeBytes, NAME_ID, creator, exLink, union, feePow, timestamp, reference, signature);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, union, (byte) 0, 0l, null, signature);
+        super(typeBytes, NAME_ID, creator, exLink, union, (byte) 0, 0l, null, signature);
     }
 
     public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) {
