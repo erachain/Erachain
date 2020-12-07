@@ -157,15 +157,11 @@ public class IssueImprintPanel extends IssueItemPanel {
     }
 
     String name_total;
-
     protected boolean checkValues() {
-
-        long parse = 0;
 
         // NAME TOTAL
         name_total = this.txtNumber.getText().trim() + this.txtDate.getText().trim()
                 + this.txtDebitor.getText().trim() + this.txtCreditor.getText().trim() + this.txtAmount.getText().trim();
-
         // CUT BYTES LEN
         name_total = Imprint.hashNameToBase58(name_total);
         return true;

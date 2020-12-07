@@ -3,12 +3,10 @@ package org.erachain.gui.items.persons;
 import com.toedter.calendar.JDateChooser;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -409,36 +407,18 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         addImageLabel.reset();
     }
 
-    public void onIssueClick() {
-        boolean forIssue = false;
+    boolean forIssue = false;
+    byte gender;
+    long birthday;
+    long deathday;
+    float birthLatitude;
+    float birthLongitude;
+    int height;
 
-        // DISABLE
-        copyButton.setEnabled(false);
-
-        if (checkWalletUnlock(copyButton)) {
-            return;
-        }
-
-        // READ CREATOR
-        Account sender = (Account) this.fromJComboBox.getSelectedItem();
-
-        ExLink exLink = null;
-        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
-        if (linkRef != null) {
-            exLink = new ExLinkAppendix(linkRef);
-        }
+    protected boolean checkValues() {
 
         int parse = 0;
-        int feePow;
-        byte gender;
-        long birthday;
-        long deathday;
-        float birthLatitude;
-        float birthLongitude;
-        int height;
         try {
-            // READ FEE POW
-            feePow = Integer.parseInt((String) textFeePow.getSelectedItem());
             // READ GENDER
             parse++;
             gender = (byte) (comboBoxGender.getSelectedIndex());
@@ -467,9 +447,6 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         } catch (Exception e) {
             String mess = "Invalid pars... " + parse;
             switch (parse) {
-                case 0:
-                    mess = "Invalid fee power 0..6";
-                    break;
                 case 1:
                     mess = "Invalid gender";
                     break;
@@ -489,107 +466,149 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                     mess = "Invalid growth 10..255";
                     break;
             }
-            JOptionPane.showMessageDialog(null, Lang.getInstance().translate(mess),
+            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(mess),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            copyButton.setEnabled(true);
+            return false;
+        }
+        return true;
+    }
+
+
+    protected void makeTransaction() {
+    }
+
+    @Override
+    protected String makeTransactionView() {
+        return null;
+    }
+
+    public void onIssueClick() {
+
+        // DISABLE
+        issueJButton.setEnabled(false);
+        if (checkWalletUnlock(issueJButton)) {
+            issueJButton.setEnabled(true);
             return;
         }
-        PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
-        if (creator == null) {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+
+        // READ CREATOR
+        Account creatorAccount = (Account) fromJComboBox.getSelectedItem();
+
+        Long linkRef = null; //Transaction.parseDBRef(exLinkText.getText());
+        if (linkRef != null) {
+            exLink = new ExLinkAppendix(linkRef);
+        }
+
+        try {
+            //READ FEE POW
+            feePow = Integer.parseInt((String) this.textFeePow.getSelectedItem());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee Power!"),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            issueJButton.setEnabled(true);
             return;
         }
 
-        Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, creator,
-                exLink, textName.getText(), feePow, birthday, deathday, gender,
-                "", //textPersonNumber.getText(),
-                birthLatitude,
-                birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),
-                height, null, addImageLabel.getImgBytes(), textAreaDescription.getText(),
-                creator, null);
+        if (checkValues()) {
 
-        IssuePersonRecord issuePersonRecord = (IssuePersonRecord) result.getA();
-
-        // CHECK VALIDATE MESSAGE
-        if (result.getB() == Transaction.VALIDATE_OK) {
-            if (!forIssue) {
-                PersonHuman personHuman = (PersonHuman) issuePersonRecord.getItem();
-                // SIGN
-                personHuman.sign(creator);
-                byte[] issueBytes = personHuman.toBytes(false, false);
-                String base58str = Base58.encode(issueBytes);
-                if (registrar == null) {
-                    // copy to clipBoard
-
-                    // This method writes a string to the system clipboard.
-                    // otherwise it returns null.
-                    StringSelection stringSelection = new StringSelection(base58str);
-                    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate("Person bytecode has been copy to buffer") + "!",
-                            Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    // send telegram
-                    byte[] encryptedBytes = AEScrypto.dataEncrypt(issueBytes, creator.getPrivateKey(), registrar.getPublicKey());
-
-                    Transaction transaction = Controller.getInstance().r_Send(
-                            creator, null, feePow, registrar, 0L,
-                            null, "Person bytecode", encryptedBytes,
-                            new byte[1], new byte[]{1}, 0);
-
-                    Controller.getInstance().broadcastTelegram(transaction, true);
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate("Person bytecode has been send to Registrar") + "!",
-                            Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-
-                }
-
-                // ENABLE
-                copyButton.setEnabled(true);
+            creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creatorAccount.getAddress());
+            if (creator == null) {
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                issueJButton.setEnabled(true);
                 return;
             }
-            String statusText = "";
-            IssueConfirmDialog issueConfirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, issuePersonRecord,
-                    " ",
-                    (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
-                    Lang.getInstance().translate("Confirmation transaction issue person"));
 
-            IssuePersonDetailsFrame issuePersonDetailsFrame = new IssuePersonDetailsFrame(issuePersonRecord);
-            issueConfirmDialog.jScrollPane1.setViewportView(issuePersonDetailsFrame);
-            issueConfirmDialog.setLocationRelativeTo(this);
-            issueConfirmDialog.setVisible(true);
-            if (issueConfirmDialog.isConfirm) {
-                // VALIDATE AND PROCESS
-                Integer afterCreateResult = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(), Transaction.FOR_NETWORK);
-                if (afterCreateResult != Transaction.VALIDATE_OK) {
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate(OnDealClick.resultMess(afterCreateResult)),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate("Person issue has been sent!"),
-                            Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+            Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, creator,
+                    exLink, textName.getText(), feePow, birthday, deathday, gender,
+                    "", //textPersonNumber.getText(),
+                    birthLatitude,
+                    birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),
+                    height, null, addImageLabel.getImgBytes(), textAreaDescription.getText(),
+                    creator, null);
+
+            transaction = (IssuePersonRecord) result.getA();
+
+            // CHECK VALIDATE MESSAGE
+            if (result.getB() == Transaction.VALIDATE_OK) {
+                if (!forIssue) {
+                    PersonHuman personHuman = (PersonHuman) transaction.getItem();
+                    // SIGN
+                    personHuman.sign(creator);
+                    byte[] issueBytes = personHuman.toBytes(false, false);
+                    String base58str = Base58.encode(issueBytes);
+                    if (registrar == null) {
+                        // copy to clipBoard
+
+                        // This method writes a string to the system clipboard.
+                        // otherwise it returns null.
+                        StringSelection stringSelection = new StringSelection(base58str);
+                        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+                        JOptionPane.showMessageDialog(new JFrame(),
+                                Lang.getInstance().translate("Person bytecode has been copy to buffer") + "!",
+                                Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        // send telegram
+                        byte[] encryptedBytes = AEScrypto.dataEncrypt(issueBytes, creator.getPrivateKey(), registrar.getPublicKey());
+
+                        Transaction transaction = Controller.getInstance().r_Send(
+                                creator, null, feePow, registrar, 0L,
+                                null, "Person bytecode", encryptedBytes,
+                                new byte[1], new byte[]{1}, 0);
+
+                        Controller.getInstance().broadcastTelegram(transaction, true);
+                        JOptionPane.showMessageDialog(new JFrame(),
+                                Lang.getInstance().translate("Person bytecode has been send to Registrar") + "!",
+                                Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+                    }
+
+                    // ENABLE
+                    copyButton.setEnabled(true);
+                    return;
                 }
+                String statusText = "";
+                IssueConfirmDialog issueConfirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+                        " ",
+                        (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
+                        Lang.getInstance().translate("Confirmation transaction issue person"));
 
+                IssuePersonDetailsFrame issuePersonDetailsFrame = new IssuePersonDetailsFrame((IssuePersonRecord) transaction);
+                issueConfirmDialog.jScrollPane1.setViewportView(issuePersonDetailsFrame);
+                issueConfirmDialog.setLocationRelativeTo(this);
+                issueConfirmDialog.setVisible(true);
+                if (issueConfirmDialog.isConfirm) {
+                    // VALIDATE AND PROCESS
+                    Integer afterCreateResult = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(), Transaction.FOR_NETWORK);
+                    if (afterCreateResult != Transaction.VALIDATE_OK) {
+                        JOptionPane.showMessageDialog(new JFrame(),
+                                Lang.getInstance().translate(OnDealClick.resultMess(afterCreateResult)),
+                                Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(new JFrame(),
+                                Lang.getInstance().translate("Person issue has been sent!"),
+                                Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                    }
+
+                }
+            } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MIN) {
+                JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                        Lang.getInstance().translate("Name must be more then %val characters!")
+                                .replace("%val", "" + transaction.getItem().getMinNameLen()),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MAX) {
+                JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                        Lang.getInstance().translate("Name must be less then %val characters!")
+                                .replace("%val", "" + ItemCls.MAX_NAME_LENGTH),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.getInstance().translate(OnDealClick.resultMess(result.getB())),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             }
-        } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MIN) {
-            JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                    Lang.getInstance().translate("Name must be more then %val characters!")
-                            .replace("%val", "" + issuePersonRecord.getItem().getMinNameLen()),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-        } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MAX) {
-            JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                    Lang.getInstance().translate("Name must be less then %val characters!")
-                            .replace("%val", "" + ItemCls.MAX_NAME_LENGTH),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(result.getB())),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-        }
 
+        }
 
         // ENABLE
         copyButton.setEnabled(true);

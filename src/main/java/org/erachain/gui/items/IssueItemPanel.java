@@ -208,7 +208,7 @@ public abstract class IssueItemPanel extends IconPanel {
             //READ FEE POW
             feePow = Integer.parseInt((String) this.textFeePow.getSelectedItem());
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee Power!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             issueJButton.setEnabled(true);
             return;
         }
