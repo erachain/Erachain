@@ -662,8 +662,9 @@ public abstract class AssetCls extends ItemCls {
 
     public static boolean isUnHoldable(long key, int assetType) {
         if (key < getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY, AssetCls.MIN_START_KEY)
-                || assetType > AssetCls.AS_OUTSIDE_OTHER_CLAIM
-                && assetType <= AssetCls.AS_INSIDE_OTHER_CLAIM
+                || assetType == AS_INSIDE_ASSETS
+                || assetType > AS_OUTSIDE_OTHER_CLAIM
+                && assetType <= AS_INSIDE_OTHER_CLAIM
         ) {
             return true;
         }
