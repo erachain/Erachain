@@ -339,7 +339,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     public int getActionType() {
-        if (amount == null)
+        if (!hasAmount())
             return 0;
         return getActionType(this.key, this.amount, this.isBackward(), asset.isSelfManaged());
     }
