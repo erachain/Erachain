@@ -3476,12 +3476,14 @@ public class BlockExplorer {
                                 type = transaction.getType();
                                 if (type == Transaction.SEND_ASSET_TRANSACTION) {
                                     RSend rSend = (RSend) transaction;
-                                    if (rSend.getCreator().equals(account)) {
-                                        outcome = false;
-                                        atSideAccount = rSend.getRecipient();
+                                    if (rSend.hasAmount()) {
+                                        if (rSend.getCreator().equals(account)) {
+                                            outcome = false;
+                                            atSideAccount = rSend.getRecipient();
+                                        }
+                                        // возврат и взять на харенение обратный
+                                        outcome = outcome ^ !rSend.isBackward() ^ (rSend.getActionType() == TransactionAmount.ACTION_HOLD);
                                     }
-                                    // возврат и взять на харенение обратный
-                                    outcome = outcome ^ !rSend.isBackward() ^ (rSend.getActionType() == TransactionAmount.ACTION_HOLD);
                                 }
                             }
 
