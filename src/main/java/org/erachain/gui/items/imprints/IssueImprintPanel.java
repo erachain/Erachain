@@ -8,7 +8,6 @@ import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
-import java.awt.*;
 
 
 @SuppressWarnings("serial")
@@ -33,56 +32,22 @@ public class IssueImprintPanel extends IssueItemPanel {
         // вывод верхней панели
         int y = initTopArea();
 
-        //LABEL GBC
-        GridBagConstraints labelGBC = new GridBagConstraints();
-        //labelGBC.insets = new Insets(5,5,5,5);
-        labelGBC.insets = new java.awt.Insets(5, 15, 5, 5);
-        labelGBC.fill = GridBagConstraints.HORIZONTAL;
-        labelGBC.anchor = GridBagConstraints.NORTHWEST;
-        labelGBC.weightx = 0;
-        labelGBC.gridx = 4;
-
-        //COMBOBOX GBC
-        GridBagConstraints cbxGBC = new GridBagConstraints();
-        //cbxGBC.insets = new Insets(5,5,5,5);
-        cbxGBC.insets = new java.awt.Insets(5, 3, 5, 15);
-        cbxGBC.fill = GridBagConstraints.NONE;
-        cbxGBC.anchor = GridBagConstraints.NORTHWEST;
-        cbxGBC.weightx = 0;
-        cbxGBC.gridx = 8;
-
-        //TEXTFIELD GBC
-        GridBagConstraints txtGBC = new GridBagConstraints();
-        //txtGBC.insets = new Insets(5,5,5,5);
-        txtGBC.insets = new java.awt.Insets(5, 3, 5, 15);
-        txtGBC.fill = GridBagConstraints.HORIZONTAL;
-        txtGBC.anchor = GridBagConstraints.NORTHWEST;
-        txtGBC.weightx = 1;
-        txtGBC.gridwidth = 2;
-        txtGBC.gridx = 8;
-
-        //BUTTON GBC
-        GridBagConstraints buttonGBC = new GridBagConstraints();
-        buttonGBC.insets = new Insets(5, 5, 5, 5);
-        buttonGBC.insets = new java.awt.Insets(5, 3, 5, 15);
-        buttonGBC.fill = GridBagConstraints.NONE;
-        //buttonGBC.anchor = GridBagConstraints.NORTHWEST;
-        buttonGBC.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-        buttonGBC.gridwidth = 2;
-
-        buttonGBC.gridx = 12;
-
         int gridy = y;
+
+        nameJLabel.setVisible(false);
+        textName.setVisible(false);
 
         //LABEL NUMBER
         labelGBC.gridy = gridy;
         JLabel numberLabel = new JLabel(Lang.getInstance().translate("Number") + " (0..9/-.):");
         jPanelMain.add(numberLabel, labelGBC);
 
+        int gridwidth = fieldGBC.gridwidth;
+        fieldGBC.gridwidth = 8;
         //TXT NUMBER
-        txtGBC.gridy = gridy++;
+        fieldGBC.gridy = gridy++;
         this.txtNumber = new JTextField();
-        jPanelMain.add(this.txtNumber, txtGBC);
+        jPanelMain.add(this.txtNumber, fieldGBC);
 
         //LABEL DATE
         labelGBC.gridy = gridy;
@@ -90,9 +55,9 @@ public class IssueImprintPanel extends IssueItemPanel {
         jPanelMain.add(dateLabel, labelGBC);
 
         //TXT DEBITOR
-        txtGBC.gridy = gridy++;
+        fieldGBC.gridy = gridy++;
         this.txtDate = new JTextField();
-        jPanelMain.add(this.txtDate, txtGBC);
+        jPanelMain.add(this.txtDate, fieldGBC);
 
         //LABEL DEBTOR
         labelGBC.gridy = gridy;
@@ -101,9 +66,9 @@ public class IssueImprintPanel extends IssueItemPanel {
         jPanelMain.add(debitorLabel, labelGBC);
 
         //TXT DEBTOR
-        txtGBC.gridy = gridy++;
+        fieldGBC.gridy = gridy++;
         this.txtDebitor = new JTextField();
-        jPanelMain.add(this.txtDebitor, txtGBC);
+        jPanelMain.add(this.txtDebitor, fieldGBC);
 
         //LABEL CREDITOR
         labelGBC.gridy = gridy;
@@ -112,9 +77,9 @@ public class IssueImprintPanel extends IssueItemPanel {
         jPanelMain.add(creditorLabel, labelGBC);
 
         //TXT CREDITOR
-        txtGBC.gridy = gridy++;
+        fieldGBC.gridy = gridy++;
         this.txtCreditor = new JTextField();
-        jPanelMain.add(this.txtCreditor, txtGBC);
+        jPanelMain.add(this.txtCreditor, fieldGBC);
 
         //LABEL TOTAL
         labelGBC.gridy = gridy;
@@ -122,9 +87,11 @@ public class IssueImprintPanel extends IssueItemPanel {
         jPanelMain.add(amountLabel, labelGBC);
 
         //TXT TOTAL
-        txtGBC.gridy = gridy++;
+        fieldGBC.gridy = gridy++;
         this.txtAmount = new JTextField();
-        jPanelMain.add(this.txtAmount, txtGBC);
+        jPanelMain.add(this.txtAmount, fieldGBC);
+
+        fieldGBC.gridwidth = gridwidth;
 
         // вывод подвала
         initBottom(gridy);
@@ -156,6 +123,7 @@ public class IssueImprintPanel extends IssueItemPanel {
         String text = "<HTML><body>";
         text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;" + Lang.getInstance().translate("Issue Imprint") + "<br><br><br>";
         text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>";
+        text += Lang.getInstance().translate("Hash") + ":&nbsp;" + name_total + "<br>";
         text += Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
 
         return text;
