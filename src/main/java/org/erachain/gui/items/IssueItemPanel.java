@@ -52,6 +52,7 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JPanel jPanelMain = new javax.swing.JPanel();
     protected JPanel jPanelLeft = new javax.swing.JPanel();
     protected GridBagConstraints gridBagConstraints;
+    protected GridBagConstraints labelGBC;
     protected JLabel exLinkTextLabel = new JLabel(Lang.getInstance().translate("Append to") + ":");
     protected JLabel exLinkDescriptionLabel = new JLabel(Lang.getInstance().translate("Parent") + ":");
     protected JTextField exLinkText = new JTextField();
@@ -61,6 +62,7 @@ public abstract class IssueItemPanel extends IconPanel {
     public IssueItemPanel(String name, String title) {
         super(name, title);
 // init
+
         jScrollPane2 = new JScrollPane();
         addImageLabel = new AddImageLabel(
                 Lang.getInstance().translate("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG,
@@ -122,7 +124,11 @@ public abstract class IssueItemPanel extends IconPanel {
 
         jPanelMain.setLayout(new java.awt.GridBagLayout());
 
-        jPanelLeft.setLayout(new java.awt.GridBagLayout());
+        labelGBC = new java.awt.GridBagConstraints();
+        labelGBC.gridwidth = 3;
+        labelGBC.anchor = java.awt.GridBagConstraints.EAST;
+        labelGBC.insets = new java.awt.Insets(0, 0, 5, 0);
+        //labelGBC.insets = new java.awt.Insets(8, 8, 8, 8);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -267,14 +273,9 @@ public abstract class IssueItemPanel extends IconPanel {
         jPanelMain.add(titleJLabel, gridBagConstraints);
 
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        jPanelMain.add(accountJLabel, gridBagConstraints);
-
+        labelGBC.gridx = 4;
+        labelGBC.gridy = y;
+        jPanelMain.add(accountJLabel, labelGBC);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
@@ -286,14 +287,9 @@ public abstract class IssueItemPanel extends IconPanel {
         jPanelMain.add(fromJComboBox, gridBagConstraints);
 
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        jPanelMain.add(exLinkTextLabel, gridBagConstraints);
-
+        labelGBC.gridx = 4;
+        labelGBC.gridy = y;
+        jPanelMain.add(exLinkTextLabel, labelGBC);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;

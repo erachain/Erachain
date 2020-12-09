@@ -128,12 +128,9 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         txtDeathDay.setFont(UIManager.getFont("TextField.font"));
 
         // gender
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 18, 0, 0);
-        jPanelMain.add(jLabelGender, gridBagConstraints);
+        labelGBC.gridx = 4;
+        labelGBC.gridy = gridy;
+        jPanelMain.add(jLabelGender, labelGBC);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 8;
@@ -145,12 +142,9 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         jPanelMain.add(comboBoxGender, gridBagConstraints);
 
         // born
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 18, 0, 0);
-        jPanelMain.add(jLabelBirthday, gridBagConstraints);
+        labelGBC.gridx = 4;
+        labelGBC.gridy = gridy;
+        jPanelMain.add(jLabelBirthday, labelGBC);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 8;
@@ -163,34 +157,37 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
         // dead
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        jPanelMain.add(jLabelDead, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         jPanelMain.add(aliveCheckBox, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanelMain.add(jLabelDead, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = gridy++;
-        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 16);
+        //gridBagConstraints.insets = new Insets(0, 0, 0, 16);
         jPanelMain.add(txtDeathDay, gridBagConstraints);
 
         //BirthLatitude
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 18, 0, 0);
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
         jPanelMain.add(jLabelBirthLatitudeLongtitude, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
