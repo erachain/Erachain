@@ -11,7 +11,6 @@ import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * @author Саша
@@ -63,24 +62,19 @@ public class IssueAssetPanel extends IssueItemPanel {
         super.initComponents();
 
         // вывод верхней панели
-        int y = super.initTopArea();
+        int gridy = super.initTopArea();
 
         // insert asset issue info
         // grid x - 4...26
         // y -  3 ....29
-        GridBagConstraints gridBagConstraints;
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        jPanelMain.add(typeJLabel, gridBagConstraints);
+        labelGBC.gridx = 4;
+        labelGBC.gridy = gridy;
+        jPanelMain.add(typeJLabel, labelGBC);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 19;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
@@ -96,7 +90,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 27;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
@@ -104,45 +98,33 @@ public class IssueAssetPanel extends IssueItemPanel {
         jPanelMain.add(textareasAssetTypeDescription, gridBagConstraints);
 
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        jPanelMain.add(quantityJLabel, gridBagConstraints);
-
+        labelGBC.gridx = 4;
+        labelGBC.gridy = gridy;
+        jPanelMain.add(quantityJLabel, labelGBC);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
         jPanelMain.add(textQuantity, gridBagConstraints);
 
+        labelGBC.gridx = 13;
+        labelGBC.gridy = gridy;
+        gridBagConstraints.gridwidth = 1;
+        jPanelMain.add(scaleJLabel, labelGBC);
+        gridBagConstraints.gridwidth = 3;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 13;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        jPanelMain.add(scaleJLabel, gridBagConstraints);
-
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 15;
-        gridBagConstraints.gridy = y++;
-        //   gridBagConstraints.gridwidth = 4;
-        //   gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        //   gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.gridx = 18;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
         jPanelMain.add(textScale, gridBagConstraints);
 
         // вывод подвала
-        super.initBottom(y);
+        super.initBottom(gridy);
     }
 
     int scale;
