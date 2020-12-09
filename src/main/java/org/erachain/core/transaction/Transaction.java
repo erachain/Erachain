@@ -1508,7 +1508,28 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     }
 
-    public abstract int getDataLength(int forDeal, boolean withSignature);
+    public int getDataLength(int forDeal, boolean withSignature) {
+        // not include item reference
+
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
+        if (exLink != null)
+            base_len += exLink.length();
+
+        return base_len;
+
+    }
 
     // PROCESS/ORPHAN
     public boolean isWiped() {

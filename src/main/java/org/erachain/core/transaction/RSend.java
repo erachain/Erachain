@@ -474,8 +474,6 @@ public class RSend extends TransactionAmount {
     public int getDataLength(int forDeal, boolean withSignature) {
 
         int dataLen = super.getDataLength(forDeal, withSignature) + 1 + title.getBytes(StandardCharsets.UTF_8).length;
-        if (exLink != null)
-            dataLen += exLink.length();
 
         if (this.typeBytes[3] >= 0)
             return dataLen + LOAD_LENGTH + this.data.length;
