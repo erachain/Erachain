@@ -930,10 +930,10 @@ public class Account {
 
             if (!isNotSender) {
                 // у создателя транзакции так же баланс ИМЕЮ уменьшаем - просто вычитаем - для учета вывода из оборота
-                if (isBackward) {
-                    ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.add(amount));
-                } else {
+                if (subtract) {
                     ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.subtract(amount));
+                } else {
+                    ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.add(amount));
                 }
             }
 
