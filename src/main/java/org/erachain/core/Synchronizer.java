@@ -844,7 +844,7 @@ public class Synchronizer extends Thread {
         return response.getSignatures();
     }
 
-    static byte[] badCheck = Base58.decode("5SxUGJcgS29XA5rGGhTu9RnjSdoK4qtA8AgHEtANdLei11f386P6Net8MPPBVNKKJqkGKeHoAWg6N116fhCRrh2f");
+    static byte[] badCheck = Base58.decode("5SxUG...");
     public void checkBadBlock(Peer peer) throws Exception {
 
         if (false && BlockChain.DEMO_MODE) {
