@@ -60,8 +60,11 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JTextField exLinkDescription = new JTextField();
 
 
-    public IssueItemPanel(String name, String title) {
+    public IssueItemPanel(String name, String title, String issueMess, String confirmMess) {
         super(name, title);
+
+        this.issueMess = issueMess;
+        this.confirmMess = confirmMess;
 
         jScrollPane2 = new JScrollPane();
         addImageLabel = new AddImageLabel(
