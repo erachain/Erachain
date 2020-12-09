@@ -104,11 +104,14 @@ public class IssueUnionPanel extends IssueItemPanel {
 
         super.initComponents();
 
-        int gridy = initTopArea();
+        int gridyParent = initTopArea();
+        int gridy = 1;
+
+        int gridwidth = fieldGBC.gridwidth;
 
         birthdayJLabel.setText(Lang.getInstance().translate("Birthday") + ":");
         labelGBC.gridy = gridy;
-        jPanelMain.add(birthdayJLabel, labelGBC);
+        jPanelAdd.add(birthdayJLabel, labelGBC);
 
         // Маска ввода
         MaskFormatter formatter = null;
@@ -119,24 +122,21 @@ public class IssueUnionPanel extends IssueItemPanel {
         }
         txtBirthday = new JFormattedTextField(formatter);
         txtBirthday.setText("1970-12-08");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = gridy++;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-
         fieldGBC.gridy = gridy++;
-        jPanelMain.add(txtBirthday, fieldGBC);
+        fieldGBC.gridwidth = 1;
+        jPanelAdd.add(txtBirthday, fieldGBC);
 
         parentJLabel.setText(Lang.getInstance().translate("Parent") + ":");
         labelGBC.gridy = gridy;
-        jPanelMain.add(parentJLabel, labelGBC);
+        jPanelAdd.add(parentJLabel, labelGBC);
+        fieldGBC.gridwidth = 2;
         fieldGBC.gridy = gridy++;
-        jPanelMain.add(txtParent, fieldGBC);
+        jPanelAdd.add(txtParent, fieldGBC);
         txtParent.setText("0");
 
-        initBottom(gridy);
+        fieldGBC.gridwidth = gridwidth;
+
+        initBottom(gridyParent);
 
     }
 }

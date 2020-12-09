@@ -50,6 +50,7 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JScrollPane jScrollPane3 = new JScrollPane();
     protected JScrollPane mainJScrollPane = new javax.swing.JScrollPane();
     protected JPanel jPanelMain = new javax.swing.JPanel();
+    protected JPanel jPanelAdd = new javax.swing.JPanel();
     protected JPanel jPanelLeft = new javax.swing.JPanel();
     protected GridBagConstraints gridBagConstraints;
     protected GridBagConstraints labelGBC;
@@ -125,6 +126,7 @@ public abstract class IssueItemPanel extends IconPanel {
         mainJScrollPane.setBorder(null);
 
         jPanelMain.setLayout(new java.awt.GridBagLayout());
+        jPanelAdd.setLayout(new java.awt.GridBagLayout());
 
         jPanelLeft.setLayout(new java.awt.GridBagLayout());
 
@@ -176,7 +178,6 @@ public abstract class IssueItemPanel extends IconPanel {
         gridBagConstraints.weighty = 0.9;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
         jPanelMain.add(jPanelLeft, gridBagConstraints);
-
 
         mainJScrollPane.setViewportView(jPanelMain);
 
@@ -328,6 +329,9 @@ public abstract class IssueItemPanel extends IconPanel {
         fieldGBC.gridy = y++;
         jPanelMain.add(textName, fieldGBC);
 
+        fieldGBC.gridy = y++;
+        jPanelMain.add(jPanelAdd, fieldGBC);
+
 
         return y;
     }
@@ -336,13 +340,8 @@ public abstract class IssueItemPanel extends IconPanel {
     // принимает номер сроки с которой  продолжать вывод полей на нижнюю панель
     protected void initBottom(int y) {
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        jPanelMain.add(descriptionJLabel, gridBagConstraints);
+        labelGBC.gridy = ++y;
+        jPanelMain.add(descriptionJLabel, labelGBC);
 
         textAreaDescription.setColumns(20);
         textAreaDescription.setRows(5);
@@ -359,32 +358,8 @@ public abstract class IssueItemPanel extends IconPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
         jPanelMain.add(jScrollPane1, gridBagConstraints);
 
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        jPanelMain.add(feeJLabel, gridBagConstraints);
-
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 0);
-        jPanelMain.add(textFeePow, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 23;
-        //   gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        //   gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 5, 8);
-        jPanelMain.add(issueJButton, gridBagConstraints);
+        fieldGBC.gridy = y;
+        jPanelMain.add(issueJButton, fieldGBC);
 
     }
 

@@ -65,10 +65,10 @@ public class IssueAssetPanel extends IssueItemPanel {
         int gridy = super.initTopArea();
 
         labelGBC.gridy = gridy;
-        jPanelMain.add(typeJLabel, labelGBC);
+        jPanelAdd.add(typeJLabel, labelGBC);
 
         fieldGBC.gridy = gridy++;
-        jPanelMain.add(assetTypeJComboBox, fieldGBC);
+        jPanelAdd.add(assetTypeJComboBox, fieldGBC);
 
         JScrollPane scrollPaneAssetTypeDescription = new JScrollPane();
 
@@ -80,29 +80,29 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = gridy++;
-        gridBagConstraints.gridwidth = 27;
+        gridBagConstraints.gridwidth = 19;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelMain.add(textareasAssetTypeDescription, gridBagConstraints);
+        jPanelAdd.add(textareasAssetTypeDescription, gridBagConstraints);
 
 
         labelGBC.gridy = gridy;
-        jPanelMain.add(quantityJLabel, labelGBC);
+        jPanelAdd.add(quantityJLabel, labelGBC);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelMain.add(textQuantity, gridBagConstraints);
+        jPanelAdd.add(textQuantity, gridBagConstraints);
 
         labelGBC.gridx = 13;
         labelGBC.gridy = gridy;
         gridBagConstraints.gridwidth = 1;
-        jPanelMain.add(scaleJLabel, labelGBC);
+        jPanelAdd.add(scaleJLabel, labelGBC);
         labelGBC.gridx = 4;
         gridBagConstraints.gridwidth = 3;
 
@@ -110,7 +110,7 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints.gridx = 18;
         gridBagConstraints.gridy = gridy++;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelMain.add(textScale, gridBagConstraints);
+        jPanelAdd.add(textScale, gridBagConstraints);
 
         // вывод подвала
         super.initBottom(gridy);

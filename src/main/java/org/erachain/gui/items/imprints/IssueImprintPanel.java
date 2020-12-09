@@ -38,56 +38,56 @@ public class IssueImprintPanel extends IssueItemPanel {
         //LABEL NUMBER
         labelGBC.gridy = gridy;
         JLabel numberLabel = new JLabel(Lang.getInstance().translate("Number") + " (0..9/-.):");
-        jPanelMain.add(numberLabel, labelGBC);
+        jPanelAdd.add(numberLabel, labelGBC);
 
         int gridwidth = fieldGBC.gridwidth;
         fieldGBC.gridwidth = 8;
         //TXT NUMBER
         fieldGBC.gridy = gridy++;
         this.txtNumber = new JTextField();
-        jPanelMain.add(this.txtNumber, fieldGBC);
+        jPanelAdd.add(this.txtNumber, fieldGBC);
 
         //LABEL DATE
         labelGBC.gridy = gridy;
         JLabel dateLabel = new JLabel(Lang.getInstance().translate("Date") + " (YY-MM-DD HH:MM):");
-        jPanelMain.add(dateLabel, labelGBC);
+        jPanelAdd.add(dateLabel, labelGBC);
 
         //TXT DEBITOR
         fieldGBC.gridy = gridy++;
         this.txtDate = new JTextField();
-        jPanelMain.add(this.txtDate, fieldGBC);
+        jPanelAdd.add(this.txtDate, fieldGBC);
 
         //LABEL DEBTOR
         labelGBC.gridy = gridy;
         JLabel debitorLabel = new JLabel(Lang.getInstance().translate("Debtor")
                 + " (" + Lang.getInstance().translate("IBN-INN") + "):");
-        jPanelMain.add(debitorLabel, labelGBC);
+        jPanelAdd.add(debitorLabel, labelGBC);
 
         //TXT DEBTOR
         fieldGBC.gridy = gridy++;
         this.txtDebitor = new JTextField();
-        jPanelMain.add(this.txtDebitor, fieldGBC);
+        jPanelAdd.add(this.txtDebitor, fieldGBC);
 
         //LABEL CREDITOR
         labelGBC.gridy = gridy;
         JLabel creditorLabel = new JLabel(Lang.getInstance().translate("Creditor")
                 + " (" + Lang.getInstance().translate("IBN-INN") + "):");
-        jPanelMain.add(creditorLabel, labelGBC);
+        jPanelAdd.add(creditorLabel, labelGBC);
 
         //TXT CREDITOR
         fieldGBC.gridy = gridy++;
         this.txtCreditor = new JTextField();
-        jPanelMain.add(this.txtCreditor, fieldGBC);
+        jPanelAdd.add(this.txtCreditor, fieldGBC);
 
         //LABEL TOTAL
         labelGBC.gridy = gridy;
         JLabel amountLabel = new JLabel(Lang.getInstance().translate("Total") + " (123.03):");
-        jPanelMain.add(amountLabel, labelGBC);
+        jPanelAdd.add(amountLabel, labelGBC);
 
         //TXT TOTAL
         fieldGBC.gridy = gridy++;
         this.txtAmount = new JTextField();
-        jPanelMain.add(this.txtAmount, fieldGBC);
+        jPanelAdd.add(this.txtAmount, fieldGBC);
 
         fieldGBC.gridwidth = gridwidth;
 

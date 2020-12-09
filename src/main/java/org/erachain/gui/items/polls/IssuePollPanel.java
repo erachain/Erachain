@@ -10,7 +10,6 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 
 public class IssuePollPanel extends IssueItemPanel {
@@ -33,29 +32,19 @@ public class IssuePollPanel extends IssueItemPanel {
 
         JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
         labelGBC.gridy = gridy;
-        jPanelMain.add(optionsLabel, labelGBC);
+        jPanelAdd.add(optionsLabel, labelGBC);
 
         // TABLE OPTIONS
-        GridBagConstraints gbcOptionalTable = new GridBagConstraints();
-        gbcOptionalTable.gridx = 8;
-        gbcOptionalTable.gridy = gridy++;
-        gbcOptionalTable.weighty = 0.9;
-        gbcOptionalTable.gridwidth = 3;
-        gbcOptionalTable.fill = GridBagConstraints.BOTH;
-        gbcOptionalTable.anchor = GridBagConstraints.CENTER;
         table = new MTable(optionsTableModel);
         JScrollPane scrollPaneOptionalTable = new JScrollPane();
         scrollPaneOptionalTable.setViewportView(table);
-        jPanelMain.add(scrollPaneOptionalTable, gbcOptionalTable);
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(scrollPaneOptionalTable, fieldGBC);
 
         JButton deleteButton = new JButton(Lang.getInstance().translate("Delete"));
         deleteButton.addActionListener(e -> deleteRow());
-        GridBagConstraints gbcDeleteButton = new GridBagConstraints();
-        gbcDeleteButton.gridx = 8;
-        gbcDeleteButton.gridy = gridy++;
-        gbcDeleteButton.fill = GridBagConstraints.HORIZONTAL;
-        gbcDeleteButton.gridwidth = 2;
-        jPanelMain.add(deleteButton, gbcDeleteButton);
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(deleteButton, fieldGBC);
 
         JPopupMenu menu = new JPopupMenu();
         JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Delete"));

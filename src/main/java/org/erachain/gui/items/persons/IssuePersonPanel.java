@@ -131,17 +131,17 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
         // gender
         labelGBC.gridy = gridy;
-        jPanelMain.add(jLabelGender, labelGBC);
+        jPanelAdd.add(jLabelGender, labelGBC);
 
         fieldGBC.gridy = gridy++;
-        jPanelMain.add(comboBoxGender, fieldGBC);
+        jPanelAdd.add(comboBoxGender, fieldGBC);
 
         // born
         labelGBC.gridy = gridy;
-        jPanelMain.add(jLabelBirthday, labelGBC);
+        jPanelAdd.add(jLabelBirthday, labelGBC);
 
         fieldGBC.gridy = gridy++;
-        jPanelMain.add(txtBirthday, fieldGBC);
+        jPanelAdd.add(txtBirthday, fieldGBC);
 
         // dead
         gridBagConstraints = new GridBagConstraints();
@@ -149,49 +149,49 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         gridBagConstraints.gridy = gridy++;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        jPanelMain.add(aliveCheckBox, gridBagConstraints);
+        jPanelAdd.add(aliveCheckBox, gridBagConstraints);
 
         labelGBC.gridy = gridy;
-        jPanelMain.add(jLabelDead, labelGBC);
+        jPanelAdd.add(jLabelDead, labelGBC);
         fieldGBC.gridy = gridy++;
-        jPanelMain.add(txtDeathDay, fieldGBC);
+        jPanelAdd.add(txtDeathDay, fieldGBC);
 
         //BirthLatitude
         labelGBC.gridy = gridy;
-        jPanelMain.add(jLabelBirthLatitudeLongtitude, labelGBC);
+        jPanelAdd.add(jLabelBirthLatitudeLongtitude, labelGBC);
         fieldGBC.gridy = gridy++;
-        jPanelMain.add(txtBirthLatitude, fieldGBC);
+        jPanelAdd.add(txtBirthLatitude, fieldGBC);
 
         //HairСolor
         labelGBC.gridy = gridy;
-        jPanelMain.add(jlabelhairColor, labelGBC);
+        jPanelAdd.add(jlabelhairColor, labelGBC);
         fieldGBC.gridy = gridy++;
-        jPanelMain.add(txtHairColor, fieldGBC);
+        jPanelAdd.add(txtHairColor, fieldGBC);
 
         // EyeColor
         labelGBC.gridy = gridy;
-        jPanelMain.add(jLabelEyeColor, labelGBC);
+        jPanelAdd.add(jLabelEyeColor, labelGBC);
         fieldGBC.gridy = gridy++;
-        jPanelMain.add(txtEyeColor, fieldGBC);
+        jPanelAdd.add(txtEyeColor, fieldGBC);
 
         // Height
         labelGBC.gridy = gridy;
-        jPanelMain.add(jLabelHeight, labelGBC);
+        jPanelAdd.add(jLabelHeight, labelGBC);
         fieldGBC.gridy = gridy++;
-        jPanelMain.add(txtHeight, fieldGBC);
+        jPanelAdd.add(txtHeight, fieldGBC);
 
         // registrar address
         labelGBC.gridy = gridy;
-        jPanelMain.add(jLabelRegistrarAddress, labelGBC);
+        jPanelAdd.add(jLabelRegistrarAddress, labelGBC);
 
         registrarAddress = new RecipientAddress(this);
         fieldGBC.gridy = gridy++;
         fieldGBC.weightx = 0.2;
         fieldGBC.gridwidth = 4;
-        jPanelMain.add(registrarAddress, fieldGBC);
+        jPanelAdd.add(registrarAddress, fieldGBC);
 
         fieldGBC.gridy = gridy++;
-        jPanelMain.add(registrarAddressDesc, fieldGBC);
+        jPanelAdd.add(registrarAddressDesc, fieldGBC);
 
         /* Added Copy, Paste in GEO (by Samartsev. 18.03.2019) */
         JPopupMenu popup = new JPopupMenu();
