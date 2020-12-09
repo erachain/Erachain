@@ -95,7 +95,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.2";
+    public static String version = "5.2.01";
     public static String buildTime = "2020-12-09 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -3105,31 +3105,31 @@ public class Controller extends Observable {
         }
     }
 
-    public Pair<Transaction, Integer> issueImprint(PrivateKeyAccount creator, String name, String description,
+    public Pair<Transaction, Integer> issueImprint(PrivateKeyAccount creator, ExLink exLink, String name, String description,
                                                    byte[] icon, byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueImprintTransaction(creator, name, description, icon, image,
+            return this.transactionCreator.createIssueImprintTransaction(creator, exLink, name, description, icon, image,
                     feePow);
         }
     }
 
-    public Transaction issueImprint1(PrivateKeyAccount creator, String name, String description, byte[] icon,
+    public Transaction issueImprint1(PrivateKeyAccount creator, ExLink exLink, String name, String description, byte[] icon,
                                      byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueImprintTransaction1(creator, name, description, icon, image,
+            return this.transactionCreator.createIssueImprintTransaction1(creator, exLink, name, description, icon, image,
                     feePow);
         }
     }
 
-    public Pair<Transaction, Integer> issuePerson(boolean forIssue, PrivateKeyAccount creator, String fullName,
+    public Pair<Transaction, Integer> issuePerson(boolean forIssue, PrivateKeyAccount creator, ExLink linkTo, String fullName,
                                                   int feePow, long birthday, long deathday, byte gender, String race, float birthLatitude,
                                                   float birthLongitude, String skinColor, String eyeColor, String hairСolor, int height, byte[] icon,
                                                   byte[] image, String description, PublicKeyAccount owner, byte[] ownerSignature) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssuePersonTransaction(forIssue, creator, fullName, feePow, birthday,
+            return this.transactionCreator.createIssuePersonTransaction(forIssue, creator, linkTo, fullName, feePow, birthday,
                     deathday, gender, race, birthLatitude, birthLongitude, skinColor, eyeColor, hairСolor, height, icon,
                     image, description, owner, ownerSignature);
         }
@@ -3251,11 +3251,11 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction issueStatus(PrivateKeyAccount creator, String name, String description, boolean unique,
+    public Transaction issueStatus(PrivateKeyAccount creator, ExLink linkTo, String name, String description, boolean unique,
                                    byte[] icon, byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueStatusTransaction(creator, name, description, icon, image, unique,
+            return this.transactionCreator.createIssueStatusTransaction(creator, linkTo, name, description, icon, image, unique,
                     feePow);
         }
     }
@@ -3267,20 +3267,20 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction issueTemplate(PrivateKeyAccount creator, String name, String description, byte[] icon,
+    public Transaction issueTemplate(PrivateKeyAccount creator, ExLink linkTo, String name, String description, byte[] icon,
                                      byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueTemplateTransaction(creator, name, description, icon, image,
+            return this.transactionCreator.createIssueTemplateTransaction(creator, linkTo, name, description, icon, image,
                     feePow);
         }
     }
 
-    public Transaction issueUnion(PrivateKeyAccount creator, String name, long birthday, long parent,
+    public Transaction issueUnion(PrivateKeyAccount creator, ExLink linkTo, String name, long birthday, long parent,
                                   String description, byte[] icon, byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueUnionTransaction(creator, name, birthday, parent, description,
+            return this.transactionCreator.createIssueUnionTransaction(creator, linkTo, name, birthday, parent, description,
                     icon, image, feePow);
         }
     }

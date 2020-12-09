@@ -348,10 +348,13 @@ public class RHashes extends Transaction {
         else
             base_len = BASE_LENGTH;
 
+        if (exLink != null)
+            base_len += exLink.length();
+
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
 
-        int add_len = this.url == null? 0 : this.url.length
+        int add_len = this.url == null ? 0 : this.url.length
                 + this.data.length
                 + this.hashes.length * HASH_LENGTH;
 

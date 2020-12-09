@@ -30,37 +30,29 @@ public class IssueImprintRecord extends IssueItemRecord {
         super(typeBytes, NAME_ID, creator, null, imprint, feePow, timestamp, null);
     }
 
-    public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, null, signature);
+    public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, ImprintCls imprint, byte feePow, long timestamp, byte[] signature) {
+        super(typeBytes, NAME_ID, creator, linkTo, imprint, feePow, timestamp, null, signature);
     }
 
-    public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow,
+    public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, ImprintCls imprint, byte feePow,
                               long timestamp, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, null, signature);
+        super(typeBytes, NAME_ID, creator, linkTo, imprint, feePow, timestamp, null, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
     }
 
     // asPack
-    public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, imprint, (byte) 0, 0l, null, signature);
-    }
-
-    public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, imprint, (byte) 0, 0l, signature);
+    public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, ImprintCls imprint, byte[] signature) {
+        super(typeBytes, NAME_ID, creator, linkTo, imprint, (byte) 0, 0L, null, signature);
     }
 
     public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, imprint, feePow, timestamp, signature);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, imprint, feePow, timestamp, signature);
     }
 
-    public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, imprint, feePow, timestamp, null);
-    }
-
-    public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, imprint, (byte) 0, 0l, null);
+    public IssueImprintRecord(PublicKeyAccount creator, ExLink linkTo, ImprintCls imprint, byte feePow, long timestamp) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, imprint, feePow, timestamp, null);
     }
 
     //GETTERS/SETTERS
@@ -108,12 +100,12 @@ public class IssueImprintRecord extends IssueItemRecord {
         PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
         position += CREATOR_LENGTH;
 
-        ExLink exLink;
+        ExLink linkTo;
         if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
-            exLink = ExLink.parse(data, position);
-            position += exLink.length();
+            linkTo = ExLink.parse(data, position);
+            position += linkTo.length();
         } else {
-            exLink = null;
+            linkTo = null;
         }
 
         byte feePow = 0;
@@ -159,9 +151,9 @@ public class IssueImprintRecord extends IssueItemRecord {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new IssueImprintRecord(typeBytes, creator, imprint, feePow, timestamp, signatureBytes, seqNo, feeLong);
+            return new IssueImprintRecord(typeBytes, creator, linkTo, imprint, feePow, timestamp, signatureBytes, seqNo, feeLong);
         } else {
-            return new IssueImprintRecord(typeBytes, creator, imprint, signatureBytes);
+            return new IssueImprintRecord(typeBytes, creator, linkTo, imprint, signatureBytes);
         }
     }
 
@@ -217,6 +209,9 @@ public class IssueImprintRecord extends IssueItemRecord {
             base_len = BASE_LENGTH_AS_DBRECORD + KEY_LENGTH;
         else
             base_len = BASE_LENGTH;
+
+        if (exLink != null)
+            base_len += exLink.length();
 
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;

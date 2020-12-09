@@ -426,6 +426,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         else
             base_len = BASE_LENGTH;
 
+        if (exLink != null)
+            base_len += exLink.length();
+
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
 

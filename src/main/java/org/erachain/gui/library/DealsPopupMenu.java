@@ -77,7 +77,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
                 // AccountAssetLendPanel
                 MainPanel.getInstance().insertNewTab(sendAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetSendPanel(asset, pubKey, null, null, null, false));
+                        new AccountAssetSendPanel(asset, pubKey, null, null, null, asset.isReverseSend()));
 
             }
         });
@@ -88,7 +88,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
                 // AccountAssetLendPanel
                 MainPanel.getInstance().insertNewTab(sendAssetBackward.getText() + ":" + asset.getKey(),
-                        new AccountAssetSendPanel(asset, pubKey, null, null, null, true));
+                        new AccountAssetSendPanel(asset, pubKey, null, null, null, !asset.isReverseSend()));
 
             }
         });
@@ -316,7 +316,7 @@ public class DealsPopupMenu extends JPopupMenu {
         String actionName;
 
         /// **** SEND
-        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SEND, isCreatorOwner);
+        actionName = asset.viewAssetTypeAction(asset.isReverseSend(), TransactionAmount.ACTION_SEND, isCreatorOwner);
         if (actionName == null) {
             this.sendAsset.setVisible(false);
         } else {
@@ -324,7 +324,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.sendAsset.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_SEND, isCreatorOwner);
+        actionName = asset.viewAssetTypeAction(!asset.isReverseSend(), TransactionAmount.ACTION_SEND, isCreatorOwner);
         if (actionName == null) {
             this.sendAssetBackward.setVisible(false);
         } else {

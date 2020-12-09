@@ -2019,8 +2019,9 @@ public class Block implements Closeable, ExplorerJsonLine {
     @Override
     protected void finalize() throws Throwable {
         if (!isClosed) {
+            boolean hasValidatedForkDB = validatedForkDB != null;
             close();
-            if (BlockChain.CHECK_BUGS > 5) {
+            if (hasValidatedForkDB && BlockChain.CHECK_BUGS > 5) {
                 LOGGER.debug("validatedForkDB is FINALIZED: " + this.toString());
             }
         }

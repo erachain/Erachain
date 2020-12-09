@@ -3,26 +3,21 @@ package org.erachain.gui.items.persons;
 import com.toedter.calendar.JDateChooser;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.Gui;
-import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.items.TypeOfImage;
-import org.erachain.gui.library.AddImageLabel;
+import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
-import org.erachain.gui.library.MButton;
 import org.erachain.gui.library.RecipientAddress;
-import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -36,29 +31,26 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
-public class IssuePersonPanel extends IconPanel implements RecipientAddress.RecipientAddressInterface {
+public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress.RecipientAddressInterface {
 
     public static String NAME = "IssuePersonPanel";
     public static String TITLE = "Issue Person";
 
     private static final Logger logger = LoggerFactory.getLogger(IssuePersonPanel.class);
-    protected JLabel titleJLabel = new JLabel();
-    protected JComboBox<Account> cbxFrom = new JComboBox<>();
-    protected JComboBox<String> txtFeePow = new JComboBox<>();
-    protected JTextField txtName = new JTextField("");
-    protected JTextArea txtareaDescription = new JTextArea();
     protected JDateChooser txtBirthday;
     protected RecipientAddress registrarAddress;
     protected JLabel registrarAddressDesc = new JLabel();
-    protected JDateChooser txtDeathday;
+    protected JDateChooser txtDeathDay;
     protected JComboBox<String> comboBoxGender = new JComboBox<>();
     //protected JTextField textPersonNumber = new JTextField();
     protected JTextField txtBirthLatitude = new JTextField("0.0, 0.0");
@@ -67,92 +59,76 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
     protected JTextField txtEyeColor = new JTextField();
     protected JTextField txtHairColor = new JTextField();
     protected JTextField txtHeight = new JTextField("170");
-    protected MButton copyButton;
-    protected JLabel jLabelRegistratorAddress = new JLabel(Lang.getInstance().translate("Registrar") + ":");
-    private JLabel jLabelFee = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
-    private JLabel jLabelAccount = new JLabel(Lang.getInstance().translate("Account") + ":");
+
+    protected JLabel jLabelRegistrarAddress = new JLabel(Lang.getInstance().translate("Registrar") + ":");
     private JLabel jLabelBirthLatitudeLongtitude = new JLabel(Lang.getInstance().translate("Coordinates of Birth") + ":");
     private JLabel jLabelBirthday = new JLabel(Lang.getInstance().translate("Birthday") + ":");
     protected JLabel jLabelDead = new JLabel(Lang.getInstance().translate("Deathday") + ":");
-    private JLabel jLabelDescription = new JLabel(Lang.getInstance().translate("Description") + ":");
     private JLabel jLabelEyeColor = new JLabel(Lang.getInstance().translate("Eye color") + ":");
     private JLabel jLabelGender = new JLabel(Lang.getInstance().translate("Gender") + ":");
     private JLabel jlabelhairColor = new JLabel(Lang.getInstance().translate("Hair color") + ":");
     private JLabel jLabelHeight = new JLabel(Lang.getInstance().translate("Growth") + ":");
-    private JLabel jLabelName = new JLabel(Lang.getInstance().translate("Full name") + ":");
     //private JLabel jLabelPersonNumber = new JLabel(Lang.getInstance().translate("Person number") + ":");
     protected JPanel jPanelHead = new JPanel();
-    protected JScrollPane scrollPaneDescription = new JScrollPane();
-    protected AddImageLabel addImageLabel;
     protected JCheckBox aliveCheckBox = new JCheckBox(Lang.getInstance().translate("Alive"), true);
-    protected JPanel mainPanel = new JPanel();
-    private JScrollPane mainScrollPane1 = new JScrollPane();
+
+    public IssuePersonPanel() {
+        this(NAME, TITLE);
+    }
 
     public IssuePersonPanel(String name, String title) {
-        super(name, title);
-        initComponents();
+        super(name, title, "Person issue has been sent!");
+        initComponents(true);
         initLabels();
-       titleJLabel.setFont(FONT_TITLE);
-        titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-        titleJLabel.setText(Lang.getInstance().translate("Issue Person"));
-        cbxFrom.setModel(new AccountsComboBoxModel());
-        txtName.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (txtName.getText().getBytes().length < 2) {
-                    JOptionPane.showMessageDialog(null,
-                            Lang.getInstance().translate("the name must be longer than 2 characters"),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                    txtName.requestFocus();
-                }
+
+    }
+
+    public IssuePersonPanel(String name, String title, String issueMess) {
+        super(name, title, issueMess);
+    }
+
+    protected void initLabels() {
+        txtDeathDay.setVisible(false);
+        jLabelDead.setVisible(false);
+        aliveCheckBox.addActionListener(arg0 -> {
+            if (aliveCheckBox.isSelected()) {
+                txtDeathDay.setVisible(false);
+                jLabelDead.setVisible(false);
+            } else {
+                txtDeathDay.setVisible(true);
+                jLabelDead.setVisible(true);
             }
-
         });
-
 
         String[] items = PersonCls.GENDERS_LIST;
         items = Lang.getInstance().translate(items);
         comboBoxGender.setModel(new DefaultComboBoxModel<>(items));
         comboBoxGender.setSelectedIndex(2);
         setVisible(true);
+
     }
 
-    public IssuePersonPanel() {
-        this(NAME, TITLE);
-    }
+    protected int initComponents(boolean andBottom) {
+        super.initComponents();
 
-    private void initLabels() {
-        txtDeathday.setVisible(false);
-        jLabelDead.setVisible(false);
-        aliveCheckBox.addActionListener(arg0 -> {
-            if (aliveCheckBox.isSelected()) {
-                txtDeathday.setVisible(false);
-                jLabelDead.setVisible(false);
-            } else {
-                txtDeathday.setVisible(true);
-                jLabelDead.setVisible(true);
-            }
-        });
-    }
+        registrarAddress = new RecipientAddress(this);
 
+        exLinkTextLabel.setVisible(!andBottom);
+        exLinkText.setVisible(!andBottom);
+        exLinkDescriptionLabel.setVisible(!andBottom);
+        exLinkDescription.setVisible(!andBottom);
+        registrarAddressDesc.setVisible(andBottom);
+        registrarAddress.setVisible(andBottom);
+        jLabelRegistrarAddress.setVisible(andBottom);
 
-    private void initComponents() {
-        GridBagConstraints gridBagConstraints;
-        setLayout(new BorderLayout());
+        addImageLabel.setEditable(andBottom);
+        addLogoIconLabel.setEditable(andBottom);
 
-        jLabelFee.setVisible(Gui.SHOW_FEE_POWER);
-        txtFeePow.setModel(new DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
-        txtFeePow.setSelectedIndex(0);
-        txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
+        // вывод верхней панели
+        int gridy = super.initTopArea();
 
-        copyButton = new MButton(Lang.getInstance().translate("Create and copy to clipboard"), 2);
-        copyButton.addActionListener(e -> onIssueClick(false));
-
-        addImageLabel = new AddImageLabel(Lang.getInstance().translate("Add image"),
-                WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG,
-                PersonCls.MIN_IMAGE_LENGTH, PersonCls.MAX_IMAGE_LENGTH,
-                WIDTH_IMAGE_INITIAL,HEIGHT_IMAGE_INITIAL);
+        issueJButton.setText(Lang.getInstance().translate("Create and copy to clipboard"));
+        //issueJButton.addActionListener(e -> onIssueClick());
 
         // SET ONE TIME ZONE for Birthday
         TimeZone tz = TimeZone.getDefault();
@@ -161,241 +137,75 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
         Calendar calendar = Calendar.getInstance(tz);
         calendar.set(1990, Calendar.NOVEMBER, 11, 12, 13, 1);
         txtBirthday.setCalendar(calendar);
-        txtDeathday = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+        txtDeathDay = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
         TimeZone.setDefault(tz);
 
-        mainPanel.setLayout(new GridBagLayout());
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 8;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        mainPanel.add(titleJLabel, gridBagConstraints);
-
-
-        composePanelHead();
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        gridBagConstraints.insets = new Insets(10, 18, 0, 16);
-        mainPanel.add(jPanelHead, gridBagConstraints);
-
-
-
-        // born
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 18, 0, 0);
-        mainPanel.add(jLabelBirthday, gridBagConstraints);
-
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 18, 0, 0);
-        mainPanel.add(jLabelGender, gridBagConstraints);
-
-
-        //HairСolor
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 18, 0, 0);
-        mainPanel.add(jlabelhairColor, gridBagConstraints);
-
-        //BirthLatitude
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 18, 0, 0);
-        mainPanel.add(jLabelBirthLatitudeLongtitude, gridBagConstraints);
-
-        //Fee
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 16;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 18, 0, 0);
-        mainPanel.add(jLabelFee, gridBagConstraints);
-
-
-       // label registrator address
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 19;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 18, 0, 0);
-        mainPanel.add(jLabelRegistratorAddress, gridBagConstraints);
-        // Registrator address object
-
-
-        registrarAddress = new RecipientAddress(this);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 19;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-  //      gridBagConstraints.insets = new Insets(5, 5, 5, 8);
-        mainPanel.add(registrarAddress, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 20;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        mainPanel.add(registrarAddressDesc, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 21;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 16);
-        mainPanel.add(copyButton, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        mainPanel.add(txtBirthday, gridBagConstraints);
         txtBirthday.setFont(UIManager.getFont("TextField.font"));
+        txtDeathDay.setFont(UIManager.getFont("TextField.font"));
+
+        int gridwidth = fieldGBC.gridwidth;
+        fieldGBC.gridwidth = 2;
 
         // gender
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        mainPanel.add(comboBoxGender, gridBagConstraints);
+        labelGBC.gridy = gridy;
+        jPanelAdd.add(jLabelGender, labelGBC);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 12;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        mainPanel.add(txtHairColor, gridBagConstraints);
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(comboBoxGender, fieldGBC);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        mainPanel.add(txtBirthLatitude, gridBagConstraints);
+        // born
+        labelGBC.gridy = gridy;
+        jPanelAdd.add(jLabelBirthday, labelGBC);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 16;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 1);
-        mainPanel.add(txtFeePow, gridBagConstraints);
-
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(txtBirthday, fieldGBC);
 
         // dead
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        mainPanel.add(aliveCheckBox, gridBagConstraints);
+        jPanelAdd.add(aliveCheckBox, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 7;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        mainPanel.add(jLabelDead, gridBagConstraints);
+        labelGBC.gridy = gridy;
+        jPanelAdd.add(jLabelDead, labelGBC);
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(txtDeathDay, fieldGBC);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 7;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        //mainPanel.add(jLabelPersonNumber, gridBagConstraints);
+        //BirthLatitude
+        labelGBC.gridy = gridy;
+        jPanelAdd.add(jLabelBirthLatitudeLongtitude, labelGBC);
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(txtBirthLatitude, fieldGBC);
+
+        //HairСolor
+        labelGBC.gridy = gridy;
+        jPanelAdd.add(jlabelhairColor, labelGBC);
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(txtHairColor, fieldGBC);
 
         // EyeColor
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 7;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        mainPanel.add(jLabelEyeColor, gridBagConstraints);
+        labelGBC.gridy = gridy;
+        jPanelAdd.add(jLabelEyeColor, labelGBC);
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(txtEyeColor, fieldGBC);
 
         // Height
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 7;
-        gridBagConstraints.gridy = 12;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        mainPanel.add(jLabelHeight, gridBagConstraints);
+        labelGBC.gridy = gridy;
+        jPanelAdd.add(jLabelHeight, labelGBC);
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(txtHeight, fieldGBC);
 
+        // registrar address
+        labelGBC.gridy = gridy;
+        jPanelAdd.add(jLabelRegistrarAddress, labelGBC);
 
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(registrarAddress, fieldGBC);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 16);
-        mainPanel.add(txtDeathday, gridBagConstraints);
-        txtDeathday.setFont(UIManager.getFont("TextField.font"));
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 16);
-        //mainPanel.add(textPersonNumber, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 16);
-        mainPanel.add(txtEyeColor, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 12;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 16);
-        mainPanel.add(txtHeight, gridBagConstraints);
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(registrarAddressDesc, fieldGBC);
 
         /* Added Copy, Paste in GEO (by Samartsev. 18.03.2019) */
         JPopupMenu popup = new JPopupMenu();
@@ -446,119 +256,36 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
             }
         });*/
 
-        mainScrollPane1.setViewportView(mainPanel);
-        add(mainScrollPane1, BorderLayout.CENTER);
+        fieldGBC.gridwidth = gridwidth;
+
+        if (andBottom) {
+            // вывод подвала
+            super.initBottom(gridy);
+        }
+
+        return gridy;
+
     }
 
-    private void composePanelHead() {
-        GridBagConstraints gridBagConstraints;
-        jPanelHead.setLayout(new GridBagLayout());
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.gridheight = 5;
-        gridBagConstraints.weightx = 0.05;
-        jPanelHead.add(addImageLabel, gridBagConstraints);
-
-        txtareaDescription.setColumns(20);
-        txtareaDescription.setRows(5);
-        scrollPaneDescription.setViewportView(txtareaDescription);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 12;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.gridheight = 4;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.weighty = 0.1;
-        jPanelHead.add(scrollPaneDescription, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 12;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.1;
-        jPanelHead.add(txtName, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        jPanelHead.add(jLabelName, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(10, 10, 0, 0);
-        jPanelHead.add(jLabelAccount, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        jPanelHead.add(jLabelDescription, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 12;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        jPanelHead.add(cbxFrom, gridBagConstraints);
-    }
 
     protected void reset() {
-        txtName.setText("");
-        txtareaDescription.setText("");
+        textName.setText("");
+        textAreaDescription.setText("");
         addImageLabel.reset();
     }
 
-    private void onIssueClick(boolean forIssue) {
-        // DISABLE
-        copyButton.setEnabled(false);
+    boolean forIssue = false;
+    byte gender;
+    long birthday;
+    long deathday;
+    float birthLatitude;
+    float birthLongitude;
+    int height;
 
-        // CHECK IF NETWORK OK
-        if (false && forIssue && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
-            // NETWORK NOT OK
-            JOptionPane.showMessageDialog(null,
-                    Lang.getInstance().translate(
-                            "You are unable to send a transaction while synchronizing or while having no connections!"),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-
-            // ENABLE
-            copyButton.setEnabled(true);
-            return;
-        }
-        if (checkWalletUnlock(copyButton)) {
-            return;
-        }
-
-        // READ CREATOR
-        Account sender = (Account) this.cbxFrom.getSelectedItem();
+    protected boolean checkValues() {
 
         int parse = 0;
-        int feePow;
-        byte gender;
-        long birthday;
-        long deathday;
-        float birthLatitude;
-        float birthLongitude;
-        int height;
         try {
-            // READ FEE POW
-            feePow = Integer.parseInt((String) txtFeePow.getSelectedItem());
             // READ GENDER
             parse++;
             gender = (byte) (comboBoxGender.getSelectedIndex());
@@ -569,7 +296,7 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
             parse++;
             // END DATE
             try {
-                deathday = txtDeathday.getCalendar().getTimeInMillis();
+                deathday = txtDeathDay.getCalendar().getTimeInMillis();
             } catch (Exception ed1) {
                 deathday = birthday - 1;
             }
@@ -587,9 +314,6 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
         } catch (Exception e) {
             String mess = "Invalid pars... " + parse;
             switch (parse) {
-                case 0:
-                    mess = "Invalid fee power 0..6";
-                    break;
                 case 1:
                     mess = "Invalid gender";
                     break;
@@ -609,113 +333,156 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
                     mess = "Invalid growth 10..255";
                     break;
             }
-            JOptionPane.showMessageDialog(null, Lang.getInstance().translate(mess),
+            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(mess),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            copyButton.setEnabled(true);
+            return false;
+        }
+        return true;
+    }
+
+
+    protected void makeTransaction() {
+    }
+
+    @Override
+    protected String makeTransactionView() {
+        return null;
+    }
+
+    public void onIssueClick() {
+
+        // DISABLE
+        issueJButton.setEnabled(false);
+        if (checkWalletUnlock(issueJButton)) {
+            issueJButton.setEnabled(true);
             return;
         }
-        PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
-        if (creator == null) {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+
+        // READ CREATOR
+        Account creatorAccount = (Account) fromJComboBox.getSelectedItem();
+
+        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
+        if (linkRef != null) {
+            exLink = new ExLinkAppendix(linkRef);
+        }
+
+        try {
+            //READ FEE POW
+            feePow = Integer.parseInt((String) this.textFeePow.getSelectedItem());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee Power!"),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            issueJButton.setEnabled(true);
             return;
         }
 
-        Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, creator,
-                txtName.getText(), feePow, birthday, deathday, gender,
-                "", //textPersonNumber.getText(),
-                birthLatitude,
-                birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),
-                height, null, addImageLabel.getImgBytes(), txtareaDescription.getText(),
-                creator, null);
+        if (checkValues()) {
 
-        IssuePersonRecord issuePersonRecord = (IssuePersonRecord) result.getA();
-
-        // CHECK VALIDATE MESSAGE
-        if (result.getB() == Transaction.VALIDATE_OK) {
-            if (!forIssue) {
-                PersonHuman personHuman = (PersonHuman) issuePersonRecord.getItem();
-                // SIGN
-                personHuman.sign(creator);
-                byte[] issueBytes = personHuman.toBytes(false, false);
-                String base58str = Base58.encode(issueBytes);
-                if (registrar == null) {
-                    // copy to clipBoard
-
-                    // This method writes a string to the system clipboard.
-                    // otherwise it returns null.
-                    StringSelection stringSelection = new StringSelection(base58str);
-                    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate("Person bytecode has been copy to buffer") + "!",
-                            Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    // send telegram
-                    byte[] encryptedBytes = AEScrypto.dataEncrypt(issueBytes, creator.getPrivateKey(), registrar.getPublicKey());
-
-                    Transaction transaction = Controller.getInstance().r_Send(
-                            creator, null, feePow, registrar, 0L,
-                            null, "Person bytecode", encryptedBytes,
-                            new byte[1], new byte[]{1}, 0);
-
-                    Controller.getInstance().broadcastTelegram(transaction, true);
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate("Person bytecode has been send to Registrar") + "!",
-                            Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-
-                }
-
-                // ENABLE
-                copyButton.setEnabled(true);
+            creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creatorAccount.getAddress());
+            if (creator == null) {
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                issueJButton.setEnabled(true);
                 return;
             }
-            String statusText = "";
-            IssueConfirmDialog issueConfirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, issuePersonRecord,
-                    " ",
-                    (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
-                    Lang.getInstance().translate("Confirmation transaction issue person"));
 
-            IssuePersonDetailsFrame issuePersonDetailsFrame = new IssuePersonDetailsFrame(issuePersonRecord);
-            issueConfirmDialog.jScrollPane1.setViewportView(issuePersonDetailsFrame);
-            issueConfirmDialog.setLocationRelativeTo(this);
-            issueConfirmDialog.setVisible(true);
-            if (issueConfirmDialog.isConfirm) {
-                // VALIDATE AND PROCESS
-                Integer afterCreateResult = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(), Transaction.FOR_NETWORK);
-                if (afterCreateResult != Transaction.VALIDATE_OK) {
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate(OnDealClick.resultMess(afterCreateResult)),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate("Person issue has been sent!"),
-                            Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+            Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, creator,
+                    exLink, textName.getText(), feePow, birthday, deathday, gender,
+                    "", //textPersonNumber.getText(),
+                    birthLatitude,
+                    birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),
+                    height, addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(), textAreaDescription.getText(),
+                    creator, null);
+
+            transaction = (IssuePersonRecord) result.getA();
+
+            // CHECK VALIDATE MESSAGE
+            if (result.getB() == Transaction.VALIDATE_OK) {
+                if (!forIssue) {
+                    PersonHuman personHuman = (PersonHuman) transaction.getItem();
+                    // SIGN
+                    personHuman.sign(creator);
+                    byte[] issueBytes = personHuman.toBytes(false, false);
+                    String base58str = Base58.encode(issueBytes);
+                    if (registrar == null) {
+                        // copy to clipBoard
+
+                        // This method writes a string to the system clipboard.
+                        // otherwise it returns null.
+                        StringSelection stringSelection = new StringSelection(base58str);
+                        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+                        JOptionPane.showMessageDialog(new JFrame(),
+                                Lang.getInstance().translate("Person bytecode has been copy to buffer") + "!",
+                                Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        // send telegram
+                        byte[] encryptedBytes = AEScrypto.dataEncrypt(issueBytes, creator.getPrivateKey(), registrar.getPublicKey());
+
+                        Transaction transaction = Controller.getInstance().r_Send(
+                                creator, null, feePow, registrar, 0L,
+                                null, "Person bytecode", encryptedBytes,
+                                new byte[1], new byte[]{1}, 0);
+
+                        Controller.getInstance().broadcastTelegram(transaction, true);
+                        JOptionPane.showMessageDialog(new JFrame(),
+                                Lang.getInstance().translate("Person bytecode has been send to Registrar") + "!",
+                                Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+                    }
+
+                    // ENABLE
+                    issueJButton.setEnabled(true);
+                    return;
                 }
+                String statusText = "";
+                IssueConfirmDialog issueConfirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+                        " ",
+                        (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
+                        Lang.getInstance().translate("Confirmation transaction issue person"));
 
+                IssuePersonDetailsFrame issuePersonDetailsFrame = new IssuePersonDetailsFrame((IssuePersonRecord) transaction);
+                issueConfirmDialog.jScrollPane1.setViewportView(issuePersonDetailsFrame);
+                issueConfirmDialog.setLocationRelativeTo(this);
+                issueConfirmDialog.setVisible(true);
+                if (issueConfirmDialog.isConfirm) {
+                    // VALIDATE AND PROCESS
+                    Integer afterCreateResult = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(), Transaction.FOR_NETWORK);
+                    if (afterCreateResult != Transaction.VALIDATE_OK) {
+                        JOptionPane.showMessageDialog(new JFrame(),
+                                Lang.getInstance().translate(OnDealClick.resultMess(afterCreateResult)),
+                                Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(new JFrame(),
+                                Lang.getInstance().translate("Person issue has been sent!"),
+                                Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                    }
+
+                }
+            } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MIN) {
+                JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                        Lang.getInstance().translate("Name must be more then %val characters!")
+                                .replace("%val", "" + transaction.getItem().getMinNameLen()),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MAX) {
+                JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                        Lang.getInstance().translate("Name must be less then %val characters!")
+                                .replace("%val", "" + ItemCls.MAX_NAME_LENGTH),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.getInstance().translate(OnDealClick.resultMess(result.getB())),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             }
-        } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MIN) {
-            JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                    Lang.getInstance().translate("Name must be more then %val characters!")
-                            .replace("%val", "" + issuePersonRecord.getItem().getMinNameLen()),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-        } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MAX) {
-            JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                    Lang.getInstance().translate("Name must be less then %val characters!")
-                            .replace("%val", "" + ItemCls.MAX_NAME_LENGTH),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(result.getB())),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
         }
 
-
         // ENABLE
-        copyButton.setEnabled(true);
+        issueJButton.setEnabled(true);
     }
 
     PublicKeyAccount registrar;
+
     private void refreshReceiverDetails(String registrarStr) {
 
         //Account
@@ -739,13 +506,13 @@ public class IssuePersonPanel extends IconPanel implements RecipientAddress.Reci
         }
 
         if (registrar == null) {
-            copyButton.setText(Lang.getInstance().translate("Create and copy to clipboard"));
+            issueJButton.setText(Lang.getInstance().translate("Create and copy to clipboard"));
         } else {
-            copyButton.setText(Lang.getInstance().translate("Create and send to Registrar"));
+            issueJButton.setText(Lang.getInstance().translate("Create and send to Registrar"));
         }
     }
 
-// выполняемая процедура при изменении адреса получателя
+    // выполняемая процедура при изменении адреса получателя
     @Override
     public void recipientAddressWorker(String e) {
         refreshReceiverDetails(e);

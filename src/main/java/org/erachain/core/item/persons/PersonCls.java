@@ -200,7 +200,7 @@ public abstract class PersonCls extends ItemCls {
                 || this.deathday < this.birthday)
             return true;
 
-        if (onThisTime > 0l
+        if (onThisTime > 0L
                 && this.deathday > onThisTime)
             return true;
 

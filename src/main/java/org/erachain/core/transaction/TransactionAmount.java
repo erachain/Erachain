@@ -339,6 +339,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     public int getActionType() {
+        if (!hasAmount())
+            return 0;
         return getActionType(this.key, this.amount, this.isBackward(), asset.isSelfManaged());
     }
 
@@ -552,6 +554,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             base_len = BASE_LENGTH_AS_DBRECORD;
         else
             base_len = BASE_LENGTH;
+
+        if (exLink != null)
+            base_len += exLink.length();
 
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;

@@ -108,7 +108,7 @@ public class TestRecUnion {
 
 
         //CREATE ISSUE UNION TRANSACTION
-        issueUnionTransaction = new IssueUnionRecord(certifier, union, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0]);
+        issueUnionTransaction = new IssueUnionRecord(certifier, linkTo, union, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0]);
 
         certifiedPrivateKeys.add(userAccount1);
         certifiedPrivateKeys.add(userAccount2);

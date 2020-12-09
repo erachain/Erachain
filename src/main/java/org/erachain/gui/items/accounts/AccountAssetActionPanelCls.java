@@ -145,6 +145,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jComboBox_Asset.setEditable(false);
         //this.jComboBox_Asset.setEnabled(assetIn != null);
 
+        exLinkDescription.setEditable(false);
         exLinkText.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override

@@ -221,7 +221,7 @@ public class BlockChain {
      * Если задан то это режим синхронизации со стрым протоколом - значит нам нельза генерить блоки и трнзакции
      * и вести себя тихо - ничего не посылать никуда - чтобы не забанили
      */
-    public static int ALL_VALID_BEFORE = DEMO_MODE ? 167400 : TEST_DB > 0 || !MAIN_MODE ? 0 : 1537000; // see in sidePROTOCOL.json as 'allValidBefore'
+    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 1537000; // see in sidePROTOCOL.json as 'allValidBefore'
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 623904; //260120;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам<bR>
@@ -251,14 +251,14 @@ public class BlockChain {
 
     public static final int VERS_4_23_01 = TEST_DB > 0 || !MAIN_MODE ? 0 : 800000;
 
-    public static final int VERS_5_01_01 = TEST_DB > 0 || CLONE_MODE ? 0 : DEMO_MODE ? 22000 : TEST_MODE ? 0 : 990000;
+    public static final int VERS_5_01_01 = TEST_DB > 0 || !MAIN_MODE ? 0 : 990000;
 
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
      */
-    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 || !MAIN_MODE ? 0 : VERS_5_01_01;
+    public static final int START_ISSUE_RIGHTS = VERS_5_01_01;
 
-    public static final int START_ITEM_DUPLICATE = TEST_DB > 0 || !MAIN_MODE ? 0 : 800000;
+    public static final int START_ITEM_DUPLICATE = VERS_5_01_01;
 
 
     public static final int DEFAULT_DURATION = 365 * 5; // 5 years
@@ -1182,11 +1182,7 @@ public class BlockChain {
             repeatsMin = (repeatsMin >> 2);
 
             if (ERA_COMPU_ALL_UP) {
-                if (DEMO_MODE && height < 2100) {
-                    repeatsMin = 1;
-                } else {
-                    repeatsMin = REPEAT_WIN;
-                }
+                repeatsMin = REPEAT_WIN;
             } else if (MAIN_MODE) {
                 if (height < 40000) {
                     if (repeatsMin > 4)
@@ -1210,7 +1206,7 @@ public class BlockChain {
             }
         }
 
-        if (difference < repeatsMin && (!DEMO_MODE || height > 31515)) {
+        if (difference < repeatsMin) {
             return difference - repeatsMin;
         }
 

@@ -281,6 +281,9 @@ public class CancelOrderTransaction extends Transaction {
         else
             base_len = BASE_LENGTH;
 
+        if (exLink != null)
+            base_len += exLink.length();
+
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
 

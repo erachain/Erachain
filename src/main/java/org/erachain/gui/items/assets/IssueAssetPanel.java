@@ -1,25 +1,17 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetType;
 import org.erachain.core.transaction.IssueAssetTransaction;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.IssueItemPanel;
-import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MDecimalFormatedTextField;
-import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.json.simple.JSONObject;
 
 import javax.swing.*;
-import java.awt.*;
-
-import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 /**
  * @author Саша
@@ -42,15 +34,13 @@ public class IssueAssetPanel extends IssueItemPanel {
     private AssetTypesComboBoxModel assetTypesComboBoxModel;
 
 
-
     public IssueAssetPanel() {
-        super(NAME, TITLE);
-// init
+        super(NAME, TITLE, "Asset issue has been sent!");
+
         assetTypesComboBoxModel = new AssetTypesComboBoxModel();
         assetTypeJComboBox.setModel(assetTypesComboBoxModel);
         textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
         textScale.setSelectedIndex(8);
-//
 
         initComponents();
         textQuantity.setMaskType(textQuantity.maskLong);
@@ -69,33 +59,16 @@ public class IssueAssetPanel extends IssueItemPanel {
     }
 
     protected void initComponents() {
-        // намтройка панелей
         super.initComponents();
+
         // вывод верхней панели
-        int y = super.initTopArea();
+        int gridy = super.initTopArea();
 
-        // insert asset issue info
-        // grid x - 4...26
-        // y -  3 ....29
-        GridBagConstraints gridBagConstraints;
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        labelGBC.gridy = gridy;
+        jPanelAdd.add(typeJLabel, labelGBC);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        jPanelMain.add(typeJLabel, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 19;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.4;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelMain.add(assetTypeJComboBox, gridBagConstraints);
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(assetTypeJComboBox, fieldGBC);
 
         JScrollPane scrollPaneAssetTypeDescription = new JScrollPane();
 
@@ -106,220 +79,115 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 27;
+        gridBagConstraints.gridy = gridy++;
+        gridBagConstraints.gridwidth = 19;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelMain.add(textareasAssetTypeDescription, gridBagConstraints);
+        jPanelAdd.add(textareasAssetTypeDescription, gridBagConstraints);
 
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        jPanelMain.add(quantityJLabel, gridBagConstraints);
-
+        labelGBC.gridy = gridy;
+        jPanelAdd.add(quantityJLabel, labelGBC);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
-        jPanelMain.add(textQuantity, gridBagConstraints);
-
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 13;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        jPanelMain.add(scaleJLabel, gridBagConstraints);
-
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 15;
-        gridBagConstraints.gridy = y++;
-     //   gridBagConstraints.gridwidth = 4;
-     //   gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-     //   gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelMain.add(textScale, gridBagConstraints);
+        jPanelAdd.add(textQuantity, gridBagConstraints);
+
+        labelGBC.gridx = 13;
+        labelGBC.gridy = gridy;
+        gridBagConstraints.gridwidth = 1;
+        jPanelAdd.add(scaleJLabel, labelGBC);
+        labelGBC.gridx = 4;
+        gridBagConstraints.gridwidth = 3;
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 18;
+        gridBagConstraints.gridy = gridy++;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
+        jPanelAdd.add(textScale, gridBagConstraints);
 
         // вывод подвала
-        super.initBottom(y);
+        super.initBottom(gridy);
     }
 
-    public void onIssueClick() {
-        // DISABLE
-        issueJButton.setEnabled(false);
-        if (checkWalletUnlock(issueJButton)) {
-            return;
-        }
+    int scale;
+    long quantity;
+    int assetType;
 
-        // READ CREATOR
-        Account sender = (Account) fromJComboBox.getSelectedItem();
+    protected boolean checkValues() {
 
-        int parsestep = 0;
+        int parseStep = 0;
         try {
 
-            // READ FEE POW
-            int feePow = Integer.parseInt((String) textFeePow.getSelectedItem());
-
             // READ SCALE
-            parsestep++;
-            byte scale = Byte.parseByte((String) textScale.getSelectedItem());
-
+            scale = Byte.parseByte((String) textScale.getSelectedItem());
 
             // READ QUANTITY
-            parsestep++;
-            long quantity = Long.parseLong(textQuantity.getText());
-            int forDeal = Transaction.FOR_NETWORK;
+            parseStep++;
+            quantity = Long.parseLong(textQuantity.getText());
 
-            // CREATE ASSET
-            parsestep++;
-            // SCALE, ASSET_TYPE, QUANTITY
-            PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
-            if (creator == null) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-
-            // if (currency_unmovabl_chk.isSelected()) assetType = 1;
-            // if (claim_right_obligation_chk.isSelected()) assetType = 2;
-            parsestep++;
-            int assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
-
-            IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
-                    creator, null, textName.getText(), textAreaDescription.getText(), addLogoIconLabel.getImgBytes(),
-                    addImageLabel.getImgBytes(), scale, assetType, quantity, feePow);
-
-            AssetCls asset = (AssetCls) issueAssetTransaction.getItem();
-
-            String text = "<HTML><body>";
-            text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
-                    + Lang.getInstance().translate("Issue Asset") + "<br><br><br>"
-                    + Lang.getInstance().translate("Creator") + ":&nbsp;" + issueAssetTransaction.getCreator() + "<br>"
-                    + "[" + asset.getKey() + "]" + Lang.getInstance().translate("Name") + ":&nbsp;" + asset.viewName() + "<br>"
-                    + Lang.getInstance().translate("Quantity") + ":&nbsp;" + asset.getQuantity() + "<br>"
-                    + Lang.getInstance().translate("Asset Type") + ":&nbsp;"
-                    + Lang.getInstance().translate(asset.viewAssetTypeFull() + "") + "<br>"
-                    + Lang.getInstance().translate("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
-                    + Lang.getInstance().translate("Description") + ":<br>";
-            if (asset.getKey() > 0 && asset.getKey() < 1000) {
-                text += Library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "<br>";
-            } else {
-                text += Library.to_HTML(asset.viewDescription()) + "<br>";
-            }
-            String statusText = "";
-
-            IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(),
-                    true, issueAssetTransaction,
-                    text, (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
-                    Lang.getInstance().translate("Confirmation Transaction"));
-            confirmDialog.setLocationRelativeTo(this);
-            confirmDialog.setVisible(true);
-
-            // JOptionPane.OK_OPTION
-            if (!confirmDialog.isConfirm) {
-                issueJButton.setEnabled(true);
-                return;
-            }
-
-            // VALIDATE AND PROCESS
-            int result = Controller.getInstance().getTransactionCreator().afterCreate(issueAssetTransaction, forDeal);
-
-            // CHECK VALIDATE MESSAGE
-            switch (result) {
-                case Transaction.VALIDATE_OK:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Asset issue has been sent!"),
-                            Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-                    break;
-                case Transaction.INVALID_QUANTITY:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"),
-                            JOptionPane.ERROR_MESSAGE);
-                    break;
-                case Transaction.NOT_ENOUGH_FEE:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%",
-                                    AssetCls.FEE_NAME),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                    break;
-                case Transaction.INVALID_NAME_LENGTH_MIN:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Name must be more then %val characters!")
-                                    .replace("%val", "" + issueAssetTransaction.getItem().getMinNameLen()),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                    break;
-                case Transaction.INVALID_NAME_LENGTH_MAX:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Name must be less then %val characters!")
-                                    .replace("%val", "" + ItemCls.MAX_NAME_LENGTH),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                    break;
-                case Transaction.INVALID_DESCRIPTION_LENGTH_MAX:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Description must be between 1 and 1000 characters!"),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                    break;
-                case Transaction.INVALID_PAYMENTS_LENGTH:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"),
-                            JOptionPane.ERROR_MESSAGE);
-                    break;
-                case Transaction.CREATOR_NOT_PERSONALIZED:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Issuer account not personalized!"),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                    break;
-                default:
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate(OnDealClick.resultMess(result)),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                    break;
-            }
         } catch (Exception e) {
-            switch (parsestep) {
+            switch (parseStep) {
                 case 0:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Invalid Fee Power!"), Lang.getInstance().translate("Error"),
-                            JOptionPane.ERROR_MESSAGE);
-                    break;
-                case 1:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
                             Lang.getInstance().translate("Invalid Scale!"), Lang.getInstance().translate("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     break;
-                case 2:
+                case 1:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
                             Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     break;
-                case 4:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Invalid Type!"), Lang.getInstance().translate("Error"),
-                            JOptionPane.ERROR_MESSAGE);
-                    break;
-                case 3:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Invalid Asset!"), Lang.getInstance().translate("Error"),
-                            JOptionPane.ERROR_MESSAGE);
-                    break;
             }
+            return false;
         }
 
-        // ENABLE
-        issueJButton.setEnabled(true);
+        assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
+
+        return true;
+    }
+
+    protected void makeTransaction() {
+
+        transaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
+                creator, exLink, textName.getText(), textAreaDescription.getText(),
+                addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
+                scale, assetType, quantity, feePow);
+
+        // TEST
+        JSONObject json = transaction.copy().toJson();
+
+    }
+
+    protected String makeTransactionView() {
+
+        AssetCls asset = (AssetCls) transaction.getItem();
+
+        String text = "<HTML><body><h2>";
+        text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
+                + Lang.getInstance().translate("Issue Asset") + "</h2>"
+                + Lang.getInstance().translate("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
+                + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
+                + "[" + asset.getKey() + "]" + Lang.getInstance().translate("Name") + ":&nbsp;" + asset.viewName() + "<br>"
+                + Lang.getInstance().translate("Quantity") + ":&nbsp;" + asset.getQuantity() + "<br>"
+                + Lang.getInstance().translate("Asset Type") + ":&nbsp;"
+                + Lang.getInstance().translate(asset.viewAssetTypeFull() + "") + "<br>"
+                + Lang.getInstance().translate("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
+                + Lang.getInstance().translate("Description") + ":<br>";
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            text += Library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "<br>";
+        } else {
+            text += Library.to_HTML(asset.viewDescription()) + "<br>";
+        }
+
+        return text;
+
     }
 
 }
