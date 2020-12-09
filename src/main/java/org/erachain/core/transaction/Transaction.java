@@ -2084,6 +2084,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         try {
             return TransactionFactory.getInstance().parse(this.toBytes(FOR_NETWORK, true), Transaction.FOR_NETWORK);
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
             return null;
         }
     }

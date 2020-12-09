@@ -225,27 +225,27 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
         createIndexes(BIDIRECTION_ADDRESS_INDEX, addressBiIndex, descendingaddressBiIndex,
                 new Fun.Function2<byte[][],
-                Long, Transaction>() {
-            @Override
-            public byte[][] run(Long key, Transaction transaction) {
-                // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                if (transaction.noDCSet()) {
-                    transaction.setDC((DCSet) databaseSet, true);
-                }
-                HashSet<Account> accounts = transaction.getInvolvedAccounts();
-                int size = accounts.size();
-                byte[][] result = new byte[size][];
-                int count = 0;
-                for (Account account : accounts) {
-                    byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-                    System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                        Long, Transaction>() {
+                    @Override
+                    public byte[][] run(Long key, Transaction transaction) {
+                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                        if (transaction.noDCSet()) {
+                            transaction.setDC((DCSet) databaseSet, true);
+                        }
+                        HashSet<Account> accounts = transaction.getInvolvedAccounts();
+                        int size = accounts.size();
+                        byte[][] result = new byte[size][];
+                        int count = 0;
+                        for (Account account : accounts) {
+                            byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+                            System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-                    result[count++] = addressKey;
-                }
+                            result[count++] = addressKey;
+                        }
 
-                return result;
-            }
-        });
+                        return result;
+                    }
+                });
 
     }
 
@@ -263,9 +263,9 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-         return IteratorCloseableImpl.make(((BTreeMap<Long, Transaction>) map)
-                 .subMap(Transaction.makeDBRef(height, 0),
-                         Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator());
+        return IteratorCloseableImpl.make(((BTreeMap<Long, Transaction>) map)
+                .subMap(Transaction.makeDBRef(height, 0),
+                        Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator());
 
     }
 
@@ -544,7 +544,8 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
         super.put(key, transaction);
 
-        if (BlockChain.CHECK_BUGS > 3 && transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
+        // FOR TESTs
+        if (false && BlockChain.CHECK_BUGS > 3) {
             logger.info(Transaction.viewDBRef(key) + ": " + transaction.toString());
             Transaction tx = transaction.copy();
             // !!! нужно отключать КЭШ для этого

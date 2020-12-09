@@ -290,7 +290,7 @@ public abstract class IssueItemPanel extends IconPanel {
         fieldGBC.gridy = y++;
         jPanelMain.add(fromJComboBox, fieldGBC);
 
-        if (false) {
+        if (true) {
             labelGBC.gridy = y;
             jPanelMain.add(exLinkTextLabel, labelGBC);
 

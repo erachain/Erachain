@@ -9,6 +9,7 @@ import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.lang.Lang;
+import org.json.simple.JSONObject;
 
 import javax.swing.*;
 
@@ -17,8 +18,8 @@ import javax.swing.*;
  */
 public class IssueAssetPanel extends IssueItemPanel {
 
-    public static String NAME = "IssueStatusPanel";
-    public static String TITLE = "Issue Status";
+    public static String NAME = "IssueAssetPanel";
+    public static String TITLE = "Issue Asset";
 
     private JLabel scaleJLabel = new JLabel(Lang.getInstance().translate("Scale") + ":");
     private JLabel quantityJLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
@@ -63,15 +64,9 @@ public class IssueAssetPanel extends IssueItemPanel {
         // вывод верхней панели
         int gridy = super.initTopArea();
 
-        // insert asset issue info
-        // grid x - 4...26
-        // y -  3 ....29
-
-        labelGBC.gridx = 4;
         labelGBC.gridy = gridy;
         jPanelMain.add(typeJLabel, labelGBC);
 
-        fieldGBC.gridx = 8;
         fieldGBC.gridy = gridy++;
         jPanelMain.add(assetTypeJComboBox, fieldGBC);
 
@@ -92,7 +87,6 @@ public class IssueAssetPanel extends IssueItemPanel {
         jPanelMain.add(textareasAssetTypeDescription, gridBagConstraints);
 
 
-        labelGBC.gridx = 4;
         labelGBC.gridy = gridy;
         jPanelMain.add(quantityJLabel, labelGBC);
 
@@ -103,14 +97,13 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        fieldGBC.gridx = 8;
-        fieldGBC.gridy = gridy;
-        jPanelMain.add(textQuantity, fieldGBC);
+        jPanelMain.add(textQuantity, gridBagConstraints);
 
         labelGBC.gridx = 13;
         labelGBC.gridy = gridy;
         gridBagConstraints.gridwidth = 1;
         jPanelMain.add(scaleJLabel, labelGBC);
+        labelGBC.gridx = 4;
         gridBagConstraints.gridwidth = 3;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -166,6 +159,9 @@ public class IssueAssetPanel extends IssueItemPanel {
                 creator, exLink, textName.getText(), textAreaDescription.getText(),
                 addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
                 scale, assetType, quantity, feePow);
+
+        // TEST
+        JSONObject json = transaction.copy().toJson();
 
     }
 
