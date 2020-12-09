@@ -26,15 +26,14 @@ public class IssuePollPanel extends IssueItemPanel {
 
         initComponents();
 
+        optionsTableModel = new CreateOptionsTableModel(new Object[]{Lang.getInstance().translate("Name")}, 0);
+
         // вывод верхней панели
         int gridy = initTopArea();
 
         JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
-        GridBagConstraints gbcOptionsLabel = new GridBagConstraints();
-        gbcOptionsLabel.gridx = 4;
-        gbcOptionsLabel.gridy = gridy;
-        gbcOptionsLabel.anchor = GridBagConstraints.NORTHEAST;
-        jPanelMain.add(optionsLabel, gbcOptionsLabel);
+        labelGBC.gridy = gridy;
+        jPanelMain.add(optionsLabel, labelGBC);
 
         // TABLE OPTIONS
         GridBagConstraints gbcOptionalTable = new GridBagConstraints();
@@ -101,7 +100,8 @@ public class IssuePollPanel extends IssueItemPanel {
         String text = "<HTML><body>";
         text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
                 + Lang.getInstance().translate("Issue Voting") + "<br><br><br>";
-        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>";
+        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
+                + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
         text += Lang.getInstance().translate("Name") + ":&nbsp;" + this.textName.getText() + "<br>";
         text += "<br>" + Lang.getInstance().translate("Description") + ":<br>"
                 + Library.to_HTML(this.textAreaDescription.getText()) + "<br>";

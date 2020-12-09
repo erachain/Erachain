@@ -90,7 +90,8 @@ public class IssueUnionPanel extends IssueItemPanel {
 
         String text = "<HTML><body>";
         text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;" + Lang.getInstance().translate("Issue Union") + "<br><br><br>";
-        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>";
+        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
+                + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
         text += Lang.getInstance().translate("Name") + ":&nbsp;" + transaction.getItem().viewName() + "<br>";
         text += Lang.getInstance().translate("Description") + ":<br>" + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
         text += Lang.getInstance().translate("Date") + ":&nbsp;" + ((UnionCls) transaction.getItem()).getBirthday() + "<br>";
@@ -106,11 +107,8 @@ public class IssueUnionPanel extends IssueItemPanel {
         int gridy = initTopArea();
 
         birthdayJLabel.setText(Lang.getInstance().translate("Birthday") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = gridy;
-        jPanelMain.add(birthdayJLabel, gridBagConstraints);
-
+        labelGBC.gridy = gridy;
+        jPanelMain.add(birthdayJLabel, labelGBC);
 
         // Маска ввода
         MaskFormatter formatter = null;
@@ -125,22 +123,21 @@ public class IssueUnionPanel extends IssueItemPanel {
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = gridy++;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
         jPanelMain.add(txtBirthday, gridBagConstraints);
 
         parentJLabel.setText(Lang.getInstance().translate("Parent") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.insets = new Insets(0, 0, 7, 7);
-        jPanelMain.add(parentJLabel, gridBagConstraints);
+        labelGBC.gridy = gridy;
+        jPanelMain.add(parentJLabel, labelGBC);
 
         txtParent.setText("0");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = gridy++;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
         jPanelMain.add(txtParent, gridBagConstraints);
 
         initBottom(gridy);

@@ -21,8 +21,6 @@ public class IssueImprintPanel extends IssueItemPanel {
     private JTextField txtDebitor;
     private JTextField txtCreditor;
     private JTextField txtAmount;
-    private JButton issueButton;
-    private JTextArea txtDescription;
 
     public IssueImprintPanel() {
         super(NAME, TITLE, "Imprint issue has been sent!");
@@ -122,7 +120,8 @@ public class IssueImprintPanel extends IssueItemPanel {
 
         String text = "<HTML><body>";
         text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;" + Lang.getInstance().translate("Issue Imprint") + "<br><br><br>";
-        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>";
+        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
+                + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
         text += Lang.getInstance().translate("Hash") + ":&nbsp;" + name_total + "<br>";
         text += Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
 

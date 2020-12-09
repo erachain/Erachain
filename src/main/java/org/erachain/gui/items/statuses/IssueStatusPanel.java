@@ -27,11 +27,8 @@ public class IssueStatusPanel extends IssueItemPanel {
         int gridy = initTopArea();
 
         JLabel singleLabel = new JLabel(Lang.getInstance().translate("Single") + ":");
-        GridBagConstraints gbcSingleLabel = new GridBagConstraints();
-        gbcSingleLabel.gridx = 4;
-        gbcSingleLabel.gridy = gridy;
-        gbcSingleLabel.anchor = GridBagConstraints.NORTHEAST;
-        jPanelMain.add(singleLabel, gbcSingleLabel);
+        labelGBC.gridy = gridy;
+        jPanelMain.add(singleLabel, labelGBC);
 
 
         jcheckUnique = new JCheckBox();
@@ -69,7 +66,8 @@ public class IssueStatusPanel extends IssueItemPanel {
         String text = "<HTML><body>";
         text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
                 + Lang.getInstance().translate("Create Status") + "<br><br><br>";
-        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>";
+        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
+                + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
         text += Lang.getInstance().translate("Name") + ":&nbsp;" + transaction.getItem().viewName() + "<br>";
         text += Lang.getInstance().translate("Description") + ":<br>"
                 + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
