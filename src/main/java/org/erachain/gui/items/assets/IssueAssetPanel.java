@@ -72,14 +72,9 @@ public class IssueAssetPanel extends IssueItemPanel {
         labelGBC.gridy = gridy;
         jPanelMain.add(typeJLabel, labelGBC);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = gridy++;
-        gridBagConstraints.gridwidth = 19;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.4;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelMain.add(assetTypeJComboBox, gridBagConstraints);
+        fieldGBC.gridx = 8;
+        fieldGBC.gridy = gridy++;
+        jPanelMain.add(assetTypeJComboBox, fieldGBC);
 
         JScrollPane scrollPaneAssetTypeDescription = new JScrollPane();
 
@@ -109,7 +104,9 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelMain.add(textQuantity, gridBagConstraints);
+        fieldGBC.gridx = 8;
+        fieldGBC.gridy = gridy;
+        jPanelMain.add(textQuantity, fieldGBC);
 
         labelGBC.gridx = 13;
         labelGBC.gridy = gridy;
