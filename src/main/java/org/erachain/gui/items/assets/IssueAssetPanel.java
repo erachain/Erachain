@@ -17,8 +17,8 @@ import javax.swing.*;
  */
 public class IssueAssetPanel extends IssueItemPanel {
 
-    public static String NAME = "IssueAssetPanel";
-    public static String TITLE = "Issue Asset";
+    public static String NAME = "IssueStatusPanel";
+    public static String TITLE = "Issue Status";
 
     private JLabel scaleJLabel = new JLabel(Lang.getInstance().translate("Scale") + ":");
     private JLabel quantityJLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
@@ -34,15 +34,12 @@ public class IssueAssetPanel extends IssueItemPanel {
 
 
     public IssueAssetPanel() {
-        super(NAME, TITLE);
+        super(NAME, TITLE, null, "Asset issue has been sent!");
 
-        issueMess =
-// init
-                assetTypesComboBoxModel = new AssetTypesComboBoxModel();
+        assetTypesComboBoxModel = new AssetTypesComboBoxModel();
         assetTypeJComboBox.setModel(assetTypesComboBoxModel);
         textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
         textScale.setSelectedIndex(8);
-//
 
         initComponents();
         textQuantity.setMaskType(textQuantity.maskLong);

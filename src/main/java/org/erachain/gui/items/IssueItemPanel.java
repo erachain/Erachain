@@ -64,7 +64,7 @@ public abstract class IssueItemPanel extends IconPanel {
         super(name, title);
 
         this.issueMess = issueMess;
-        this.confirmMess = confirmMess;
+        this.confirmMess = confirmMess == null ? "Confirmation Transaction" : confirmMess;
 
         jScrollPane2 = new JScrollPane();
         addImageLabel = new AddImageLabel(

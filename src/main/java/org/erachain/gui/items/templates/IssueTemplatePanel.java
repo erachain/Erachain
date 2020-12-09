@@ -13,7 +13,7 @@ public class IssueTemplatePanel extends IssueItemPanel {
     public static String TITLE = "Issue Template";
 
     public IssueTemplatePanel() {
-        super(NAME, TITLE);
+        super(NAME, TITLE, null, "Template issue has been sent");
 
         initComponents();
 
