@@ -111,6 +111,16 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
     protected int initComponents(boolean andBottom) {
         super.initComponents();
 
+        registrarAddress = new RecipientAddress(this);
+
+        exLinkTextLabel.setVisible(!andBottom);
+        exLinkText.setVisible(!andBottom);
+        exLinkDescriptionLabel.setVisible(!andBottom);
+        exLinkDescription.setVisible(!andBottom);
+        registrarAddressDesc.setVisible(andBottom);
+        registrarAddress.setVisible(andBottom);
+        jLabelRegistrarAddress.setVisible(andBottom);
+
         // вывод верхней панели
         int gridy = super.initTopArea();
 
@@ -188,7 +198,6 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         labelGBC.gridy = gridy;
         jPanelAdd.add(jLabelRegistrarAddress, labelGBC);
 
-        registrarAddress = new RecipientAddress(this);
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(registrarAddress, fieldGBC);
 

@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.item.persons.PersonHuman;
@@ -81,6 +82,9 @@ public class InsertPersonPanel extends IssuePersonPanel {
         int gridy = super.initComponents(false);
         initLabels();
 
+        exLinkTextLabel.setVisible(true);
+        exLinkText.setVisible(true);
+
         txtBirthLatitude.setText("");
         txtBirthLongitudeLatitude.setText("");
         txtHeight.setText("");
@@ -94,7 +98,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         registrarAddressDesc.setEnabled(false);
 
         addImageLabel.setEnabled(false);
-        comboBoxGender.setEditable(false);
+        comboBoxGender.setEnabled(false);
         txtBirthLatitude.setEditable(false);
         txtBirthLongitudeLatitude.setEditable(false);
         txtSkinColor.setEditable(false);
@@ -175,7 +179,12 @@ public class InsertPersonPanel extends IssuePersonPanel {
                 return;
             }
 
-            Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(creator, null, feePow, person);
+            Long linkRef = Transaction.parseDBRef(exLinkText.getText());
+            if (linkRef != null) {
+                exLink = new ExLinkAppendix(linkRef);
+            }
+
+            Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(creator, exLink, feePow, person);
 
             // CHECK VALIDATE MESSAGE
             if (result.getB() == Transaction.VALIDATE_OK) {
