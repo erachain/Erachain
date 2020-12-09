@@ -125,20 +125,16 @@ public class IssueUnionPanel extends IssueItemPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelMain.add(txtBirthday, gridBagConstraints);
+
+        fieldGBC.gridy = gridy++;
+        jPanelMain.add(txtBirthday, fieldGBC);
 
         parentJLabel.setText(Lang.getInstance().translate("Parent") + ":");
         labelGBC.gridy = gridy;
         jPanelMain.add(parentJLabel, labelGBC);
-
+        fieldGBC.gridy = gridy++;
+        jPanelMain.add(txtParent, fieldGBC);
         txtParent.setText("0");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = gridy++;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.3;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelMain.add(txtParent, gridBagConstraints);
 
         initBottom(gridy);
 

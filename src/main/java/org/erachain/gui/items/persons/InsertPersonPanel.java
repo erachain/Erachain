@@ -60,7 +60,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtBirthLatitude.setComponentPopupMenu(null);
 
 
-        copyButton.setVisible(false);
+        issueJButton.setVisible(false);
         aliveCheckBox.setSelected(false);
         aliveCheckBox.setVisible(false);
     }
