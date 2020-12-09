@@ -78,7 +78,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
     }
 
     public IssuePersonPanel(String name, String title) {
-        super(name, title, null, "Person issue has been sent!");
+        super(name, title, "Person issue has been sent!");
         initComponents();
         initLabels();
 
@@ -446,7 +446,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         // READ CREATOR
         Account creatorAccount = (Account) fromJComboBox.getSelectedItem();
 
-        Long linkRef = null; //Transaction.parseDBRef(exLinkText.getText());
+        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
         if (linkRef != null) {
             exLink = new ExLinkAppendix(linkRef);
         }

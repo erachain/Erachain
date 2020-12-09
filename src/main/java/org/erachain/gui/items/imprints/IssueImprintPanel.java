@@ -26,7 +26,7 @@ public class IssueImprintPanel extends IssueItemPanel {
     private JTextArea txtDescription;
 
     public IssueImprintPanel() {
-        super(NAME, TITLE, null, "Imprint issue has been sent!");
+        super(NAME, TITLE, "Imprint issue has been sent!");
 
         initComponents();
 

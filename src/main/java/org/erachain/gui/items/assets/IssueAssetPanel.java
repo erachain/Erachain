@@ -34,7 +34,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
 
     public IssueAssetPanel() {
-        super(NAME, TITLE, null, "Asset issue has been sent!");
+        super(NAME, TITLE, "Asset issue has been sent!");
 
         assetTypesComboBoxModel = new AssetTypesComboBoxModel();
         assetTypeJComboBox.setModel(assetTypesComboBoxModel);

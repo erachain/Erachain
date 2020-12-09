@@ -19,7 +19,7 @@ public class IssueStatusPanel extends IssueItemPanel {
 
 
     public IssueStatusPanel() {
-        super(NAME, TITLE, "", "Status issue has been sent");
+        super(NAME, TITLE, "Status issue has been sent");
 
         initComponents();
 

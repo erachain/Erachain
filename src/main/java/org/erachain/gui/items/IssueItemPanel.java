@@ -59,12 +59,11 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JTextField exLinkText = new JTextField();
     protected JTextField exLinkDescription = new JTextField();
 
-
-    public IssueItemPanel(String name, String title, String issueMess, String confirmMess) {
+    public IssueItemPanel(String name, String title, String issueMess) {
         super(name, title);
 
         this.issueMess = issueMess;
-        this.confirmMess = confirmMess == null ? "Confirmation Transaction" : confirmMess;
+        this.confirmMess = "Confirmation Transaction";
 
         jScrollPane2 = new JScrollPane();
         addImageLabel = new AddImageLabel(
@@ -217,7 +216,7 @@ public abstract class IssueItemPanel extends IconPanel {
         // READ CREATOR
         Account creatorAccount = (Account) fromJComboBox.getSelectedItem();
 
-        Long linkRef = null; //Transaction.parseDBRef(exLinkText.getText());
+        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
         if (linkRef != null) {
             exLink = new ExLinkAppendix(linkRef);
         }
@@ -288,47 +287,40 @@ public abstract class IssueItemPanel extends IconPanel {
         labelGBC.gridy = y;
         jPanelMain.add(accountJLabel, labelGBC);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        //gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 19;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.4;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-
         fieldGBC.gridy = y++;
         jPanelMain.add(fromJComboBox, fieldGBC);
 
-        labelGBC.gridy = y;
-        jPanelMain.add(exLinkTextLabel, labelGBC);
+        if (false) {
+            labelGBC.gridy = y;
+            jPanelMain.add(exLinkTextLabel, labelGBC);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
-        jPanelMain.add(exLinkText, gridBagConstraints);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 8;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 5;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.weightx = 0.1;
+            gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+            jPanelMain.add(exLinkText, gridBagConstraints);
 
-        exLinkDescriptionLabel.setText(Lang.getInstance().translate("Parent") + ":");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 13;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        jPanelMain.add(exLinkDescriptionLabel, gridBagConstraints);
+            exLinkDescriptionLabel.setText(Lang.getInstance().translate("Parent") + ":");
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 13;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+            gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+            jPanelMain.add(exLinkDescriptionLabel, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 15;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 12;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.9;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelMain.add(exLinkDescription, gridBagConstraints);
-
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 15;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 12;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.weightx = 0.9;
+            gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
+            jPanelMain.add(exLinkDescription, gridBagConstraints);
+        }
 
         labelGBC.gridy = y;
         jPanelMain.add(nameJLabel, labelGBC);
@@ -393,7 +385,6 @@ public abstract class IssueItemPanel extends IconPanel {
         //   gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 5, 8);
         jPanelMain.add(issueJButton, gridBagConstraints);
-
 
     }
 
