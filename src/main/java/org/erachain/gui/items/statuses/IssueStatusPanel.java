@@ -24,25 +24,25 @@ public class IssueStatusPanel extends IssueItemPanel {
         initComponents();
 
         // вывод верхней панели
-        int y = initTopArea();
+        int gridy = initTopArea();
 
         JLabel singleLabel = new JLabel(Lang.getInstance().translate("Single") + ":");
         GridBagConstraints gbcSingleLabel = new GridBagConstraints();
-        gbcSingleLabel.gridx = 1;
-        gbcSingleLabel.gridy = y + 7;
+        gbcSingleLabel.gridx = 4;
+        gbcSingleLabel.gridy = gridy;
         gbcSingleLabel.anchor = GridBagConstraints.NORTHEAST;
-        add(singleLabel, gbcSingleLabel);
+        jPanelMain.add(singleLabel, gbcSingleLabel);
 
 
         jcheckUnique = new JCheckBox();
         GridBagConstraints gbcJCheckUnique = new GridBagConstraints();
-        gbcJCheckUnique.gridx = 2;
-        gbcJCheckUnique.gridy = y + 7;
+        gbcJCheckUnique.gridx = 8;
+        gbcJCheckUnique.gridy = gridy++;
         gbcJCheckUnique.anchor = GridBagConstraints.NORTHEAST;
-        add(jcheckUnique, gbcJCheckUnique);
+        jPanelMain.add(jcheckUnique, gbcJCheckUnique);
 
         // вывод подвала
-        initBottom(y + 7);
+        initBottom(gridy);
 
         setVisible(true);
     }

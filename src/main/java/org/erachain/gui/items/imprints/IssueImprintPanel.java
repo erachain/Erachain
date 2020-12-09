@@ -40,7 +40,7 @@ public class IssueImprintPanel extends IssueItemPanel {
         labelGBC.fill = GridBagConstraints.HORIZONTAL;
         labelGBC.anchor = GridBagConstraints.NORTHWEST;
         labelGBC.weightx = 0;
-        labelGBC.gridx = 0;
+        labelGBC.gridx = 4;
 
         //COMBOBOX GBC
         GridBagConstraints cbxGBC = new GridBagConstraints();
@@ -49,7 +49,7 @@ public class IssueImprintPanel extends IssueItemPanel {
         cbxGBC.fill = GridBagConstraints.NONE;
         cbxGBC.anchor = GridBagConstraints.NORTHWEST;
         cbxGBC.weightx = 0;
-        cbxGBC.gridx = 1;
+        cbxGBC.gridx = 8;
 
         //TEXTFIELD GBC
         GridBagConstraints txtGBC = new GridBagConstraints();
@@ -59,7 +59,7 @@ public class IssueImprintPanel extends IssueItemPanel {
         txtGBC.anchor = GridBagConstraints.NORTHWEST;
         txtGBC.weightx = 1;
         txtGBC.gridwidth = 2;
-        txtGBC.gridx = 1;
+        txtGBC.gridx = 8;
 
         //BUTTON GBC
         GridBagConstraints buttonGBC = new GridBagConstraints();
@@ -70,85 +70,61 @@ public class IssueImprintPanel extends IssueItemPanel {
         buttonGBC.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         buttonGBC.gridwidth = 2;
 
-        buttonGBC.gridx = 2;
+        buttonGBC.gridx = 12;
 
         int gridy = y;
 
         //LABEL NUMBER
         labelGBC.gridy = gridy;
         JLabel numberLabel = new JLabel(Lang.getInstance().translate("Number") + " (0..9/-.):");
-        this.add(numberLabel, labelGBC);
+        jPanelMain.add(numberLabel, labelGBC);
 
         //TXT NUMBER
         txtGBC.gridy = gridy++;
         this.txtNumber = new JTextField();
-        this.add(this.txtNumber, txtGBC);
+        jPanelMain.add(this.txtNumber, txtGBC);
 
         //LABEL DATE
         labelGBC.gridy = gridy;
         JLabel dateLabel = new JLabel(Lang.getInstance().translate("Date") + " (YY-MM-DD HH:MM):");
-        this.add(dateLabel, labelGBC);
+        jPanelMain.add(dateLabel, labelGBC);
 
         //TXT DEBITOR
         txtGBC.gridy = gridy++;
         this.txtDate = new JTextField();
-        this.add(this.txtDate, txtGBC);
+        jPanelMain.add(this.txtDate, txtGBC);
 
-        //LABEL DEBITOR
+        //LABEL DEBTOR
         labelGBC.gridy = gridy;
-        JLabel debitorLabel = new JLabel(Lang.getInstance().translate("Debitor INN") + ":");
-        this.add(debitorLabel, labelGBC);
+        JLabel debitorLabel = new JLabel(Lang.getInstance().translate("Debtor")
+                + " (" + Lang.getInstance().translate("IBN-INN") + "):");
+        jPanelMain.add(debitorLabel, labelGBC);
 
-        //TXT DEBITOR
+        //TXT DEBTOR
         txtGBC.gridy = gridy++;
         this.txtDebitor = new JTextField();
-        this.add(this.txtDebitor, txtGBC);
+        jPanelMain.add(this.txtDebitor, txtGBC);
 
         //LABEL CREDITOR
         labelGBC.gridy = gridy;
-        JLabel creditorLabel = new JLabel(Lang.getInstance().translate("Creditor INN") + ":");
-        this.add(creditorLabel, labelGBC);
+        JLabel creditorLabel = new JLabel(Lang.getInstance().translate("Creditor")
+                + " (" + Lang.getInstance().translate("IBN-INN") + "):");
+        jPanelMain.add(creditorLabel, labelGBC);
 
-        //TXT DEBITOR
+        //TXT CREDITOR
         txtGBC.gridy = gridy++;
         this.txtCreditor = new JTextField();
-        this.add(this.txtCreditor, txtGBC);
+        jPanelMain.add(this.txtCreditor, txtGBC);
 
-        //LABEL CREDITOR
+        //LABEL TOTAL
         labelGBC.gridy = gridy;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
-        this.add(descriptionLabel, labelGBC);
+        JLabel amountLabel = new JLabel(Lang.getInstance().translate("Total") + " (123.03):");
+        jPanelMain.add(amountLabel, labelGBC);
 
-        //TXT DEBITOR
-        txtGBC.gridy = gridy++;
-        this.txtDescription = new JTextArea();
-        txtDescription.setColumns(20);
-        txtDescription.setRows(5);
-        JScrollPane jScrollPane1 = new JScrollPane();
-        jScrollPane1.setViewportView(txtDescription);
-        this.add(jScrollPane1, txtGBC);
-
-
-        //LABEL CREDITOR
-        labelGBC.gridy = gridy;
-        JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + " (123.03):");
-        this.add(amountLabel, labelGBC);
-
-        //TXT DEBITOR
+        //TXT TOTAL
         txtGBC.gridy = gridy++;
         this.txtAmount = new JTextField();
-        this.add(this.txtAmount, txtGBC);
-
-
-        //BUTTON GBC
-
-        buttonGBC.fill = GridBagConstraints.NONE;
-        buttonGBC.anchor = GridBagConstraints.NORTHWEST;
-        buttonGBC.gridwidth = 2;
-        buttonGBC.gridx = 0;
-        buttonGBC.weighty = 1.0;
-        JLabel labBootom = new JLabel("");
-        this.add(labBootom, buttonGBC);
+        jPanelMain.add(this.txtAmount, txtGBC);
 
         // вывод подвала
         initBottom(gridy);

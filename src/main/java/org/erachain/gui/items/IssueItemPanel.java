@@ -350,7 +350,6 @@ public abstract class IssueItemPanel extends IconPanel {
     // принимает номер сроки с которой  продолжать вывод полей на нижнюю панель
     protected void initBottom(int y) {
 
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = y;

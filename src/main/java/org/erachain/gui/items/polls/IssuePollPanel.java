@@ -27,36 +27,36 @@ public class IssuePollPanel extends IssueItemPanel {
         initComponents();
 
         // вывод верхней панели
-        int y = initTopArea();
+        int gridy = initTopArea();
 
         JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
         GridBagConstraints gbcOptionsLabel = new GridBagConstraints();
-        gbcOptionsLabel.gridx = 1;
-        gbcOptionsLabel.gridy = y + 4;
+        gbcOptionsLabel.gridx = 4;
+        gbcOptionsLabel.gridy = gridy;
         gbcOptionsLabel.anchor = GridBagConstraints.NORTHEAST;
-        add(optionsLabel, gbcOptionsLabel);
+        jPanelMain.add(optionsLabel, gbcOptionsLabel);
 
         // TABLE OPTIONS
         GridBagConstraints gbcOptionalTable = new GridBagConstraints();
-        gbcOptionalTable.gridx = 2;
-        gbcOptionalTable.gridy = y + 4;
-        gbcOptionalTable.weighty = 0.1;
-        gbcOptionalTable.gridwidth = 2;
+        gbcOptionalTable.gridx = 8;
+        gbcOptionalTable.gridy = gridy++;
+        gbcOptionalTable.weighty = 0.9;
+        gbcOptionalTable.gridwidth = 3;
         gbcOptionalTable.fill = GridBagConstraints.BOTH;
         gbcOptionalTable.anchor = GridBagConstraints.CENTER;
         table = new MTable(optionsTableModel);
         JScrollPane scrollPaneOptionalTable = new JScrollPane();
         scrollPaneOptionalTable.setViewportView(table);
-        add(scrollPaneOptionalTable, gbcOptionalTable);
+        jPanelMain.add(scrollPaneOptionalTable, gbcOptionalTable);
 
         JButton deleteButton = new JButton(Lang.getInstance().translate("Delete"));
         deleteButton.addActionListener(e -> deleteRow());
         GridBagConstraints gbcDeleteButton = new GridBagConstraints();
-        gbcDeleteButton.gridx = 2;
-        gbcDeleteButton.gridy = y + 5;
+        gbcDeleteButton.gridx = 8;
+        gbcDeleteButton.gridy = gridy++;
         gbcDeleteButton.fill = GridBagConstraints.HORIZONTAL;
         gbcDeleteButton.gridwidth = 2;
-        add(deleteButton, gbcDeleteButton);
+        jPanelMain.add(deleteButton, gbcDeleteButton);
 
         JPopupMenu menu = new JPopupMenu();
         JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Delete"));
@@ -65,7 +65,7 @@ public class IssuePollPanel extends IssueItemPanel {
         TableMenuPopupUtil.installContextMenu(table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
         // вывод подвала
-        initBottom(y + 5);
+        initBottom(gridy);
 
         setVisible(true);
     }

@@ -103,16 +103,13 @@ public class IssueUnionPanel extends IssueItemPanel {
 
         super.initComponents();
 
-        int y = initTopArea();
-
-        setLayout(new GridBagLayout());
-        GridBagConstraints gridBagConstraints;
+        int gridy = initTopArea();
 
         birthdayJLabel.setText(Lang.getInstance().translate("Birthday") + ":");
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y + 6;
-        add(birthdayJLabel, gridBagConstraints);
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = gridy;
+        jPanelMain.add(birthdayJLabel, gridBagConstraints);
 
 
         // Маска ввода
@@ -125,28 +122,28 @@ public class IssueUnionPanel extends IssueItemPanel {
         txtBirthday = new JFormattedTextField(formatter);
         txtBirthday.setText("1970-12-08");
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = y + 6;
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        add(txtBirthday, gridBagConstraints);
+        jPanelMain.add(txtBirthday, gridBagConstraints);
 
         parentJLabel.setText(Lang.getInstance().translate("Parent") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = y + 6;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.insets = new Insets(0, 0, 7, 7);
-        add(parentJLabel, gridBagConstraints);
+        jPanelMain.add(parentJLabel, gridBagConstraints);
 
         txtParent.setText("0");
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = y + 6;
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        add(txtParent, gridBagConstraints);
+        jPanelMain.add(txtParent, gridBagConstraints);
 
-        initBottom(y + 6);
+        initBottom(gridy);
 
     }
 }
