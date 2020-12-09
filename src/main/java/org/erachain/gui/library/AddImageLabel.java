@@ -30,6 +30,7 @@ public class AddImageLabel extends JPanel {
     private Logger logger = LoggerFactory.getLogger(getClass());
     private JLabel label;
     private JLabel mainLabel = new JLabel();
+    private boolean editable = true;
 
     public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize, int initialWidth, int initialHeight) {
         setLayout(new BorderLayout());
@@ -50,8 +51,10 @@ public class AddImageLabel extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    addImage(typeOfImage, minSize, maxSize);
+                if (editable) {
+                    if (e.getButton() == MouseEvent.BUTTON1) {
+                        addImage(typeOfImage, minSize, maxSize);
+                    }
                 }
             }
         });
@@ -65,7 +68,16 @@ public class AddImageLabel extends JPanel {
         validate();
     }
 
-    public void setImageHorizontalAlignment(int alig){
+    public void setEditable(boolean value) {
+        this.editable = value;
+        if (value) {
+            setCursor(new Cursor(Cursor.HAND_CURSOR));
+        } else {
+            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        }
+    }
+
+    public void setImageHorizontalAlignment(int alig) {
         mainLabel.setHorizontalAlignment(alig);
         label.setHorizontalAlignment(alig);
     }
@@ -160,7 +172,7 @@ public class AddImageLabel extends JPanel {
 
     public void set(byte[] imgBytes) {
         this.imgBytes = imgBytes;
-        mainLabel.setIcon(createImageIcon(Color.WHITE, initialWidth, initialHeight));
+        mainLabel.setIcon(new ImageIcon(imgBytes));
     }
 
     public byte[] getImgBytes() {

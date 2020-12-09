@@ -245,20 +245,9 @@ public class InsertPersonPanel extends IssuePersonPanel {
         }
 
         textName.setText(person.viewName());
-        if (true) {
-            addImageLabel.set(person.getImage());
-        } else {
-            ImageIcon image = new ImageIcon(person.getImage());
-            int x = image.getIconWidth();
-            int y = image.getIconHeight();
-            int x1 = 250;
-            double k = ((double) x / (double) x1);
-            y = (int) ((double) y / k);
-            if (y != 0) {
-                Image Im = image.getImage().getScaledInstance(x1, y, 1);
-                //addImageLabel.`.setIcon(new ImageIcon(Im));
-            }
-        }
+        addImageLabel.set(person.getImage());
+        addLogoIconLabel.set(person.getIcon());
+
         // SET ONE TIME ZONE for Birthday
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         txtBirthday.setDate(new Date(person.getBirthday()));

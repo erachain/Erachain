@@ -121,6 +121,9 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         registrarAddress.setVisible(andBottom);
         jLabelRegistrarAddress.setVisible(andBottom);
 
+        addImageLabel.setEditable(andBottom);
+        addLogoIconLabel.setEditable(andBottom);
+
         // вывод верхней панели
         int gridy = super.initTopArea();
 
