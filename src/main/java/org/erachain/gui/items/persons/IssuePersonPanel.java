@@ -78,12 +78,16 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
     public IssuePersonPanel(String name, String title) {
         super(name, title, "Person issue has been sent!");
-        initComponents();
+        initComponents(true);
         initLabels();
 
     }
 
-    private void initLabels() {
+    public IssuePersonPanel(String name, String title, String issueMess) {
+        super(name, title, issueMess);
+    }
+
+    protected void initLabels() {
         txtDeathDay.setVisible(false);
         jLabelDead.setVisible(false);
         aliveCheckBox.addActionListener(arg0 -> {
@@ -104,7 +108,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
     }
 
-    protected void initComponents() {
+    protected int initComponents(boolean andBottom) {
         super.initComponents();
 
         // вывод верхней панели
@@ -186,8 +190,6 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
         registrarAddress = new RecipientAddress(this);
         fieldGBC.gridy = gridy++;
-        fieldGBC.weightx = 0.2;
-        fieldGBC.gridwidth = 4;
         jPanelAdd.add(registrarAddress, fieldGBC);
 
         fieldGBC.gridy = gridy++;
@@ -244,8 +246,12 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
         fieldGBC.gridwidth = gridwidth;
 
-        // вывод подвала
-        super.initBottom(gridy);
+        if (andBottom) {
+            // вывод подвала
+            super.initBottom(gridy);
+        }
+
+        return gridy;
 
     }
 
@@ -374,7 +380,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                     "", //textPersonNumber.getText(),
                     birthLatitude,
                     birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),
-                    height, null, addImageLabel.getImgBytes(), textAreaDescription.getText(),
+                    height, addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(), textAreaDescription.getText(),
                     creator, null);
 
             transaction = (IssuePersonRecord) result.getA();

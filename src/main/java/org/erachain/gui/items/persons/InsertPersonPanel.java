@@ -25,6 +25,7 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.util.Date;
 import java.util.TimeZone;
 
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
@@ -39,29 +40,23 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
     private JTextField txtSign = new JTextField();
     private JTextField txtPublicKey = new JTextField();
-    private JTextField txtGenderTxt = new JTextField();
-    private JTextField txtBirthdayTxt = new JTextField();
-    private JTextField txtDeathdayTxt = new JTextField();
 
     private MButton transformButton;
     private JLabel labelSign = new JLabel();
     private JLabel labelPublicKey = new JLabel();
-    protected JLabel iconLabel = new JLabel();
     protected MButton pasteButton;
 
     protected PersonHuman person;
 
     public InsertPersonPanel() {
-        super(NAME, TITLE);
+        super(NAME, TITLE, "Person issue has been sent!");
         init();
 
         // нужно чтобы нельзя было случайно вставить по Ctrl-C в это поле чего угодно
         txtBirthLatitude.removeAll();
         txtBirthLatitude.setComponentPopupMenu(null);
 
-
         issueJButton.setVisible(false);
-        aliveCheckBox.setSelected(false);
         aliveCheckBox.setVisible(false);
     }
 
@@ -82,26 +77,24 @@ public class InsertPersonPanel extends IssuePersonPanel {
     }
 
     private void init() {
-        titleJLabel.setText(Lang.getInstance().translate("Enter Person"));
+
+        int gridy = super.initComponents(false);
+        initLabels();
+
         txtBirthLatitude.setText("");
         txtBirthLongitudeLatitude.setText("");
         txtHeight.setText("");
         textFeePow.setSelectedItem("0");
         textName.setEditable(false);
         textAreaDescription.setEditable(false);
-        txtBirthday.setVisible(false);
-        txtDeathDay.setVisible(false);
-        txtBirthdayTxt.setEditable(false);
-        txtDeathdayTxt.setVisible(false);
-        txtDeathdayTxt.setEditable(false);
+        txtBirthday.setEnabled(false);
+        txtDeathDay.setEnabled(false);
 
-        jLabelRegistrarAddress.setVisible(false);
-        registrarAddress.setVisible(false);
-        registrarAddressDesc.setVisible(false);
+        registrarAddress.setEnabled(false);
+        registrarAddressDesc.setEnabled(false);
 
-        addImageLabel.setVisible(false);
-        comboBoxGender.setVisible(false);
-        txtGenderTxt.setEditable(false);
+        addImageLabel.setEnabled(false);
+        comboBoxGender.setEditable(false);
         txtBirthLatitude.setEditable(false);
         txtBirthLongitudeLatitude.setEditable(false);
         txtSkinColor.setEditable(false);
@@ -112,75 +105,20 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtPublicKey.setEditable(false);
 
         labelSign.setText(Lang.getInstance().translate("Signature") + ":");
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 17;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 18, 0, 0);
-        jPanelMain.add(labelSign, gridBagConstraints);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 17;
-        gridBagConstraints.gridwidth = 13;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 1);
+        labelGBC.gridy = ++gridy;
+        jPanelAdd.add(labelSign, labelGBC);
+
+        fieldGBC.gridy = gridy++;
         txtSign.setEditable(false);
-        jPanelMain.add(txtSign, gridBagConstraints);
+        jPanelAdd.add(txtSign, fieldGBC);
 
         labelPublicKey.setText(Lang.getInstance().translate("Public key") + ":");
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 18;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new Insets(0, 18, 0, 0);
-        jPanelMain.add(labelPublicKey, gridBagConstraints);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 18;
-        gridBagConstraints.gridwidth = 13;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 1);
-        jPanelMain.add(txtPublicKey, gridBagConstraints);
+        labelGBC.gridy = gridy;
+        jPanelAdd.add(labelPublicKey, labelGBC);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        jPanelMain.add(txtGenderTxt, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        jPanelMain.add(txtBirthdayTxt, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 16);
-        jPanelMain.add(txtDeathdayTxt, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.gridheight = 5;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.05;
-        jPanelHead.add(iconLabel, gridBagConstraints);
+        fieldGBC.gridy = gridy++;
+        txtPublicKey.setEditable(false);
+        jPanelAdd.add(txtPublicKey, fieldGBC);
 
         pasteButton = new MButton(Lang.getInstance().translate("Paste Person from clipboard"), 2);
         pasteButton.addActionListener(arg0 -> {
@@ -197,11 +135,11 @@ public class InsertPersonPanel extends IssuePersonPanel {
         });
 
         GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
-        gridBagConstraints1.gridx = 4;
-        gridBagConstraints1.gridy = 19;
+        gridBagConstraints1.gridx = labelGBC.gridx;
+        gridBagConstraints1.gridy = gridy;
         gridBagConstraints1.anchor = GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints1.insets = new Insets(20, 0, 0, 0);
-        jPanelMain.add(pasteButton, gridBagConstraints1);
+        jPanelAdd.add(pasteButton, gridBagConstraints1);
 
         transformButton = new MButton(Lang.getInstance().translate("Check person and insert"), 2);
 
@@ -276,11 +214,13 @@ public class InsertPersonPanel extends IssuePersonPanel {
             }
         });
 
-        gridBagConstraints1.gridx = 6;
-        gridBagConstraints1.gridy = 19;
+        gridBagConstraints1.gridx = fieldGBC.gridx;
+        gridBagConstraints1.gridy = gridy++;
         gridBagConstraints1.anchor = GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints1.insets = new Insets(20, 0, 0, 16);
-        jPanelMain.add(transformButton, gridBagConstraints1);
+        jPanelAdd.add(transformButton, gridBagConstraints1);
+
+        super.initBottom(gridy);
 
     }
 
@@ -294,33 +234,38 @@ public class InsertPersonPanel extends IssuePersonPanel {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
+
         textName.setText(person.viewName());
-        ImageIcon image = new ImageIcon(person.getImage());
-        int x = image.getIconWidth();
-        int y = image.getIconHeight();
-        int x1 = 250;
-        double k = ((double) x / (double) x1);
-        y = (int) ((double) y / k);
-        if (y != 0) {
-            Image Im = image.getImage().getScaledInstance(x1, y, 1);
-            iconLabel.setIcon(new ImageIcon(Im));
+        if (true) {
+            addImageLabel.set(person.getImage());
+        } else {
+            ImageIcon image = new ImageIcon(person.getImage());
+            int x = image.getIconWidth();
+            int y = image.getIconHeight();
+            int x1 = 250;
+            double k = ((double) x / (double) x1);
+            y = (int) ((double) y / k);
+            if (y != 0) {
+                Image Im = image.getImage().getScaledInstance(x1, y, 1);
+                //addImageLabel.`.setIcon(new ImageIcon(Im));
+            }
         }
         // SET ONE TIME ZONE for Birthday
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        txtBirthdayTxt.setText(person.getBirthdayStr());
-        txtDeathdayTxt.setText(person.getDeathdayStr());
-        txtDeathdayTxt.setVisible(false);
-        jLabelDead.setVisible(false);
+        txtBirthday.setDate(new Date(person.getBirthday()));
         if (!person.isAlive(0L)) {
-            txtDeathdayTxt.setVisible(true);
+            txtDeathDay.setDate(new Date(person.getDeathday()));
+            txtDeathDay.setVisible(true);
             jLabelDead.setVisible(true);
+        } else {
+            txtDeathDay.setVisible(false);
+            jLabelDead.setVisible(false);
         }
         TimeZone.setDefault(TimeZone.getDefault());
 
         textAreaDescription.setText(person.getDescription() == null ? "" : person.getDescription());
 
         comboBoxGender.setSelectedIndex(person.getGender());
-        txtGenderTxt.setText(comboBoxGender.getSelectedItem().toString());
 
         txtBirthLatitude.setText("" + person.getBirthLatitude() + ", " + person.getBirthLongitude());
         if (person.getSkinColor() != null) {
@@ -349,7 +294,6 @@ public class InsertPersonPanel extends IssuePersonPanel {
         textFeePow.setSelectedItem("0");
         textName.setText("");
         textAreaDescription.setText("");
-        txtGenderTxt.setText("");
         txtBirthLatitude.setText("");
         txtBirthLongitudeLatitude.setText("");
         txtSkinColor.setText("");
@@ -359,10 +303,6 @@ public class InsertPersonPanel extends IssuePersonPanel {
         addImageLabel.reset();
         txtSign.setText("");
         txtPublicKey.setText("");
-        txtBirthdayTxt.setText("");
-        txtDeathdayTxt.setText("");
-        txtGenderTxt.setText("");
-        iconLabel.setIcon(null);
 
     }
 

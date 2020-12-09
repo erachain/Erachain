@@ -160,6 +160,11 @@ public class AddImageLabel extends JPanel {
         mainLabel.setIcon(createImageIcon(Color.WHITE, initialWidth, initialHeight));
     }
 
+    public void set(byte[] imgBytes) {
+        imgBytes = imgBytes;
+        mainLabel.setIcon(createImageIcon(Color.WHITE, initialWidth, initialHeight));
+    }
+
     public byte[] getImgBytes() {
         return imgBytes;
     }
