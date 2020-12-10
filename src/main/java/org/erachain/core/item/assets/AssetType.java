@@ -22,6 +22,10 @@ public class AssetType {
             joiner.add(Lang.getInstance().translate(action));
         }
 
+        if (AssetCls.isReverseSend(assetType)) {
+            joiner.add(Lang.getInstance().translate("Actions for OWN balance is reversed"));
+        }
+
         this.description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(assetType))
                 + ".\n" + Lang.getInstance().translate("Acceptable actions") + ":\n" + joiner.toString();
 
