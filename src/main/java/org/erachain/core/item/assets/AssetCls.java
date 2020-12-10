@@ -778,7 +778,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of exchange";
             case AS_MY_DEBT:
-                return "My Debt";
+                return "AS_MY_DEBT_N";
             case AS_OUTSIDE_OTHER_CLAIM:
                 return "Outside Other Claim";
 
@@ -845,7 +845,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of Exchange";
             case AS_MY_DEBT:
-                return "My Debt to Loaner";
+                return "AS_MY_DEBT_NF";
             case AS_OUTSIDE_OTHER_CLAIM:
                 return "Other Outside Right of Claim";
 
