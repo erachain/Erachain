@@ -44,6 +44,8 @@ public class DepositExchange extends IconPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     private MButton jButtonHistory;
+    private JLabel detailsHead;
+    private JLabel jText_Help;
     private MButton jButton_getDetails;
     private JComboBox<Account> jComboBox_YourAddress;
     public JComboBox<AssetCls> cbxAssets;
@@ -275,7 +277,7 @@ public class DepositExchange extends IconPanel {
         add(jText_Title, gridBagConstraints);
         jText_Title.setText("<html><h1>" + Lang.getInstance().translate("Deposit of Assets to the Exchange") + "</h1></html>");
 
-        JLabel jText_Help = new JLabel();
+        jText_Help = new JLabel();
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -371,62 +373,7 @@ public class DepositExchange extends IconPanel {
         cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel(true));
         this.add(cbxAssets, gridBagConstraints);
 
-        JLabel detailsHead = new JLabel();
-
-        cbxAssets.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (true || e.getStateChange() == ItemEvent.SELECTED) {
-                    AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
-                    //paneAssetInfo.setViewportView(new AssetInfo(asset, false));
-
-                    jTextField_Details.setText("");
-                    jTextField_Details_Check.setText("");
-
-                    jLabel_Asset.setText(Lang.getInstance().translate("To Deposit"));
-
-                    switch ((int)asset.getKey()) {
-                        case 1:
-                            jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for buy") + ":");
-                            refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
-                                            " " + Lang.getInstance().translate("for buy") + " ERA",
-                                    detailsHead);
-                            jLabel_Asset.setText(Lang.getInstance().translate("To Buy"));
-                            jLabel_AssetInput.setVisible(true);
-                            cbxAssetsInput.setVisible(true);
-                            break;
-                        case 2:
-                            jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for buy") + ":");
-                            refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
-                                            " " + Lang.getInstance().translate("for buy") + " COMPU",
-                                    detailsHead);
-                            jLabel_Asset.setText(Lang.getInstance().translate("To Buy"));
-                            jLabel_AssetInput.setVisible(true);
-                            cbxAssetsInput.setVisible(true);
-                            break;
-                        case 1114:
-                            jLabel_Details.setText(Lang.getInstance().translate("Address for deposit") + " ZEN" + ":");
-                            refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
-                                            " " + Lang.getInstance().translate("for deposit") + " ZEN",
-                                    detailsHead);
-                            break;
-                        default:
-                            jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for deposit") + ":");
-                            refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
-                                            " " + Lang.getInstance().translate("for deposit") + " bitcoins",
-                                    detailsHead);
-                            jLabel_AssetInput.setVisible(false);
-                            cbxAssetsInput.setVisible(false);
-                    }
-
-                    jText_Help.setText("<html><h2>3. " + Lang.getInstance().translate(
-                            "Click the button '%1' and transfer the Assets to the received address")
-                            .replace("%1", Lang.getInstance().translate("Get Payment Details")) + "</h2></html>");
-
-                }
-            }
-        });
+        detailsHead = new JLabel();
 
         if (asset != null) {
             cbxAssets.setSelectedItem(asset);
@@ -576,6 +523,64 @@ public class DepositExchange extends IconPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_History, gridBagConstraints);
+
+        cbxAssets.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                reset();
+            }
+        });
+
+        reset();
+
+    }
+
+    private void reset() {
+        AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
+        //paneAssetInfo.setViewportView(new AssetInfo(asset, false));
+
+        jTextField_Details.setText("");
+        jTextField_Details_Check.setText("");
+
+        jLabel_Asset.setText(Lang.getInstance().translate("To Deposit"));
+
+        switch ((int) asset.getKey()) {
+            case 1:
+                jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for buy") + ":");
+                refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
+                                " " + Lang.getInstance().translate("for buy") + " ERA",
+                        detailsHead);
+                jLabel_Asset.setText(Lang.getInstance().translate("To Buy"));
+                jLabel_AssetInput.setVisible(true);
+                cbxAssetsInput.setVisible(true);
+                break;
+            case 2:
+                jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for buy") + ":");
+                refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
+                                " " + Lang.getInstance().translate("for buy") + " COMPU",
+                        detailsHead);
+                jLabel_Asset.setText(Lang.getInstance().translate("To Buy"));
+                jLabel_AssetInput.setVisible(true);
+                cbxAssetsInput.setVisible(true);
+                break;
+            case 1114:
+                jLabel_Details.setText(Lang.getInstance().translate("Address for deposit") + " ZEN" + ":");
+                refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
+                                " " + Lang.getInstance().translate("for deposit") + " ZEN",
+                        detailsHead);
+                break;
+            default:
+                jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for deposit") + ":");
+                refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
+                                " " + Lang.getInstance().translate("for deposit") + " bitcoins",
+                        detailsHead);
+                jLabel_AssetInput.setVisible(false);
+                cbxAssetsInput.setVisible(false);
+        }
+
+        jText_Help.setText("<html><h2>3. " + Lang.getInstance().translate(
+                "Click the button '%1' and transfer the Assets to the received address")
+                .replace("%1", Lang.getInstance().translate("Get Payment Details")) + "</h2></html>");
 
     }
 
