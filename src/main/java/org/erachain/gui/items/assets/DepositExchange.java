@@ -371,21 +371,20 @@ public class DepositExchange extends IconPanel {
         cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel(true));
         this.add(cbxAssets, gridBagConstraints);
 
-        if (asset != null) {
-            cbxAssets.setSelectedItem(asset);
-        }
         JLabel detailsHead = new JLabel();
 
         cbxAssets.addItemListener(new ItemListener() {
 
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
+                if (true || e.getStateChange() == ItemEvent.SELECTED) {
                     AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
                     //paneAssetInfo.setViewportView(new AssetInfo(asset, false));
 
                     jTextField_Details.setText("");
                     jTextField_Details_Check.setText("");
+
+                    jLabel_Asset.setText(Lang.getInstance().translate("To Deposit"));
 
                     switch ((int)asset.getKey()) {
                         case 1:
@@ -393,6 +392,7 @@ public class DepositExchange extends IconPanel {
                             refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
                                             " " + Lang.getInstance().translate("for buy") + " ERA",
                                     detailsHead);
+                            jLabel_Asset.setText(Lang.getInstance().translate("To Buy"));
                             jLabel_AssetInput.setVisible(true);
                             cbxAssetsInput.setVisible(true);
                             break;
@@ -401,6 +401,7 @@ public class DepositExchange extends IconPanel {
                             refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
                                             " " + Lang.getInstance().translate("for buy") + " COMPU",
                                     detailsHead);
+                            jLabel_Asset.setText(Lang.getInstance().translate("To Buy"));
                             jLabel_AssetInput.setVisible(true);
                             cbxAssetsInput.setVisible(true);
                             break;
@@ -426,6 +427,10 @@ public class DepositExchange extends IconPanel {
                 }
             }
         });
+
+        if (asset != null) {
+            cbxAssets.setSelectedItem(asset);
+        }
 
         /////////////// INPUT ASSET
         jLabel_AssetInput.setText(Lang.getInstance().translate("Asset to Pay") + ":");
