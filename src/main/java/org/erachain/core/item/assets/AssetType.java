@@ -15,6 +15,7 @@ public class AssetType {
         this.id = assetType;
         this.name = Lang.getInstance().translate(AssetCls.viewAssetTypeCls(assetType));
         this.nameFull = Lang.getInstance().translate(AssetCls.viewAssetTypeFullCls(assetType));
+
         StringJoiner joiner = new StringJoiner(", ");
         for (String action : AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
                 AssetCls.ASSET_TYPE, AssetCls.START_KEY, AssetCls.MIN_START_KEY),
@@ -22,12 +23,11 @@ public class AssetType {
             joiner.add(Lang.getInstance().translate(action));
         }
 
+        this.description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(assetType)) + ".\n";
         if (AssetCls.isReverseSend(assetType)) {
-            joiner.add(Lang.getInstance().translate("Actions for OWN balance is reversed"));
+            description += Lang.getInstance().translate("Actions for OWN balance is reversed") + ".\n";
         }
-
-        this.description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(assetType))
-                + ".\n" + Lang.getInstance().translate("Acceptable actions") + ":\n" + joiner.toString();
+        description += Lang.getInstance().translate("Acceptable actions") + ":\n" + joiner.toString();
 
     }
 
