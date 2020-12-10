@@ -1000,7 +1000,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_MANAGED_ACCOUNTING:
                 return "AS_SELF_MANAGED_D";
             case AS_SELF_ACCOUNTING_LOAN:
-                return "AS_ACCOUNTING_LOAN_D";
+                return "AS_SELF_ACCOUNTING_LOAN_D";
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
                 return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_D";
             case AS_SELF_ACCOUNTING_CASH_FUND:
@@ -1252,12 +1252,12 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_ACCOUNTING_LOAN:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? "AS_ACCOUNTING_LOAN_1B" : "AS_ACCOUNTING_LOAN_1";
+                        return backward ? "AS_SELF_ACCOUNTING_LOAN_1B" : "AS_SELF_ACCOUNTING_LOAN_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "AS_ACCOUNTING_LOAN_2B" : "AS_ACCOUNTING_LOAN_2";
+                        return backward ? "AS_SELF_ACCOUNTING_LOAN_2B" : "AS_SELF_ACCOUNTING_LOAN_2";
                     case TransactionAmount.ACTION_HOLD:
                         // SPEND нельзя брать так как он Баланс Мой изменит у меня
-                        return backward ? "AS_ACCOUNTING_LOAN_3B" : "AS_ACCOUNTING_LOAN_3";
+                        return backward ? "AS_SELF_ACCOUNTING_LOAN_3B" : "AS_SELF_ACCOUNTING_LOAN_3";
                     default:
                         return null;
                 }

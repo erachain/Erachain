@@ -56,10 +56,10 @@ public class DepositExchange extends IconPanel {
     private JLabel jLabel_YourAddress;
     private JTextField jTextField_Address = new JTextField();
 
-    public DepositExchange(AssetCls asset, Account account) {
+    public DepositExchange(AssetCls asset, Account account, BigDecimal amount, AssetCls assetOut) {
         super(NAME, TITLE);
 
-        initComponents(asset, account);
+        initComponents(asset, account, amount);
         this.setVisible(true);
     }
 
@@ -210,11 +210,11 @@ public class DepositExchange extends IconPanel {
 
     }
 
-    private void initComponents(AssetCls asset_in, Account account) {
+    private void initComponents(AssetCls asset_in, Account account, BigDecimal amount) {
 
         AssetCls asset;
         if (asset_in == null) {
-            asset = Controller.getInstance().getAsset(2L);
+            asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
         } else {
             asset = asset_in;
         }
@@ -348,6 +348,9 @@ public class DepositExchange extends IconPanel {
         cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel(true));
         this.add(cbxAssets, gridBagConstraints);
 
+        if (asset != null) {
+            cbxAssets.setSelectedItem(asset);
+        }
         JLabel detailsHead = new JLabel();
 
         cbxAssets.addItemListener(new ItemListener() {
