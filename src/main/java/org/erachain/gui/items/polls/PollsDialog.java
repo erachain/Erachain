@@ -11,6 +11,7 @@ import org.erachain.core.transaction.VoteOnItemPollTransaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.ResultDialog;
 import org.erachain.gui.items.ComboBoxModelItemsAll;
 import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -297,27 +298,7 @@ public class PollsDialog extends JDialog {
 
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
-
-            int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-
-            // CHECK VALIDATE MESSAGE
-            if (result == Transaction.VALIDATE_OK) {
-                // RESET FIELDS
-
-                // TODO "A" ??
-
-                // TODO "A" ??
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Your vote has been sent") + "!",
-                        Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-
-                this.dispose();
-
-            } else {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(result)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            }
+            ResultDialog.make(this, transaction, "Your vote has been sent");
         }
 
     }

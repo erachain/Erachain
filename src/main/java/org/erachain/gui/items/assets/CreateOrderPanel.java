@@ -11,6 +11,7 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.ResultDialog;
 import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MDecimalFormatedTextField;
@@ -669,27 +670,7 @@ public class CreateOrderPanel extends JPanel {
 
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
-
-            Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-
-            // CHECK VALIDATE MESSAGE
-            if (result == Transaction.VALIDATE_OK) {
-
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Order has been sent") + "!",
-                        Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-
-                // this.txtFeePow.setText("0");
-                this.txtAmountHave.setText("0");
-                //this.txtPrice.setText("0");
-
-            } else {
-                // ENABLE
-                this.sellButton.setEnabled(true);
-
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(result)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            }
+            ResultDialog.make(this, transaction, "Order has been sent");
         }
     }
 

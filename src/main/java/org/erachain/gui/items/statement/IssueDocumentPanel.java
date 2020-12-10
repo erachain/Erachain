@@ -6,10 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.Gui;
-import org.erachain.gui.IconPanel;
-import org.erachain.gui.MainFrame;
-import org.erachain.gui.PasswordPane;
+import org.erachain.gui.*;
 import org.erachain.gui.exdata.ExDataPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
@@ -187,21 +184,21 @@ public class IssueDocumentPanel extends IconPanel {
 
     }// </editor-fold>
 
-    public Integer makeDeal(int forDeal) {
+    public void makeDeal(int forDeal) {
 
         // CHECK IF WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {
             // ASK FOR PASSWORD
             String password = PasswordPane.showUnlockWalletDialog(this);
             if (password.equals("")) {
-                return null;
+                return;
             }
             if (!Controller.getInstance().unlockWallet(password)) {
                 // WRONG PASSWORD
                 JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
                         Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
-                return null;
+                return;
             }
         }
 
@@ -243,7 +240,7 @@ public class IssueDocumentPanel extends IconPanel {
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
             }
-            return null;
+            return;
         }
 
         Account[] recipients = exData_Panel.multipleRecipientsPanel.recipientsTableModel.getRecipients();
@@ -253,7 +250,7 @@ public class IssueDocumentPanel extends IconPanel {
                 if (recipient == null) {
                     JOptionPane.showMessageDialog(new JFrame(), "Recipient[" + (i + 1) + "] is wrong",
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                    return null;
+                    return;
                 }
             }
         }
@@ -263,7 +260,7 @@ public class IssueDocumentPanel extends IconPanel {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            return null;
+            return;
         }
 
         try {
@@ -271,17 +268,17 @@ public class IssueDocumentPanel extends IconPanel {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(new JFrame(), " ERROR: " + e.getMessage(),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            return null;
+            return;
         }
         if (messageBytes == null) {
-            return null;
+            return;
         } else if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.getInstance().translate("Message size exceeded %1 kB")
                             .replace("%1", "" + (BlockChain.MAX_REC_DATA_BYTES >> 10)),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
-            return null;
+            return;
         }
 
         parsing = 5;
@@ -338,33 +335,16 @@ public class IssueDocumentPanel extends IconPanel {
 
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) { // s!= JOptionPane.OK_OPTION) {
-
-            // VALIDATE AND PROCESS
-            result = Controller.getInstance().getTransactionCreator().afterCreate(issueDoc, forDeal);
-
-            // CHECK VALIDATE MESSAGE
-            if (result == Transaction.VALIDATE_OK) {
-                return result;
-            } else {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(result))
-                                + (issueDoc.errorValue == null ? "" : ": " + issueDoc.errorValue),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                return null;
-            }
+            ResultDialog.make(this, issueDoc, "Your vote has been sent");
         }
 
-        return null;
+        return;
     }
 
     public void onSendClick() {
         this.jButton_Work_OK.setEnabled(false);
         this.jButton_Work_OK1.setEnabled(false);
-        Integer result = makeDeal(Transaction.FOR_NETWORK);
-        if (result != null) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Statement has been sent!"),
-                    Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-        }
+        makeDeal(Transaction.FOR_NETWORK);
         this.jButton_Work_OK.setEnabled(true);
         this.jButton_Work_OK1.setEnabled(true);
     }

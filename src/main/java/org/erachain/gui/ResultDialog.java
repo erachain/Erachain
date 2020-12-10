@@ -14,14 +14,16 @@ import java.math.BigDecimal;
 
 public class ResultDialog {
 
-    public static void make(Component parent, Transaction transaction, String message) {
+    public static boolean make(Component parent, Transaction transaction, String message) {
 
         int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
         //CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(message),
+            JOptionPane.showMessageDialog(new JFrame(), (message == null ? transaction.viewFullTypeName() : Lang.getInstance().translate(message))
+                            + " " + Lang.getInstance().translate("- was made") + "!",
                     Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+            return true;
         } else if (true || result == Transaction.NOT_ENOUGH_FEE) {
 
             Object[] options = {Lang.getInstance().translate("Add funds to Your account"),
@@ -49,8 +51,11 @@ public class ResultDialog {
 
         } else {
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(result)),
+                    Lang.getInstance().translate(OnDealClick.resultMess(result))
+                            + (transaction.errorValue == null ? "" : ": " + transaction.errorValue),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
         }
+        return false;
+
     }
 }
