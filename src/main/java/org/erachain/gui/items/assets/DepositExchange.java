@@ -47,16 +47,18 @@ public class DepositExchange extends IconPanel {
     private MButton jButton_getDetails;
     private JComboBox<Account> jComboBox_YourAddress;
     public JComboBox<AssetCls> cbxAssets;
+    public JComboBox<AssetCls> cbxAssetsInput;
     private JLabel jLabel_Address;
     private JLabel jLabel_Adress_Check;
     private JLabel jLabel_Asset;
+    private JLabel jLabel_AssetInput;
     private JLabel jLabel_Details;
     private JTextField jTextField_Details;
     private JLabel jTextField_Details_Check;
     private JLabel jLabel_YourAddress;
     private JTextField jTextField_Address = new JTextField();
 
-    public DepositExchange(AssetCls asset, Account account, BigDecimal amount, AssetCls assetOut) {
+    public DepositExchange(AssetCls asset, Account account, BigDecimal amount, AssetCls assetInput) {
         super(NAME, TITLE);
 
         initComponents(asset, account, amount);
@@ -86,22 +88,41 @@ public class DepositExchange extends IconPanel {
         String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
 
         AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
-        switch ((int)asset.getKey()) {
+        AssetCls assetInput = (AssetCls) cbxAssetsInput.getSelectedItem();
+        String assetInputAbbrev;
+        switch ((int) assetInput.getKey()) {
             case 1:
-                urlGetDetails += "3/9/" + jTextField_Address.getText() + "/0.1"; // BTC -> ERA
+                assetInputAbbrev = "ERA/";
                 break;
             case 12:
-                urlGetDetails += "3/12/" + jTextField_Address.getText() + "/0.1"; // BTC -> eBTC
+                assetInputAbbrev = "BTC/";
                 break;
             case 95:
-                urlGetDetails += "3/13/" + jTextField_Address.getText() + "/0.1"; // BTC -> eUSD
+                assetInputAbbrev = "RUB/";
+                break;
+            case 1114:
+                assetInputAbbrev = "ZEN/";
+                break;
+            default:
+                assetInputAbbrev = "COMPU/";
+        }
+
+        switch ((int) asset.getKey()) {
+            case 1:
+                urlGetDetails += "3/" + assetInputAbbrev + jTextField_Address.getText() + "/0.1"; // BTC -> ERA
+                break;
+            case 12:
+                urlGetDetails += "3/" + assetInputAbbrev + jTextField_Address.getText() + "/0.1"; // BTC -> eBTC
+                break;
+            case 95:
+                urlGetDetails += "3/" + assetInputAbbrev + jTextField_Address.getText() + "/0.1"; // BTC -> eUSD
                 break;
             case 1114:
                 urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
-                urlGetDetails += "7/15/" + jTextField_Address.getText() + "/10"; // ZEN -> eZEN
+                urlGetDetails += "7/" + assetInputAbbrev + jTextField_Address.getText() + "/10"; // ZEN -> eZEN
                 break;
             default:
-                urlGetDetails += "3/10/" + jTextField_Address.getText() + "/0.1"; // BTC -> COMPU
+                urlGetDetails += "3/" + assetInputAbbrev + jTextField_Address.getText() + "/0.1"; // BTC -> COMPU
         }
 
         String inputText = "";
@@ -226,6 +247,7 @@ public class DepositExchange extends IconPanel {
         jComboBox_YourAddress = new JComboBox<>();
         jLabel_Address = new JLabel();
         jLabel_Asset = new JLabel();
+        jLabel_AssetInput = new JLabel();
 
         jLabel_Adress_Check = new JLabel();
         jLabel_Details = new JLabel();
@@ -397,6 +419,25 @@ public class DepositExchange extends IconPanel {
                 }
             }
         });
+
+        /////////////// INPUT ASSET
+        jLabel_Asset.setText(Lang.getInstance().translate("Input Asset") + ":");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        add(jLabel_AssetInput, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        cbxAssetsInput = new JComboBox<AssetCls>(new FundTokensComboBoxModel(true));
+        this.add(cbxAssetsInput, gridBagConstraints);
 
         //////////////// BUTTONS
 
