@@ -1347,17 +1347,14 @@ public abstract class AssetCls extends ItemCls {
         String addActionStr;
         for (int action = TransactionAmount.ACTION_SEND; action < TransactionAmount.ACTION_PLEDGE; action++) {
 
-            boolean backward = true; //AssetCls.isReverseSend(assetType) && action != TransactionAmount.ACTION_SEND;
+            boolean backward = !AssetCls.isReverseSend(assetType) || action != TransactionAmount.ACTION_SEND;
 
-            if (true || action != TransactionAmount.ACTION_SEND || AssetCls.isAccounting(assetType)) {
-                // не писать что выпуск доступен и так понятно
-                actionStr = viewAssetTypeAction(assetKey, assetType, !backward, action, true);
-                if (actionStr != null && !list.contains(actionStr)) {
-                    list.add(actionStr);
-                    addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, !backward, action, true);
-                    if (addActionStr != null) {
-                        list.add(addActionStr);
-                    }
+            actionStr = viewAssetTypeAction(assetKey, assetType, !backward, action, true);
+            if (actionStr != null && !list.contains(actionStr)) {
+                list.add(actionStr);
+                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, !backward, action, true);
+                if (addActionStr != null) {
+                    list.add(addActionStr);
                 }
             }
 
