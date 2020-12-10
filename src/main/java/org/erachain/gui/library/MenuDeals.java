@@ -48,21 +48,6 @@ public class MenuDeals extends JMenu {
 
         addSeparator();
 
-        // Take on HOLD
-
-        JMenuItem dealsMenu_Take_On_Hold = new JMenuItem(Lang.getInstance().translate("Take on Hold"));
-        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
-        dealsMenu_Take_On_Hold.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Take on Hold"),
-                        new AccountAssetHoldPanel(null, null, null, null, true));
-            }
-        });
-        add(dealsMenu_Take_On_Hold);
-
-        addSeparator();
-
         // to lend
 
         JMenuItem dealsMenuLend = new JMenuItem(Lang.getInstance().translate("Lend"));
@@ -104,6 +89,21 @@ public class MenuDeals extends JMenu {
             }
         });
         add(dealsMenu_Repay_Debt);
+
+        addSeparator();
+
+        // Take on HOLD
+
+        JMenuItem dealsMenu_Take_On_Hold = new JMenuItem(Lang.getInstance().translate("Take on Hold"));
+        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenu_Take_On_Hold.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Take on Hold"),
+                        new AccountAssetHoldPanel(null, null, null, null, true));
+            }
+        });
+        add(dealsMenu_Take_On_Hold);
 
         addSeparator();
 
