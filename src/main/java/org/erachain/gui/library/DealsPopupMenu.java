@@ -41,23 +41,23 @@ public class DealsPopupMenu extends JPopupMenu {
     private JMenuItem sendMail;
 
     private Separator ownSeparator = new Separator();
-    private JLabel ownTitle = new JLabel("    " + Lang.getInstance().translate("Actions for OWN balance") + ":");
+    private JLabel ownTitle = new JLabel("    " + Lang.getInstance().translate("Actions for OWN balance") + "  ");
     private JMenuItem sendAsset;
     private JMenuItem sendAssetBackward;
 
     private Separator debtSeparator = new Separator();
-    private JLabel debtTitle = new JLabel("    " + Lang.getInstance().translate("Actions for DEBT balance") + ":");
+    private JLabel debtTitle = new JLabel("    " + Lang.getInstance().translate("Actions for DEBT balance") + "  ");
     private JMenuItem debtAsset;
     private JMenuItem debtAssetReturn;
     private JMenuItem debtAssetBackward;
 
     private Separator holdSeparator = new Separator();
-    private JLabel holdTitle = new JLabel("    " + Lang.getInstance().translate("Actions for HOLD balance") + ":");
+    private JLabel holdTitle = new JLabel("    " + Lang.getInstance().translate("Actions for HOLD balance") + "  ");
     private JMenuItem holdAsset;
     private JMenuItem holdAssetBackward;
 
     private Separator spendSeparator = new Separator();
-    private JLabel spendTitle = new JLabel("    " + Lang.getInstance().translate("Actions for SPEND balance") + ":");
+    private JLabel spendTitle = new JLabel("    " + Lang.getInstance().translate("Actions for SPEND balance") + "  ");
     private JMenuItem spendAsset;
     private JMenuItem spendAssetBackward;
 
