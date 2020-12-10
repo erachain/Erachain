@@ -149,6 +149,10 @@ public class IssueAssetTransaction extends IssueItemRecord {
             return INVALID_QUANTITY;
         }
 
+        if (((AssetCls) this.item).isAccounting() && quantity != 0) {
+            return INVALID_QUANTITY;
+        }
+
         if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
             Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
             if (item.b < quantity) {

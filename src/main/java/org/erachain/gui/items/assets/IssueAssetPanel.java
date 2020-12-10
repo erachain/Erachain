@@ -51,6 +51,8 @@ public class IssueAssetPanel extends IssueItemPanel {
             JComboBox source = (JComboBox) e.getSource();
             AssetType assetType = (AssetType) source.getSelectedItem();
             textareasAssetTypeDescription.setText(assetType.getDescription());
+            textQuantity.setVisible(!AssetCls.isAccounting(assetType.getId()));
+            quantityJLabel.setVisible(!AssetCls.isAccounting(assetType.getId()));
         });
 
         // set start text area asset type

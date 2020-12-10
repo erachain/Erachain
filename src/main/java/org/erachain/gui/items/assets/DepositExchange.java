@@ -57,6 +57,7 @@ public class DepositExchange extends IconPanel {
     private JLabel jTextField_Details_Check;
     private JLabel jLabel_YourAddress;
     private JTextField jTextField_Address = new JTextField();
+    protected int step = 0;
 
     public DepositExchange(AssetCls asset, Account account, BigDecimal amount, AssetCls assetInput) {
         super(NAME, TITLE);
@@ -352,7 +353,7 @@ public class DepositExchange extends IconPanel {
 
         gridy++;
         /////////////// ASSET
-        jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
+        jLabel_Asset.setText(Lang.getInstance().translate("Deposit") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++gridy;
@@ -392,12 +393,16 @@ public class DepositExchange extends IconPanel {
                             refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
                                             " " + Lang.getInstance().translate("for buy") + " ERA",
                                     detailsHead);
+                            jLabel_AssetInput.setVisible(true);
+                            cbxAssetsInput.setVisible(true);
                             break;
                         case 2:
                             jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for buy") + ":");
                             refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
                                             " " + Lang.getInstance().translate("for buy") + " COMPU",
                                     detailsHead);
+                            jLabel_AssetInput.setVisible(true);
+                            cbxAssetsInput.setVisible(true);
                             break;
                         case 1114:
                             jLabel_Details.setText(Lang.getInstance().translate("Address for deposit") + " ZEN" + ":");
@@ -410,6 +415,8 @@ public class DepositExchange extends IconPanel {
                             refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
                                             " " + Lang.getInstance().translate("for deposit") + " bitcoins",
                                     detailsHead);
+                            jLabel_AssetInput.setVisible(false);
+                            cbxAssetsInput.setVisible(false);
                     }
 
                     jText_Help.setText("<html><h2>3. " + Lang.getInstance().translate(
@@ -421,7 +428,7 @@ public class DepositExchange extends IconPanel {
         });
 
         /////////////// INPUT ASSET
-        jLabel_Asset.setText(Lang.getInstance().translate("Input Asset") + ":");
+        jLabel_AssetInput.setText(Lang.getInstance().translate("Asset to Pay") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++gridy;
@@ -436,7 +443,7 @@ public class DepositExchange extends IconPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        cbxAssetsInput = new JComboBox<AssetCls>(new FundTokensComboBoxModel(true));
+        cbxAssetsInput = new JComboBox<AssetCls>(new FundTokensComboBoxModel(new long[]{AssetCls.BTC_KEY, 14L}));
         this.add(cbxAssetsInput, gridBagConstraints);
 
         //////////////// BUTTONS
@@ -457,12 +464,13 @@ public class DepositExchange extends IconPanel {
         });
 
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new Insets(1, 0, 29, 0);
+
         add(jButton_getDetails, gridBagConstraints);
 
         ////////////// DETAILS

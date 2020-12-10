@@ -53,4 +53,14 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
 
     }
 
+    public FundTokensComboBoxModel(long[] assetKets) {
+
+        AssetCls asset;
+        for (Long key : assetKets) {
+            asset = Controller.getInstance().getAsset(key);
+            if (asset == null)
+                continue;
+            this.addElement(asset);
+        }
+    }
 }

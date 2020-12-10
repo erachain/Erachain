@@ -71,6 +71,8 @@ public class DealsPopupMenu extends JPopupMenu {
         this.add(sendMail);
 
         this.addSeparator();
+        JLabel titleAction = new JLabel(Lang.getInstance().translate("Actions for OWN balance"));
+        this.add(titleAction);
 
         sendAsset = new JMenuItem(Lang.getInstance().translate("Send"));
         sendAsset.addActionListener(new ActionListener() {
@@ -95,6 +97,8 @@ public class DealsPopupMenu extends JPopupMenu {
         this.add(sendAssetBackward);
 
         this.addSeparator();
+        titleAction = new JLabel(Lang.getInstance().translate("Actions for DEBT balance"));
+        this.add(titleAction);
 
         debtAsset = new JMenuItem(Lang.getInstance().translate("Lend"));
         debtAsset.addActionListener(new ActionListener() {
@@ -130,6 +134,11 @@ public class DealsPopupMenu extends JPopupMenu {
         this.add(debtAssetBackward);
 
         this.addSeparator();
+        titleAction = new JLabel(); //Lang.getInstance().translate("Actions for HOLD balance"));
+        titleAction.setHorizontalAlignment(SwingConstants.CENTER);
+        titleAction.setHorizontalTextPosition(SwingConstants.CENTER);
+        titleAction.setText(Lang.getInstance().translate("Actions for HOLD balance"));
+        this.add(titleAction);
 
         holdAsset = new JMenuItem(Lang.getInstance().translate("Hold")); /// GIVE
         holdAsset.addActionListener(new ActionListener() {
@@ -154,6 +163,8 @@ public class DealsPopupMenu extends JPopupMenu {
         this.add(holdAssetBackward);
 
         this.addSeparator();
+        titleAction = new JLabel(Lang.getInstance().translate("Actions for SPEND balance"));
+        this.add(titleAction);
 
         spendAsset = new JMenuItem(Lang.getInstance().translate("Spend"));
         spendAsset.addActionListener(new ActionListener() {
