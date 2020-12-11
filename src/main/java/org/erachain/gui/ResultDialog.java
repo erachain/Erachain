@@ -24,7 +24,7 @@ public class ResultDialog {
                             + " " + Lang.getInstance().translate("- was made") + "!",
                     Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
             return true;
-        } else if (true || result == Transaction.NOT_ENOUGH_FEE) {
+        } else if (result == Transaction.NOT_ENOUGH_FEE) {
 
             Object[] options = {Lang.getInstance().translate("Add funds to Your account"),
                     Lang.getInstance().translate("Cancel")};
