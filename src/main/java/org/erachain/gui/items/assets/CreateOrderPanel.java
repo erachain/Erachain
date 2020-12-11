@@ -43,9 +43,7 @@ public class CreateOrderPanel extends JPanel {
     private JButton sellButton;
     private JComboBox<String> txtFeePow;
     private MDecimalFormatedTextField txtAmountWant;
-    private JTextPane superHintText;
     private boolean SHOW_HINTS = false;
-    boolean needUpdatePrice = false;
     boolean noUpdateFields = false;
 
     MDecimalFormatedTextField[] queve = new MDecimalFormatedTextField[2];
@@ -329,22 +327,6 @@ public class CreateOrderPanel extends JPanel {
         labelGBC.gridy++;
         labelGBC.gridwidth = 3;
 
-        superHintText = new JTextPane();
-        ///////superHintText.setEditable(false);
-        superHintText.setBackground(this.getBackground());
-        superHintText.setContentType("text/html");
-
-        superHintText.setFont(txtAmountWant.getFont());
-        superHintText.setText("<html><body style='font-size: 100%'>&nbsp;<br>&nbsp;<br></body></html>");
-
-        // superHintText.setPreferredSize(new Dimension(125, 40));
-
-        JPanel scrollPaneSuperHintText = new JPanel(new BorderLayout());
-
-        scrollPaneSuperHintText.add(superHintText, BorderLayout.SOUTH);
-
-        this.add(scrollPaneSuperHintText, superhintGBC);
-
         labelGBC.gridy++;
 
         if (buying) {
@@ -364,32 +346,6 @@ public class CreateOrderPanel extends JPanel {
             }
         });
         this.add(this.sellButton, labelGBC);
-    }
-
-    private static boolean isDigit(String s) throws NumberFormatException {
-        try {
-            new BigDecimal(s);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    public void calculateHint() {
-        if (!isDigit(this.txtPrice.getText()))
-            superHintText.setText("<html><body style='font-size: 100%'>&nbsp;<br>"
-                    + Lang.getInstance().translate("Enter correct price.") + "</body></html>");
-        else if (!isDigit(this.txtAmountHave.getText()))
-            superHintText.setText("<html><body style='font-size: 100%'>&nbsp;<br>"
-                    + Lang.getInstance().translate("Enter correct amount.") + "</body></html>");
-        else
-            superHintText.setText("<html><body style='font-size: 100%'>" + Lang.getInstance()
-                    .translate("Give <b>%amount% %have%</b>"
-                            + " at the price of <b>%price%&nbsp;%want%</b> per <b>1% %have%</b> that would get "
-                            + "<b>%buyingamount%&nbsp;%want%</b>.")
-                    .replace("%amount%", this.txtAmountHave.getText()).replace("%have%", have.getShort())
-                    .replace("%price%", this.txtPrice.getText()).replace("%want%", want.getShort())
-                    .replace("%buyingamount%", this.txtAmountWant.getText()) + "</body></html>");
     }
 
     /*
@@ -550,128 +506,114 @@ public class CreateOrderPanel extends JPanel {
         // DISABLE
         this.sellButton.setEnabled(false);
 
-        // CHECK IF NETWORK OK
-        if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
-            // NETWORK NOT OK
-            JOptionPane.showMessageDialog(null,
-                    Lang.getInstance().translate(
-                            "You are unable to send a transaction while synchronizing or while having no connections!"),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-
-            // ENABLE
-            this.sellButton.setEnabled(true);
-
-            return;
-        }
-
-        // READ CREATOR
-        Account sender = (Account) this.cbxAccount.getSelectedItem();
-
-        int feePow;
-        BigDecimal amountHave;
-        BigDecimal amountWant;
-        long parse = 0;
         try {
-            // READ FEE
-            feePow = Integer.parseInt((String) this.txtFeePow.getSelectedItem());
+            // READ CREATOR
+            Account sender = (Account) this.cbxAccount.getSelectedItem();
 
-            // READ AMOUNT
-            parse = 1;
-            amountHave = new BigDecimal(this.txtAmountHave.getText());
+            int feePow;
+            BigDecimal amountHave;
+            BigDecimal amountWant;
+            long parse = 0;
+            try {
+                // READ FEE
+                feePow = Integer.parseInt((String) this.txtFeePow.getSelectedItem());
 
-            // READ PRICE
-            parse = 2;
-            // price = new BigDecimal(this.txtPrice.getText());
-            amountWant = new BigDecimal(this.txtAmountWant.getText());
+                // READ AMOUNT
+                parse = 1;
+                amountHave = new BigDecimal(this.txtAmountHave.getText());
 
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+                // READ PRICE
+                parse = 2;
+                // price = new BigDecimal(this.txtPrice.getText());
+                amountWant = new BigDecimal(this.txtAmountWant.getText());
 
-            if (parse == 0) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee") + "!",
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            }
-            if (parse == 1) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount") + "!",
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            }
-            if (parse == 2) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid price") + "!",
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            }
-            this.sellButton.setEnabled(true);
-            return;
-        }
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
 
-        if (amountWant.compareTo(new BigDecimal(0)) == 0 || amountHave.compareTo(new BigDecimal(0)) == 0) {
-
-            // DISABLE
-            this.sellButton.setEnabled(true);
-            return;
-        }
-
-        // CREATE ORDER
-
-        // BigDecimal amountWant = amountHave.multiply(price);
-        if (buying) {
-            BigDecimal amountTemp = amountWant;
-            amountWant = amountHave;
-            amountHave = amountTemp;
-        }
-
-        if (false) {
-            // for develop
-            JOptionPane.showMessageDialog(new JFrame(), amountHave.toPlainString() + " - " + amountWant.toPlainString(),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            this.sellButton.setEnabled(true);
-            return;
-        }
-
-        // CHECK IF WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            // ASK FOR PASSWORD
-            String password = PasswordPane.showUnlockWalletDialog(this);
-            if (!Controller.getInstance().unlockWallet(password)) {
-                // WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-
-                // ENABLE
-                this.sellButton.setEnabled(true);
-
+                if (parse == 0) {
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee") + "!",
+                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                }
+                if (parse == 1) {
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount") + "!",
+                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                }
+                if (parse == 2) {
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid price") + "!",
+                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                }
                 return;
             }
+
+            if (amountWant.compareTo(new BigDecimal(0)) == 0 || amountHave.compareTo(new BigDecimal(0)) == 0) {
+                return;
+            }
+
+            // CREATE ORDER
+
+            // BigDecimal amountWant = amountHave.multiply(price);
+            if (buying) {
+                BigDecimal amountTemp = amountWant;
+                amountWant = amountHave;
+                amountHave = amountTemp;
+            }
+
+            if (false) {
+                // for develop
+                JOptionPane.showMessageDialog(new JFrame(), amountHave.toPlainString() + " - " + amountWant.toPlainString(),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // CHECK IF WALLET UNLOCKED
+            if (!Controller.getInstance().isWalletUnlocked()) {
+                // ASK FOR PASSWORD
+                String password = PasswordPane.showUnlockWalletDialog(this);
+                if (!Controller.getInstance().unlockWallet(password)) {
+                    // WRONG PASSWORD
+                    JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
+                            Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+
+
+                    return;
+                }
+            }
+
+            PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
+            if (creator == null) {
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Transaction transaction = Controller.getInstance().createOrder(creator, this.have, this.want,
+                    amountHave.setScale(this.have.getScale(), RoundingMode.HALF_UP),
+                    amountWant.setScale(this.want.getScale(), RoundingMode.HALF_DOWN), feePow);
+
+            String Status_text = "";
+            IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+                    Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
+                    (int) (MainFrame.getInstance().getHeight() / 1.2), Status_text,
+                    Lang.getInstance().translate("Confirmation Transaction") + ": "
+                            + Lang.getInstance().translate("order creation"));
+
+            CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) transaction);
+            dd.jScrollPane1.setViewportView(ww);
+            dd.pack();
+            dd.setLocationRelativeTo(null);
+            dd.setVisible(true);
+
+            // JOptionPane.OK_OPTION
+            if (dd.isConfirm) {
+                ResultDialog.make(this, transaction, "Order has been sent");
+            }
+
+        } finally {
+            // ENABLE
+            this.sellButton.setEnabled(true);
         }
 
-        PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
-        if (creator == null) {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        Transaction transaction = Controller.getInstance().createOrder(creator, this.have, this.want,
-                amountHave.setScale(this.have.getScale(), RoundingMode.HALF_UP),
-                amountWant.setScale(this.want.getScale(), RoundingMode.HALF_DOWN), feePow);
-
-        String Status_text = "";
-        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
-                Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
-                (int) (MainFrame.getInstance().getHeight() / 1.2), Status_text,
-                Lang.getInstance().translate("Confirmation Transaction") + ": "
-                        + Lang.getInstance().translate("order creation"));
-
-        CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) transaction);
-        dd.jScrollPane1.setViewportView(ww);
-        dd.pack();
-        dd.setLocationRelativeTo(null);
-        dd.setVisible(true);
-
-        // JOptionPane.OK_OPTION
-        if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, "Order has been sent");
-        }
     }
 
     // confirm asset & return scale
