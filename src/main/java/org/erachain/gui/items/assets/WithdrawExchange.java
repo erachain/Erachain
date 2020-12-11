@@ -81,31 +81,31 @@ public class WithdrawExchange extends IconPanel {
         String message = "";
         String rate = null;
         AssetCls assetIn = null;
+        String address = jTextField_Address.getText().trim();
         try {
 
             String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
             assetIn = (AssetCls) cbxAssets.getSelectedItem();
-            String address = jTextField_Address.getText().trim();
             switch ((int) assetIn.getKey()) {
                 case 12:
-                    urlGetDetails += "12/3/" + address + "/0.1"; // eBTC -> BTC
+                    urlGetDetails += "@BTC/BTC/" + address + "/0.1"; // eBTC -> BTC
                     message += "BTC";
                     break;
                 case 95:
-                    urlGetDetails += "13/3/" + address + "/100"; // eUSD -> BTC
+                    urlGetDetails += "@USD/BTC/" + address + "/100"; // eUSD -> BTC
                     message += "BTC";
                     break;
                 case 94:
-                    urlGetDetails += "14/3/" + address + "/100"; // eEUR -> BTC
+                    urlGetDetails += "@EUR/BTC/" + address + "/100"; // eEUR -> BTC
                     message += "BTC";
                     break;
                 case 1114:
                     urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
-                    urlGetDetails += "15/7/" + address + "/10"; // eZEN -> ZEN
+                    urlGetDetails += "@ZEN/ZEN/" + address + "/30"; // eZEN -> ZEN
                     message += "ZEN";
                     break;
                 default:
-                    urlGetDetails += "10/3/" + address + "/1"; // COMPU -> BTC
+                    urlGetDetails += "COMPU/BTC/" + address + "/1"; // COMPU -> BTC
                     message += "BTC";
             }
 
@@ -172,9 +172,12 @@ public class WithdrawExchange extends IconPanel {
             String incomeAssetName = assetIn.getName();
             switch ((int) assetIn.getKey()) {
                 case 12:
+                    incomeAssetName = "BTC";
+                    formTitle = Lang.getInstance().translate("Withdraw %1 to").replace("%1", incomeAssetName) + " " + address;
+                    break;
                 case 1114:
                     incomeAssetName = "ZEN";
-                    formTitle = Lang.getInstance().translate("Withdraw %1 to").replace("%1", incomeAssetName) + " " + accountTo;
+                    formTitle = Lang.getInstance().translate("Withdraw %1 to").replace("%1", incomeAssetName) + " " + address;
                     break;
                 default:
                     formTitle = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
@@ -251,7 +254,7 @@ public class WithdrawExchange extends IconPanel {
         add(jText_Help, gridBagConstraints);
         String cryto = "BTC";
         jText_Help.setText("<html><h2>1. " + Lang.getInstance().translate("Select the Asset that you want to withdraw") + "</h2>"
-                + "<h3>2. " + Lang.getInstance().translate("Set the address for bitcoins where you want to withdraw")
+                + "<h3>2. " + Lang.getInstance().translate("Set the address to which you want to withdraw funds")
                 + ". " + Lang.getInstance().translate("And click button '%1' to open the panel for payment").replace("%1",
                 Lang.getInstance().translate("Withdraw"))
                 + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
@@ -299,8 +302,8 @@ public class WithdrawExchange extends IconPanel {
                             cryto = "BTC";
                     }
 
-
-                    jText_Help.setText("<html><h3>2. " + Lang.getInstance().translate("Set the address for %1 where you want to withdraw").replace("%1", cryto)
+                    jText_Help.setText("<html><h3>2. " + Lang.getInstance().translate("Set the address to which you want to withdraw")
+                            + " " + cryto
                             + ". " + Lang.getInstance().translate("And click button '%1' to open the panel for payment").replace("%1",
                             Lang.getInstance().translate("Next"))
                             + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")

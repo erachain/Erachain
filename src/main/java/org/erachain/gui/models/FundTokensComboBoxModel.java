@@ -31,11 +31,12 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
 
             if (deposit) {
                 this.addElement(Controller.getInstance().getAsset(AssetCls.ERA_KEY));
+                this.addElement(Controller.getInstance().getAsset(AssetCls.FEE_KEY));
             } else {
             }
 
             for (Long key : new Long[]{
-                    AssetCls.FEE_KEY,
+                    //AssetCls.FEE_KEY,
                     AssetCls.BTC_KEY // BTC
                     //1114L
             }) {
