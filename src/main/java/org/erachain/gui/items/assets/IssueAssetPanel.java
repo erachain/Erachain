@@ -9,7 +9,6 @@ import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.lang.Lang;
-import org.json.simple.JSONObject;
 
 import javax.swing.*;
 
@@ -148,9 +147,6 @@ public class IssueAssetPanel extends IssueItemPanel {
                 creator, exLink, textName.getText(), textAreaDescription.getText(),
                 addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
                 scale, assetType, quantity, feePow);
-
-        // TEST
-        JSONObject json = transaction.copy().toJson();
 
     }
 

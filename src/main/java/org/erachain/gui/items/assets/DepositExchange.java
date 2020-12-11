@@ -315,8 +315,6 @@ public class DepositExchange extends IconPanel {
         jPanelMain.add(jLabel_YourAddress, labelGBC);
 
         jComboBox_YourAddress = new JComboBox<Account>(new AccountsComboBoxModel());
-        jTextField_Address.setText(((Account) jComboBox_YourAddress.getSelectedItem()).getAddress());
-
         jComboBox_YourAddress.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -326,6 +324,13 @@ public class DepositExchange extends IconPanel {
 
             }
         });
+
+        if (account != null) {
+            jComboBox_YourAddress.setSelectedItem(account);
+            jComboBox_YourAddress.setEnabled(false);
+            jTextField_Address.setEditable(false);
+        }
+        jTextField_Address.setText(((Account) jComboBox_YourAddress.getSelectedItem()).getAddress());
 
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBox_YourAddress, fieldGBC);
@@ -364,7 +369,9 @@ public class DepositExchange extends IconPanel {
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel_AssetInput, labelGBC);
 
-        cbxAssetsInput = new JComboBox<AssetCls>(new FundTokensComboBoxModel(new long[]{AssetCls.BTC_KEY, 14L}));
+        cbxAssetsInput = new JComboBox<AssetCls>(new FundTokensComboBoxModel(new long[]{AssetCls.BTC_KEY
+                // 14L // ETG
+        }));
         fieldGBC.gridy = gridy;
         this.jPanelMain.add(cbxAssetsInput, fieldGBC);
 

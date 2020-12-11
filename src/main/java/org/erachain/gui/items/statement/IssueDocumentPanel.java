@@ -335,7 +335,7 @@ public class IssueDocumentPanel extends IconPanel {
 
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) { // s!= JOptionPane.OK_OPTION) {
-            ResultDialog.make(this, issueDoc, "Your vote has been sent");
+            ResultDialog.make(this, issueDoc, "Your document has been sent");
         }
 
         return;

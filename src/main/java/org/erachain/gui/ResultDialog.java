@@ -45,7 +45,7 @@ public class ResultDialog {
             if (n == JOptionPane.YES_OPTION) {
                 AssetCls feeAsset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
                 BigDecimal amountBuy = transaction.getFee();
-                MainPanel.getInstance().insertTab(new DepositExchange(feeAsset, transaction.getCreator(),
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Deposit") + " COMPU", new DepositExchange(feeAsset, transaction.getCreator(),
                         amountBuy, feeAsset));
             }
 
