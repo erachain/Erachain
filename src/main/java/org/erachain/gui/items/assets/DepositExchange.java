@@ -135,18 +135,15 @@ public class DepositExchange extends IconPanel {
         switch ((int) assetInput.getKey()) {
             case 1:
                 urlPars = "ERA/" + urlPars + "/500";
-                assetIncomeName = "ERA";
-                assetIncomeABBR = "ERA";
+                assetIncomeName = assetIncomeABBR = "ERA";
                 break;
             case 2:
                 urlPars = "COMPU/" + urlPars + "/1";
-                assetIncomeName = "COMPU";
-                assetIncomeABBR = "COMPU";
+                assetIncomeName = assetIncomeABBR = "COMPU";
                 break;
             case 95:
                 urlPars = "RUB/" + urlPars + "/2500";
-                assetIncomeName = "RUB";
-                assetIncomeABBR = "RUB";
+                assetIncomeName = assetIncomeABBR = "RUB";
                 break;
             case 1114:
                 urlPars = "ZEN/" + urlPars + "/100";
@@ -216,20 +213,11 @@ public class DepositExchange extends IconPanel {
 
                 switch ((int) asset.getKey()) {
                     case 1:
-                        help = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
-                                .replace("%1", assetIncomeName) + " <b>" + assetOutputName + "</b>"
-                                + " " + Lang.getInstance().translate("by rate") + ": <b>" + rate + "</b>"
-                                + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> " + assetOutputName;
-                        break;
                     case 2:
                         help = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
                                 .replace("%1", assetIncomeName) + " <b>" + assetOutputName + "</b>"
                                 + " " + Lang.getInstance().translate("by rate") + ": <b>" + rate + "</b>"
                                 + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> " + assetOutputName;
-                        break;
-                    case 1114:
-                        help = Lang.getInstance().translate("Transfer <b>%1</B> to this address for deposit your account on Exchange")
-                                .replace("%1", assetIncomeName);
                         break;
                     default:
                         help = Lang.getInstance().translate("Transfer <b>%1</B> to this address for deposit your account on Exchange")
