@@ -457,7 +457,7 @@ public class DepositExchange extends IconPanel {
             }
         });
 
-        jText_History.setText("123<br>wqasad<br>zxc<br>wqe<br>iu<br>");
+        jText_History.setText("");
 
         //////// PANEL LEFT
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
