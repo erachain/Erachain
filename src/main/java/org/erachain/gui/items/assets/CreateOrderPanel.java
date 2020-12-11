@@ -345,6 +345,7 @@ public class CreateOrderPanel extends JPanel {
                 onSellClick(buying);
             }
         });
+        labelGBC.insets = new java.awt.Insets(10, 20, 0, 20);
         this.add(this.sellButton, labelGBC);
     }
 
