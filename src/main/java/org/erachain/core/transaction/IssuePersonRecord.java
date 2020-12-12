@@ -373,10 +373,10 @@ public class IssuePersonRecord extends IssueItemRecord {
 
         if (person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
-            return calcCommonFee() >> 1;
+            return super.calcBaseFee() >> 1;
         }
 
         // is DEAD
-        return calcCommonFee();
+        return super.calcBaseFee();
     }
 }

@@ -350,9 +350,4 @@ public class RecordReleasePack extends Transaction {
         return assetAmount;
     }
 
-    @Override
-    public long calcBaseFee() {
-        return calcCommonFee();
-    }
-
 }

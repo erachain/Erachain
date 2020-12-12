@@ -768,7 +768,7 @@ public class RSignNote extends Transaction implements Itemable {
     @Override
     public long calcBaseFee() {
 
-        long fee = calcCommonFee();
+        long fee = super.calcBaseFee();
         byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
 
         if (allHashes != null) {

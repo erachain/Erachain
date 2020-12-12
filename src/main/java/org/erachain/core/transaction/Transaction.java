@@ -978,8 +978,8 @@ public abstract class Transaction implements ExplorerJsonLine {
         return 0;
     }
 
-    public int calcCommonFee() {
-
+    // get fee
+    public long calcBaseFee() {
         int len = this.getDataLength(Transaction.FOR_NETWORK, true);
 
         /*
@@ -997,12 +997,6 @@ public abstract class Transaction implements ExplorerJsonLine {
         */
 
         return len * BlockChain.FEE_PER_BYTE;
-
-    }
-
-    // get fee
-    public long calcBaseFee() {
-        return calcCommonFee();
     }
 
     // calc FEE by recommended and feePOW

@@ -322,8 +322,4 @@ public class CreatePollTransaction extends Transaction {
         return subAssetAmount(null, this.creator.getAddress(), FEE_KEY, this.fee);
     }
 
-    @Override
-    public long calcBaseFee() {
-        return calcCommonFee();
-    }
 }

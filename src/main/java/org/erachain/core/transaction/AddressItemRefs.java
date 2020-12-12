@@ -174,6 +174,6 @@ public abstract class AddressItemRefs extends Transaction {
             add_fee = 3 ^ (10 - len) * 100;
         }
 
-        return calcCommonFee() + BlockChain.FEE_PER_BYTE * (500 + add_fee);
+        return super.calcBaseFee() + BlockChain.FEE_PER_BYTE * (500 + add_fee);
     }
 }

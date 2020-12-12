@@ -451,8 +451,4 @@ public abstract class ArbitraryTransaction extends Transaction {
         }
     }
 
-    @Override
-    public long calcBaseFee() {
-        return calcCommonFee();
-    }
 }

@@ -321,7 +321,8 @@ public class VoteOnPollTransaction extends Transaction {
 
         // TODO delete IT
         if (height > TODO_h1)
-            return calcCommonFee();
-        return 0;
+            return super.calcBaseFee();
+
+        return 1;
     }
 }
