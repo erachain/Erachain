@@ -323,6 +323,6 @@ public class VoteOnPollTransaction extends Transaction {
         if (height > TODO_h1)
             return super.calcBaseFee();
 
-        return 1;
+        return 0;
     }
 }
