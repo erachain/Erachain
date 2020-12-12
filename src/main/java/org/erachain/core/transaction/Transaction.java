@@ -1002,13 +1002,17 @@ public abstract class Transaction implements ExplorerJsonLine {
     // calc FEE by recommended and feePOW
     public void calcFee() {
 
-        long fee_long = calcBaseFee();
-        BigDecimal fee = new BigDecimal(fee_long).multiply(BlockChain.FEE_RATE).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
-
-        if (this.feePow > 0) {
-            this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
+        if (seqNo <= BlockChain.FREE_FEE_SEQNO && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
+            this.fee = BigDecimal.ZERO;
         } else {
-            this.fee = fee;
+            long fee_long = calcBaseFee();
+            BigDecimal fee = new BigDecimal(fee_long).multiply(BlockChain.FEE_RATE).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
+
+            if (this.feePow > 0) {
+                this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
+            } else {
+                this.fee = fee;
+            }
         }
     }
 
