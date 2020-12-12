@@ -688,7 +688,14 @@ public class RSignNote extends Transaction implements Itemable {
             return INVALID_DATA_LENGTH;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result;
+        if (seqNo <= BlockChain.FREE_FEE_SEQNO && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
+            // не учитываем комиссию если размер маленький
+            result = super.isValid(forDeal, flags | NOT_VALIDATE_FLAG_FEE);
+        } else {
+            result = super.isValid(forDeal, flags);
+        }
+
         if (result != Transaction.VALIDATE_OK) return result;
 
         // ITEM EXIST? - for assets transfer not need - amount expect instead
