@@ -14,9 +14,9 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.ResultDialog;
 import org.erachain.gui.items.mails.MailInfo;
 import org.erachain.gui.library.IssueConfirmDialog;
-import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
@@ -259,20 +259,7 @@ public class IssueSendPaymentOrder extends IconPanel {
 
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
-
-            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-
-            // CHECK VALIDATE MESSAGE
-            if (result == transaction.VALIDATE_OK) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Payment Order has been sent") + "!",
-                        Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-
-            } else {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(result)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            }
+            ResultDialog.make(this, transaction, null);
         }
         // ENABLE
         issue_Panel.jButton_OK.setEnabled(true);

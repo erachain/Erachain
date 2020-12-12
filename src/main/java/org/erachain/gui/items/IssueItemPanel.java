@@ -11,6 +11,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.MainFrame;
+import org.erachain.gui.ResultDialog;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.models.AccountsComboBoxModel;
@@ -251,18 +252,7 @@ public abstract class IssueItemPanel extends IconPanel {
             confirmDialog.setVisible(true);
 
             if (confirmDialog.isConfirm) {
-
-                int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-
-                //CHECK VALIDATE MESSAGE
-                if (result == Transaction.VALIDATE_OK) {
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(issueMess),
-                            Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate(OnDealClick.resultMess(result)),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                }
+                ResultDialog.make(this, transaction, issueMess);
             }
         }
 

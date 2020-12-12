@@ -15,21 +15,29 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
         if (BlockChain.TEST_MODE) {
             //this.addElement(Controller.getInstance().getAsset(1031));
 
+            if (deposit) {
+                this.addElement(Controller.getInstance().getAsset(AssetCls.ERA_KEY));
+            } else {
+            }
 
-            for (Long key : new Long[]{1077L, 1078L, 1079L, 2L}) {
+            for (Long key : new Long[]{AssetCls.FEE_KEY, 1077L, 1078L, 1079L}) {
                 asset = Controller.getInstance().getAsset(key);
                 if (asset == null)
                     continue;
                 this.addElement(asset);
             }
 
+        } else {
+
             if (deposit) {
-                this.addElement(Controller.getInstance().getAsset(1L));
+                this.addElement(Controller.getInstance().getAsset(AssetCls.ERA_KEY));
+                this.addElement(Controller.getInstance().getAsset(AssetCls.FEE_KEY));
             } else {
             }
 
-        } else {
-            for (Long key : new Long[]{AssetCls.BTC_KEY // BTC
+            for (Long key : new Long[]{
+                    //AssetCls.FEE_KEY,
+                    AssetCls.BTC_KEY // BTC
                     //1114L
             }) {
                 asset = Controller.getInstance().getAsset(key);
@@ -39,10 +47,6 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
                 this.addElement(asset);
             }
 
-            if (deposit) {
-                //this.addElement(Controller.getInstance().getAsset(1L));
-            } else {
-            }
             //this.addElement(Controller.getInstance().getAsset(14)); // ETH
             //this.addElement(Controller.getInstance().getAsset(92)); // RUB
             //this.addElement(Controller.getInstance().getAsset(95)); // USD
@@ -50,4 +54,14 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
 
     }
 
+    public FundTokensComboBoxModel(long[] assetKets) {
+
+        AssetCls asset;
+        for (Long key : assetKets) {
+            asset = Controller.getInstance().getAsset(key);
+            if (asset == null)
+                continue;
+            this.addElement(asset);
+        }
+    }
 }

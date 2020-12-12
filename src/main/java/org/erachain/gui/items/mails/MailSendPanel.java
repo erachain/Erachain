@@ -13,10 +13,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.Gui;
-import org.erachain.gui.IconPanel;
-import org.erachain.gui.MainFrame;
-import org.erachain.gui.PasswordPane;
+import org.erachain.gui.*;
 import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.items.accounts.AccountsComboBoxModel;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -778,21 +775,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
 
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
-
-            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-
-            // CHECK VALIDATE MESSAGE
-            if (result == transaction.VALIDATE_OK) {
-                if (true || this.recipientBox.getSelectedAddress().startsWith(wrongFirstCharOfAddress)) {
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate("Message and/or payment has been sent!"),
-                            Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(result)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            }
+            ResultDialog.make(this, transaction, null);
         }
         // ENABLE
         this.sendButton.setEnabled(true);

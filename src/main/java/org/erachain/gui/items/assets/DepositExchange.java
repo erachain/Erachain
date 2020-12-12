@@ -43,23 +43,32 @@ public class DepositExchange extends IconPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(DepositExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
+
+    protected JPanel jPanelHistory = new javax.swing.JPanel();
+    protected JPanel jPanelMain = new javax.swing.JPanel();
+
     private MButton jButtonHistory;
+    private JLabel detailsHead;
+    private JLabel jText_Help;
     private MButton jButton_getDetails;
     private JComboBox<Account> jComboBox_YourAddress;
     public JComboBox<AssetCls> cbxAssets;
+    public JComboBox<AssetCls> cbxAssetsInput;
     private JLabel jLabel_Address;
     private JLabel jLabel_Adress_Check;
     private JLabel jLabel_Asset;
+    private JLabel jLabel_AssetInput;
     private JLabel jLabel_Details;
     private JTextField jTextField_Details;
     private JLabel jTextField_Details_Check;
     private JLabel jLabel_YourAddress;
     private JTextField jTextField_Address = new JTextField();
+    protected int step = 0;
 
-    public DepositExchange(AssetCls asset, Account account) {
+    public DepositExchange(AssetCls asset, Account account, BigDecimal amount, AssetCls assetInput) {
         super(NAME, TITLE);
 
-        initComponents(asset, account);
+        initComponents(asset, account, amount);
         this.setVisible(true);
     }
 
@@ -86,23 +95,70 @@ public class DepositExchange extends IconPanel {
         String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
 
         AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
-        switch ((int)asset.getKey()) {
+        AssetCls assetInput = (AssetCls) cbxAssetsInput.getSelectedItem();
+
+        String assetOutput;
+        String assetOutputName;
+
+        switch ((int) asset.getKey()) {
             case 1:
-                urlGetDetails += "3/9/" + jTextField_Address.getText() + "/0.1"; // BTC -> ERA
+                assetOutput = "ERA/";
+                assetOutputName = "ERA";
                 break;
-            case 12:
-                urlGetDetails += "3/12/" + jTextField_Address.getText() + "/0.1"; // BTC -> eBTC
+            case 2:
+                assetOutput = "COMPU/";
+                assetOutputName = "COMPU";
+                break;
+            case 92:
+                assetOutput = "@RUB/";
+                assetOutputName = "RUB";
                 break;
             case 95:
-                urlGetDetails += "3/13/" + jTextField_Address.getText() + "/0.1"; // BTC -> eUSD
+                assetOutput = "@USD/";
+                assetOutputName = "USD";
                 break;
             case 1114:
                 urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
-                urlGetDetails += "7/15/" + jTextField_Address.getText() + "/10"; // ZEN -> eZEN
+                assetOutput = "@ZEN/";
+                assetOutputName = "ZEN";
                 break;
             default:
-                urlGetDetails += "3/10/" + jTextField_Address.getText() + "/0.1"; // BTC -> COMPU
+                assetOutput = "@BTC/";
+                assetOutputName = "BTC";
         }
+
+        String urlPars = assetOutput + jTextField_Address.getText();
+
+        String assetIncomeName;
+        String assetIncomeABBR;
+
+        switch ((int) assetInput.getKey()) {
+            case 1:
+                urlPars = "ERA/" + urlPars + "/500";
+                assetIncomeName = assetIncomeABBR = "ERA";
+                break;
+            case 2:
+                urlPars = "COMPU/" + urlPars + "/1";
+                assetIncomeName = assetIncomeABBR = "COMPU";
+                break;
+            case 95:
+                urlPars = "RUB/" + urlPars + "/2500";
+                assetIncomeName = assetIncomeABBR = "RUB";
+                break;
+            case 1114:
+                urlPars = "ZEN/" + urlPars + "/100";
+                assetIncomeName = "horizens";
+                assetIncomeABBR = "ZEN";
+                break;
+            default:
+                urlPars = "BTC/" + urlPars + "/0.01";
+                assetIncomeName = "bitcoins";
+                assetIncomeABBR = "BTC";
+        }
+
+        urlGetDetails += urlPars;
+
+        LOGGER.info(urlGetDetails);
 
         String inputText = "";
         try {
@@ -144,62 +200,47 @@ public class DepositExchange extends IconPanel {
             }
 
             if (jsonObject.containsKey("wrong")) {
-                jTextField_Details.setText(Lang.getInstance().translate("error"));
+                jTextField_Details.setText(jsonObject.get("addr_in").toString());
                 jTextField_Details_Check.setText("<html><b>" + jsonObject.get("wrong") + "<b></html>");
 
             } else {
 
+                String help;
                 String rate = jsonObject.get("rate").toString();
                 String bal = jsonObject.get("bal").toString();
 
                 LOGGER.debug(StrJSonFine.convert(jsonObject));
-                String help;
 
-                String incomeAssetName = "bitcoins";
-                String incomeName = "BTC";
-                String outcomeAssetName;
-                asset = (AssetCls) cbxAssets.getSelectedItem();
                 switch ((int) asset.getKey()) {
                     case 1:
-                        outcomeAssetName = "ERA";
-                        help = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
-                                .replace("%1", incomeAssetName) + " <b>" + outcomeAssetName + "</b>"
-                                + " " + Lang.getInstance().translate("by rate") + ": <b>" + rate + "</b>"
-                                + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> " + outcomeAssetName;
-                        break;
                     case 2:
-                        outcomeAssetName = "COMPU";
                         help = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
-                                .replace("%1", incomeAssetName) + " <b>" + outcomeAssetName + "</b>"
+                                .replace("%1", assetIncomeName) + " <b>" + assetOutputName + "</b>"
                                 + " " + Lang.getInstance().translate("by rate") + ": <b>" + rate + "</b>"
-                                + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> " + outcomeAssetName;
-                        break;
-                    case 1114:
-                        outcomeAssetName = incomeAssetName = "ZEN";
-                        help = Lang.getInstance().translate("Transfer <b>%1</B> to this address for deposit your account on Exchange")
-                                .replace("%1", incomeAssetName);
+                                + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> " + assetOutputName;
                         break;
                     default:
                         help = Lang.getInstance().translate("Transfer <b>%1</B> to this address for deposit your account on Exchange")
-                                .replace("%1", incomeAssetName);
+                                .replace("%1", assetIncomeName);
                 }
 
                 if (jsonObject.containsKey("may_pay")) {
                     help += "<br>" + Lang.getInstance().translate("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
-                            + incomeName;
+                            + assetIncomeABBR;
                 }
 
                 help += "<br>" + Lang.getInstance().translate("Minimal payment in equivalent")
-                        + " <b>" + 0.0025 + " " + incomeName + "</b>" + "<br>";
+                        + " <b>" + 0.0025 + " " + assetIncomeABBR + "</b>" + "<br>";
 
                 jTextField_Details.setText(jsonObject.get("addr_in").toString());
                 jTextField_Details_Check.setText("<html>" + help + "</html>");
             }
 
         } else {
-            jLabel_Adress_Check.setText("<html>" + inputText + "</html>");
+            jLabel_Adress_Check.setText("");
             jTextField_Details.setText("");
-            jTextField_Details_Check.setText(Lang.getInstance().translate("error"));
+            jTextField_Details_Check.setText("<html><h2>" + Lang.getInstance().translate("error") + "</h2>>"
+                    + inputText);
         }
 
         jButton_getDetails.setEnabled(true);
@@ -210,100 +251,94 @@ public class DepositExchange extends IconPanel {
 
     }
 
-    private void initComponents(AssetCls asset_in, Account account) {
+    private void initComponents(AssetCls asset_in, Account account, BigDecimal amount) {
+
+        setLayout(new GridLayout(1, 2));
+
+        jPanelMain.setLayout(new GridBagLayout());
+        jPanelHistory.setLayout(new GridBagLayout());
 
         AssetCls asset;
         if (asset_in == null) {
-            asset = Controller.getInstance().getAsset(2L);
+            asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
         } else {
             asset = asset_in;
         }
 
-        GridBagConstraints gridBagConstraints;
+        int gridy = 0;
+
+        GridBagConstraints titleGBC = new GridBagConstraints();
+        titleGBC.gridx = 0;
+        titleGBC.gridwidth = 2;
+        titleGBC.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        titleGBC.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        titleGBC.insets = new java.awt.Insets(0, 5, 5, 0);
+
+        GridBagConstraints labelGBC = new GridBagConstraints();
+        labelGBC.gridx = 0;
+        labelGBC.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        labelGBC.insets = new java.awt.Insets(0, 5, 5, 0);
+
+        GridBagConstraints fieldGBC = new GridBagConstraints();
+        fieldGBC.gridx = 1;
+        fieldGBC.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        fieldGBC.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        fieldGBC.insets = new java.awt.Insets(0, 5, 5, 8);
 
         //paneAssetInfo = new JScrollPane();
         jLabel_YourAddress = new JLabel();
         jComboBox_YourAddress = new JComboBox<>();
         jLabel_Address = new JLabel();
         jLabel_Asset = new JLabel();
+        jLabel_AssetInput = new JLabel();
 
         jLabel_Adress_Check = new JLabel();
         jLabel_Details = new JLabel();
+        detailsHead = new JLabel();
         jTextField_Details = new JTextField();
         jTextField_Details_Check = new JLabel();
 
-        GridBagLayout layout = new GridBagLayout();
-        layout.columnWidths = new int[]{0, 9, 0, 9, 0, 9, 0};
-        layout.rowHeights = new int[]{0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0};
-        //getContentPane().setLayout(layout);
-        this.setLayout(layout);
-
-        int gridy = 0;
 
         JLabel jText_Title = new JLabel();
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jText_Title, gridBagConstraints);
+        jPanelMain.add(jText_Title, titleGBC);
         jText_Title.setText("<html><h1>" + Lang.getInstance().translate("Deposit of Assets to the Exchange") + "</h1></html>");
 
-        JLabel jText_Help = new JLabel();
+        jText_Help = new JLabel();
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jText_Help, gridBagConstraints);
-        jText_Help.setText("<html><h2>1. " + Lang.getInstance().translate("Select Your account or insert another account in field below") + "</h2></html>");
+        titleGBC.gridy = ++gridy;
+        jPanelMain.add(jText_Help, titleGBC);
+        jText_Help.setText("<html><h3>" + Lang.getInstance().translate("Select account or insert manual") + "</h3></html>");
 
-        jLabel_YourAddress.setText(Lang.getInstance().translate("Your account") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new Insets(21, 27, 0, 0);
-        add(jLabel_YourAddress, gridBagConstraints);
+        jLabel_YourAddress.setText(Lang.getInstance().translate("Select account") + ":");
+        labelGBC.gridy = ++gridy;
+        jPanelMain.add(jLabel_YourAddress, labelGBC);
 
         jComboBox_YourAddress = new JComboBox<Account>(new AccountsComboBoxModel());
-        jTextField_Address.setText(((Account) jComboBox_YourAddress.getSelectedItem()).getAddress());
-
         jComboBox_YourAddress.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
                 jTextField_Address.setText(((Account) jComboBox_YourAddress.getSelectedItem()).getAddress());
-
-                jText_Help.setText("<html><h2>2. " + Lang.getInstance().translate(
-                        "Select Asset that Your wish to receive") + "</h2></html>");
+                jText_Help.setText("");
 
             }
         });
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new Insets(21, 0, 0, 13);
-        add(jComboBox_YourAddress, gridBagConstraints);
+        if (account != null) {
+            jComboBox_YourAddress.setSelectedItem(account);
+            jComboBox_YourAddress.setEnabled(false);
+            jTextField_Address.setEditable(false);
+        }
+        jTextField_Address.setText(((Account) jComboBox_YourAddress.getSelectedItem()).getAddress());
+
+        fieldGBC.gridy = gridy;
+        jPanelMain.add(jComboBox_YourAddress, fieldGBC);
 
         ////////////////
         jLabel_Address.setText(Lang.getInstance().translate("Account to Deposit") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 27, 0, 0);
-        add(jLabel_Address, gridBagConstraints);
+        labelGBC.gridy = ++gridy;
+        jPanelMain.add(jLabel_Address, labelGBC);
 
         if (account == null) {
             jLabel_Adress_Check.setText(Lang.getInstance().translate("Insert Deposit Account"));
@@ -311,89 +346,34 @@ public class DepositExchange extends IconPanel {
             jTextField_Address.setText(account.getAddress());
         }
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jTextField_Address, gridBagConstraints);
+        fieldGBC.gridy = gridy;
+        jPanelMain.add(jTextField_Address, fieldGBC);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        add(jLabel_Adress_Check, gridBagConstraints);
+        titleGBC.gridy = ++gridy;
+        jPanelMain.add(jLabel_Adress_Check, titleGBC);
 
-        gridy++;
         /////////////// ASSET
-        jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jLabel_Asset, gridBagConstraints);
+        labelGBC.gridy = ++gridy;
+        jPanelMain.add(jLabel_Asset, labelGBC);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel(true));
-        this.add(cbxAssets, gridBagConstraints);
+        fieldGBC.gridy = gridy;
+        this.jPanelMain.add(cbxAssets, fieldGBC);
 
-        JLabel detailsHead = new JLabel();
+        if (asset != null) {
+            cbxAssets.setSelectedItem(asset);
+        }
 
-        cbxAssets.addItemListener(new ItemListener() {
+        /////////////// INPUT ASSET
+        jLabel_AssetInput.setText(Lang.getInstance().translate("What to pay") + ":");
+        labelGBC.gridy = ++gridy;
+        jPanelMain.add(jLabel_AssetInput, labelGBC);
 
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
-                    //paneAssetInfo.setViewportView(new AssetInfo(asset, false));
-
-                    jTextField_Details.setText("");
-                    jTextField_Details_Check.setText("");
-
-                    switch ((int)asset.getKey()) {
-                        case 1:
-                            jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for buy") + ":");
-                            refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
-                                            " " + Lang.getInstance().translate("for buy") + " ERA",
-                                    detailsHead);
-                            break;
-                        case 2:
-                            jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for buy") + ":");
-                            refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
-                                            " " + Lang.getInstance().translate("for buy") + " COMPU",
-                                    detailsHead);
-                            break;
-                        case 1114:
-                            jLabel_Details.setText(Lang.getInstance().translate("Address for deposit") + " ZEN" + ":");
-                            refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
-                                            " " + Lang.getInstance().translate("for deposit") + " ZEN",
-                                    detailsHead);
-                            break;
-                        default:
-                            jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for deposit") + ":");
-                            refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
-                                            " " + Lang.getInstance().translate("for deposit") + " bitcoins",
-                                    detailsHead);
-                    }
-
-                    jText_Help.setText("<html><h2>3. " + Lang.getInstance().translate(
-                            "Click the button '%1' and transfer the Assets to the received address")
-                            .replace("%1", Lang.getInstance().translate("Get Payment Details")) + "</h2></html>");
-
-                }
-            }
-        });
+        cbxAssetsInput = new JComboBox<AssetCls>(new FundTokensComboBoxModel(new long[]{AssetCls.BTC_KEY
+                // 14L // ETG
+        }));
+        fieldGBC.gridy = gridy;
+        this.jPanelMain.add(cbxAssetsInput, fieldGBC);
 
         //////////////// BUTTONS
 
@@ -402,8 +382,8 @@ public class DepositExchange extends IconPanel {
         jButton_getDetails.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 jButton_getDetails.setText(Lang.getInstance().translate("Wait") + "...");
-                jText_Help.setText("<html><h2><blink>4. " + Lang.getInstance().translate(
-                        "Please Wait...") + "</blink></h2></html>");
+                jText_Help.setText("<html><h3><blink>4. " + Lang.getInstance().translate(
+                        "Please Wait...") + "</blink></h3></html>");
 
                 // чтобы не ждать зависание скрипта - и отображение текста моментальное будеьт
                 new Thread(() -> {
@@ -412,62 +392,30 @@ public class DepositExchange extends IconPanel {
             }
         });
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jButton_getDetails, gridBagConstraints);
+        fieldGBC.gridy = ++gridy;
+        jPanelMain.add(jButton_getDetails, fieldGBC);
 
         ////////////// DETAILS
-        gridy += 1;
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = ++gridy;
-        //gridBagConstraints.anchor = GridBagConstraints.ABOVE_BASELINE_TRAILING;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(detailsHead, gridBagConstraints);
-        //detailsHead.setHorizontalAlignment(JTextField.LEFT);
         detailsHead.setText(Lang.getInstance().translate("Payment Details"));
+        titleGBC.gridy = ++gridy;
+        jPanelMain.add(detailsHead, titleGBC);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 27, 0, 0);
-        add(jLabel_Details, gridBagConstraints);
-        jLabel_Details.setHorizontalAlignment(JTextField.LEFT);
         jLabel_Details.setText(Lang.getInstance().translate("Address for deposit") + ":");
+        labelGBC.gridy = ++gridy;
+        jPanelMain.add(jLabel_Details, labelGBC);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jTextField_Details, gridBagConstraints);
+        titleGBC.gridy = ++gridy;
+        jPanelMain.add(jTextField_Details, titleGBC);
         jTextField_Details.setEditable(false);
         jTextField_Details.setToolTipText("");
-        jTextField_Details.setText(""); // NOI18N
+        jTextField_Details.setText("");
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        add(jTextField_Details_Check, gridBagConstraints);
+        titleGBC.gridy = ++gridy;
+        jPanelMain.add(jTextField_Details_Check, titleGBC);
 
         //////////////////////////
         JTextPane jText_History = new JTextPane();
         //jText_History.setStyledDocument(styleDocument);
-
-        gridy += 1;
 
         jButtonHistory = new MButton(Lang.getInstance().translate("See Deposit History"), 2);
         jButtonHistory.addActionListener(new ActionListener() {
@@ -479,14 +427,8 @@ public class DepositExchange extends IconPanel {
             }
         });
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
-        gridBagConstraints.insets = new Insets(1, 0, 29, 0);
-
-        add(jButtonHistory, gridBagConstraints);
+        fieldGBC.gridy = 0;
+        jPanelHistory.add(jButtonHistory, fieldGBC);
 
         jText_History.setContentType("text/html");
         jText_History.setEditable(false);
@@ -511,14 +453,88 @@ public class DepositExchange extends IconPanel {
             }
         });
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        titleGBC.gridy = 1;
         //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jText_History, gridBagConstraints);
+        jPanelHistory.add(jText_History, titleGBC);
+
+        cbxAssets.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                reset();
+            }
+        });
+
+        jText_History.setText("");
+
+        //////// PANEL LEFT
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
+        add(jPanelMain, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
+        add(jPanelHistory, gridBagConstraints);
+
+        reset();
+
+    }
+
+    private void reset() {
+        AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
+        //paneAssetInfo.setViewportView(new AssetInfo(asset, false));
+
+        jTextField_Details.setText("");
+        jTextField_Details_Check.setText("");
+
+        switch ((int) asset.getKey()) {
+            case 1:
+                jLabel_Details.setText(Lang.getInstance().translate("Address for buy") + ":");
+                refreshReceiverDetails(Lang.getInstance().translate("Payment details for buy") + " ERA",
+                        detailsHead);
+                jLabel_Asset.setText(Lang.getInstance().translate("What to buy"));
+                jLabel_AssetInput.setVisible(true);
+                cbxAssetsInput.setVisible(true);
+                break;
+            case 2:
+                jLabel_Details.setText(Lang.getInstance().translate("Address for buy") + ":");
+                refreshReceiverDetails(Lang.getInstance().translate("Payment details for buy") + " COMPU",
+                        detailsHead);
+                jLabel_Asset.setText(Lang.getInstance().translate("What to buy"));
+                jLabel_AssetInput.setVisible(true);
+                cbxAssetsInput.setVisible(true);
+                break;
+            case 1114:
+                jLabel_Details.setText(Lang.getInstance().translate("Address to deposit") + " ZEN" + ":");
+                refreshReceiverDetails(Lang.getInstance().translate("Payment details to deposit") + " ZEN",
+                        detailsHead);
+                jLabel_Asset.setText(Lang.getInstance().translate("What to deposit"));
+                jLabel_AssetInput.setVisible(false);
+                cbxAssetsInput.setVisible(false);
+                break;
+            default:
+                jLabel_Details.setText(Lang.getInstance().translate("Address to deposit") + ":");
+                refreshReceiverDetails(Lang.getInstance().translate("Payment details to deposit") + " BTC",
+                        detailsHead);
+                jLabel_Asset.setText(Lang.getInstance().translate("What to deposit"));
+                jLabel_AssetInput.setVisible(false);
+                cbxAssetsInput.setVisible(false);
+        }
+
+        //jText_Help.setText("<html><h2>3. " + Lang.getInstance().translate(
+        //        "Click the button '%1' and transfer the Assets to the received address")
+        //        .replace("%1", Lang.getInstance().translate("Get Payment Details")) + "</h2></html>");
 
     }
 
@@ -562,6 +578,8 @@ public class DepositExchange extends IconPanel {
         }
 
         urlGetDetails += address;
+
+        LOGGER.info(urlGetDetails);
 
         String inputText = "";
         try {

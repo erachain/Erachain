@@ -48,25 +48,9 @@ public class MenuDeals extends JMenu {
 
         addSeparator();
 
-        // Take on HOLD
-
-        JMenuItem dealsMenu_Take_On_Hold = new JMenuItem(Lang.getInstance().translate("Take on Hold"));
-        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
-        dealsMenu_Take_On_Hold.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Take on Hold"),
-                        new AccountAssetHoldPanel(null, null, null, null, true));
-            }
-        });
-        add(dealsMenu_Take_On_Hold);
-
-        addSeparator();
-
         // to lend
 
         JMenuItem dealsMenuLend = new JMenuItem(Lang.getInstance().translate("Lend"));
-        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenuLend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -80,7 +64,6 @@ public class MenuDeals extends JMenu {
         // Confiscate_Debt
 
         JMenuItem dealsMenu_Confiscate_Debt = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
-        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenu_Confiscate_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -94,7 +77,6 @@ public class MenuDeals extends JMenu {
         // Repay_Debt
 
         JMenuItem dealsMenu_Repay_Debt = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
-        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenu_Repay_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -107,10 +89,23 @@ public class MenuDeals extends JMenu {
 
         addSeparator();
 
+        // Take on HOLD
+
+        JMenuItem dealsMenu_Take_On_Hold = new JMenuItem(Lang.getInstance().translate("Take on Hold"));
+        dealsMenu_Take_On_Hold.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Take on Hold"),
+                        new AccountAssetHoldPanel(null, null, null, null, true));
+            }
+        });
+        add(dealsMenu_Take_On_Hold);
+
+        addSeparator();
+
         // Spend
 
         JMenuItem dealsMenu_Spend = new JMenuItem(Lang.getInstance().translate("Spend"));
-        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenu_Spend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -129,8 +124,6 @@ public class MenuDeals extends JMenu {
         dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Vouching record"));
         dealsMenuVouchRecord.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
                 new VouchRecordDialog(null, null);
             }
         });
@@ -138,12 +131,9 @@ public class MenuDeals extends JMenu {
 
 
         JMenuItem dealsMenu_Open_Wallet = new JMenuItem(Lang.getInstance().translate("Open Wallet"));
-        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
         dealsMenu_Open_Wallet.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-                // new AccountRepayDebtDialog(null, null);
                 int res = Controller.getInstance().loadWalletFromDir();
                 if (res == 0) {
                     JOptionPane.showMessageDialog(

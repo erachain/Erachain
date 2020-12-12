@@ -9,7 +9,6 @@ import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.lang.Lang;
-import org.json.simple.JSONObject;
 
 import javax.swing.*;
 
@@ -51,6 +50,8 @@ public class IssueAssetPanel extends IssueItemPanel {
             JComboBox source = (JComboBox) e.getSource();
             AssetType assetType = (AssetType) source.getSelectedItem();
             textareasAssetTypeDescription.setText(assetType.getDescription());
+            textQuantity.setVisible(!AssetCls.isAccounting(assetType.getId()));
+            quantityJLabel.setVisible(!AssetCls.isAccounting(assetType.getId()));
         });
 
         // set start text area asset type
@@ -86,31 +87,18 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
         jPanelAdd.add(textareasAssetTypeDescription, gridBagConstraints);
 
-
+        ////
         labelGBC.gridy = gridy;
         jPanelAdd.add(quantityJLabel, labelGBC);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.4;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelAdd.add(textQuantity, gridBagConstraints);
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(textQuantity, fieldGBC);
 
-        labelGBC.gridx = 13;
         labelGBC.gridy = gridy;
-        gridBagConstraints.gridwidth = 1;
         jPanelAdd.add(scaleJLabel, labelGBC);
-        labelGBC.gridx = 4;
-        gridBagConstraints.gridwidth = 3;
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 18;
-        gridBagConstraints.gridy = gridy++;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-        jPanelAdd.add(textScale, gridBagConstraints);
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(textScale, fieldGBC);
 
         // вывод подвала
         super.initBottom(gridy);
@@ -159,9 +147,6 @@ public class IssueAssetPanel extends IssueItemPanel {
                 creator, exLink, textName.getText(), textAreaDescription.getText(),
                 addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
                 scale, assetType, quantity, feePow);
-
-        // TEST
-        JSONObject json = transaction.copy().toJson();
 
     }
 

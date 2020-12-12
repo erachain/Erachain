@@ -116,10 +116,9 @@ public class AboutFrame extends JDialog implements Observer {
         gbc_lbllversionLabel.gridy = gridy++;
         aboutPanel.add(lblversionLabel, gbc_lbllversionLabel);
 
-        JLabel label = null;
-        label = new JLabel(
-            Controller.version + Lang.getInstance().translate(" build ")
-                    + Controller.buildTime);
+        JLabel label = new JLabel(
+                Controller.version + " " + Lang.getInstance().translate("build") + " "
+                        + Controller.buildTime);
 
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setForeground(Color.RED);

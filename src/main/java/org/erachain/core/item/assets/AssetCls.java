@@ -260,7 +260,7 @@ public abstract class AssetCls extends ItemCls {
     /**
      * mutual aid fund
      * +++ фонд взаимопомощи - учетный, бухгалтерский учет
-     * === подобно AS_SELF_MANAGED_ACCOUNTING - поидее тут без требований к оплате
+     * === подобно AS_SELF_MANAGED_ACCOUNTING - по-идее тут без требований к оплате
      */
     public static final int AS_SELF_ACCOUNTING_MUTUAL_AID_FUND = 126;
 
@@ -693,8 +693,12 @@ public abstract class AssetCls extends ItemCls {
         return assetType >= AS_SELF_MANAGED_ACCOUNTING;
     }
 
+    public static boolean isAccounting(int assetType) {
+        return assetType >= AS_SELF_MANAGED_ACCOUNTING;
+    }
+
     public boolean isAccounting() {
-        return this.assetType >= AS_SELF_MANAGED_ACCOUNTING;
+        return isAccounting(assetType);
     }
 
     /**
@@ -711,10 +715,14 @@ public abstract class AssetCls extends ItemCls {
      *
      * @return
      */
+    public static boolean isReverseSend(int assetType) {
+        return assetType == AS_SELF_MANAGED_ACCOUNTING
+                || assetType == AS_SELF_ACCOUNTING_MUTUAL_AID_FUND
+                || assetType == AS_SELF_ACCOUNTING_CASH_FUND;
+    }
+
     public boolean isReverseSend() {
-        return this.assetType == AS_SELF_MANAGED_ACCOUNTING
-                || this.assetType == AS_SELF_ACCOUNTING_MUTUAL_AID_FUND
-                || this.assetType == AS_SELF_ACCOUNTING_CASH_FUND;
+        return isReverseSend(this.assetType);
     }
 
     /**
@@ -770,7 +778,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of exchange";
             case AS_MY_DEBT:
-                return "My Debt";
+                return "AS_MY_DEBT_N";
             case AS_OUTSIDE_OTHER_CLAIM:
                 return "Outside Other Claim";
 
@@ -837,7 +845,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of Exchange";
             case AS_MY_DEBT:
-                return "My Debt to Loaner";
+                return "AS_MY_DEBT_NF";
             case AS_OUTSIDE_OTHER_CLAIM:
                 return "Other Outside Right of Claim";
 
@@ -998,9 +1006,9 @@ public abstract class AssetCls extends ItemCls {
             case AS_ACCOUNTING:
                 return "AS_ACCOUNTING_D";
             case AS_SELF_MANAGED_ACCOUNTING:
-                return "AS_SELF_MANAGED_D";
+                return "AS_SELF_MANAGED_ACCOUNTING_D";
             case AS_SELF_ACCOUNTING_LOAN:
-                return "AS_ACCOUNTING_LOAN_D";
+                return "AS_SELF_ACCOUNTING_LOAN_D";
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
                 return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_D";
             case AS_SELF_ACCOUNTING_CASH_FUND:
@@ -1239,25 +1247,25 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_MANAGED_ACCOUNTING:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? "AS_SELF_MANAGED_1B" : "AS_SELF_MANAGED_1";
+                        return backward ? "AS_SELF_MANAGED_ACCOUNTING_1B" : "AS_SELF_MANAGED_ACCOUNTING_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "AS_SELF_MANAGED_2B" : "AS_SELF_MANAGED_2";
+                        return backward ? "AS_SELF_MANAGED_ACCOUNTING_2B" : "AS_SELF_MANAGED_ACCOUNTING_2";
                     case TransactionAmount.ACTION_HOLD:
-                        return backward ? "AS_SELF_MANAGED_3B" : "AS_SELF_MANAGED_3";
+                        return backward ? "AS_SELF_MANAGED_ACCOUNTING_3B" : "AS_SELF_MANAGED_ACCOUNTING_3";
                     case TransactionAmount.ACTION_SPEND:
-                        return backward ? "AS_SELF_MANAGED_4B" : "AS_SELF_MANAGED_4";
+                        return backward ? "AS_SELF_MANAGED_ACCOUNTING_4B" : "AS_SELF_MANAGED_ACCOUNTING_4";
                     default:
                         return null;
                 }
             case AS_SELF_ACCOUNTING_LOAN:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
-                        return backward ? "AS_ACCOUNTING_LOAN_1B" : "AS_ACCOUNTING_LOAN_1";
+                        return backward ? "AS_SELF_ACCOUNTING_LOAN_1B" : "AS_SELF_ACCOUNTING_LOAN_1";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "AS_ACCOUNTING_LOAN_2B" : "AS_ACCOUNTING_LOAN_2";
+                        return backward ? "AS_SELF_ACCOUNTING_LOAN_2B" : "AS_SELF_ACCOUNTING_LOAN_2";
                     case TransactionAmount.ACTION_HOLD:
                         // SPEND нельзя брать так как он Баланс Мой изменит у меня
-                        return backward ? "AS_ACCOUNTING_LOAN_3B" : "AS_ACCOUNTING_LOAN_3";
+                        return backward ? "AS_SELF_ACCOUNTING_LOAN_3B" : "AS_SELF_ACCOUNTING_LOAN_3";
                     default:
                         return null;
                 }
@@ -1338,26 +1346,44 @@ public abstract class AssetCls extends ItemCls {
         String actionStr;
         String addActionStr;
         for (int action = TransactionAmount.ACTION_SEND; action < TransactionAmount.ACTION_PLEDGE; action++) {
-            if (action != TransactionAmount.ACTION_SEND) {
-                // не писать что выпуск доступен и так понятно
-                actionStr = viewAssetTypeAction(assetKey, assetType, false, action, true);
-                if (actionStr != null && !list.contains(actionStr))
-                    list.add(actionStr);
-            }
-            actionStr = viewAssetTypeAction(assetKey, assetType, false, action, false);
+
+            boolean backward = !AssetCls.isReverseSend(assetType) || action != TransactionAmount.ACTION_SEND;
+
+            actionStr = viewAssetTypeAction(assetKey, assetType, !backward, action, true);
             if (actionStr != null && !list.contains(actionStr)) {
-                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, false, action, false);
+                list.add(actionStr);
+                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, !backward, action, true);
                 if (addActionStr != null) {
                     list.add(addActionStr);
                 }
-                list.add(actionStr);
             }
-            actionStr = viewAssetTypeAction(assetKey, assetType, true, action, true);
-            if (actionStr != null && !list.contains(actionStr))
+
+            actionStr = viewAssetTypeAction(assetKey, assetType, !backward, action, false);
+            if (actionStr != null && !list.contains(actionStr)) {
                 list.add(actionStr);
-            actionStr = viewAssetTypeAction(assetKey, assetType, true, action, false);
-            if (actionStr != null && !list.contains(actionStr))
+                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, !backward, action, false);
+                if (addActionStr != null) {
+                    list.add(addActionStr);
+                }
+            }
+
+            actionStr = viewAssetTypeAction(assetKey, assetType, backward, action, true);
+            if (actionStr != null && !list.contains(actionStr)) {
                 list.add(actionStr);
+                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, backward, action, true);
+                if (addActionStr != null) {
+                    list.add(addActionStr);
+                }
+            }
+
+            actionStr = viewAssetTypeAction(assetKey, assetType, backward, action, false);
+            if (actionStr != null && !list.contains(actionStr)) {
+                list.add(actionStr);
+                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, backward, action, false);
+                if (addActionStr != null) {
+                    list.add(addActionStr);
+                }
+            }
         }
 
         return list;

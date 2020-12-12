@@ -14,6 +14,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
+import org.erachain.gui.ResultDialog;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
@@ -234,18 +235,7 @@ public class PersonCertifyPubKeysDialog extends JDialog {
 
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
-
-            Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-
-            // CHECK VALIDATE MESSAGE
-            if (result == Transaction.VALIDATE_OK) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Public Key was Certified") + "!",
-                        Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-                this.dispose();
-            } else {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            }
+            ResultDialog.make(this, transaction, "Public Key was Certified");
         }
         // ENABLE
         Button_Confirm.setEnabled(true);

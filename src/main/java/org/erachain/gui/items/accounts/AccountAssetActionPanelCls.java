@@ -19,13 +19,13 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.ResultDialog;
 import org.erachain.gui.items.assets.AssetInfo;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.models.AccountsComboBoxModel;
-import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
@@ -543,21 +543,6 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         }
     }
 
-    public void confirmaftecreatetransaction() {
-
-        //CHECK VALIDATE MESSAGE
-        if (result == Transaction.VALIDATE_OK) {
-            //RESET FIELDS
-
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message and/or payment has been sent!"),
-                    Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-        }
-
-    }
-
     // выполняемая процедура при изменении адреса получателя
     @Override
     public void recipientAddressWorker(String e) {
@@ -593,11 +578,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
-
-            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-
-            confirmaftecreatetransaction();
+            ResultDialog.make(this, transaction, jButton_ok.getText());
         }
+
         // ENABLE
         this.jButton_ok.setEnabled(true);
     }
