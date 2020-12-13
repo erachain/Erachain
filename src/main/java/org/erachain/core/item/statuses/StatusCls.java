@@ -49,7 +49,7 @@ public abstract class StatusCls extends ItemCls {
     @Override
     public long START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return 1L << 15;
+            return BlockChain.START_KEY_UO_ITEMS;
 
         return START_KEY;
     }
@@ -57,7 +57,7 @@ public abstract class StatusCls extends ItemCls {
     @Override
     public long MIN_START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return 1L << 20;
+            return BlockChain.START_KEY_UO_ITEMS;
 
         return MIN_START_KEY;
     }
