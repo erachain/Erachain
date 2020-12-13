@@ -54,7 +54,7 @@ public abstract class TemplateCls extends ItemCls {
     @Override
     public long START_KEY() {
         if (Transaction.parseHeightDBRef(seqNo) > BlockChain.START_KEY_UP)
-            return 1L << 20;
+            return 1L << 15;
 
         return START_KEY;
     }
