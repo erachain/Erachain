@@ -74,6 +74,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
      * this is signature of issued record
      */
     protected byte[] reference = null;
+    protected long seqNo;
     protected byte[] icon;
     protected byte[] image;
 
