@@ -33,6 +33,7 @@ public class TransactionV3Tests {
 
     Long releaserReference = null;
 
+    long dbRef = 0L;
     long ERM_KEY = AssetCls.ERA_KEY;
     long FEE_KEY = AssetCls.FEE_KEY;
     byte FEE_POWER = (byte) 1;

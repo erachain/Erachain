@@ -47,6 +47,7 @@ public class RCertifyPubKeysTest {
     byte[] personReference = new byte[64];
     long timestamp = NTP.getTime();
 
+    long dbRef = 0L;
     long flags = 0l;
     Long last_ref;
     //CREATE KNOWN ACCOUNT

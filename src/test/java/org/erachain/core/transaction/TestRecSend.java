@@ -40,6 +40,7 @@ public class TestRecSend {
     byte FEE_POWER = (byte) 0;
     byte[] assetReference = new byte[64];
     long timestamp = NTP.getTime();
+    long dbRef = 0L;
 
     ExLink exLink = null;
 

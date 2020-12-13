@@ -52,6 +52,7 @@ public class TestRecPerson {
     byte FEE_POWER = (byte) 1;
     byte[] personReference = new byte[64];
     long timestamp;
+    long dbRef = 0L;
 
     long flags = 0l;
     Long last_ref;

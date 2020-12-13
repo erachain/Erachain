@@ -42,6 +42,7 @@ public class TestRecAsset {
 
     //Long Transaction.FOR_NETWORK = null;
 
+    long dbRef = 0L;
     long FEE_KEY = AssetCls.FEE_KEY;
     byte FEE_POWER = (byte) 1;
     byte[] assetReference = new byte[64];

@@ -38,6 +38,7 @@ public class TestRecUnion {
     ExLink linkTo = null;
     //long ALIVE_KEY = StatusCls.ALIVE_KEY;
     byte FEE_POWER = (byte) 1;
+    long dbRef = 0L;
     byte[] unionReference = new byte[64];
     long timestamp = NTP.getTime();
 

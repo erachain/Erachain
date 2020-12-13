@@ -41,6 +41,7 @@ public class TestRecPoll {
     byte FEE_POWER = (byte) 1;
     byte[] pollReference = new byte[64];
     long timestamp = NTP.getTime();
+    long dbRef = 0L;
 
     long flags = 4l;
     //CREATE KNOWN ACCOUNT

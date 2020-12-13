@@ -29,7 +29,7 @@ public class IssueAssetTransactionTest {
 
     Controller cntrl;
 
-    long dbRef = 0l;
+    long dbRef = 0L;
 
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("tes213sdffsdft".getBytes());
