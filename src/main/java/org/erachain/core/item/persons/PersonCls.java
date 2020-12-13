@@ -128,7 +128,7 @@ public abstract class PersonCls extends ItemCls {
     @Override
     public long MIN_START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return 1L << 18;
+            return 1L << 17;
 
         return MIN_START_KEY;
     }

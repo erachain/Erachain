@@ -470,8 +470,8 @@ public class BlockChain {
     /**
      * Новый уровень начальных номеров для всех сущностей
      */
-    public static int START_KEY_UP = MAIN_MODE ? 1700000 : DEMO_MODE ? 400 : 0;
-    public static int START_KEY_UO_ITEMS = 1 << 16;
+    public static int START_KEY_UP = MAIN_MODE ? 1700000 : DEMO_MODE ? 406660 : 0;
+    public static int START_KEY_UO_ITEMS = 1 << 15;
 
     //private int target = 0;
     //private byte[] lastBlockSignature;
