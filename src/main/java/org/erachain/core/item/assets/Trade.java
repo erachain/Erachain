@@ -126,7 +126,7 @@ public class Trade {
         trade.put("initiator", Transaction.viewDBRef(initiator));
         trade.put("target", Transaction.viewDBRef(target));
 
-        int height = Transaction.parseDBRefHeight(initiator);
+        int height = Transaction.parseHeightDBRef(initiator);
         trade.put("height", height);
         trade.put("timestamp", Controller.getInstance().blockChain.getTimestamp(height));
 

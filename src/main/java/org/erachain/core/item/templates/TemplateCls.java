@@ -1,8 +1,10 @@
 package org.erachain.core.item.templates;
 
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
@@ -51,11 +53,17 @@ public abstract class TemplateCls extends ItemCls {
 
     @Override
     public long START_KEY() {
+        if (Transaction.parseHeightDBRef(seqNo) > BlockChain.START_KEY_UP)
+            return 1L << 20;
+
         return START_KEY;
     }
 
     @Override
     public long MIN_START_KEY() {
+        if (Transaction.parseHeightDBRef(seqNo) > BlockChain.START_KEY_UP)
+            return 1L << 20;
+
         return MIN_START_KEY;
     }
 

@@ -119,11 +119,17 @@ public abstract class PersonCls extends ItemCls {
 
     @Override
     public long START_KEY() {
+        if (Transaction.parseHeightDBRef(seqNo) > BlockChain.START_KEY_UP)
+            return 1L << 20;
+
         return START_KEY;
     }
 
     @Override
     public long MIN_START_KEY() {
+        if (Transaction.parseHeightDBRef(seqNo) > BlockChain.START_KEY_UP)
+            return 1L << 20;
+
         return MIN_START_KEY;
     }
 

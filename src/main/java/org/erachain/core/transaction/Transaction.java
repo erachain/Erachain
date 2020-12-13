@@ -599,7 +599,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public void setHeightSeq(long seqNo) {
         this.dbRef = seqNo;
-        this.height = parseDBRefHeight(seqNo);
+        this.height = parseHeightDBRef(seqNo);
         this.seqNo = (int) seqNo;
     }
 
@@ -1155,7 +1155,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     }
 
-    public static int parseDBRefHeight(long dbRef) {
+    public static int parseHeightDBRef(long dbRef) {
         return (int) (dbRef >> 32);
     }
 

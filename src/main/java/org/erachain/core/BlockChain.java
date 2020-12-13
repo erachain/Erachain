@@ -464,6 +464,10 @@ public class BlockChain {
     private Block waitWinBuffer;
 
     public static long[] startKeys = new long[10];
+    /**
+     * Новый уровень начальных номеров для всех сущностей
+     */
+    public static int START_KEY_UP = MAIN_MODE ? 1700000 : 0;
 
     //private int target = 0;
     //private byte[] lastBlockSignature;

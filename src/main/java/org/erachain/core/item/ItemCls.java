@@ -109,7 +109,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
                 Long date = Long.parseLong(str);
                 return new Pair<Integer, Long>(0, date);
             } catch (Exception e) {
-                return new Pair<Integer, Long>(-1, 0l);
+                return new Pair<Integer, Long>(-1, 0L);
             }
         }
     }
@@ -392,6 +392,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
      */
     public void setReference(byte[] signature, long seqNo) {
         this.reference = signature;
+        this.seqNo = seqNo;
     }
 
     public Transaction getIssueTransaction(DCSet dcSet) {
@@ -421,7 +422,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         if (dbRef == null)
             return 0;
 
-        int height = Transaction.parseDBRefHeight(dbRef);
+        int height = Transaction.parseHeightDBRef(dbRef);
 
         return 1 + db.getBlockMap().size() - height;
 
