@@ -1003,7 +1003,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     // calc FEE by recommended and feePOW
     public void calcFee() {
 
-        if (seqNo <= BlockChain.FREE_FEE_SEQNO && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
+        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
+                && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
             this.fee = BigDecimal.ZERO;
         } else {
             long fee_long = calcBaseFee();

@@ -689,7 +689,8 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         int result;
-        if (seqNo <= BlockChain.FREE_FEE_SEQNO && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
+        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
+                && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
             // не учитываем комиссию если размер маленький
             result = super.isValid(forDeal, flags | NOT_VALIDATE_FLAG_FEE);
         } else {
@@ -775,7 +776,8 @@ public class RSignNote extends Transaction implements Itemable {
     @Override
     public long calcBaseFee() {
 
-        if (seqNo <= BlockChain.FREE_FEE_SEQNO && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
+        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
+                && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
             return 0L;
         } else {
             long fee = super.calcBaseFee();
