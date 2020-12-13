@@ -1,6 +1,7 @@
 package org.erachain.core.item.imprints;
 
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 
@@ -87,16 +88,22 @@ public class Imprint extends ImprintCls {
         position += descriptionLength;
 
         byte[] reference = null;
+        long seqNo = 0;
         if (includeReference) {
             //READ REFERENCE
             reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
             position += REFERENCE_LENGTH;
+
+            //READ SEQNO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + SEQNO_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += SEQNO_LENGTH;
         }
 
         //RETURN
         Imprint imprint = new Imprint(typeBytes, owner, name, icon, image, description);
         if (includeReference) {
-            imprint.setReference(reference);
+            imprint.setReference(reference, seqNo);
         }
 
         return imprint;

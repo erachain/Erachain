@@ -201,7 +201,7 @@ public class TestRecPoll {
 
         byte[] rawPoll = poll.toBytes(false, false);
         assertEquals(rawPoll.length, poll.getDataLength(false));
-        poll.setReference(new byte[64]);
+        poll.setReference(new byte[64], 0L);
         rawPoll = poll.toBytes(true, false);
         assertEquals(rawPoll.length, poll.getDataLength(true));
 

@@ -744,7 +744,7 @@ public class TestRecSend {
         //ADD ERM ASSET
         AssetCls aTFundingAsset = new AssetVenture(new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.",
                 0, 8, 250000000l);
-        aTFundingAsset.setReference(assetReference);
+        aTFundingAsset.setReference(assetReference, seqNo);
         db.getItemAssetMap().set(assetKeyTest, aTFundingAsset);
 
         GenesisBlock genesisBlock = gb; //new GenesisBlock();
@@ -833,7 +833,7 @@ public class TestRecSend {
 
         AssetCls aTFundingAsset = new AssetVenture(gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.",
                 0, 8, 250000000l);
-        aTFundingAsset.setReference(gb.getSignature());
+        aTFundingAsset.setReference(gb.getSignature(), seqNo);
         db.getItemAssetMap().set(assetKeyTest, aTFundingAsset);
 
         //CREATE KNOWN ACCOUNT

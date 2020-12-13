@@ -108,7 +108,7 @@ public class TransactionTests3AssetsAsPack {
         byte[] raw = asset.toBytes(includeReference, false);
         assertEquals(raw.length, asset.getDataLength(includeReference));
 
-        asset.setReference(new byte[64]);
+        asset.setReference(new byte[64], 0L);
         raw = asset.toBytes(true, false);
         assertEquals(raw.length, asset.getDataLength(true));
 

@@ -1,6 +1,7 @@
 package org.erachain.core.item.statuses;
 
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 
@@ -87,16 +88,22 @@ public class Status extends StatusCls {
         position += descriptionLength;
 
         byte[] reference = null;
+        long seqNo = 0;
         if (includeReference) {
             //READ REFERENCE
             reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
             position += REFERENCE_LENGTH;
+
+            //READ SEQNO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + SEQNO_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += SEQNO_LENGTH;
         }
 
         //RETURN
         Status status = new Status(typeBytes, owner, name, icon, image, description);
         if (includeReference) {
-            status.setReference(reference);
+            status.setReference(reference, seqNo);
         }
 
         return status;

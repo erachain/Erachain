@@ -98,16 +98,22 @@ public class Union extends UnionCls {
         position += PARENT_LENGTH;
 
         byte[] reference = null;
+        long seqNo = 0;
         if (includeReference) {
             //READ REFERENCE
             reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
             position += REFERENCE_LENGTH;
+
+            //READ SEQNO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + SEQNO_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += SEQNO_LENGTH;
         }
 
         //RETURN
         Union union = new Union(typeBytes, owner, name, birthday, parent, icon, image, description);
         if (includeReference) {
-            union.setReference(reference);
+            union.setReference(reference, seqNo);
         }
 
         return union;

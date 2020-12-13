@@ -1,6 +1,7 @@
 package org.erachain.core.item.templates;
 
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 
@@ -8,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 //import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+
 
 public class Template extends TemplateCls {
 
@@ -88,16 +89,22 @@ public class Template extends TemplateCls {
         position += descriptionLength;
 
         byte[] reference = null;
+        long seqNo = 0;
         if (includeReference) {
             //READ REFERENCE
             reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
             position += REFERENCE_LENGTH;
+
+            //READ SEQNO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + SEQNO_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += SEQNO_LENGTH;
         }
 
         //RETURN
         Template template = new Template(typeBytes, owner, name, icon, image, description);
         if (includeReference) {
-            template.setReference(reference);
+            template.setReference(reference, seqNo);
         }
 
         return template;

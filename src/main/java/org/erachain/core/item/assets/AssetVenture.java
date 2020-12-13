@@ -112,10 +112,16 @@ public class AssetVenture extends AssetCls {
         position += descriptionLength;
 
         byte[] reference = null;
+        long seqNo = 0;
         if (includeReference) {
             //READ REFERENCE
             reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
             position += REFERENCE_LENGTH;
+
+            //READ SEQNO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + SEQNO_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += SEQNO_LENGTH;
         }
 
         //READ QUANTITY
@@ -136,7 +142,7 @@ public class AssetVenture extends AssetCls {
         //RETURN
         AssetVenture venture = new AssetVenture(typeBytes, owner, name, icon, image, description, assetTypeBytes[0], scale, quantity);
         if (includeReference) {
-            venture.setReference(reference);
+            venture.setReference(reference, seqNo);
         }
 
         return venture;

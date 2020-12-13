@@ -3,6 +3,7 @@ package org.erachain.core.item.polls;
 //import java.math.BigDecimal;
 
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 
@@ -89,10 +90,16 @@ public class Poll extends PollCls {
         position += descriptionLength;
 
         byte[] reference = null;
+        long seqNo = 0;
         if (includeReference) {
             //READ REFERENCE
             reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
             position += REFERENCE_LENGTH;
+
+            //READ SEQNO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + SEQNO_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += SEQNO_LENGTH;
         }
 
         //READ OPTIONS SIZE
@@ -117,7 +124,7 @@ public class Poll extends PollCls {
         //RETURN
         Poll poll = new Poll(typeBytes, owner, name, icon, image, description, options);
         if (includeReference) {
-            poll.setReference(reference);
+            poll.setReference(reference, seqNo);
         }
 
         return poll;

@@ -5,6 +5,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.ItemFactory;
 import org.erachain.core.item.unions.Union;
@@ -34,6 +35,7 @@ public class TestRecUnion {
     BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
     long ERM_KEY = Transaction.RIGHTS_KEY;
     long FEE_KEY = Transaction.FEE_KEY;
+    ExLink linkTo = null;
     //long ALIVE_KEY = StatusCls.ALIVE_KEY;
     byte FEE_POWER = (byte) 1;
     byte[] unionReference = new byte[64];
@@ -195,7 +197,7 @@ public class TestRecUnion {
 
         byte[] rawUnion = union.toBytes(false, false);
         assertEquals(rawUnion.length, union.getDataLength(false));
-        union.setReference(new byte[64]);
+        union.setReference(new byte[64], 0L);
         rawUnion = union.toBytes(true, false);
         assertEquals(rawUnion.length, union.getDataLength(true));
 

@@ -34,9 +34,9 @@ public abstract class AddressItemRefs extends Transaction {
     }
      */
     public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) {
-        this(typeBytes, NAME_ID, creator, item, (byte) 0, 0l, null);
+        this(typeBytes, NAME_ID, creator, item, (byte) 0, 0L, null);
         this.signature = signature;
-        this.item.setReference(signature);
+        this.item.setReference(signature, 0L);
     }
 
     //GETTERS/SETTERS
@@ -127,7 +127,7 @@ public abstract class AddressItemRefs extends Transaction {
         //UPDATE CREATOR
         super.process(block, forDeal);
 
-        this.item.setReference(this.signature);
+        this.item.setReference(this.signature, seqNo);
 
         //INSERT INTO DATABASE
         this.item.insertToMap(this.dcSet, START_KEY);
