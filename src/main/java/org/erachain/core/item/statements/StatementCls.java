@@ -37,7 +37,7 @@ public abstract class StatementCls extends ItemCls {
 
     @Override
     public long START_KEY() {
-        if (Transaction.parseHeightDBRef(seqNo) > BlockChain.START_KEY_UP)
+        if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
             return 1L << 15;
 
         return START_KEY;
@@ -45,7 +45,7 @@ public abstract class StatementCls extends ItemCls {
 
     @Override
     public long MIN_START_KEY() {
-        if (Transaction.parseHeightDBRef(seqNo) > BlockChain.START_KEY_UP)
+        if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
             return 1L << 20;
 
         return MIN_START_KEY;

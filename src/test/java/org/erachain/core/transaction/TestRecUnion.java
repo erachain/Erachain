@@ -197,7 +197,7 @@ public class TestRecUnion {
 
         byte[] rawUnion = union.toBytes(false, false);
         assertEquals(rawUnion.length, union.getDataLength(false));
-        union.setReference(new byte[64], 0L);
+        union.setReference(new byte[64], dbRef);
         rawUnion = union.toBytes(true, false);
         assertEquals(rawUnion.length, union.getDataLength(true));
 

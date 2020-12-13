@@ -35,13 +35,13 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, NAME_ID, creator, linkTo, item, feePow, timestamp, reference);
         this.signature = signature;
-        this.item.setReference(signature, seqNo);
+        this.item.setReference(signature, dbRef);
     }
 
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte[] signature) {
         this(typeBytes, NAME_ID, creator, linkTo, item, (byte) 0, 0L, null);
         this.signature = signature;
-        this.item.setReference(signature, seqNo);
+        this.item.setReference(signature, dbRef);
     }
 
     //GETTERS/SETTERS
@@ -269,7 +269,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         //UPDATE CREATOR
         super.process(block, forDeal);
 
-        this.item.setReference(this.signature, seqNo);
+        this.item.setReference(this.signature, dbRef);
 
         //INSERT INTO DATABASE
         key = this.item.insertToMap(this.dcSet, this.item.getStartKey());

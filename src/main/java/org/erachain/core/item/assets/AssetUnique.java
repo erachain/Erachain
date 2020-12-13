@@ -99,16 +99,16 @@ public class AssetUnique extends AssetCls {
         position += descriptionLength;
 
         byte[] reference = null;
-        long seqNo = 0;
+        long dbRef = 0;
         if (includeReference) {
             //READ REFERENCE
             reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
             position += REFERENCE_LENGTH;
 
             //READ SEQNO
-            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + SEQNO_LENGTH);
-            seqNo = Longs.fromByteArray(seqNoBytes);
-            position += SEQNO_LENGTH;
+            byte[] dbRefBytes = Arrays.copyOfRange(data, position, position + DBREF_LENGTH);
+            dbRef = Longs.fromByteArray(dbRefBytes);
+            position += DBREF_LENGTH;
         }
 
         //READ SCALE
@@ -124,7 +124,7 @@ public class AssetUnique extends AssetCls {
         //RETURN
         AssetUnique unique = new AssetUnique(typeBytes, owner, name, icon, image, description, assetTypeBytes[0], scale);
         if (includeReference) {
-            unique.setReference(reference, seqNo);
+            unique.setReference(reference, dbRef);
         }
 
         return unique;

@@ -152,7 +152,7 @@ public class TestRecPerson {
         person = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich as registrar", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
-        person.setReference(ownerSignature, seqNo);
+        person.setReference(ownerSignature, dbRef);
         dcSet.getItemPersonMap().incrementPut(person);
         long keyRegistrar = person.getKey(dcSet);
 
@@ -161,7 +161,7 @@ public class TestRecPerson {
         person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
-        person.setReference(ownerSignature, seqNo);
+        person.setReference(ownerSignature, dbRef);
         dcSet.getItemPersonMap().incrementPut(person);
         long keyCertifier = person.getKey(dcSet);
 
@@ -320,7 +320,7 @@ public class TestRecPerson {
 
                 byte[] rawPerson = person.toBytes(false, false);
                 assertEquals(rawPerson.length, person.getDataLength(false));
-                person.setReference(new byte[64], seqNo);
+                person.setReference(new byte[64], dbRef);
                 rawPerson = person.toBytes(true, false);
                 assertEquals(rawPerson.length, person.getDataLength(true));
 

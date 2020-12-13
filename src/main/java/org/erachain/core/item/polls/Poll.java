@@ -90,16 +90,16 @@ public class Poll extends PollCls {
         position += descriptionLength;
 
         byte[] reference = null;
-        long seqNo = 0;
+        long dbRef = 0;
         if (includeReference) {
             //READ REFERENCE
             reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
             position += REFERENCE_LENGTH;
 
             //READ SEQNO
-            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + SEQNO_LENGTH);
-            seqNo = Longs.fromByteArray(seqNoBytes);
-            position += SEQNO_LENGTH;
+            byte[] dbRefBytes = Arrays.copyOfRange(data, position, position + DBREF_LENGTH);
+            dbRef = Longs.fromByteArray(dbRefBytes);
+            position += DBREF_LENGTH;
         }
 
         //READ OPTIONS SIZE
@@ -124,7 +124,7 @@ public class Poll extends PollCls {
         //RETURN
         Poll poll = new Poll(typeBytes, owner, name, icon, image, description, options);
         if (includeReference) {
-            poll.setReference(reference, seqNo);
+            poll.setReference(reference, dbRef);
         }
 
         return poll;

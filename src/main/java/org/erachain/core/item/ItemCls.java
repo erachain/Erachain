@@ -59,7 +59,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     protected static final int IMAGE_SIZE_LENGTH = 4;
     protected static final int DESCRIPTION_SIZE_LENGTH = 4;
     protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
-    protected static final int SEQNO_LENGTH = Transaction.SEQNO_LENGTH;
+    protected static final int DBREF_LENGTH = Transaction.DBREF_LENGTH;
     protected static final int BASE_LENGTH = TYPE_LENGTH + OWNER_LENGTH + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
 
     protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
@@ -76,7 +76,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
      * this is signature of issued record
      */
     protected byte[] reference = null;
-    protected long seqNo;
+    protected long dbRef;
     protected byte[] icon;
     protected byte[] image;
 
@@ -388,11 +388,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
      * ранее. Это не страшно
      *
      * @param signature
-     * @param seqNo
+     * @param dbRef
      */
-    public void setReference(byte[] signature, long seqNo) {
+    public void setReference(byte[] signature, long dbRef) {
         this.reference = signature;
-        this.seqNo = seqNo;
+        this.dbRef = dbRef;
     }
 
     public Transaction getIssueTransaction(DCSet dcSet) {
@@ -495,7 +495,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         if (useAll && includeReference) {
             //WRITE REFERENCE
             data = Bytes.concat(data, this.reference);
-            data = Bytes.concat(data, Longs.toByteArray(this.seqNo));
+            data = Bytes.concat(data, Longs.toByteArray(this.dbRef));
         }
 
         return data;
@@ -524,7 +524,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
                 + this.icon.length
                 + this.image.length
                 + this.description.getBytes(StandardCharsets.UTF_8).length
-                + (includeReference ? REFERENCE_LENGTH + SEQNO_LENGTH : 0);
+                + (includeReference ? REFERENCE_LENGTH + DBREF_LENGTH : 0);
     }
 
     //OTHER

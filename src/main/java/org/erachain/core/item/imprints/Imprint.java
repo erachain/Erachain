@@ -88,22 +88,22 @@ public class Imprint extends ImprintCls {
         position += descriptionLength;
 
         byte[] reference = null;
-        long seqNo = 0;
+        long dbRef = 0;
         if (includeReference) {
             //READ REFERENCE
             reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
             position += REFERENCE_LENGTH;
 
             //READ SEQNO
-            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + SEQNO_LENGTH);
-            seqNo = Longs.fromByteArray(seqNoBytes);
-            position += SEQNO_LENGTH;
+            byte[] dbRefBytes = Arrays.copyOfRange(data, position, position + DBREF_LENGTH);
+            dbRef = Longs.fromByteArray(dbRefBytes);
+            position += DBREF_LENGTH;
         }
 
         //RETURN
         Imprint imprint = new Imprint(typeBytes, owner, name, icon, image, description);
         if (includeReference) {
-            imprint.setReference(reference, seqNo);
+            imprint.setReference(reference, dbRef);
         }
 
         return imprint;

@@ -43,6 +43,8 @@ public class OrderTestsMy {
 
     int height;
 
+    long dbRef = 0L;
+
     Long releaserReference = null;
     long ERM_KEY = Transaction.RIGHTS_KEY;
     long FEE_KEY = Transaction.FEE_KEY;
@@ -167,7 +169,7 @@ public class OrderTestsMy {
 
         assetA = new AssetVenture(new GenesisBlock().getCreator(), "START", icon, image, ".", 0, 8, 50000L);
         // сразу зазадим чтобы все активы были уже в версии где учитывается точность
-        assetA.setReference(new byte[64], seqNo);
+        assetA.setReference(new byte[64], dbRef);
         assetA.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM + 1);
 
         assetA = new AssetVenture(new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
@@ -436,7 +438,7 @@ public class OrderTestsMy {
 
                 int thisScale = 5;
                 assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, thisScale, 0L);
-                assetA.setReference(new byte[64], seqNo);
+                assetA.setReference(new byte[64], dbRef);
                 // Актив с учетом точности создадим
                 assetA.insertToMap(dcSet, 0L);
 
@@ -459,7 +461,7 @@ public class OrderTestsMy {
                 assertEquals(orderCreation.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);
 
                 assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, 30, 0L);
-                assetA.setReference(new byte[64], seqNo);
+                assetA.setReference(new byte[64], dbRef);
                 assetA.insertToMap(dcSet, 0l);
 
                 // IS VALID
@@ -518,14 +520,14 @@ public class OrderTestsMy {
                 assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
                 byte[] reference = new byte[64];
                 this.random.nextBytes(reference);
-                assetA.setReference(reference, seqNo);
+                assetA.setReference(reference, dbRef);
                 // чтобы точность сбросить в 0
                 assetA.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
 
                 int toScale = 0;
                 assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
                 this.random.nextBytes(reference);
-                assetB.setReference(reference, seqNo);
+                assetB.setReference(reference, dbRef);
                 // чтобы точность сбросить в 0
                 assetB.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
 
@@ -634,14 +636,14 @@ public class OrderTestsMy {
                 assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
                 byte[] reference = new byte[64];
                 this.random.nextBytes(reference);
-                assetA.setReference(reference, seqNo);
+                assetA.setReference(reference, dbRef);
                 // чтобы точность сбросить в 0
                 assetA.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
 
                 int toScale = 0;
                 assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
                 this.random.nextBytes(reference);
-                assetB.setReference(reference, seqNo);
+                assetB.setReference(reference, dbRef);
                 // чтобы точность сбросить в 0
                 assetB.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
 
@@ -712,14 +714,14 @@ public class OrderTestsMy {
                 assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
                 byte[] reference = new byte[64];
                 this.random.nextBytes(reference);
-                assetA.setReference(reference, seqNo);
+                assetA.setReference(reference, dbRef);
                 // чтобы точность сбросить в 0
                 assetA.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
 
                 int toScale = 0;
                 assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
                 this.random.nextBytes(reference);
-                assetB.setReference(reference, seqNo);
+                assetB.setReference(reference, dbRef);
                 // чтобы точность сбросить в 0
                 assetB.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
 
@@ -808,14 +810,14 @@ public class OrderTestsMy {
                 assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
                 byte[] reference = new byte[64];
                 this.random.nextBytes(reference);
-                assetA.setReference(reference, seqNo);
+                assetA.setReference(reference, dbRef);
                 // чтобы точность сбросить в 0
                 assetA.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
 
                 int toScale = 0;
                 assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
                 this.random.nextBytes(reference);
-                assetB.setReference(reference, seqNo);
+                assetB.setReference(reference, dbRef);
                 // чтобы точность сбросить в 0
                 assetB.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
 
