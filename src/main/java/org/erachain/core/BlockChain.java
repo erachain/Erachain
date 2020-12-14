@@ -531,7 +531,7 @@ public class BlockChain {
                 //CREATE JSON OBJECT
                 JSONObject chainParams = (JSONObject) JSONValue.parse(jsonString);
                 if (chainParams == null) {
-                    throw new Exception("Wrong JSON in " + file.getName() + "\n" + jsonString);
+                    throw new Exception("Wrong JSON or not UTF-8 encode in " + file.getName());
                 }
 
                 if (chainParams.containsKey("assets")) {
