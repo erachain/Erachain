@@ -1419,7 +1419,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
         String password = (String) jsonObject.getOrDefault("password", null);
 
-        return new Fun.Tuple4(jsonObject, creator, feePow, password);
+        return new Fun.Tuple4(creator, feePow, password, jsonObject);
 
     }
 
