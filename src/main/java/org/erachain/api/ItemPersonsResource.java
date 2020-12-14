@@ -138,6 +138,8 @@ public class ItemPersonsResource {
         return output.toJSONString();
     }
 
+    // POST persons/issue {"creator": "7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz", "name": "Generate", "description": "Generate description", "birthday": 946688521000, "gender": 1, "birthLatitude": 0.0, "birthLongitude": 0.0, "height": 180, "password": "1"}
+
     @POST
     @Path("issue")
     public String issue(String x) {

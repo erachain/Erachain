@@ -79,12 +79,12 @@ public abstract class PersonCls extends ItemCls {
         this.birthday = birthday;
         this.deathday = deathday;
         this.gender = gender;
-        this.race = race;
+        this.race = race == null ? "" : race;
         this.birthLatitude = birthLatitude;
         this.birthLongitude = birthLongitude;
-        this.skinColor = skinColor;
-        this.eyeColor = eyeColor;
-        this.hairСolor = hairСolor;
+        this.skinColor = skinColor == null ? "" : skinColor;
+        this.eyeColor = eyeColor == null ? "" : eyeColor;
+        this.hairСolor = hairСolor == null ? "" : hairСolor;
         this.height = height;
     }
 

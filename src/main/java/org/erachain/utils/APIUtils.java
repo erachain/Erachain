@@ -135,12 +135,17 @@ public class APIUtils {
                 min_length = 8;
             }
 
+            min_length = 0;
             if (BlockChain.TEST_MODE)
                 min_length = 0;
 
             if (password != null) {
-                if (password.length() <= min_length)
-                    throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_PASSWORD_SO_SHORT);
+                JSONObject errorJson;
+                if (password.length() <= min_length) {
+                    throw ApiErrorFactory.getInstance()
+                            .createError(ApiErrorFactory.ERROR_WALLET_PASSWORD_SO_SHORT,
+                                    " need > " + min_length);
+                }
 
                 if (once) {
                     if (Controller.getInstance().unlockOnceWallet(password))
