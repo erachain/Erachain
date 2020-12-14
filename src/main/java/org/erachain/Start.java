@@ -133,6 +133,10 @@ public class Start {
 
             //CREATE JSON OBJECT
             Settings.genesisJSON = (JSONArray) JSONValue.parse(jsonString);
+            if (Settings.genesisJSON == null) {
+                throw new Exception("Wrong JSON or not UTF-8 encode in " + file.getName());
+            }
+
             JSONArray appArray = (JSONArray) Settings.genesisJSON.get(0);
             Settings.APP_NAME = appArray.get(0).toString();
             Settings.APP_FULL_NAME = appArray.get(1).toString();
