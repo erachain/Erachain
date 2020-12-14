@@ -349,6 +349,7 @@ public class TransactionCreator {
                         if (record instanceof IssuePersonRecord) {
                             IssuePersonRecord issuePerson = (IssuePersonRecord) record;
                             if (issuePerson.getItem().getName().equals(fullName)) {
+                                record.setErrorValue("equal to " + fullName);
                                 return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
                             }
                         }
@@ -384,8 +385,9 @@ public class TransactionCreator {
 
         //VALIDATE AND PROCESS
         if (forIssue) {
-            if (this.fork.getTransactionFinalMapSigns().contains(person.getOwnerSignature())) {
-                return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+            if (person.getOwnerSignature() != null && this.fork.getTransactionFinalMapSigns().contains(person.getOwnerSignature())) {
+                issuePersonRecord.setErrorValue("equal to OwnerSignature " + person.getOwnerSignature());
+                return new Pair<Transaction, Integer>(issuePersonRecord, Transaction.ITEM_DUPLICATE);
             }
 
             boolean asPack = false;

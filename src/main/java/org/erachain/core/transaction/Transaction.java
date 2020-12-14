@@ -609,6 +609,14 @@ public abstract class Transaction implements ExplorerJsonLine {
         this.seqNo = seqNo;
     }
 
+    public void setErrorValue(String value) {
+        errorValue = value;
+    }
+
+    public String getErrorValue() {
+        return errorValue;
+    }
+
     /**
      * NEED FOR DB SECONDATY KEYS see org.mapdb.Bind.secondaryKeys
      *

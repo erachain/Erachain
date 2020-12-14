@@ -391,7 +391,7 @@ public class OnDealClick {
                 mess = "Duplicate key";
                 break;
             case Transaction.ITEM_DUPLICATE:
-                mess = "Invalid duplicte item";
+                mess = "Invalid duplicate item";
                 break;
             case Transaction.INVALID_TIMESTAMP_START:
                 mess = "Invalid start timestamp item";
