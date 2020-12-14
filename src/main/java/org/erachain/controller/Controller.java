@@ -3035,13 +3035,13 @@ public class Controller extends Observable {
             return new Fun.Tuple2<>(error, OnDealClick.resultMess(error));
         }
 
-        String name = (String) jsonObject.getOrDefault("name", null);
-        String description = (String) jsonObject.getOrDefault("description", null);
+        String name = (String) jsonObject.get("name");
+        String description = (String) jsonObject.get("description");
 
         byte[] icon;
-        String icon64 = (String) jsonObject.getOrDefault("icon64", null);
+        String icon64 = (String) jsonObject.get("icon64");
         if (icon64 == null) {
-            String icon58 = (String) jsonObject.getOrDefault("icon", null);
+            String icon58 = (String) jsonObject.get("icon");
             if (icon58 == null)
                 icon = null;
             else
@@ -3051,9 +3051,9 @@ public class Controller extends Observable {
         }
 
         byte[] image;
-        String image64 = (String) jsonObject.getOrDefault("image64", null);
+        String image64 = (String) jsonObject.get("image64");
         if (image64 == null) {
-            String image58 = (String) jsonObject.getOrDefault("image", null);
+            String image58 = (String) jsonObject.get("image");
             if (image58 == null)
                 image = null;
             else
@@ -3062,7 +3062,7 @@ public class Controller extends Observable {
             image = java.util.Base64.getDecoder().decode(image64);
         }
 
-        String linkToRefStr = jsonObject.get("linkTo").toString();
+        String linkToRefStr = (String) jsonObject.get("linkTo");
         ExLink linkTo;
         if (linkToRefStr == null)
             linkTo = null;
@@ -3076,9 +3076,24 @@ public class Controller extends Observable {
             }
         }
 
-        Integer scale = (Integer) jsonObject.getOrDefault("scale", 0);
-        Integer assetType = (Integer) jsonObject.getOrDefault("assetType", 0);
-        Long quantity = (Long) jsonObject.getOrDefault("quantity", 0L);
+        Integer scale = null;
+        Integer assetType = null;
+        Long quantity = null;
+        int error;
+        String errorName = null;
+        try {
+            errorName = "scale: -8...24";
+            scale = (Integer) jsonObject.getOrDefault("scale", 0);
+            errorName = "assetType: int";
+            assetType = (Integer) jsonObject.getOrDefault("assetType", 0);
+            errorName = "quantity: long";
+            quantity = (Long) jsonObject.getOrDefault("quantity", 0L);
+        } catch (Exception e) {
+            error = ApiErrorFactory.ERROR_JSON;
+            JSONObject out = new JSONObject();
+            out.put("error", error);
+            out.put("error_message", errorName);
+        }
 
         APIUtils.askAPICallAllowed(password, "POST issue Asset " + name, request, true);
         PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
