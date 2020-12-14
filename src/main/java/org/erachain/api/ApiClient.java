@@ -16,6 +16,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -820,6 +821,16 @@ public class ApiClient {
             }
 
             return help;
+        }
+
+        if (command.toLowerCase().equals("get persons")) {
+            String help = "\n";
+            Map map = ItemPersonsResource.help;
+            for (Object key : map.keySet()) {
+                help += key.toString() + ":\n     " + map.get(key) + "\n";
+            }
+            return help;
+
         }
 
         if (command.toLowerCase().startsWith("help")) {

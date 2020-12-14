@@ -36,22 +36,21 @@ public class ItemPersonsResource {
     @Context
     HttpServletRequest request;
 
+    public static Map help = new LinkedHashMap<String, String>() {{
+        put("persons/last", "Get last key");
+        put("persons/{key}", "Returns information about person with the given key.");
+        put("persons/raw/{key}", "Returns RAW in Base58 of person with the given key.");
+        put("persons/images/{key}", "get item Images by key");
+        put("persons/listfrom/{start}", "get list from KEY");
+        put("POST persons/issue {\"linkTo\": \"<SeqNo>\", \"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": \"long\", \"deathday\": \"<long>\", \"gender\": \"<int>\", \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": , \"password\": \"<password>\"}", "issue");
+        put("POST persons/issueraw/{creator}?linkTo=<SeqNo>&feePow=<int>&password=<String> ", "Issue Person by Base58 RAW in POST body");
+
+        put("persons/certify/{creator}/{personKey}?pubkey=<Base58>&feePow=<int>&linkTo=<SeqNo>&days<int>&password=<String>", "Certify some public key for Person by it key. Default: pubKey is owner from Person, feePow=0, days=1");
+    }};
+
     @SuppressWarnings("unchecked")
     @GET
     public String help() {
-        Map help = new LinkedHashMap();
-
-        help.put("persons/last", "Get last key");
-        help.put("persons/{key}", "Returns information about person with the given key.");
-        help.put("persons/raw/{key}", "Returns RAW in Base58 of person with the given key.");
-        help.put("persons/images/{key}", "get item Images by key");
-        help.put("persons/listfrom/{start}", "get list from KEY");
-        help.put("POST persons/issue {\"linkTo\": \"<SeqNo>\", \"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": \"long\", \"deathday\": \"<long>\", \"gender\": \"<int>\", \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": , \"password\": \"<password>\"}", "issue");
-        help.put("POST persons/issueraw/{creator}?linkTo=<SeqNo>&feePow=<int>&password=<String> ", "Issue Person by Base58 RAW in POST body");
-
-        help.put("persons/certify/{creator}/{personKey}?pubkey=<Base58>&feePow=<int>&linkTo=<SeqNo>&days<int>&password=<String>", "Certify some public key for Person by it key. Default: pubKey is owner from Person, feePow=0, days=1");
-
-
         return StrJSonFine.convert(help);
     }
 
