@@ -260,6 +260,7 @@ public class ApiErrorFactory {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("error", error);
+        jsonObject.put("value", value);
 
         if (error > ERROR) {
             // errors for API
@@ -272,7 +273,6 @@ public class ApiErrorFactory {
             // errors for Transaction
             //jsonObject.put("message", this.errorMessages.get(error));
             jsonObject.put("message", OnDealClick.resultMess(error));
-            jsonObject.put("value", value);
         }
 
         return jsonObject;

@@ -144,7 +144,7 @@ public class APIUtils {
                 if (password.length() <= min_length) {
                     throw ApiErrorFactory.getInstance()
                             .createError(ApiErrorFactory.ERROR_WALLET_PASSWORD_SO_SHORT,
-                                    " need > " + min_length);
+                                    "need > " + min_length);
                 }
 
                 if (once) {
