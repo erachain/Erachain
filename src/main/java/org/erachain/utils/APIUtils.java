@@ -135,7 +135,7 @@ public class APIUtils {
                 min_length = 8;
             }
 
-            min_length = 0;
+            //min_length = 0;
             if (BlockChain.TEST_MODE)
                 min_length = 0;
 
