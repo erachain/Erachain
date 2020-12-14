@@ -471,7 +471,7 @@ public class BlockChain {
     /**
      * Новый уровень начальных номеров для всех сущностей
      */
-    public static int START_KEY_UP = MAIN_MODE ? 1700000 : DEMO_MODE ? 12500 : 0;
+    public static int START_KEY_UP = MAIN_MODE ? 1700000 : DEMO_MODE ? 12500 : Integer.MAX_VALUE;
     public static int START_KEY_UO_ITEMS = 1 << 15;
 
     //private int target = 0;
@@ -530,6 +530,9 @@ public class BlockChain {
 
                 //CREATE JSON OBJECT
                 JSONObject chainParams = (JSONObject) JSONValue.parse(jsonString);
+                if (chainParams == null) {
+                    throw new Exception("Wrong JSON in " + file.getName() + "\n" + jsonString);
+                }
 
                 if (chainParams.containsKey("assets")) {
                     JSONArray items = (JSONArray) chainParams.get("assets");
