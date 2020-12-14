@@ -43,7 +43,7 @@ import java.util.*;
 /**
  * обработка секртеных ключей и моих записей, которые относятся к набору моих счетов
  */
-public class Wallet extends Observable /*implements Observer*/ {
+public class Wallet extends Observable implements Observer {
 
 	static final boolean CHECK_CHAIN_BROKENS_ON_SYNC_WALLET = false;
 
@@ -79,6 +79,8 @@ public class Wallet extends Observable /*implements Observer*/ {
 
 			if (withObserver) {
 				// ADD OBSERVER
+
+
 				// Controller.getInstance().addObserver(this);
 
 				/// вешает при синхронизации ничего нельзя сделать с кошельком - ни открыть ни закрыть
@@ -90,6 +92,11 @@ public class Wallet extends Observable /*implements Observer*/ {
 				// DCSet.getInstance().getBlockMap().addObserver(this);
 
 				// DCSet.getInstance().getCompletedOrderMap().addObserver(this);
+
+
+				// REGISTER ON ORDERS - foe BELLs on incomed TRADES
+				this.database.getOrderMap().addObserver(this);
+
 			}
 
 			walletUpdater = new WalletUpdater(Controller.getInstance(), this);
@@ -978,9 +985,6 @@ public class Wallet extends Observable /*implements Observer*/ {
 			// REGISTER ON UNION
 			this.database.getUnionMap().addObserver(o);
 
-			// REGISTER ON ORDERS
-			this.database.getOrderMap().addObserver(o);
-
 		}
 
 		// SEND STATUS
@@ -1714,89 +1718,83 @@ public class Wallet extends Observable /*implements Observer*/ {
 		}
 	}
 
-	/*
+	long notifySysTrayRecord;
+
 	@SuppressWarnings("unchecked")
-    @Override
-    public void update(Observable o, Object arg) {
-    	if (Controller.getInstance().noUseWallet || Controller.getInstance().noDataWallet
+	@Override
+	public void update(Observable o, Object arg) {
+		if (Controller.getInstance().noUseWallet || Controller.getInstance().noDataWallet
 				|| synchronizeBodyUsed)
-    		return;
-
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
-	 */
-
-    long notifySysTrayRecord;
-    @SuppressWarnings("unchecked")
-    // synchronized нужно чтобы не было конкуренции при this.database.commit();
-    public synchronized void syncUpdate(Observable o, Object arg) {
-
-        if (this.database == null)
 			return;
 
-        ObserverMessage message = (ObserverMessage) arg;
-        int type = message.getType();
+		try {
+			if (this.database == null)
+				return;
 
-		if (false && type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
+			ObserverMessage message = (ObserverMessage) arg;
+			int type = message.getType();
 
-			// прилетающие неподтвержденные тоже проверяем и если это относится к нам
-			// то закатываем себе в кошелек.
-			// потом они при переподтверждении обновятся
-			// но если нет то останутся висеть и пользователь сам их должен удалить
-			// это как раз сигнал что такая не подтвердилась трнзакция
+			if () {
+			} else if (false && type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
 
-			Pair<Long, Transaction> item = (Pair<Long, Transaction>) message.getValue();
-			Transaction transaction = item.getB();
+				// прилетающие неподтвержденные тоже проверяем и если это относится к нам
+				// то закатываем себе в кошелек.
+				// потом они при переподтверждении обновятся
+				// но если нет то останутся висеть и пользователь сам их должен удалить
+				// это как раз сигнал что такая не подтвердилась трнзакция
 
-			if (false) {
-				/// блокирует внесение блоков через вызов события!
-				List<Account> accounts = this.getAccounts();
-				synchronized (accounts) {
-					for (Account account : accounts) {
-						// CHECK IF INVOLVED
-						if (transaction.isInvolved(account)) {
-							// ADD TO ACCOUNT TRANSACTIONS
-							if (!this.database.getTransactionMap().set(account, transaction)) {
-								// UPDATE UNCONFIRMED BALANCE for ASSET
+				Pair<Long, Transaction> item = (Pair<Long, Transaction>) message.getValue();
+				Transaction transaction = item.getB();
+
+				if (false) {
+					/// блокирует внесение блоков через вызов события!
+					List<Account> accounts = this.getAccounts();
+					synchronized (accounts) {
+						for (Account account : accounts) {
+							// CHECK IF INVOLVED
+							if (transaction.isInvolved(account)) {
+								// ADD TO ACCOUNT TRANSACTIONS
+								if (!this.database.getTransactionMap().set(account, transaction)) {
+									// UPDATE UNCONFIRMED BALANCE for ASSET
+								}
 							}
 						}
 					}
 				}
-			}
 
-			return;
-
-		} else if (type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-			if (Controller.getInstance().useGui
-					&& System.currentTimeMillis() - notifySysTrayRecord > 1000) {
-				notifySysTrayRecord = System.currentTimeMillis();
-				Pair<Tuple2<String, String>, Transaction> item = (Pair<Tuple2<String, String>, Transaction>) message.getValue();
-				Transaction transaction = item.getB();
-				Library.notifySysTrayRecord(transaction);
-			}
-
-			return;
-
-		} else if (type == ObserverMessage.ADD_ORDER_TYPE
-				|| type == ObserverMessage.ADD_COMPL_ORDER_TYPE) {
-            // UPDATE FULFILLED
-            Order order = (Order) message.getValue();
-			if (!this.accountExists(order.getCreator()))
 				return;
 
-			Long key = order.getId();
-            if (this.database.getOrderMap().contains(key)) {
-				this.database.getOrderMap().set(key, order);
+			} else if (false && type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
+				if (Controller.getInstance().useGui
+						&& System.currentTimeMillis() - notifySysTrayRecord > 1000) {
+					notifySysTrayRecord = System.currentTimeMillis();
+					Pair<Tuple2<String, String>, Transaction> item = (Pair<Tuple2<String, String>, Transaction>) message.getValue();
+					Transaction transaction = item.getB();
+					Library.notifySysTrayRecord(transaction);
+				}
+
+				return;
+
+			} else if (type == ObserverMessage.WALLET_ADD_ORDER_TYPE
+				// || type == ObserverMessage.WALLET_REMOVE_ORDER_TYPE
+			) {
+
+				// UPDATE FULFILLED
+				Order order = (Order) message.getValue();
+				if (!this.accountExists(order.getCreator()))
+					return;
+
+				Long key = order.getId();
+				if (this.database.getOrderMap().contains(key)) {
+					this.database.getOrderMap().set(key, order);
+				}
+
+				return;
+
 			}
-
-			return;
-
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
 		}
-
     }
 
 	// CLOSE
