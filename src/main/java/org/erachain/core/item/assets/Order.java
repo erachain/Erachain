@@ -32,7 +32,7 @@ public class Order implements Comparable<Order> {
     private static final int HAVE_LENGTH = 8;
     private static final int WANT_LENGTH = 8;
     private static final int SCALE_LENGTH = 1;
-    private static final int AMOUNT_LENGTH = 8;
+    public static final int AMOUNT_LENGTH = 8;
     private static final int STATUS_LENGTH = 1;
     public static final int FULFILLED_LENGTH = AMOUNT_LENGTH + 4;
     private static final int BASE_LENGTH = ID_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH
