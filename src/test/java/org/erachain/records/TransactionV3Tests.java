@@ -33,6 +33,7 @@ public class TransactionV3Tests {
 
     Long releaserReference = null;
 
+    long dbRef = 0L;
     long ERM_KEY = AssetCls.ERA_KEY;
     long FEE_KEY = AssetCls.FEE_KEY;
     byte FEE_POWER = (byte) 1;
@@ -134,7 +135,7 @@ public class TransactionV3Tests {
 
         //ADD ERM ASSET
         AssetCls aTFundingAsset = new AssetVenture(new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
-        aTFundingAsset.setReference(assetReference);
+        aTFundingAsset.setReference(assetReference, dbRef);
         db.getItemAssetMap().set(61l, aTFundingAsset);
 
         GenesisBlock genesisBlock = new GenesisBlock();
@@ -219,7 +220,7 @@ public class TransactionV3Tests {
         init();
 
         AssetCls aTFundingAsset = new AssetVenture(gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
-        aTFundingAsset.setReference(gb.getSignature());
+        aTFundingAsset.setReference(gb.getSignature(), dbRef);
         db.getItemAssetMap().set(61l, aTFundingAsset);
 
         //CREATE KNOWN ACCOUNT
@@ -232,7 +233,7 @@ public class TransactionV3Tests {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+        maker.changeBalance(db, false, false, 61L, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
         List<Payment> payments = new ArrayList<Payment>();
 

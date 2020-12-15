@@ -38,7 +38,7 @@ public class GenesisIssueItemRecord extends GenesisRecord implements Itemable {
 
         super.generateSignature();
         // NEED to set an reference
-        this.item.setReference(this.signature);
+        this.item.setReference(this.signature, dbRef);
 
     }
 

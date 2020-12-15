@@ -374,6 +374,10 @@ public class BlockChain {
     //
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
 
+    public static final int FREE_FEE_LENGTH = 1 << 13;
+    public static final int FREE_FEE_TO_SEQNO = DEMO_MODE ? 1 : -1;
+    public static final int FREE_FEE_FROM_HEIGHT = DEMO_MODE ? 1 : Integer.MAX_VALUE;
+
     /**
      * FEE_KEY used here
      */
@@ -464,6 +468,11 @@ public class BlockChain {
     private Block waitWinBuffer;
 
     public static long[] startKeys = new long[10];
+    /**
+     * Новый уровень начальных номеров для всех сущностей
+     */
+    public static int START_KEY_UP = MAIN_MODE ? 1700000 : DEMO_MODE ? 12500 : Integer.MAX_VALUE;
+    public static int START_KEY_UO_ITEMS = 1 << 15;
 
     //private int target = 0;
     //private byte[] lastBlockSignature;
@@ -521,6 +530,9 @@ public class BlockChain {
 
                 //CREATE JSON OBJECT
                 JSONObject chainParams = (JSONObject) JSONValue.parse(jsonString);
+                if (chainParams == null) {
+                    throw new Exception("Wrong JSON or not UTF-8 encode in " + file.getName());
+                }
 
                 if (chainParams.containsKey("assets")) {
                     JSONArray items = (JSONArray) chainParams.get("assets");

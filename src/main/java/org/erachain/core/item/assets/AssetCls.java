@@ -5,6 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
@@ -271,7 +272,9 @@ public abstract class AssetCls extends ItemCls {
      */
     public static final int AS_SELF_ACCOUNTING_CASH_FUND = 127;
 
-    // + or -
+    /**
+     * +8 ... -23 = 32 диапазон. положительные - округляют целые числа
+     */
     protected int scale;
     //
     protected int assetType;
@@ -298,11 +301,17 @@ public abstract class AssetCls extends ItemCls {
 
     @Override
     public long START_KEY() {
+        if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
+            return BlockChain.START_KEY_UO_ITEMS;
+
         return START_KEY;
     }
 
     @Override
     public long MIN_START_KEY() {
+        if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
+            return BlockChain.START_KEY_UO_ITEMS;
+
         return MIN_START_KEY;
     }
 

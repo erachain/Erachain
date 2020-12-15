@@ -47,6 +47,7 @@ public class RCertifyPubKeysTest {
     byte[] personReference = new byte[64];
     long timestamp = NTP.getTime();
 
+    long dbRef = 0L;
     long flags = 0l;
     Long last_ref;
     //CREATE KNOWN ACCOUNT
@@ -141,7 +142,7 @@ public class RCertifyPubKeysTest {
         person = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich as registrar", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
-        person.setReference(ownerSignature);
+        person.setReference(ownerSignature, dbRef);
         dcSet.getItemPersonMap().incrementPut(person);
         long keyRegistrar = person.getKey(dcSet);
 
@@ -150,7 +151,7 @@ public class RCertifyPubKeysTest {
         person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
-        person.setReference(ownerSignature);
+        person.setReference(ownerSignature, dbRef);
         dcSet.getItemPersonMap().incrementPut(person);
         long keyCertifier = person.getKey(dcSet);
 

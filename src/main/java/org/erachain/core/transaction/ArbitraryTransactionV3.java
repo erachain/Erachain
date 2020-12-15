@@ -287,9 +287,4 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
         return VALIDATE_OK;
     }
 
-    @Override
-    public long calcBaseFee() {
-        return calcCommonFee();
-    }
-
 }

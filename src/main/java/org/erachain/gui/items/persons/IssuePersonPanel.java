@@ -471,7 +471,8 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                         Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(result.getB())),
+                        Lang.getInstance().translate(OnDealClick.resultMess(result.getB())
+                                + (transaction != null && transaction.getErrorValue() != null ? " " + transaction.getErrorValue() : "")),
                         Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             }
 

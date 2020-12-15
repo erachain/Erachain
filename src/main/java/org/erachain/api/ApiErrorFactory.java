@@ -256,6 +256,28 @@ public class ApiErrorFactory {
         return jsonObject;
     }
 
+    public JSONObject createErrorJSON(int error, String value) {
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("error", error);
+        jsonObject.put("value", value);
+
+        if (error > ERROR) {
+            // errors for API
+            jsonObject.put("message", this.errorMessages.get(error));
+
+        } else if (error > Transaction.AT_ERROR) {
+            // AT errors
+            jsonObject.put("message", ATError.getATError(error - Transaction.AT_ERROR));
+        } else {
+            // errors for Transaction
+            //jsonObject.put("message", this.errorMessages.get(error));
+            jsonObject.put("message", OnDealClick.resultMess(error));
+        }
+
+        return jsonObject;
+    }
+
     @SuppressWarnings("unchecked")
     public JSONObject createErrorJSON(String error) {
 
@@ -282,4 +304,12 @@ public class ApiErrorFactory {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(createErrorJSON(error).toJSONString()).build());
     }
+
+    public WebApplicationException createError(int error, String value) {
+        return new WebApplicationException(Response.status(Response.Status.OK)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(createErrorJSON(error, value).toJSONString()).build());
+    }
+
 }

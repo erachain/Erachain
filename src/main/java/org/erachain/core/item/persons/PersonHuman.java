@@ -123,10 +123,16 @@ public class PersonHuman extends PersonCls {
         position += descriptionLength;
 
         byte[] reference = null;
+        long dbRef = 0;
         if (includeReference) {
             //READ REFERENCE
             reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
             position += REFERENCE_LENGTH;
+
+            //READ SEQNO
+            byte[] dbRefBytes = Arrays.copyOfRange(data, position, position + DBREF_LENGTH);
+            dbRef = Longs.fromByteArray(dbRefBytes);
+            position += DBREF_LENGTH;
         }
 
         //READ BIRTDAY
@@ -219,7 +225,7 @@ public class PersonHuman extends PersonCls {
                 skinColor, eyeColor, hairСolor, height, icon, image, description, ownerSignature);
 
         if (includeReference) {
-            personHuman.setReference(reference);
+            personHuman.setReference(reference, dbRef);
         }
 
         return personHuman;

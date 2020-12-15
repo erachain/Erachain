@@ -25,6 +25,9 @@ public class TransactionTests3AssetsAsPack {
     static Logger LOGGER = LoggerFactory.getLogger(TransactionTests3AssetsAsPack.class.getName());
     static int asPack = Transaction.FOR_NETWORK;
     //Long Transaction.FOR_NETWORK;
+
+    long dbRef = 0L;
+
     long FEE_KEY = 1l;
     byte FEE_POWER = (byte) 1;
     byte[] assetReference = new byte[64];
@@ -108,7 +111,7 @@ public class TransactionTests3AssetsAsPack {
         byte[] raw = asset.toBytes(includeReference, false);
         assertEquals(raw.length, asset.getDataLength(includeReference));
 
-        asset.setReference(new byte[64]);
+        asset.setReference(new byte[64], dbRef);
         raw = asset.toBytes(true, false);
         assertEquals(raw.length, asset.getDataLength(true));
 

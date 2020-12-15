@@ -4,6 +4,7 @@ package org.erachain.core.item.unions;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
@@ -51,11 +52,17 @@ public abstract class UnionCls extends ItemCls {
 
     @Override
     public long START_KEY() {
+        if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
+            return BlockChain.START_KEY_UO_ITEMS;
+
         return START_KEY;
     }
 
     @Override
     public long MIN_START_KEY() {
+        if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
+            return BlockChain.START_KEY_UO_ITEMS;
+
         return MIN_START_KEY;
     }
 

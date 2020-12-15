@@ -1,7 +1,9 @@
 package org.erachain.core.item.statuses;
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
@@ -46,11 +48,17 @@ public abstract class StatusCls extends ItemCls {
 
     @Override
     public long START_KEY() {
+        if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
+            return BlockChain.START_KEY_UO_ITEMS;
+
         return START_KEY;
     }
 
     @Override
     public long MIN_START_KEY() {
+        if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
+            return BlockChain.START_KEY_UO_ITEMS;
+
         return MIN_START_KEY;
     }
 

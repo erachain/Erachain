@@ -365,7 +365,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int DATA_VERSION_PART_LENGTH = 6;
     public static final int DATA_TITLE_PART_LENGTH = 4;
     protected static final int DATA_NUM_FILE_LENGTH = 4;
-    protected static final int SEQ_LENGTH = 4;
+    protected static final int SEQ_LENGTH = Integer.BYTES;
+    public static final int DBREF_LENGTH = Long.BYTES;
     public static final int DATA_SIZE_LENGTH = 4;
     public static final int ENCRYPTED_LENGTH = 1;
     public static final int IS_TEXT_LENGTH = 1;
@@ -598,7 +599,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public void setHeightSeq(long seqNo) {
         this.dbRef = seqNo;
-        this.height = parseDBRefHeight(seqNo);
+        this.height = parseHeightDBRef(seqNo);
         this.seqNo = (int) seqNo;
     }
 
@@ -606,6 +607,14 @@ public abstract class Transaction implements ExplorerJsonLine {
         this.dbRef = makeDBRef(height, seqNo);
         this.height = height;
         this.seqNo = seqNo;
+    }
+
+    public void setErrorValue(String value) {
+        errorValue = value;
+    }
+
+    public String getErrorValue() {
+        return errorValue;
     }
 
     /**
@@ -978,8 +987,8 @@ public abstract class Transaction implements ExplorerJsonLine {
         return 0;
     }
 
-    public int calcCommonFee() {
-
+    // get fee
+    public long calcBaseFee() {
         int len = this.getDataLength(Transaction.FOR_NETWORK, true);
 
         /*
@@ -997,24 +1006,23 @@ public abstract class Transaction implements ExplorerJsonLine {
         */
 
         return len * BlockChain.FEE_PER_BYTE;
-
-    }
-
-    // get fee
-    public long calcBaseFee() {
-        return calcCommonFee();
     }
 
     // calc FEE by recommended and feePOW
     public void calcFee() {
 
-        long fee_long = calcBaseFee();
-        BigDecimal fee = new BigDecimal(fee_long).multiply(BlockChain.FEE_RATE).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
-
-        if (this.feePow > 0) {
-            this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
+        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
+                && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
+            this.fee = BigDecimal.ZERO;
         } else {
-            this.fee = fee;
+            long fee_long = calcBaseFee();
+            BigDecimal fee = new BigDecimal(fee_long).multiply(BlockChain.FEE_RATE).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
+
+            if (this.feePow > 0) {
+                this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
+            } else {
+                this.fee = fee;
+            }
         }
     }
 
@@ -1154,7 +1162,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     }
 
-    public static int parseDBRefHeight(long dbRef) {
+    public static int parseHeightDBRef(long dbRef) {
         return (int) (dbRef >> 32);
     }
 
@@ -1419,7 +1427,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
         String password = (String) jsonObject.getOrDefault("password", null);
 
-        return new Fun.Tuple4(jsonObject, creator, feePow, password);
+        return new Fun.Tuple4(creator, feePow, password, jsonObject);
 
     }
 

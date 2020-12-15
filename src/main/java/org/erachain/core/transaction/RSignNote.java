@@ -688,7 +688,15 @@ public class RSignNote extends Transaction implements Itemable {
             return INVALID_DATA_LENGTH;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result;
+        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
+                && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
+            // не учитываем комиссию если размер маленький
+            result = super.isValid(forDeal, flags | NOT_VALIDATE_FLAG_FEE);
+        } else {
+            result = super.isValid(forDeal, flags);
+        }
+
         if (result != Transaction.VALIDATE_OK) return result;
 
         // ITEM EXIST? - for assets transfer not need - amount expect instead
@@ -768,25 +776,30 @@ public class RSignNote extends Transaction implements Itemable {
     @Override
     public long calcBaseFee() {
 
-        long fee = calcCommonFee();
-        byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
+        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
+                && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
+            return 0L;
+        } else {
+            long fee = super.calcBaseFee();
+            byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
 
-        if (allHashes != null) {
-            fee += allHashes.length * 100 * BlockChain.FEE_PER_BYTE;
+            if (allHashes != null) {
+                fee += allHashes.length * 100 * BlockChain.FEE_PER_BYTE;
+            }
+
+            if (getExLink() != null)
+                fee += 100 * BlockChain.FEE_PER_BYTE;
+
+            if (extendedData.hasAuthors()) {
+                fee += extendedData.getAuthors().length * 100 * BlockChain.FEE_PER_BYTE;
+            }
+
+            if (extendedData.hasSources()) {
+                fee += extendedData.getSources().length * 100 * BlockChain.FEE_PER_BYTE;
+            }
+
+            return fee;
         }
-
-        if (getExLink() != null)
-            fee += 100 * BlockChain.FEE_PER_BYTE;
-
-        if (extendedData.hasAuthors()) {
-            fee += extendedData.getAuthors().length * 100 * BlockChain.FEE_PER_BYTE;
-        }
-
-        if (extendedData.hasSources()) {
-            fee += extendedData.getSources().length * 100 * BlockChain.FEE_PER_BYTE;
-        }
-
-        return fee;
     }
 
     public void parseDataV2WithoutFiles() {

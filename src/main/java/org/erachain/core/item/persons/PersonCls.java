@@ -79,12 +79,12 @@ public abstract class PersonCls extends ItemCls {
         this.birthday = birthday;
         this.deathday = deathday;
         this.gender = gender;
-        this.race = race;
+        this.race = race == null ? "" : race;
         this.birthLatitude = birthLatitude;
         this.birthLongitude = birthLongitude;
-        this.skinColor = skinColor;
-        this.eyeColor = eyeColor;
-        this.hairСolor = hairСolor;
+        this.skinColor = skinColor == null ? "" : skinColor;
+        this.eyeColor = eyeColor == null ? "" : eyeColor;
+        this.hairСolor = hairСolor == null ? "" : hairСolor;
         this.height = height;
     }
 
@@ -119,11 +119,17 @@ public abstract class PersonCls extends ItemCls {
 
     @Override
     public long START_KEY() {
+        if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
+            return 1L << 18;
+
         return START_KEY;
     }
 
     @Override
     public long MIN_START_KEY() {
+        if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
+            return 1L << 17;
+
         return MIN_START_KEY;
     }
 

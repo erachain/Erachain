@@ -42,6 +42,7 @@ public class TestRecAsset {
 
     //Long Transaction.FOR_NETWORK = null;
 
+    long dbRef = 0L;
     long FEE_KEY = AssetCls.FEE_KEY;
     byte FEE_POWER = (byte) 1;
     byte[] assetReference = new byte[64];
@@ -98,13 +99,13 @@ public class TestRecAsset {
 
         asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", 1, 8, 50000l);
         // set SCALABLE assets ++
-        asset.setReference(Crypto.getInstance().digest(asset.toBytes(false, false)));
+        asset.setReference(Crypto.getInstance().digest(asset.toBytes(false, false)), dbRef);
         asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         asset.insertToMap(db, 0l);
         key = asset.getKey(db);
 
         assetMovable = new AssetVenture(maker, "movable", icon, image, "...", 0, 8, 500l);
-        assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)));
+        assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)), dbRef);
 
     }
 
@@ -223,7 +224,7 @@ public class TestRecAsset {
                 LOGGER.info("asset: " + assetUni.getTypeBytes()[0] + ", " + assetUni.getTypeBytes()[1]);
                 byte[] rawUni = assetUni.toBytes(false, false);
                 assertEquals(rawUni.length, assetUni.getDataLength(false));
-                assetUni.setReference(new byte[64]);
+                assetUni.setReference(new byte[64], dbRef);
                 rawUni = assetUni.toBytes(true, false);
                 assertEquals(rawUni.length, assetUni.getDataLength(true));
 
@@ -232,7 +233,7 @@ public class TestRecAsset {
                 LOGGER.info("asset: " + asset.getTypeBytes()[0] + ", " + asset.getTypeBytes()[1]);
                 byte[] raw = asset.toBytes(false, false);
                 assertEquals(raw.length, asset.getDataLength(false));
-                asset.setReference(new byte[64]);
+                asset.setReference(new byte[64], dbRef);
                 raw = asset.toBytes(true, false);
                 assertEquals(raw.length, asset.getDataLength(true));
 

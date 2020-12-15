@@ -1,6 +1,7 @@
 package org.erachain.core.item.statements;
 
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 
@@ -87,16 +88,22 @@ public class Note extends StatementCls {
         position += descriptionLength;
 
         byte[] reference = null;
+        long dbRef = 0;
         if (includeReference) {
             //READ REFERENCE
             reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
             position += REFERENCE_LENGTH;
+
+            //READ SEQNO
+            byte[] dbRefBytes = Arrays.copyOfRange(data, position, position + DBREF_LENGTH);
+            dbRef = Longs.fromByteArray(dbRefBytes);
+            position += DBREF_LENGTH;
         }
 
         //RETURN
         Note status = new Note(typeBytes, owner, name, icon, image, description);
         if (includeReference) {
-            status.setReference(reference);
+            status.setReference(reference, dbRef);
         }
 
         return status;

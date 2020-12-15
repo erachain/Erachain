@@ -33,10 +33,10 @@ public abstract class AddressItemRefs extends Transaction {
         ///// if (timestamp > 1000 ) setDB; // not asPaack
     }
      */
-    public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) {
-        this(typeBytes, NAME_ID, creator, item, (byte) 0, 0l, null);
+    public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature, long dbRef) {
+        this(typeBytes, NAME_ID, creator, item, (byte) 0, 0L, null);
         this.signature = signature;
-        this.item.setReference(signature);
+        this.item.setReference(signature, dbRef);
     }
 
     //GETTERS/SETTERS
@@ -127,7 +127,7 @@ public abstract class AddressItemRefs extends Transaction {
         //UPDATE CREATOR
         super.process(block, forDeal);
 
-        this.item.setReference(this.signature);
+        this.item.setReference(this.signature, dbRef);
 
         //INSERT INTO DATABASE
         this.item.insertToMap(this.dcSet, START_KEY);
@@ -174,6 +174,6 @@ public abstract class AddressItemRefs extends Transaction {
             add_fee = 3 ^ (10 - len) * 100;
         }
 
-        return calcCommonFee() + BlockChain.FEE_PER_BYTE * (500 + add_fee);
+        return super.calcBaseFee() + BlockChain.FEE_PER_BYTE * (500 + add_fee);
     }
 }

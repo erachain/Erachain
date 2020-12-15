@@ -349,7 +349,8 @@ public class TransactionCreator {
                         if (record instanceof IssuePersonRecord) {
                             IssuePersonRecord issuePerson = (IssuePersonRecord) record;
                             if (issuePerson.getItem().getName().equals(fullName)) {
-                                return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+                                record.setErrorValue("equal to " + fullName);
+                                return new Pair<Transaction, Integer>(record, Transaction.ITEM_DUPLICATE);
                             }
                         }
                     }
@@ -384,8 +385,9 @@ public class TransactionCreator {
 
         //VALIDATE AND PROCESS
         if (forIssue) {
-            if (this.fork.getTransactionFinalMapSigns().contains(person.getOwnerSignature())) {
-                return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+            if (person.getOwnerSignature() != null && this.fork.getTransactionFinalMapSigns().contains(person.getOwnerSignature())) {
+                issuePersonRecord.setErrorValue("equal to OwnerSignature " + Base58.encode(person.getOwnerSignature()));
+                return new Pair<Transaction, Integer>(issuePersonRecord, Transaction.ITEM_DUPLICATE);
             }
 
             boolean asPack = false;
@@ -419,8 +421,10 @@ public class TransactionCreator {
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
         issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
-        if (this.fork.getTransactionFinalMapSigns().contains(((PersonHuman) issuePersonRecord.getItem()).getOwnerSignature())) {
-            return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+        byte[] ownerSign = ((PersonHuman) issuePersonRecord.getItem()).getOwnerSignature();
+        if (ownerSign != null && this.fork.getTransactionFinalMapSigns().contains(ownerSign)) {
+            issuePersonRecord.setErrorValue("equal to OwnerSignature " + Base58.encode(ownerSign));
+            return new Pair<Transaction, Integer>(issuePersonRecord, Transaction.ITEM_DUPLICATE);
         }
 
         //VALIDATE AND PROCESS

@@ -4,6 +4,7 @@ package org.erachain.core.item.assets;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.datachain.DCSet;
@@ -97,6 +98,19 @@ public class AssetUnique extends AssetCls {
         String description = new String(descriptionBytes, StandardCharsets.UTF_8);
         position += descriptionLength;
 
+        byte[] reference = null;
+        long dbRef = 0;
+        if (includeReference) {
+            //READ REFERENCE
+            reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+            position += REFERENCE_LENGTH;
+
+            //READ SEQNO
+            byte[] dbRefBytes = Arrays.copyOfRange(data, position, position + DBREF_LENGTH);
+            dbRef = Longs.fromByteArray(dbRefBytes);
+            position += DBREF_LENGTH;
+        }
+
         //READ SCALE
         byte[] scaleBytes = Arrays.copyOfRange(data, position, position + SCALE_LENGTH);
         byte scale = scaleBytes[0];
@@ -104,19 +118,16 @@ public class AssetUnique extends AssetCls {
 
         //READ ASSET TYPE
         byte[] assetTypeBytes = Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH);
-        //boolean divisable = divisibleBytes[0] == 1;
         position += ASSET_TYPE_LENGTH;
 
 
         //RETURN
-        AssetUnique statement = new AssetUnique(typeBytes, owner, name, icon, image, description, assetTypeBytes[0], scale);
-
+        AssetUnique unique = new AssetUnique(typeBytes, owner, name, icon, image, description, assetTypeBytes[0], scale);
         if (includeReference) {
-            //READ REFERENCE
-            byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-            statement.setReference(reference);
+            unique.setReference(reference, dbRef);
         }
-        return statement;
+
+        return unique;
     }
 
     //GETTERS/SETTERS

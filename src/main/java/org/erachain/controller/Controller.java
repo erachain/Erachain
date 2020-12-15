@@ -3035,13 +3035,13 @@ public class Controller extends Observable {
             return new Fun.Tuple2<>(error, OnDealClick.resultMess(error));
         }
 
-        String name = (String) jsonObject.getOrDefault("name", null);
-        String description = (String) jsonObject.getOrDefault("description", null);
+        String name = (String) jsonObject.get("name");
+        String description = (String) jsonObject.get("description");
 
         byte[] icon;
-        String icon64 = (String) jsonObject.getOrDefault("icon64", null);
+        String icon64 = (String) jsonObject.get("icon64");
         if (icon64 == null) {
-            String icon58 = (String) jsonObject.getOrDefault("icon", null);
+            String icon58 = (String) jsonObject.get("icon");
             if (icon58 == null)
                 icon = null;
             else
@@ -3051,9 +3051,9 @@ public class Controller extends Observable {
         }
 
         byte[] image;
-        String image64 = (String) jsonObject.getOrDefault("image64", null);
+        String image64 = (String) jsonObject.get("image64");
         if (image64 == null) {
-            String image58 = (String) jsonObject.getOrDefault("image", null);
+            String image58 = (String) jsonObject.get("image");
             if (image58 == null)
                 image = null;
             else
@@ -3062,7 +3062,7 @@ public class Controller extends Observable {
             image = java.util.Base64.getDecoder().decode(image64);
         }
 
-        String linkToRefStr = jsonObject.get("linkTo").toString();
+        String linkToRefStr = (String) jsonObject.get("linkTo");
         ExLink linkTo;
         if (linkToRefStr == null)
             linkTo = null;
@@ -3076,9 +3076,24 @@ public class Controller extends Observable {
             }
         }
 
-        Integer scale = (Integer) jsonObject.getOrDefault("scale", 0);
-        Integer assetType = (Integer) jsonObject.getOrDefault("assetType", 0);
-        Long quantity = (Long) jsonObject.getOrDefault("quantity", 0L);
+        Integer scale = null;
+        Integer assetType = null;
+        Long quantity = null;
+        int error;
+        String errorName = null;
+        try {
+            errorName = "scale: -8...24";
+            scale = (Integer) jsonObject.getOrDefault("scale", 0);
+            errorName = "assetType: int";
+            assetType = (Integer) jsonObject.getOrDefault("assetType", 0);
+            errorName = "quantity: long";
+            quantity = (Long) jsonObject.getOrDefault("quantity", 0L);
+        } catch (Exception e) {
+            error = ApiErrorFactory.ERROR_JSON;
+            JSONObject out = new JSONObject();
+            out.put("error", error);
+            out.put("error_message", errorName);
+        }
 
         APIUtils.askAPICallAllowed(password, "POST issue Asset " + name, request, true);
         PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
@@ -3142,6 +3157,7 @@ public class Controller extends Observable {
             return result;
         }
 
+        int error;
         Fun.Tuple4<Account, Integer, String, JSONObject> transactionResult = (Fun.Tuple4<Account, Integer, String, JSONObject>) result;
         Account creator = transactionResult.a;
         int feePow = transactionResult.b;
@@ -3149,11 +3165,11 @@ public class Controller extends Observable {
         JSONObject jsonObject = transactionResult.d;
 
         if (jsonObject == null) {
-            int error = ApiErrorFactory.ERROR_JSON;
+            error = ApiErrorFactory.ERROR_JSON;
             return new Fun.Tuple2<>(error, OnDealClick.resultMess(error));
         }
 
-        String linkToRefStr = jsonObject.get("linkTo").toString();
+        String linkToRefStr = (String) jsonObject.get("linkTo");
         ExLink linkTo;
         if (linkToRefStr == null)
             linkTo = null;
@@ -3167,13 +3183,13 @@ public class Controller extends Observable {
             }
         }
 
-        String name = (String) jsonObject.getOrDefault("name", null);
-        String description = (String) jsonObject.getOrDefault("description", null);
+        String name = (String) jsonObject.get("name");
+        String description = (String) jsonObject.get("description");
 
         byte[] icon;
-        String icon64 = (String) jsonObject.getOrDefault("icon64", null);
+        String icon64 = (String) jsonObject.get("icon64");
         if (icon64 == null) {
-            String icon58 = (String) jsonObject.getOrDefault("icon", null);
+            String icon58 = (String) jsonObject.get("icon");
             if (icon58 == null)
                 icon = null;
             else
@@ -3183,9 +3199,9 @@ public class Controller extends Observable {
         }
 
         byte[] image;
-        String image64 = (String) jsonObject.getOrDefault("image64", null);
+        String image64 = (String) jsonObject.get("image64");
         if (image64 == null) {
-            String image58 = (String) jsonObject.getOrDefault("image", null);
+            String image58 = (String) jsonObject.get("image");
             if (image58 == null)
                 image = null;
             else
@@ -3194,25 +3210,71 @@ public class Controller extends Observable {
             image = java.util.Base64.getDecoder().decode(image64);
         }
 
-        Long birthday = (Long) jsonObject.getOrDefault("birthday", 0L);
-        Long deathday = (Long) jsonObject.getOrDefault("deathday", null);
-        Integer gender = (Integer) jsonObject.getOrDefault("gender", 0);
-        String race = jsonObject.getOrDefault("race", null).toString();
-        Float birthLatitude = (Float) jsonObject.getOrDefault("birthLatitude", 0.0f);
-        Float birthLongitude = (Float) jsonObject.getOrDefault("birthLongitude", 0.0f);
-        String skinColor = jsonObject.getOrDefault("skinColor", null).toString();
-        String eyeColor = jsonObject.getOrDefault("eyeColor", null).toString();
-        String hairСolor = jsonObject.getOrDefault("hairСolor", null).toString();
-        Integer height = (Integer) jsonObject.getOrDefault("height", 0);
-        String owner58 = jsonObject.getOrDefault("owner", null).toString();
-        PublicKeyAccount owner = new PublicKeyAccount(owner58);
-        String ownerSignature58 = jsonObject.getOrDefault("ownerSignature", null).toString();
-        byte[] ownerSignature = Base58.decode(ownerSignature58);
+        long birthday = 0;
+        long deathday = 0;
+        byte gender = 2;
+        String race = null;
+        float birthLatitude = 0.0f;
+        float birthLongitude = 0.0f;
+        String skinColor = null;
+        String eyeColor = null;
+        String hairСolor = null;
+        int height = 170;
+        String owner58 = null;
+        PublicKeyAccount owner = null;
+        String ownerSignature58 = null;
+        byte[] ownerSignature = null;
+
+        String errorName = null;
+        try {
+            errorName = "birthday";
+            birthday = (long) (Long) jsonObject.getOrDefault("birthday", 0L);
+            errorName = "deathday";
+            Long deathdayLong = (Long) jsonObject.get("deathday");
+            if (deathdayLong == null) {
+                deathday = birthday - 1;
+            } else {
+                birthday = deathdayLong;
+            }
+
+            errorName = "gender - man:0, wimen:1, none:2";
+            gender = (byte) (int) (long) (Long) jsonObject.get("gender");
+
+            errorName = "birthLatitude: float";
+            birthLatitude = (float) (double) (Double) jsonObject.getOrDefault("birthLatitude", 0.0f);
+            errorName = "birthLongitude: float";
+            birthLongitude = (float) (double) (Double) jsonObject.getOrDefault("birthLongitude", 0.0f);
+
+            errorName = "height: 10..250";
+            height = (int) (long) (Long) jsonObject.get("height");
+
+            race = (String) jsonObject.get("race");
+            skinColor = (String) jsonObject.get("skinColor");
+            eyeColor = (String) jsonObject.get("eyeColor");
+            hairСolor = (String) jsonObject.get("hairСolor");
+
+            owner58 = (String) jsonObject.get("owner");
+            if (owner58 != null) {
+                errorName = "owner: Base58";
+                owner = new PublicKeyAccount(owner58);
+
+                ownerSignature58 = (String) jsonObject.get("ownerSignature");
+                errorName = "ownerSignature: Base58";
+                ownerSignature = Base58.decode(ownerSignature58);
+            }
+
+        } catch (Exception e) {
+            error = ApiErrorFactory.ERROR_JSON;
+            JSONObject out = new JSONObject();
+            out.put("error", error);
+            out.put("error_message", errorName);
+            return out;
+        }
 
         APIUtils.askAPICallAllowed(password, "POST issue Person " + name, request, true);
         PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
 
-        PersonHuman person = new PersonHuman(owner, name, birthday, deathday, (byte) (int) gender,
+        PersonHuman person = new PersonHuman(owner, name, birthday, deathday, gender,
                 race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, height, icon, image, description,
                 ownerSignature);
