@@ -441,16 +441,24 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     }
 
+    @Override
+    public String viewFullTypeName() {
+        return viewActionType();
+    }
+
     public String viewActionType() {
         if (asset == null)
             return "mail";
-        return viewActionType(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
+
+        //return viewActionType(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
+        return asset.viewAssetTypeAction(isBackward(), getActionType(), creator == null ? false : asset.getOwner().equals(creator));
     }
 
     public String viewActionTypeWas() {
         if (asset == null)
             return "mail";
-        return viewActionTypeWas(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
+        //return viewActionTypeWas(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
+        return asset.viewAssetTypeActionOK(isBackward(), getActionType(), creator == null ? false : asset.getOwner().equals(creator));
     }
 
 
