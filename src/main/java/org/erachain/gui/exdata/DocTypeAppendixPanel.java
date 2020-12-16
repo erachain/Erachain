@@ -61,21 +61,18 @@ public class DocTypeAppendixPanel extends JPanel {
                         parentDetails.setVisible(true);
                         switch (item) {
                             case ExData.LINK_APPENDIX_TYPE:
-                                labelTitle.setText(Lang.getInstance().translate("Set parent Document for Appendix")
-                                        + ".\n\n" + Lang.getInstance().translate("This will be reset Recipients list to involved accounts list by default")
-                                        + ".\n" + Lang.getInstance().translate("But You may edit Recipients list"));
+                                labelTitle.setText(Lang.getInstance().translate("Set parent Transaction for Appendix below")
+                                        + ".\n\n" + Lang.getInstance().translate("LINK_APPENDIX_TYPE"));
                                 estimationPanel.setVisible(false);
                                 break;
                             case ExData.LINK_REPLY_COMMENT_TYPE:
-                                labelTitle.setText(Lang.getInstance().translate("Set parent Document for Reply")
-                                        + ".\n\n" + Lang.getInstance().translate("This will be reset Recipients list to involved accounts list by default")
-                                        + "\n" + Lang.getInstance().translate("But You may edit Recipients list"));
+                                labelTitle.setText(Lang.getInstance().translate("Set parent Transaction for Reply below")
+                                        + ".\n\n" + Lang.getInstance().translate("LINK_REPLY_COMMENT_TYPE"));
                                 estimationPanel.setVisible(BlockChain.TEST_MODE);
-                                 break;
+                                break;
                             case ExData.LINK_COMMENT_TYPE_FOR_VIEW:
-                                labelTitle.setText(Lang.getInstance().translate("Set parent Document for Comment")
-                                        + ".\n\n" + Lang.getInstance().translate("This will erase Recipients list by default")
-                                        + ".\n" + Lang.getInstance().translate("But You may edit Recipients list"));
+                                labelTitle.setText(Lang.getInstance().translate("Set parent Transaction for Comment below")
+                                        + ".\n\n" + Lang.getInstance().translate("LINK_COMMENT_TYPE_FOR_VIEW"));
                                 estimationPanel.setVisible(BlockChain.TEST_MODE);
                                 break;
                             default:
