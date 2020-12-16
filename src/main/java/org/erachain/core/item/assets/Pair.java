@@ -33,27 +33,38 @@ public class Pair {
     private int countHave;
     private int countWant;
 
+    private BigDecimal bidPrice;
+    private BigDecimal askPrice;
+
     private BigDecimal volume24Have;
     private BigDecimal volume24Want;
 
-    private BigDecimal avgPrice;
+    private BigDecimal lastPrice;
+    private long lastTime;
 
     // make trading if two orders is seeked
-    public Pair(Long assetKey1, Long assetKey2, BigDecimal amountHave, BigDecimal volumeWant, int haveAssetScale, int wantAssetScale,
-                int countHave, int countWant, BigDecimal volume24Have, BigDecimal avgPrice) {
+    public Pair(Long assetKey1, Long assetKey2, int haveAssetScale, int wantAssetScale, BigDecimal bidPrice, BigDecimal askPrice,
+                BigDecimal volumeHave, BigDecimal volumeWant,
+                int countHave, int countWant, BigDecimal volume24Have, BigDecimal volume24Want, BigDecimal lastPrice, long lastTime) {
         this.assetKey1 = assetKey1;
         this.assetKey2 = assetKey2;
-
-        this.volumeHave = amountHave;
-        this.volumeWant = volumeWant;
         this.haveAssetScale = haveAssetScale;
         this.wantAssetScale = wantAssetScale;
+
+        this.volumeHave = volumeHave;
+        this.volumeWant = volumeWant;
 
         this.countHave = countHave;
         this.countWant = countWant;
 
+        this.bidPrice = bidPrice;
+        this.askPrice = askPrice;
+
         this.volume24Have = volume24Have;
-        this.avgPrice = avgPrice;
+        this.volume24Want = volume24Want;
+
+        this.lastPrice = lastPrice;
+        this.lastTime = lastTime;
     }
 
     public String viewID() {
@@ -63,20 +74,17 @@ public class Pair {
     public Long getAssetKey1() {
         return this.assetKey1;
     }
-
     public Long getAssetKey2() {
         return this.assetKey2;
     }
 
     public static Pair get(DCSet db, Long assetKey1, Long assetKey2) {
-
         return db.getPairMap().get(TradeMapImpl.key);
     }
 
     public int getCountHave() {
         return this.countHave;
     }
-
     public int getCountWant() {
         return this.countWant;
     }
@@ -93,8 +101,24 @@ public class Pair {
         return volume24Have;
     }
 
-    public BigDecimal getAvgPrice() {
-        return avgPrice;
+    public BigDecimal getVolume24Want() {
+        return volume24Want;
+    }
+
+    public BigDecimal getBidPrice() {
+        return this.bidPrice;
+    }
+
+    public BigDecimal getAskPrice() {
+        return this.askPrice;
+    }
+
+    public BigDecimal getLastPrice() {
+        return lastPrice;
+    }
+
+    public long getLastTime() {
+        return lastTime;
     }
 
     @SuppressWarnings("unchecked")
@@ -104,6 +128,8 @@ public class Pair {
         pair.put("id", viewID());
         pair.put("assetKey1", Transaction.viewDBRef(assetKey1));
         pair.put("assetKey2", Transaction.viewDBRef(assetKey2));
+
+        pair.put("lastTime", lastTime);
 
         if (keyForBuySell == 0 || keyForBuySell == assetKey1) {
 
@@ -115,22 +141,29 @@ public class Pair {
             pair.put("countHave", countHave);
             pair.put("countWant", countWant);
 
-            pair.put("amountHave", volumeWant);
-            pair.put("amountWant", volumeHave);
+            pair.put("volumeHave", volumeHave);
+            pair.put("volumeWant", volumeWant);
 
-            pair.put("avgPrice", avgPrice);
-            pair.put("volume24", volume24Have);
+            pair.put("volume24Have", volume24Have);
+            pair.put("volume24Want", volume24Want);
+
+            pair.put("lastPrice", lastPrice);
         } else {
             pair.put("type", "buy");
 
             pair.put("countHave", countWant);
             pair.put("countWant", countHave);
 
-            pair.put("amountHave", volumeHave);
-            pair.put("amountWant", volumeWant);
+            pair.put("volumeHave", volumeWant);
+            pair.put("volumeWant", volumeHave);
 
-            pair.put("avgPrice", BigDecimal.ONE.divide(avgPrice, wantAssetScale, RoundingMode.HALF_DOWN).stripTrailingZeros());
-            pair.put("volume24", volume24Have);
+            pair.put("volume24Have", volume24Want);
+            pair.put("volume24Want", volume24Have);
+
+            pair.put("bid", askPrice);
+            pair.put("ask", bidPrice);
+
+            pair.put("lastPrice", BigDecimal.ONE.divide(lastPrice, wantAssetScale, RoundingMode.HALF_DOWN).stripTrailingZeros());
 
         }
 
@@ -148,38 +181,53 @@ public class Pair {
 
         int position = 0;
 
-        //READ INITIATOR
-        byte[] initiatorBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
-        Long initiator = Longs.fromByteArray(initiatorBytes);
-        position += ORDER_LENGTH;
-
-        //READ TARGET
-        byte[] targetBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
-        Long target = Longs.fromByteArray(targetBytes);
-        position += ORDER_LENGTH;
-
-        //READ HAVE
-        byte[] haveBytes = Arrays.copyOfRange(data, position, position + ASSET_KEY_LENGTH);
-        Long haveKey = Longs.fromByteArray(haveBytes);
+        //READ ASSET 1 KEY
+        byte[] assetKey1Bytes = Arrays.copyOfRange(data, position, position + ASSET_KEY_LENGTH);
+        Long assetKey1 = Longs.fromByteArray(assetKey1Bytes);
         position += ASSET_KEY_LENGTH;
 
-        //READ WANT
-        byte[] wantBytes = Arrays.copyOfRange(data, position, position + ASSET_KEY_LENGTH);
-        Long wantKey = Longs.fromByteArray(wantBytes);
+        //READ ASSET 2 KEY
+        byte[] assetKey2Bytes = Arrays.copyOfRange(data, position, position + ASSET_KEY_LENGTH);
+        Long assetKey2 = Longs.fromByteArray(assetKey2Bytes);
         position += ASSET_KEY_LENGTH;
 
         //READ HAVE SCALE
         byte scaleHave = Arrays.copyOfRange(data, position, position + 1)[0];
         position++;
 
-        //READ AMOUNT HAVE
-        byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-        BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), scaleHave);
-        position += AMOUNT_LENGTH;
-
-        //READ HAVE SCALE
+        //READ WANT SCALE
         byte scaleWant = Arrays.copyOfRange(data, position, position + 1)[0];
         position++;
+
+        //READ HAVE VOLUME
+        byte[] volumeHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+        BigDecimal volumeHave = new BigDecimal(new BigInteger(volumeHaveBytes), scaleHave);
+        position += AMOUNT_LENGTH;
+
+        //READ WANT VOLUME
+        byte[] volumeWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+        BigDecimal volumeWant = new BigDecimal(new BigInteger(volumeWantBytes), scaleWant);
+        position += AMOUNT_LENGTH;
+
+        //READ COUNT HAVE
+        byte[] countHaveBytes = Arrays.copyOfRange(data, position, position + Integer.BYTES);
+        int countHave = Ints.fromByteArray(countHaveBytes);
+        position += Integer.BYTES;
+
+        //READ COUNT WANT
+        byte[] countWantBytes = Arrays.copyOfRange(data, position, position + Integer.BYTES);
+        int countWant = Ints.fromByteArray(countWantBytes);
+        position += Integer.BYTES;
+
+        //READ BID PRICE
+        byte[] bidBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+        BigDecimal bidPrice = new BigDecimal(new BigInteger(bidBytes), scaleHave);
+        position += AMOUNT_LENGTH;
+
+        //READ ASK PRICE
+        byte[] askBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+        BigDecimal askPrice = new BigDecimal(new BigInteger(askBytes), scaleWant);
+        position += AMOUNT_LENGTH;
 
         //READ AMOUNT WANT
         byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
@@ -195,7 +243,7 @@ public class Pair {
         byte[] sequenceBytes = Arrays.copyOfRange(data, position, position + SEQUENCE_LENGTH);
         int sequence = Ints.fromByteArray(sequenceBytes);
 
-        return new Pair(initiator, target, haveKey, wantKey, amountHave, amountWant, haveAssetScale, wantAssetScale, sequence);
+        return new Pair(assetKey1, assetKey2, haveAssetScale, wantAssetScale, aamountHave, amountWant, haveAssetScale, wantAssetScale, sequence);
     }
 
     public byte[] toBytes() {
