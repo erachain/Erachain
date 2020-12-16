@@ -287,7 +287,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         }
 
         if (asset.viewAssetTypeAction(backward, balancePosition, senderIsOwner) == null) {
-            // Это возможно если был выбран актив с типом одним а потом выбрали другой - а для такого действия у него нету
+            // Это возможно если был выбран актив уже внутри формы, а у него тип для которого текущего действия нету
             jButton_ok.setEnabled(false);
             jButton_ok.setText(Lang.getInstance().translate("Wrong Action"));
             return;
