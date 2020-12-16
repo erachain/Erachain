@@ -348,33 +348,59 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public boolean isBackward() {
         return typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
     }
-    
+
     /*
      * ************** VIEW
      */
-    
+
     @Override
     public String viewTypeName() {
-        if (this.amount == null || this.amount.signum() == 0)
+        return viewTypeName(this.amount, isBackward());
+    }
+
+    public static String viewTypeName(BigDecimal amount, boolean isBackward) {
+        if (amount == null || amount.signum() == 0)
             return "LETTER";
-        
-        if (this.isBackward()) {
+
+        if (isBackward) {
             return "backward";
         } else {
             return "SEND";
         }
     }
-    
+
     @Override
     public String viewSubTypeName() {
-        return viewActionType();
+        return viewSubTypeName(key, amount, isBackward(), asset.isDirectBalances());
     }
-    
+
+    public static String viewSubTypeName(long assetKey, BigDecimal amount, boolean isBackward, boolean isDirect) {
+
+        if (amount == null || amount.signum() == 0)
+            return "";
+
+        int actionType = Account.balancePosition(assetKey, amount, isBackward, isDirect);
+
+        switch (actionType) {
+            case ACTION_SEND:
+                return NAME_ACTION_TYPE_PROPERTY;
+            case ACTION_DEBT:
+                return NAME_CREDIT;
+            case ACTION_HOLD:
+                return NAME_ACTION_TYPE_HOLD;
+            case ACTION_SPEND:
+                return NAME_SPEND;
+        }
+
+        return "???";
+
+    }
+
     @Override
     public String viewAmount() {
         if (this.amount == null)
             return "";
-        
+
         if (this.amount.signum() < 0) {
             return this.amount.negate().toPlainString();
         } else {
@@ -397,50 +423,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return NumberAsString.formatAsString(getAmount(address));
     }
 
-    public static String viewActionType(long assetKey, BigDecimal amount, boolean isBackward, boolean isDirect) {
-
-        if (amount == null || amount.signum() == 0)
-            return "";
-
-        int actionType = Account.balancePosition(assetKey, amount, isBackward, isDirect);
-
-        switch (actionType) {
-            case ACTION_SEND:
-                return NAME_ACTION_TYPE_PROPERTY;
-            case ACTION_DEBT:
-                return NAME_CREDIT;
-            case ACTION_HOLD:
-                return NAME_ACTION_TYPE_HOLD;
-            case ACTION_SPEND:
-                return NAME_SPEND;
-        }
-
-        return "???";
-
-    }
-
-    public static String viewActionTypeWas(long assetKey, BigDecimal amount, boolean isBackward, boolean isDirect) {
-
-        if (amount == null || amount.signum() == 0)
-            return "";
-
-        int actionType = Account.balancePosition(assetKey, amount, isBackward, isDirect);
-
-        switch (actionType) {
-            case ACTION_SEND:
-                return NAME_ACTION_TYPE_PROPERTY_WAS;
-            case ACTION_DEBT:
-                return NAME_CREDIT_WAS;
-            case ACTION_HOLD:
-                return NAME_ACTION_TYPE_HOLD_WAS;
-            case ACTION_SPEND:
-                return NAME_SPEND_WAS;
-        }
-
-        return "???";
-
-    }
-
     @Override
     public String viewFullTypeName() {
         return viewActionType();
@@ -453,14 +435,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         //return viewActionType(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
         return asset.viewAssetTypeAction(isBackward(), getActionType(), creator == null ? false : asset.getOwner().equals(creator));
     }
-
-    public String viewActionTypeWas() {
-        if (asset == null)
-            return "mail";
-        //return viewActionTypeWas(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
-        return asset.viewAssetTypeActionOK(isBackward(), getActionType(), creator == null ? false : asset.getOwner().equals(creator));
-    }
-
 
     // PARSE/CONVERT
     // @Override
@@ -514,7 +488,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             transaction.put("assetKey", this.getAbsKey());
             transaction.put("amount", this.amount.toPlainString());
             transaction.put("actionKey", this.getActionType());
-            transaction.put("actionName", this.viewActionType());
+            transaction.put("actionName", viewActionType());
             if (this.isBackward())
                 transaction.put("backward", this.isBackward());
         }

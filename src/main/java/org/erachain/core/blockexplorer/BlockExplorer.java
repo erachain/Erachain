@@ -3436,7 +3436,7 @@ public class BlockExplorer {
                         }
 
                         String message = txCalculated.getMessage();
-                        String typeName = transaction.viewFullTypeName();
+                        String typeName = Lang.getInstance().translateFromLangObj(transaction.viewFullTypeName(), langObj);
                         out.put("type", typeName);
 
                         if (typeName.equals("_protocol_")) {
@@ -3455,7 +3455,7 @@ public class BlockExplorer {
                     } else {
                         out.put("signature", Base58.encode(transaction.getSignature()));
                         out.put("timestamp", transaction.getTimestamp());
-                        String typeName = transaction.viewFullTypeName();
+                        String typeName = Lang.getInstance().translateFromLangObj(transaction.viewFullTypeName(), langObj);
                         out.put("type", typeName);
 
                         if (transaction.getCreator() == null) {
