@@ -26,6 +26,7 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.models.AccountsComboBoxModel;
+import org.erachain.gui.models.FavoriteComboBoxModel;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
@@ -34,7 +35,6 @@ import org.erachain.utils.MenuPopupUtil;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
@@ -144,6 +144,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // favorite combo box
         jComboBox_Asset.setModel(new ComboBoxAssetsModel());
+        jComboBox_Asset.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
         jComboBox_Asset.setEditable(false);
         //this.jComboBox_Asset.setEnabled(assetIn != null);
 
@@ -244,7 +245,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // CONTEXT MENU
         MenuPopupUtil.installContextMenu(this.jTextField_Amount);
-        MenuPopupUtil.installContextMenu(this.jTextArea_Description);
+        MenuPopupUtil.installContextMenu(this.jTextArea_Message);
         //MenuPopupUtil.installContextMenu(this.jlabel_RecipientDetail);
         jTextArea_Account_Description.setWrapStyleWord(true);
         jTextArea_Account_Description.setLineWrap(true);
@@ -455,7 +456,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             return false;
         }
 
-        this.message = jTextArea_Description.getText();
+        this.message = jTextArea_Message.getText();
 
         isTextB = true;
         messageBytes = null;
@@ -608,7 +609,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jTextFieldTXTitle = new javax.swing.JTextField();
         jLabel_Mess = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea_Description = new javax.swing.JTextArea();
+        jTextArea_Message = new javax.swing.JTextArea();
         jCheckBox_Encript = new javax.swing.JCheckBox();
         jLabel_Asset = new javax.swing.JLabel();
         jLabel_AssetType = new javax.swing.JLabel();
@@ -684,10 +685,10 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         labelGBC.gridy = ++gridy;
         add(jLabel_Mess, labelGBC);
 
-        jTextArea_Description.setColumns(20);
-        jTextArea_Description.setRows(5);
-        jTextArea_Description.setText(message == null ? "" : message);
-        jScrollPane1.setViewportView(jTextArea_Description);
+        jTextArea_Message.setColumns(20);
+        jTextArea_Message.setRows(5);
+        jTextArea_Message.setText(message == null ? "" : message);
+        jScrollPane1.setViewportView(jTextArea_Message);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = fieldGBC.gridx;
@@ -695,7 +696,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         gridBagConstraints.gridwidth = fieldGBC.gridwidth;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = fieldGBC.weightx;
-        gridBagConstraints.weighty = 0.2;
+        gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = fieldGBC.insets;
         add(jScrollPane1, gridBagConstraints);
 
@@ -710,10 +711,13 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         fieldGBC.gridy = ++gridy;
         add(jLabel_AssetType, fieldGBC);
 
+        labelGBC.gridy = ++gridy;
+        add(jLabel_Amount, labelGBC);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = fieldGBC.gridx;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = fieldGBC.insets;
@@ -721,9 +725,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         jLabel_AmountHave.setHorizontalAlignment(SwingConstants.RIGHT);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 10;
+        gridBagConstraints.gridx = fieldGBC.gridx + 4;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+        gridBagConstraints.insets = fieldGBC.insets;
         add(jLabel_AmountHave, gridBagConstraints);
 
         labelGBC.gridy = ++gridy;
@@ -737,35 +741,38 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         add(exLinkTextLabel, labelGBC);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = fieldGBC.gridx;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.3;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = fieldGBC.insets;
         add(exLinkText, gridBagConstraints);
 
+        exLinkDescriptionLabel.setText(Lang.getInstance().translate("Parent") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridx = fieldGBC.gridx + 1;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = fieldGBC.insets;
         add(exLinkDescriptionLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 10;
+        gridBagConstraints.gridx = fieldGBC.gridx + 3;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.gridwidth = 10;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.3;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
+        gridBagConstraints.weightx = 0.7;
+        gridBagConstraints.insets = fieldGBC.insets;
         add(exLinkDescription, gridBagConstraints);
 
-        // exlink
-
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 16;
-        gridBagConstraints.gridy = 22;
+        gridBagConstraints.gridx = fieldGBC.gridx + 10;
+        gridBagConstraints.gridy = gridy + 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.7;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(7, 0, 15, 15);
         add(jButton_ok, gridBagConstraints);
 
@@ -806,7 +813,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea_Account_Description;
-    public javax.swing.JTextArea jTextArea_Description;
+    public javax.swing.JTextArea jTextArea_Message;
     public MDecimalFormatedTextField jTextField_Amount;
     public javax.swing.JTextField jTextFieldTXTitle;
     private javax.swing.JLabel jlabel_RecipientDetail;
