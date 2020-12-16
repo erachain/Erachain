@@ -719,6 +719,10 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType == AS_SELF_ACCOUNTING_CASH_FUND;
     }
 
+    public boolean isChangeDebtBySpendActions() {
+        return isOutsideType();
+    }
+
     /**
      * Если обратный Послать то в меню местами меняем
      *

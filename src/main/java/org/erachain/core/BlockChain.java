@@ -471,7 +471,7 @@ public class BlockChain {
     /**
      * Новый уровень начальных номеров для всех сущностей
      */
-    public static int START_KEY_UP = MAIN_MODE ? 1700000 : DEMO_MODE ? 12500 : Integer.MAX_VALUE;
+    public static int START_KEY_UP = MAIN_MODE ? 1700000 : DEMO_MODE ? 22500 : Integer.MAX_VALUE;
     public static int START_KEY_UO_ITEMS = 1 << 15;
 
     //private int target = 0;

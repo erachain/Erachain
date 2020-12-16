@@ -1269,11 +1269,17 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // STANDARD ACTION PROCESS
         processAction(dcSet, false, creator, recipient, actionType, absKey, key, amount, backward, isDirect, incomeReverse);
 
-        if (asset.isChangeDebtBySendActions() && actionType == ACTION_SEND) {
+        if (actionType == ACTION_SEND && asset.isChangeDebtBySendActions()) {
             // если это актив который должен поменять и балансы Долговые то
             processAction(dcSet, false, creator, recipient, ACTION_DEBT,
                     absKey, -key, amount, backward, isDirect, incomeReverse);
+        } else if (actionType == ACTION_SPEND && asset.isChangeDebtBySpendActions()) {
+            // если это актив в Требованием Исполнения - то подтверждение Исполнения уменьшит и Требование Исполнения
+            // Но ПОЛУЧАТЕЛЬ - у нас создатель Актива
+            processAction(dcSet, false, creator, asset.getOwner(), ACTION_DEBT,
+                    absKey, key, amount.negate(), backward, isDirect, incomeReverse);
         }
+
 
         if (absKey == Transaction.RIGHTS_KEY && block != null) {
             block.addForgingInfoUpdate(this.recipient);
@@ -1313,10 +1319,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // STANDARD ACTION ORPHAN
         processAction(dcSet, true, creator, recipient, actionType, absKey, key, amount, backward, isDirect, incomeReverse);
 
-        if (asset.isChangeDebtBySendActions() && actionType == ACTION_SEND) {
+        if (actionType == ACTION_SEND && asset.isChangeDebtBySendActions()) {
             // если это актив который должен поменять и балансы Долговые то
             processAction(dcSet, true, creator, recipient, ACTION_DEBT,
                     absKey, -key, amount, backward, isDirect, incomeReverse);
+        } else if (actionType == ACTION_SPEND && asset.isChangeDebtBySpendActions()) {
+            // если это актив в Требованием Исполнения - то подтверждение Исполнения уменьшит и Требование Исполнения
+            processAction(dcSet, true, creator, asset.getOwner(), ACTION_DEBT,
+                    absKey, key, amount.negate(), backward, isDirect, incomeReverse);
         }
 
         if (absKey == Transaction.RIGHTS_KEY && block != null) {
