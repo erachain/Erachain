@@ -65,11 +65,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     public AssetCls asset;
 
-    //public String title;
-
     public long key;
 
-    public String head;
+    public String txTitle;
 
     public byte[] isTextByte;
 
@@ -286,6 +284,13 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         boolean recipientIsOwner = false;
         if (recipient != null) {
             recipientIsOwner = recipient.equals(asset.getOwner());
+        }
+
+        if (asset.viewAssetTypeAction(backward, balancePosition, senderIsOwner) == null) {
+            // Это возможно если был выбран актив с типом одним а потом выбрали другой - а для такого действия у него нету
+            jButton_ok.setEnabled(false);
+            jButton_ok.setText(Lang.getInstance().translate("Wrong Action"));
+            return;
         }
 
         String title = Lang.getInstance().translate(asset.viewAssetTypeActionTitle(backward, balancePosition, senderIsOwner));
@@ -530,10 +535,10 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                 messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
             }
         }
-        head = this.jTextFieldTXTitle.getText();
-        if (head == null)
-            head = "";
-        if (head.getBytes(StandardCharsets.UTF_8).length > 256) {
+        txTitle = this.jTextFieldTXTitle.getText();
+        if (txTitle == null)
+            txTitle = "";
+        if (txTitle.getBytes(StandardCharsets.UTF_8).length > 256) {
 
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Title size exceeded!") + " <= 256", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             return false;
@@ -572,7 +577,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send((byte) 2, backward ? TransactionAmount.BACKWARD_MASK : 0,
                 (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, feePow,
-                recipient, getAssetKey(), getAmount(), head, messageBytes, isTextByte, encrypted);
+                recipient, getAssetKey(), getAmount(), txTitle, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";
         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,

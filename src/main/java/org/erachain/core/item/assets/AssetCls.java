@@ -1615,7 +1615,7 @@ public abstract class AssetCls extends ItemCls {
                 return "Spender";
         }
 
-        return "unknown";
+        return null;
     }
 
     public String viewAssetTypeActionOK(boolean backward, int actionType, boolean isCreatorOwner) {
