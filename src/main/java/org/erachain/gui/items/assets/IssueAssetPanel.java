@@ -85,19 +85,16 @@ public class IssueAssetPanel extends IssueItemPanel {
         textareasAssetTypeDescription.setBackground(this.getBackground());
         textareasAssetTypeDescription.setContentType("text/html");
 
-        JScrollPane scrollPaneAssetTypeDescription = new JScrollPane();
-        scrollPaneAssetTypeDescription.setViewportView(textareasAssetTypeDescription);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = fieldGBC.gridx;
         gridBagConstraints.gridy = gridy;
         gridBagConstraints.gridwidth = fieldGBC.gridwidth;
         gridBagConstraints.anchor = fieldGBC.anchor;
-        gridBagConstraints.fill = fieldGBC.fill;
-        gridBagConstraints.weighty = fieldGBC.weighty;
-        gridBagConstraints.weightx = fieldGBC.weightx;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 0.3;
+        gridBagConstraints.weightx = 0.3;
         gridBagConstraints.insets = fieldGBC.insets;
-        jPanelAdd.add(scrollPaneAssetTypeDescription, gridBagConstraints);
+        jPanelAdd.add(textareasAssetTypeDescription, gridBagConstraints);
 
         ////
         labelGBC.gridy = ++gridy;
