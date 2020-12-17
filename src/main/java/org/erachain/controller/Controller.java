@@ -3225,6 +3225,9 @@ public class Controller extends Observable {
         String ownerSignature58 = null;
         byte[] ownerSignature = null;
 
+        APIUtils.askAPICallAllowed(password, "POST issue Person " + name, request, true);
+        PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
+
         String errorName = null;
         try {
             errorName = "birthday";
@@ -3254,7 +3257,9 @@ public class Controller extends Observable {
             hairСolor = (String) jsonObject.get("hairСolor");
 
             owner58 = (String) jsonObject.get("owner");
-            if (owner58 != null) {
+            if (owner58 == null) {
+                owner = new PublicKeyAccount(creatorPrivate.getPublicKey());
+            } else {
                 errorName = "owner: Base58";
                 owner = new PublicKeyAccount(owner58);
 
@@ -3270,9 +3275,6 @@ public class Controller extends Observable {
             out.put("error_message", errorName);
             return out;
         }
-
-        APIUtils.askAPICallAllowed(password, "POST issue Person " + name, request, true);
-        PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
 
         PersonHuman person = new PersonHuman(owner, name, birthday, deathday, gender,
                 race, birthLatitude, birthLongitude,
