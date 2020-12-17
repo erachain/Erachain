@@ -27,7 +27,7 @@ public class IssueAssetPanel extends IssueItemPanel {
     private JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
     private JComboBox<String> textScale = new JComboBox<>();
 
-    private JTextPane textareasAssetTypeDescription = new JTextPane();
+    private JTextPane textareasAssetTypeDescription;
     private MDecimalFormatedTextField textQuantity = new MDecimalFormatedTextField();
 
     private AssetTypesComboBoxModel assetTypesComboBoxModel;
@@ -42,12 +42,9 @@ public class IssueAssetPanel extends IssueItemPanel {
         textScale.setSelectedIndex(8);
 
         initComponents();
+
         textQuantity.setMaskType(textQuantity.maskLong);
         textQuantity.setText("0");
-
-        textareasAssetTypeDescription.setEditable(false);
-        textareasAssetTypeDescription.setBackground(this.getBackground());
-        textareasAssetTypeDescription.setContentType("text/html");
 
         // select combobox Asset type
         assetTypeJComboBox.addActionListener(e -> {
@@ -83,19 +80,24 @@ public class IssueAssetPanel extends IssueItemPanel {
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(assetTypeJComboBox, fieldGBC);
 
-        //JScrollPane scrollPaneAssetTypeDescription = new JScrollPane();
-        //scrollPaneAssetTypeDescription.setViewportView(textareasAssetTypeDescription);
+        textareasAssetTypeDescription = new JTextPane();
+        textareasAssetTypeDescription.setEditable(false);
+        textareasAssetTypeDescription.setBackground(this.getBackground());
+        textareasAssetTypeDescription.setContentType("text/html");
+
+        JScrollPane scrollPaneAssetTypeDescription = new JScrollPane();
+        scrollPaneAssetTypeDescription.setViewportView(textareasAssetTypeDescription);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = fieldGBC.gridx;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.gridwidth = 10;
+        gridBagConstraints.gridwidth = fieldGBC.gridwidth;
         gridBagConstraints.anchor = fieldGBC.anchor;
         gridBagConstraints.fill = fieldGBC.fill;
-        gridBagConstraints.weighty = 0.4;
-        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = fieldGBC.weighty;
+        gridBagConstraints.weightx = fieldGBC.weightx;
         gridBagConstraints.insets = fieldGBC.insets;
-        jPanelAdd.add(textareasAssetTypeDescription, gridBagConstraints);
+        jPanelAdd.add(scrollPaneAssetTypeDescription, gridBagConstraints);
 
         ////
         labelGBC.gridy = ++gridy;

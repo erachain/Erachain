@@ -92,6 +92,7 @@ public class DocTypeAppendixPanel extends JPanel {
         labelDocType = new JLabel();
         filler1 = new Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 32767));
+
         typeDescription = new JTextPane();
         typeDescription.setEditable(false);
         typeDescription.setBackground(this.getBackground());
