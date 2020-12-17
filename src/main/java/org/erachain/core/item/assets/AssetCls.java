@@ -640,9 +640,13 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public boolean isOutsideType() {
+        return isOutsideType(this.assetType);
+    }
+
+    public static boolean isOutsideType(int assetType) {
         return // ?? this.assetType == AS_OUTSIDE_GOODS ||
-                this.assetType >= AS_OUTSIDE_CURRENCY
-                        && this.assetType <= AS_OUTSIDE_OTHER_CLAIM;
+                assetType >= AS_OUTSIDE_CURRENCY
+                        && assetType <= AS_OUTSIDE_OTHER_CLAIM;
     }
 
     public boolean isOutsideCurrency() {
@@ -719,8 +723,12 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType == AS_SELF_ACCOUNTING_CASH_FUND;
     }
 
+    public static boolean isChangeDebtBySpendActions(int assetType) {
+        return isOutsideType(assetType);
+    }
+
     public boolean isChangeDebtBySpendActions() {
-        return isOutsideType();
+        return isChangeDebtBySpendActions(this.assetType);
     }
 
     /**
@@ -1338,6 +1346,11 @@ public abstract class AssetCls extends ItemCls {
                         return "AS_SELF_SEND_ADDITIONAL_ACT_DEBT";
                 }
         }
+
+        if (isChangeDebtBySpendActions(assetType)) {
+            return "AdditionAction_on_isChangeDebtBySpendActions";
+        }
+
         return null;
     }
 

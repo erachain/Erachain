@@ -172,6 +172,7 @@
   "AS_MY_DEBT_4": "Confirm loan repayment",
   "AS_MY_DEBT_4B": "Cancel loan repayment (reverse)",
   "AS_SELF_SEND_ADDITIONAL_ACT_DEBT": "Action on 'Own' balance update 'Debt' balance too",
+  "AdditionAction_on_isChangeDebtBySpendActions": "Confirm Execution action also reduces Execution Requirements",
   "Asset Details": "Asset details",
   "Asset Exchange": "Asset exchange",
   "Asset issue has been sent!": "Asset has been sent!",

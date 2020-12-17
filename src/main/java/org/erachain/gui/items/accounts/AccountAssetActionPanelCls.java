@@ -294,16 +294,17 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         }
 
         String title = Lang.getInstance().translate(asset.viewAssetTypeActionTitle(backward, balancePosition, senderIsOwner));
-        jLabel_Title.setText(title + " - " + asset.viewName());
-
-        setName(title + " ]" + asset.getKey() + " ]");
         String addAssetType = asset.viewAssetTypeAdditionAction(backward, balancePosition, senderIsOwner);
         if (addAssetType == null) {
-            jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition, senderIsOwner)));
+            jLabel_Title.setText(title + " - " + asset.viewName());
         } else {
-            jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition, senderIsOwner))
+            jLabel_Title.setText(title + " - " + asset.viewName()
                     + " (" + Lang.getInstance().translate(addAssetType) + ")");
         }
+
+        setName(title + " ]" + asset.getKey() + " ]");
+
+        jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition, senderIsOwner)));
 
         this.jLabel_Account.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, balancePosition, senderIsOwner)) + ":");
 
