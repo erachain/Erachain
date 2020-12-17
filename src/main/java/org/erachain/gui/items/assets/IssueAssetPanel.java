@@ -11,7 +11,6 @@ import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * @author Саша
@@ -85,16 +84,17 @@ public class IssueAssetPanel extends IssueItemPanel {
         jPanelAdd.add(assetTypeJComboBox, fieldGBC);
 
         //JScrollPane scrollPaneAssetTypeDescription = new JScrollPane();
-
         //scrollPaneAssetTypeDescription.setViewportView(textareasAssetTypeDescription);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridy;//0;
+        gridBagConstraints.gridx = fieldGBC.gridx;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.gridwidth = 10;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 0);
+        gridBagConstraints.anchor = fieldGBC.anchor;
+        gridBagConstraints.fill = fieldGBC.fill;
+        gridBagConstraints.weighty = 0.4;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = fieldGBC.insets;
         jPanelAdd.add(textareasAssetTypeDescription, gridBagConstraints);
 
         ////

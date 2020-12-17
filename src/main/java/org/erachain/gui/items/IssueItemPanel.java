@@ -132,7 +132,6 @@ public abstract class IssueItemPanel extends IconPanel {
         jPanelLeft.setLayout(new java.awt.GridBagLayout());
 
         labelGBC = new java.awt.GridBagConstraints();
-        labelGBC.gridy = 4;
         labelGBC.gridwidth = 3;
         labelGBC.anchor = java.awt.GridBagConstraints.EAST;
         labelGBC.insets = new java.awt.Insets(0, 0, 5, 0);
@@ -340,15 +339,15 @@ public abstract class IssueItemPanel extends IconPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 19;
-        // gridBagConstraints.gridheight = 7;
+        gridBagConstraints.gridwidth = fieldGBC.gridwidth;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.weighty = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
+        gridBagConstraints.insets = fieldGBC.insets;
         jPanelMain.add(jScrollPane1, gridBagConstraints);
 
         fieldGBC.gridy = y;
+        fieldGBC.insets = new java.awt.Insets(10, 5, 15, 5);
         jPanelMain.add(issueJButton, fieldGBC);
 
     }
