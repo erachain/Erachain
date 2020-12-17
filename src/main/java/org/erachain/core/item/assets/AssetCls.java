@@ -823,11 +823,11 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_MANAGED_ACCOUNTING:
                 return "Self Managed";
             case AS_SELF_ACCOUNTING_LOAN:
-                return "Accounting Loan";
+                return "AS_SELF_ACCOUNTING_LOAN_N";
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
-                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_NF";
+                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_N";
             case AS_SELF_ACCOUNTING_CASH_FUND:
-                return "AS_SELF_ACCOUNTING_CASH_FUND_NF";
+                return "AS_SELF_ACCOUNTING_CASH_FUND_N";
 
         }
         return null;
@@ -890,7 +890,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_MANAGED_ACCOUNTING:
                 return "Self Managed for Accounting";
             case AS_SELF_ACCOUNTING_LOAN:
-                return "Accounting Loan for Debtor";
+                return "AS_SELF_ACCOUNTING_LOAN_NF";
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
                 return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_NF";
             case AS_SELF_ACCOUNTING_CASH_FUND:
