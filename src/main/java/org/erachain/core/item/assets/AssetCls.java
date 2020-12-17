@@ -27,6 +27,7 @@ public abstract class AssetCls extends ItemCls {
     public static final int TYPE_KEY = ItemCls.ASSET_TYPE;
 
     public final static long START_KEY = ItemCls.START_KEY;
+    public final static long START_KEY_UO_ITEMS = 1 << 20;
     public static final long MIN_START_KEY = 1000L;
 
     // CORE KEY
