@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.*;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -406,6 +408,10 @@ public class APIUtils {
 
     public static Tuple3<PrivateKeyAccount, Integer, byte[]> postIssueRawItem(HttpServletRequest request, String x,
                                                                               String creator, String feePowStr, String password) {
+
+        @QueryParam("linkTo") String linkToRefStr,
+        @DefaultValue("0") @QueryParam("feePow") String feePowStr,
+        @QueryParam("password") String password
 
         int feePow;
         // PARSE FEE POWER

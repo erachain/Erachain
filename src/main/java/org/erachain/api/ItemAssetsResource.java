@@ -182,10 +182,7 @@ public class ItemAssetsResource {
 
     @POST
     @Path("issueraw/{creator}")
-    public String issueRAW(String x, @PathParam("creator") String creator,
-                           @QueryParam("linkTo") String linkToRefStr,
-                           @DefaultValue("0") @QueryParam("feePow") String feePowStr,
-                           @QueryParam("password") String password) {
+    public String issueRAW(String x, @PathParam("creator") String creator) {
 
         Controller cntr = Controller.getInstance();
 

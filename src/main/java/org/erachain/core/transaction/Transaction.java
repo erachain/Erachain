@@ -1425,7 +1425,9 @@ public abstract class Transaction implements ExplorerJsonLine {
         }
 
         int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
-        String password = (String) jsonObject.getOrDefault("password", null);
+        String password = (String) jsonObject.get("password");
+
+        String linkToStr = (String) jsonObject.get("linkTo");
 
         return new Fun.Tuple4(creator, feePow, password, jsonObject);
 
