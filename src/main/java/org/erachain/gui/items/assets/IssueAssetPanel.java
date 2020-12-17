@@ -27,7 +27,7 @@ public class IssueAssetPanel extends IssueItemPanel {
     private JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
     private JComboBox<String> textScale = new JComboBox<>();
 
-    private JTextArea textareasAssetTypeDescription = new JTextArea();
+    private JTextPane textareasAssetTypeDescription;
     private MDecimalFormatedTextField textQuantity = new MDecimalFormatedTextField();
 
     private AssetTypesComboBoxModel assetTypesComboBoxModel;
@@ -42,6 +42,7 @@ public class IssueAssetPanel extends IssueItemPanel {
         textScale.setSelectedIndex(8);
 
         initComponents();
+
         textQuantity.setMaskType(textQuantity.maskLong);
         textQuantity.setText("0");
 
@@ -49,13 +50,21 @@ public class IssueAssetPanel extends IssueItemPanel {
         assetTypeJComboBox.addActionListener(e -> {
             JComboBox source = (JComboBox) e.getSource();
             AssetType assetType = (AssetType) source.getSelectedItem();
-            textareasAssetTypeDescription.setText(assetType.getDescription());
+
+            int fontSize = textScale.getFontMetrics(textScale.getFont()).getHeight();
+            String fontStyle = textScale.getFont().getFontName();
+            fontStyle = "<body style='font: " + (fontSize - 2) + "pt " + fontStyle + "'>";
+
+            textareasAssetTypeDescription.setText(fontStyle + assetType.getDescription());
             textQuantity.setVisible(!AssetCls.isAccounting(assetType.getId()));
             quantityJLabel.setVisible(!AssetCls.isAccounting(assetType.getId()));
         });
 
         // set start text area asset type
-        textareasAssetTypeDescription.setText(((AssetType) assetTypesComboBoxModel.getSelectedItem()).getDescription());
+        int fontSize = textScale.getFontMetrics(textScale.getFont()).getHeight();
+        String fontStyle = textScale.getFont().getFontName();
+        fontStyle = "<body style='font: " + (fontSize - 2) + "pt " + fontStyle + "'>";
+        textareasAssetTypeDescription.setText(fontStyle + ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getDescription());
 
     }
 
@@ -71,24 +80,24 @@ public class IssueAssetPanel extends IssueItemPanel {
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(assetTypeJComboBox, fieldGBC);
 
-        JScrollPane scrollPaneAssetTypeDescription = new JScrollPane();
-
-        textareasAssetTypeDescription.setColumns(20);
-        textareasAssetTypeDescription.setRows(5);
-        textareasAssetTypeDescription.setLineWrap(true);
-        scrollPaneAssetTypeDescription.setViewportView(textareasAssetTypeDescription);
+        textareasAssetTypeDescription = new JTextPane();
+        textareasAssetTypeDescription.setEditable(false);
+        textareasAssetTypeDescription.setBackground(this.getBackground());
+        textareasAssetTypeDescription.setContentType("text/html");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = gridy++;
-        gridBagConstraints.gridwidth = 19;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.4;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
+        gridBagConstraints.gridx = fieldGBC.gridx;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridwidth = fieldGBC.gridwidth;
+        gridBagConstraints.anchor = fieldGBC.anchor;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 0.3;
+        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.insets = fieldGBC.insets;
         jPanelAdd.add(textareasAssetTypeDescription, gridBagConstraints);
 
         ////
-        labelGBC.gridy = gridy;
+        labelGBC.gridy = ++gridy;
         jPanelAdd.add(quantityJLabel, labelGBC);
 
         fieldGBC.gridy = gridy++;

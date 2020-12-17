@@ -160,10 +160,10 @@ public class WithdrawExchange extends IconPanel {
             AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn,
                     null, new Account(accountTo), null, message, false);
 
-            panel.jTextField_Mess_Title.setEnabled(false);
+            panel.jTextFieldTXTitle.setEnabled(false);
             panel.jComboBox_Asset.setEnabled(false);
             panel.recipientAddress.setEnabled(false);
-            panel.jTextArea_Description.setEnabled(false);
+            panel.jTextArea_Message.setEnabled(false);
             jLabelAdressCheck.setText("");
             rate = jsonObject.get("rate").toString();
             String bal = jsonObject.get("bal").toString();

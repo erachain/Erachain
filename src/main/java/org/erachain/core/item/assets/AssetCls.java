@@ -27,6 +27,7 @@ public abstract class AssetCls extends ItemCls {
     public static final int TYPE_KEY = ItemCls.ASSET_TYPE;
 
     public final static long START_KEY = ItemCls.START_KEY;
+    public final static long START_KEY_UO_ITEMS = 1 << 20;
     public static final long MIN_START_KEY = 1000L;
 
     // CORE KEY
@@ -640,9 +641,13 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public boolean isOutsideType() {
+        return isOutsideType(this.assetType);
+    }
+
+    public static boolean isOutsideType(int assetType) {
         return // ?? this.assetType == AS_OUTSIDE_GOODS ||
-                this.assetType >= AS_OUTSIDE_CURRENCY
-                        && this.assetType <= AS_OUTSIDE_OTHER_CLAIM;
+                assetType >= AS_OUTSIDE_CURRENCY
+                        && assetType <= AS_OUTSIDE_OTHER_CLAIM;
     }
 
     public boolean isOutsideCurrency() {
@@ -717,6 +722,14 @@ public abstract class AssetCls extends ItemCls {
      */
     public boolean isChangeDebtBySendActions() {
         return this.assetType == AS_SELF_ACCOUNTING_CASH_FUND;
+    }
+
+    public static boolean isChangeDebtBySpendActions(int assetType) {
+        return isOutsideType(assetType);
+    }
+
+    public boolean isChangeDebtBySpendActions() {
+        return isChangeDebtBySpendActions(this.assetType);
     }
 
     /**
@@ -819,11 +832,11 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_MANAGED_ACCOUNTING:
                 return "Self Managed";
             case AS_SELF_ACCOUNTING_LOAN:
-                return "Accounting Loan";
+                return "AS_SELF_ACCOUNTING_LOAN_N";
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
-                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_NF";
+                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_N";
             case AS_SELF_ACCOUNTING_CASH_FUND:
-                return "AS_SELF_ACCOUNTING_CASH_FUND_NF";
+                return "AS_SELF_ACCOUNTING_CASH_FUND_N";
 
         }
         return null;
@@ -886,7 +899,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_MANAGED_ACCOUNTING:
                 return "Self Managed for Accounting";
             case AS_SELF_ACCOUNTING_LOAN:
-                return "Accounting Loan for Debtor";
+                return "AS_SELF_ACCOUNTING_LOAN_NF";
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
                 return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_NF";
             case AS_SELF_ACCOUNTING_CASH_FUND:
@@ -1334,6 +1347,11 @@ public abstract class AssetCls extends ItemCls {
                         return "AS_SELF_SEND_ADDITIONAL_ACT_DEBT";
                 }
         }
+
+        if (actionType == TransactionAmount.ACTION_SPEND && isChangeDebtBySpendActions(assetType)) {
+            return "AdditionAction_on_isChangeDebtBySpendActions";
+        }
+
         return null;
     }
 
@@ -1615,7 +1633,7 @@ public abstract class AssetCls extends ItemCls {
                 return "Spender";
         }
 
-        return "unknown";
+        return null;
     }
 
     public String viewAssetTypeActionOK(boolean backward, int actionType, boolean isCreatorOwner) {

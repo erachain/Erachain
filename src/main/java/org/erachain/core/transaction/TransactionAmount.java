@@ -348,33 +348,59 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public boolean isBackward() {
         return typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
     }
-    
+
     /*
      * ************** VIEW
      */
-    
+
     @Override
     public String viewTypeName() {
-        if (this.amount == null || this.amount.signum() == 0)
+        return viewTypeName(this.amount, isBackward());
+    }
+
+    public static String viewTypeName(BigDecimal amount, boolean isBackward) {
+        if (amount == null || amount.signum() == 0)
             return "LETTER";
-        
-        if (this.isBackward()) {
+
+        if (isBackward) {
             return "backward";
         } else {
             return "SEND";
         }
     }
-    
+
     @Override
     public String viewSubTypeName() {
-        return viewActionType();
+        return viewSubTypeName(key, amount, isBackward(), asset.isDirectBalances());
     }
-    
+
+    public static String viewSubTypeName(long assetKey, BigDecimal amount, boolean isBackward, boolean isDirect) {
+
+        if (amount == null || amount.signum() == 0)
+            return "";
+
+        int actionType = Account.balancePosition(assetKey, amount, isBackward, isDirect);
+
+        switch (actionType) {
+            case ACTION_SEND:
+                return NAME_ACTION_TYPE_PROPERTY;
+            case ACTION_DEBT:
+                return NAME_CREDIT;
+            case ACTION_HOLD:
+                return NAME_ACTION_TYPE_HOLD;
+            case ACTION_SPEND:
+                return NAME_SPEND;
+        }
+
+        return "???";
+
+    }
+
     @Override
     public String viewAmount() {
         if (this.amount == null)
             return "";
-        
+
         if (this.amount.signum() < 0) {
             return this.amount.negate().toPlainString();
         } else {
@@ -397,62 +423,18 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return NumberAsString.formatAsString(getAmount(address));
     }
 
-    public static String viewActionType(long assetKey, BigDecimal amount, boolean isBackward, boolean isDirect) {
-
-        if (amount == null || amount.signum() == 0)
-            return "";
-
-        int actionType = Account.balancePosition(assetKey, amount, isBackward, isDirect);
-
-        switch (actionType) {
-            case ACTION_SEND:
-                return NAME_ACTION_TYPE_PROPERTY;
-            case ACTION_DEBT:
-                return NAME_CREDIT;
-            case ACTION_HOLD:
-                return NAME_ACTION_TYPE_HOLD;
-            case ACTION_SPEND:
-                return NAME_SPEND;
-        }
-
-        return "???";
-
-    }
-
-    public static String viewActionTypeWas(long assetKey, BigDecimal amount, boolean isBackward, boolean isDirect) {
-
-        if (amount == null || amount.signum() == 0)
-            return "";
-
-        int actionType = Account.balancePosition(assetKey, amount, isBackward, isDirect);
-
-        switch (actionType) {
-            case ACTION_SEND:
-                return NAME_ACTION_TYPE_PROPERTY_WAS;
-            case ACTION_DEBT:
-                return NAME_CREDIT_WAS;
-            case ACTION_HOLD:
-                return NAME_ACTION_TYPE_HOLD_WAS;
-            case ACTION_SPEND:
-                return NAME_SPEND_WAS;
-        }
-
-        return "???";
-
+    @Override
+    public String viewFullTypeName() {
+        return viewActionType();
     }
 
     public String viewActionType() {
         if (asset == null)
             return "mail";
-        return viewActionType(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
-    }
 
-    public String viewActionTypeWas() {
-        if (asset == null)
-            return "mail";
-        return viewActionTypeWas(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
+        //return viewActionType(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
+        return asset.viewAssetTypeAction(isBackward(), getActionType(), creator == null ? false : asset.getOwner().equals(creator));
     }
-
 
     // PARSE/CONVERT
     // @Override
@@ -506,7 +488,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             transaction.put("assetKey", this.getAbsKey());
             transaction.put("amount", this.amount.toPlainString());
             transaction.put("actionKey", this.getActionType());
-            transaction.put("actionName", this.viewActionType());
+            transaction.put("actionName", viewActionType());
             if (this.isBackward())
                 transaction.put("backward", this.isBackward());
         }
@@ -1269,11 +1251,27 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // STANDARD ACTION PROCESS
         processAction(dcSet, false, creator, recipient, actionType, absKey, key, amount, backward, isDirect, incomeReverse);
 
-        if (asset.isChangeDebtBySendActions() && actionType == ACTION_SEND) {
+        if (actionType == ACTION_SEND && asset.isChangeDebtBySendActions()) {
             // если это актив который должен поменять и балансы Долговые то
+            // тут не важно какое направление и какой остаток - все одинаково - учетный же
+
             processAction(dcSet, false, creator, recipient, ACTION_DEBT,
                     absKey, -key, amount, backward, isDirect, incomeReverse);
+        } else if (actionType == ACTION_SPEND && amount.signum() < 0 && asset.isChangeDebtBySpendActions()) {
+            // если это актив в Требованием Исполнения - то подтверждение Исполнения уменьшит и Требование Исполнения
+            // Но ПОЛУЧАТЕЛЬ - у нас создатель Актива
+
+            // смотрим какой там долг (он отрицательный)
+            BigDecimal debtBalance = creator.getBalance(dcSet, absKey, ACTION_DEBT).b;
+            // и берем наибольший из них (там оба отрицательные) - так чтобы если Требование меньше Чем  текущее Действие - чтобы в минус не ушло
+            debtBalance = debtBalance.max(amount);
+
+            if (debtBalance.signum() != 0) {
+                processAction(dcSet, true, creator, asset.getOwner(), ACTION_DEBT,
+                        absKey, key, debtBalance.negate(), backward, isDirect, incomeReverse);
+            }
         }
+
 
         if (absKey == Transaction.RIGHTS_KEY && block != null) {
             block.addForgingInfoUpdate(this.recipient);
@@ -1297,8 +1295,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (this.amount == null)
             return;
 
-        DCSet db = this.dcSet;
-
         int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
         if (amount_sign == 0)
             return;
@@ -1313,10 +1309,23 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // STANDARD ACTION ORPHAN
         processAction(dcSet, true, creator, recipient, actionType, absKey, key, amount, backward, isDirect, incomeReverse);
 
-        if (asset.isChangeDebtBySendActions() && actionType == ACTION_SEND) {
+        if (actionType == ACTION_SEND && asset.isChangeDebtBySendActions()) {
             // если это актив который должен поменять и балансы Долговые то
+
             processAction(dcSet, true, creator, recipient, ACTION_DEBT,
                     absKey, -key, amount, backward, isDirect, incomeReverse);
+        } else if (actionType == ACTION_SPEND && amount.signum() < 0 && asset.isChangeDebtBySpendActions()) {
+            // если это актив в Требованием Исполнения - то подтверждение Исполнения уменьшит и Требование Исполнения
+
+            // смотрим какой там долг (он отрицательный)
+            BigDecimal debtBalance = creator.getBalance(dcSet, absKey, ACTION_DEBT).b;
+            // и берем наибольший из них (там оба отрицательные) - так чтобы если Требование меньше Чем  текущее Действие - чтобы в минус не ушло
+            debtBalance = debtBalance.max(amount);
+
+            if (debtBalance.signum() != 0) {
+                processAction(dcSet, false, creator, asset.getOwner(), ACTION_DEBT,
+                        absKey, key, debtBalance.negate(), backward, isDirect, incomeReverse);
+            }
         }
 
         if (absKey == Transaction.RIGHTS_KEY && block != null) {
@@ -1324,7 +1333,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
 
         if (assetFee != null && assetFee.signum() != 0) {
-            this.creator.changeBalance(db, backward, backward, absKey, this.assetFee, false, false, !incomeReverse);
+            this.creator.changeBalance(dcSet, backward, backward, absKey, this.assetFee, false, false, !incomeReverse);
         }
 
     }

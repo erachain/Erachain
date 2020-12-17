@@ -10,6 +10,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.WalletTableModel;
+import org.erachain.lang.Lang;
 import org.mapdb.Fun;
 
 import java.io.IOException;
@@ -97,7 +98,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
                 return itemTran.itemCls;
 
             case COLUMN_TYPE:
-                return itemTran.transaction.viewFullTypeName();
+                return Lang.getInstance().translate(itemTran.transaction.viewFullTypeName());
 
             case COLUMN_SENDER:
                 if (itemTran.owner != null) {

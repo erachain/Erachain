@@ -471,8 +471,8 @@ public class BlockChain {
     /**
      * Новый уровень начальных номеров для всех сущностей
      */
-    public static int START_KEY_UP = MAIN_MODE ? 1700000 : DEMO_MODE ? 12500 : Integer.MAX_VALUE;
-    public static int START_KEY_UO_ITEMS = 1 << 15;
+    public static int START_KEY_UP = MAIN_MODE ? 1700000 : DEMO_MODE ? 23000 : Integer.MAX_VALUE;
+    public static int START_KEY_UO_ITEMS = 1 << 17;
 
     //private int target = 0;
     //private byte[] lastBlockSignature;
@@ -486,7 +486,7 @@ public class BlockChain {
 
     /**
      * Учитывает время очистки очереди неподтвержденных трнзакций и сброса на жесткий диск их памяти
-     * И поэтому это число хуже чем в Логе по подстчету обработки транзакций в блоке
+     * И поэтому это число хуже чем в Логе по подсчету обработки транзакций в блоке
      */
     public long transactionProcessTimingAverage;
     public long transactionProcessTimingCounter;
