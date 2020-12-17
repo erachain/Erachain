@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.*;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -406,20 +404,8 @@ public class APIUtils {
 
     }
 
-    public static Tuple3<PrivateKeyAccount, Integer, byte[]> postIssueRawItem(HttpServletRequest request, String x,
-                                                                              String creator, String feePowStr, String password) {
-
-        @QueryParam("linkTo") String linkToRefStr,
-        @DefaultValue("0") @QueryParam("feePow") String feePowStr,
-        @QueryParam("password") String password
-
-        int feePow;
-        // PARSE FEE POWER
-        try {
-            feePow = Integer.parseInt(feePowStr);
-        } catch (Exception e0) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_FEE_POWER);
-        }
+    public static Fun.Tuple2<PrivateKeyAccount, byte[]> postIssueRawItem(HttpServletRequest request, String x,
+                                                                         Account creator, String password, String walletMess) {
 
         byte[] raw;
         try {
@@ -431,11 +417,6 @@ public class APIUtils {
         if (raw == null)
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_RAW_DATA);
 
-        // CHECK ADDRESS
-        if (!Crypto.getInstance().isValidAddress(creator)) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
-        }
-
         // check this up here to avoid leaking wallet information to remote
         // user
         // full check is later to prompt user with calculated fee
@@ -446,7 +427,7 @@ public class APIUtils {
         }
 
         // TRY UNLOCK
-        askAPICallAllowed(password, "", request, true);
+        askAPICallAllowed(password, walletMess, request, true);
 
         // CHECK WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {
@@ -459,7 +440,7 @@ public class APIUtils {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
         }
 
-        return new Tuple3<>(account, feePow, raw);
+        return new Fun.Tuple2<>(account, raw);
 
     }
 

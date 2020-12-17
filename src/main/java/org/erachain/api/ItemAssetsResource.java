@@ -7,7 +7,6 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
@@ -49,7 +48,7 @@ public class ItemAssetsResource {
         help.put("assets/images/{key}", "get item images by KEY");
         help.put("assets/listfrom/{start}", "get list from KEY");
         help.put("POST assets/issue {\"linkTo\": \"<SeqNo>\", \"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"scale\": \"<scale>\", \"assetType\": \"<assetType>\", \"quantity\": \"<quantity>\", \"password\": \"<password>\"}", "Issue Asset");
-        help.put("POST assets/issueraw/{creator}?linkTo=<SeqNo>&feePow=<int>&password=<String> ", "Issue Asset by Base58 RAW in POST body");
+        help.put("POST assets/issueraw/{creator} {\"linkTo\":<SeqNo>, \"feePow\":<int>, \"password\":<String>, \"linkTo\":<SeqNo>, \"raw\":RAW-Base58", "Issue Asset by Base58 RAW in POST body");
 
         help.put("assets/types", "get types");
         help.put("assets/balances/{key}", "get balances for key");
@@ -182,34 +181,34 @@ public class ItemAssetsResource {
 
     @POST
     @Path("issueraw/{creator}")
-    public String issueRAW(String x, @PathParam("creator") String creator) {
+    public String issueRAW(String x, @PathParam("creator") String creatorStr) {
 
         Controller cntr = Controller.getInstance();
 
-        Fun.Tuple3<PrivateKeyAccount, Integer, byte[]> result = APIUtils.postIssueRawItem(request, x, creator, feePowStr, password);
+        Object result = Transaction.decodeJson(creatorStr, x);
+        if (result instanceof JSONObject) {
+            return result.toString();
+        }
+
+        Fun.Tuple5<Account, Integer, ExLink, String, JSONObject> resultHead = (Fun.Tuple5<Account, Integer, ExLink, String, JSONObject>) result;
+        Account creator = resultHead.a;
+        int feePow = resultHead.b;
+        ExLink linkTo = resultHead.c;
+        String password = resultHead.d;
+        JSONObject jsonObject = resultHead.e;
+
+        Fun.Tuple2<PrivateKeyAccount, byte[]> resultRaw = APIUtils.postIssueRawItem(request, jsonObject.get("raw").toString(),
+                creator, password, "issue Asset");
 
         AssetCls item;
         try {
-            item = AssetFactory.getInstance().parse(result.c, false);
+            item = AssetFactory.getInstance().parse(resultRaw.b, false);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     e.getMessage());
         }
 
-        ExLink linkTo;
-        if (linkToRefStr == null)
-            linkTo = null;
-        else {
-            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
-            if (linkToRef == null) {
-                throw ApiErrorFactory.getInstance().createError(
-                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
-            } else {
-                linkTo = new ExLinkSource(linkToRef, null);
-            }
-        }
-
-        Transaction transaction = cntr.issueAsset(result.a, linkTo, result.b, item);
+        Transaction transaction = cntr.issueAsset(resultRaw.a, linkTo, feePow, item);
         int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
         if (validate == Transaction.VALIDATE_OK)

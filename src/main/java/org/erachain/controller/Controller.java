@@ -3019,7 +3019,7 @@ public class Controller extends Observable {
 
     public Object issueAsset(HttpServletRequest request, String x) {
 
-        Object result = Transaction.decodeJson(x);
+        Object result = Transaction.decodeJson(null, x);
         if (result instanceof JSONObject) {
             return result;
         }
@@ -3152,7 +3152,7 @@ public class Controller extends Observable {
 
     public Object issuePerson(HttpServletRequest request, String x) {
 
-        Object result = Transaction.decodeJson(x);
+        Object result = Transaction.decodeJson(null, x);
         if (result instanceof JSONObject) {
             return result;
         }
