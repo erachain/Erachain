@@ -1347,7 +1347,7 @@ public abstract class AssetCls extends ItemCls {
                 }
         }
 
-        if (isChangeDebtBySpendActions(assetType)) {
+        if (actionType == TransactionAmount.ACTION_SPEND && isChangeDebtBySpendActions(assetType)) {
             return "AdditionAction_on_isChangeDebtBySpendActions";
         }
 

@@ -96,7 +96,6 @@ public class DocTypeAppendixPanel extends JPanel {
         typeDescription.setEditable(false);
         typeDescription.setBackground(this.getBackground());
         typeDescription.setContentType("text/html");
-        //labelTitle.setEnabled(false);
 
         parentDetails = new JLabel();
 
@@ -135,35 +134,35 @@ public class DocTypeAppendixPanel extends JPanel {
         java.awt.GridBagLayout panelLayout = new java.awt.GridBagLayout();
         panel.setLayout(panelLayout);
 
-        int dridY = 0;
+        int gridy = 0;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = dridY;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         add(tagsLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = dridY;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         add(tagsField, gridBagConstraints);
-        dridY++;
+        gridy++;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = dridY;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         panel.add(typeDocumentLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = dridY;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
@@ -172,7 +171,7 @@ public class DocTypeAppendixPanel extends JPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = dridY;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -180,39 +179,39 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         add(panel, gridBagConstraints);
 
-        dridY++;
+        gridy++;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = dridY;//0;
+        gridBagConstraints.gridy = gridy;//0;
         gridBagConstraints.gridwidth = 10;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 0);
         add(typeDescription, gridBagConstraints);
-        dridY++;
+        gridy++;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = dridY;//2;
+        gridBagConstraints.gridy = gridy;//2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         add(labelDocType, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = dridY;//2;
+        gridBagConstraints.gridy = gridy;//2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 8);
         add(parentReference, gridBagConstraints);
-        dridY++;
+        gridy++;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = dridY;//3;
+        gridBagConstraints.gridy = gridy;//3;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 0);
@@ -220,7 +219,7 @@ public class DocTypeAppendixPanel extends JPanel {
 
 //        gridBagConstraints = new java.awt.GridBagConstraints();
 //        gridBagConstraints.gridx = 0;
-//        gridBagConstraints.gridy = ++dridY;
+//        gridBagConstraints.gridy = ++gridy;
 //        gridBagConstraints.gridwidth = 3;
 //        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 //        gridBagConstraints.weightx = 0.3;
@@ -287,7 +286,7 @@ public class DocTypeAppendixPanel extends JPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = ++dridY;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -298,7 +297,7 @@ public class DocTypeAppendixPanel extends JPanel {
         // botoom
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = ++dridY;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
