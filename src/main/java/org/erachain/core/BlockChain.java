@@ -486,7 +486,7 @@ public class BlockChain {
 
     /**
      * Учитывает время очистки очереди неподтвержденных трнзакций и сброса на жесткий диск их памяти
-     * И поэтому это число хуже чем в Логе по подстчету обработки транзакций в блоке
+     * И поэтому это число хуже чем в Логе по подсчету обработки транзакций в блоке
      */
     public long transactionProcessTimingAverage;
     public long transactionProcessTimingCounter;
