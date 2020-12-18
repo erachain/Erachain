@@ -1399,16 +1399,12 @@ public abstract class Transaction implements ExplorerJsonLine {
             //READ JSON
             jsonObject = (JSONObject) JSONValue.parse(x);
         } catch (NullPointerException | ClassCastException e) {
-            error = ApiErrorFactory.ERROR_JSON;
-            out.put("error", error);
-            out.put("error_message", OnDealClick.resultMess(error));
+            Transaction.updateMapByErrorSimple(ApiErrorFactory.ERROR_JSON, out);
             return out;
         }
 
         if (jsonObject == null) {
-            error = ApiErrorFactory.ERROR_JSON;
-            out.put("error", error);
-            out.put("error_message", OnDealClick.resultMess(error));
+            Transaction.updateMapByErrorSimple(ApiErrorFactory.ERROR_JSON, out);
             return out;
         }
 
@@ -1416,12 +1412,13 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         Account creator = null;
         if (creatorStr == null) {
-            error = Transaction.INVALID_CREATOR;
-            return new Fun.Tuple2<>(error, OnDealClick.resultMess(error));
+            Transaction.updateMapByErrorSimple(Transaction.INVALID_CREATOR, out);
+            return out;
         } else {
             Fun.Tuple2<Account, String> resultCreator = Account.tryMakeAccount(creatorStr);
             if (resultCreator.a == null) {
-                return new Fun.Tuple2<>(Transaction.INVALID_CREATOR, resultCreator.b);
+                Transaction.updateMapByErrorValue(Transaction.INVALID_CREATOR, resultCreator.b, out);
+                return out;
             }
             creator = resultCreator.a;
         }
@@ -1442,17 +1439,14 @@ public abstract class Transaction implements ExplorerJsonLine {
                 Long linkToRef = Transaction.parseDBRef(linkToRefStr);
                 if (linkToRef == null) {
                     error = Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR;
-                    Transaction.updateMapByErrorSimple(error, OnDealClick.resultMess(error), out);
-                    out.put("error_value", "linkTo");
+                    Transaction.updateMapByErrorValue(error, "for 'linkTo'", out);
                     return out;
                 } else {
                     linkTo = new ExLinkSource(linkToRef, null);
                 }
             }
         } catch (Exception e) {
-            Transaction.updateMapByErrorSimple(ApiErrorFactory.ERROR_JSON,
-                    OnDealClick.resultMess(ApiErrorFactory.ERROR_JSON), out);
-            out.put("error_value", error_value);
+            Transaction.updateMapByErrorValue(ApiErrorFactory.ERROR_JSON, error_value, out);
             return out;
         }
 
@@ -1760,6 +1754,12 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static void updateMapByErrorSimple(int error, HashMap out) {
         out.put("error", error);
         out.put("message", OnDealClick.resultMess(error));
+    }
+
+    public static void updateMapByErrorValue(int error, String errorValue, HashMap out) {
+        out.put("error", error);
+        out.put("message", OnDealClick.resultMess(error));
+        out.put("value", errorValue);
     }
 
     public void process_gifts_turn(int level, long fee_gift, Account invitedAccount,

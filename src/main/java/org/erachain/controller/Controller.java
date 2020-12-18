@@ -20,7 +20,6 @@ import org.erachain.core.crypto.Base32;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
@@ -3024,11 +3023,12 @@ public class Controller extends Observable {
             return result;
         }
 
-        Fun.Tuple4<Account, Integer, String, JSONObject> transactionResult = (Fun.Tuple4<Account, Integer, String, JSONObject>) result;
-        Account creator = transactionResult.a;
-        int feePow = transactionResult.b;
-        String password = transactionResult.c;
-        JSONObject jsonObject = transactionResult.d;
+        Fun.Tuple5<Account, Integer, ExLink, String, JSONObject> resultHead = (Fun.Tuple5<Account, Integer, ExLink, String, JSONObject>) result;
+        Account creator = resultHead.a;
+        int feePow = resultHead.b;
+        ExLink linkTo = resultHead.c;
+        String password = resultHead.d;
+        JSONObject jsonObject = resultHead.e;
 
         if (jsonObject == null) {
             int error = ApiErrorFactory.ERROR_JSON;
@@ -3060,20 +3060,6 @@ public class Controller extends Observable {
                 image = Base58.decode(image58);
         } else {
             image = java.util.Base64.getDecoder().decode(image64);
-        }
-
-        String linkToRefStr = (String) jsonObject.get("linkTo");
-        ExLink linkTo;
-        if (linkToRefStr == null)
-            linkTo = null;
-        else {
-            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
-            if (linkToRef == null) {
-                throw ApiErrorFactory.getInstance().createError(
-                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
-            } else {
-                linkTo = new ExLinkSource(linkToRef, null);
-            }
         }
 
         Integer scale = null;
@@ -3152,35 +3138,25 @@ public class Controller extends Observable {
 
     public Object issuePerson(HttpServletRequest request, String x) {
 
+        JSONObject out = new JSONObject();
+
         Object result = Transaction.decodeJson(null, x);
         if (result instanceof JSONObject) {
             return result;
         }
 
         int error;
-        Fun.Tuple4<Account, Integer, String, JSONObject> transactionResult = (Fun.Tuple4<Account, Integer, String, JSONObject>) result;
+        // creator, feePow, linkTo, password, jsonObject
+        Fun.Tuple5<Account, Integer, ExLink, String, JSONObject> transactionResult = (Fun.Tuple5<Account, Integer, ExLink, String, JSONObject>) result;
         Account creator = transactionResult.a;
         int feePow = transactionResult.b;
-        String password = transactionResult.c;
-        JSONObject jsonObject = transactionResult.d;
+        ExLink linkTo = transactionResult.c;
+        String password = transactionResult.d;
+        JSONObject jsonObject = transactionResult.e;
 
         if (jsonObject == null) {
-            error = ApiErrorFactory.ERROR_JSON;
-            return new Fun.Tuple2<>(error, OnDealClick.resultMess(error));
-        }
-
-        String linkToRefStr = (String) jsonObject.get("linkTo");
-        ExLink linkTo;
-        if (linkToRefStr == null)
-            linkTo = null;
-        else {
-            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
-            if (linkToRef == null) {
-                throw ApiErrorFactory.getInstance().createError(
-                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
-            } else {
-                linkTo = new ExLinkSource(linkToRef, null);
-            }
+            Transaction.updateMapByErrorSimple(ApiErrorFactory.ERROR_JSON, out);
+            return out;
         }
 
         String name = (String) jsonObject.get("name");
@@ -3227,6 +3203,10 @@ public class Controller extends Observable {
 
         APIUtils.askAPICallAllowed(password, "POST issue Person " + name, request, true);
         PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
+        if (creatorPrivate == null) {
+            Transaction.updateMapByErrorSimple(Transaction.INVALID_CREATOR, out);
+            return out;
+        }
 
         String errorName = null;
         try {
@@ -3270,9 +3250,8 @@ public class Controller extends Observable {
 
         } catch (Exception e) {
             error = ApiErrorFactory.ERROR_JSON;
-            JSONObject out = new JSONObject();
-            out.put("error", error);
-            out.put("error_message", errorName);
+            Transaction.updateMapByErrorSimple(ApiErrorFactory.ERROR_JSON, out);
+            out.put("value", errorName);
             return out;
         }
 
