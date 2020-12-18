@@ -301,35 +301,36 @@ public class APIUtils {
                 asset.getKey(DCSet.getInstance()), bdAmount, title,
                 message, isText, isEncrypted, 0);
         
-        boolean confirmed = true;
+        int confirmed = IssueConfirmDialog.CONFIRM;
         if (Gui.isGuiStarted()) {
             String Status_text = "";
-            IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+            IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                     Lang.getInstance().translate("Send Mail"), (600), (450), Status_text,
                     Lang.getInstance().translate("Confirmation Transaction"));
             Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
-            
+
             // ww.jTabbedPane1.setVisible(false);
-            dd.jScrollPane1.setViewportView(ww);
-            dd.setLocationRelativeTo(null);
-            dd.setVisible(true);
-            
+            confirmDialog.jScrollPane1.setViewportView(ww);
+            confirmDialog.setLocationRelativeTo(null);
+            confirmDialog.setVisible(true);
+
             // JOptionPane.OK_OPTION
-            confirmed = dd.isConfirm;
-            
+            confirmed = confirmDialog.isConfirm;
+
         }
-        
-        if (confirmed) {
-            
-            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-            
+
+        if (confirmed > 0) {
+
+            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK,
+                    confirmed == IssueConfirmDialog.TRY_FREE);
+
             if (result == Transaction.VALIDATE_OK)
                 return transaction.toJson().toJSONString();
             else {
-                
+
                 // Lang.getInstance().translate(OnDealClick.resultMess(result.getB()));
                 throw ApiErrorFactory.getInstance().createError(result);
-                
+
             }
             
         }

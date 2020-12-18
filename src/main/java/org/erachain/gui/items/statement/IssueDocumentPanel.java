@@ -322,20 +322,20 @@ public class IssueDocumentPanel extends IconPanel {
         // Lang.getInstance().translate("Issue Asset"),
         // JOptionPane.YES_NO_OPTION);
 
-        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, issueDoc,
+        IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, issueDoc,
                 text,
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation transaction issue document"));
 
         RNoteInfo ww = new RNoteInfo(issueDoc);
         ww.jPanel2.setVisible(false);
-        dd.jScrollPane1.setViewportView(ww);
-        dd.setLocationRelativeTo(th);
-        dd.setVisible(true);
+        confirmDialog.jScrollPane1.setViewportView(ww);
+        confirmDialog.setLocationRelativeTo(th);
+        confirmDialog.setVisible(true);
 
         // JOptionPane.OK_OPTION
-        if (dd.isConfirm) { // s!= JOptionPane.OK_OPTION) {
-            ResultDialog.make(this, issueDoc, "Your document has been sent", false);
+        if (confirmDialog.isConfirm > 0) {
+            ResultDialog.make(this, issueDoc, "Your document has been sent", false, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
 
         return;

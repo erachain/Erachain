@@ -167,8 +167,10 @@ public class ItemAssetsResource {
             return ((JSONObject) result).toJSONString();
         }
 
+        boolean tryFree = true;
+
         Transaction transaction = (Transaction) result;
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -208,8 +210,10 @@ public class ItemAssetsResource {
                     e.getMessage());
         }
 
+        boolean tryFree = true;
+
         Transaction transaction = cntr.issueAsset(resultRaw.a, linkTo, feePow, item);
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();

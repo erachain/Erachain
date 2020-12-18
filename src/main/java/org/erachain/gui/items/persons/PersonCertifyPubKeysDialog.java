@@ -224,18 +224,18 @@ public class PersonCertifyPubKeysDialog extends JDialog {
                 person.getKey(), certifiedPublicKeys, toDate);
 
         String Status_text = "";
-        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+        IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Certification of Account"), (int) (this.getWidth() / 1.2),
                 (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         CertifyPubKeysDetailsFrame ww = new CertifyPubKeysDetailsFrame((RCertifyPubKeys) transaction);
-        dd.jScrollPane1.setViewportView(ww);
-        dd.setLocationRelativeTo(this);
-        dd.pack();
-        dd.setVisible(true);
+        confirmDialog.jScrollPane1.setViewportView(ww);
+        confirmDialog.setLocationRelativeTo(this);
+        confirmDialog.pack();
+        confirmDialog.setVisible(true);
 
         // JOptionPane.OK_OPTION
-        if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, "Public Key was Certified", false);
+        if (confirmDialog.isConfirm > 0) {
+            ResultDialog.make(this, transaction, "Public Key was Certified", false, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
         // ENABLE
         Button_Confirm.setEnabled(true);
