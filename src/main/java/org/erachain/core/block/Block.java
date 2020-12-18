@@ -987,9 +987,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     public BigDecimal getBonusFee() {
 
-        if (this.heightBlock == 1) {
-            return BigDecimal.ZERO;
-        } else if (this.heightBlock > BlockChain.FREE_FEE_FROM_HEIGHT) {
+        if (this.heightBlock == 1 || this.heightBlock > BlockChain.FREE_FEE_FROM_HEIGHT) {
             return BigDecimal.ZERO;
         }
 
