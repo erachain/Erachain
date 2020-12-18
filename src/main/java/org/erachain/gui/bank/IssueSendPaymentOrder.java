@@ -259,7 +259,7 @@ public class IssueSendPaymentOrder extends IconPanel {
 
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, null);
+            ResultDialog.make(this, transaction, null, true);
         }
         // ENABLE
         issue_Panel.jButton_OK.setEnabled(true);

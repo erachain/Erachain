@@ -282,7 +282,7 @@ public class AssetSetStatusDialog extends JDialog {
 
         //	JOptionPane.OK_OPTION
         if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, "Status assigned!");
+            ResultDialog.make(this, transaction, "Status assigned!", false);
         }
         //ENABLE
         Button_Confirm.setEnabled(true);

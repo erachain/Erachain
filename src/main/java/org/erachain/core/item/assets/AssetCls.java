@@ -1330,6 +1330,10 @@ public abstract class AssetCls extends ItemCls {
             case TransactionAmount.ACTION_PLEDGE:
                 return backward ? "Re-pledge"
                         : "Pledge";
+            case TransactionAmount.ACTION_RESERCED_6:
+                // for CALCULATED TX
+                return backward ? "Reserved 6-"
+                        : "Reserved 6";
         }
 
         return null;

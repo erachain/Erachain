@@ -173,7 +173,7 @@ public class VouchRecordDialog extends JDialog {
 
         //	JOptionPane.OK_OPTION
         if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, "Record has been certified");
+            ResultDialog.make(this, transaction, "Record has been certified", false);
         }
         //ENABLE
         jButton_Confirm.setEnabled(true);

@@ -607,7 +607,7 @@ public class CreateOrderPanel extends JPanel {
 
             // JOptionPane.OK_OPTION
             if (dd.isConfirm) {
-                ResultDialog.make(this, transaction, "Order has been sent");
+                ResultDialog.make(this, transaction, "Order has been sent", false);
             }
 
         } finally {
