@@ -149,6 +149,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextPane1 = new MTextPane();
         jPanel1 = new javax.swing.JPanel();
+        jButton0 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jStatus_Label = new JLabel();
