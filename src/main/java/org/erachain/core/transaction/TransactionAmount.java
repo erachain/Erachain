@@ -313,6 +313,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
                 && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
+            // не учитываем комиссию если размер блока маленький
             return 0L;
         } else {
             if (hasAmount() && getActionType() == ACTION_SEND // только для передачи в собственность!
@@ -656,7 +657,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
                 && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
-            // не учитываем комиссию если размер маленький
+            // не учитываем комиссию если размер блока маленький
             flags = flags | NOT_VALIDATE_FLAG_FEE;
         }
 

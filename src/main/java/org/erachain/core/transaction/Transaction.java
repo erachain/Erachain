@@ -1014,6 +1014,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
                 && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
+            // не учитываем комиссию если размер блока маленький
             this.fee = BigDecimal.ZERO;
         } else {
             long fee_long = calcBaseFee();
