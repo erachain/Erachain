@@ -198,7 +198,7 @@ public class TransactionCreator {
         pollVote.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
-        return new Pair<Transaction, Integer>(pollVote, this.afterCreate(pollVote, Transaction.FOR_NETWORK));
+        return new Pair<Transaction, Integer>(pollVote, this.afterCreate(pollVote, Transaction.FOR_NETWORK, false));
     }
 
 
@@ -215,7 +215,7 @@ public class TransactionCreator {
         arbitraryTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
-        return new Pair<Transaction, Integer>(arbitraryTransaction, this.afterCreate(arbitraryTransaction, Transaction.FOR_NETWORK));
+        return new Pair<Transaction, Integer>(arbitraryTransaction, this.afterCreate(arbitraryTransaction, Transaction.FOR_NETWORK, false));
     }
 
 
@@ -261,7 +261,7 @@ public class TransactionCreator {
         issueImprintRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
-        return new Pair<Transaction, Integer>(issueImprintRecord, this.afterCreate(issueImprintRecord, Transaction.FOR_NETWORK));
+        return new Pair<Transaction, Integer>(issueImprintRecord, this.afterCreate(issueImprintRecord, Transaction.FOR_NETWORK, false));
     }
 
     public Transaction createIssueImprintTransaction1(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
@@ -577,7 +577,7 @@ public class TransactionCreator {
         cancelOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
-        return new Pair<Transaction, Integer>(cancelOrderTransaction, this.afterCreate(cancelOrderTransaction, Transaction.FOR_NETWORK));
+        return new Pair<Transaction, Integer>(cancelOrderTransaction, this.afterCreate(cancelOrderTransaction, Transaction.FOR_NETWORK, false));
     }
 
     public Transaction createCancelOrderTransaction1(PrivateKeyAccount creator, byte[] orderID, int feePow) {
@@ -609,7 +609,7 @@ public class TransactionCreator {
         multiPayment.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
-        return new Pair<Transaction, Integer>(multiPayment, this.afterCreate(multiPayment, Transaction.FOR_NETWORK));
+        return new Pair<Transaction, Integer>(multiPayment, this.afterCreate(multiPayment, Transaction.FOR_NETWORK, false));
     }
 
     public Pair<Transaction, Integer> deployATTransaction(PrivateKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal amount, int feePow) {
@@ -624,7 +624,7 @@ public class TransactionCreator {
         deployAT.sign(creator, Transaction.FOR_NETWORK);
         deployAT.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
-        return new Pair<Transaction, Integer>(deployAT, this.afterCreate(deployAT, Transaction.FOR_NETWORK));
+        return new Pair<Transaction, Integer>(deployAT, this.afterCreate(deployAT, Transaction.FOR_NETWORK, false));
 
     }
 
@@ -775,7 +775,7 @@ public class TransactionCreator {
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
-        return new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, Transaction.FOR_NETWORK));
+        return new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, Transaction.FOR_NETWORK, false));
     }
 
     public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount creator, int feePow,
@@ -908,10 +908,10 @@ public class TransactionCreator {
         }
 
         //VALIDATE AND PROCESS
-        return new Pair<Transaction, Integer>(transaction, this.afterCreate(transaction, Transaction.FOR_NETWORK));
+        return new Pair<Transaction, Integer>(transaction, this.afterCreate(transaction, Transaction.FOR_NETWORK, false));
     }
 
-    public Integer afterCreate(Transaction transaction, int forDeal) {
+    public Integer afterCreate(Transaction transaction, int forDeal, boolean tryFree) {
         //CHECK IF PAYMENT VALID
 
         if (false && // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
@@ -922,7 +922,7 @@ public class TransactionCreator {
         }
 
         transaction.setDC(this.fork, forDeal, this.blockHeight, ++this.seqNo);
-        int valid = transaction.isValid(forDeal, 0L);
+        int valid = transaction.isValid(forDeal, tryFree ? Transaction.NOT_VALIDATE_FLAG_FEE : 0L);
 
         if (valid == Transaction.VALIDATE_OK) {
 
@@ -949,7 +949,7 @@ public class TransactionCreator {
 
     public Integer afterCreateRaw(Transaction transaction, int forDeal, long flags) {
         this.checkUpdate();
-        return this.afterCreate(transaction, forDeal);
+        return this.afterCreate(transaction, forDeal, false);
     }
 
 }

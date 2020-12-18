@@ -272,17 +272,17 @@ public class PersonSetStatusDialog extends JDialog {
         );
 
         String Status_text = "";
-        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+        IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
 
         SetStatusToItemDetailsFrame ww = new SetStatusToItemDetailsFrame((RSetStatusToItem) transaction);
-        dd.jScrollPane1.setViewportView(ww);
-        dd.setLocationRelativeTo(this);
-        dd.setVisible(true);
+        confirmDialog.jScrollPane1.setViewportView(ww);
+        confirmDialog.setLocationRelativeTo(this);
+        confirmDialog.setVisible(true);
 
         //	JOptionPane.OK_OPTION
-        if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, "Status assigned!", false);
+        if (confirmDialog.isConfirm > 0) {
+            ResultDialog.make(this, transaction, "Status assigned!", false, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
         //ENABLE
         Button_Confirm.setEnabled(true);

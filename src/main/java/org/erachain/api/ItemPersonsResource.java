@@ -159,7 +159,7 @@ public class ItemPersonsResource {
         }
 
         Transaction transaction = resultGood.getA();
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -206,7 +206,7 @@ public class ItemPersonsResource {
         }
 
         Transaction transaction = transactionResult.getA();
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -266,7 +266,7 @@ public class ItemPersonsResource {
         PrivateKeyAccount creator = APIUtils.getPrivateKeyCreator(creatorStr);
 
         Transaction transaction = cntr.r_CertifyPubKeysPerson(0, creator, linkTo, feePow, personKey, pubKey, addDays);
-        Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
         // CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {

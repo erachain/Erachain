@@ -763,19 +763,19 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         // Transaction.VALIDATE_OK);
 
         String Status_text = "";
-        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+        IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Mail"), (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2),
                 Status_text, Lang.getInstance().translate("Confirmation transaction send mail"));
 
         MailInfo ww = new MailInfo((RSend) transaction);
         ww.jTabbedPane1.setVisible(false);
-        dd.jScrollPane1.setViewportView(ww);
-        dd.setLocationRelativeTo(th);
-        dd.setVisible(true);
+        confirmDialog.jScrollPane1.setViewportView(ww);
+        confirmDialog.setLocationRelativeTo(th);
+        confirmDialog.setVisible(true);
 
         // JOptionPane.OK_OPTION
-        if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, null, false);
+        if (confirmDialog.isConfirm > 0) {
+            ResultDialog.make(this, transaction, null, false, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
         // ENABLE
         this.sendButton.setEnabled(true);

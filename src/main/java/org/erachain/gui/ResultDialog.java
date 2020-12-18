@@ -15,9 +15,9 @@ import java.math.BigDecimal;
 
 public class ResultDialog {
 
-    public static boolean make(Component parent, Transaction transaction, String message, boolean addMess) {
+    public static boolean make(Component parent, Transaction transaction, String message, boolean addMess, boolean tryFree) {
 
-        int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, tryFree);
 
         //CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {

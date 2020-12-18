@@ -593,21 +593,21 @@ public class CreateOrderPanel extends JPanel {
                     amountWant.setScale(this.want.getScale(), RoundingMode.HALF_DOWN), feePow);
 
             String Status_text = "";
-            IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+            IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                     Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
                     (int) (MainFrame.getInstance().getHeight() / 1.2), Status_text,
                     Lang.getInstance().translate("Confirmation Transaction") + ": "
                             + Lang.getInstance().translate("order creation"));
 
             CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) transaction);
-            dd.jScrollPane1.setViewportView(ww);
-            dd.pack();
-            dd.setLocationRelativeTo(null);
-            dd.setVisible(true);
+            confirmDialog.jScrollPane1.setViewportView(ww);
+            confirmDialog.pack();
+            confirmDialog.setLocationRelativeTo(null);
+            confirmDialog.setVisible(true);
 
             // JOptionPane.OK_OPTION
-            if (dd.isConfirm) {
-                ResultDialog.make(this, transaction, "Order has been sent", false);
+            if (confirmDialog.isConfirm > 0) {
+                ResultDialog.make(this, transaction, "Order has been sent", false, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
             }
 
         } finally {

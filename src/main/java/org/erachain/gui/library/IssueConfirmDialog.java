@@ -18,7 +18,13 @@ import java.awt.event.ActionListener;
  * @author Саша
  */
 public class IssueConfirmDialog extends javax.swing.JDialog {
-    public boolean isConfirm = false;
+
+    public static final int CANCEL = 0;
+    public static final int CONFIRM = 1;
+    public static final int TRY_FREE = 2;
+
+    public int isConfirm = 0;
+    public javax.swing.JButton jButton0;
     public javax.swing.JButton jButton1;
     public javax.swing.JButton jButton2;
     public javax.swing.JPanel jPanel1;
@@ -27,27 +33,28 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
     int insest = 0;
     private JLabel jStatus_Label;
     private JLabel jTitle_Label;
+
     /**
      * Creates new form Issue_Asset_Confirm_Dialog
-     *
      */
     public IssueConfirmDialog(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
                               int w, int h, String status_Text, String title_Text) {
         super(parent, modal);
         Init(parent, modal, transaction, text, w, h, status_Text, title_Text, true);
     }
-    
+
     public IssueConfirmDialog(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
                               int w, int h, String status_Text, String title_Text, boolean receive) {
-            super(parent, modal);
-            Init(parent, modal, transaction, text, w, h, status_Text, title_Text, receive);
+        super(parent, modal);
+        Init(parent, modal, transaction, text, w, h, status_Text, title_Text, receive);
     }
+
     public IssueConfirmDialog(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
                               int w, int h, String status_Text) {
         super(parent, modal);
         Init(parent, modal, transaction, text, w, h, status_Text, "", true);
     }
-    
+
     public IssueConfirmDialog(java.awt.Frame parent, boolean modal, Transaction transaction,
                               int w, int h, String status_Text) {
         super(parent, modal);
@@ -71,20 +78,33 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         }
 
         jStatus_Label.setText("<HTML>" + status_Text + "</HTML>");
-         //  setMaximumSize(new Dimension(350,200));
+        //  setMaximumSize(new Dimension(350,200));
         setSize(w, h);
-        if (!receive)jButton1.setText(Lang.getInstance().translate("Save"));
-        jButton1.addActionListener(new ActionListener() {
 
+        if (!receive) {
+            jButton0.setVisible(false);
+            jButton1.setText(Lang.getInstance().translate("Save"));
+        }
+
+        jButton0.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                isConfirm = true;
+                isConfirm = TRY_FREE;
                 dispose();
             }
         });
-        jButton2.addActionListener(new ActionListener() {
 
+        jButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                isConfirm = CONFIRM;
+                dispose();
+            }
+        });
+
+        jButton2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
@@ -104,9 +124,10 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jStatus_Label.setText(status_Text);
         //  setMaximumSize(new Dimension(350,200));
         setSize(w, h);
+        jButton0.setVisible(false);
         jButton1.setVisible(false);
-        jButton2.addActionListener(new ActionListener() {
 
+        jButton2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
@@ -114,6 +135,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
             }
         });
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -172,16 +194,23 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
         jPanel1.add(jStatus_Label, gridBagConstraints);
 
+        jButton0.setText(Lang.getInstance().translate("Try Free"));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
+        jPanel1.add(jButton0, gridBagConstraints);
+
 
         jButton1.setText(Lang.getInstance().translate("Confirm"));
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
         jPanel1.add(jButton1, gridBagConstraints);
 
         jButton2.setText(Lang.getInstance().translate("Cancel"));
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);

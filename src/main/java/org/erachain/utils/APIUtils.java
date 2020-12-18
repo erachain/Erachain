@@ -321,7 +321,7 @@ public class APIUtils {
         
         if (confirmed) {
             
-            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
             
             if (result == Transaction.VALIDATE_OK)
                 return transaction.toJson().toJSONString();

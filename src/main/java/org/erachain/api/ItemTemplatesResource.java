@@ -161,7 +161,7 @@ public class ItemTemplatesResource {
         }
 
         Transaction transaction = cntr.issueTemplate(resultRaw.a, linkTo, feePow, item);
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();

@@ -281,24 +281,24 @@ public class PollsDialog extends JDialog {
 
         // CHECK VALIDATE MESSAGE
         String Status_text = "";
-        IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,
+        IssueConfirmDialog confirmDialog = new IssueConfirmDialog(null, true, transaction,
                 Lang.getInstance().translate("Vote on Poll"),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction"));
         VoteOnItemPollDetailsFrame ww = new VoteOnItemPollDetailsFrame((VoteOnItemPollTransaction) transaction);
-        dd.jScrollPane1.setViewportView(ww);
-        dd.pack();
-        dd.setLocationRelativeTo(this);
-        dd.setVisible(true);
+        confirmDialog.jScrollPane1.setViewportView(ww);
+        confirmDialog.pack();
+        confirmDialog.setLocationRelativeTo(this);
+        confirmDialog.setVisible(true);
 
-        dd.dispose();
+        confirmDialog.dispose();
 
         // ENABLE
         this.voteButton.setEnabled(true);
 
         // JOptionPane.OK_OPTION
-        if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, "Your vote has been sent", false);
+        if (confirmDialog.isConfirm > 0) {
+            ResultDialog.make(this, transaction, "Your vote has been sent", false, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
 
     }

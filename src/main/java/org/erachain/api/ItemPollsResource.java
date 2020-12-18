@@ -248,7 +248,7 @@ public class ItemPollsResource {
             IssuePollRecord issue_voiting = (IssuePollRecord) controller.issuePoll(account, linkTo, name, description, options, null, null, feePow);
 
             //VALIDATE AND PROCESS
-            int validate = controller.getTransactionCreator().afterCreate(issue_voiting, Transaction.FOR_NETWORK);
+            int validate = controller.getTransactionCreator().afterCreate(issue_voiting, Transaction.FOR_NETWORK, false);
             if (validate == Transaction.VALIDATE_OK)
                 return "ok";
         } catch (NullPointerException | ClassCastException e) {
@@ -377,7 +377,7 @@ public class ItemPollsResource {
         }
 
         Transaction transaction = cntr.issuePoll(resultRaw.a, linkTo, feePow, item);
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -448,7 +448,7 @@ public class ItemPollsResource {
             //CREATE POLL
             Transaction transaction = Controller.getInstance().createItemPollVote(account, key, option, feePow);
 
-            int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+            int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
             if (result == Transaction.VALIDATE_OK) {
 
@@ -507,7 +507,7 @@ public class ItemPollsResource {
 
         //CREATE POLL
         Transaction transaction = Controller.getInstance().createItemPollVote(account, pollKey, option, feePow);
-        int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
         if (result == Transaction.VALIDATE_OK) {
 

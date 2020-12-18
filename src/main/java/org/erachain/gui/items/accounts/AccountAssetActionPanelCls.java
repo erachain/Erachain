@@ -581,21 +581,21 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                 recipient, getAssetKey(), getAmount(), txTitle, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";
-        IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,
+        IssueConfirmDialog confirmDialog = new IssueConfirmDialog(null, true, transaction,
                 Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition,
                         sender != null && sender.equals(asset.getOwner()))),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction"), !noReceive);
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
 
-        dd.jScrollPane1.setViewportView(ww);
-        dd.pack();
-        dd.setLocationRelativeTo(this);
-        dd.setVisible(true);
+        confirmDialog.jScrollPane1.setViewportView(ww);
+        confirmDialog.pack();
+        confirmDialog.setLocationRelativeTo(this);
+        confirmDialog.setVisible(true);
 
         // JOptionPane.OK_OPTION
-        if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, jButton_ok.getText(), false);
+        if (confirmDialog.isConfirm > 0) {
+            ResultDialog.make(this, transaction, jButton_ok.getText(), false, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
 
         // ENABLE
