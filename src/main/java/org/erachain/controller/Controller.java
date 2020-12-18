@@ -3369,6 +3369,18 @@ public class Controller extends Observable {
         }
     }
 
+    public Transaction cancelOrder1(PrivateKeyAccount creator, Order order, int feePow) {
+        Transaction orderCreate = this.dcSet.getTransactionFinalMap().get(order.getId());
+        return cancelOrder1(creator, orderCreate.getSignature(), feePow);
+    }
+
+    public Transaction cancelOrder1(PrivateKeyAccount creator, byte[] orderID, int feePow) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createCancelOrderTransaction1(creator, orderID, feePow);
+        }
+    }
+
     public Transaction cancelOrder2(PrivateKeyAccount creator, Long orderID, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {

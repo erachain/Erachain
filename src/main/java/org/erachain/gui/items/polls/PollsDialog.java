@@ -298,7 +298,7 @@ public class PollsDialog extends JDialog {
 
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, "Your vote has been sent");
+            ResultDialog.make(this, transaction, "Your vote has been sent", false);
         }
 
     }

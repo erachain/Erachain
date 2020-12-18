@@ -235,7 +235,7 @@ public class PersonCertifyPubKeysDialog extends JDialog {
 
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, "Public Key was Certified");
+            ResultDialog.make(this, transaction, "Public Key was Certified", false);
         }
         // ENABLE
         Button_Confirm.setEnabled(true);

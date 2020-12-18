@@ -249,7 +249,7 @@ public abstract class IssueItemPanel extends IconPanel {
             confirmDialog.setVisible(true);
 
             if (confirmDialog.isConfirm) {
-                ResultDialog.make(this, transaction, issueMess);
+                ResultDialog.make(this, transaction, issueMess, false);
             }
         }
 

@@ -775,7 +775,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
 
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, null);
+            ResultDialog.make(this, transaction, null, false);
         }
         // ENABLE
         this.sendButton.setEnabled(true);
