@@ -188,39 +188,44 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
         jStatus_Label.setText(Lang.getInstance().translate("Status"));
+        jStatus_Label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
-        jPanel1.add(jStatus_Label, gridBagConstraints);
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        //  gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(insest, insest, insest, insest);
+        getContentPane().add(jStatus_Label, gridBagConstraints);
 
-        jButton0.setText(Lang.getInstance().translate("Try Free"));
-        gridBagConstraints.gridx = 1;
+        jButton0.setText(Lang.getInstance().translate("Try without Fee"));
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
         jPanel1.add(jButton0, gridBagConstraints);
 
 
         jButton1.setText(Lang.getInstance().translate("Confirm"));
-        gridBagConstraints.gridx = 2;
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
         jPanel1.add(jButton1, gridBagConstraints);
 
         jButton2.setText(Lang.getInstance().translate("Cancel"));
-        gridBagConstraints.gridx = 3;
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
         jPanel1.add(jButton2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.insets = new java.awt.Insets(0, insest, insest, insest);
         getContentPane().add(jPanel1, gridBagConstraints);
 
