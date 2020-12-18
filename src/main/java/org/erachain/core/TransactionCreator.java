@@ -369,8 +369,7 @@ public class TransactionCreator {
                 return new Pair<Transaction, Integer>(issuePersonRecord, Transaction.ITEM_DUPLICATE);
             }
 
-            boolean asPack = false;
-            return new Pair<Transaction, Integer>(issuePersonRecord, 1);//this.afterCreate(issuePersonRecord, asPack));
+            return new Pair<Transaction, Integer>(issuePersonRecord, 1);
         } else {
             // for COPY -
             int valid = issuePersonRecord.isValid(Transaction.FOR_NETWORK,
