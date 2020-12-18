@@ -3250,8 +3250,7 @@ public class Controller extends Observable {
 
         } catch (Exception e) {
             error = ApiErrorFactory.ERROR_JSON;
-            Transaction.updateMapByErrorSimple(ApiErrorFactory.ERROR_JSON, out);
-            out.put("value", errorName);
+            Transaction.updateMapByErrorValue(ApiErrorFactory.ERROR_JSON, errorName, out);
             return out;
         }
 

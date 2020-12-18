@@ -246,6 +246,9 @@ public class OnDealClick {
             case Transaction.INVALID_SIGNATURE:
                 mess = "Invalid signature";
                 break;
+            case Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID:
+                mess = "Invalid Person Owner signature";
+                break;
             case Transaction.TRANSACTION_DOES_NOT_EXIST:
                 mess = "Transaction does not exist";
                 break;
