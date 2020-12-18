@@ -369,11 +369,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
     }
 
-    @Override
-    public String viewSubTypeName() {
-        return viewSubTypeName(key, amount, isBackward(), asset.isDirectBalances());
-    }
-
     public static String viewSubTypeName(long assetKey, BigDecimal amount, boolean isBackward, boolean isDirect) {
 
         if (amount == null || amount.signum() == 0)
@@ -394,6 +389,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         return "???";
 
+    }
+
+    @Override
+    public String viewSubTypeName() {
+        return viewSubTypeName(key, amount, isBackward(), asset.isDirectBalances());
     }
 
     @Override
