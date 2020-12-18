@@ -374,7 +374,7 @@ public class BlockChain {
     //
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
 
-    public static final int FREE_FEE_LENGTH = 1 << 13;
+    public static final int FREE_FEE_LENGTH = 1 << 10;
     public static final int FREE_FEE_TO_SEQNO = DEMO_MODE ? 1 : MAIN_MODE ? 1 : -1;
     public static final int FREE_FEE_FROM_HEIGHT = DEMO_MODE ? 1 : MAIN_MODE ? 1610000 : Integer.MAX_VALUE;
 
