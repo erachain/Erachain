@@ -311,23 +311,28 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     @Override
     public long calcBaseFee() {
 
-        if (hasAmount() && getActionType() == ACTION_SEND // только для передачи в собственность!
-                && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
-                && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)
-                && !isInvolved(asset.getOwner())) {
-            Fun.Tuple2<BigDecimal, BigDecimal> percItem = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
-            assetFee = amount.abs().multiply(percItem.a).setScale(asset.getScale(), RoundingMode.DOWN);
-            if (assetFee.compareTo(percItem.b) < 0) {
-                // USE MINIMAL VALUE
-                assetFee = percItem.b.setScale(asset.getScale(), RoundingMode.DOWN);
+        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
+                && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
+            return 0L;
+        } else {
+            if (hasAmount() && getActionType() == ACTION_SEND // только для передачи в собственность!
+                    && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
+                    && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)
+                    && !isInvolved(asset.getOwner())) {
+                Fun.Tuple2<BigDecimal, BigDecimal> percItem = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
+                assetFee = amount.abs().multiply(percItem.a).setScale(asset.getScale(), RoundingMode.DOWN);
+                if (assetFee.compareTo(percItem.b) < 0) {
+                    // USE MINIMAL VALUE
+                    assetFee = percItem.b.setScale(asset.getScale(), RoundingMode.DOWN);
+                }
+                if (!BlockChain.ASSET_BURN_PERCENTAGE.isEmpty()
+                        && BlockChain.ASSET_BURN_PERCENTAGE.containsKey(key)) {
+                    assetFeeBurn = assetFee.multiply(BlockChain.ASSET_BURN_PERCENTAGE.get(key)).setScale(asset.getScale(), RoundingMode.UP);
+                }
+                return super.calcBaseFee() >> 1;
             }
-            if (!BlockChain.ASSET_BURN_PERCENTAGE.isEmpty()
-                    && BlockChain.ASSET_BURN_PERCENTAGE.containsKey(key)) {
-                assetFeeBurn = assetFee.multiply(BlockChain.ASSET_BURN_PERCENTAGE.get(key)).setScale(asset.getScale(), RoundingMode.UP);
-            }
-            return super.calcBaseFee() >> 1;
+            return super.calcBaseFee();
         }
-        return super.calcBaseFee();
     }
 
     public boolean hasAmount() {
@@ -649,6 +654,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return ITEM_PERSON_IS_DEAD;
         }
 
+        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
+                && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
+            // не учитываем комиссию если размер маленький
+            flags = flags | NOT_VALIDATE_FLAG_FEE;
+        }
+
         // CHECK IF AMOUNT AND ASSET
         if ((flags & NOT_VALIDATE_FLAG_BALANCE) == 0L
                 && this.amount != null) {
@@ -743,7 +754,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         }
 
                         // TRY FEE
-                        if (!BlockChain.isFeeEnough(height, creator)
+                        if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
+                                && !BlockChain.isFeeEnough(height, creator)
                                 && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
                             return NOT_ENOUGH_FEE;
                         }
@@ -789,7 +801,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     return INVALID_HOLD_DIRECTION;
                                 }
 
-                                if (!BlockChain.isFeeEnough(height, creator)
+                                if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
+                                        && !BlockChain.isFeeEnough(height, creator)
                                         && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
                                     return NOT_ENOUGH_FEE;
                                 }
@@ -870,7 +883,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     }
                                 }
 
-                                if (!BlockChain.isFeeEnough(height, creator)
+                                if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
+                                        && !BlockChain.isFeeEnough(height, creator)
                                         && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
                                     return NOT_ENOUGH_FEE;
                                 }
@@ -920,7 +934,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                         forSale = forSale.subtract(assetFee);
                                     }
 
-                                    if (!BlockChain.isFeeEnough(height, creator)
+                                    if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
+                                            && !BlockChain.isFeeEnough(height, creator)
                                             && forSale.compareTo(this.amount.add(this.fee)) < 0) {
 
                                         /// если это девелоп то не проверяем ниже особые счета
@@ -945,7 +960,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     unLimited = asset.isUnlimited(this.creator, false);
                                     if (unLimited) {
                                         // TRY FEE
-                                        if (!BlockChain.isFeeEnough(height, creator)
+                                        if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
+                                                && !BlockChain.isFeeEnough(height, creator)
                                                 && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
                                             return NOT_ENOUGH_FEE;
                                         }
@@ -1055,7 +1071,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 }
 
                                 // TRY FEE
-                                if (!BlockChain.isFeeEnough(height, creator)
+                                if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
+                                        && !BlockChain.isFeeEnough(height, creator)
                                         && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
                                     return NOT_ENOUGH_FEE;
                                 }
@@ -1096,7 +1113,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 }
 
                                 // TRY FEE
-                                if (!BlockChain.isFeeEnough(height, creator)
+                                if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
+                                        && !BlockChain.isFeeEnough(height, creator)
                                         && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
                                     return NOT_ENOUGH_FEE;
                                 }
@@ -1142,6 +1160,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             // TODO first org.erachain.records is BAD already ((
             // CHECK IF CREATOR HAS ENOUGH FEE MONEY
             if (height > BlockChain.ALL_BALANCES_OK_TO
+                    && (flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
                     && !BlockChain.isFeeEnough(height, creator)
                     && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
                 return NOT_ENOUGH_FEE;
