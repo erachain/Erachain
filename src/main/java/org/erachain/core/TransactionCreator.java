@@ -95,39 +95,18 @@ public class TransactionCreator {
         List<Transaction> accountTransactions = new ArrayList<Transaction>();
         Transaction transaction;
 
-        if (false) {
-            // У форка нет вторичных индексов поэтому этот вариант не покатит
-            for (Account account : Controller.getInstance().getWalletAccounts()) {
-                try (IteratorCloseable<Long> iterator = transactionTab.findTransactionsKeys(account.getAddress(), null, null,
-                        0, false, 0, 0, 0L)) {
-                    while (iterator.hasNext()) {
-                        transaction = transactionTab.get(iterator.next());
-                        accountTransactions.add(transaction);
-                    }
-                } catch (java.lang.Throwable e) {
-                    if (e instanceof java.lang.IllegalAccessError) {
-                        // налетели на закрытую таблицу
-                    } else {
-                        logger.error(e.getMessage(), e);
-                    }
+        // здесь нужен протокольный итератор!
+        try (IteratorCloseable<Long> iterator = transactionTab.getIterator()) {
+            List<Account> accountMap = Controller.getInstance().getWalletAccounts();
+
+            while (iterator.hasNext()) {
+                transaction = transactionTab.get(iterator.next());
+
+                if (accountMap.contains(transaction.getCreator())) {
+                    accountTransactions.add(transaction);
                 }
             }
-
-        } else {
-            // здесь нужен протокольный итератор!
-
-            try (IteratorCloseable<Long> iterator = transactionTab.getIterator()) {
-                List<Account> accountMap = Controller.getInstance().getWalletAccounts();
-
-                while (iterator.hasNext()) {
-                    transaction = transactionTab.get(iterator.next());
-
-                    if (accountMap.contains(transaction.getCreator())) {
-                        accountTransactions.add(transaction);
-                    }
-                }
-            } catch (IOException e) {
-            }
+        } catch (IOException e) {
         }
 
         //SORT THEM BY TIMESTAMP
@@ -142,7 +121,7 @@ public class TransactionCreator {
                     //THE TRANSACTION BECAME INVALID LET
                     this.fork.getTransactionTab().delete(transactionAccount);
                 } else {
-                    if (transactionAccount.isValid(Transaction.FOR_NETWORK, 0l) == Transaction.VALIDATE_OK) {
+                    if (transactionAccount.isValid(Transaction.FOR_NETWORK, 0L) == Transaction.VALIDATE_OK) {
                         transactionAccount.process(null, Transaction.FOR_NETWORK);
                     } else {
                         //THE TRANSACTION BECAME INVALID LET
