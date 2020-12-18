@@ -189,16 +189,17 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
 
         jStatus_Label.setText(Lang.getInstance().translate("Status"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
         jPanel1.add(jStatus_Label, gridBagConstraints);
 
         jButton0.setText(Lang.getInstance().translate("Try Free"));
         gridBagConstraints.gridx = 1;
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
         jPanel1.add(jButton0, gridBagConstraints);
 
