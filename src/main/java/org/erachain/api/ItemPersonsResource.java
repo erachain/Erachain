@@ -46,7 +46,7 @@ public class ItemPersonsResource {
         put("POST persons/issue {\"linkTo\": \"<SeqNo>\", \"feePow\": int, \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"birthday\": long, \"deathday\": long, \"gender\": int, \"race\": String, \"birthLatitude\": float, \"birthLongitude\": float, \"skinColor\": String, \"eyeColor\": String, \"hairСolor\": String, \"height\": int, \"owner\": Base58-PubKey, \"ownerSignature\": Base58, \"\": , \"password\": \"<password>\"}", "issue");
         put("POST persons/issueraw/{creator} {\"linkTo\":<SeqNo>, \"feePow\":<int>, \"password\":<String>, \"linkTo\":<SeqNo>, \"raw\":RAW-Base58", "Issue Person by Base58 RAW in POST body");
 
-        put("persons/certify/{creator}/{personKey}?pubkey=<Base58>&feePow=<int>&linkTo=<SeqNo>&days<int>&password=<String>", "Certify some public key for Person by it key. Default: pubKey is owner from Person, feePow=0, days=1");
+        put("persons/certify/{creator}/{personKey}/{pubkey}?feePow=<int>&linkTo=<SeqNo>&days=<int>&password=<String>", "Certify some public key for Person by it key. Default: pubKey is owner from Person, feePow=0, days=1");
     }};
 
     @SuppressWarnings("unchecked")
@@ -217,13 +217,14 @@ public class ItemPersonsResource {
         }
     }
 
+    // GET persons/issueraw/7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz/123/asdasdasdasd
     @GET
     // @Consumes(MediaType.WILDCARD)
     //@Produces("text/plain")
-    @Path("certify/{creator}/{person}")
+    @Path("certify/{creator}/{person}/{pubkey}")
     public String certifyPubkey(@PathParam("creator") String creatorStr,
                                 @PathParam("person") Long personKey,
-                                @QueryParam("pubkey") String pubkeyStr,
+                                @PathParam("pubkey") String pubkeyStr,
                                 @DefaultValue("1") @QueryParam("days") Integer addDays,
                                 @QueryParam("linkTo") String linkToRefStr,
                                 @DefaultValue("0") @QueryParam("feePow") int feePow,
@@ -276,6 +277,5 @@ public class ItemPersonsResource {
         return transaction.makeErrorJSON(result).toJSONString();
 
     }
-
 
 }
