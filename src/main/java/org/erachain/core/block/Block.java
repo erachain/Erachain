@@ -989,6 +989,8 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         if (this.heightBlock == 1) {
             return BigDecimal.ZERO;
+        } else if (this.heightBlock > BlockChain.FREE_FEE_FROM_HEIGHT) {
+            return BigDecimal.ZERO;
         }
 
         // in OLD protocol it USED - and heightBlock get AS 1
