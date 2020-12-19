@@ -8,6 +8,7 @@ import org.erachain.gui.items.assets.DepositExchange;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,7 +26,9 @@ public class ResultDialog {
                             + (addMess ? " " + Lang.getInstance().translate("- was made") + "!" : ""),
                     Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
             return true;
-        } else if (BlockChain.MAIN_MODE && result == Transaction.NOT_ENOUGH_FEE) {
+        } else if (BlockChain.MAIN_MODE && result == Transaction.NOT_ENOUGH_FEE
+                // и биржа включена
+                && Settings.EXCHANGE_IN_OUT) {
 
             Object[] options = {Lang.getInstance().translate("Add funds to Your account"),
                     Lang.getInstance().translate("Cancel")};

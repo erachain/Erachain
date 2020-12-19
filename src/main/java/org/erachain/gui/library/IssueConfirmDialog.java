@@ -5,6 +5,8 @@ package org.erachain.gui.library;
  * and open the template in the editor.
  */
 
+import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -81,9 +83,15 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         //  setMaximumSize(new Dimension(350,200));
         setSize(w, h);
 
+
         if (!receive) {
             jButton0.setVisible(false);
             jButton1.setText(Lang.getInstance().translate("Save"));
+        } else {
+            // проверим а вообще такая трнзакция может быть бесплатна?
+            jButton0.setVisible(BlockChain.FREE_FEE_TO_SEQNO > 0
+                    && BlockChain.FREE_FEE_FROM_HEIGHT > Controller.getInstance().getMyHeight()
+                    && transaction.getDataLength(Transaction.FOR_NETWORK, true) < BlockChain.FREE_FEE_LENGTH);
         }
 
         jButton0.addActionListener(new ActionListener() {
