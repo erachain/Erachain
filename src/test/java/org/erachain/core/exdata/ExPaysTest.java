@@ -77,6 +77,66 @@ public class ExPaysTest {
 
         assertEquals(exPays.filterTXEndSeqNo, exPaysParsed.filterTXEndSeqNo);
 
+        ///////////////////
+        exPays = new ExPays(flags, null, balancePos, backward, amountMin, amountMax,
+                payMethod, payMethodValue, filterAssetKey, filterBalancePos, filterBalanceSide,
+                filterBalanceLessThen, filterBalanceMoreThen,
+                filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
+                filterByGender, selfPay);
+        try {
+            bytes = exPays.toByte();
+        } catch (Exception e) {
+        }
+        assertEquals(bytes.length, exPays.length());
+
+        try {
+            exPaysParsed = ExPays.parse(bytes, 0);
+        } catch (Exception e) {
+            String ee = e.getMessage();
+        }
+
+        assertEquals(exPays.filterTXEndSeqNo, exPaysParsed.filterTXEndSeqNo);
+
+        ///////////////////
+        exPays = new ExPays(flags, null, balancePos, backward, amountMin, amountMax,
+                payMethod, payMethodValue, null, filterBalancePos, filterBalanceSide,
+                filterBalanceLessThen, filterBalanceMoreThen,
+                filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
+                filterByGender, selfPay);
+        try {
+            bytes = exPays.toByte();
+        } catch (Exception e) {
+        }
+        assertEquals(bytes.length, exPays.length());
+
+        try {
+            exPaysParsed = ExPays.parse(bytes, 0);
+        } catch (Exception e) {
+            String ee = e.getMessage();
+        }
+
+        assertEquals(exPays.filterTXEndSeqNo, exPaysParsed.filterTXEndSeqNo);
+
+        ///////////////////
+        exPays = new ExPays(flags, null, balancePos, backward, amountMin, amountMax,
+                payMethod, payMethodValue, null, filterBalancePos, filterBalanceSide,
+                filterBalanceLessThen, filterBalanceMoreThen,
+                null, filterTXStartSeqNo, filterTXEndSeqNo,
+                filterByGender, selfPay);
+        try {
+            bytes = exPays.toByte();
+        } catch (Exception e) {
+        }
+        assertEquals(bytes.length, exPays.length());
+
+        try {
+            exPaysParsed = ExPays.parse(bytes, 0);
+        } catch (Exception e) {
+            String ee = e.getMessage();
+        }
+
+        assertEquals(exPays.selfPay, exPaysParsed.selfPay);
+
 
     }
 

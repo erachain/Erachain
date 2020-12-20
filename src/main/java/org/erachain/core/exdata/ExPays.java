@@ -74,7 +74,7 @@ public class ExPays {
     public Long filterTXEndSeqNo; // 52
 
     private final Integer filterByGender; // 53 = gender or all
-    private boolean selfPay; // 54
+    public boolean selfPay; // 54
 
     /////////////////
     private int height;
