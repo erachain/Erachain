@@ -3,6 +3,7 @@ package org.erachain.core.exdata;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSignNote;
@@ -35,6 +36,8 @@ import java.util.List;
 
 public class ExPays {
 
+    public static final byte BASE_LENGTH = 4 + 2;
+
     private static final byte AMOUNT_FLAG_MASK = 64;
     private static final byte BALANCE_FLAG_MASK = 32;
     private static final byte TXTYPE_FLAG_MASK = 16;
@@ -55,11 +58,10 @@ public class ExPays {
     private Long assetKey;
     private int balancePos;
     private boolean backward;
-    private BigDecimal amountMin;
-    private BigDecimal amountMax;
-
     private int payMethod; // 0 - by Total, 1 - by Percent
     private BigDecimal payMethodValue;
+    private BigDecimal amountMin;
+    private BigDecimal amountMax;
 
     private Long filterAssetKey;
     private int filterBalancePos;
@@ -72,7 +74,6 @@ public class ExPays {
     private Long filterTXEndSeqNo;
 
     private final Integer filterByGender; // = gender or all
-
     private boolean selfPay;
 
     /////////////////
@@ -145,6 +146,14 @@ public class ExPays {
         if (hasAmount()) {
             outStream.write(Longs.toByteArray(this.assetKey));
 
+            buff = new byte[]{(byte) balancePos, (byte) (backward ? 1 : 0), (byte) payMethod};
+            outStream.write(buff);
+
+            outStream.write((byte) this.payMethodValue.scale());
+            buff = this.payMethodValue.unscaledValue().toByteArray();
+            outStream.write((byte) buff.length);
+            outStream.write(buff);
+
             outStream.write((byte) this.amountMin.scale());
             buff = this.amountMin.unscaledValue().toByteArray();
             outStream.write((byte) buff.length);
@@ -155,21 +164,14 @@ public class ExPays {
             outStream.write((byte) buff.length);
             outStream.write(buff);
 
-            buff = new byte[]{(byte) balancePos, (byte) (backward ? 1 : 0), (byte) payMethod};
-            outStream.write(buff);
-
-            //WRITE AMOUNT MAX SCALE
-            outStream.write((byte) this.payMethodValue.scale());
-
-            //WRITE AMOUNT MAX
-            buff = this.payMethodValue.unscaledValue().toByteArray();
-            outStream.write((byte) buff.length);
-            outStream.write(buff);
         }
 
         if (hasAssetFilter()) {
             outStream.write(Longs.toByteArray(this.filterAssetKey));
-            buff = new byte[]{(byte) filterBalancePos, (byte) filterBalancePos};
+            buff = new byte[]{(byte) filterBalancePos, (byte) filterBalanceSide};
+            outStream.write(buff);
+
+            buff = new byte[]{(byte) filterBalancePos, (byte) filterBalanceSide};
             outStream.write(buff);
 
             outStream.write((byte) this.filterBalanceLessThen.scale());
@@ -196,7 +198,26 @@ public class ExPays {
     }
 
     public int length() {
-        return 1;
+        int len = BASE_LENGTH;
+
+        if (hasAmount()) {
+            len += Transaction.KEY_LENGTH + 3 + 6
+                    + payMethodValue.unscaledValue().toByteArray().length
+                    + amountMin.unscaledValue().toByteArray().length
+                    + amountMax.unscaledValue().toByteArray().length;
+        }
+
+        if (hasAssetFilter()) {
+            len += Transaction.KEY_LENGTH + 2 + 4
+                    + filterBalanceLessThen.unscaledValue().toByteArray().length
+                    + filterBalanceMoreThen.unscaledValue().toByteArray().length;
+        }
+
+        if (hasTXTypeFilter()) {
+            len += 1 + 8 + 8;
+        }
+
+        return len;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -220,6 +241,15 @@ public class ExPays {
             assetKey = Longs.fromByteArray(Arrays.copyOfRange(data, position, Long.BYTES));
             position += Long.BYTES;
 
+            balancePos = data[position++];
+            backward = data[position++] > 0;
+            payMethod = data[position++];
+
+            scale = data[position++];
+            len = data[position++];
+            payMethodValue = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, len)), scale);
+            position += len;
+
             scale = data[position++];
             len = data[position++];
             amountMin = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, len)), scale);
@@ -228,15 +258,6 @@ public class ExPays {
             scale = data[position++];
             len = data[position++];
             amountMax = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, len)), scale);
-            position += len;
-
-            balancePos = data[position++];
-            backward = data[position++] > 0;
-            payMethod = data[position++];
-
-            scale = data[position++];
-            len = data[position++];
-            payMethodValue = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, len)), scale);
             position += len;
 
         }
@@ -370,10 +391,12 @@ public class ExPays {
             totalFee = BigDecimal.ZERO;
 
             long actionFlags = 0L;
-            Account recipent = new Account((byte[]) payouts.get(1).a);
+            Account recipient = new Account((byte[]) payouts.get(1).a);
+            PublicKeyAccount creator = rNote.getCreator();
+            byte[] signature = rNote.getSignature();
             // проверим как будто всю сумму одному переводим
-            int result = TransactionAmount.isValidAction(dcSet, height, rNote.getCreator(), rNote.getSignature(),
-                    assetKey, asset, totalPay, recipent,
+            int result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
+                    assetKey, asset, totalPay, recipient,
                     backward, rNote.getFee(), null, false, actionFlags);
             if (result != Transaction.VALIDATE_OK)
                 return result;
@@ -385,8 +408,18 @@ public class ExPays {
                         // end
                         break;
 
-                    Account recipient = (Account) item.a;
-                    BigDecimal amount = (BigDecimal) item.b
+                    recipient = (Account) item.a;
+                    BigDecimal amount = (BigDecimal) item.b;
+
+                    result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
+                            assetKey, asset, amount, recipient,
+                            backward, BigDecimal.ZERO, null, false, actionFlags);
+
+                    if (result != Transaction.VALIDATE_OK) {
+                        errorValue = amount.toPlainString() + " -> " + recipient.getAddress();
+                        return result;
+                    }
+
                 }
             }
         }
@@ -399,7 +432,7 @@ public class ExPays {
         BigDecimal totalSendAmount = BigDecimal.ZERO;
 
         boolean onlyPerson = filterByGender != NOT_FILTER_PERSONS;
-        byte[] accountFrom = transaction.getCreator().getShortAddressBytes()
+        byte[] accountFrom = transaction.getCreator().getShortAddressBytes();
 
         DCSet dcSet = transaction.getDCSet();
         ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
@@ -516,7 +549,7 @@ public class ExPays {
             LOGGER.error(e.getMessage(), e);
         }
 
-        payouts.add(new Fun.Tuple2(count, totalSendAmount);
+        payouts.add(new Fun.Tuple2(count, totalSendAmount));
         return count;
 
     }

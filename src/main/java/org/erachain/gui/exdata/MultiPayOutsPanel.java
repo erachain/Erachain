@@ -1,6 +1,7 @@
 package org.erachain.gui.exdata;
 
 
+import org.erachain.core.exdata.ExPays;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.IconPanel;
@@ -541,6 +542,9 @@ public class MultiPayOutsPanel extends IconPanel {
         add(jComboBoxPersonFilter, gridBagConstraints);
     }
 
+    public ExPays getPays() {
+        return null;
+    }
 
     private javax.swing.JButton jButtonCalcCompu;
     private javax.swing.JButton jButtonCancel;

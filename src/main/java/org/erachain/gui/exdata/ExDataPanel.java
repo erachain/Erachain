@@ -4,6 +4,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.ExPays;
 import org.erachain.core.exdata.exLink.*;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
@@ -849,6 +850,9 @@ public class ExDataPanel extends JPanel {
                     exLink = null;
             }
         }
+
+        ExPays exPays = multiPayOutsPanel.getPays();
+
         return ExData.make(exLink, exPays, creator, jTextField_Title_Message.getText(),
                 signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
                 (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),
