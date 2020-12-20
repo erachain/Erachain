@@ -1238,7 +1238,11 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public String viewCreator() {
-        return creator == null ? "GENESIS" : creator.getPersonAsString();
+        return viewAccount(creator);
+    }
+
+    public static String viewAccount(Account account) {
+        return account == null ? "GENESIS" : account.getPersonAsString();
     }
 
     public String viewRecipient() {
@@ -1255,6 +1259,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public String viewTimestamp() {
+        return viewTimestamp(timestamp);
+    }
+
+    public static String viewTimestamp(long timestamp) {
         return timestamp < 1000 ? "null" : DateTimeFormat.timestamptoString(timestamp);
     }
 

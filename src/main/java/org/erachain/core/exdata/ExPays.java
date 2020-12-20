@@ -3,9 +3,11 @@ package org.erachain.core.exdata;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.TransactionFinalMapImpl;
@@ -18,7 +20,10 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * StandardCharsets.UTF_8 JSON "TM" - template key "PR" - template params
@@ -69,6 +74,14 @@ public class ExPays {
     private final Integer filterByGender; // = gender or all
 
     private boolean selfPay;
+
+    /////////////////
+    private int height;
+    AssetCls asset;
+    public List<Fun.Tuple2> payouts;
+    public BigDecimal totalPay;
+    public BigDecimal totalFee;
+    public String errorValue;
 
 
     public ExPays(int flags, Long assetKey, int balancePos, boolean backward, BigDecimal amountMin, BigDecimal amountMax,
@@ -182,16 +195,13 @@ public class ExPays {
 
     }
 
+    public int length() {
+        return 1;
+    }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static ExPays parse(byte[] data) throws Exception {
+    public static ExPays parse(byte[] data, int position) throws Exception {
 
-        //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < 10) {
-            throw new Exception("Data does not match block length " + data.length);
-        }
-
-        int position = 0;
         int scale;
         int len;
 
@@ -301,8 +311,9 @@ public class ExPays {
     /**
      * Version 2 maker for BlockExplorer
      */
-    public void makeJSONforHTML(Map output,
-                                int blockNo, int seqNo, JSONObject langObj) {
+    public JSONObject makeJSONforHTML(JSONObject langObj) {
+        JSONObject json = new JSONObject();
+        return json;
 
     }
 
@@ -343,6 +354,43 @@ public class ExPays {
             return Transaction.INVALID_TRANSACTION_TYPE;
         }
 
+
+        payouts = new ArrayList<>();
+        int count = makePayList(rNote, payouts);
+
+        if (count < 0) {
+            // ERROR on make LIST
+            return -count;
+
+        } else if (count > 0) {
+            height = rNote.getBlockHeight();
+            asset = dcSet.getItemAssetMap().get(assetKey);
+
+            totalPay = (BigDecimal) payouts.get(count).b;
+            totalFee = BigDecimal.ZERO;
+
+            long actionFlags = 0L;
+            Account recipent = new Account((byte[]) payouts.get(1).a);
+            // проверим как будто всю сумму одному переводим
+            int result = TransactionAmount.isValidAction(dcSet, height, rNote.getCreator(), rNote.getSignature(),
+                    assetKey, asset, totalPay, recipent,
+                    backward, rNote.getFee(), null, false, actionFlags);
+            if (result != Transaction.VALIDATE_OK)
+                return result;
+
+            boolean needCheckAllList = false;
+            if (needCheckAllList) {
+                for (Fun.Tuple2 item : payouts) {
+                    if (item.a instanceof Integer)
+                        // end
+                        break;
+
+                    Account recipient = (Account) item.a;
+                    BigDecimal amount = (BigDecimal) item.b
+                }
+            }
+        }
+
         return Transaction.VALIDATE_OK;
     }
 
@@ -372,6 +420,9 @@ public class ExPays {
         } else {
             myPersonKey = null;
         }
+
+        boolean isPerson = transaction.getCreator().isPerson(dcSet, height, transaction.getCreatorPersonDuration());
+        int actionType = balancePos;
 
         HashSet<Long> usedPersons = new HashSet<>();
         PersonCls person;
@@ -420,6 +471,16 @@ public class ExPays {
                     person = null;
                 }
 
+                Account recipient = new Account(recipentShort);
+
+                // IF send from PERSON to ANONYMOUS
+                if (!TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
+                        isPerson, filterAssetKey, actionType,
+                        asset)) {
+                    errorValue = recipient.getAddress();
+                    return -Transaction.RECEIVER_NOT_PERSONALIZED;
+                }
+
                 /// если задано то проверим - входит ли в в диаппазон
                 // - собранные блоки учитываем? да - иначе долго будет делать поиск
                 if (filterTXStartSeqNo != null || filterTXEndSeqNo != null) {
@@ -439,7 +500,7 @@ public class ExPays {
                     sendAmount = sendAmount.add(balance.b.multiply(payMethodValue));
                 }
 
-                payouts.add(new Fun.Tuple2(recipentShort, sendAmount));
+                payouts.add(new Fun.Tuple2(recipient, sendAmount));
 
                 // просчитаем тоже даже если ошибка
                 totalSendAmount = totalSendAmount.add(sendAmount);
@@ -465,18 +526,24 @@ public class ExPays {
         DCSet dcSet = transaction.getDCSet();
 
         int count = makePayList(transaction, payouts);
+        if (count == 0)
+            return;
+
+        int height = transaction.getBlockHeight();
         BigDecimal totalPay = (BigDecimal) payouts.get(count).b;
         BigDecimal totalFee = BigDecimal.ZERO;
-        Fun.Tuple2<BigDecimal, BigDecimal> balance = transaction.getCreator().getBalanceInPosition(dcSet, assetKey, balancePos);
-        if (balance)
+
 
     }
 
     public void orphan(Transaction transaction) {
         List<Fun.Tuple2> payouts = new ArrayList<>();
         int count = makePayList(transaction, payouts);
+        if (count == 0)
+            return;
         BigDecimal totalPay = (BigDecimal) payouts.get(count).b;
         BigDecimal totalFee = BigDecimal.ZERO;
+
     }
 
 }
