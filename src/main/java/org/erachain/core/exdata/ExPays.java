@@ -71,7 +71,7 @@ public class ExPays {
 
     private Integer filterTXType; // 36
     private Long filterTXStartSeqNo; // 44
-    private Long filterTXEndSeqNo; // 52
+    public Long filterTXEndSeqNo; // 52
 
     private final Integer filterByGender; // 53 = gender or all
     private boolean selfPay; // 54
@@ -235,7 +235,7 @@ public class ExPays {
         BigDecimal payMethodValue = null;
 
         if ((flags & AMOUNT_FLAG_MASK) != 0) {
-            assetKey = Longs.fromByteArray(Arrays.copyOfRange(data, position, Long.BYTES));
+            assetKey = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));
             position += Long.BYTES;
 
             balancePos = data[position++];
@@ -244,17 +244,17 @@ public class ExPays {
 
             scale = data[position++];
             len = data[position++];
-            payMethodValue = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, len)), scale);
+            payMethodValue = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
             position += len;
 
             scale = data[position++];
             len = data[position++];
-            amountMin = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, len)), scale);
+            amountMin = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
             position += len;
 
             scale = data[position++];
             len = data[position++];
-            amountMax = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, len)), scale);
+            amountMax = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
             position += len;
 
         }
@@ -266,7 +266,7 @@ public class ExPays {
         BigDecimal filterBalanceMoreThen = null;
 
         if ((flags & BALANCE_FLAG_MASK) != 0) {
-            filterAssetKey = Longs.fromByteArray(Arrays.copyOfRange(data, position, Long.BYTES));
+            filterAssetKey = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));
             position += Long.BYTES;
 
             filterBalancePos = data[position++];
@@ -274,12 +274,12 @@ public class ExPays {
 
             scale = data[position++];
             len = data[position++];
-            filterBalanceLessThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, len)), scale);
+            filterBalanceLessThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
             position += len;
 
             scale = data[position++];
             len = data[position++];
-            filterBalanceMoreThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, len)), scale);
+            filterBalanceMoreThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
             position += len;
 
         }
@@ -292,10 +292,10 @@ public class ExPays {
 
             filterTXType = (int) data[position++];
 
-            filterTXStart = Longs.fromByteArray(Arrays.copyOfRange(data, position, Long.BYTES));
+            filterTXStart = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));
             position += Long.BYTES;
 
-            filterTXEnd = Longs.fromByteArray(Arrays.copyOfRange(data, position, Long.BYTES));
+            filterTXEnd = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));
             position += Long.BYTES;
 
         }

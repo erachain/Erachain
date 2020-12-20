@@ -56,6 +56,28 @@ public class ExPaysTest {
 
     @Test
     public void parse() {
+        ExPays exPays = new ExPays(flags, assetKey, balancePos, backward, amountMin, amountMax,
+                payMethod, payMethodValue, filterAssetKey, filterBalancePos, filterBalanceSide,
+                filterBalanceLessThen, filterBalanceMoreThen,
+                filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
+                filterByGender, selfPay);
+        byte[] bytes = null;
+        try {
+            bytes = exPays.toByte();
+        } catch (Exception e) {
+        }
+        assertEquals(bytes.length, exPays.length());
+
+        ExPays exPaysParsed = null;
+        try {
+            exPaysParsed = ExPays.parse(bytes, 0);
+        } catch (Exception e) {
+            String ee = e.getMessage();
+        }
+
+        assertEquals(exPays.filterTXEndSeqNo, exPaysParsed.filterTXEndSeqNo);
+
+
     }
 
     @Test
