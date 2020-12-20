@@ -53,28 +53,28 @@ public class ExPays {
     /**
      * 0 - version; 1..3 - flags;
      */
-    private int flags;
+    private int flags; // 4
 
-    private Long assetKey;
-    private int balancePos;
-    private boolean backward;
-    private int payMethod; // 0 - by Total, 1 - by Percent
-    private BigDecimal payMethodValue;
-    private BigDecimal amountMin;
-    private BigDecimal amountMax;
+    private Long assetKey; // 12
+    private int balancePos; // 13
+    private boolean backward; // 14
+    private int payMethod; // 15 0 - by Total, 1 - by Percent
+    private BigDecimal payMethodValue; // 17
+    private BigDecimal amountMin; // 19
+    private BigDecimal amountMax; //21
 
-    private Long filterAssetKey;
-    private int filterBalancePos;
-    private int filterBalanceSide;
-    private BigDecimal filterBalanceLessThen;
-    private BigDecimal filterBalanceMoreThen;
+    private Long filterAssetKey; // 29
+    private int filterBalancePos; //30
+    private int filterBalanceSide; //31
+    private BigDecimal filterBalanceLessThen; // 33
+    private BigDecimal filterBalanceMoreThen; // 35
 
-    private Integer filterTXType;
-    private Long filterTXStartSeqNo;
-    private Long filterTXEndSeqNo;
+    private Integer filterTXType; // 36
+    private Long filterTXStartSeqNo; // 44
+    private Long filterTXEndSeqNo; // 52
 
-    private final Integer filterByGender; // = gender or all
-    private boolean selfPay;
+    private final Integer filterByGender; // 53 = gender or all
+    private boolean selfPay; // 54
 
     /////////////////
     private int height;
@@ -140,7 +140,7 @@ public class ExPays {
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
-        outStream.write(flags);
+        outStream.write(Ints.toByteArray(flags));
 
         byte[] buff;
         if (hasAmount()) {
@@ -149,19 +149,19 @@ public class ExPays {
             buff = new byte[]{(byte) balancePos, (byte) (backward ? 1 : 0), (byte) payMethod};
             outStream.write(buff);
 
-            outStream.write((byte) this.payMethodValue.scale());
+            outStream.write(this.payMethodValue.scale());
             buff = this.payMethodValue.unscaledValue().toByteArray();
-            outStream.write((byte) buff.length);
+            outStream.write(buff.length);
             outStream.write(buff);
 
-            outStream.write((byte) this.amountMin.scale());
+            outStream.write(this.amountMin.scale());
             buff = this.amountMin.unscaledValue().toByteArray();
-            outStream.write((byte) buff.length);
+            outStream.write(buff.length);
             outStream.write(buff);
 
-            outStream.write((byte) this.amountMax.scale());
+            outStream.write(this.amountMax.scale());
             buff = this.amountMax.unscaledValue().toByteArray();
-            outStream.write((byte) buff.length);
+            outStream.write(buff.length);
             outStream.write(buff);
 
         }
@@ -171,22 +171,19 @@ public class ExPays {
             buff = new byte[]{(byte) filterBalancePos, (byte) filterBalanceSide};
             outStream.write(buff);
 
-            buff = new byte[]{(byte) filterBalancePos, (byte) filterBalanceSide};
-            outStream.write(buff);
-
-            outStream.write((byte) this.filterBalanceLessThen.scale());
+            outStream.write(this.filterBalanceLessThen.scale());
             buff = this.filterBalanceLessThen.unscaledValue().toByteArray();
-            outStream.write((byte) buff.length);
+            outStream.write(buff.length);
             outStream.write(buff);
 
-            outStream.write((byte) this.filterBalanceMoreThen.scale());
+            outStream.write(this.filterBalanceMoreThen.scale());
             buff = this.filterBalanceMoreThen.unscaledValue().toByteArray();
-            outStream.write((byte) buff.length);
+            outStream.write(buff.length);
             outStream.write(buff);
         }
 
         if (hasTXTypeFilter()) {
-            outStream.write(new byte[]{(byte) (int) filterTXType});
+            outStream.write(filterTXType);
             outStream.write(Longs.toByteArray(this.filterTXStartSeqNo));
             outStream.write(Longs.toByteArray(this.filterTXEndSeqNo));
         }
