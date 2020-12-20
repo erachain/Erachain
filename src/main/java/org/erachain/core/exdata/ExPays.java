@@ -38,6 +38,7 @@ public class ExPays {
 
     public static final byte BASE_LENGTH = 4 + 2;
 
+    public static final int MAX_COUNT = Integer.MAX_VALUE >> 1;
     private static final byte AMOUNT_FLAG_MASK = 64;
     private static final byte BALANCE_FLAG_MASK = 32;
     private static final byte TXTYPE_FLAG_MASK = 16;
@@ -384,13 +385,19 @@ public class ExPays {
             height = rNote.getBlockHeight();
             asset = dcSet.getItemAssetMap().get(assetKey);
 
-            totalPay = (BigDecimal) payouts.get(count).b;
             totalFee = BigDecimal.ZERO;
 
             long actionFlags = 0L;
             Account recipient = new Account((byte[]) payouts.get(1).a);
             PublicKeyAccount creator = rNote.getCreator();
             byte[] signature = rNote.getSignature();
+
+            if (filterTXType == PAYMENT_METHOD_COEFF) {
+                totalPay = (BigDecimal) payouts.get(count).b;
+            } else {
+                totalPay = payMethodValue;
+            }
+
             // проверим как будто всю сумму одному переводим
             int result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
                     assetKey, asset, totalPay, recipient,
@@ -398,6 +405,7 @@ public class ExPays {
             if (result != Transaction.VALIDATE_OK)
                 return result;
 
+            ////////// TODO NEED CHECK ALL
             boolean needCheckAllList = false;
             if (needCheckAllList) {
                 for (Fun.Tuple2 item : payouts) {
@@ -535,6 +543,11 @@ public class ExPays {
                 // просчитаем тоже даже если ошибка
                 totalSendAmount = totalSendAmount.add(sendAmount);
                 count++;
+                if (count > MAX_COUNT) {
+                    errorValue = "MAX count over: " + MAX_COUNT;
+                    return -Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR;
+                }
+
                 if (onlyPerson) {
                     // учтем что такой персоне давали
                     usedPersons.add(addressDuration.a);
