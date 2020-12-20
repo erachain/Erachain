@@ -2,20 +2,23 @@ package org.erachain.core.exdata;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.erachain.core.exdata.exLink.ExLinkAuthor;
-import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.account.Account;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
 /**
  * StandardCharsets.UTF_8 JSON "TM" - template key "PR" - template params
@@ -27,29 +30,31 @@ import java.util.Map;
 
 public class ExPays {
 
-    /**
-     * flags[1] masks
-     */
-
     private static final byte AMOUNT_FLAG_MASK = 64;
     private static final byte BALANCE_FLAG_MASK = 32;
     private static final byte TXTYPE_FLAG_MASK = 16;
 
+    private static final byte PAYMENT_METHOD_TOTAL = 1; // by TOTAL
+    private static final byte PAYMENT_METHOD_COEFF = 2; // by coefficient
+
+    private static final byte NOT_FILTER_PERSONS = -1; //
+    private static final byte NOT_FILTER_GENDER = -2; //
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ExPays.class);
 
     /**
-     * 0 - version; 1 - flag 1;
+     * 0 - version; 1..3 - flags;
      */
     private int flags;
 
-    private final Long assetKey;
-    private final int balancePos;
-    private final boolean backward;
-    private final BigDecimal amountMin;
-    private final BigDecimal amountMax;
+    private Long assetKey;
+    private int balancePos;
+    private boolean backward;
+    private BigDecimal amountMin;
+    private BigDecimal amountMax;
 
-    private final int payMethod; // 0 - by Total, 1 - by Percent
-    private final BigDecimal payMethodValue;
+    private int payMethod; // 0 - by Total, 1 - by Percent
+    private BigDecimal payMethodValue;
 
     private Long filterAssetKey;
     private int filterBalancePos;
@@ -58,16 +63,19 @@ public class ExPays {
     private BigDecimal filterBalanceMoreThen;
 
     private Integer filterTXType;
-    private Long filterTXStart;
-    private Long filterTXEnd;
+    private Long filterTXStartSeqNo;
+    private Long filterTXEndSeqNo;
 
-    private final Integer filterByPerson; // = gender or all
+    private final Integer filterByGender; // = gender or all
+
+    private boolean selfPay;
 
 
     public ExPays(int flags, Long assetKey, int balancePos, boolean backward, BigDecimal amountMin, BigDecimal amountMax,
                   int payMethod, BigDecimal payMethodValue, Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
                   BigDecimal filterBalanceLessThen, BigDecimal filterBalanceMoreThen,
-                  Integer filterTXType, Long filterTXStart, Long filterTXEnd, Integer filterByPerson) {
+                  Integer filterTXType, Long filterTXStartSeqNo, Long filterTXEndSeqNo,
+                  Integer filterByGender, boolean selfPay) {
         this.flags = flags;
 
         if (assetKey != null && assetKey != 0) {
@@ -94,11 +102,12 @@ public class ExPays {
         if (filterTXType != null && filterTXType != 0) {
             this.flags |= TXTYPE_FLAG_MASK;
             this.filterTXType = filterTXType;
-            this.filterTXStart = filterTXStart;
-            this.filterTXEnd = filterTXEnd;
+            this.filterTXStartSeqNo = filterTXStartSeqNo;
+            this.filterTXEndSeqNo = filterTXEndSeqNo;
         }
 
-        this.filterByPerson = filterByPerson;
+        this.filterByGender = filterByGender;
+        this.selfPay = selfPay;
     }
 
     public boolean hasAmount() {
@@ -123,18 +132,12 @@ public class ExPays {
         if (hasAmount()) {
             outStream.write(Longs.toByteArray(this.assetKey));
 
-            //WRITE AMOUNT MIN SCALE
             outStream.write((byte) this.amountMin.scale());
-
-            //WRITE AMOUNT MIN
             buff = this.amountMin.unscaledValue().toByteArray();
             outStream.write((byte) buff.length);
             outStream.write(buff);
 
-            //WRITE AMOUNT MAX SCALE
             outStream.write((byte) this.amountMax.scale());
-
-            //WRITE AMOUNT MAX
             buff = this.amountMax.unscaledValue().toByteArray();
             outStream.write((byte) buff.length);
             outStream.write(buff);
@@ -169,11 +172,13 @@ public class ExPays {
 
         if (hasTXTypeFilter()) {
             outStream.write(new byte[]{(byte) (int) filterTXType});
-            outStream.write(Longs.toByteArray(this.filterTXStart));
-            outStream.write(Longs.toByteArray(this.filterTXEnd));
+            outStream.write(Longs.toByteArray(this.filterTXStartSeqNo));
+            outStream.write(Longs.toByteArray(this.filterTXEndSeqNo));
         }
 
-        outStream.write(new byte[]{(byte) (int) filterByPerson});
+        outStream.write(new byte[]{(byte) (int) filterByGender, (byte) (selfPay ? 1 : 0)});
+
+        return outStream.toByteArray();
 
     }
 
@@ -194,11 +199,11 @@ public class ExPays {
         position += Integer.BYTES;
 
         Long assetKey = null;
-        int balancePos;
-        boolean backward;
+        int balancePos = 0;
+        boolean backward = false;
         BigDecimal amountMin = null;
         BigDecimal amountMax = null;
-        int payMethod;
+        int payMethod = 0;
         BigDecimal payMethodValue = null;
 
         if ((flags & AMOUNT_FLAG_MASK) != 0) {
@@ -218,7 +223,6 @@ public class ExPays {
             balancePos = data[position++];
             backward = data[position++] > 0;
             payMethod = data[position++];
-            ;
 
             scale = data[position++];
             len = data[position++];
@@ -228,8 +232,8 @@ public class ExPays {
         }
 
         Long filterAssetKey = null;
-        int filterBalancePos;
-        int filterBalanceSide;
+        int filterBalancePos = 0;
+        int filterBalanceSide = 0;
         BigDecimal filterBalanceLessThen = null;
         BigDecimal filterBalanceMoreThen = null;
 
@@ -252,13 +256,13 @@ public class ExPays {
 
         }
 
-        int filterTXType;
+        Integer filterTXType = null;
         Long filterTXStart = null;
         Long filterTXEnd = null;
 
         if ((flags & TXTYPE_FLAG_MASK) != 0) {
 
-            filterTXType = data[position++];
+            filterTXType = (int) data[position++];
 
             filterTXStart = Longs.fromByteArray(Arrays.copyOfRange(data, position, Long.BYTES));
             position += Long.BYTES;
@@ -269,24 +273,28 @@ public class ExPays {
         }
 
         int filterByPerson = data[position++];
+        boolean selfPay = data[position++] > 0;
 
         return new ExPays(flags, assetKey, balancePos, backward, amountMin, amountMax,
                 payMethod, payMethodValue, filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceLessThen, filterBalanceMoreThen,
-                filterTXType, filterTXStart, filterTXEnd, filterByPerson);
+                filterTXType, filterTXStart, filterTXEnd,
+                filterByPerson, selfPay);
     }
 
     public static byte[] make(int flags, Long assetKey, int balancePos, boolean backward, BigDecimal amountMin, BigDecimal amountMax,
                               int payMethod, BigDecimal payMethodValue, Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
                               BigDecimal filterBalanceLessThen, BigDecimal filterBalanceMoreThen,
-                              Integer filterTXType, Long filterTXStart, Long filterTXEnd, Integer filterByPerson)
+                              Integer filterTXType, Long filterTXStart, Long filterTXEnd,
+                              Integer filterByPerson, boolean selfPay)
             throws Exception {
 
 
         return new ExPays(flags, assetKey, balancePos, backward, amountMin, amountMax,
                 payMethod, payMethodValue, filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceLessThen, filterBalanceMoreThen,
-                filterTXType, filterTXStart, filterTXEnd, filterByPerson).toByte();
+                filterTXType, filterTXStart, filterTXEnd,
+                filterByPerson, selfPay).toByte();
 
     }
 
@@ -338,39 +346,137 @@ public class ExPays {
         return Transaction.VALIDATE_OK;
     }
 
+    public int makePayList(Transaction transaction, List<Fun.Tuple2> payouts) {
+
+        BigDecimal totalSendAmount = BigDecimal.ZERO;
+
+        boolean onlyPerson = filterByGender != NOT_FILTER_PERSONS;
+        byte[] accountFrom = transaction.getCreator().getShortAddressBytes()
+
+        DCSet dcSet = transaction.getDCSet();
+        ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
+        TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
+
+        byte[] key;
+        Fun.Tuple2<BigDecimal, BigDecimal> balance;
+
+        int count = 0;
+
+        Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
+        Long myPersonKey = null;
+        if (onlyPerson && !selfPay) {
+            addressDuration = dcSet.getAddressPersonMap().getItem(accountFrom);
+            if (addressDuration != null) {
+                myPersonKey = addressDuration.a;
+            }
+        } else {
+            myPersonKey = null;
+        }
+
+        HashSet<Long> usedPersons = new HashSet<>();
+        PersonCls person;
+
+        try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(filterAssetKey)) {
+            while (iterator.hasNext()) {
+                key = iterator.next();
+
+                balance = Account.getBalanceInPosition(balancesMap.get(key), filterBalancePos);
+
+                // только тем у кого положительный баланс и больше чем задано
+                if (balance.b.compareTo(filterBalanceLessThen) < 0)
+                    continue;
+
+                byte[] recipentShort = ItemAssetBalanceMap.getShortAccountFromKey(key);
+
+                if (onlyPerson) {
+                    // так как тут сортировка по убыванию значит первым встретится тот счет на котром больше всего актива
+                    // - он и будет выбран куда 1 раз пошлем актив свой
+                    addressDuration = dcSet.getAddressPersonMap().getItem(recipentShort);
+                    if (addressDuration == null)
+                        continue;
+                    if (usedPersons.contains(addressDuration.a))
+                        continue;
+
+                    if (!selfPay && myPersonKey != null && myPersonKey.equals(addressDuration.a)) {
+                        // сами себе не платим?
+                        continue;
+                    }
+
+                    person = (PersonCls) dcSet.getItemPersonMap().get(addressDuration.a);
+
+                    if (filterByGender != NOT_FILTER_GENDER) {
+                        if (person.getGender() != filterByGender) {
+                            continue;
+                        }
+                    }
+                } else {
+
+                    if (!selfPay && Arrays.equals(accountFrom, recipentShort)) {
+                        // сами себе не платим?
+                        continue;
+                    }
+
+                    addressDuration = null;
+                    person = null;
+                }
+
+                /// если задано то проверим - входит ли в в диаппазон
+                // - собранные блоки учитываем? да - иначе долго будет делать поиск
+                if (filterTXStartSeqNo != null || filterTXEndSeqNo != null) {
+                    // на счете должна быть активность в заданном диаппазоне для данного типа
+                    if (!txMap.isCreatorWasActive(recipentShort, assetKey, filterTXType, filterTXEndSeqNo))
+                        continue;
+                }
+
+                BigDecimal sendAmount;
+                if (amountMin != null && amountMin.signum() > 0) {
+                    sendAmount = amountMin;
+                } else {
+                    sendAmount = BigDecimal.ZERO;
+                }
+
+                if (payMethodValue != null && payMethodValue.signum() > 0) {
+                    sendAmount = sendAmount.add(balance.b.multiply(payMethodValue));
+                }
+
+                payouts.add(new Fun.Tuple2(recipentShort, sendAmount));
+
+                // просчитаем тоже даже если ошибка
+                totalSendAmount = totalSendAmount.add(sendAmount);
+                count++;
+                if (onlyPerson) {
+                    // учтем что такой персоне давали
+                    usedPersons.add(addressDuration.a);
+                }
+
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+
+        payouts.add(new Fun.Tuple2(count, totalSendAmount);
+        return count;
+
+    }
+
     public void process(Transaction transaction) {
-        if (exLink != null)
-            exLink.process(transaction);
+        List<Fun.Tuple2> payouts = new ArrayList<>();
+        DCSet dcSet = transaction.getDCSet();
 
-        if (authors != null) {
-            for (ExLinkAuthor author : authors) {
-                author.process(transaction);
-            }
-        }
-
-        if (sources != null) {
-            for (ExLinkSource source : sources) {
-                source.process(transaction);
-            }
-        }
+        int count = makePayList(transaction, payouts);
+        BigDecimal totalPay = (BigDecimal) payouts.get(count).b;
+        BigDecimal totalFee = BigDecimal.ZERO;
+        Fun.Tuple2<BigDecimal, BigDecimal> balance = transaction.getCreator().getBalanceInPosition(dcSet, assetKey, balancePos);
+        if (balance)
 
     }
 
     public void orphan(Transaction transaction) {
-        if (exLink != null)
-            exLink.orphan(transaction);
-
-        if (authors != null) {
-            for (ExLinkAuthor author : authors) {
-                author.orphan(transaction);
-            }
-        }
-
-        if (sources != null) {
-            for (ExLinkSource source : sources) {
-                source.orphan(transaction);
-            }
-        }
+        List<Fun.Tuple2> payouts = new ArrayList<>();
+        int count = makePayList(transaction, payouts);
+        BigDecimal totalPay = (BigDecimal) payouts.get(count).b;
+        BigDecimal totalFee = BigDecimal.ZERO;
     }
 
 }
