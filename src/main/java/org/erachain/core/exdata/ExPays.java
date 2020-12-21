@@ -2,9 +2,11 @@ package org.erachain.core.exdata;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
@@ -21,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -57,7 +60,7 @@ public class ExPays {
     private int flags; // 4
 
     private Long assetKey; // 12
-    private int balancePos; // 13
+    private int actionType; // 13
     private boolean backward; // 14
     private int payMethod; // 15 0 - by Total, 1 - by Percent
     private BigDecimal payMethodValue; // 17
@@ -78,15 +81,17 @@ public class ExPays {
     public boolean selfPay; // 54
 
     /////////////////
+    DCSet dcSet;
     private int height;
     AssetCls asset;
-    public List<Fun.Tuple2> payouts;
+    public List<Fun.Tuple3> filteredPayouts;
+    public int filteredPayoutsCount;
     public BigDecimal totalPay;
     public BigDecimal totalFee;
     public String errorValue;
 
 
-    public ExPays(int flags, Long assetKey, int balancePos, boolean backward, BigDecimal amountMin, BigDecimal amountMax,
+    public ExPays(int flags, Long assetKey, int actionType, boolean backward, BigDecimal amountMin, BigDecimal amountMax,
                   int payMethod, BigDecimal payMethodValue, Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
                   BigDecimal filterBalanceLessThen, BigDecimal filterBalanceMoreThen,
                   Integer filterTXType, Long filterTXStartSeqNo, Long filterTXEndSeqNo,
@@ -96,7 +101,7 @@ public class ExPays {
         if (assetKey != null && assetKey != 0) {
             this.flags |= AMOUNT_FLAG_MASK;
             this.assetKey = assetKey;
-            this.balancePos = balancePos;
+            this.actionType = actionType;
             this.backward = backward;
             this.amountMin = amountMin;
             this.amountMax = amountMax;
@@ -137,6 +142,13 @@ public class ExPays {
         return (this.flags & TXTYPE_FLAG_MASK) != 0;
     }
 
+    public void setDC(DCSet dcSet) {
+        this.dcSet = dcSet;
+        if (hasAmount() && this.asset == null) {
+            this.asset = this.dcSet.getItemAssetMap().get(this.assetKey);
+        }
+    }
+
     public byte[] toByte() throws Exception {
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -147,7 +159,7 @@ public class ExPays {
         if (hasAmount()) {
             outStream.write(Longs.toByteArray(this.assetKey));
 
-            buff = new byte[]{(byte) balancePos, (byte) (backward ? 1 : 0), (byte) payMethod};
+            buff = new byte[]{(byte) actionType, (byte) (backward ? 1 : 0), (byte) payMethod};
             outStream.write(buff);
 
             outStream.write(this.payMethodValue.scale());
@@ -344,10 +356,24 @@ public class ExPays {
         return toJson;
     }
 
-    public int isValid(DCSet dcSet, RSignNote rNote) {
+    public void calcPayoutsForMethodTotal() {
+        // нужно подсчитать выплаты по общей сумме балансов
+        int scale = asset.getScale();
+        BigDecimal totalBalances = (BigDecimal) filteredPayouts.get(filteredPayoutsCount).c;
+        BigDecimal coefficient = payMethodValue.divide(totalBalances,
+                scale + Order.powerTen(totalBalances) + 3, RoundingMode.HALF_DOWN);
+        for (int index = 0; index < filteredPayoutsCount; index++) {
+            Fun.Tuple3 item = filteredPayouts.get(index);
+            BigDecimal amount = (BigDecimal) item.b;
+            filteredPayouts.set(index, new Fun.Tuple3(item.a, item.b,
+                    amount.multiply(coefficient).setScale(scale)));
+        }
+    }
+
+    public int isValid(RSignNote rNote) {
 
         if (hasAmount() && (
-                this.balancePos < 0 || this.balancePos > 5
+                this.actionType < 0 || this.actionType > 5
                         || this.amountMin == null
                         || this.amountMax == null
                         || this.payMethodValue == null
@@ -373,27 +399,32 @@ public class ExPays {
             return Transaction.INVALID_TRANSACTION_TYPE;
         }
 
+        if (assetKey != null && filterAssetKey != null
+                && assetKey.equals(filterAssetKey)
+                && actionType == filterBalancePos) {
+            // при откате невозможно тогда будет правильно рассчитать - так как съехала общая сумма
+            return Transaction.INVALID_TRANSFER_TYPE;
+        }
 
-        payouts = new ArrayList<>();
-        int count = makePayList(rNote, payouts);
+        filteredPayouts = new ArrayList<>();
+        filteredPayoutsCount = filterPayList(rNote, true);
 
-        if (count < 0) {
+        if (filteredPayoutsCount < 0) {
             // ERROR on make LIST
-            return -count;
+            return -filteredPayoutsCount;
 
-        } else if (count > 0) {
+        } else if (filteredPayoutsCount > 0) {
             height = rNote.getBlockHeight();
-            asset = dcSet.getItemAssetMap().get(assetKey);
 
-            totalFee = BigDecimal.ZERO;
+            totalFee = BigDecimal.valueOf(25L * filteredPayoutsCount * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
 
             long actionFlags = 0L;
-            Account recipient = new Account((byte[]) payouts.get(1).a);
+            Account recipient = new Account((byte[]) filteredPayouts.get(0).a);
             PublicKeyAccount creator = rNote.getCreator();
             byte[] signature = rNote.getSignature();
 
             if (filterTXType == PAYMENT_METHOD_COEFF) {
-                totalPay = (BigDecimal) payouts.get(count).b;
+                totalPay = (BigDecimal) filteredPayouts.get(filteredPayoutsCount).c;
             } else {
                 totalPay = payMethodValue;
             }
@@ -405,16 +436,20 @@ public class ExPays {
             if (result != Transaction.VALIDATE_OK)
                 return result;
 
+            if (filterTXType == PAYMENT_METHOD_TOTAL) {
+                calcPayoutsForMethodTotal();
+            }
+
             ////////// TODO NEED CHECK ALL
             boolean needCheckAllList = false;
             if (needCheckAllList) {
-                for (Fun.Tuple2 item : payouts) {
-                    if (item.a instanceof Integer)
-                        // end
-                        break;
+
+                for (Fun.Tuple3 item : filteredPayouts) {
 
                     recipient = (Account) item.a;
-                    BigDecimal amount = (BigDecimal) item.b;
+                    if (recipient == null)
+                        break;
+                    BigDecimal amount = (BigDecimal) item.c;
 
                     result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
                             assetKey, asset, amount, recipient,
@@ -432,9 +467,9 @@ public class ExPays {
         return Transaction.VALIDATE_OK;
     }
 
-    public int makePayList(Transaction transaction, List<Fun.Tuple2> payouts) {
+    public int filterPayList(Transaction transaction, boolean andValidate) {
 
-        BigDecimal totalSendAmount = BigDecimal.ZERO;
+        int scale = asset.getScale();
 
         boolean onlyPerson = filterByGender != NOT_FILTER_PERSONS;
         byte[] accountFrom = transaction.getCreator().getShortAddressBytes();
@@ -444,7 +479,9 @@ public class ExPays {
         TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
 
         byte[] key;
-        Fun.Tuple2<BigDecimal, BigDecimal> balance;
+        BigDecimal balance;
+        BigDecimal payout;
+        BigDecimal totalBalances = BigDecimal.ZERO;
 
         int count = 0;
 
@@ -460,7 +497,6 @@ public class ExPays {
         }
 
         boolean isPerson = transaction.getCreator().isPerson(dcSet, height, transaction.getCreatorPersonDuration());
-        int actionType = balancePos;
 
         HashSet<Long> usedPersons = new HashSet<>();
         PersonCls person;
@@ -469,10 +505,10 @@ public class ExPays {
             while (iterator.hasNext()) {
                 key = iterator.next();
 
-                balance = Account.getBalanceInPosition(balancesMap.get(key), filterBalancePos);
+                balance = Account.balanceInPositionAndSide(balancesMap.get(key), filterBalancePos, filterBalanceSide);
 
-                // только тем у кого положительный баланс и больше чем задано
-                if (balance.b.compareTo(filterBalanceLessThen) < 0)
+                if (filterBalanceLessThen != null && balance.compareTo(filterBalanceLessThen) > 0
+                        || filterBalanceMoreThen != null && balance.compareTo(filterBalanceMoreThen) < 0)
                     continue;
 
                 byte[] recipentShort = ItemAssetBalanceMap.getShortAccountFromKey(key);
@@ -512,8 +548,8 @@ public class ExPays {
                 Account recipient = new Account(recipentShort);
 
                 // IF send from PERSON to ANONYMOUS
-                if (!TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
-                        isPerson, filterAssetKey, actionType,
+                if (andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
+                        isPerson, assetKey, actionType,
                         asset)) {
                     errorValue = recipient.getAddress();
                     return -Transaction.RECEIVER_NOT_PERSONALIZED;
@@ -527,23 +563,20 @@ public class ExPays {
                         continue;
                 }
 
-                BigDecimal sendAmount;
-                if (amountMin != null && amountMin.signum() > 0) {
-                    sendAmount = amountMin;
+                if (payMethodValue != null && payMethod == PAYMENT_METHOD_COEFF) {
+                    // нужно вычислить сразу сколько шлем
+                    payout = balance.multiply(payMethodValue).setScale(scale, RoundingMode.HALF_DOWN);
                 } else {
-                    sendAmount = BigDecimal.ZERO;
+                    payout = null;
                 }
 
-                if (payMethodValue != null && payMethodValue.signum() > 0) {
-                    sendAmount = sendAmount.add(balance.b.multiply(payMethodValue));
-                }
-
-                payouts.add(new Fun.Tuple2(recipient, sendAmount));
+                // не проверяем на 0 - так это может быть рассылка писем всем
+                filteredPayouts.add(new Fun.Tuple3(recipient, balance, payout));
 
                 // просчитаем тоже даже если ошибка
-                totalSendAmount = totalSendAmount.add(sendAmount);
+                totalBalances = totalBalances.add(balance);
                 count++;
-                if (count > MAX_COUNT) {
+                if (andValidate && count > MAX_COUNT) {
                     errorValue = "MAX count over: " + MAX_COUNT;
                     return -Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR;
                 }
@@ -559,33 +592,50 @@ public class ExPays {
             LOGGER.error(e.getMessage(), e);
         }
 
-        payouts.add(new Fun.Tuple2(count, totalSendAmount));
+        filteredPayouts.add(new Fun.Tuple3(null, null, totalBalances));
+
         return count;
 
     }
 
-    public void process(Transaction transaction) {
-        List<Fun.Tuple2> payouts = new ArrayList<>();
-        DCSet dcSet = transaction.getDCSet();
+    public void process(Transaction rNote) {
 
-        int count = makePayList(transaction, payouts);
-        if (count == 0)
+        if (filteredPayouts == null) {
+            filteredPayouts = new ArrayList<>();
+            filteredPayoutsCount = filterPayList(rNote, false);
+            if (filterTXType == PAYMENT_METHOD_TOTAL) {
+                calcPayoutsForMethodTotal();
+            }
+        }
+
+        if (filteredPayoutsCount == 0)
             return;
 
-        int height = transaction.getBlockHeight();
-        BigDecimal totalPay = (BigDecimal) payouts.get(count).b;
-        BigDecimal totalFee = BigDecimal.ZERO;
+        height = rNote.getBlockHeight();
+        asset = dcSet.getItemAssetMap().get(assetKey);
+
+        totalFee = BigDecimal.ZERO;
 
 
     }
 
-    public void orphan(Transaction transaction) {
-        List<Fun.Tuple2> payouts = new ArrayList<>();
-        int count = makePayList(transaction, payouts);
-        if (count == 0)
+    public void orphan(Transaction rNote) {
+
+        if (filteredPayouts == null) {
+            filteredPayouts = new ArrayList<>();
+            filteredPayoutsCount = filterPayList(rNote, false);
+            if (filterTXType == PAYMENT_METHOD_TOTAL) {
+                calcPayoutsForMethodTotal();
+            }
+        }
+
+        if (filteredPayoutsCount == 0)
             return;
-        BigDecimal totalPay = (BigDecimal) payouts.get(count).b;
-        BigDecimal totalFee = BigDecimal.ZERO;
+
+        height = rNote.getBlockHeight();
+        asset = dcSet.getItemAssetMap().get(assetKey);
+
+        totalFee = BigDecimal.ZERO;
 
     }
 

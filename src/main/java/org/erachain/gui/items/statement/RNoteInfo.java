@@ -335,7 +335,8 @@ public class RNoteInfo extends javax.swing.JPanel {
         ExData exData;
 
         exData = statement.getExData();
-        exData.resolveValues(DCSet.getInstance());
+        exData.setDC(DCSet.getInstance());
+        exData.resolveValues();
 
         ExLink exLink = exData.getExLink();
         if (exLink != null) {

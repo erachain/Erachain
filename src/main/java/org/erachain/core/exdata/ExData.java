@@ -117,6 +117,8 @@ public class ExData {
     private byte[][] secrets;
     private byte[] encryptedData;
 
+
+    public DCSet dcSet;
     public String errorValue;
 
     /**
@@ -250,10 +252,17 @@ public class ExData {
 
     }
 
+    public void setDC(DCSet dcSet) {
+        this.dcSet = dcSet;
+        if (exPays != null) {
+            exPays.setDC(dcSet);
+        }
+    }
+
     /**
      * for set up all values from JSON etc.
      */
-    public void resolveValues(DCSet dcSet) {
+    public void resolveValues() {
 
         String str = "";
         Set<String> kS;

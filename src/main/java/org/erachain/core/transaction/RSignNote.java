@@ -136,6 +136,7 @@ public class RSignNote extends Transaction implements Itemable {
     public void setDC(DCSet dcSet, boolean andUpdateFromState) {
         super.setDC(dcSet, false);
 
+
         // LOAD values from EXTERNAL DATA
         parseDataV2WithoutFiles();
 
@@ -815,7 +816,8 @@ public class RSignNote extends Transaction implements Itemable {
                 error++;
             }
 
-            extendedData.resolveValues(dcSet);
+            extendedData.setDC(dcSet);
+            extendedData.resolveValues();
         }
     }
 
@@ -834,7 +836,8 @@ public class RSignNote extends Transaction implements Itemable {
                 error++;
             }
 
-            extendedData.resolveValues(dcSet);
+            extendedData.setDC(dcSet);
+            extendedData.resolveValues();
         }
     }
 
