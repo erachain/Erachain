@@ -1518,7 +1518,7 @@ public class ExData {
         return toJson;
     }
 
-    public int isValid(DCSet dcSet, RSignNote rNote) {
+    public int isValid(RSignNote rNote) {
 
         int result;
 
@@ -1575,7 +1575,7 @@ public class ExData {
         }
 
         if (exPays != null) {
-            result = exPays.isValid(dcSet, rNote);
+            result = exPays.isValid(rNote);
             if (result != Transaction.VALIDATE_OK)
                 errorValue = exPays.errorValue;
             return result;

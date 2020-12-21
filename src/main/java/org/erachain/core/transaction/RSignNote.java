@@ -708,7 +708,7 @@ public class RSignNote extends Transaction implements Itemable {
             parseDataV2WithoutFiles();
         }
 
-        result = extendedData.isValid(dcSet, this);
+        result = extendedData.isValid(this);
         if (result != Transaction.VALIDATE_OK) {
             // errorValue updated in extendedData
             return result;
