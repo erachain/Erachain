@@ -36,7 +36,7 @@ import java.util.Map;
 
 public abstract class ItemCls implements Iconable, ExplorerJsonLine {
 
-    protected final static long START_KEY_OLD = 1L << 14;
+    public final static long START_KEY_OLD = 1L << 14;
     public static final long MIN_START_KEY_OLD = 1000L;
 
     public static final int ASSET_TYPE = 1;
