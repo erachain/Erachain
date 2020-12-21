@@ -33,9 +33,8 @@ public abstract class PersonCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.PERSON_TYPE;
 
-    public static final long MIN_START_KEY = 0L;
+    public static final long MIN_START_KEY_OLD = 0L;
     public static final long START_KEY_UP_ITEMS = 1L << 20;
-
 
     public static int MAX_IMAGE_LENGTH = 28000;
     public static int MIN_IMAGE_LENGTH = 10240;
@@ -124,7 +123,7 @@ public abstract class PersonCls extends ItemCls {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
             return START_KEY_UP_ITEMS;
 
-        return START_KEY;
+        return START_KEY_OLD;
     }
 
     @Override
@@ -132,7 +131,7 @@ public abstract class PersonCls extends ItemCls {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
             return START_KEY_UP_ITEMS;
 
-        return MIN_START_KEY;
+        return MIN_START_KEY_OLD;
     }
 
     public String getItemTypeName() {

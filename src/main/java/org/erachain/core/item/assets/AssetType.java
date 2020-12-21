@@ -18,7 +18,7 @@ public class AssetType {
 
         StringJoiner joiner = new StringJoiner(", ");
         for (String action : AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
-                AssetCls.ASSET_TYPE, AssetCls.START_KEY, AssetCls.MIN_START_KEY),
+                AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
                 assetType)) {
             joiner.add(Lang.getInstance().translate(action));
         }
