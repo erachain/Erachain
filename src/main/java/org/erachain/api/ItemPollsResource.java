@@ -53,7 +53,7 @@ public class ItemPollsResource {
         help.put("polls/listfrom/{start}", "get list from KEY");
         help.put("GET polls/issue {\"creator\":\"<creatorAddress>\", \"linkTo\":\"<SeqNo>\",  \"name\":\"<name>\", \"description\":\"<description>\", \"options\": [<optionOne>, <optionTwo>], \"feePow\":\"<feePow>\"}", "issue");
         help.put("POST polls/issue {\"creator\":\"<creatorAddress>\", \"linkTo\":\"<SeqNo>\", \"name\":\"<name>\", \"description\":\"<description>\", \"options\": [<optionOne>, <optionTwo>], \"feePow\":\"<feePow>\"}", "Used to create a new poll. Returns the transaction in JSON when successful.");
-        help.put("POST polls/issueraw/{creator}?linkTo=<SeqNo>&feePow=<int>&password=<String> ", "Issue Poll by Base58 RAW in POST body");
+        help.put("POST polls/issueraw/{creator} {\"linkTo\":<SeqNo>, \"feePow\":<int>, \"password\":<String>, \"linkTo\":<SeqNo>, \"raw\":RAW-Base58", "Issue Poll by Base58 RAW in POST body");
 
         help.put("polls/vote/{key}/{option}/{voter}?feePow=feePow", "Used to vote on a poll with the given KEY. Returns the transaction in JSON when successful.");
         help.put("POST polls/vote/{key} {\"voter\":\"<voterAddress>\", \"option\": \"<optionOne>\", \"feePow\":\"<feePow>\"}", "Used to vote on a poll with the given KEY. Returns the transaction in JSON when successful.");
@@ -248,7 +248,7 @@ public class ItemPollsResource {
             IssuePollRecord issue_voiting = (IssuePollRecord) controller.issuePoll(account, linkTo, name, description, options, null, null, feePow);
 
             //VALIDATE AND PROCESS
-            int validate = controller.getTransactionCreator().afterCreate(issue_voiting, Transaction.FOR_NETWORK);
+            int validate = controller.getTransactionCreator().afterCreate(issue_voiting, Transaction.FOR_NETWORK, false);
             if (validate == Transaction.VALIDATE_OK)
                 return "ok";
         } catch (NullPointerException | ClassCastException e) {
@@ -350,36 +350,34 @@ public class ItemPollsResource {
 
     @POST
     @Path("issueraw/{creator}")
-    public String issueRAW(String x, @PathParam("creator") String creator,
-                           @QueryParam("linkTo") String linkToRefStr,
-                           @DefaultValue("0") @QueryParam("feePow") String feePowStr,
-                           @QueryParam("password") String password) {
+    public String issueRAW(String x, @PathParam("creator") String creatorStr) {
 
         Controller cntr = Controller.getInstance();
-        Fun.Tuple3<PrivateKeyAccount, Integer, byte[]> result = APIUtils.postIssueRawItem(request, x, creator, feePowStr, password);
+        Object result = Transaction.decodeJson(creatorStr, x);
+        if (result instanceof JSONObject) {
+            return result.toString();
+        }
+
+        Fun.Tuple5<Account, Integer, ExLink, String, JSONObject> resultHead = (Fun.Tuple5<Account, Integer, ExLink, String, JSONObject>) result;
+        Account creator = resultHead.a;
+        int feePow = resultHead.b;
+        ExLink linkTo = resultHead.c;
+        String password = resultHead.d;
+        JSONObject jsonObject = resultHead.e;
+
+        Fun.Tuple2<PrivateKeyAccount, byte[]> resultRaw = APIUtils.postIssueRawItem(request, jsonObject.get("raw").toString(),
+                creator, password, "issue Poll");
+
         PollCls item;
         try {
-            item = PollFactory.getInstance().parse(result.c, false);
+            item = PollFactory.getInstance().parse(resultRaw.b, false);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     e.getMessage());
         }
 
-        ExLink linkTo;
-        if (linkToRefStr == null)
-            linkTo = null;
-        else {
-            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
-            if (linkToRef == null) {
-                throw ApiErrorFactory.getInstance().createError(
-                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
-            } else {
-                linkTo = new ExLinkSource(linkToRef, null);
-            }
-        }
-
-        Transaction transaction = cntr.issuePoll(result.a, linkTo, result.b, item);
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        Transaction transaction = cntr.issuePoll(resultRaw.a, linkTo, feePow, item);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -450,7 +448,7 @@ public class ItemPollsResource {
             //CREATE POLL
             Transaction transaction = Controller.getInstance().createItemPollVote(account, key, option, feePow);
 
-            int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+            int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
             if (result == Transaction.VALIDATE_OK) {
 
@@ -509,7 +507,7 @@ public class ItemPollsResource {
 
         //CREATE POLL
         Transaction transaction = Controller.getInstance().createItemPollVote(account, pollKey, option, feePow);
-        int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
         if (result == Transaction.VALIDATE_OK) {
 

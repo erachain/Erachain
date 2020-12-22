@@ -18,8 +18,6 @@ public abstract class TemplateCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.TEMPLATE_TYPE;
 
-    public static final long MIN_START_KEY = 1000L;
-
     // PERS KEY
     public static final long EMPTY_KEY = 1L;
     public static final long LICENSE_KEY = 2L;
@@ -54,17 +52,17 @@ public abstract class TemplateCls extends ItemCls {
     @Override
     public long START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return START_KEY;
+        return START_KEY_OLD;
     }
 
     @Override
     public long MIN_START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return MIN_START_KEY;
+        return MIN_START_KEY_OLD;
     }
 
     public String getItemTypeName() {

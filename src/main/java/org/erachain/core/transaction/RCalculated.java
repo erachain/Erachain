@@ -86,6 +86,16 @@ public class RCalculated extends TransactionAmount {
     }
 
     @Override
+    public String viewFullTypeName() {
+        return viewTypeName();
+    }
+
+    @Override
+    public String viewActionType() {
+        return "";
+    }
+
+    @Override
     public boolean hasPublicText() {
         return false;
     }

@@ -190,19 +190,19 @@ public class InsertPersonPanel extends IssuePersonPanel {
             if (result.getB() == Transaction.VALIDATE_OK) {
                 String statusText = "";
 
-                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, result.getA(),
+                IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, result.getA(),
                         " ",
                         (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
                         Lang.getInstance().translate("Confirmation transaction issue person"));
 
                 IssuePersonDetailsFrame ww = new IssuePersonDetailsFrame((IssuePersonRecord) result.getA());
-                dd.jScrollPane1.setViewportView(ww);
-                dd.setLocationRelativeTo(this);
-                dd.setVisible(true);
-                if (dd.isConfirm) {
+                confirmDialog.jScrollPane1.setViewportView(ww);
+                confirmDialog.setLocationRelativeTo(this);
+                confirmDialog.setVisible(true);
+                if (confirmDialog.isConfirm > 0) {
                     // VALIDATE AND PROCESS
                     Integer result1 = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(),
-                            Transaction.FOR_NETWORK);
+                            Transaction.FOR_NETWORK, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
                     if (result1 != Transaction.VALIDATE_OK) {
                         JOptionPane.showMessageDialog(new JFrame(),
                                 Lang.getInstance().translate(OnDealClick.resultMess(result1)),

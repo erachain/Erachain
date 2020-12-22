@@ -248,8 +248,8 @@ public abstract class IssueItemPanel extends IconPanel {
             confirmDialog.setLocationRelativeTo(this);
             confirmDialog.setVisible(true);
 
-            if (confirmDialog.isConfirm) {
-                ResultDialog.make(this, transaction, issueMess);
+            if (confirmDialog.isConfirm > 0) {
+                ResultDialog.make(this, transaction, issueMess, false, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
             }
         }
 

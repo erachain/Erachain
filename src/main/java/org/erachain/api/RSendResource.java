@@ -133,7 +133,7 @@ public class RSendResource {
             return out.toJSONString();
         }
 
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -597,7 +597,7 @@ public class RSendResource {
                                 (address + counter + "TEST SEND ERA").getBytes(StandardCharsets.UTF_8), encryptMessage,
                                 new byte[]{(byte) 1}, 0);
 
-                        Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+                        Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
                         // CLEAR for HEAP
                         transaction.resetDCSet();
 
@@ -921,7 +921,7 @@ public class RSendResource {
                             WeakReference<Transaction> weakRef = new WeakReference<>(transaction);
                             int validate = cntr.getTransactionCreator().afterCreate(weakRef.get(),
                                     // если проба то не шлем в реальности
-                                    test ? Transaction.FOR_PACK : Transaction.FOR_NETWORK);
+                                    test ? Transaction.FOR_PACK : Transaction.FOR_NETWORK, false);
 
                             if (validate != Transaction.VALIDATE_OK) {
                                 resultOne.add(OnDealClick.resultMess(validate));

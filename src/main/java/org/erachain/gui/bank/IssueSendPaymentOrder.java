@@ -247,19 +247,19 @@ public class IssueSendPaymentOrder extends IconPanel {
                 null, head, messageBytes, isTextByte, encrypted, 0);
 
         String Status_text = "";
-        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+        IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Payment Order"), (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2),
                 Status_text, Lang.getInstance().translate("Confirmation transaction send payment order"));
 
         MailInfo ww = new MailInfo((RSend) transaction);
         ww.jTabbedPane1.setVisible(false);
-        dd.jScrollPane1.setViewportView(ww);
-        dd.setLocationRelativeTo(th);
-        dd.setVisible(true);
+        confirmDialog.jScrollPane1.setViewportView(ww);
+        confirmDialog.setLocationRelativeTo(th);
+        confirmDialog.setVisible(true);
 
         // JOptionPane.OK_OPTION
-        if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, null);
+        if (confirmDialog.isConfirm > 0) {
+            ResultDialog.make(this, transaction, null, true, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
         // ENABLE
         issue_Panel.jButton_OK.setEnabled(true);

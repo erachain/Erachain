@@ -18,7 +18,7 @@ public abstract class StatusCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.STATUS_TYPE;
 
-    public static final long MIN_START_KEY = 0L;
+    public static final long MIN_START_KEY_OLD = 0L;
 
     public static final Long RIGHTS_KEY = 1L;
     public static final Long MEMBER_KEY = 2L;
@@ -49,17 +49,17 @@ public abstract class StatusCls extends ItemCls {
     @Override
     public long START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return START_KEY;
+        return START_KEY_OLD;
     }
 
     @Override
     public long MIN_START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return MIN_START_KEY;
+        return MIN_START_KEY_OLD;
     }
 
     public String getItemTypeName() {
