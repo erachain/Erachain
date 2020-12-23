@@ -1603,7 +1603,7 @@ public class Controller extends Observable {
                     peer.setHWeight(new Tuple2<>(peerHeight, peerWeight));
                     peer.setVersion(peerIhfo.get("v").toString());
                     try {
-                        peer.setInfo((JSONObject) JSONValue.parse(peerIhfo.get("i").toString()));
+                        peer.setNodeInfo((JSONObject) JSONValue.parse(peerIhfo.get("i").toString()));
                     } catch (Exception e) {
                     }
 

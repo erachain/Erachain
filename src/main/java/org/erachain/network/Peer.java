@@ -65,7 +65,7 @@ public class Peer extends MonitoredThread {
     private int requestKey;
 
     private String version = "";
-    private JSONObject info;
+    private JSONObject nodeInfo;
     private long buildDateTime;
     private String banMessage;
     private Tuple2<Integer, Long> hWeight;
@@ -311,16 +311,16 @@ public class Peer extends MonitoredThread {
         this.version = version;
     }
 
-    public void setInfo(JSONObject info) {
-        this.info = info;
+    public void setNodeInfo(JSONObject nodeInfo) {
+        this.nodeInfo = nodeInfo;
     }
 
     public String getVersion() {
         return version;
     }
 
-    public JSONObject getInfo() {
-        return info;
+    public JSONObject getNodeInfo() {
+        return nodeInfo;
     }
 
     public String getBanMessage() {
