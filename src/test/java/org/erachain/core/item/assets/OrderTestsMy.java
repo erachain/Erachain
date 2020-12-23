@@ -204,8 +204,7 @@ public class OrderTestsMy {
 
     private Order reloadOrder(Long orderId) {
 
-        return dcSet.getCompletedOrderMap().contains(orderId) ? dcSet.getCompletedOrderMap().get(orderId)
-                : dcSet.getOrderMap().get(orderId);
+        return Order.getOrder(dcSet, orderId);
 
     }
 

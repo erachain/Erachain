@@ -3,12 +3,14 @@ package org.erachain.gui;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
+import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.erachain.utils.PlaySound;
 import org.erachain.utils.SysTray;
 import org.mapdb.Fun;
@@ -22,7 +24,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletTimer<U> implements Observer {
+public class WalletNotifyTimer<U> implements Observer {
 
     public Object playEvent;
 
@@ -34,7 +36,7 @@ public class WalletTimer<U> implements Observer {
     Lang lang = Lang.getInstance();
     private List<Integer> transactionsAlreadyPlayed;
 
-    public WalletTimer() {
+    public WalletNotifyTimer() {
         transactionsAlreadyPlayed = new ArrayList<>();
 
         logger = LoggerFactory.getLogger(this.getClass());
@@ -166,7 +168,19 @@ public class WalletTimer<U> implements Observer {
                 } else if (diff < 1000) {
                     sound = null;
                 }
-
+            } else if (event instanceof Pair) {
+                Object value = ((Pair<?, ?>) event).getB();
+                if (value instanceof Order) {
+                    Order order = (Order) value;
+                    head = lang.translate("Order") + " - " + lang.translate(order.state());
+                    message = order.toString();
+                    int status = order.getStatus();
+                    if (status == Order.FULFILLED || status == Order.COMPLETED) {
+                        sound = "receivepayment.wav";
+                    } else {
+                        sound = "receivemail.wav";
+                    }
+                }
             } else {
                 head = lang.translate("EVENT");
                 sound = "receivemail.wav";

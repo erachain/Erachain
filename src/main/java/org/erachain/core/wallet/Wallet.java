@@ -1387,7 +1387,7 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK IF ORDER CREATION
 			if (transaction instanceof CreateOrderTransaction) {
-				this.processOrderCreation((CreateOrderTransaction) transaction);
+				this.processOrderCreation(dcSet, (CreateOrderTransaction) transaction);
 			}
 
 			// CHECK IF ORDER CANCEL
@@ -1641,7 +1641,7 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	private void processOrderCreation(CreateOrderTransaction orderCreation) {
+	private void processOrderCreation(DCSet dcSet, CreateOrderTransaction orderCreation) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.walletKeysExists()) {
 			return;
@@ -1650,21 +1650,16 @@ public class Wallet extends Observable implements Observer {
 		if (orderCreation.getOrderId() == null)
 			return;
 
-		this.addOrder(orderCreation);
+		this.addOrder(dcSet, orderCreation);
 
 	}
 
-	private void addOrder(CreateOrderTransaction orderCreation) {
-		// CHECK IF WE ARE CREATOR
-		if (this.accountExists(orderCreation.getCreator())) {
+	private void addOrder(DCSet dcSet, CreateOrderTransaction orderCreation) {
 
-			// ADD ORDER
-			Order orderNew = orderCreation.makeOrder();
-			this.database.getOrderMap().add(orderNew);
-
-			// TRADES for TARGETs
-			//trades
-		}
+		// UPDATE Order INFO
+		Order orderNew = Order.getOrder(dcSet, orderCreation.getOrderId());
+		// ADD ORDER
+		this.database.getOrderMap().add(orderNew);
 	}
 
 	private void orphanOrderCreation(CreateOrderTransaction orderCreation) {

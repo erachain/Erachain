@@ -68,7 +68,7 @@ public class WalletOrdersTableModel extends WalletTableModel<Order> implements O
                 return order.getAmountWant().toPlainString();
 
             case COLUMN_LEFT:
-                return order.getFulfilledWant().toPlainString();
+                return order.getAmountWantLeft().toPlainString();
 
             case COLUMN_CREATOR:
                 return order.getCreator().getPersonAsString();

@@ -1196,9 +1196,9 @@ public class Controller extends Observable {
     }
 
     public void playWalletEvent(Object object) {
-        if (gui == null || gui.walletTimer == null)
+        if (gui == null || gui.walletNotifyTimer == null)
             return;
-        gui.walletTimer.playEvent(object);
+        gui.walletNotifyTimer.playEvent(object);
     }
 
     /**
