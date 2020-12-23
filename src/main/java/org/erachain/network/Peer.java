@@ -8,6 +8,7 @@ import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,7 @@ public class Peer extends MonitoredThread {
     private int requestKey;
 
     private String version = "";
+    private JSONObject nodeInfo;
     private long buildDateTime;
     private String banMessage;
     private Tuple2<Integer, Long> hWeight;
@@ -309,8 +311,23 @@ public class Peer extends MonitoredThread {
         this.version = version;
     }
 
+    public void setNodeInfo(JSONObject nodeInfo) {
+        this.nodeInfo = nodeInfo;
+    }
+
     public String getVersion() {
         return version;
+    }
+
+    public JSONObject getNodeInfo() {
+        return nodeInfo;
+    }
+
+    public Long getWEBPort() {
+        if (nodeInfo != null) {
+            return (Long) nodeInfo.get("port");
+        }
+        return null;
     }
 
     public String getBanMessage() {
