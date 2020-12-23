@@ -41,7 +41,7 @@ import java.util.Timer;
 import java.util.*;
 
 /**
- * обработка секртеных ключей и моих записей, которые относятся к набору моих счетов
+ * обработка секретных ключей и моих записей, которые относятся к набору моих счетов
  */
 public class Wallet extends Observable implements Observer {
 
@@ -96,6 +96,7 @@ public class Wallet extends Observable implements Observer {
 
 				// REGISTER ON ORDERS - foe BELLs on incomed TRADES
 				this.database.getOrderMap().addObserver(this);
+				this.database.getTelegramsMap().addObserver(this);
 
 			}
 
@@ -1734,7 +1735,12 @@ public class Wallet extends Observable implements Observer {
 			ObserverMessage message = (ObserverMessage) arg;
 			int type = message.getType();
 
-			if () {
+			if (type == ObserverMessage.WALLET_ADD_TELEGRAM_TYPE) {
+				Controller.getInstance().playWalletEvent(message.getValue());
+
+			} else if (type == ObserverMessage.WALLET_ADD_ORDER_TYPE) {
+				Controller.getInstance().playWalletEvent(message.getValue());
+
 			} else if (false && type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
 
 				// прилетающие неподтвержденные тоже проверяем и если это относится к нам
@@ -1762,8 +1768,6 @@ public class Wallet extends Observable implements Observer {
 					}
 				}
 
-				return;
-
 			} else if (false && type == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
 				if (Controller.getInstance().useGui
 						&& System.currentTimeMillis() - notifySysTrayRecord > 1000) {
@@ -1773,25 +1777,8 @@ public class Wallet extends Observable implements Observer {
 					Library.notifySysTrayRecord(transaction);
 				}
 
-				return;
-
-			} else if (type == ObserverMessage.WALLET_ADD_ORDER_TYPE
-				// || type == ObserverMessage.WALLET_REMOVE_ORDER_TYPE
-			) {
-
-				// UPDATE FULFILLED
-				Order order = (Order) message.getValue();
-				if (!this.accountExists(order.getCreator()))
-					return;
-
-				Long key = order.getId();
-				if (this.database.getOrderMap().contains(key)) {
-					this.database.getOrderMap().set(key, order);
-				}
-
-				return;
-
 			}
+
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 		}

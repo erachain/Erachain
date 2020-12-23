@@ -169,6 +169,7 @@ public class WalletTimer<U> implements Observer {
 
             } else {
                 head = lang.translate("EVENT");
+                sound = "receivemail.wav";
                 message = event.toString();
             }
 
