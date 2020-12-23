@@ -979,11 +979,16 @@ public class ApiClient {
                 inputText += inputLine;
             bufferedReader.close();
 
-            try {
-                return StrJSonFine.convert(inputText);
-            } catch (Exception e) {
-                return inputText;
+            if (inputText.length() > 0) {
+                inputText = inputText.trim();
+                if (inputText.charAt(0) == '{' || inputText.charAt(0) == '[') {
+                    try {
+                        return StrJSonFine.convert(inputText);
+                    } catch (Exception e) {
+                    }
+                }
             }
+            return inputText;
 
         } catch (Exception ioe) {
             LOGGER.info(ioe.getMessage());
