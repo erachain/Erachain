@@ -128,10 +128,11 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
             case COLUMN_ADDRESS:
                 JSONObject info = peer.getNodeInfo();
                 if (info != null) {
-                    String port = info.get("port").toString();
+                    Long port = (Long) info.get("port");
                     if (port != null) {
-                        return "<HTML><a href = '' >" + info.getOrDefault("scheme", "https").toString()
-                                + "://" + peer.getAddress().getHostAddress() + ":" + port + "</a>";
+                        String url = info.getOrDefault("scheme", "https").toString()
+                                + "://" + peer.getAddress().getHostAddress() + ":" + port + "/index/blockexplorer.html";
+                        return "<HTML><a href = '" + url + "' >" + peer.getAddress().getHostAddress() + "</a>";
                     }
                 }
                 return peer.getAddress().getHostAddress();
