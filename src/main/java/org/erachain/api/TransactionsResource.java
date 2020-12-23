@@ -878,7 +878,7 @@ public class TransactionsResource {
 
         }
 
-        Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
 
         // CHECK VALIDATE MESSAGE
         if (result != Transaction.VALIDATE_OK) {

@@ -436,18 +436,19 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                     return;
                 }
                 String statusText = "";
-                IssueConfirmDialog issueConfirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+                IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                         " ",
                         (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
                         Lang.getInstance().translate("Confirmation transaction issue person"));
 
                 IssuePersonDetailsFrame issuePersonDetailsFrame = new IssuePersonDetailsFrame((IssuePersonRecord) transaction);
-                issueConfirmDialog.jScrollPane1.setViewportView(issuePersonDetailsFrame);
-                issueConfirmDialog.setLocationRelativeTo(this);
-                issueConfirmDialog.setVisible(true);
-                if (issueConfirmDialog.isConfirm) {
+                confirmDialog.jScrollPane1.setViewportView(issuePersonDetailsFrame);
+                confirmDialog.setLocationRelativeTo(this);
+                confirmDialog.setVisible(true);
+                if (confirmDialog.isConfirm > 0) {
                     // VALIDATE AND PROCESS
-                    Integer afterCreateResult = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(), Transaction.FOR_NETWORK);
+                    Integer afterCreateResult = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(),
+                            Transaction.FOR_NETWORK, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
                     if (afterCreateResult != Transaction.VALIDATE_OK) {
                         JOptionPane.showMessageDialog(new JFrame(),
                                 Lang.getInstance().translate(OnDealClick.resultMess(afterCreateResult)),
@@ -471,7 +472,8 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                         Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(result.getB())),
+                        Lang.getInstance().translate(OnDealClick.resultMess(result.getB())
+                                + (transaction != null && transaction.getErrorValue() != null ? " " + transaction.getErrorValue() : "")),
                         Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             }
 

@@ -1,12 +1,14 @@
 package org.erachain.gui;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.items.assets.DepositExchange;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,17 +16,19 @@ import java.math.BigDecimal;
 
 public class ResultDialog {
 
-    public static boolean make(Component parent, Transaction transaction, String message) {
+    public static boolean make(Component parent, Transaction transaction, String message, boolean addMess, boolean tryFree) {
 
-        int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, tryFree);
 
         //CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {
             JOptionPane.showMessageDialog(new JFrame(), (message == null ? transaction.viewFullTypeName() : Lang.getInstance().translate(message))
-                            + " " + Lang.getInstance().translate("- was made") + "!",
+                            + (addMess ? " " + Lang.getInstance().translate("- was made") + "!" : ""),
                     Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
             return true;
-        } else if (result == Transaction.NOT_ENOUGH_FEE) {
+        } else if (BlockChain.MAIN_MODE && result == Transaction.NOT_ENOUGH_FEE
+                // и биржа включена
+                && Settings.EXCHANGE_IN_OUT) {
 
             Object[] options = {Lang.getInstance().translate("Add funds to Your account"),
                     Lang.getInstance().translate("Cancel")};

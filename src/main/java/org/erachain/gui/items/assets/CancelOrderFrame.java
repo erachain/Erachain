@@ -8,10 +8,10 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.ResultDialog;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.Pair;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -229,48 +229,8 @@ public class CancelOrderFrame extends JDialog {
             return;
         }
 
-        Pair<Transaction, Integer> result = Controller.getInstance().cancelOrder(creator, order, feePow);
-
-        //CHECK VALIDATE MESSAGE
-        switch (result.getB()) {
-            case Transaction.VALIDATE_OK:
-
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Cancel order has been sent") + "!",
-                        Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-                this.dispose();
-                break;
-
-            case Transaction.ORDER_DOES_NOT_EXIST:
-
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("That order does not exist or has already been completed!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                break;
-
-            case Transaction.INVALID_ADDRESS:
-
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid creator!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                break;
-
-            case Transaction.INVALID_ORDER_CREATOR:
-
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are not the creator this order!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                break;
-
-            case Transaction.NOT_ENOUGH_FEE:
-
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                break;
-
-            case Transaction.NO_BALANCE:
-
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                break;
-
-            default:
-
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Unknown error!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-                break;
-
-        }
+        Transaction cancelOrder = Controller.getInstance().cancelOrder1(creator, order, feePow);
+        ResultDialog.make(this, cancelOrder, "Order has been sent", false, false);
 
         //ENABLE
         this.cancelOrderButton.setEnabled(true);

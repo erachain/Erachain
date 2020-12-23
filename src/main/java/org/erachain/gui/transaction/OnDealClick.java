@@ -246,6 +246,9 @@ public class OnDealClick {
             case Transaction.INVALID_SIGNATURE:
                 mess = "Invalid signature";
                 break;
+            case Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID:
+                mess = "Invalid Person Owner signature";
+                break;
             case Transaction.TRANSACTION_DOES_NOT_EXIST:
                 mess = "Transaction does not exist";
                 break;
@@ -391,7 +394,7 @@ public class OnDealClick {
                 mess = "Duplicate key";
                 break;
             case Transaction.ITEM_DUPLICATE:
-                mess = "Invalid duplicte item";
+                mess = "Invalid duplicate item";
                 break;
             case Transaction.INVALID_TIMESTAMP_START:
                 mess = "Invalid start timestamp item";

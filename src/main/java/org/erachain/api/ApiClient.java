@@ -16,6 +16,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -822,6 +823,16 @@ public class ApiClient {
             return help;
         }
 
+        if (command.toLowerCase().equals("get persons")) {
+            String help = "\n";
+            Map map = ItemPersonsResource.help;
+            for (Object key : map.keySet()) {
+                help += key.toString() + ":\n     " + map.get(key) + "\n";
+            }
+            return help;
+
+        }
+
         if (command.toLowerCase().startsWith("help")) {
             command = command.substring(4, command.length()).toLowerCase();
             String[] args = command.split("[ /<>]");
@@ -968,11 +979,16 @@ public class ApiClient {
                 inputText += inputLine;
             bufferedReader.close();
 
-            try {
-                return StrJSonFine.convert(inputText);
-            } catch (Exception e) {
-                return inputText;
+            if (inputText.length() > 0) {
+                inputText = inputText.trim();
+                if (inputText.charAt(0) == '{' || inputText.charAt(0) == '[') {
+                    try {
+                        return StrJSonFine.convert(inputText);
+                    } catch (Exception e) {
+                    }
+                }
             }
+            return inputText;
 
         } catch (Exception ioe) {
             LOGGER.info(ioe.getMessage());

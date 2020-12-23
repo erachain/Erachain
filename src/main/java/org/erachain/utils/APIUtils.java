@@ -135,12 +135,17 @@ public class APIUtils {
                 min_length = 8;
             }
 
+            //min_length = 0;
             if (BlockChain.TEST_MODE)
                 min_length = 0;
 
             if (password != null) {
-                if (password.length() <= min_length)
-                    throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_PASSWORD_SO_SHORT);
+                JSONObject errorJson;
+                if (password.length() <= min_length) {
+                    throw ApiErrorFactory.getInstance()
+                            .createError(ApiErrorFactory.ERROR_WALLET_PASSWORD_SO_SHORT,
+                                    "need > " + min_length);
+                }
 
                 if (once) {
                     if (Controller.getInstance().unlockOnceWallet(password))
@@ -296,35 +301,36 @@ public class APIUtils {
                 asset.getKey(DCSet.getInstance()), bdAmount, title,
                 message, isText, isEncrypted, 0);
         
-        boolean confirmed = true;
+        int confirmed = IssueConfirmDialog.CONFIRM;
         if (Gui.isGuiStarted()) {
             String Status_text = "";
-            IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+            IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                     Lang.getInstance().translate("Send Mail"), (600), (450), Status_text,
                     Lang.getInstance().translate("Confirmation Transaction"));
             Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
-            
+
             // ww.jTabbedPane1.setVisible(false);
-            dd.jScrollPane1.setViewportView(ww);
-            dd.setLocationRelativeTo(null);
-            dd.setVisible(true);
-            
+            confirmDialog.jScrollPane1.setViewportView(ww);
+            confirmDialog.setLocationRelativeTo(null);
+            confirmDialog.setVisible(true);
+
             // JOptionPane.OK_OPTION
-            confirmed = dd.isConfirm;
-            
+            confirmed = confirmDialog.isConfirm;
+
         }
-        
-        if (confirmed) {
-            
-            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-            
+
+        if (confirmed > 0) {
+
+            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK,
+                    confirmed == IssueConfirmDialog.TRY_FREE);
+
             if (result == Transaction.VALIDATE_OK)
                 return transaction.toJson().toJSONString();
             else {
-                
+
                 // Lang.getInstance().translate(OnDealClick.resultMess(result.getB()));
                 throw ApiErrorFactory.getInstance().createError(result);
-                
+
             }
             
         }
@@ -399,16 +405,8 @@ public class APIUtils {
 
     }
 
-    public static Tuple3<PrivateKeyAccount, Integer, byte[]> postIssueRawItem(HttpServletRequest request, String x,
-                                                                              String creator, String feePowStr, String password) {
-
-        int feePow;
-        // PARSE FEE POWER
-        try {
-            feePow = Integer.parseInt(feePowStr);
-        } catch (Exception e0) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_FEE_POWER);
-        }
+    public static Fun.Tuple2<PrivateKeyAccount, byte[]> postIssueRawItem(HttpServletRequest request, String x,
+                                                                         Account creator, String password, String walletMess) {
 
         byte[] raw;
         try {
@@ -420,11 +418,6 @@ public class APIUtils {
         if (raw == null)
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_RAW_DATA);
 
-        // CHECK ADDRESS
-        if (!Crypto.getInstance().isValidAddress(creator)) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
-        }
-
         // check this up here to avoid leaking wallet information to remote
         // user
         // full check is later to prompt user with calculated fee
@@ -435,7 +428,7 @@ public class APIUtils {
         }
 
         // TRY UNLOCK
-        askAPICallAllowed(password, "", request, true);
+        askAPICallAllowed(password, walletMess, request, true);
 
         // CHECK WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {
@@ -448,7 +441,7 @@ public class APIUtils {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
         }
 
-        return new Tuple3<>(account, feePow, raw);
+        return new Fun.Tuple2<>(account, raw);
 
     }
 

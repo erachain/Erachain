@@ -1,7 +1,5 @@
 package org.erachain.gui.settings;
 
-import org.erachain.controller.Controller;
-import org.erachain.core.wallet.Wallet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -321,6 +319,7 @@ public class SettingsBasicPanel extends JPanel {
 
                         dd.setTitle(Lang.getInstance().translate("SSL is OK."));
                         dd.jTextPane1.setText("Certificate: \n " + cetrtyficatemy.toString());
+                        dd.jButton0.setVisible(false);
                         dd.jButton1.setVisible(false);
                         dd.jButton2.setText(Lang.getInstance().translate("OK"));
                         dd.setLocationRelativeTo(null);

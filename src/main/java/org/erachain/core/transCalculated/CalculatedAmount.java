@@ -126,7 +126,7 @@ public abstract class CalculatedAmount extends Calculated {
     
     @Override
     public String viewSubTypeName() {
-        return TransactionAmount.viewActionType(this.assetKey, this.amount, this.isBackward(), isDirect);
+        return TransactionAmount.viewSubTypeName(this.assetKey, this.amount, this.isBackward(), isDirect);
     }
     
     @Override
@@ -217,7 +217,7 @@ public abstract class CalculatedAmount extends Calculated {
             transaction.put("amount", this.viewAmount());
             // transaction.put("action_type", this.viewActionType());
             transaction.put("action_key", this.getActionType());
-            transaction.put("action_name", TransactionAmount.viewActionType(this.assetKey, this.amount, this.isBackward(), isDirect));
+            transaction.put("action_name", TransactionAmount.viewSubTypeName(this.assetKey, this.amount, this.isBackward(), isDirect));
             transaction.put("backward", this.isBackward());
         }
         

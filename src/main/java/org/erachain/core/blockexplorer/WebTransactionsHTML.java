@@ -245,7 +245,7 @@ public class WebTransactionsHTML {
                 + assetTransfer.getRecipient().getAddress() + get_Lang() + "><b>" + assetTransfer.getRecipient().getPersonAsString()
                 + "</b></a><br>";
 
-        out += "<br>" + Lang.getInstance().translateFromLangObj(assetTransfer.viewActionTypeWas(), langObj)
+        out += "<br>" + Lang.getInstance().translateFromLangObj(assetTransfer.viewActionType(), langObj)
                 + ": <b>" + assetTransfer.getAmount().toPlainString() + " x "
                 + itemNameHTML(Controller.getInstance().getAsset(assetTransfer.getAbsKey())) + "</b>";
 
@@ -638,7 +638,7 @@ public class WebTransactionsHTML {
                 + "</b></a>";
 
         if (rSend.getAmount() != null) {
-            out += "<br>" + Lang.getInstance().translateFromLangObj(rSend.viewActionTypeWas(), langObj)
+            out += "<br>" + Lang.getInstance().translateFromLangObj(rSend.viewActionType(), langObj)
                     + ": <b>" + rSend.getAmount().toPlainString() + " х "
                     + itemNameHTML(Controller.getInstance().getAsset(rSend.getAbsKey())) + "</b>";
         }

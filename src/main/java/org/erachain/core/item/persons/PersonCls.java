@@ -33,7 +33,8 @@ public abstract class PersonCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.PERSON_TYPE;
 
-    public static final long MIN_START_KEY = 0L;
+    public static final long MIN_START_KEY_OLD = 0L;
+    public static final long START_KEY_UP_ITEMS = 1L << 20;
 
     public static int MAX_IMAGE_LENGTH = 28000;
     public static int MIN_IMAGE_LENGTH = 10240;
@@ -79,12 +80,12 @@ public abstract class PersonCls extends ItemCls {
         this.birthday = birthday;
         this.deathday = deathday;
         this.gender = gender;
-        this.race = race;
+        this.race = race == null ? "" : race;
         this.birthLatitude = birthLatitude;
         this.birthLongitude = birthLongitude;
-        this.skinColor = skinColor;
-        this.eyeColor = eyeColor;
-        this.hairСolor = hairСolor;
+        this.skinColor = skinColor == null ? "" : skinColor;
+        this.eyeColor = eyeColor == null ? "" : eyeColor;
+        this.hairСolor = hairСolor == null ? "" : hairСolor;
         this.height = height;
     }
 
@@ -120,17 +121,17 @@ public abstract class PersonCls extends ItemCls {
     @Override
     public long START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return 1L << 18;
+            return START_KEY_UP_ITEMS;
 
-        return START_KEY;
+        return START_KEY_OLD;
     }
 
     @Override
     public long MIN_START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return 1L << 17;
+            return START_KEY_UP_ITEMS;
 
-        return MIN_START_KEY;
+        return MIN_START_KEY_OLD;
     }
 
     public String getItemTypeName() {

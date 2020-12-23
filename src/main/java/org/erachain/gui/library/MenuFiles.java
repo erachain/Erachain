@@ -221,8 +221,8 @@ public class MenuFiles extends JMenu {
                     AssetCls asset = ct.getAsset(assetKey);
                     panel.recipientAddress.setSelectedAddress(recipient);
                     panel.recipientAddress.setEditable(false);
-                    panel.jTextField_Mess_Title.setText(head);
-                    panel.jTextField_Mess_Title.setEditable(false);
+                    panel.jTextFieldTXTitle.setText(head);
+                    panel.jTextFieldTXTitle.setEditable(false);
                     panel.jTextField_Amount.setText(amount);
                     panel.jTextField_Amount.setEditable(false);
                     panel.jComboBox_Asset.setSelectedItem(asset);

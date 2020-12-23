@@ -167,6 +167,11 @@ public class PeersResource {
 
         o.put("height", peer.getHWeight(false));
         o.put("version", peer.getVersion());
+        if (Settings.getInstance().isWebEnabled() && Settings.getInstance().getWebAllowed().length == 0) {
+            // разрешено всем - передадим его
+            o.put("port", Settings.getInstance().getWebPort());
+            o.put("scheme", Settings.getInstance().isWebUseSSL() ? "https" : "http");
+        }
         o.put("buildTime", peer.getBuildTime() > 0 ?
                 DateTimeFormat.timestamptoString(peer.getBuildTime(), "yyyy-MM-dd", "UTC")
                 : "");

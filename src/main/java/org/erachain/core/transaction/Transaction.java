@@ -15,6 +15,7 @@ import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
@@ -609,6 +610,14 @@ public abstract class Transaction implements ExplorerJsonLine {
         this.seqNo = seqNo;
     }
 
+    public void setErrorValue(String value) {
+        errorValue = value;
+    }
+
+    public String getErrorValue() {
+        return errorValue;
+    }
+
     /**
      * NEED FOR DB SECONDATY KEYS see org.mapdb.Bind.secondaryKeys
      *
@@ -1005,6 +1014,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
                 && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
+            // не учитываем комиссию если размер блока маленький
             this.fee = BigDecimal.ZERO;
         } else {
             long fee_long = calcBaseFee();
@@ -1380,7 +1390,7 @@ public abstract class Transaction implements ExplorerJsonLine {
      * @param jsonObject
      * @return
      */
-    static public Object decodeJson(String x) {
+    static public Object decodeJson(String creatorStr, String x) {
 
         JSONObject out = new JSONObject();
         JSONObject jsonObject;
@@ -1389,37 +1399,58 @@ public abstract class Transaction implements ExplorerJsonLine {
             //READ JSON
             jsonObject = (JSONObject) JSONValue.parse(x);
         } catch (NullPointerException | ClassCastException e) {
-            error = ApiErrorFactory.ERROR_JSON;
-            out.put("error", error);
-            out.put("error_message", OnDealClick.resultMess(error));
+            Transaction.updateMapByErrorSimple(ApiErrorFactory.ERROR_JSON, out);
             return out;
         }
 
         if (jsonObject == null) {
-            error = ApiErrorFactory.ERROR_JSON;
-            out.put("error", error);
-            out.put("error_message", OnDealClick.resultMess(error));
+            Transaction.updateMapByErrorSimple(ApiErrorFactory.ERROR_JSON, out);
             return out;
         }
 
-        String creatorStr = (String) jsonObject.getOrDefault("creator", null);
+        creatorStr = creatorStr == null ? (String) jsonObject.get("creator") : creatorStr;
 
         Account creator = null;
         if (creatorStr == null) {
-            error = Transaction.INVALID_CREATOR;
-            return new Fun.Tuple2<>(error, OnDealClick.resultMess(error));
+            Transaction.updateMapByErrorSimple(Transaction.INVALID_CREATOR, out);
+            return out;
         } else {
             Fun.Tuple2<Account, String> resultCreator = Account.tryMakeAccount(creatorStr);
             if (resultCreator.a == null) {
-                return new Fun.Tuple2<>(Transaction.INVALID_CREATOR, resultCreator.b);
+                Transaction.updateMapByErrorValue(Transaction.INVALID_CREATOR, resultCreator.b, out);
+                return out;
             }
             creator = resultCreator.a;
         }
 
-        int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
-        String password = (String) jsonObject.getOrDefault("password", null);
+        String password = (String) jsonObject.get("password");
 
-        return new Fun.Tuple4(jsonObject, creator, feePow, password);
+        String error_value = null;
+        int feePow;
+        ExLink linkTo;
+        try {
+            error_value = "feePow error";
+            feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
+
+            String linkToRefStr = (String) jsonObject.get("linkTo");
+            if (linkToRefStr == null) {
+                linkTo = null;
+            } else {
+                Long linkToRef = Transaction.parseDBRef(linkToRefStr);
+                if (linkToRef == null) {
+                    error = Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR;
+                    Transaction.updateMapByErrorValue(error, "for 'linkTo'", out);
+                    return out;
+                } else {
+                    linkTo = new ExLinkSource(linkToRef, null);
+                }
+            }
+        } catch (Exception e) {
+            Transaction.updateMapByErrorValue(ApiErrorFactory.ERROR_JSON, error_value, out);
+            return out;
+        }
+
+        return new Fun.Tuple5(creator, feePow, linkTo, password, jsonObject);
 
     }
 
@@ -1723,6 +1754,12 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static void updateMapByErrorSimple(int error, HashMap out) {
         out.put("error", error);
         out.put("message", OnDealClick.resultMess(error));
+    }
+
+    public static void updateMapByErrorValue(int error, String errorValue, HashMap out) {
+        out.put("error", error);
+        out.put("message", OnDealClick.resultMess(error));
+        out.put("value", errorValue);
     }
 
     public void process_gifts_turn(int level, long fee_gift, Account invitedAccount,

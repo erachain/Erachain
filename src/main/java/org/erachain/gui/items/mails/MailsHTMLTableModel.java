@@ -8,7 +8,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.WTransactionMap;
@@ -728,7 +727,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
 
                 }
 
-                String actionName = TransactionAmount.viewActionType(assetKey, amount, backward, false);
+                String actionName = tx.viewFullTypeName();
                 amountStr = "<b><font size='3'>" + actionName + " "
                         //+ Lang.getInstance().translate("Amount") + ": "
                         + NumberAsString.formatAsString(this.amount) + "</font> "

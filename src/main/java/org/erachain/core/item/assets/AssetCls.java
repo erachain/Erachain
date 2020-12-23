@@ -26,9 +26,6 @@ public abstract class AssetCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.ASSET_TYPE;
 
-    public final static long START_KEY = ItemCls.START_KEY;
-    public static final long MIN_START_KEY = 1000L;
-
     // CORE KEY
     public static final long ERA_KEY = 1L;
     public static final String ERA_ABBREV = "ERA"; // ERA (main rights units)
@@ -302,17 +299,17 @@ public abstract class AssetCls extends ItemCls {
     @Override
     public long START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return START_KEY;
+        return START_KEY_OLD;
     }
 
     @Override
     public long MIN_START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return MIN_START_KEY;
+        return MIN_START_KEY_OLD;
     }
 
     @Override
@@ -640,9 +637,13 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public boolean isOutsideType() {
+        return isOutsideType(this.assetType);
+    }
+
+    public static boolean isOutsideType(int assetType) {
         return // ?? this.assetType == AS_OUTSIDE_GOODS ||
-                this.assetType >= AS_OUTSIDE_CURRENCY
-                        && this.assetType <= AS_OUTSIDE_OTHER_CLAIM;
+                assetType >= AS_OUTSIDE_CURRENCY
+                        && assetType <= AS_OUTSIDE_OTHER_CLAIM;
     }
 
     public boolean isOutsideCurrency() {
@@ -670,7 +671,7 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public static boolean isUnHoldable(long key, int assetType) {
-        if (key < getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY, AssetCls.MIN_START_KEY)
+        if (key < getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD)
                 || assetType == AS_INSIDE_ASSETS
                 || assetType > AS_OUTSIDE_OTHER_CLAIM
                 && assetType <= AS_INSIDE_OTHER_CLAIM
@@ -717,6 +718,14 @@ public abstract class AssetCls extends ItemCls {
      */
     public boolean isChangeDebtBySendActions() {
         return this.assetType == AS_SELF_ACCOUNTING_CASH_FUND;
+    }
+
+    public static boolean isChangeDebtBySpendActions(int assetType) {
+        return isOutsideType(assetType);
+    }
+
+    public boolean isChangeDebtBySpendActions() {
+        return isChangeDebtBySpendActions(this.assetType);
     }
 
     /**
@@ -819,11 +828,11 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_MANAGED_ACCOUNTING:
                 return "Self Managed";
             case AS_SELF_ACCOUNTING_LOAN:
-                return "Accounting Loan";
+                return "AS_SELF_ACCOUNTING_LOAN_N";
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
-                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_NF";
+                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_N";
             case AS_SELF_ACCOUNTING_CASH_FUND:
-                return "AS_SELF_ACCOUNTING_CASH_FUND_NF";
+                return "AS_SELF_ACCOUNTING_CASH_FUND_N";
 
         }
         return null;
@@ -886,7 +895,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_MANAGED_ACCOUNTING:
                 return "Self Managed for Accounting";
             case AS_SELF_ACCOUNTING_LOAN:
-                return "Accounting Loan for Debtor";
+                return "AS_SELF_ACCOUNTING_LOAN_NF";
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
                 return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_NF";
             case AS_SELF_ACCOUNTING_CASH_FUND:
@@ -1317,6 +1326,10 @@ public abstract class AssetCls extends ItemCls {
             case TransactionAmount.ACTION_PLEDGE:
                 return backward ? "Re-pledge"
                         : "Pledge";
+            case TransactionAmount.ACTION_RESERCED_6:
+                // for CALCULATED TX
+                return backward ? "Reserved 6-"
+                        : "Reserved 6";
         }
 
         return null;
@@ -1334,6 +1347,11 @@ public abstract class AssetCls extends ItemCls {
                         return "AS_SELF_SEND_ADDITIONAL_ACT_DEBT";
                 }
         }
+
+        if (actionType == TransactionAmount.ACTION_SPEND && isChangeDebtBySpendActions(assetType)) {
+            return "AdditionAction_on_isChangeDebtBySpendActions";
+        }
+
         return null;
     }
 
@@ -1615,7 +1633,7 @@ public abstract class AssetCls extends ItemCls {
                 return "Spender";
         }
 
-        return "unknown";
+        return null;
     }
 
     public String viewAssetTypeActionOK(boolean backward, int actionType, boolean isCreatorOwner) {

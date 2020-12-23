@@ -26,8 +26,6 @@ public abstract class PollCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.POLL_TYPE;
 
-    public static final long MIN_START_KEY = 1000L;
-
     public static final int POLL = 1;
     public static final int INITIAL_FAVORITES = 0;
     protected static final int OPTIONS_SIZE_LENGTH = 4;
@@ -55,17 +53,17 @@ public abstract class PollCls extends ItemCls {
     @Override
     public long START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return START_KEY;
+        return START_KEY_OLD;
     }
 
     @Override
     public long MIN_START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return MIN_START_KEY;
+        return MIN_START_KEY_OLD;
     }
 
     public String getItemTypeName() {
