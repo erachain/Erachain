@@ -88,7 +88,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
             jButton0.setVisible(false);
             jButton1.setText(Lang.getInstance().translate("Save"));
         } else {
-            // проверим а вообще такая трнзакция может быть бесплатна?
+            // проверим а вообще такая транзакция может быть бесплатна?
             jButton0.setVisible(BlockChain.FREE_FEE_TO_SEQNO > 0
                     && BlockChain.FREE_FEE_FROM_HEIGHT > Controller.getInstance().getMyHeight()
                     && transaction.getDataLength(Transaction.FOR_NETWORK, true) < BlockChain.FREE_FEE_LENGTH);
