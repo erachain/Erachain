@@ -125,6 +125,10 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
 
         switch (column) {
             case COLUMN_ADDRESS:
+                if (peer.getInfo() != null && peer.getInfo().get("port") != null) {
+                    String scheme = peer.getInfo().getOrDefault("scheme", "https").toString();
+                    return "<HTML><a href = '' >" + scheme + "://" + peer.getAddress().getHostAddress() + ":" + peer.getInfo().get("port") + "</a>";
+                }
                 return peer.getAddress().getHostAddress();
 
             case COLUMN_HEIGHT:
