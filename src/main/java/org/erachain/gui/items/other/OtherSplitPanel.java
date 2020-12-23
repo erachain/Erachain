@@ -20,8 +20,7 @@ import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Observable;
@@ -55,6 +54,50 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
         DCSet.getInstance().getBlockMap().addObserver(this);
         jTableJScrollPanelLeftPanel.setModel(peersTableModel);
         jTableJScrollPanelLeftPanel.setAutoCreateRowSorter(true);
+
+        // hand cursor for Favorite column
+        jTableJScrollPanelLeftPanel.addMouseMotionListener(new MouseMotionAdapter() {
+            public void mouseMoved(MouseEvent e) {
+
+                if (jTableJScrollPanelLeftPanel.columnAtPoint(e.getPoint()) == peersTableModel.COLUMN_ADDRESS) {
+                    int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                    if (row >= 0) {
+                        int convertRowIndexToModel = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+                        itemPeerMenu = peersTableModel.getItem(convertRowIndexToModel);
+                        if (itemPeerMenu.getWEBPort() != null) {
+                            jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                            return;
+                        }
+                    }
+                }
+                jTableJScrollPanelLeftPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+
+        jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 1) {
+                    //GET ROW
+                    if (jTableJScrollPanelLeftPanel.columnAtPoint(e.getPoint()) == peersTableModel.COLUMN_ADDRESS) {
+                        int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                        if (row >= 0) {
+                            int convertRowIndexToModel = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+                            itemPeerMenu = peersTableModel.getItem(convertRowIndexToModel);
+                            if (itemPeerMenu.getWEBPort() != null) {
+                                try {
+                                    String url = itemPeerMenu.getNodeInfo().getOrDefault("scheme", "https").toString()
+                                            + "://" + itemPeerMenu.getAddress().getHostAddress() + ":" + itemPeerMenu.getWEBPort()
+                                            + "/index/blockexplorer.html";
+                                    URLViewer.openWebpage(new URL(url));
+                                } catch (MalformedURLException e1) {
+                                    logger.error(e1.getMessage(), e1);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
         peersMenu.addPopupMenuListener(new PopupMenuListener() {
             @Override

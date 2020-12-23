@@ -19,7 +19,7 @@ import java.util.*;
 @SuppressWarnings("serial")
 public class PeersTableModel extends TimerTableModelCls<Peer> implements Observer {
 
-    private static final int COLUMN_ADDRESS = 0;
+    public static final int COLUMN_ADDRESS = 0;
     private static final int COLUMN_HEIGHT = 1;
     private static final int COLUMN_PINGMC = 2;
     private static final int COLUMN_REILABLE = 3;

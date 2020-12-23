@@ -323,6 +323,13 @@ public class Peer extends MonitoredThread {
         return nodeInfo;
     }
 
+    public Long getWEBPort() {
+        if (nodeInfo != null) {
+            return (Long) nodeInfo.get("port");
+        }
+        return null;
+    }
+
     public String getBanMessage() {
         return banMessage;
     }
