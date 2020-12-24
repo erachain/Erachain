@@ -180,6 +180,10 @@ public class WalletNotifyTimer<U> implements Observer {
                     } else {
                         sound = "receivemail.wav";
                     }
+                } else {
+                    head = lang.translate("EVENT");
+                    sound = "receivemail.wav";
+                    message = value.toString();
                 }
             } else {
                 head = lang.translate("EVENT");
