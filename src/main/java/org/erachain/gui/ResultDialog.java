@@ -22,8 +22,8 @@ public class ResultDialog {
 
         //CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {
-            message = Lang.getInstance().translate("Transaction \"%1\" - was sent").replace("%1",
-                    message == null ? transaction.viewFullTypeName() : Lang.getInstance().translate(message)) + "!";
+            message = Lang.getInstance().translate("Transaction \"%1\" has been sent").replace("%1",
+                    Lang.getInstance().translate(message == null ? transaction.viewFullTypeName() : message)) + "!";
             JOptionPane.showMessageDialog(new JFrame(), message,
                     Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
             return true;

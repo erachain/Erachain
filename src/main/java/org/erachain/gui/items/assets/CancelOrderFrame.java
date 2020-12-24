@@ -230,7 +230,7 @@ public class CancelOrderFrame extends JDialog {
         }
 
         Transaction cancelOrder = Controller.getInstance().cancelOrder1(creator, order, feePow);
-        ResultDialog.make(this, cancelOrder, "Order has been sent", false, false);
+        ResultDialog.make(this, cancelOrder, null, false, false);
 
         //ENABLE
         this.cancelOrderButton.setEnabled(true);

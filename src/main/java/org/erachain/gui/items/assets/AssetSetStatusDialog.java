@@ -273,7 +273,7 @@ public class AssetSetStatusDialog extends JDialog {
 
         String Status_text = "";
         IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
-                Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+                Lang.getInstance().translate(transaction.viewFullTypeName()), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
 
         SetStatusToItemDetailsFrame ww = new SetStatusToItemDetailsFrame((RSetStatusToItem) transaction);
         confirmDialog.jScrollPane1.setViewportView(ww);
@@ -282,7 +282,7 @@ public class AssetSetStatusDialog extends JDialog {
 
         //	JOptionPane.OK_OPTION
         if (confirmDialog.isConfirm > 0) {
-            ResultDialog.make(this, transaction, "Status assigned!", false, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
+            ResultDialog.make(this, transaction, null, false, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
         //ENABLE
         Button_Confirm.setEnabled(true);
