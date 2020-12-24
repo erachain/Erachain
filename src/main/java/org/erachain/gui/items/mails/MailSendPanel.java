@@ -1,5 +1,6 @@
 package org.erachain.gui.items.mails;
 
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -717,7 +718,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
                 if (publicKey == null) {
                     JOptionPane.showMessageDialog(new JFrame(),
                             Lang.getInstance().translate(
-                                    "The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."),
+                                    ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
                     // ENABLE
@@ -775,7 +776,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
 
         // JOptionPane.OK_OPTION
         if (confirmDialog.isConfirm > 0) {
-            ResultDialog.make(this, transaction, null, false, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
+            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
         // ENABLE
         this.sendButton.setEnabled(true);

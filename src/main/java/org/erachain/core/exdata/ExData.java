@@ -1,6 +1,7 @@
 package org.erachain.core.exdata;
 
 import com.google.common.primitives.Ints;
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -1199,7 +1200,7 @@ public class ExData {
 
                 if (publicKey == null) {
                     JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(recipient.toString() + " : " +
-                                    "The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."),
+                                    ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
                     return null;

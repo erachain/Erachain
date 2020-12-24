@@ -1346,7 +1346,7 @@
   "the Message format is not hex - correct the text or use isTextMessage = true": "",
   "The name is free, you can register it!": "Это имя свободно, вы можете зарегистрировать его!",
   "The name is not registered": "Такое имя не зарегистрировано",
-  "The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him.": "",
+  "ERROR_NO_PUBLIC_KEY": "Получатель еще не сделал ниодного действия в блокчейн.\nВы не можете послать ему зашифрованное сообщение.",
   "There are atleast two entries with duplicate keys (Bad key: %key%)": "",
   "Ledger Account": "Лицевой Счет",
   "Account Details": "Детали Счета",
