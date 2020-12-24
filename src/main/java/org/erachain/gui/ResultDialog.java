@@ -22,8 +22,9 @@ public class ResultDialog {
 
         //CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {
-            JOptionPane.showMessageDialog(new JFrame(), (message == null ? transaction.viewFullTypeName() : Lang.getInstance().translate(message))
-                            + (addMess ? " " + Lang.getInstance().translate("- was made") + "!" : ""),
+            message = Lang.getInstance().translate("Transaction \"%1\" - was sent").replace("%1",
+                    message == null ? transaction.viewFullTypeName() : Lang.getInstance().translate(message)) + "!";
+            JOptionPane.showMessageDialog(new JFrame(), message,
                     Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
             return true;
         } else if (BlockChain.MAIN_MODE && result == Transaction.NOT_ENOUGH_FEE
