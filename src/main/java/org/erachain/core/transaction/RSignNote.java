@@ -776,31 +776,28 @@ public class RSignNote extends Transaction implements Itemable {
     @Override
     public long calcBaseFee() {
 
-        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
-                && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
-            // не учитываем комиссию если размер блока маленький
+        long long_fee = super.calcBaseFee();
+        if (long_fee == 0)
             return 0L;
-        } else {
-            long fee = super.calcBaseFee();
-            byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
 
-            if (allHashes != null) {
-                fee += allHashes.length * 100 * BlockChain.FEE_PER_BYTE;
-            }
+        byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
 
-            if (getExLink() != null)
-                fee += 100 * BlockChain.FEE_PER_BYTE;
-
-            if (extendedData.hasAuthors()) {
-                fee += extendedData.getAuthors().length * 100 * BlockChain.FEE_PER_BYTE;
-            }
-
-            if (extendedData.hasSources()) {
-                fee += extendedData.getSources().length * 100 * BlockChain.FEE_PER_BYTE;
-            }
-
-            return fee;
+        if (allHashes != null) {
+            long_fee += allHashes.length * 100 * BlockChain.FEE_PER_BYTE;
         }
+
+        if (getExLink() != null)
+            long_fee += 100 * BlockChain.FEE_PER_BYTE;
+
+        if (extendedData.hasAuthors()) {
+            long_fee += extendedData.getAuthors().length * 100 * BlockChain.FEE_PER_BYTE;
+        }
+
+        if (extendedData.hasSources()) {
+            long_fee += extendedData.getSources().length * 100 * BlockChain.FEE_PER_BYTE;
+        }
+
+        return long_fee;
     }
 
     public void parseDataV2WithoutFiles() {

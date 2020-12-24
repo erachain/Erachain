@@ -357,7 +357,6 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int KEY_LENGTH = 8;
     // not need now protected static final int FEE_LENGTH = 8;
     public static final int SIGNATURE_LENGTH = Crypto.SIGNATURE_LENGTH;
-    protected static final int TODO_h1 = 69000;
     // PROPERTIES LENGTH
     protected static final int SIMPLE_TYPE_LENGTH = 1;
     public static final int TYPE_LENGTH = 4;
@@ -991,20 +990,11 @@ public abstract class Transaction implements ExplorerJsonLine {
     // get fee
     public long calcBaseFee() {
         int len = this.getDataLength(Transaction.FOR_NETWORK, true);
-
-        /*
-        int anonimous = 0;
-        if (anonimous > 0) {
-            len *= anonimous;
+        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
+                && len < BlockChain.FREE_FEE_LENGTH) {
+            // не учитываем комиссию если размер блока маленький
+            return 0L;
         }
-
-        int minLen = getJobLevel();
-        if (this.height < BlockChain.VERS_4_11 && BlockChain.VERS_4_11_USE_OLD_FEE)
-            return len * BlockChain.FEE_PER_BYTE_4_10;
-
-        if (len < minLen)
-            len = minLen;
-        */
 
         return len * BlockChain.FEE_PER_BYTE;
     }
@@ -1012,19 +1002,18 @@ public abstract class Transaction implements ExplorerJsonLine {
     // calc FEE by recommended and feePOW
     public void calcFee() {
 
-        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
-                && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
-            // не учитываем комиссию если размер блока маленький
+        long fee_long = calcBaseFee();
+        if (fee_long == 0) {
             this.fee = BigDecimal.ZERO;
-        } else {
-            long fee_long = calcBaseFee();
-            BigDecimal fee = new BigDecimal(fee_long).multiply(BlockChain.FEE_RATE).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
+            return;
+        }
 
-            if (this.feePow > 0) {
-                this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
-            } else {
-                this.fee = fee;
-            }
+        BigDecimal fee = new BigDecimal(fee_long).multiply(BlockChain.FEE_RATE).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
+
+        if (this.feePow > 0) {
+            this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
+        } else {
+            this.fee = fee;
         }
     }
 
