@@ -920,7 +920,10 @@ public class TransactionCreator {
             return Transaction.KEY_COLLISION;
         }
 
-        transaction.setDC(this.fork, forDeal, this.blockHeight, ++this.seqNo);
+        if (!this.fork.equals(transaction.getDCSet())) {
+            transaction.setDC(this.fork, forDeal, this.blockHeight, ++this.seqNo);
+        }
+
         int valid = transaction.isValid(forDeal, tryFree ? Transaction.NOT_VALIDATE_FLAG_FEE : 0L);
 
         if (valid == Transaction.VALIDATE_OK) {
