@@ -1,11 +1,5 @@
 package org.erachain;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import org.junit.Ignore;
-import org.junit.Test;
-
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
@@ -13,6 +7,11 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
 import org.erachain.ntp.NTP;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 @Ignore
 public class WalletTests {
 
@@ -40,7 +39,7 @@ public class WalletTests {
 
         wallet = new Wallet(false, false);
         create = wallet.create(database, secureDatabase, Crypto.getInstance()
-                .digest(password.getBytes()), 10, false);
+                .digest(password.getBytes()), 10, false, false);
     }
 
     @Test

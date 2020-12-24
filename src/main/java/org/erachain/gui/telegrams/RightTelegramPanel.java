@@ -38,6 +38,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
      * Creates new form rightTelegramPanel
      */
     JPopupMenu menu;
+    JMenuItem tryIssuePersonText;
 
     public WalletTelegramsFilterTableModel walletTelegramsFilterTableModel;
     protected int row;
@@ -64,6 +65,9 @@ public class RightTelegramPanel extends javax.swing.JPanel {
 
                         int crow = jTableMessages.convertRowIndexToModel(row);
                         Transaction transaction = walletTelegramsFilterTableModel.getItem(crow);
+
+                        String title = transaction.getTitle();
+                        tryIssuePersonText.setEnabled(title != null && title.toLowerCase().equals("person bytecode"));
 
                         if (e.getClickCount() == 2) {
                             tableMouse2Click(crow, transaction);
@@ -352,7 +356,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
         });
         menu.add(copyText);
 
-        JMenuItem tryIssuePersonText = new JMenuItem(Lang.getInstance().translate("Try Issue Person"));
+        tryIssuePersonText = new JMenuItem(Lang.getInstance().translate("Try Issue Person"));
         tryIssuePersonText.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -390,6 +394,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
                                 JOptionPane.showMessageDialog(new JFrame(),
                                         Lang.getInstance().translate(message),
                                         Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                                return;
                             }
                         }
 
@@ -398,6 +403,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
                         JOptionPane.showMessageDialog(new JFrame(),
                                 Lang.getInstance().translate(message),
                                 Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        return;
 
                     }
 
