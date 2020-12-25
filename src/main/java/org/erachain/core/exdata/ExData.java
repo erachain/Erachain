@@ -1574,8 +1574,9 @@ public class ExData {
             templateOwner.changeBalance(dcSet, false, false, Transaction.FEE_KEY, royaltyFee, false, false, false);
             // учтем что получили бонусы
             templateOwner.changeCOMPUBonusBalances(dcSet, false, royaltyFee, Transaction.BALANCE_SIDE_DEBIT);
+
             transaction.addCalculated(block, templateOwner, Transaction.FEE_KEY, royaltyFee,
-                    "template royalty ");
+                    Lang.getInstance().translate("template royalty for %1").replace("%1", "" + templateKey));
 
         }
 
