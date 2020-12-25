@@ -1056,7 +1056,9 @@ public abstract class Transaction implements ExplorerJsonLine {
             return 0L;
         }
 
-        long fee = this.fee.unscaledValue().longValue();
+        long fee = this.fee.unscaledValue().longValue() - getRoyaltyFee();
+        if (fee <= 0)
+            return 0L;
 
         // Если слишком большая комиссия, то и награду чуток увеличим
         if (fee > BlockChain.BONUS_REFERAL << 4)
