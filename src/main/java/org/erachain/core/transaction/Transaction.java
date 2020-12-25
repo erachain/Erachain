@@ -1029,8 +1029,16 @@ public abstract class Transaction implements ExplorerJsonLine {
     // GET forged FEE without invited FEE
     public long getForgedFee() {
         long fee = this.fee.unscaledValue().longValue();
-        long fee_invited = this.getInvitedFee();
-        return fee - fee_invited;
+        return fee - this.getInvitedFee() - this.getRoyaltyFee();
+    }
+
+    /**
+     * Сколько на другие проценты уйдет - например создателю шаблона
+     *
+     * @return
+     */
+    public long getRoyaltyFee() {
+        return 0L;
     }
 
     // GET only INVITED FEE
