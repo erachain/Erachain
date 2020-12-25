@@ -168,12 +168,15 @@ public abstract class AddressItemRefs extends Transaction {
     @Override
     public long calcBaseFee() {
 
-        long add_fee = 0;
+        long long_fee = super.calcBaseFee();
+        if (long_fee == 0)
+            return 0L;
+
         long len = this.getItem().getName().length();
         if (len < 10) {
-            add_fee = 3 ^ (10 - len) * 100;
+            long_fee += BlockChain.FEE_PER_BYTE * (500 + 3 ^ (10 - len) * 100);
         }
 
-        return super.calcBaseFee() + BlockChain.FEE_PER_BYTE * (500 + add_fee);
+        return long_fee;
     }
 }

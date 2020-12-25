@@ -1,5 +1,6 @@
 package org.erachain.gui.items.accounts;
 
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -60,8 +61,6 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
     public ExLink exLink;
 
     public int feePow;
-
-    public boolean isTextB;
 
     public AssetCls asset;
 
@@ -228,8 +227,10 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         this.jLabelTXTitle.setText(Lang.getInstance().translate("Title") + ":");
         this.jLabel_Mess.setText(Lang.getInstance().translate("Message") + ":");
-        this.jCheckBox_Encript.setText(Lang.getInstance().translate("Encrypt message") + ":");
-        this.jCheckBox_Encript.setSelected(true);
+        this.jCheckBox_Encrypt.setText(Lang.getInstance().translate("Encrypt message"));
+        this.jCheckBox_Encrypt.setSelected(true);
+        this.jCheckBox_isText.setText(Lang.getInstance().translate("As Text"));
+        this.jCheckBox_isText.setSelected(true);
         this.jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
         this.jLabel_Amount.setText(Lang.getInstance().translate("Amount") + ":");
 
@@ -363,7 +364,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         this.jlabel_RecipientDetail.setText(Lang.getInstance().translate(
                 Account.getDetailsForEncrypt(recipient, asset.getKey(),
-                        this.jCheckBox_Encript.isSelected())));
+                        this.jCheckBox_Encrypt.isSelected())));
 
         refreshLabels();
 
@@ -462,12 +463,13 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             return false;
         }
 
-        this.message = jTextArea_Message.getText();
+        boolean asText = this.jCheckBox_isText.isSelected();
+        isTextByte = (asText) ? new byte[]{1} : new byte[]{0};
 
-        isTextB = true;
+        this.message = jTextArea_Message.getText();
         messageBytes = null;
         if (message != null && message.length() > 0) {
-            if (isTextB) {
+            if (isTextByte[0] > 0) {
                 messageBytes = message.getBytes(StandardCharsets.UTF_8);
             } else {
                 try {
@@ -490,11 +492,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         // if amount = 0 - set null
         if (amount.compareTo(BigDecimal.ZERO) == 0) amount = null;
 
-        boolean encryptMessage = this.jCheckBox_Encript.isSelected();
-
+        boolean encryptMessage = this.jCheckBox_Encrypt.isSelected();
         encrypted = (encryptMessage) ? new byte[]{1} : new byte[]{0};
-        isTextByte = (isTextB) ? new byte[]{1} : new byte[]{0};
-
 
         if (amount != null) {
             //CHECK IF PAYMENT OR ASSET TRANSFER
@@ -525,7 +524,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                 }
 
                 if (publicKey == null) {
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
+                            ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
+                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
                     //ENABLE
                     this.jButton_ok.setEnabled(true);
@@ -595,7 +596,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // JOptionPane.OK_OPTION
         if (confirmDialog.isConfirm > 0) {
-            ResultDialog.make(this, transaction, jButton_ok.getText(), false, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
+            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
 
         // ENABLE
@@ -616,7 +617,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jLabel_Mess = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea_Message = new javax.swing.JTextArea();
-        jCheckBox_Encript = new javax.swing.JCheckBox();
+        jCheckBox_Encrypt = new javax.swing.JCheckBox();
+        jCheckBox_isText = new javax.swing.JCheckBox();
         jLabel_Asset = new javax.swing.JLabel();
         jLabel_AssetType = new javax.swing.JLabel();
         jComboBox_Asset = new javax.swing.JComboBox<>();
@@ -707,7 +709,10 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         add(jScrollPane1, gridBagConstraints);
 
         fieldGBC.gridy = ++gridy;
-        add(jCheckBox_Encript, fieldGBC);
+        add(jCheckBox_Encrypt, fieldGBC);
+
+        fieldGBC.gridy = ++gridy;
+        add(jCheckBox_isText, fieldGBC);
 
         labelGBC.gridy = ++gridy;
         add(jLabel_Asset, labelGBC);
@@ -801,7 +806,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
 
     public javax.swing.JButton jButton_ok;
-    private javax.swing.JCheckBox jCheckBox_Encript;
+    private javax.swing.JCheckBox jCheckBox_Encrypt;
+    private javax.swing.JCheckBox jCheckBox_isText;
     private javax.swing.JComboBox<Account> jComboBox_Account;
     public javax.swing.JComboBox<ItemCls> jComboBox_Asset;
     private javax.swing.JComboBox<String> jComboBox_Fee;

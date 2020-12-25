@@ -112,10 +112,15 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     @Override
     public long calcBaseFee() {
+
+        long long_fee = super.calcBaseFee();
+        if (long_fee == 0)
+            return 0L;
+
         if (!BlockChain.MAIN_MODE || height > BlockChain.VERS_5_01_01) {
             return 1000 * BlockChain.FEE_PER_BYTE;
         } else {
-            return super.calcBaseFee();
+            return long_fee;
         }
     }
 

@@ -16,14 +16,15 @@ import java.math.BigDecimal;
 
 public class ResultDialog {
 
-    public static boolean make(Component parent, Transaction transaction, String message, boolean addMess, boolean tryFree) {
+    public static boolean make(Component parent, Transaction transaction, boolean tryFree) {
 
         int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, tryFree);
 
         //CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {
-            JOptionPane.showMessageDialog(new JFrame(), (message == null ? transaction.viewFullTypeName() : Lang.getInstance().translate(message))
-                            + (addMess ? " " + Lang.getInstance().translate("- was made") + "!" : ""),
+            String message = Lang.getInstance().translate("Transaction \"%1\" has been sent").replace("%1",
+                    Lang.getInstance().translate(transaction.viewFullTypeName())) + "!";
+            JOptionPane.showMessageDialog(new JFrame(), message,
                     Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
             return true;
         } else if (BlockChain.MAIN_MODE && result == Transaction.NOT_ENOUGH_FEE

@@ -85,6 +85,26 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         }
     }
 
+    @Override
+    public boolean isFreeFee() {
+        return false;
+    }
+
+    int minLen = 200 * 500;
+
+    @Override
+    public long calcBaseFee() {
+
+        int len = this.getDataLength(Transaction.FOR_NETWORK, true);
+
+        if (this.height > BlockChain.USE_NEW_ISSUE_FEE) {
+            if (len < minLen)
+                len = minLen;
+        }
+
+        return len * BlockChain.FEE_PER_BYTE;
+    }
+
     /**
      * нельзя вызывать для Форка и для isWIPED
      */

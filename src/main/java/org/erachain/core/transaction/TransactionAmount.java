@@ -311,29 +311,29 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     @Override
     public long calcBaseFee() {
 
-        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
-                && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
-            // не учитываем комиссию если размер блока маленький
+        long long_fee = super.calcBaseFee();
+        if (long_fee == 0)
+            // если бесплатно то и процентную комиссию (ниже) не считаем!
             return 0L;
-        } else {
-            if (hasAmount() && getActionType() == ACTION_SEND // только для передачи в собственность!
-                    && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
-                    && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)
-                    && !isInvolved(asset.getOwner())) {
-                Fun.Tuple2<BigDecimal, BigDecimal> percItem = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
-                assetFee = amount.abs().multiply(percItem.a).setScale(asset.getScale(), RoundingMode.DOWN);
-                if (assetFee.compareTo(percItem.b) < 0) {
-                    // USE MINIMAL VALUE
-                    assetFee = percItem.b.setScale(asset.getScale(), RoundingMode.DOWN);
-                }
-                if (!BlockChain.ASSET_BURN_PERCENTAGE.isEmpty()
-                        && BlockChain.ASSET_BURN_PERCENTAGE.containsKey(key)) {
-                    assetFeeBurn = assetFee.multiply(BlockChain.ASSET_BURN_PERCENTAGE.get(key)).setScale(asset.getScale(), RoundingMode.UP);
-                }
-                return super.calcBaseFee() >> 1;
+
+        // ПРОЦЕНТЫ в любом случае посчитаем - даже если халявная транзакция
+        if (hasAmount() && getActionType() == ACTION_SEND // только для передачи в собственность!
+                && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
+                && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)
+                && !isInvolved(asset.getOwner())) {
+            Fun.Tuple2<BigDecimal, BigDecimal> percItem = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
+            assetFee = amount.abs().multiply(percItem.a).setScale(asset.getScale(), RoundingMode.DOWN);
+            if (assetFee.compareTo(percItem.b) < 0) {
+                // USE MINIMAL VALUE
+                assetFee = percItem.b.setScale(asset.getScale(), RoundingMode.DOWN);
             }
-            return super.calcBaseFee();
+            if (!BlockChain.ASSET_BURN_PERCENTAGE.isEmpty()
+                    && BlockChain.ASSET_BURN_PERCENTAGE.containsKey(key)) {
+                assetFeeBurn = assetFee.multiply(BlockChain.ASSET_BURN_PERCENTAGE.get(key)).setScale(asset.getScale(), RoundingMode.UP);
+            }
+            return long_fee >> 1;
         }
+        return long_fee;
     }
 
     public boolean hasAmount() {
@@ -439,7 +439,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     public String viewActionType() {
         if (asset == null)
-            return "mail";
+            return "Mail";
 
         //return viewActionType(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
         return asset.viewAssetTypeAction(isBackward(), getActionType(), creator == null ? false : asset.getOwner().equals(creator));

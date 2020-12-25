@@ -1,5 +1,6 @@
 package org.erachain.gui.telegrams;
 
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -514,7 +515,9 @@ public class TelegramSplitPanel extends SplitPanel {
                 //recipient
                 byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
                 if (publicKey == null) {
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
+                            ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)
+                    ), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
                     //ENABLE
                     this.rightTelegramPanel.jButtonSendTelegram.setEnabled(true);
