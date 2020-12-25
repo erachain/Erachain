@@ -981,6 +981,15 @@ public abstract class Transaction implements ExplorerJsonLine {
         return false;
     }
 
+    /**
+     * может ли быть трнзакция бесплатной?
+     *
+     * @return
+     */
+    public boolean isFreeFee() {
+        return true;
+    }
+
     public abstract boolean hasPublicText();
 
     public int getJobLevel() {

@@ -311,6 +311,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     @Override
     public long calcBaseFee() {
 
+        long long_fee = super.calcBaseFee();
+        if (long_fee == 0)
+            // если бесплатно то и процентную комиссию (ниже) не считаем!
+            return 0L;
+
         // ПРОЦЕНТЫ в любом случае посчитаем - даже если халявная транзакция
         if (hasAmount() && getActionType() == ACTION_SEND // только для передачи в собственность!
                 && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
@@ -326,9 +331,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     && BlockChain.ASSET_BURN_PERCENTAGE.containsKey(key)) {
                 assetFeeBurn = assetFee.multiply(BlockChain.ASSET_BURN_PERCENTAGE.get(key)).setScale(asset.getScale(), RoundingMode.UP);
             }
-            return super.calcBaseFee() >> 1;
+            return long_fee >> 1;
         }
-        return super.calcBaseFee();
+        return long_fee;
     }
 
     public boolean hasAmount() {

@@ -85,6 +85,11 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         }
     }
 
+    @Override
+    public boolean isFreeFee() {
+        return false;
+    }
+
     int minLen = 200 * 500;
 
     @Override
