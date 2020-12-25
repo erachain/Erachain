@@ -79,6 +79,12 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         sendButton = new MButton(Lang.getInstance().translate("Send"), 2);
         y = 0;
 
+        GridBagConstraints fieldGBC = new GridBagConstraints();
+        fieldGBC.insets = new Insets(5, 5, 5, 5);
+        fieldGBC.fill = GridBagConstraints.HORIZONTAL;
+        fieldGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
+        fieldGBC.gridx = 1;
+
         GridBagLayout gridBagLayout = new GridBagLayout();
         // gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
         // gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
@@ -234,54 +240,16 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
 
         this.add(messageLabel, labelMessageGBC);
 
-        // LABEL ISTEXT
-        GridBagConstraints labelIsTextGBC = new GridBagConstraints();
-        labelIsTextGBC.gridy = ++y;
-        labelIsTextGBC.insets = new Insets(5, 5, 5, 5);
-        labelIsTextGBC.fill = GridBagConstraints.HORIZONTAL;
-        labelIsTextGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
-        labelIsTextGBC.gridx = 0;
-
-        final JLabel isTextLabel = new JLabel(Lang.getInstance().translate("Text Message") + ":");
-        isTextLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        this.add(isTextLabel, labelIsTextGBC);
+        fieldGBC.gridy = ++y;
+        encrypted = new JCheckBox(Lang.getInstance().translate("Encrypt message"));
+        encrypted.setSelected(true);
+        this.add(encrypted, fieldGBC);
 
         // TEXT ISTEXT
-        GridBagConstraints isChkTextGBC = new GridBagConstraints();
-        isChkTextGBC.insets = new Insets(5, 5, 5, 5);
-        isChkTextGBC.fill = GridBagConstraints.HORIZONTAL;
-        isChkTextGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
-        isChkTextGBC.gridx = 1;
-        isChkTextGBC.gridy = y;
-
-        isText = new JCheckBox();
+        fieldGBC.gridy = ++y;
+        isText = new JCheckBox(Lang.getInstance().translate("As Text"));
         isText.setSelected(true);
-        this.add(isText, isChkTextGBC);
-
-        // LABEL ENCRYPTED
-        GridBagConstraints labelEncGBC = new GridBagConstraints();
-        labelEncGBC.insets = new Insets(5, 5, 5, 5);
-        labelEncGBC.fill = GridBagConstraints.HORIZONTAL;
-        labelEncGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
-        labelEncGBC.gridx = 2;
-        labelEncGBC.gridy = y;
-
-        JLabel encLabel = new JLabel(Lang.getInstance().translate("Encrypt message") + ":");
-        encLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        this.add(encLabel, labelEncGBC);
-
-        // ENCRYPTED CHECKBOX
-        GridBagConstraints ChkEncGBC = new GridBagConstraints();
-        ChkEncGBC.insets = new Insets(5, 5, 5, 5);
-        ChkEncGBC.fill = GridBagConstraints.HORIZONTAL;
-        ChkEncGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
-        ChkEncGBC.gridx = 3;
-        ChkEncGBC.gridy = y;
-
-        encrypted = new JCheckBox();
-        encrypted.setSelected(true);
-        this.add(encrypted, ChkEncGBC);
-
+        this.add(isText, fieldGBC);
 
         //exLink
         exLinkDescriptionLabel = new JLabel();
