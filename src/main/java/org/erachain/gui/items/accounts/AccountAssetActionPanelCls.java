@@ -335,13 +335,14 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         /////////// RECIPIENT DETAILS
         if (recipient != null) {
             String details = Lang.getInstance().translate(
-                    Account.getDetailsForEncrypt(recipient.getAddress(), asset.getKey(),
-                            this.jCheckBox_Encrypt.isSelected()));
+                    Account.getDetailsForEncrypt(recipient.getAddress(), 0,
+                            this.jCheckBox_Encrypt.isSelected(), false));
 
             Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                     balance = recipient.getBalance(asset.getKey());
             if (balance != null) {
-                details += (details.isEmpty() ? "" : "<br>") + (balancePosition == TransactionAmount.ACTION_SEND ? ("<b>" + balance.a.b.toPlainString() + "</b>") : balance.a.b.toPlainString())
+                details += (details.isEmpty() ? "" : "<br>") + Lang.getInstance().translate("Balances") + ": "
+                        + (balancePosition == TransactionAmount.ACTION_SEND ? ("<b>" + balance.a.b.toPlainString() + "</b>") : balance.a.b.toPlainString())
                         + " / " + (balancePosition == TransactionAmount.ACTION_DEBT ? ("<b>" + balance.b.b.toPlainString() + "</b>") : balance.b.b.toPlainString())
                         + " / " + (balancePosition == TransactionAmount.ACTION_HOLD ? ("<b>" + balance.c.b.toPlainString() + "</b>") : balance.c.b.toPlainString())
                         + " / " + (balancePosition == TransactionAmount.ACTION_SPEND ? ("<b>" + balance.d.b.toPlainString() + "</b>") : balance.d.b.toPlainString());
@@ -358,7 +359,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             return;
         }
 
-        String details = Lang.getInstance().translate("Balance") + ": ";
+        String details = Lang.getInstance().translate("Balances") + ": ";
 
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                 balance = creator.getBalance(asset.getKey());

@@ -478,7 +478,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
         //Account
         this.registrarAddressDesc.setText(Lang.getInstance().translate(
-                Account.getDetailsForEncrypt(registrarStr, AssetCls.FEE_KEY, true)));
+                Account.getDetailsForEncrypt(registrarStr, AssetCls.FEE_KEY, true, true)));
 
         registrar = null;
         if (registrarStr != null && !registrarStr.isEmpty()) {
