@@ -22,6 +22,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONObject;
@@ -2224,17 +2225,18 @@ public abstract class Transaction implements ExplorerJsonLine {
     @Override
     public String toString() {
         if (signature == null) {
-            return getClass().getName() + " : " + viewFullTypeName();
+            return viewTypeName() + ": " + getTitle();
         }
-        return getClass().getName() + ": " + viewFullTypeName() + " : " + Base58.encode(signature);
+        return viewTypeName() + ": " + getTitle() + " - " + Base58.encode(signature);
     }
 
     public String toStringShort() {
-        return viewFullTypeName() + ": " + getTitle();
+        return viewTypeName() + ": " + getTitle();
     }
 
-    public String toStringShortAsCreator() {
-        return viewFullTypeName() + ": " + getTitle() + (creator == null ? "" : " - " + creator.getPersonAsString());
+    public String toStringFullAndCreatorLang() {
+        return Lang.getInstance().translate(viewFullTypeName())
+                + ": " + getTitle() + (creator == null ? "" : " - " + creator.getPersonAsString());
     }
 
 }

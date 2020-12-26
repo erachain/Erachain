@@ -68,8 +68,8 @@ public class AuthorsPanel extends JPanel {
         TableColumn columnNo = columnModel.getColumn(AuthorsModel.KEY_COL);
         columnNo.setMinWidth(50);
         columnNo.setMaxWidth(150);
-        columnNo.setPreferredWidth(50);
-        columnNo.setWidth(50);
+        columnNo.setPreferredWidth(100);
+        columnNo.setWidth(100);
         columnNo.sizeWidthToFit();
 
         TableColumn columnShare = columnModel.getColumn(AuthorsModel.SHARE_COL);
