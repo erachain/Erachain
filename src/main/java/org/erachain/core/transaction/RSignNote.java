@@ -613,7 +613,7 @@ public class RSignNote extends Transaction implements Itemable {
         super.process(block, forDeal);
 
         parseDataFull(); // need for take HASHES from FILES
-        extendedData.process(this);
+        extendedData.process(this, block);
 
         byte[][] hashes = extendedData.getAllHashesAsBytes(true);
         if (hashes != null) {
@@ -622,6 +622,7 @@ public class RSignNote extends Transaction implements Itemable {
                 dcSet.getTransactionFinalMapSigns().put(hash, dbKey);
             }
         }
+
     }
 
     @Override
@@ -777,31 +778,33 @@ public class RSignNote extends Transaction implements Itemable {
     @Override
     public long calcBaseFee() {
 
-        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
-                && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
-            // не учитываем комиссию если размер блока маленький
-            return 0L;
-        } else {
-            long fee = super.calcBaseFee();
-            byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
+        long long_fee = super.calcBaseFee();
+        if (long_fee == 0)
+            return getRoyaltyFee();
 
-            if (allHashes != null) {
-                fee += allHashes.length * 100 * BlockChain.FEE_PER_BYTE;
-            }
+        byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
 
-            if (getExLink() != null)
-                fee += 100 * BlockChain.FEE_PER_BYTE;
-
-            if (extendedData.hasAuthors()) {
-                fee += extendedData.getAuthors().length * 100 * BlockChain.FEE_PER_BYTE;
-            }
-
-            if (extendedData.hasSources()) {
-                fee += extendedData.getSources().length * 100 * BlockChain.FEE_PER_BYTE;
-            }
-
-            return fee;
+        if (allHashes != null) {
+            long_fee += allHashes.length * 100 * BlockChain.FEE_PER_BYTE;
         }
+
+        if (getExLink() != null)
+            long_fee += 100 * BlockChain.FEE_PER_BYTE;
+
+        if (extendedData.hasAuthors()) {
+            long_fee += extendedData.getAuthors().length * 100 * BlockChain.FEE_PER_BYTE;
+        }
+
+        if (extendedData.hasSources()) {
+            long_fee += extendedData.getSources().length * 100 * BlockChain.FEE_PER_BYTE;
+        }
+
+        return long_fee + getRoyaltyFee();
+    }
+
+    @Override
+    public long getRoyaltyFee() {
+        return extendedData.getRoyaltyFee();
     }
 
     public void parseDataV2WithoutFiles() {

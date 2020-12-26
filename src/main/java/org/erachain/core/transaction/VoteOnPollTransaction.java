@@ -316,13 +316,4 @@ public class VoteOnPollTransaction extends Transaction {
         return subAssetAmount(null, this.creator.getAddress(), FEE_KEY, this.fee);
     }
 
-    @Override
-    public long calcBaseFee() {
-
-        // TODO delete IT
-        if (height <= TODO_h1)
-            return 0;
-
-        return super.calcBaseFee();
-    }
 }

@@ -19,8 +19,6 @@ public abstract class UnionCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.UNION_TYPE;
 
-    public static final long MIN_START_KEY = 1000L;
-
     public static final int UNION = 1;
 
     protected static final int BIRTHDAY_LENGTH = ItemCls.TIMESTAMP_LENGTH;
@@ -55,7 +53,7 @@ public abstract class UnionCls extends ItemCls {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
             return BlockChain.START_KEY_UP_ITEMS;
 
-        return START_KEY;
+        return START_KEY_OLD;
     }
 
     @Override
@@ -63,7 +61,7 @@ public abstract class UnionCls extends ItemCls {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
             return BlockChain.START_KEY_UP_ITEMS;
 
-        return MIN_START_KEY;
+        return MIN_START_KEY_OLD;
     }
 
     public String getItemTypeName() {

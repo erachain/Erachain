@@ -99,6 +99,6 @@ public class GenesisRecord extends Transaction {
 
     @Override
     public long calcBaseFee() {
-        return 0;
+        return 0L;
     }
 }

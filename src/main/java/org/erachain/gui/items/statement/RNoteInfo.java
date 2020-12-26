@@ -474,7 +474,7 @@ public class RNoteInfo extends javax.swing.JPanel {
                 Transaction sourceTx = cntr.getTransaction(sources[i - 1].getRef());
                 String memo = sources[i - 1].getMemo();
 
-                resultStr += i + ". " + sources[i - 1].getValue() + " x " + sourceTx.toStringShortAsCreator() + (memo == null ? "" : " - " + memo) + "<br>";
+                resultStr += i + ". " + sources[i - 1].getValue() + " x " + sourceTx.toStringFullAndCreatorLang() + (memo == null ? "" : " - " + memo) + "<br>";
             }
             resultStr += "<br>";
         }

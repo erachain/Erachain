@@ -8,6 +8,7 @@ import org.erachain.network.Peer;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +115,15 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
 
         switch (column) {
             case COLUMN_ADDRESS:
+                JSONObject info = peer.getNodeInfo();
+                if (info != null) {
+                    String port = (String) info.get("port");
+                    if (port != null) {
+                        String url = info.getOrDefault("scheme", "https").toString()
+                                + "://" + peer.getAddress().getHostAddress() + ":" + port + "/index/blockexplorer.html";
+                        return "<HTML><a href = '" + url + "' >" + peer.getAddress().getHostAddress() + "</a>";
+                    }
+                }
                 return peer.getAddress().getHostAddress();
 
             case COLUMN_HEIGHT:

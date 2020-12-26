@@ -216,7 +216,7 @@ public class ApiErrorFactory {
         //MESSAGES
         this.errorMessages.put(ERROR_MESSAGE_FORMAT_NOT_HEX, Lang.getInstance().translate("the Message format is not hex and not Base58 - correct the text or use isTextMessage = true"));
         //this.errorMessages.put(ERROR_MESSAGE_BLANK, Lang.getInstance().translate("The message attribute is missing or content is blank"));
-        this.errorMessages.put(ERROR_NO_PUBLIC_KEY, Lang.getInstance().translate("The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."));
+        this.errorMessages.put(ERROR_NO_PUBLIC_KEY, Lang.getInstance().translate("ERROR_NO_PUBLIC_KEY"));
         //this.errorMessages.put(ERROR_MESSAGESIZE_EXCEEDED, Lang.getInstance().translate("Message size exceeded!"));
 
     }

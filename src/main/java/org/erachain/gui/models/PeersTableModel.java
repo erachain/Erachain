@@ -7,6 +7,7 @@ import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.*;
@@ -18,7 +19,7 @@ import java.util.*;
 @SuppressWarnings("serial")
 public class PeersTableModel extends TimerTableModelCls<Peer> implements Observer {
 
-    private static final int COLUMN_ADDRESS = 0;
+    public static final int COLUMN_ADDRESS = 0;
     private static final int COLUMN_HEIGHT = 1;
     private static final int COLUMN_PINGMC = 2;
     private static final int COLUMN_REILABLE = 3;
@@ -125,6 +126,15 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
 
         switch (column) {
             case COLUMN_ADDRESS:
+                JSONObject info = peer.getNodeInfo();
+                if (info != null) {
+                    Long port = (Long) info.get("port");
+                    if (port != null) {
+                        String url = info.getOrDefault("scheme", "https").toString()
+                                + "://" + peer.getAddress().getHostAddress() + ":" + port + "/index/blockexplorer.html";
+                        return "<HTML><a href = '" + url + "' >" + peer.getAddress().getHostAddress() + "</a>";
+                    }
+                }
                 return peer.getAddress().getHostAddress();
 
             case COLUMN_HEIGHT:

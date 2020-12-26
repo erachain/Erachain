@@ -1,10 +1,13 @@
 package org.erachain.core.exdata;
 
 import com.google.common.primitives.Ints;
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.block.Block;
 import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
@@ -30,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -523,10 +527,28 @@ public class ExData {
         return !isEncrypted() && json.containsKey("FU");
     }
 
+    static long templateRoyaltyFee = 200 * 10;
+
+    public long getRoyaltyFee() {
+        if (templateKey > 0)
+            return templateRoyaltyFee;
+
+        return 0L;
+    }
+
+    public BigDecimal getRoyaltyFeeBG() {
+        long royaltyFee = getRoyaltyFee();
+        if (royaltyFee == 0L)
+            return BigDecimal.ZERO;
+
+        return new BigDecimal(royaltyFee).multiply(BlockChain.FEE_RATE).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
+    }
+
     // info to byte[]
     @SuppressWarnings("unchecked")
 
     static boolean newStyle = true;
+
     public static byte[] toByteJsonAndFiles(ByteArrayOutputStream outStream, JSONObject json,
                                             HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) throws Exception {
 
@@ -1238,7 +1260,7 @@ public class ExData {
 
                 if (publicKey == null) {
                     JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(recipient.toString() + " : " +
-                                    "The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."),
+                                    ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
                     return null;
@@ -1584,7 +1606,7 @@ public class ExData {
         return Transaction.VALIDATE_OK;
     }
 
-    public void process(Transaction transaction) {
+    public void process(Transaction transaction, Block block) {
         if (exLink != null)
             exLink.process(transaction);
 
@@ -1601,6 +1623,20 @@ public class ExData {
             for (ExLinkSource source : sources) {
                 source.process(transaction);
             }
+        }
+
+        if (template != null) {
+            DCSet dcSet = transaction.getDCSet();
+            Account templateOwner = template.getOwner();
+
+            BigDecimal royaltyFee = getRoyaltyFeeBG();
+            templateOwner.changeBalance(dcSet, false, false, Transaction.FEE_KEY, royaltyFee, false, false, false);
+            // учтем что получили бонусы
+            templateOwner.changeCOMPUBonusBalances(dcSet, false, royaltyFee, Transaction.BALANCE_SIDE_DEBIT);
+
+            transaction.addCalculated(block, templateOwner, Transaction.FEE_KEY, royaltyFee,
+                    Lang.getInstance().translate("template royalty for %1").replace("%1", "" + templateKey));
+
         }
 
     }
@@ -1622,6 +1658,17 @@ public class ExData {
             for (ExLinkSource source : sources) {
                 source.orphan(transaction);
             }
+        }
+
+        if (template != null) {
+            DCSet dcSet = transaction.getDCSet();
+            Account templateOwner = template.getOwner();
+
+            BigDecimal royaltyFee = getRoyaltyFeeBG();
+            templateOwner.changeBalance(dcSet, true, false, Transaction.FEE_KEY, royaltyFee, false, false, false);
+            // учтем что получили бонусы
+            templateOwner.changeCOMPUBonusBalances(dcSet, true, royaltyFee, Transaction.BALANCE_SIDE_DEBIT);
+
         }
     }
 

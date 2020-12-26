@@ -789,7 +789,7 @@
   "The message attribute is missing or its content is blank": "The message attribute is missing or its content is blank",
   "the Message format is not hex - correct the text or use isTextMessage = true": "the Message format is not hex - correct the text or use isTextMessage = true",
   "The name is free, you can register it!": "This name is free, you can register it!",
-  "The recipient has not yet performed any actions in the blockchain. You can't send an encrypted message to him.": "The recipient has not yet performed any actions in the blockchain. You can't send an encrypted message to him.",
+  "ERROR_NO_PUBLIC_KEY": "The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him.",
   "There are at least two entries with duplicate keys (Bad key: %key%)": "There is at least two entries with duplicate keys (Bad key: %key%)",
   "This Imprint already exists!": "This Imprint already exists!",
   "this blog is disabled": "this blog is disabled",

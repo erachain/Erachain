@@ -6,6 +6,7 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SearchTableModelCls;
+import org.erachain.lang.Lang;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class SearchStatementsTableModel extends SearchTableModelCls<Transaction>
             case COLUMN_TIMESTAMP:
                 return transaction.viewTimestamp();
             case COLUMN_TYPE:
-                return transaction.viewFullTypeName();
+                return Lang.getInstance().translate(transaction.viewFullTypeName());
             case COLUMN_CREATOR:
                 return transaction.getCreator().getPersonAsString();
             case COLUMN_TITLE:

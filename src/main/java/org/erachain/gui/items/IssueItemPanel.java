@@ -115,7 +115,7 @@ public abstract class IssueItemPanel extends IconPanel {
         if (parentTx == null) {
             exLinkDescription.setText(Lang.getInstance().translate("Not Found") + "!");
         } else {
-            exLinkDescription.setText(parentTx.toStringShortAsCreator());
+            exLinkDescription.setText(parentTx.toStringFullAndCreatorLang());
         }
     }
 
@@ -249,7 +249,7 @@ public abstract class IssueItemPanel extends IconPanel {
             confirmDialog.setVisible(true);
 
             if (confirmDialog.isConfirm > 0) {
-                ResultDialog.make(this, transaction, issueMess, false, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
+                ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
             }
         }
 

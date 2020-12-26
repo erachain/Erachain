@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 
 public class ExLinkSource extends ExLinkMemo {
@@ -26,7 +27,9 @@ public class ExLinkSource extends ExLinkMemo {
 
     public JSONObject makeJSONforHTML(JSONObject langObj) {
         JSONObject json = super.makeJSONforHTML(langObj);
-        json.put("name", Controller.getInstance().getTransaction(ref).toStringShortAsCreator());
+        Transaction source = Controller.getInstance().getTransaction(ref);
+        json.put("name", Lang.getInstance().translateFromLangObj(source.viewFullTypeName(), langObj)
+                + ": " + source.getTitle() + (source.getCreator() == null ? "" : " - " + source.getCreator().getPersonAsString()));
         json.put("weight", getValue());
 
         return json;

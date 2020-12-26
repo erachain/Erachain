@@ -21,13 +21,13 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
     private static final int COLUMN_ADDRESS = 0;
     public static final int COLUMN_OWN = 1;
     public static final int COLUMN_DEBT = 2;
-    public static final int COLUMN_USE = 3;
-    public static final int COLUMN_HAND = 4;
+    public static final int COLUMN_HOLD = 3;
+    public static final int COLUMN_SPEND = 4;
     private AssetCls asset;
     private int balanceIndex;
     private long key;
     private int scale;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "In own", "In debt", "In use", "On hand"});
+    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "OWN (1)", "DEBT (2)", "HOLD (3)", "SPEND (4)"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, false};
     private List<Tuple2<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
@@ -93,46 +93,25 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
 
             case COLUMN_OWN:
 
-                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = account
-                        .getBalance(this.key);
+                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                        balance = account.getBalance(this.key);
                 return (balance.a.b.setScale(scale));
 
             case COLUMN_DEBT:
-                
+
                 balance = account.getBalance(this.key);
                 return (balance.b.b.setScale(scale));
 
-            case COLUMN_USE:
-                
-                return (account.getBalanceUSE(this.key));
+            case COLUMN_HOLD:
 
-            case COLUMN_HAND:
-                
                 balance = account.getBalance(this.key);
                 return (balance.c.b.setScale(scale));
 
-                /*
-            case COLUMN_OWN:
-                
-                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = account
-                        .getBalance(this.key);
-                switch (this.balanceIndex) {
-                    case 1:
-                        return NumberAsString.formatAsString(balance.a.b.setScale(scale));
-                    case 2:
-                        return NumberAsString.formatAsString(balance.b.b.setScale(scale));
-                    case 3:
-                        return NumberAsString.formatAsString(balance.c.b.setScale(scale));
-                    case 4:
-                        return NumberAsString.formatAsString(balance.d.b.setScale(scale));
-                    case 5:
-                        return NumberAsString.formatAsString(balance.e.b.setScale(scale));
-                    default:
-                        return NumberAsString.formatAsString(balance.a.b.setScale(scale)) + " / "
-                                + NumberAsString.formatAsString(balance.b.b.setScale(scale)) + " / "
-                                + NumberAsString.formatAsString(balance.c.b.setScale(scale));
-                }
-                */
+            case COLUMN_SPEND:
+
+                balance = account.getBalance(this.key);
+                return (balance.d.b.setScale(scale));
+
         }
         
         return null;

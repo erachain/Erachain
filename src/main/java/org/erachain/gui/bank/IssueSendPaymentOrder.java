@@ -1,5 +1,6 @@
 package org.erachain.gui.bank;
 
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -208,8 +209,7 @@ public class IssueSendPaymentOrder extends IconPanel {
                 byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
                 if (publicKey == null) {
                     JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate(
-                                    "The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."),
+                            Lang.getInstance().translate(ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
                             Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
                     // ENABLE
@@ -259,7 +259,7 @@ public class IssueSendPaymentOrder extends IconPanel {
 
         // JOptionPane.OK_OPTION
         if (confirmDialog.isConfirm > 0) {
-            ResultDialog.make(this, transaction, null, true, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
+            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
         // ENABLE
         issue_Panel.jButton_OK.setEnabled(true);

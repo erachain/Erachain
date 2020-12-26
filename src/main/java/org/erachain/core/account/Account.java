@@ -232,7 +232,7 @@ public class Account {
 
     }
 
-    public static String getDetailsForEncrypt(String address, long itemKey, boolean forEncrypt) {
+    public static String getDetailsForEncrypt(String address, long itemKey, boolean forEncrypt, boolean okAsMess) {
 
         if (address.isEmpty()) {
             return "";
@@ -250,7 +250,7 @@ public class Account {
                 }
                 return " + " + account.getBalance(itemKey).a.b.toPlainString();
             }
-            return "address is OK";
+            return okAsMess ? "address is OK" : "";
         } else {
             // Base58 string len = 33-34 for ADDRESS and 40-44 for PubKey
             if (PublicKeyAccount.isValidPublicKey(address)) {
@@ -261,7 +261,7 @@ public class Account {
                     }
                     return " + " + account.getBalance(itemKey).a.b.toPlainString();
                 }
-                return "public key is OK";
+                return okAsMess ? "public key is OK" : "";
             } else {
                 return "address or public key is invalid";
             }

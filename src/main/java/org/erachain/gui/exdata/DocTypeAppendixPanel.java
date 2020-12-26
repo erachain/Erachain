@@ -370,7 +370,7 @@ public class DocTypeAppendixPanel extends JPanel {
             }
         }
 
-        parentDetails.setText(parentTx.toStringShortAsCreator());
+        parentDetails.setText(parentTx.toStringFullAndCreatorLang());
 
         exPanel.updateRecipients();
 
