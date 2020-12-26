@@ -17,13 +17,13 @@ public class UnconfirmedTransactionsTableModel extends TimerTableModelCls<Transa
 
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TYPE = 1;
-    public static final int COLUMN_NAME = 2;
+    public static final int COLUMN_TITLE = 2;
     public static final int COLUMN_CREATOR = 3;
     public static final int COLUMN_FEE = 4;
 
     public UnconfirmedTransactionsTableModel() {
         super((DBTabImpl) DCSet.getInstance().getTransactionTab(),
-                new String[]{"Timestamp", "Type", "Name", "Creator", "Fee"},
+                new String[]{"Timestamp", "Type", "Title", "Creator", "Fee"},
                 new Boolean[]{true, false, true, true, false}, false);
 
         addObservers();
@@ -48,11 +48,11 @@ public class UnconfirmedTransactionsTableModel extends TimerTableModelCls<Transa
 
                 case COLUMN_TYPE:
 
-                    return Lang.getInstance().translate(transaction.viewTypeName());
-
-                case COLUMN_NAME:
-
                     return Lang.getInstance().translate(transaction.viewFullTypeName());
+
+                case COLUMN_TITLE:
+
+                    return transaction.getTitle();
 
                 case COLUMN_CREATOR:
 
