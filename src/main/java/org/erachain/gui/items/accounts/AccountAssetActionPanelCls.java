@@ -8,7 +8,6 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
@@ -16,7 +15,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.PasswordPane;
@@ -343,37 +341,34 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                     balance = recipient.getBalance(asset.getKey());
             if (balance != null) {
-                details += balance.a.b.toPlainString() + " / " + balance.b.b.toPlainString() + " / " + balance.c.b.toPlainString() + " / " + balance.d.b.toPlainString();
+                details += (details.isEmpty() ? "" : "<br>") + (balancePosition == TransactionAmount.ACTION_SEND ? ("<b>" + balance.a.b.toPlainString() + "</b>") : balance.a.b.toPlainString())
+                        + " / " + (balancePosition == TransactionAmount.ACTION_DEBT ? ("<b>" + balance.b.b.toPlainString() + "</b>") : balance.b.b.toPlainString())
+                        + " / " + (balancePosition == TransactionAmount.ACTION_HOLD ? ("<b>" + balance.c.b.toPlainString() + "</b>") : balance.c.b.toPlainString())
+                        + " / " + (balancePosition == TransactionAmount.ACTION_SPEND ? ("<b>" + balance.d.b.toPlainString() + "</b>") : balance.d.b.toPlainString());
             }
-            this.jlabel_RecipientDetail.setText(details);
+            this.jlabel_RecipientDetail.setText("<html>" + details);
         }
 
         updateBalances();
     }
 
     private void updateBalances() {
-        if (creator == null || asset == null || recipient == null) {
+        if (creator == null || asset == null) {
             jLabel_Balances.setText("");
             return;
         }
 
-        String message = Lang.getInstance().translate("Balance") + ": ";
+        String details = Lang.getInstance().translate("Balance") + ": ";
 
-        if (balancePosition == TransactionAmount.ACTION_DEBT || balancePosition == TransactionAmount.ACTION_REPAY_DEBT) {
-            // берем совместно с выданным кредитом
-            BigDecimal forSale = creator.getForSale(DCSet.getInstance(), asset.getKey(), Controller.getInstance().getMyHeight(),
-                    true);
-            message += forSale.toPlainString();
-        } else {
-            message += creator.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString();
+        Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                balance = creator.getBalance(asset.getKey());
+        if (balance != null) {
+            details += (balancePosition == TransactionAmount.ACTION_SEND ? ("<b>" + balance.a.b.toPlainString() + "</b>") : balance.a.b.toPlainString())
+                    + " / " + (balancePosition == TransactionAmount.ACTION_DEBT ? ("<b>" + balance.b.b.toPlainString() + "</b>") : balance.b.b.toPlainString())
+                    + " / " + (balancePosition == TransactionAmount.ACTION_HOLD ? ("<b>" + balance.c.b.toPlainString() + "</b>") : balance.c.b.toPlainString())
+                    + " / " + (balancePosition == TransactionAmount.ACTION_SPEND ? ("<b>" + balance.d.b.toPlainString() + "</b>") : balance.d.b.toPlainString());
         }
-
-        if (asset.isSelfManaged()) {
-            message += " / " + jLabelRecipient.getText() + ": "
-                    + recipient.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString();
-        }
-
-        jLabel_Balances.setText(message);
+        this.jLabel_Balances.setText("<html>" + details);
 
     }
 
@@ -390,7 +385,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     private void refreshReceiverDetails() {
 
-        Fun.Tuple2<Account, String> resultMake = Account.tryMakeAccount((String) recipientAddress.getSelectedItem());
+        Fun.Tuple2<Account, String> resultMake = Account.tryMakeAccount(recipientAddress.getSelectedAddress());
         if (resultMake.b != null) {
             recipient = null;
             this.jlabel_RecipientDetail.setText(Lang.getInstance().translate(resultMake.b));
@@ -420,24 +415,6 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             if (!Controller.getInstance().unlockWallet(password)) {
                 //WRONG PASSWORD
                 JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-
-                //ENABLE
-                this.jButton_ok.setEnabled(true);
-                return false;
-            }
-        }
-
-        //READ RECIPIENT
-        String recipientAddressStr = recipientAddress.getSelectedAddress().trim();
-
-        //ORDINARY RECIPIENT
-        if (Crypto.getInstance().isValidAddress(recipientAddressStr)) {
-            this.recipient = new Account(recipientAddressStr);
-        } else {
-            if (PublicKeyAccount.isValidPublicKey(recipientAddressStr)) {
-                recipient = new PublicKeyAccount(recipientAddressStr);
-            } else {
-                JOptionPane.showMessageDialog(null, "INVALID", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
                 this.jButton_ok.setEnabled(true);
