@@ -8,7 +8,6 @@ import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
@@ -460,20 +459,10 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                     }
 
                 }
-            } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MIN) {
-                JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                        Lang.getInstance().translate("Name must be more then %val characters!")
-                                .replace("%val", "" + transaction.getItem().getMinNameLen()),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MAX) {
-                JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                        Lang.getInstance().translate("Name must be less then %val characters!")
-                                .replace("%val", "" + ItemCls.MAX_NAME_LENGTH),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.getInstance().translate(OnDealClick.resultMess(result.getB())
-                                + (transaction != null && transaction.getErrorValue() != null ? " " + transaction.getErrorValue() : "")),
+                                + (transaction != null && transaction.getErrorValue() != null ? "\n" + transaction.getErrorValue() : "")),
                         Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             }
 
