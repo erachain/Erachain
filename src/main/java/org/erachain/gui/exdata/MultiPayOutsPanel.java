@@ -8,6 +8,7 @@ import org.erachain.gui.IconPanel;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.models.RenderComboBoxOtborPoDeistviy;
 import org.erachain.gui.models.RenderComboBoxVidBalance;
+import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +19,7 @@ import java.awt.event.ItemListener;
 public class MultiPayOutsPanel extends IconPanel {
 
     public static String NAME = "MultiPayOutsPanel";
-    public static String TITLE = "Multi paument out";
+    public static String TITLE = "Multi Payment";
     public ComboBoxAssetsModel accountsModel;
     public ComboBoxAssetsModel accountsModel1;
 
@@ -27,9 +28,9 @@ public class MultiPayOutsPanel extends IconPanel {
         initComponents();
         accountsModel = new ComboBoxAssetsModel();
         accountsModel1 = new ComboBoxAssetsModel();
-        this.jComboBoxAsset.setModel(accountsModel);
-        this.jComboBoxOtborAsset.setModel(accountsModel1);
-        jComboBoxVidBalance.setModel(new javax.swing.DefaultComboBoxModel(new Integer[] {
+        this.jComboBoxAssetToPay.setModel(accountsModel);
+        this.jComboBoxFilterAsset.setModel(accountsModel1);
+        jComboBoxBalancePosition.setModel(new javax.swing.DefaultComboBoxModel(new Integer[]{
                 TransactionAmount.ACTION_DEBT,
                 TransactionAmount.ACTION_SEND,
                 TransactionAmount.ACTION_HOLD,
@@ -38,72 +39,94 @@ public class MultiPayOutsPanel extends IconPanel {
                 TransactionAmount.ACTION_PLEDGE,
                 TransactionAmount.ACTION_RESERCED_6
         }));
-        jComboBoxVidBalance.setRenderer(new RenderComboBoxVidBalance());
-        jComboBoxStoronaBalance.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
-            "Всего Дебет", "Остаток",    "Всего Кредит"
+        jComboBoxBalancePosition.setRenderer(new RenderComboBoxVidBalance());
+        jComboBoxSideBalance.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
+                Lang.getInstance().translate("Total Debit"),
+                Lang.getInstance().translate("Left"),
+                Lang.getInstance().translate("Total Credit")
         }));
-        jComboBoxOtborPoDeistviy.setModel(new javax.swing.DefaultComboBoxModel<>(new Integer[] {1,2,3,4,5 }));
-        jComboBoxOtborPoDeistviy.setRenderer(new RenderComboBoxOtborPoDeistviy());
-        jComboBoxMetodPaymentType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Summ", "%"}));
+        jComboBoxActionFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new Integer[]{1, 2, 3, 4, 5}));
+        jComboBoxActionFilter.setRenderer(new RenderComboBoxOtborPoDeistviy());
 
-        jComboBoxMetodPaymentType.addItemListener(new ItemListener() {
+        jComboBoxMethodPaymentType.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                setTextJLabelMetodPaumentDecscription((String) e.getItem());
+                updateLabelsByMethod();
             }
         });
-        setTextJLabelMetodPaumentDecscription((String) jComboBoxMetodPaymentType.getModel().getSelectedItem());
+        updateLabelsByMethod();
 
-        jLabelMetodPaumentDecscription.setHorizontalAlignment(SwingConstants.LEFT);
-        jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"All accounts", "Persons","Men", "Women"}));
+        jLabelMethodPaymentDecscription.setHorizontalAlignment(SwingConstants.LEFT);
+        jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"All accounts", "Persons", "Men", "Women"}));
         // paragrafs font
         Font ff = (Font) UIManager.get("Label.font");
-        Font paragrFont = new java.awt.Font(ff.getFontName(), 1, ff.getSize()+1);
+        Font paragrFont = new java.awt.Font(ff.getFontName(), 1, ff.getSize() + 1);
         jLabel5.setFont(paragrFont); // NOI18N
         jLabelTitlemetod.setFont(paragrFont); // NOI18N
         jLabel20.setFont(paragrFont); // NOI18N
         jLabel4.setFont(paragrFont); // NOI18N
     }
-    private void setTextJLabelMetodPaumentDecscription(String ss){
-        if( ss.equals("%")){
-            jLabelMetodPaumentDecscription.setText("будет начислен процент на сумму каждого отобранного счета");
-        }else{
-            jLabelMetodPaumentDecscription.setText("будет распределена сумма по всем отобранного счетам");
+
+    private void updateLabelsByMethod() {
+        switch (jComboBoxMethodPaymentType.getSelectedIndex()) {
+            case 0:
+                jLabelMethodPaymentDecscription.setText(
+                        Lang.getInstance().translate("будет начислен процент на сумму каждого отобранного счета"));
+                jLabelAmount.setText(Lang.getInstance().translate("Percent"));
+                jTextFieldPaymentMin.setEnabled(true);
+                jTextFieldPaymentMax.setEnabled(true);
+                return;
+            case 1:
+                jLabelMethodPaymentDecscription.setText(
+                        Lang.getInstance().translate("будет распределена сумма по всем отобранного счетам"));
+                jLabelAmount.setText(Lang.getInstance().translate("Total"));
+                jTextFieldPaymentMin.setEnabled(true);
+                jTextFieldPaymentMax.setEnabled(true);
+                return;
+            case 2:
+                jLabelMethodPaymentDecscription.setText(
+                        Lang.getInstance().translate("ABSOLUTE"));
+                jLabelAmount.setText(Lang.getInstance().translate("Amount"));
+                jTextFieldPaymentMin.setEnabled(false);
+                jTextFieldPaymentMax.setEnabled(false);
+                return;
         }
     }
 
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         jLabel13 = new javax.swing.JLabel();
         jLabelTitle = new javax.swing.JLabel();
-        jComboBoxAsset = new javax.swing.JComboBox<>();
+        jComboBoxAssetToPay = new javax.swing.JComboBox<>();
+        jComboBoxAction = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
-        jComboBoxOtborAsset = new javax.swing.JComboBox<>();
-        jLabelVidBalance = new javax.swing.JLabel();
-        jComboBoxVidBalance = new javax.swing.JComboBox<>();
+        jComboBoxFilterAsset = new javax.swing.JComboBox<>();
+        jLabelBalancePosition = new javax.swing.JLabel();
+        jComboBoxBalancePosition = new javax.swing.JComboBox<>();
         jLabel8 = new javax.swing.JLabel();
         jTextFieldBQ = new javax.swing.JTextField();
         jTextFieldLQ = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
-        jLabelAsset1 = new javax.swing.JLabel();
+        jLabelAssetToPay = new javax.swing.JLabel();
+        jLabelAction = new javax.swing.JLabel();
         jLabelTitlemetod = new javax.swing.JLabel();
-        jLabelMetodPaumentDecscription = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
-        jLabelMetodPaumentItemMin = new javax.swing.JLabel();
-        jTextFieldMetodPaumentItemMin = new javax.swing.JTextField();
-        jLabelMetodPaumentItemMax = new javax.swing.JLabel();
-        jTextFieldMetodPaumentItemMax = new javax.swing.JTextField();
-        jPanel2 = new javax.swing.JPanel();
+        jLabelMethodPaymentDecscription = new javax.swing.JLabel();
+        jLabelPaymentMin = new javax.swing.JLabel();
+        jTextFieldPaymentMin = new javax.swing.JTextField();
+        jLabelPaymentMax = new javax.swing.JLabel();
+        jTextFieldPaymentMax = new javax.swing.JTextField();
+        jPanelMinMaxAmounts = new javax.swing.JPanel();
+        jPanelFilterBalance = new javax.swing.JPanel();
+        jPanelStartEndActions = new javax.swing.JPanel();
         jLabelDataStart = new javax.swing.JLabel();
         jTextFieldDateStart = new javax.swing.JTextField();
         jLabelDateEnd = new javax.swing.JLabel();
         jTextFieldDateEnd = new javax.swing.JTextField();
         jLabel19 = new javax.swing.JLabel();
-        jComboBoxStoronaBalance = new javax.swing.JComboBox<>();
+        jComboBoxSideBalance = new javax.swing.JComboBox<>();
         jLabel20 = new javax.swing.JLabel();
-        jComboBoxOtborPoDeistviy = new javax.swing.JComboBox<>();
+        jComboBoxActionFilter = new javax.swing.JComboBox<>();
         jPanel3 = new javax.swing.JPanel();
         jButtonViewResult = new javax.swing.JButton();
         jButtonCancel = new javax.swing.JButton();
@@ -113,282 +136,264 @@ public class MultiPayOutsPanel extends IconPanel {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        jLabelMethod = new javax.swing.JLabel();
+        jLabelAmount = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
         jSeparator3 = new javax.swing.JSeparator();
         jSeparator4 = new javax.swing.JSeparator();
         jSeparator5 = new javax.swing.JSeparator();
-        jTextField1 = new javax.swing.JTextField();
+        jTextFieldAmount = new javax.swing.JTextField();
         jButtonCalcCompu = new javax.swing.JButton();
-        jComboBoxMetodPaymentType = new javax.swing.JComboBox<>();
+        jComboBoxMethodPaymentType = new javax.swing.JComboBox<>();
         jComboBoxPersonFilter = new javax.swing.JComboBox<>();
 
         jLabel13.setText("jLabel13");
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
-        layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
-        layout.rowHeights = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        layout.rowHeights = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
         setLayout(layout);
 
-        jLabelTitle.setText("Multi paument");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 10);
-        add(jLabelTitle, gridBagConstraints);
+        java.awt.GridBagConstraints gridBagConstraints;
 
-     //   jComboBoxAsset.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        add(jComboBoxAsset, gridBagConstraints);
+        GridBagConstraints labelGBC = new GridBagConstraints();
+        labelGBC.anchor = java.awt.GridBagConstraints.LINE_END;
+        labelGBC.insets = new java.awt.Insets(0, 10, 10, 0);
 
-        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setText("отбор по активу");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        add(jLabel5, gridBagConstraints);
+        GridBagConstraints fieldGBC = new GridBagConstraints();
+        fieldGBC.gridx = 6;
+        fieldGBC.gridwidth = 9;
+        fieldGBC.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        fieldGBC.anchor = java.awt.GridBagConstraints.LINE_START;
+        fieldGBC.weightx = 0.1;
+        fieldGBC.insets = new java.awt.Insets(0, 0, 10, 10);
 
-//        jComboBoxOtborAsset.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 16;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        add(jComboBoxOtborAsset, gridBagConstraints);
+        GridBagConstraints headBGC = new GridBagConstraints();
+        headBGC.gridwidth = 15;
+        headBGC.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        headBGC.weightx = 0.1;
+        headBGC.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        headBGC.anchor = java.awt.GridBagConstraints.LINE_START;
+        headBGC.insets = new java.awt.Insets(10, 10, 15, 10);
 
-        jLabelVidBalance.setText("Вид баланса");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 18;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        add(jLabelVidBalance, gridBagConstraints);
+        GridBagConstraints separateBGC = new GridBagConstraints();
+        separateBGC.gridwidth = 15;
+        separateBGC.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        separateBGC.weightx = 0.1;
+        separateBGC.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        separateBGC.anchor = java.awt.GridBagConstraints.LINE_START;
+        separateBGC.insets = new java.awt.Insets(0, 0, 0, 0);
 
-//        jComboBoxVidBalance.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 18;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        add(jComboBoxVidBalance, gridBagConstraints);
+        int gridy = 0;
+        jLabelTitle.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabelTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelTitle.setText("Multi payment");
+        add(jLabelTitle, headBGC);
 
-        jLabel8.setText("Больше чем");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 22;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        add(jLabel8, gridBagConstraints);
+        jLabelAssetToPay.setText("Asset");
+        labelGBC.gridy = ++gridy;
+        add(jLabelAssetToPay, labelGBC);
 
-        jTextFieldBQ.setToolTipText("");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 22;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        add(jTextFieldBQ, gridBagConstraints);
+        fieldGBC.gridy = gridy;
+        add(jComboBoxAssetToPay, fieldGBC);
 
-        jTextFieldLQ.setToolTipText("");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 12;
-        gridBagConstraints.gridy = 22;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        add(jTextFieldLQ, gridBagConstraints);
+        jLabelAction.setText("Action");
+        labelGBC.gridy = ++gridy;
+        add(jLabelAction, labelGBC);
 
-        jLabel9.setText("Меньше чем");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 10;
-        gridBagConstraints.gridy = 22;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 17, 0, 0);
-        add(jLabel9, gridBagConstraints);
+        fieldGBC.gridy = gridy;
+        add(jComboBoxAction, fieldGBC);
 
-        jLabelAsset1.setText("Asset");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        add(jLabelAsset1, gridBagConstraints);
+        separateBGC.gridy = ++gridy;
+        add(jSeparator1, separateBGC);
+
+        ////////// PAYMENT METHOD
 
         jLabelTitlemetod.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabelTitlemetod.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelTitlemetod.setText("Metod payment");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        add(jLabelTitlemetod, gridBagConstraints);
+        jLabelTitlemetod.setText("Payment Method");
+        headBGC.gridy = ++gridy;
+        add(jLabelTitlemetod, headBGC);
 
-        jLabelMetodPaumentDecscription.setText("по общеме значению");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 10;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.gridwidth = 5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LAST_LINE_START;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        add(jLabelMetodPaumentDecscription, gridBagConstraints);
+        jLabelMethod.setText("Method");
+        labelGBC.gridy = ++gridy;
+        add(jLabelMethod, labelGBC);
+        jComboBoxMethodPaymentType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
+                Lang.getInstance().translate("Payouts make by Total Amount and balance of recipient"),
+                Lang.getInstance().translate("Payouts make by Percentage and balance of recipient"),
+                Lang.getInstance().translate("Absolute Value"),
+        }));
+        fieldGBC.gridy = gridy;
+        add(jComboBoxMethodPaymentType, fieldGBC);
 
-        java.awt.GridBagLayout jPanel1Layout = new java.awt.GridBagLayout();
-        jPanel1Layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0};
-        jPanel1Layout.rowHeights = new int[] {0};
-        jPanel1.setLayout(jPanel1Layout);
+        labelGBC.gridy = ++gridy;
+        add(jLabelAmount, labelGBC);
+        fieldGBC.gridy = gridy;
+        add(jTextFieldAmount, fieldGBC);
 
-        jLabelMetodPaumentItemMin.setText("Значение Мин.");
+        fieldGBC.gridy = ++gridy;
+        add(jLabelMethodPaymentDecscription, fieldGBC);
+
+        java.awt.GridBagLayout jPanelLayout = new java.awt.GridBagLayout();
+        jPanelLayout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0};
+        jPanelLayout.rowHeights = new int[]{0};
+        jPanelMinMaxAmounts.setLayout(jPanelLayout);
+
+        jLabelPaymentMin.setText("Minimal Volume");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        jPanel1.add(jLabelMetodPaumentItemMin, gridBagConstraints);
+        gridBagConstraints.insets = labelGBC.insets;
+        jPanelMinMaxAmounts.add(jLabelPaymentMin, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        jPanel1.add(jTextFieldMetodPaumentItemMin, gridBagConstraints);
-
-        jLabelMetodPaumentItemMax.setText("Значение Макс.");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        jPanel1.add(jLabelMetodPaumentItemMax, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        jPanel1.add(jTextFieldMetodPaumentItemMax, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.3;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        add(jPanel1, gridBagConstraints);
-
-        java.awt.GridBagLayout jPanel2Layout = new java.awt.GridBagLayout();
-        jPanel2Layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0};
-        jPanel2Layout.rowHeights = new int[] {0};
-        jPanel2.setLayout(jPanel2Layout);
-
-        jLabelDataStart.setText("Data start");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        jPanel2.add(jLabelDataStart, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 50;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
-        jPanel2.add(jTextFieldDateStart, gridBagConstraints);
+        gridBagConstraints.insets = fieldGBC.insets;
+        jPanelMinMaxAmounts.add(jTextFieldPaymentMin, gridBagConstraints);
+
+        jLabelPaymentMax.setText("Maximum Volume");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = labelGBC.insets;
+        jPanelMinMaxAmounts.add(jLabelPaymentMax, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 50;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = fieldGBC.insets;
+        jPanelMinMaxAmounts.add(jTextFieldPaymentMax, gridBagConstraints);
+
+        fieldGBC.gridy = ++gridy;
+        add(jPanelMinMaxAmounts, fieldGBC);
+
+        separateBGC.gridy = ++gridy;
+        add(jSeparator2, separateBGC);
+
+        /////////////////////
+        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel5.setText("Filter By Asset");
+        headBGC.gridy = ++gridy;
+        add(jLabel5, headBGC);
+
+        jLabel2.setText("Select Asset");
+        labelGBC.gridy = ++gridy;
+        add(jLabel2, labelGBC);
+        fieldGBC.gridy = gridy;
+        add(jComboBoxFilterAsset, fieldGBC);
+
+        jLabelBalancePosition.setText("Balance Position");
+        labelGBC.gridy = ++gridy;
+        add(jLabelBalancePosition, labelGBC);
+        fieldGBC.gridy = gridy;
+        add(jComboBoxBalancePosition, fieldGBC);
+
+        jLabel19.setText(Lang.getInstance().translate("Balance Side"));
+        labelGBC.gridy = ++gridy;
+        add(jLabel19, labelGBC);
+        fieldGBC.gridy = gridy;
+        add(jComboBoxSideBalance, fieldGBC);
+
+        jPanelFilterBalance.setLayout(jPanelLayout);
+
+        jLabel8.setText("More then");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = labelGBC.insets;
+        jPanelFilterBalance.add(jLabel8, gridBagConstraints);
+        jTextFieldBQ.setToolTipText("if set - more");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 50;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = fieldGBC.insets;
+        jPanelFilterBalance.add(jTextFieldBQ, gridBagConstraints);
+
+        jLabel9.setText("Less then");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = labelGBC.insets;
+        jPanelFilterBalance.add(jLabel9, gridBagConstraints);
+        jTextFieldLQ.setToolTipText("if set - less");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 50;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = fieldGBC.insets;
+        jPanelFilterBalance.add(jTextFieldLQ, gridBagConstraints);
+
+        fieldGBC.gridy = ++gridy;
+        add(jPanelFilterBalance, fieldGBC);
+
+        separateBGC.gridy = ++gridy;
+        add(jSeparator3, separateBGC);
+
+        jLabel20.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel20.setText(Lang.getInstance().translate("Filter by Actions"));
+        headBGC.gridy = ++gridy;
+        add(jLabel20, headBGC);
+
+        jLabel3.setText(Lang.getInstance().translate("Select Action"));
+        labelGBC.gridy = ++gridy;
+        add(jLabel3, labelGBC);
+
+        fieldGBC.gridy = gridy;
+        add(jComboBoxActionFilter, fieldGBC);
+
+        java.awt.GridBagLayout jPanel2Layout = new java.awt.GridBagLayout();
+        jPanel2Layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0};
+        jPanel2Layout.rowHeights = new int[]{0};
+        jPanelStartEndActions.setLayout(jPanel2Layout);
+
+        jLabelDataStart.setText(Lang.getInstance().translate("Data start"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = labelGBC.insets;
+        jPanelStartEndActions.add(jLabelDataStart, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 50;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = fieldGBC.insets;
+        jPanelStartEndActions.add(jTextFieldDateStart, gridBagConstraints);
 
         jLabelDateEnd.setText("Date end");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 13, 0, 0);
-        jPanel2.add(jLabelDateEnd, gridBagConstraints);
+        gridBagConstraints.insets = labelGBC.insets;
+        jPanelStartEndActions.add(jLabelDateEnd, gridBagConstraints);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 50;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
-        jPanel2.add(jTextFieldDateEnd, gridBagConstraints);
+        gridBagConstraints.insets = fieldGBC.insets;
+        jPanelStartEndActions.add(jTextFieldDateEnd, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 30;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        add(jPanel2, gridBagConstraints);
-
-        jLabel19.setText("Сторона баланса");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 20;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        add(jLabel19, gridBagConstraints);
-
-        jComboBoxStoronaBalance.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 20;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        add(jComboBoxStoronaBalance, gridBagConstraints);
-
-        jLabel20.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel20.setText("Отбор по действию");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 26;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        add(jLabel20, gridBagConstraints);
-
-    //    jComboBoxOtborPoDeistviy.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 28;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        add(jComboBoxOtborPoDeistviy, gridBagConstraints);
+        fieldGBC.gridy = ++gridy;
+        add(jPanelStartEndActions, fieldGBC);
 
         java.awt.GridBagLayout jPanel3Layout = new java.awt.GridBagLayout();
-        jPanel3Layout.columnWidths = new int[] {0, 5, 0, 5, 0};
-        jPanel3Layout.rowHeights = new int[] {0};
+        jPanel3Layout.columnWidths = new int[]{0, 5, 0, 5, 0};
+        jPanel3Layout.rowHeights = new int[]{0};
         jPanel3.setLayout(jPanel3Layout);
 
         jButtonViewResult.setText("ViewResult");
@@ -419,7 +424,7 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
         add(jPanel3, gridBagConstraints);
 
-        jLabel1.setToolTipText("");
+        jLabel1.setToolTipText("jLabel1");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 46;
@@ -437,19 +442,6 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 10);
         add(jCheckBoxConfirmResult, gridBagConstraints);
 
-        jLabel2.setText("Выберите Актив");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 16;
-        add(jLabel2, gridBagConstraints);
-
-        jLabel3.setText("Выберите действие");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 28;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        add(jLabel3, gridBagConstraints);
-
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("Отбор по персонам");
@@ -461,60 +453,10 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.weightx = 0.2;
         add(jLabel4, gridBagConstraints);
 
-        jLabel6.setText("Сумма");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        add(jLabel6, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
-        add(jSeparator1, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
-        add(jSeparator2, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 24;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
-        add(jSeparator3, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 32;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
-        add(jSeparator4, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 38;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        add(jSeparator5, gridBagConstraints);
-
-        jTextField1.setText("");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        add(jTextField1, gridBagConstraints);
+        separateBGC.gridy = 32;
+        add(jSeparator4, separateBGC);
+        separateBGC.gridy = 38;
+        add(jSeparator5, separateBGC);
 
         jButtonCalcCompu.setText("Расчитать COMPU");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -523,14 +465,7 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.insets = new java.awt.Insets(7, 10, 0, 10);
         add(jButtonCalcCompu, gridBagConstraints);
 
-        jComboBoxMetodPaymentType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Summa", "Cofficient" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        add(jComboBoxMetodPaymentType, gridBagConstraints);
-
-        jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Only Persons", "Men", "Women" }));
+        jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"All", "Only Persons", "Men", "Women"}));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 36;
@@ -551,13 +486,14 @@ public class MultiPayOutsPanel extends IconPanel {
     private javax.swing.JButton jButtonSend;
     private javax.swing.JButton jButtonViewResult;
     private javax.swing.JCheckBox jCheckBoxConfirmResult;
-    private javax.swing.JComboBox<ItemCls> jComboBoxAsset;
-    private javax.swing.JComboBox<String> jComboBoxMetodPaymentType;
-    private javax.swing.JComboBox<ItemCls> jComboBoxOtborAsset;
-    private javax.swing.JComboBox<Integer> jComboBoxOtborPoDeistviy;
+    private javax.swing.JComboBox<String> jComboBoxAction;
+    private javax.swing.JComboBox<ItemCls> jComboBoxAssetToPay;
+    private javax.swing.JComboBox<String> jComboBoxMethodPaymentType;
+    private javax.swing.JComboBox<ItemCls> jComboBoxFilterAsset;
+    private javax.swing.JComboBox<Integer> jComboBoxActionFilter;
     private javax.swing.JComboBox<String> jComboBoxPersonFilter;
-    private javax.swing.JComboBox<String> jComboBoxStoronaBalance;
-    private javax.swing.JComboBox<Integer> jComboBoxVidBalance;
+    private javax.swing.JComboBox<String> jComboBoxSideBalance;
+    private javax.swing.JComboBox<Integer> jComboBoxBalancePosition;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel19;
@@ -566,32 +502,35 @@ public class MultiPayOutsPanel extends IconPanel {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabelMethod;
+    private javax.swing.JLabel jLabelAmount;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JLabel jLabelAsset1;
+    private javax.swing.JLabel jLabelAssetToPay;
+    private javax.swing.JLabel jLabelAction;
     private javax.swing.JLabel jLabelDataStart;
     private javax.swing.JLabel jLabelDateEnd;
-    private javax.swing.JLabel jLabelMetodPaumentDecscription;
-    private javax.swing.JLabel jLabelMetodPaumentItemMax;
-    private javax.swing.JLabel jLabelMetodPaumentItemMin;
+    private javax.swing.JLabel jLabelMethodPaymentDecscription;
+    private javax.swing.JLabel jLabelPaymentMax;
+    private javax.swing.JLabel jLabelPaymentMin;
     private javax.swing.JLabel jLabelTitle;
     private javax.swing.JLabel jLabelTitlemetod;
-    private javax.swing.JLabel jLabelVidBalance;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel jLabelBalancePosition;
+    private javax.swing.JPanel jPanelMinMaxAmounts;
+    private javax.swing.JPanel jPanelFilterBalance;
+    private javax.swing.JPanel jPanelStartEndActions;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextFieldAmount;
     private javax.swing.JTextField jTextFieldBQ;
     private javax.swing.JTextField jTextFieldDateEnd;
     private javax.swing.JTextField jTextFieldDateStart;
     private javax.swing.JTextField jTextFieldLQ;
-    private javax.swing.JTextField jTextFieldMetodPaumentItemMax;
-    private javax.swing.JTextField jTextFieldMetodPaumentItemMin;
+    private javax.swing.JTextField jTextFieldPaymentMax;
+    private javax.swing.JTextField jTextFieldPaymentMin;
 
 }
