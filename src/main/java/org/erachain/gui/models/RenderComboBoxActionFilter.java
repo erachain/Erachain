@@ -1,24 +1,26 @@
 package org.erachain.gui.models;
 
-import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.lang.Lang;
 import sun.swing.DefaultLookup;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 
-public class RenderComboBoxOtborPoDeistviy extends DefaultListCellRenderer{
+public class RenderComboBoxActionFilter extends DefaultListCellRenderer {
 
-        private static final Border SAFE_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1);
-        private static final Border DEFAULT_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1);
-        protected static Border noFocusBorder = DEFAULT_NO_FOCUS_BORDER;
+    private static final Border SAFE_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1);
+    private static final Border DEFAULT_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1);
+    protected static Border noFocusBorder = DEFAULT_NO_FOCUS_BORDER;
 
-        @Override
-        public Component getListCellRendererComponent(
-                JList<?> list,
-                Object value,
-                int index,
+    @Override
+    public Component getListCellRendererComponent(
+            JList<?> list,
+            Object value,
+            int index,
                 boolean isSelected,
                 boolean cellHasFocus) {
             setComponentOrientation(list.getComponentOrientation());
@@ -50,7 +52,7 @@ public class RenderComboBoxOtborPoDeistviy extends DefaultListCellRenderer{
                 setText("");
             } else {
                 setIcon(null);
-                setText((value == null) ? "" : getDiscriptionValue((Integer) value));
+                setText((value == null) ? "" : getDescriptionValue((Integer) value));
             }
 
             setEnabled(list.isEnabled());
@@ -67,37 +69,23 @@ public class RenderComboBoxOtborPoDeistviy extends DefaultListCellRenderer{
             } else {
                 border = getNoFocusBorder();
             }
-            setBorder(border);
+        setBorder(border);
 
-            return this;
-        }
+        return this;
+    }
 
-        private String getDiscriptionValue(int value){
-            switch (value) {
-                case 1:
-                    return "Знач 1";
-                case       2:
-                    return  "Знач 2";
-                case  3:
-                    return  "Знач 3";
-                case  4:
-                    return  "Знач 4";
-                case  5:
-                    return  "Знач 5";
+    private String getDescriptionValue(int value) {
+        return Lang.getInstance().translate(Transaction.viewTypeName(value));
+    }
 
-            }
-
-            return "";
-        }
-
-        private Border getNoFocusBorder() {
-            Border border = DefaultLookup.getBorder(this, ui, "List.cellNoFocusBorder");
-            if (System.getSecurityManager() != null) {
-                if (border != null) return border;
-                return SAFE_NO_FOCUS_BORDER;
-            } else {
-                if (border != null &&
-                        (noFocusBorder == null ||
+    private Border getNoFocusBorder() {
+        Border border = DefaultLookup.getBorder(this, ui, "List.cellNoFocusBorder");
+        if (System.getSecurityManager() != null) {
+            if (border != null) return border;
+            return SAFE_NO_FOCUS_BORDER;
+        } else {
+            if (border != null &&
+                    (noFocusBorder == null ||
                                 noFocusBorder == DEFAULT_NO_FOCUS_BORDER)) {
                     return border;
                 }

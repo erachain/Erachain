@@ -32,10 +32,11 @@ typeBytes[3].3-7 = point accuracy for WANT amount: -16..16 = BYTE - 16
  */
 public class CreateOrderTransaction extends Transaction implements Itemable {
     public static final byte[][] VALID_REC = new byte[][]{
-        //Base58.decode("4...")
+            //Base58.decode("4...")
     };
-    private static final byte TYPE_ID = (byte) Transaction.CREATE_ORDER_TRANSACTION;
-    private static final String NAME_ID = "Create Order";
+    public static final byte TYPE_ID = (byte) Transaction.CREATE_ORDER_TRANSACTION;
+    public static final String TYPE_NAME = "Create Order";
+
     private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
     private static final int HAVE_LENGTH = 8;
     private static final int WANT_LENGTH = 8;
@@ -57,7 +58,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
         this.haveKey = haveKey;
         this.wantKey = wantKey;
 

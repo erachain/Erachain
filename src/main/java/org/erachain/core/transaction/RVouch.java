@@ -31,14 +31,15 @@ public class RVouch extends Transaction {
     protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
     protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
-    private static final byte TYPE_ID = (byte) Transaction.VOUCH_TRANSACTION;
-    private static final String NAME_ID = "Vouch";
+    public static final byte TYPE_ID = (byte) Transaction.VOUCH_TRANSACTION;
+    public static final String TYPE_NAME = "Vouch";
+
     static Logger LOGGER = LoggerFactory.getLogger(RVouch.class.getName());
     protected int vouchHeight;
     protected int vouchSeqNo;
 
     public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int vouchHeight, int vouchSeqNo, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
 
         this.vouchHeight = vouchHeight;
         this.vouchSeqNo = vouchSeqNo;

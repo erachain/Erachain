@@ -37,8 +37,8 @@ public class RSignNote extends Transaction implements Itemable {
     protected static final byte HAS_TEMPLATE_MASK = (byte) (1 << 7);
     protected static final byte HAS_DATA_MASK = (byte) (1 << 7);
 
-    private static final byte TYPE_ID = (byte) SIGN_NOTE_TRANSACTION;
-    private static final String NAME_ID = "Note";
+    public static final byte TYPE_ID = (byte) SIGN_NOTE_TRANSACTION;
+    public static final String TYPE_NAME = "Note";
     /*
     PROPERTIES:
     [0] - type
@@ -56,7 +56,7 @@ public class RSignNote extends Transaction implements Itemable {
 
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, long timestamp, Long reference) {
 
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
 
         this.key = templateKey;
         this.data = data;

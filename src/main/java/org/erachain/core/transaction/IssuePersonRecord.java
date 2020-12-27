@@ -24,8 +24,8 @@ import java.util.Set;
 // import org.slf4j.LoggerFactory;
 
 public class IssuePersonRecord extends IssueItemRecord {
-    private static final byte TYPE_ID = (byte) ISSUE_PERSON_TRANSACTION;
-    private static final String NAME_ID = "Issue Person";
+    public static final byte TYPE_ID = (byte) ISSUE_PERSON_TRANSACTION;
+    public static final String TYPE_NAME = "Issue Person";
     /**
      * Нельзя делать большой, так как вся комиссия будет эммитироваться - а значит слишком большой размер будет эммитрировать больше
      */
@@ -33,23 +33,23 @@ public class IssuePersonRecord extends IssueItemRecord {
 
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, linkTo, person, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, reference);
     }
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, person, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, reference, signature);
     }
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp,
                              Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, NAME_ID, creator, linkTo, person, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, reference, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
     }
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, person, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, person, (byte) 0, 0L, null, signature);
     }
 
     public IssuePersonRecord(PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference, byte[] signature) {

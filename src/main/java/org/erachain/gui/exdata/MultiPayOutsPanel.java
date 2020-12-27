@@ -3,10 +3,11 @@ package org.erachain.gui.exdata;
 
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
-import org.erachain.gui.models.RenderComboBoxOtborPoDeistviy;
+import org.erachain.gui.models.RenderComboBoxActionFilter;
 import org.erachain.gui.models.RenderComboBoxVidBalance;
 import org.erachain.lang.Lang;
 
@@ -44,8 +45,8 @@ public class MultiPayOutsPanel extends IconPanel {
                 Lang.getInstance().translate("Total Credit")
         }));
         jComboBoxSideBalance.setSelectedIndex(1);
-        jComboBoxActionFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new Integer[]{1, 2, 3, 4, 5}));
-        jComboBoxActionFilter.setRenderer(new RenderComboBoxOtborPoDeistviy());
+        jComboBoxActionFilter.setModel(new javax.swing.DefaultComboBoxModel<Integer>(Transaction.getTransactionTypes()));
+        jComboBoxActionFilter.setRenderer(new RenderComboBoxActionFilter());
 
         jComboBoxMethodPaymentType.addItemListener(new ItemListener() {
             @Override
@@ -156,7 +157,7 @@ public class MultiPayOutsPanel extends IconPanel {
 
         GridBagConstraints labelGBC = new GridBagConstraints();
         labelGBC.anchor = java.awt.GridBagConstraints.LINE_END;
-        labelGBC.insets = new java.awt.Insets(0, 10, 10, 0);
+        labelGBC.insets = new java.awt.Insets(0, 20, 10, 0);
 
         GridBagConstraints fieldGBC = new GridBagConstraints();
         fieldGBC.gridx = 6;
@@ -164,7 +165,7 @@ public class MultiPayOutsPanel extends IconPanel {
         fieldGBC.fill = java.awt.GridBagConstraints.HORIZONTAL;
         fieldGBC.anchor = java.awt.GridBagConstraints.LINE_START;
         fieldGBC.weightx = 0.1;
-        fieldGBC.insets = new java.awt.Insets(0, 0, 10, 10);
+        fieldGBC.insets = new java.awt.Insets(0, 0, 10, 20);
 
         GridBagConstraints headBGC = new GridBagConstraints();
         headBGC.gridwidth = 15;
@@ -279,7 +280,7 @@ public class MultiPayOutsPanel extends IconPanel {
         headBGC.gridy = ++gridy;
         add(jLabel5, headBGC);
 
-        jLabel2.setText(Lang.getInstance().translate("Select Asset"));
+        jLabel2.setText(Lang.getInstance().translate("Asset"));
         labelGBC.gridy = ++gridy;
         add(jLabel2, labelGBC);
         fieldGBC.gridy = gridy;
@@ -363,17 +364,14 @@ public class MultiPayOutsPanel extends IconPanel {
         headBGC.gridy = ++gridy;
         add(jLabel20, headBGC);
 
-        jLabel3.setText(Lang.getInstance().translate("Select Action"));
+        jLabel3.setText(Lang.getInstance().translate("Action"));
         labelGBC.gridy = ++gridy;
         add(jLabel3, labelGBC);
 
         fieldGBC.gridy = gridy;
         add(jComboBoxActionFilter, fieldGBC);
 
-        java.awt.GridBagLayout jPanel2Layout = new java.awt.GridBagLayout();
-        jPanel2Layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0};
-        jPanel2Layout.rowHeights = new int[]{0};
-        jPanelStartEndActions.setLayout(jPanel2Layout);
+        jPanelStartEndActions.setLayout(jPanelLayout);
 
         jLabelDataStart.setText(Lang.getInstance().translate("Data start"));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -409,89 +407,58 @@ public class MultiPayOutsPanel extends IconPanel {
         fieldGBC.gridy = ++gridy;
         add(jPanelStartEndActions, fieldGBC);
 
-        java.awt.GridBagLayout jPanel3Layout = new java.awt.GridBagLayout();
-        jPanel3Layout.columnWidths = new int[]{0, 5, 0, 5, 0};
-        jPanel3Layout.rowHeights = new int[]{0};
-        jPanel3.setLayout(jPanel3Layout);
-
-        jButtonViewResult.setText(Lang.getInstance().translate("View Result"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        jPanel3.add(jButtonViewResult, gridBagConstraints);
-
-        jButtonCancel.setText(Lang.getInstance().translate("Cancel"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        jPanel3.add(jButtonCancel, gridBagConstraints);
-
-        jButtonSend.setText(Lang.getInstance().translate("Make"));
-        jButtonSend.setToolTipText("");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        jPanel3.add(jButtonSend, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 42;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
-        add(jPanel3, gridBagConstraints);
-
-        jLabel1.setToolTipText("jLabel1");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 46;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.3;
-        gridBagConstraints.weighty = 0.2;
-        //add(jLabel1, gridBagConstraints);
-
-        jCheckBoxConfirmResult.setText(Lang.getInstance().translate("Подтверждаю правильность результата"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 40;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 10);
-        //add(jCheckBoxConfirmResult, gridBagConstraints);
+        separateBGC.gridy = ++gridy;
+        add(jSeparator4, separateBGC);
 
         jLabel4.setFont(headFont); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText(Lang.getInstance().translate("Filter by Persons"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 34;
-        gridBagConstraints.gridwidth = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.2;
-        add(jLabel4, gridBagConstraints);
+        headBGC.gridy = ++gridy;
+        add(jLabel4, headBGC);
 
-        separateBGC.gridy = 32;
-        add(jSeparator4, separateBGC);
-        separateBGC.gridy = 38;
+        jLabel1.setText(Lang.getInstance().translate("Filter"));
+        labelGBC.gridy = ++gridy;
+        add(jLabel1, labelGBC);
+
+        fieldGBC.gridy = gridy;
+        add(jComboBoxPersonFilter, fieldGBC);
+
+        separateBGC.gridy = ++gridy;
         add(jSeparator5, separateBGC);
+
+        /////////////////////// BUTTONS
+
+        jCheckBoxConfirmResult.setText(Lang.getInstance().translate("Подтверждаю правильность результата"));
+        //fieldGBC.gridy = ++gridy;
+        //add(jCheckBoxConfirmResult, gridBagConstraints);
+
+        jPanel3.setLayout(jPanelLayout);
 
         jButtonCalcCompu.setText(Lang.getInstance().translate("Calculate fee"));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 40;
-        gridBagConstraints.insets = new java.awt.Insets(7, 10, 0, 10);
-        add(jButtonCalcCompu, gridBagConstraints);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        gridBagConstraints.ipadx = 10;
+        gridBagConstraints.ipady = 10;
+        jPanel3.add(jButtonCalcCompu, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 36;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        add(jComboBoxPersonFilter, gridBagConstraints);
+        jButtonViewResult.setText(Lang.getInstance().translate("View Result"));
+        gridBagConstraints.gridx = 1;
+        jPanel3.add(jButtonViewResult, gridBagConstraints);
+
+        jButtonSend.setText(Lang.getInstance().translate("Make"));
+        jButtonSend.setFont(headFont);
+        jButtonSend.setToolTipText("");
+        gridBagConstraints.gridx = 2;
+        jPanel3.add(jButtonSend, gridBagConstraints);
+
+        jButtonCancel.setText(Lang.getInstance().translate("Cancel"));
+        gridBagConstraints.gridx = 3;
+        jPanel3.add(jButtonCancel, gridBagConstraints);
+
+        fieldGBC.gridy = ++gridy;
+        add(jPanel3, fieldGBC);
+
     }
 
     public ExPays getPays() {
