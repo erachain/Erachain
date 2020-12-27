@@ -2,6 +2,7 @@ package org.erachain.gui.models;
 
 import org.erachain.core.transaction.Transaction;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import sun.swing.DefaultLookup;
 
 import javax.swing.*;
@@ -75,7 +76,9 @@ public class RenderComboBoxActionFilter extends DefaultListCellRenderer {
     }
 
     private String getDescriptionValue(int value) {
-        return Lang.getInstance().translate(Transaction.viewTypeName(value));
+        String typeName = Transaction.viewTypeName(value);
+        return "[" + value + "] " + (Settings.DEFAULT_LANGUAGE.equals(Settings.getInstance().getLang()) ?
+                typeName : Lang.getInstance().translate(typeName) + " (" + typeName + ")");
     }
 
     private Border getNoFocusBorder() {
