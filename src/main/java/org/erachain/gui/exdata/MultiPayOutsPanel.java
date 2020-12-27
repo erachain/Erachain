@@ -19,7 +19,7 @@ import java.awt.event.ItemListener;
 public class MultiPayOutsPanel extends IconPanel {
 
     public static String NAME = "MultiPayOutsPanel";
-    public static String TITLE = "Multi Payment";
+    public static String TITLE = "Payouts";
     public ComboBoxAssetsModel accountsModel;
     public ComboBoxAssetsModel accountsModel1;
 
@@ -31,13 +31,11 @@ public class MultiPayOutsPanel extends IconPanel {
         this.jComboBoxAssetToPay.setModel(accountsModel);
         this.jComboBoxFilterAsset.setModel(accountsModel1);
         jComboBoxBalancePosition.setModel(new javax.swing.DefaultComboBoxModel(new Integer[]{
-                TransactionAmount.ACTION_DEBT,
                 TransactionAmount.ACTION_SEND,
+                TransactionAmount.ACTION_DEBT,
                 TransactionAmount.ACTION_HOLD,
-                TransactionAmount.ACTION_REPAY_DEBT,
                 TransactionAmount.ACTION_SPEND,
-                TransactionAmount.ACTION_PLEDGE,
-                TransactionAmount.ACTION_RESERCED_6
+                //TransactionAmount.ACTION_PLEDGE,
         }));
         jComboBoxBalancePosition.setRenderer(new RenderComboBoxVidBalance());
         jComboBoxSideBalance.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
@@ -45,6 +43,7 @@ public class MultiPayOutsPanel extends IconPanel {
                 Lang.getInstance().translate("Left"),
                 Lang.getInstance().translate("Total Credit")
         }));
+        jComboBoxSideBalance.setSelectedIndex(1);
         jComboBoxActionFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new Integer[]{1, 2, 3, 4, 5}));
         jComboBoxActionFilter.setRenderer(new RenderComboBoxOtborPoDeistviy());
 
@@ -57,35 +56,32 @@ public class MultiPayOutsPanel extends IconPanel {
         updateLabelsByMethod();
 
         jLabelMethodPaymentDecscription.setHorizontalAlignment(SwingConstants.LEFT);
-        jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"All accounts", "Persons", "Men", "Women"}));
-        // paragrafs font
-        Font ff = (Font) UIManager.get("Label.font");
-        Font paragrFont = new java.awt.Font(ff.getFontName(), 1, ff.getSize() + 1);
-        jLabel5.setFont(paragrFont); // NOI18N
-        jLabelTitlemetod.setFont(paragrFont); // NOI18N
-        jLabel20.setFont(paragrFont); // NOI18N
-        jLabel4.setFont(paragrFont); // NOI18N
+        jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
+                Lang.getInstance().translate("All"),
+                Lang.getInstance().translate("Only for Persons"),
+                Lang.getInstance().translate("Only for Men"),
+                Lang.getInstance().translate("Only for Women")}));
     }
 
     private void updateLabelsByMethod() {
         switch (jComboBoxMethodPaymentType.getSelectedIndex()) {
             case 0:
                 jLabelMethodPaymentDecscription.setText(
-                        Lang.getInstance().translate("будет начислен процент на сумму каждого отобранного счета"));
+                        Lang.getInstance().translate("PAY_METHOD_0"));
                 jLabelAmount.setText(Lang.getInstance().translate("Percent"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
                 return;
             case 1:
                 jLabelMethodPaymentDecscription.setText(
-                        Lang.getInstance().translate("будет распределена сумма по всем отобранного счетам"));
+                        Lang.getInstance().translate("PAY_METHOD_1"));
                 jLabelAmount.setText(Lang.getInstance().translate("Total"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
                 return;
             case 2:
                 jLabelMethodPaymentDecscription.setText(
-                        Lang.getInstance().translate("ABSOLUTE"));
+                        Lang.getInstance().translate("PAY_METHOD_2"));
                 jLabelAmount.setText(Lang.getInstance().translate("Amount"));
                 jTextFieldPaymentMin.setEnabled(false);
                 jTextFieldPaymentMax.setEnabled(false);
@@ -148,7 +144,8 @@ public class MultiPayOutsPanel extends IconPanel {
         jComboBoxMethodPaymentType = new javax.swing.JComboBox<>();
         jComboBoxPersonFilter = new javax.swing.JComboBox<>();
 
-        jLabel13.setText("jLabel13");
+        Font ff = (Font) UIManager.get("Label.font");
+        Font headFont = new java.awt.Font(ff.getFontName(), Font.BOLD, ff.getSize() + 1);
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
         layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
@@ -186,19 +183,19 @@ public class MultiPayOutsPanel extends IconPanel {
         separateBGC.insets = new java.awt.Insets(0, 0, 0, 0);
 
         int gridy = 0;
-        jLabelTitle.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabelTitle.setFont(headFont); // NOI18N
         jLabelTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelTitle.setText("Multi payment");
+        jLabelTitle.setText(Lang.getInstance().translate("Action for Asset"));
         add(jLabelTitle, headBGC);
 
-        jLabelAssetToPay.setText("Asset");
+        jLabelAssetToPay.setText(Lang.getInstance().translate("Asset"));
         labelGBC.gridy = ++gridy;
         add(jLabelAssetToPay, labelGBC);
 
         fieldGBC.gridy = gridy;
         add(jComboBoxAssetToPay, fieldGBC);
 
-        jLabelAction.setText("Action");
+        jLabelAction.setText(Lang.getInstance().translate("Action"));
         labelGBC.gridy = ++gridy;
         add(jLabelAction, labelGBC);
 
@@ -210,13 +207,13 @@ public class MultiPayOutsPanel extends IconPanel {
 
         ////////// PAYMENT METHOD
 
-        jLabelTitlemetod.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabelTitlemetod.setFont(headFont); // NOI18N
         jLabelTitlemetod.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelTitlemetod.setText("Payment Method");
+        jLabelTitlemetod.setText(Lang.getInstance().translate("Method of calculation"));
         headBGC.gridy = ++gridy;
         add(jLabelTitlemetod, headBGC);
 
-        jLabelMethod.setText("Method");
+        jLabelMethod.setText(Lang.getInstance().translate("Method"));
         labelGBC.gridy = ++gridy;
         add(jLabelMethod, labelGBC);
         jComboBoxMethodPaymentType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
@@ -240,7 +237,7 @@ public class MultiPayOutsPanel extends IconPanel {
         jPanelLayout.rowHeights = new int[]{0};
         jPanelMinMaxAmounts.setLayout(jPanelLayout);
 
-        jLabelPaymentMin.setText("Minimal Volume");
+        jLabelPaymentMin.setText(Lang.getInstance().translate("Minimal Volume"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = labelGBC.insets;
@@ -254,7 +251,7 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelMinMaxAmounts.add(jTextFieldPaymentMin, gridBagConstraints);
 
-        jLabelPaymentMax.setText("Maximum Volume");
+        jLabelPaymentMax.setText(Lang.getInstance().translate("Maximum Volume"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
@@ -276,38 +273,25 @@ public class MultiPayOutsPanel extends IconPanel {
         add(jSeparator2, separateBGC);
 
         /////////////////////
-        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel5.setFont(headFont); // NOI18N
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setText("Filter By Asset");
+        jLabel5.setText(Lang.getInstance().translate("Filter By Asset"));
         headBGC.gridy = ++gridy;
         add(jLabel5, headBGC);
 
-        jLabel2.setText("Select Asset");
+        jLabel2.setText(Lang.getInstance().translate("Select Asset"));
         labelGBC.gridy = ++gridy;
         add(jLabel2, labelGBC);
         fieldGBC.gridy = gridy;
         add(jComboBoxFilterAsset, fieldGBC);
 
-        jLabelBalancePosition.setText("Balance Position");
-        labelGBC.gridy = ++gridy;
-        add(jLabelBalancePosition, labelGBC);
-        fieldGBC.gridy = gridy;
-        add(jComboBoxBalancePosition, fieldGBC);
-
-        jLabel19.setText(Lang.getInstance().translate("Balance Side"));
-        labelGBC.gridy = ++gridy;
-        add(jLabel19, labelGBC);
-        fieldGBC.gridy = gridy;
-        add(jComboBoxSideBalance, fieldGBC);
-
         jPanelFilterBalance.setLayout(jPanelLayout);
 
-        jLabel8.setText("More then");
+        jLabelBalancePosition.setText(Lang.getInstance().translate("Balance Position"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = labelGBC.insets;
-        jPanelFilterBalance.add(jLabel8, gridBagConstraints);
-        jTextFieldBQ.setToolTipText("if set - more");
+        jPanelFilterBalance.add(jLabelBalancePosition, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -315,17 +299,51 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = fieldGBC.insets;
-        jPanelFilterBalance.add(jTextFieldBQ, gridBagConstraints);
+        jPanelFilterBalance.add(jComboBoxBalancePosition, gridBagConstraints);
 
-        jLabel9.setText("Less then");
+        jLabel19.setText(Lang.getInstance().translate("Balance Side"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = labelGBC.insets;
-        jPanelFilterBalance.add(jLabel9, gridBagConstraints);
-        jTextFieldLQ.setToolTipText("if set - less");
+        jPanelFilterBalance.add(jLabel19, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 50;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = fieldGBC.insets;
+        jPanelFilterBalance.add(jComboBoxSideBalance, gridBagConstraints);
+
+        jLabel8.setText(Lang.getInstance().translate("More then"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = labelGBC.insets;
+        jPanelFilterBalance.add(jLabel8, gridBagConstraints);
+        jTextFieldBQ.setToolTipText(Lang.getInstance().translate(""));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 50;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = fieldGBC.insets;
+        jPanelFilterBalance.add(jTextFieldBQ, gridBagConstraints);
+
+        jLabel9.setText(Lang.getInstance().translate("Less then"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = labelGBC.insets;
+        jPanelFilterBalance.add(jLabel9, gridBagConstraints);
+        jTextFieldLQ.setToolTipText(Lang.getInstance().translate(""));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 50;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -339,7 +357,7 @@ public class MultiPayOutsPanel extends IconPanel {
         separateBGC.gridy = ++gridy;
         add(jSeparator3, separateBGC);
 
-        jLabel20.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel20.setFont(headFont); // NOI18N
         jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel20.setText(Lang.getInstance().translate("Filter by Actions"));
         headBGC.gridy = ++gridy;
@@ -372,7 +390,7 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelStartEndActions.add(jTextFieldDateStart, gridBagConstraints);
 
-        jLabelDateEnd.setText("Date end");
+        jLabelDateEnd.setText(Lang.getInstance().translate("Date end"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
@@ -396,19 +414,19 @@ public class MultiPayOutsPanel extends IconPanel {
         jPanel3Layout.rowHeights = new int[]{0};
         jPanel3.setLayout(jPanel3Layout);
 
-        jButtonViewResult.setText("ViewResult");
+        jButtonViewResult.setText(Lang.getInstance().translate("View Result"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         jPanel3.add(jButtonViewResult, gridBagConstraints);
 
-        jButtonCancel.setText("Cancel");
+        jButtonCancel.setText(Lang.getInstance().translate("Cancel"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         jPanel3.add(jButtonCancel, gridBagConstraints);
 
-        jButtonSend.setText("Send");
+        jButtonSend.setText(Lang.getInstance().translate("Make"));
         jButtonSend.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
@@ -432,19 +450,19 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.3;
         gridBagConstraints.weighty = 0.2;
-        add(jLabel1, gridBagConstraints);
+        //add(jLabel1, gridBagConstraints);
 
-        jCheckBoxConfirmResult.setText("Подтверждаю правильность результата");
+        jCheckBoxConfirmResult.setText(Lang.getInstance().translate("Подтверждаю правильность результата"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 40;
         gridBagConstraints.gridwidth = 7;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 10);
-        add(jCheckBoxConfirmResult, gridBagConstraints);
+        //add(jCheckBoxConfirmResult, gridBagConstraints);
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel4.setFont(headFont); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("Отбор по персонам");
+        jLabel4.setText(Lang.getInstance().translate("Filter by Persons"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 34;
@@ -458,14 +476,13 @@ public class MultiPayOutsPanel extends IconPanel {
         separateBGC.gridy = 38;
         add(jSeparator5, separateBGC);
 
-        jButtonCalcCompu.setText("Расчитать COMPU");
+        jButtonCalcCompu.setText(Lang.getInstance().translate("Calculate fee"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 40;
         gridBagConstraints.insets = new java.awt.Insets(7, 10, 0, 10);
         add(jButtonCalcCompu, gridBagConstraints);
 
-        jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"All", "Only Persons", "Men", "Women"}));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 36;

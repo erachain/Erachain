@@ -1,6 +1,7 @@
 package org.erachain.gui.models;
 
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.lang.Lang;
 import sun.swing.DefaultLookup;
 
 import javax.swing.*;
@@ -49,7 +50,7 @@ public class RenderComboBoxVidBalance extends DefaultListCellRenderer {
             setText("");
         } else {
             setIcon(null);
-            setText((value == null) ? "" : getDiscriptionValue((Integer) value));
+            setText((value == null) ? "" : getDescriptionValue((Integer) value));
         }
 
         setEnabled(list.isEnabled());
@@ -71,22 +72,22 @@ public class RenderComboBoxVidBalance extends DefaultListCellRenderer {
         return this;
     }
 
-    private String getDiscriptionValue(int value){
-      switch (value) {
-          case TransactionAmount.ACTION_DEBT:
-              return "Debt";
-          case       TransactionAmount.ACTION_SEND:
-              return "Send";
-          case  TransactionAmount.ACTION_HOLD:
-              return "Hold";
-          case  TransactionAmount.ACTION_REPAY_DEBT:
-              return "Repay debt";
-          case  TransactionAmount.ACTION_SPEND:
-              return "Spend";
-          case  TransactionAmount.ACTION_PLEDGE:
-              return "Pledge";
+    private String getDescriptionValue(int value) {
+        switch (value) {
+            case TransactionAmount.ACTION_SEND:
+                return Lang.getInstance().translate("OWN (1)");
+            case TransactionAmount.ACTION_DEBT:
+                return Lang.getInstance().translate("DEBT (2)");
+            case TransactionAmount.ACTION_HOLD:
+                return Lang.getInstance().translate("HOLD (3)");
+            case TransactionAmount.ACTION_REPAY_DEBT:
+                return Lang.getInstance().translate("Repay debt");
+            case TransactionAmount.ACTION_SPEND:
+                return Lang.getInstance().translate("SPEND (4)");
+            case TransactionAmount.ACTION_PLEDGE:
+                return Lang.getInstance().translate("PLEDGE (5)");
           case   TransactionAmount.ACTION_RESERCED_6:
-              return "Reserced_6";
+              return "Reserved_6";
       }
 
         return "";
