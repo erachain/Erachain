@@ -17,6 +17,7 @@ import org.erachain.gui.library.*;
 import org.erachain.lang.Lang;
 import org.erachain.utils.FileHash;
 import org.erachain.utils.ZipBytes;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 
 import javax.swing.*;
@@ -851,9 +852,12 @@ public class ExDataPanel extends JPanel {
             }
         }
 
-        ExPays exPays = multiPayOutsPanel.getPays();
+        Fun.Tuple2<ExPays, String> exPayoutsResult = multiPayOutsPanel.getPayouts();
+        if (exPayoutsResult.b != null) {
+            throw new Exception(exPayoutsResult.b);
+        }
 
-        return ExData.make(exLink, exPays, creator, jTextField_Title_Message.getText(),
+        return ExData.make(exLink, exPayoutsResult.a, creator, jTextField_Title_Message.getText(),
                 signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
                 (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),
                 fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),

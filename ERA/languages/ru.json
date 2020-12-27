@@ -1056,6 +1056,7 @@
   "Payment send": "Отправлен платеж",
   "Payments": "Платежи",
   "Payouts": "Выплаты",
+  "Payout to Self too": "Выплачивать себе так же",
   "Payouts make by Total Amount and balance of recipient": "Выплаты будут произведены по Общей сумме и балансам получателей",
   "Payouts make by Percentage and balance of recipient": "Выплаты будут произведены как процент на баланс получателя",
   "Absolute Value": "Абсолютное значение",

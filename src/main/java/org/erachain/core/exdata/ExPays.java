@@ -323,19 +323,70 @@ public class ExPays {
                 filterByPerson, selfPay);
     }
 
-    public static byte[] make(int flags, Long assetKey, int balancePos, boolean backward, BigDecimal amountMin, BigDecimal amountMax,
-                              int payMethod, BigDecimal payMethodValue, Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
-                              BigDecimal filterBalanceLessThen, BigDecimal filterBalanceMoreThen,
-                              Integer filterTXType, Long filterTXStart, Long filterTXEnd,
-                              Integer filterByPerson, boolean selfPay)
-            throws Exception {
+    public static Fun.Tuple2<ExPays, String> make(Long assetKey, int balancePos, boolean backward, String amountMin, String amountMax,
+                                                  int payMethod, String payMethodValue, Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
+                                                  String filterBalanceLessThen, String filterBalanceMoreThen,
+                                                  Integer filterTXType, String filterTXStartStr, String filterTXEndStr,
+                                                  Integer filterByPerson, boolean selfPay) {
 
+        int steep = 0;
+        BigDecimal amountMinBG;
+        BigDecimal amountMaxBG;
+        BigDecimal payMethodValueBG;
+        BigDecimal filterBalanceLessThenBG;
+        BigDecimal filterBalanceMoreThenBG;
+        Long filterTXStart;
+        Long filterTXEnd;
+        try {
+            amountMinBG = amountMin == null || amountMin.isEmpty() ? null : new BigDecimal(amountMin);
+            ++steep;
+            amountMaxBG = amountMax == null || amountMax.isEmpty() ? null : new BigDecimal(amountMax);
+            ++steep;
+            payMethodValueBG = payMethodValue == null || payMethodValue.isEmpty() ? null : new BigDecimal(payMethodValue);
+            ++steep;
+            filterBalanceLessThenBG = filterBalanceLessThen == null || filterBalanceLessThen.isEmpty() ? null : new BigDecimal(filterBalanceLessThen);
+            ++steep;
+            filterBalanceMoreThenBG = filterBalanceMoreThen == null || filterBalanceMoreThen.isEmpty() ? null : new BigDecimal(filterBalanceMoreThen);
+            ++steep;
+            filterTXStart = filterTXStartStr == null || filterTXStartStr.isEmpty() ? null : new Long(filterTXStartStr);
+            ++steep;
+            filterTXEnd = filterTXEndStr == null || filterTXEndStr.isEmpty() ? null : new Long(filterTXEndStr);
+        } catch (Exception e) {
+            String error;
+            switch (steep) {
+                case 0:
+                    error = "Wrong amountMin";
+                    break;
+                case 1:
+                    error = "Wrong amountMax";
+                    break;
+                case 2:
+                    error = "Wrong payMethodValue";
+                    break;
+                case 3:
+                    error = "Wrong filterBalanceLessThen";
+                    break;
+                case 4:
+                    error = "Wrong filterBalanceMoreThen";
+                    break;
+                case 5:
+                    error = "Wrong filterTXStartStr";
+                    break;
+                case 6:
+                    error = "Wrong filterTXEndStr";
+                    break;
+                default:
+                    error = e.getMessage();
+            }
+            return new Fun.Tuple2<>(null, error);
+        }
 
-        return new ExPays(flags, assetKey, balancePos, backward, amountMin, amountMax,
-                payMethod, payMethodValue, filterAssetKey, filterBalancePos, filterBalanceSide,
-                filterBalanceLessThen, filterBalanceMoreThen,
+        int flags = 0;
+        return new Fun.Tuple2<>(new ExPays(flags, assetKey, balancePos, backward, amountMinBG, amountMaxBG,
+                payMethod, payMethodValueBG, filterAssetKey, filterBalancePos, filterBalanceSide,
+                filterBalanceLessThenBG, filterBalanceMoreThenBG,
                 filterTXType, filterTXStart, filterTXEnd,
-                filterByPerson, selfPay).toByte();
+                filterByPerson, selfPay), null);
 
     }
 
