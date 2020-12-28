@@ -125,9 +125,9 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
      * @return
      */
     @Override
-    public IteratorCloseable<byte[]> assetIterator(long assetKey) {
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
 
-        IteratorCloseable<byte[]> parentIterator = parent.getIterator();
+        IteratorCloseable<byte[]> parentIterator = ((ItemAssetBalanceMap) parent).getIteratorByAsset(assetKey);
         return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 IteratorCloseableImpl.make(this.assetKeyMap.subMap(

@@ -5,6 +5,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.block.Block;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
@@ -95,7 +96,7 @@ public class ExPays {
     DCSet dcSet;
     private int height;
     AssetCls asset;
-    public List<Fun.Tuple3> filteredPayouts;
+    public List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> filteredPayouts;
     public int filteredPayoutsCount;
     public BigDecimal totalPay;
     public BigDecimal totalFee;
@@ -139,11 +140,11 @@ public class ExPays {
             this.payMethodValue = payMethodValue;
 
             if (payMethod != PAYMENT_METHOD_ABSOLUTE) {
-                if (amountMin != null && amountMin.signum() != 0) {
+                if (amountMin != null) {
                     this.flags |= AMOUNT_MIN_FLAG_MASK;
                     this.amountMin = amountMin;
                 }
-                if (amountMax != null && amountMax.signum() != 0) {
+                if (amountMax != null) {
                     this.flags |= AMOUNT_MAX_FLAG_MASK;
                     this.amountMax = amountMax;
                 }
@@ -155,11 +156,11 @@ public class ExPays {
             this.filterAssetKey = filterAssetKey;
             this.filterBalancePos = filterBalancePos;
             this.filterBalanceSide = filterBalanceSide;
-            if (filterBalanceMIN != null && filterBalanceMIN.signum() != 0) {
+            if (filterBalanceMIN != null) {
                 this.flags |= BALANCE_AMOUNT_MIN_FLAG_MASK;
                 this.filterBalanceMIN = filterBalanceMIN;
             }
-            if (filterBalanceMAX != null && filterBalanceMAX.signum() != 0) {
+            if (filterBalanceMAX != null) {
                 this.flags |= BALANCE_AMOUNT_MAX_FLAG_MASK;
                 this.filterBalanceMAX = filterBalanceMAX;
             }
@@ -167,11 +168,11 @@ public class ExPays {
 
         this.filterTXType = filterTXType;
 
-        if (filterTXStartSeqNo != null && filterTXStartSeqNo != 0) {
+        if (filterTXStartSeqNo != null) {
             this.flags |= ACTIVE_START_FLAG_MASK;
             this.filterTXStartSeqNo = filterTXStartSeqNo;
         }
-        if (filterTXEndSeqNo != null && filterTXEndSeqNo != 0) {
+        if (filterTXEndSeqNo != null) {
             this.flags |= ACTIVE_END_FLAG_MASK;
             this.filterTXEndSeqNo = filterTXEndSeqNo;
         }
@@ -589,7 +590,7 @@ public class ExPays {
             totalFee = BigDecimal.valueOf(getLongFee() * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
 
             long actionFlags = 0L;
-            Account recipient = new Account((byte[]) filteredPayouts.get(0).a);
+            Account recipient = filteredPayouts.get(0).a;
             PublicKeyAccount creator = rNote.getCreator();
             byte[] signature = rNote.getSignature();
 
@@ -777,11 +778,15 @@ public class ExPays {
 
     }
 
-    public void processBody(Transaction rNote, boolean asOrphan) {
+    public void processBody(Transaction rNote, boolean asOrphan, Block block) {
         PublicKeyAccount creator = rNote.getCreator();
         boolean isDirect = asset.isDirectBalances();
         long absKey = assetKey;
         boolean incomeReverse = balancePos == TransactionAmount.ACTION_HOLD;
+
+        // возьмем знаки (минус) для создания позиции баланса такой
+        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
+        Long key = signs.a * assetKey;
 
         Account recipient;
         for (Fun.Tuple3 item : filteredPayouts) {
@@ -791,14 +796,18 @@ public class ExPays {
                 break;
             BigDecimal amount = (BigDecimal) item.c;
 
-            TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey, assetKey, amount, backward,
+            TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey,
+                    key, signs.b > 0 ? amount : amount.negate(), backward,
                     isDirect, incomeReverse);
+
+            if (!asOrphan && block != null)
+                rNote.addCalculated(block, recipient, absKey, amount, "payout");
 
         }
 
     }
 
-    public void process(Transaction rNote) {
+    public void process(Transaction rNote, Block block) {
 
         if (filteredPayouts == null) {
             filteredPayouts = new ArrayList<>();
@@ -817,7 +826,7 @@ public class ExPays {
 
         totalFee = BigDecimal.ZERO;
 
-        processBody(rNote, false);
+        processBody(rNote, false, block);
 
     }
 
@@ -840,7 +849,7 @@ public class ExPays {
 
         totalFee = BigDecimal.ZERO;
 
-        processBody(rNote, true);
+        processBody(rNote, true, null);
 
     }
 

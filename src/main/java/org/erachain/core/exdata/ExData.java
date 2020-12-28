@@ -1619,7 +1619,7 @@ public class ExData {
             exLink.process(transaction);
 
         if (exPays != null)
-            exPays.process(transaction);
+            exPays.process(transaction, block);
 
         if (authors != null) {
             for (ExLinkAuthor author : authors) {

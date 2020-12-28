@@ -266,7 +266,7 @@ public class ItemAssetBalanceMapImplTest {
                 }
 
                 //////////////////
-                Iterator<byte[]> assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetIterator(assetKey1);
+                Iterator<byte[]> assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey1);
 
                 balance = null;
                 iteratorSize = 0;

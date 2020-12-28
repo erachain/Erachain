@@ -160,7 +160,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         if (map instanceof ItemAssetBalanceSuitRocksDB) {
             //FILTER ALL KEYS
             keys = new ArrayList<>();
-            try (IteratorCloseable<byte[]> iterator = ((ItemAssetBalanceSuit) map).assetIterator(assetKey)) {
+            try (IteratorCloseable<byte[]> iterator = ((ItemAssetBalanceSuit) map).getIteratorByAsset(assetKey)) {
                 while (iterator.hasNext()) {
                     keys.add(iterator.next());
                 }
@@ -233,7 +233,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         if (assetKey < 0)
             assetKey = -assetKey;
 
-        return ((ItemAssetBalanceSuit) map).assetIterator(assetKey);
+        return ((ItemAssetBalanceSuit) map).getIteratorByAsset(assetKey);
 
     }
 

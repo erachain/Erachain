@@ -235,12 +235,12 @@ public class Account {
     /**
      * Sign asset + sign amount
      *
-     * @param action
+     * @param balancePos
      * @return
      */
-    public static Tuple2<Integer, Integer> getSignsForAction(int action) {
+    public static Tuple2<Integer, Integer> getSignsForBalancePos(int balancePos) {
 
-        switch (action) {
+        switch (balancePos) {
             case TransactionAmount.ACTION_SEND:
             case TransactionAmount.ACTION_PLEDGE:
                 return new Tuple2(1, 1);

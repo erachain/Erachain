@@ -7,7 +7,8 @@ import java.util.Collection;
 
 public interface ItemAssetBalanceSuit {
 
-    IteratorCloseable<byte[]> assetIterator(long assetKey);
+    IteratorCloseable<byte[]> getIteratorByAsset(long assetKey);
+
     Collection<byte[]> assetKeys(long assetKey);
 
     IteratorCloseable<byte[]> accountIterator(Account account);

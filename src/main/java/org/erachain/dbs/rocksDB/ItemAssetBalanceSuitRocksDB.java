@@ -152,7 +152,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     }
 
     @Override
-    public IteratorCloseable<byte[]> assetIterator(long assetKey) {
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
         return new IteratorCloseableImpl(assetKeys(assetKey).iterator());
     }
 
