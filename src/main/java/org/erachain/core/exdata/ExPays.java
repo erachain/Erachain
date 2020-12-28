@@ -540,7 +540,7 @@ public class ExPays {
     public int isValid(RSignNote rNote) {
 
         if (hasAmount()) {
-            if (this.balancePos < 0 || this.balancePos > 5) {
+            if (this.balancePos < TransactionAmount.ACTION_SEND || this.balancePos > TransactionAmount.ACTION_SPEND) {
                 errorValue = "Payouts: balancePos";
                 return Transaction.INVALID_AMOUNT;
             } else if (this.payMethodValue == null) {
@@ -550,10 +550,10 @@ public class ExPays {
         }
 
         if (hasAssetFilter()) {
-            if (this.filterBalancePos < 0 || this.filterBalancePos > 5) {
+            if (this.filterBalancePos < TransactionAmount.ACTION_SEND || this.filterBalancePos > TransactionAmount.ACTION_SPEND) {
                 errorValue = "Payouts: filterBalancePos";
                 return Transaction.INVALID_BACKWARD_ACTION;
-            } else if (this.filterBalanceSide < 0 || this.filterBalanceSide > 3) {
+            } else if (this.filterBalanceSide < TransactionAmount.BALANCE_SIDE_DEBIT || this.filterBalanceSide > TransactionAmount.BALANCE_SIDE_CREDIT) {
                 errorValue = "Payouts: filterBalanceSide";
                 return Transaction.INVALID_BACKWARD_ACTION;
             }
@@ -669,6 +669,7 @@ public class ExPays {
 
         HashSet<Long> usedPersons = new HashSet<>();
         PersonCls person;
+        byte[] assetOwner = asset.getOwner().getShortAddressBytes();
 
         try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(filterAssetKey)) {
             while (iterator.hasNext()) {
@@ -681,6 +682,9 @@ public class ExPays {
                     continue;
 
                 byte[] recipientShort = ItemAssetBalanceMap.getShortAccountFromKey(key);
+                if (Arrays.equals(assetOwner, recipientShort))
+                    // создателю актива не даем ничего никогда
+                    continue;
 
                 if (onlyPerson) {
                     // так как тут сортировка по убыванию значит первым встретится тот счет на котром больше всего актива
@@ -715,6 +719,14 @@ public class ExPays {
 
                 Account recipient = new Account(recipientShort);
 
+                /// если задано то проверим - входит ли в в диапазон
+                // - собранные блоки учитываем? да - иначе долго будет делать поиск
+                if (filterTXStartSeqNo != null || filterTXEndSeqNo != null) {
+                    // на счете должна быть активность в заданном диапазоне для данного типа
+                    if (!txMap.isCreatorWasActive(recipientShort, filterTXStartSeqNo, filterTXType, filterTXEndSeqNo))
+                        continue;
+                }
+
                 // IF send from PERSON to ANONYMOUS
                 if (andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
                         isPerson, assetKey, balancePos,
@@ -723,17 +735,11 @@ public class ExPays {
                     return -Transaction.RECEIVER_NOT_PERSONALIZED;
                 }
 
-                /// если задано то проверим - входит ли в в диаппазон
-                // - собранные блоки учитываем? да - иначе долго будет делать поиск
-                if (filterTXStartSeqNo != null || filterTXEndSeqNo != null) {
-                    // на счете должна быть активность в заданном диаппазоне для данного типа
-                    if (!txMap.isCreatorWasActive(recipientShort, filterTXStartSeqNo, filterTXType, filterTXEndSeqNo))
-                        continue;
-                }
-
                 if (payMethodValue != null && payMethod == PAYMENT_METHOD_COEFF) {
                     // нужно вычислить сразу сколько шлем
                     payout = balance.multiply(payMethodValue).setScale(scale, RoundingMode.HALF_DOWN);
+                } else if (payMethodValue != null && payMethod == PAYMENT_METHOD_ABSOLUTE) {
+                    payout = payMethodValue.setScale(scale, RoundingMode.HALF_DOWN);
                 } else {
                     payout = null;
                 }
@@ -772,7 +778,7 @@ public class ExPays {
         if (filteredPayouts == null) {
             filteredPayouts = new ArrayList<>();
             filteredPayoutsCount = filterPayList(rNote, false);
-            if (filterTXType == PAYMENT_METHOD_TOTAL) {
+            if (payMethod == PAYMENT_METHOD_TOTAL) {
                 calcPayoutsForMethodTotal();
             }
         }
@@ -793,7 +799,7 @@ public class ExPays {
         if (filteredPayouts == null) {
             filteredPayouts = new ArrayList<>();
             filteredPayoutsCount = filterPayList(rNote, false);
-            if (filterTXType == PAYMENT_METHOD_TOTAL) {
+            if (payMethod == PAYMENT_METHOD_TOTAL) {
                 calcPayoutsForMethodTotal();
             }
         }

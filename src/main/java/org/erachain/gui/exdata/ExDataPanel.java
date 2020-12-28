@@ -88,7 +88,7 @@ public class ExDataPanel extends JPanel {
     public JCheckBox checkBoxMakeHashAndCheckUniqueHashes;
     public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
     public DocTypeAppendixPanel docTypeAppendixPanel;
-    public MultiPayOutsPanel multiPayOutsPanel;
+    public ExPayoutsPanel exPayoutsPanel;
 
 
 
@@ -329,7 +329,7 @@ public class ExDataPanel extends JPanel {
         params_Template_Model = new ParamsTemplateModel();
         jTable_Params_Message_Public = new MTable(params_Template_Model);
         docTypeAppendixPanel = new DocTypeAppendixPanel(this);
-        multiPayOutsPanel = new MultiPayOutsPanel(this);
+        exPayoutsPanel = new ExPayoutsPanel(this);
 
         params_Template_Model.addTableModelListener(new TableModelListener() {
 
@@ -382,7 +382,7 @@ public class ExDataPanel extends JPanel {
 
         if (BlockChain.TEST_MODE) {
             JScrollPane multiPayScrollBar = new JScrollPane();
-            multiPayScrollBar.setViewportView(multiPayOutsPanel);
+            multiPayScrollBar.setViewportView(exPayoutsPanel);
             jTabbedPane_Type.addTab(Lang.getInstance().translate("Payouts"), multiPayScrollBar);
         }
 
@@ -852,7 +852,7 @@ public class ExDataPanel extends JPanel {
             }
         }
 
-        Fun.Tuple2<ExPays, String> exPayoutsResult = multiPayOutsPanel.getPayouts();
+        Fun.Tuple2<ExPays, String> exPayoutsResult = exPayoutsPanel.getPayouts();
         if (exPayoutsResult.b != null) {
             throw new Exception(exPayoutsResult.b);
         }

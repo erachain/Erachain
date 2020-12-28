@@ -23,16 +23,16 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 
-public class MultiPayOutsPanel extends IconPanel {
+public class ExPayoutsPanel extends IconPanel {
 
-    public static String NAME = "MultiPayOutsPanel";
+    public static String NAME = "ExPayoutsPanel";
     public static String TITLE = "Payouts";
 
     private ExDataPanel parent;
     public ComboBoxAssetsModel accountsModel;
     public ComboBoxAssetsModel accountsModel1;
 
-    public MultiPayOutsPanel(ExDataPanel parent) {
+    public ExPayoutsPanel(ExDataPanel parent) {
         super(NAME, TITLE);
         this.parent = parent;
         initComponents();
@@ -544,7 +544,7 @@ public class MultiPayOutsPanel extends IconPanel {
                 jComboBoxMethodPaymentType.getSelectedIndex(), jTextFieldAmount.getText(), jTextFieldPaymentMin.getText(),
                 jTextFieldPaymentMax.getText(),
                 ((AssetCls) jComboBoxFilterAsset.getSelectedItem()).getKey(),
-                jComboBoxFilterSideBalance.getSelectedIndex(), jComboBoxFilterBalancePosition.getSelectedIndex(),
+                jComboBoxFilterSideBalance.getSelectedIndex() + 1, jComboBoxFilterBalancePosition.getSelectedIndex(),
                 jTextFieldBQ.getText(), jTextFieldLQ.getText(),
                 txTypeFilter,
                 jTextFieldDateStart.getText(), jTextFieldDateEnd.getText(),
@@ -556,7 +556,7 @@ public class MultiPayOutsPanel extends IconPanel {
     private javax.swing.JCheckBox jCheckBoxPayoutsUse;
     private javax.swing.JCheckBox jCheckBoxSelfPay;
     private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxPayoutAction;
-    private javax.swing.JComboBox<ItemCls> jComboBoxPayoutAsset;
+    public javax.swing.JComboBox<ItemCls> jComboBoxPayoutAsset;
     private javax.swing.JComboBox<String> jComboBoxMethodPaymentType;
     private javax.swing.JComboBox<ItemCls> jComboBoxFilterAsset;
     private javax.swing.JComboBox<Integer> jComboBoxTXTypeFilter;

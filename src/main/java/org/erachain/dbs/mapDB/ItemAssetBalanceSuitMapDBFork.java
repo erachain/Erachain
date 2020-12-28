@@ -1,5 +1,6 @@
 package org.erachain.dbs.mapDB;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.BlockChain;
@@ -8,9 +9,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.ItemAssetBalanceSuit;
-import org.erachain.dbs.DBTab;
-import org.erachain.dbs.IteratorCloseable;
-import org.erachain.dbs.IteratorCloseableImpl;
+import org.erachain.dbs.*;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
@@ -112,17 +111,30 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
 
     }
 
+    // тут родительские ключи еще нужны поидее - но это не используется в форке никак
     @Override
     public Collection<byte[]> assetKeys(long assetKey) {
         //FILTER ALL KEYS
-        return this.assetKeyMap == null ? null : this.assetKeyMap.subMap(
-                Fun.t2(Fun.t2(assetKey, null), null),
-                Fun.t2(Fun.t2(assetKey, Fun.HI()), Fun.HI())).values();
+        return null;
     }
 
+    /**
+     * Соберем Ключи с Родителем
+     *
+     * @param assetKey
+     * @return
+     */
     @Override
     public IteratorCloseable<byte[]> assetIterator(long assetKey) {
-        return this.assetKeyMap == null ? null : new IteratorCloseableImpl(assetKeys(assetKey).iterator());
+
+        IteratorCloseable<byte[]> parentIterator = parent.getIterator();
+        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted),
+                IteratorCloseableImpl.make(this.assetKeyMap.subMap(
+                        Fun.t2(Fun.t2(assetKey, null), null),
+                        Fun.t2(Fun.t2(assetKey, Fun.HI()), Fun.HI()))
+                        .values().iterator())), Fun.COMPARATOR);
+
     }
 
     @Override

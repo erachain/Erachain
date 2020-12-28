@@ -90,7 +90,7 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
         // GET FROM PARENT and exclude DELETED here
         HashMap<Long, Order> result = ((OrderMap) parent).getProtocolEntries(have, want, stopPrice, deleted);
 
-        // берем все сейчас! так как тут просто перебьор будет и нам надо вщять + одну выше цены
+        // берем все сейчас! так как тут просто перебор будет и нам надо взять + одну выше цены
         // Object limitOrHI = stopPrice == null ? Fun.HI() : stopPrice; // надо тут делать выбор иначе ошибка преобразования в subMap
         Collection<Long> keys = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),

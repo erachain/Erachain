@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.*;
@@ -43,7 +44,7 @@ public class IssueDocumentPanel extends IconPanel {
     /**
      * Creates new form IssueDocumentPanel
      */
-    public IssueDocumentPanel() {
+    public IssueDocumentPanel(Account creator, AssetCls actionAsset) {
         super(NAME, TITLE);
         th = this;
         initComponents();
@@ -73,12 +74,22 @@ public class IssueDocumentPanel extends IconPanel {
         jComboBox_Account_Work.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 exData_Panel.updateRecipients();
-                exData_Panel.multiPayOutsPanel.updateAction();
+                exData_Panel.exPayoutsPanel.updateAction();
             }
         });
+        if (creator != null) {
+            jComboBox_Account_Work.setSelectedItem(creator);
+        }
+        if (actionAsset != null) {
+            exData_Panel.exPayoutsPanel.jComboBoxPayoutAsset.setSelectedItem(actionAsset);
+        }
 
         jLabel_Fee_Work.setText(Lang.getInstance().translate("Fee Power") + ":");
         this.jButton_Work_Cancel.setVisible(false);
+    }
+
+    public IssueDocumentPanel() {
+        this(null, null);
     }
 
     private void initComponents() {

@@ -5,6 +5,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.models.WalletItemAssetsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
@@ -109,14 +110,16 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
                 //			new AssetFrame(asset);
             }
         });
-        //	assetsMenu.add(details);
+        menuTable.add(details);
 
         JMenuItem dividend = new JMenuItem(Lang.getInstance().translate("Pay dividend"));
         dividend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
-                new PayDividendFrame(asset);
+                MainPanel.getInstance().insertTab(
+                        new IssueDocumentPanel(asset.getOwner(), asset));
+
             }
         });
         menuTable.add(dividend);

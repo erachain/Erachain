@@ -150,7 +150,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> getBalancesList(long assetKey) {
 
-        if (Controller.getInstance().onlyProtocolIndexing)
+        if (Controller.getInstance().onlyProtocolIndexing || parent != null)
             return null;
 
         if (assetKey < 0)
@@ -190,7 +190,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> getBalancesList(Account account) {
 
-        if (Controller.getInstance().onlyProtocolIndexing)
+        if (Controller.getInstance().onlyProtocolIndexing || parent != null)
             return null;
 
         Collection<byte[]> keys;
@@ -221,7 +221,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     public IteratorCloseable<byte[]> getIteratorByAccount(Account account) {
 
-        if (Controller.getInstance().onlyProtocolIndexing)
+        if (Controller.getInstance().onlyProtocolIndexing || parent != null)
             return null;
 
         return ((ItemAssetBalanceSuit) map).accountIterator(account);
@@ -229,11 +229,6 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
     }
 
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
-
-        if (false
-                && Controller.getInstance().onlyProtocolIndexing)
-            // для расчета Множественных выплат отключаем это
-            return null;
 
         if (assetKey < 0)
             assetKey = -assetKey;

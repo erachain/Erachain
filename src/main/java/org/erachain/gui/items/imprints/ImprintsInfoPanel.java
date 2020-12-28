@@ -1,13 +1,10 @@
 package org.erachain.gui.items.imprints;
 
-import javax.swing.JLabel;
-
 import org.erachain.core.item.imprints.ImprintCls;
-import org.erachain.gui.library.Library;
-import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.MTextPane;
-import org.erachain.gui.models.BalancesTableModel;
 import org.erachain.lang.Lang;
+
+import javax.swing.*;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -24,7 +21,6 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
      *
      */
     private static final long serialVersionUID = 1L;
-    private BalancesTableModel table_model;
     // Variables declaration - do not modify
     private javax.swing.JLabel Name_jLabel;
     private javax.swing.JTextField Name_jTextField;
@@ -32,9 +28,7 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
     private MTextPane description_jTextArea;
     private javax.swing.JLabel holders_jLabel;
     @SuppressWarnings("rawtypes")
-    private MTable holders_jTable1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel key_jLabel;
     private javax.swing.JTextField key_jTextField;
     private javax.swing.JLabel owner_jLabel;
@@ -67,7 +61,6 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
         owner_jLabel = new javax.swing.JLabel();
         owner_jTextField = new javax.swing.JTextField();
         holders_jLabel = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
         layout.columnWidths = new int[]{0, 7, 0};
@@ -198,7 +191,6 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
     }
 
     public void delay_on_Close() {
-        table_model.removeObservers();
 
     }
     // End of variables declaration
