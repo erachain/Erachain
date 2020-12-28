@@ -361,6 +361,10 @@ public class ExData {
         return exLink;
     }
 
+    public ExPays getExPays() {
+        return exPays;
+    }
+
     public byte getParentRefFlags() {
         if (exLink == null)
             return 0;
@@ -638,6 +642,10 @@ public class ExData {
 
         if (exLink != null) {
             outStream.write(exLink.toBytes());
+        }
+
+        if (exPays != null) {
+            outStream.write(exPays.toBytes());
         }
 
         if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {

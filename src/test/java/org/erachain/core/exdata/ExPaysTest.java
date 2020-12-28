@@ -43,7 +43,7 @@ public class ExPaysTest {
                 filterByGender, selfPay);
         byte[] bytes = null;
         try {
-            bytes = exPays.toByte();
+            bytes = exPays.toBytes();
         } catch (Exception e) {
         }
         assertEquals(bytes.length, exPays.length());
@@ -63,7 +63,7 @@ public class ExPaysTest {
                 filterByGender, selfPay);
         byte[] bytes = null;
         try {
-            bytes = exPays.toByte();
+            bytes = exPays.toBytes();
         } catch (Exception e) {
         }
         assertEquals(bytes.length, exPays.length());
@@ -84,7 +84,7 @@ public class ExPaysTest {
                 filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
                 filterByGender, selfPay);
         try {
-            bytes = exPays.toByte();
+            bytes = exPays.toBytes();
         } catch (Exception e) {
         }
         assertEquals(bytes.length, exPays.length());
@@ -104,7 +104,7 @@ public class ExPaysTest {
                 filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
                 filterByGender, selfPay);
         try {
-            bytes = exPays.toByte();
+            bytes = exPays.toBytes();
         } catch (Exception e) {
         }
         assertEquals(bytes.length, exPays.length());
@@ -124,7 +124,7 @@ public class ExPaysTest {
                 null, filterTXStartSeqNo, filterTXEndSeqNo,
                 filterByGender, selfPay);
         try {
-            bytes = exPays.toByte();
+            bytes = exPays.toBytes();
         } catch (Exception e) {
         }
         assertEquals(bytes.length, exPays.length());

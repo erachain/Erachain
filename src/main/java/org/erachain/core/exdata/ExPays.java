@@ -42,13 +42,18 @@ public class ExPays {
     public static final byte BASE_LENGTH = 4 + 3;
 
     public static final int MAX_COUNT = Integer.MAX_VALUE >> 1;
-    private static final byte AMOUNT_FLAG_MASK = 64;
-    private static final byte BALANCE_FLAG_MASK = 32;
-    private static final byte ACTIVE_START_FLAG_MASK = 16;
-    private static final byte ACTIVE_END_FLAG_MASK = 8;
+    private static final byte AMOUNT_FLAG_MASK = -128;
+    private static final byte AMOUNT_MIN_FLAG_MASK = 64;
+    private static final byte AMOUNT_MAX_FLAG_MASK = 32;
+    private static final byte BALANCE_FLAG_MASK = 16;
+    private static final byte BALANCE_AMOUNT_MIN_FLAG_MASK = 8;
+    private static final byte BALANCE_AMOUNT_MAX_FLAG_MASK = 4;
+    private static final byte ACTIVE_START_FLAG_MASK = 2;
+    private static final byte ACTIVE_END_FLAG_MASK = 1;
 
-    private static final byte PAYMENT_METHOD_TOTAL = 1; // by TOTAL
-    private static final byte PAYMENT_METHOD_COEFF = 2; // by coefficient
+    private static final byte PAYMENT_METHOD_TOTAL = 0; // by TOTAL
+    private static final byte PAYMENT_METHOD_COEFF = 1; // by coefficient
+    private static final byte PAYMENT_METHOD_ABSOLUTE = 2; // by ABSOLUTE VALUE
 
     private static final byte NOT_FILTER_PERSONS = -1; //
     private static final byte NOT_FILTER_GENDER = -2; //
@@ -61,7 +66,7 @@ public class ExPays {
     private int flags; // 4
 
     private Long assetKey; // 12
-    private int actionType; // 13
+    private int balancePos; // 13
     private boolean backward; // 14
     private int payMethod; // 15 0 - by Total, 1 - by Percent
     private BigDecimal payMethodValue; // 17
@@ -71,8 +76,8 @@ public class ExPays {
     private Long filterAssetKey; // 29
     private int filterBalancePos; //30
     private int filterBalanceSide; //31
-    private BigDecimal filterBalanceMoreThen; // 33
-    private BigDecimal filterBalanceLessThen; // 34
+    private BigDecimal filterBalanceMIN; // 33
+    private BigDecimal filterBalanceMAX; // 34
 
     private int filterTXType; // 36
     private Long filterTXStartSeqNo; // 44
@@ -97,7 +102,7 @@ public class ExPays {
      *
      * @param flags
      * @param assetKey
-     * @param actionType
+     * @param balancePos
      * @param backward
      * @param payMethod
      * @param payMethodValue
@@ -106,17 +111,17 @@ public class ExPays {
      * @param filterAssetKey
      * @param filterBalancePos
      * @param filterBalanceSide
-     * @param filterBalanceMoreThen
-     * @param filterBalanceLessThen
+     * @param filterBalanceMIN
+     * @param filterBalanceMAX
      * @param filterTXType
      * @param filterTXStartSeqNo
      * @param filterTXEndSeqNo
      * @param filterByGender
      * @param selfPay
      */
-    public ExPays(int flags, Long assetKey, int actionType, boolean backward, int payMethod, BigDecimal payMethodValue, BigDecimal amountMin, BigDecimal amountMax,
+    public ExPays(int flags, Long assetKey, int balancePos, boolean backward, int payMethod, BigDecimal payMethodValue, BigDecimal amountMin, BigDecimal amountMax,
                   Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
-                  BigDecimal filterBalanceMoreThen, BigDecimal filterBalanceLessThen,
+                  BigDecimal filterBalanceMIN, BigDecimal filterBalanceMAX,
                   int filterTXType, Long filterTXStartSeqNo, Long filterTXEndSeqNo,
                   Integer filterByGender, boolean selfPay) {
         this.flags = flags;
@@ -124,12 +129,21 @@ public class ExPays {
         if (assetKey != null && assetKey != 0L && payMethodValue != null && payMethodValue.signum() != 0) {
             this.flags |= AMOUNT_FLAG_MASK;
             this.assetKey = assetKey;
-            this.actionType = actionType;
+            this.balancePos = balancePos;
             this.backward = backward;
             this.payMethod = payMethod;
             this.payMethodValue = payMethodValue;
-            this.amountMin = amountMin;
-            this.amountMax = amountMax;
+
+            if (payMethod != PAYMENT_METHOD_ABSOLUTE) {
+                if (amountMin != null && amountMin.signum() != 0) {
+                    this.flags |= AMOUNT_MIN_FLAG_MASK;
+                    this.amountMin = amountMin;
+                }
+                if (amountMax != null && amountMax.signum() != 0) {
+                    this.flags |= AMOUNT_MAX_FLAG_MASK;
+                    this.amountMax = amountMax;
+                }
+            }
         }
 
         if (filterAssetKey != null && filterAssetKey != 0L) {
@@ -137,8 +151,14 @@ public class ExPays {
             this.filterAssetKey = filterAssetKey;
             this.filterBalancePos = filterBalancePos;
             this.filterBalanceSide = filterBalanceSide;
-            this.filterBalanceLessThen = filterBalanceLessThen;
-            this.filterBalanceMoreThen = filterBalanceMoreThen;
+            if (filterBalanceMIN != null && filterBalanceMIN.signum() != 0) {
+                this.flags |= BALANCE_AMOUNT_MIN_FLAG_MASK;
+                this.filterBalanceMIN = filterBalanceMIN;
+            }
+            if (filterBalanceMAX != null && filterBalanceMAX.signum() != 0) {
+                this.flags |= BALANCE_AMOUNT_MAX_FLAG_MASK;
+                this.filterBalanceMAX = filterBalanceMAX;
+            }
         }
 
         this.filterTXType = filterTXType;
@@ -160,8 +180,24 @@ public class ExPays {
         return (this.flags & AMOUNT_FLAG_MASK) != 0;
     }
 
+    public boolean hasAmountMin() {
+        return (this.flags & AMOUNT_MIN_FLAG_MASK) != 0;
+    }
+
+    public boolean hasAmountMax() {
+        return (this.flags & AMOUNT_MAX_FLAG_MASK) != 0;
+    }
+
     public boolean hasAssetFilter() {
         return (this.flags & BALANCE_FLAG_MASK) != 0;
+    }
+
+    public boolean hasAssetFilterBalMIN() {
+        return (this.flags & BALANCE_AMOUNT_MIN_FLAG_MASK) != 0;
+    }
+
+    public boolean hasAssetFilterBalMAX() {
+        return (this.flags & BALANCE_AMOUNT_MAX_FLAG_MASK) != 0;
     }
 
     public boolean hasTXTypeFilterActiveStart() {
@@ -179,7 +215,7 @@ public class ExPays {
         }
     }
 
-    public byte[] toByte() throws Exception {
+    public byte[] toBytes() throws Exception {
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
@@ -189,7 +225,7 @@ public class ExPays {
         if (hasAmount()) {
             outStream.write(Longs.toByteArray(this.assetKey));
 
-            buff = new byte[]{(byte) actionType, (byte) (backward ? 1 : 0), (byte) payMethod};
+            buff = new byte[]{(byte) balancePos, (byte) (backward ? 1 : 0), (byte) payMethod};
             outStream.write(buff);
 
             outStream.write(this.payMethodValue.scale());
@@ -197,15 +233,19 @@ public class ExPays {
             outStream.write(buff.length);
             outStream.write(buff);
 
-            outStream.write(this.amountMin.scale());
-            buff = this.amountMin.unscaledValue().toByteArray();
-            outStream.write(buff.length);
-            outStream.write(buff);
+            if (hasAmountMin()) {
+                outStream.write(this.amountMin.scale());
+                buff = this.amountMin.unscaledValue().toByteArray();
+                outStream.write(buff.length);
+                outStream.write(buff);
+            }
 
-            outStream.write(this.amountMax.scale());
-            buff = this.amountMax.unscaledValue().toByteArray();
-            outStream.write(buff.length);
-            outStream.write(buff);
+            if (hasAmountMax()) {
+                outStream.write(this.amountMax.scale());
+                buff = this.amountMax.unscaledValue().toByteArray();
+                outStream.write(buff.length);
+                outStream.write(buff);
+            }
 
         }
 
@@ -214,18 +254,20 @@ public class ExPays {
             buff = new byte[]{(byte) filterBalancePos, (byte) filterBalanceSide};
             outStream.write(buff);
 
-            outStream.write(this.filterBalanceMoreThen.scale());
-            buff = this.filterBalanceMoreThen.unscaledValue().toByteArray();
-            outStream.write(buff.length);
-            outStream.write(buff);
+            if (hasAssetFilterBalMIN()) {
+                outStream.write(this.filterBalanceMIN.scale());
+                buff = this.filterBalanceMIN.unscaledValue().toByteArray();
+                outStream.write(buff.length);
+                outStream.write(buff);
+            }
 
-            outStream.write(this.filterBalanceLessThen.scale());
-            buff = this.filterBalanceLessThen.unscaledValue().toByteArray();
-            outStream.write(buff.length);
-            outStream.write(buff);
+            if (hasAssetFilterBalMAX()) {
+                outStream.write(this.filterBalanceMAX.scale());
+                buff = this.filterBalanceMAX.unscaledValue().toByteArray();
+                outStream.write(buff.length);
+                outStream.write(buff);
+            }
         }
-
-        outStream.write(filterTXType);
 
         if (hasTXTypeFilterActiveStart()) {
             outStream.write(Longs.toByteArray(this.filterTXStartSeqNo));
@@ -234,7 +276,7 @@ public class ExPays {
             outStream.write(Longs.toByteArray(this.filterTXEndSeqNo));
         }
 
-        outStream.write(new byte[]{(byte) (int) filterByGender, (byte) (selfPay ? 1 : 0)});
+        outStream.write(new byte[]{(byte) filterTXType, (byte) (int) filterByGender, (byte) (selfPay ? 1 : 0)});
 
         return outStream.toByteArray();
 
@@ -244,23 +286,23 @@ public class ExPays {
         int len = BASE_LENGTH;
 
         if (hasAmount()) {
-            len += Transaction.KEY_LENGTH + 3 + 6
-                    + payMethodValue.unscaledValue().toByteArray().length
-                    + amountMin.unscaledValue().toByteArray().length
-                    + amountMax.unscaledValue().toByteArray().length;
+            len += Transaction.KEY_LENGTH + 3
+                    + payMethodValue.unscaledValue().toByteArray().length + 2
+                    + (hasAmountMin() ? amountMin.unscaledValue().toByteArray().length + 2 : 0)
+                    + (hasAmountMax() ? amountMax.unscaledValue().toByteArray().length + 2 : 0);
         }
 
         if (hasAssetFilter()) {
-            len += Transaction.KEY_LENGTH + 2 + 4
-                    + filterBalanceMoreThen.unscaledValue().toByteArray().length
-                    + filterBalanceLessThen.unscaledValue().toByteArray().length;
+            len += Transaction.KEY_LENGTH + 2
+                    + (hasAssetFilterBalMIN() ? filterBalanceMIN.unscaledValue().toByteArray().length + 2 : 0)
+                    + (hasAssetFilterBalMAX() ? filterBalanceMAX.unscaledValue().toByteArray().length + 2 : 0);
         }
 
         if (hasTXTypeFilterActiveStart()) {
-            len += 8;
+            len += Long.BYTES;
         }
         if (hasTXTypeFilterActiveEnd()) {
-            len += 8;
+            len += Long.BYTES;
         }
 
         return len;
@@ -296,15 +338,19 @@ public class ExPays {
             payMethodValue = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
             position += len;
 
-            scale = data[position++];
-            len = data[position++];
-            amountMin = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
-            position += len;
+            if ((flags & AMOUNT_MIN_FLAG_MASK) != 0) {
+                scale = data[position++];
+                len = data[position++];
+                amountMin = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
+                position += len;
+            }
 
-            scale = data[position++];
-            len = data[position++];
-            amountMax = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
-            position += len;
+            if ((flags & AMOUNT_MAX_FLAG_MASK) != 0) {
+                scale = data[position++];
+                len = data[position++];
+                amountMax = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
+                position += len;
+            }
 
         }
 
@@ -321,19 +367,22 @@ public class ExPays {
             filterBalancePos = data[position++];
             filterBalanceSide = data[position++];
 
-            scale = data[position++];
-            len = data[position++];
-            filterBalanceMoreThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
-            position += len;
+            if ((flags & BALANCE_AMOUNT_MIN_FLAG_MASK) != 0) {
+                scale = data[position++];
+                len = data[position++];
+                filterBalanceMoreThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
+                position += len;
+            }
 
-            scale = data[position++];
-            len = data[position++];
-            filterBalanceLessThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
-            position += len;
+            if ((flags & BALANCE_AMOUNT_MAX_FLAG_MASK) != 0) {
+                scale = data[position++];
+                len = data[position++];
+                filterBalanceLessThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
+                position += len;
+            }
 
         }
 
-        int filterTXType = data[position++];
         Long filterTXStart = null;
         Long filterTXEnd = null;
 
@@ -346,6 +395,7 @@ public class ExPays {
             position += Long.BYTES;
         }
 
+        int filterTXType = data[position++];
         int filterByPerson = data[position++];
         boolean selfPay = data[position++] > 0;
 
@@ -478,7 +528,7 @@ public class ExPays {
     public int isValid(RSignNote rNote) {
 
         if (hasAmount() && (
-                this.actionType < 0 || this.actionType > 5
+                this.balancePos < 0 || this.balancePos > 5
                         || this.amountMin == null
                         || this.amountMax == null
                         || this.payMethodValue == null
@@ -491,8 +541,8 @@ public class ExPays {
         if (hasAssetFilter() && (
                 this.filterBalancePos < 0 || this.filterBalancePos > 5
                         || this.filterBalanceSide < 0 || this.filterBalanceSide > 3
-                        || this.filterBalanceLessThen == null
-                        || this.filterBalanceMoreThen == null
+                        || this.filterBalanceMAX == null
+                        || this.filterBalanceMIN == null
         )
         ) {
             return Transaction.INVALID_BACKWARD_ACTION;
@@ -504,7 +554,7 @@ public class ExPays {
 
         if (assetKey != null && filterAssetKey != null
                 && assetKey.equals(filterAssetKey)
-                && actionType == filterBalancePos) {
+                && balancePos == filterBalancePos) {
             // при откате невозможно тогда будет правильно рассчитать - так как съехала общая сумма
             return Transaction.INVALID_TRANSFER_TYPE;
         }
@@ -610,8 +660,8 @@ public class ExPays {
 
                 balance = Account.balanceInPositionAndSide(balancesMap.get(key), filterBalancePos, filterBalanceSide);
 
-                if (filterBalanceMoreThen != null && balance.compareTo(filterBalanceMoreThen) < 0
-                        || filterBalanceLessThen != null && balance.compareTo(filterBalanceLessThen) > 0)
+                if (filterBalanceMIN != null && balance.compareTo(filterBalanceMIN) < 0
+                        || filterBalanceMAX != null && balance.compareTo(filterBalanceMAX) > 0)
                     continue;
 
                 byte[] recipientShort = ItemAssetBalanceMap.getShortAccountFromKey(key);
@@ -652,7 +702,7 @@ public class ExPays {
 
                 // IF send from PERSON to ANONYMOUS
                 if (andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
-                        isPerson, assetKey, actionType,
+                        isPerson, assetKey, balancePos,
                         asset)) {
                     errorValue = recipient.getAddress();
                     return -Transaction.RECEIVER_NOT_PERSONALIZED;
