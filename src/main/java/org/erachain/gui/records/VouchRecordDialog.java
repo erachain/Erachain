@@ -111,7 +111,7 @@ public class VouchRecordDialog extends JDialog {
         jButton_Confirm.setEnabled(true);
 
         JPanel infoPanel = TransactionDetailsFactory.getInstance().createTransactionDetail(record);
-        jLabel_Name_Records.setText(Lang.getInstance().translate(record.viewTypeName()));
+        jLabel_Name_Records.setText(Lang.getInstance().translate(record.viewFullTypeName()));
         //	infoPanel.show_001(record);
         //infoPanel.setFocusable(false);
         jLabel_RecordInfo.setViewportView(infoPanel);

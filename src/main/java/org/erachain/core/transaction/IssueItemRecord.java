@@ -246,18 +246,21 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
         // TEST ALL BYTES for database FIELD
         if (name.getBytes(StandardCharsets.UTF_8).length > ItemCls.MAX_NAME_LENGTH) {
-            errorValue = "" + nameLen;
+            errorValue = "" + nameLen + " > " + ItemCls.MAX_NAME_LENGTH;
             return INVALID_NAME_LENGTH_MAX;
         }
 
         //CHECK ICON LENGTH
-        int iconLength = this.item.getIcon().length;
-        if (iconLength < 0) {
-            return INVALID_ICON_LENGTH_MIN;
-        }
-        if (iconLength > ItemCls.MAX_ICON_LENGTH) {
-            errorValue = "" + iconLength;
-            return INVALID_ICON_LENGTH_MAX;
+        byte[] icon = this.item.getIcon();
+        if (icon != null) {
+            int iconLength = icon.length;
+            if (iconLength < 0) {
+                return INVALID_ICON_LENGTH_MIN;
+            }
+            if (iconLength > ItemCls.MAX_ICON_LENGTH) {
+                errorValue = "" + iconLength + " > " + ItemCls.MAX_ICON_LENGTH;
+                return INVALID_ICON_LENGTH_MAX;
+            }
         }
 
         //CHECK IMAGE LENGTH
@@ -266,14 +269,14 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
             return INVALID_IMAGE_LENGTH_MIN;
         }
         if (imageLength > ItemCls.MAX_IMAGE_LENGTH) {
-            errorValue = "" + imageLength;
+            errorValue = "" + imageLength + " > " + ItemCls.MAX_IMAGE_LENGTH;
             return INVALID_IMAGE_LENGTH_MAX;
         }
 
         //CHECK DESCRIPTION LENGTH
         int descriptionLength = this.item.getDescription().getBytes(StandardCharsets.UTF_8).length;
         if (descriptionLength > Transaction.MAX_DATA_BYTES_LENGTH) {
-            errorValue = "" + descriptionLength;
+            errorValue = "" + descriptionLength + " > " + Transaction.MAX_DATA_BYTES_LENGTH;
             return INVALID_DESCRIPTION_LENGTH_MAX;
         }
 

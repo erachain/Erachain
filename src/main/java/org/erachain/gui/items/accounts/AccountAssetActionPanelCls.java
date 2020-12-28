@@ -8,7 +8,6 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
@@ -16,7 +15,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.PasswordPane;
@@ -32,6 +30,7 @@ import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
+import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -46,7 +45,7 @@ import java.nio.charset.StandardCharsets;
 public abstract class AccountAssetActionPanelCls extends IconPanel implements RecipientAddress.RecipientAddressInterface {
 
 
-    public Account sender;
+    public Account creator;
 
     public Account recipient;
 
@@ -109,7 +108,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             setName(this.panelName);
         }
 
-        this.sender = accountFrom;
+        this.creator = accountFrom;
 
         recipient = accountTo;
         // возможно есть счет по умолчанию
@@ -131,13 +130,13 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // account ComboBox
         this.accountsModel = new AccountsComboBoxModel(balancePosition);
-        jComboBox_Account.setModel(accountsModel);
+        jComboBoxCreator.setModel(accountsModel);
 
-        if (sender != null) {
-            jComboBox_Account.setSelectedItem(sender);
+        if (creator != null) {
+            jComboBoxCreator.setSelectedItem(creator);
         }
 
-        jComboBox_Account.setRenderer(new AccountRenderer(asset.getKey()));
+        jComboBoxCreator.setRenderer(new AccountRenderer(asset.getKey()));
 
         // favorite combo box
         jComboBox_Asset.setModel(new ComboBoxAssetsModel());
@@ -194,11 +193,11 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         //ON FAVORITES CHANGE
 
-        jComboBox_Account.addActionListener(new ActionListener() {
+        jComboBoxCreator.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                sender = ((Account) jComboBox_Account.getSelectedItem());
+                creator = ((Account) jComboBoxCreator.getSelectedItem());
                 refreshLabels();
 
             }
@@ -218,6 +217,20 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             }
         });
 
+        jTextField_Amount.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    amount = new BigDecimal(jTextField_Amount.getText());
+                } catch (Exception exc) {
+                    amount = null;
+                }
+                checkReadyToOK();
+
+            }
+        });
+
         jButton_ok.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -233,11 +246,6 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         this.jCheckBox_isText.setSelected(true);
         this.jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
         this.jLabel_Amount.setText(Lang.getInstance().translate("Amount") + ":");
-
-        if (sender != null && asset != null) {
-            jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
-                    + sender.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
-        }
 
         this.jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
         jLabel_Fee.setVisible(Gui.SHOW_FEE_POWER);
@@ -270,16 +278,18 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     private void refreshLabels() {
 
+        checkReadyToOK();
+
         if (asset == null) {
             return;
         }
 
         boolean senderIsOwner = false;
         //sender = ((Account) jComboBox_Account.getSelectedItem());
-        if (sender != null) {
-            ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(asset.getKey());
-            jComboBox_Account.repaint();
-            senderIsOwner = sender.equals(asset.getOwner());
+        if (creator != null) {
+            ((AccountRenderer) jComboBoxCreator.getRenderer()).setAsset(asset.getKey());
+            jComboBoxCreator.repaint();
+            senderIsOwner = creator.equals(asset.getOwner());
         }
 
         boolean recipientIsOwner = false;
@@ -307,11 +317,11 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition, senderIsOwner)));
 
-        this.jLabel_Account.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, balancePosition, senderIsOwner)) + ":");
+        this.jLabelCreator.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, balancePosition, senderIsOwner)) + ":");
 
-        this.jLabel_To.setText(Lang.getInstance().translate(
+        this.jLabelRecipient.setText(Lang.getInstance().translate(
                 asset.viewAssetTypeTarget(backward, balancePosition, recipientIsOwner) + " " + "Account") + ":");
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Account Details") + ":");
+        this.jLabelRecipientDetail.setText(Lang.getInstance().translate("Account Details") + ":");
 
         // set scale
         int scale = asset.getScale();
@@ -322,31 +332,50 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         this.jLabel_AssetType.setText(Lang.getInstance().translate(asset.viewAssetType()));
 
-        if (sender != null) {
-            if (balancePosition == TransactionAmount.ACTION_DEBT || balancePosition == TransactionAmount.ACTION_REPAY_DEBT) {
-                // берем совместно с выданным кредитом
-                BigDecimal forSale = sender.getForSale(DCSet.getInstance(), asset.getKey(), Controller.getInstance().getMyHeight(),
-                        true);
-                jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
-                        + forSale.toPlainString());
-            } else {
-                jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
-                        + sender.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
+        /////////// RECIPIENT DETAILS
+        if (recipient != null) {
+            String details = Lang.getInstance().translate(
+                    Account.getDetailsForEncrypt(recipient.getAddress(), 0,
+                            this.jCheckBox_Encrypt.isSelected(), false));
+
+            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                    balance = recipient.getBalance(asset.getKey());
+            if (balance != null) {
+                details += (details.isEmpty() ? "" : "<br>") + Lang.getInstance().translate("Balances") + ": "
+                        + (balancePosition == TransactionAmount.ACTION_SEND ? ("<b>" + balance.a.b.toPlainString() + "</b>") : balance.a.b.toPlainString())
+                        + " / " + (balancePosition == TransactionAmount.ACTION_DEBT ? ("<b>" + balance.b.b.toPlainString() + "</b>") : balance.b.b.toPlainString())
+                        + " / " + (balancePosition == TransactionAmount.ACTION_HOLD ? ("<b>" + balance.c.b.toPlainString() + "</b>") : balance.c.b.toPlainString())
+                        + " / " + (balancePosition == TransactionAmount.ACTION_SPEND ? ("<b>" + balance.d.b.toPlainString() + "</b>") : balance.d.b.toPlainString());
             }
+            this.jlabel_RecipientDetail.setText("<html>" + details);
         }
+
+        updateBalances();
+    }
+
+    private void updateBalances() {
+        if (creator == null || asset == null) {
+            jLabel_Balances.setText("");
+            return;
+        }
+
+        String details = Lang.getInstance().translate("Balances") + ": ";
+
+        Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                balance = creator.getBalance(asset.getKey());
+        if (balance != null) {
+            details += (balancePosition == TransactionAmount.ACTION_SEND ? ("<b>" + balance.a.b.toPlainString() + "</b>") : balance.a.b.toPlainString())
+                    + " / " + (balancePosition == TransactionAmount.ACTION_DEBT ? ("<b>" + balance.b.b.toPlainString() + "</b>") : balance.b.b.toPlainString())
+                    + " / " + (balancePosition == TransactionAmount.ACTION_HOLD ? ("<b>" + balance.c.b.toPlainString() + "</b>") : balance.c.b.toPlainString())
+                    + " / " + (balancePosition == TransactionAmount.ACTION_SPEND ? ("<b>" + balance.d.b.toPlainString() + "</b>") : balance.d.b.toPlainString());
+        }
+        this.jLabel_Balances.setText("<html>" + details);
 
     }
 
     protected void checkReadyToOK() {
 
-        try {
-            String recipientAddressStr = recipientAddress.getSelectedAddress().trim();
-            if (recipientAddressStr.isEmpty() ||
-                    !Crypto.getInstance().isValidAddress(recipientAddressStr) && !PublicKeyAccount.isValidPublicKey(recipientAddressStr)) {
-                jButton_ok.setEnabled(false);
-                return;
-            }
-        } catch (Exception e) {
+        if (creator == null || recipient == null || asset == null) {
             jButton_ok.setEnabled(false);
             return;
         }
@@ -357,14 +386,15 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     private void refreshReceiverDetails() {
 
-        checkReadyToOK();
+        Fun.Tuple2<Account, String> resultMake = Account.tryMakeAccount(recipientAddress.getSelectedAddress());
+        if (resultMake.b != null) {
+            recipient = null;
+            this.jlabel_RecipientDetail.setText(Lang.getInstance().translate(resultMake.b));
+            checkReadyToOK();
+            return;
+        }
 
-        String recipient = recipientAddress.getSelectedAddress();
-        AssetCls asset = ((AssetCls) jComboBox_Asset.getSelectedItem());
-
-        this.jlabel_RecipientDetail.setText(Lang.getInstance().translate(
-                Account.getDetailsForEncrypt(recipient, asset.getKey(),
-                        this.jCheckBox_Encrypt.isSelected())));
+        recipient = resultMake.a;
 
         refreshLabels();
 
@@ -374,7 +404,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         this.jButton_ok.setEnabled(false);
 
         //READ SENDER
-        sender = (Account) jComboBox_Account.getSelectedItem();
+        creator = (Account) jComboBoxCreator.getSelectedItem();
         //CHECK IF WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {
             //ASK FOR PASSWORD
@@ -386,24 +416,6 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             if (!Controller.getInstance().unlockWallet(password)) {
                 //WRONG PASSWORD
                 JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-
-                //ENABLE
-                this.jButton_ok.setEnabled(true);
-                return false;
-            }
-        }
-
-        //READ RECIPIENT
-        String recipientAddressStr = recipientAddress.getSelectedAddress().trim();
-
-        //ORDINARY RECIPIENT
-        if (Crypto.getInstance().isValidAddress(recipientAddressStr)) {
-            this.recipient = new Account(recipientAddressStr);
-        } else {
-            if (PublicKeyAccount.isValidPublicKey(recipientAddressStr)) {
-                recipient = new PublicKeyAccount(recipientAddressStr);
-            } else {
-                JOptionPane.showMessageDialog(null, "INVALID", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
                 this.jButton_ok.setEnabled(true);
@@ -512,7 +524,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
             if (encryptMessage) {
                 //sender
-                PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
+                PrivateKeyAccount account = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator.getAddress());
                 byte[] privateKey = account.getPrivateKey();
 
                 //recipient
@@ -557,7 +569,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         if (parentTx == null) {
             exLinkDescription.setText(Lang.getInstance().translate("Not Found") + "!");
         } else {
-            exLinkDescription.setText(parentTx.toStringShortAsCreator());
+            exLinkDescription.setText(parentTx.toStringFullAndCreatorLang());
         }
     }
 
@@ -578,13 +590,13 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send((byte) 2, backward ? TransactionAmount.BACKWARD_MASK : 0,
-                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, feePow,
+                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator.getAddress()), exLink, feePow,
                 recipient, getAssetKey(), getAmount(), txTitle, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";
         IssueConfirmDialog confirmDialog = new IssueConfirmDialog(null, true, transaction,
                 Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition,
-                        sender != null && sender.equals(asset.getOwner()))),
+                        creator != null && creator.equals(asset.getOwner()))),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction"), !noReceive);
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
@@ -606,10 +618,10 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     private void initComponents(String message) {
 
-        jLabel_Recive_Detail = new javax.swing.JLabel(Lang.getInstance().translate("Recipient Details") + ":");
-        jLabel_Account = new javax.swing.JLabel(Lang.getInstance().translate("Sender") + ":");
-        jLabel_To = new javax.swing.JLabel(Lang.getInstance().translate("Recipient") + ":");
-        jComboBox_Account = new javax.swing.JComboBox<>();
+        jLabelRecipientDetail = new javax.swing.JLabel(Lang.getInstance().translate("Recipient Details") + ":");
+        jLabelCreator = new javax.swing.JLabel(Lang.getInstance().translate("Sender") + ":");
+        jLabelRecipient = new javax.swing.JLabel(Lang.getInstance().translate("Recipient") + ":");
+        jComboBoxCreator = new javax.swing.JComboBox<>();
         jLabelTXTitle = new javax.swing.JLabel();
         jlabel_RecipientDetail = new javax.swing.JLabel();
         jLabel_Title = new javax.swing.JLabel();
@@ -624,7 +636,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jComboBox_Asset = new javax.swing.JComboBox<>();
         jLabel_Amount = new javax.swing.JLabel();
         jTextField_Amount = new MDecimalFormatedTextField();
-        jLabel_AmountHave = new javax.swing.JLabel();
+        jLabel_Balances = new javax.swing.JLabel();
         jLabel_Fee = new javax.swing.JLabel();
         jComboBox_Fee = new javax.swing.JComboBox<>();
         jButton_ok = new javax.swing.JButton();
@@ -670,18 +682,18 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         add(jLabel_Title, gridBagConstraints);
 
         labelGBC.gridy = ++gridy;
-        add(jLabel_Account, labelGBC);
+        add(jLabelCreator, labelGBC);
         fieldGBC.gridy = gridy;
-        add(jComboBox_Account, fieldGBC);
+        add(jComboBoxCreator, fieldGBC);
 
         labelGBC.gridy = ++gridy;
-        add(jLabel_To, labelGBC);
+        add(jLabelRecipient, labelGBC);
         recipientAddress = new RecipientAddress(this, recipient);
         fieldGBC.gridy = gridy;
         add(recipientAddress, fieldGBC);
 
         labelGBC.gridy = ++gridy;
-        add(jLabel_Recive_Detail, labelGBC);
+        add(jLabelRecipientDetail, labelGBC);
         fieldGBC.gridy = gridy;
         add(jlabel_RecipientDetail, fieldGBC);
 
@@ -734,12 +746,12 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         gridBagConstraints.insets = fieldGBC.insets;
         add(jTextField_Amount, gridBagConstraints);
 
-        jLabel_AmountHave.setHorizontalAlignment(SwingConstants.RIGHT);
+        jLabel_Balances.setHorizontalAlignment(SwingConstants.RIGHT);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = fieldGBC.gridx + 4;
         gridBagConstraints.gridy = gridy;
         gridBagConstraints.insets = fieldGBC.insets;
-        add(jLabel_AmountHave, gridBagConstraints);
+        add(jLabel_Balances, gridBagConstraints);
 
         labelGBC.gridy = ++gridy;
         add(jLabel_Fee, labelGBC);
@@ -808,20 +820,20 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
     public javax.swing.JButton jButton_ok;
     private javax.swing.JCheckBox jCheckBox_Encrypt;
     private javax.swing.JCheckBox jCheckBox_isText;
-    private javax.swing.JComboBox<Account> jComboBox_Account;
+    private javax.swing.JComboBox<Account> jComboBoxCreator;
     public javax.swing.JComboBox<ItemCls> jComboBox_Asset;
     private javax.swing.JComboBox<String> jComboBox_Fee;
     private javax.swing.JLabel jLabel_Asset;
     private javax.swing.JLabel jLabel_AssetType;
-    private javax.swing.JLabel jLabel_Account;
+    private javax.swing.JLabel jLabelCreator;
     private javax.swing.JLabel jLabel_Amount;
-    private javax.swing.JLabel jLabel_AmountHave;
+    private javax.swing.JLabel jLabel_Balances;
     private javax.swing.JLabel jLabel_Fee;
     private javax.swing.JLabel jLabel_Mess;
     private javax.swing.JLabel jLabelTXTitle;
-    public javax.swing.JLabel jLabel_Recive_Detail;
+    public javax.swing.JLabel jLabelRecipientDetail;
     public javax.swing.JLabel jLabel_Title;
-    public javax.swing.JLabel jLabel_To;
+    public javax.swing.JLabel jLabelRecipient;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea_Account_Description;

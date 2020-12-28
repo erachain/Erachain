@@ -135,12 +135,12 @@ public class WalletNotifyTimer<U> implements Observer {
                         if (settings.isSoundNewTransactionEnabled())
                             sound = "outcometransaction.wav";
 
-                        head = lang.translate("Outcome transaction") + ": " + transaction.viewFullTypeName();
+                        head = lang.translate("Outcome transaction") + ": " + lang.translate(transaction.viewFullTypeName());
                         message = transaction.getTitle();
                     } else {
                         if (settings.isSoundNewTransactionEnabled())
                             sound = "incometransaction.wav";
-                        head = lang.translate("Income transaction") + ": " + transaction.viewFullTypeName();
+                        head = lang.translate("Income transaction") + ": " + lang.translate(transaction.viewFullTypeName());
                         message = transaction.getTitle();
                     }
                 }

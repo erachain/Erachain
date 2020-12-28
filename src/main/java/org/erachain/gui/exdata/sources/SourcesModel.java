@@ -82,7 +82,8 @@ public class SourcesModel extends DefaultTableModel {
                 Transaction result = Controller.getInstance().getTransaction(seqNo);
                 if (result != null) {
                     super.setValueAt(aValue, row, column);
-                    super.setValueAt(result.toStringShortAsCreator(), row, NAME_COL);
+
+                    super.setValueAt(result.toStringFullAndCreatorLang(), row, NAME_COL);
                     if (getRowCount() - 1 == row)
                         this.addEmpty();
 

@@ -728,7 +728,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                 }
 
                 String actionName = tx.viewFullTypeName();
-                amountStr = "<b><font size='3'>" + actionName + " "
+                amountStr = "<b><font size='3'>" + Lang.getInstance().translate(actionName) + " "
                         //+ Lang.getInstance().translate("Amount") + ": "
                         + NumberAsString.formatAsString(this.amount) + "</font> "
                         // TODO ошибка открытия

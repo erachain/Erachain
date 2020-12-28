@@ -115,7 +115,7 @@ public abstract class IssueItemPanel extends IconPanel {
         if (parentTx == null) {
             exLinkDescription.setText(Lang.getInstance().translate("Not Found") + "!");
         } else {
-            exLinkDescription.setText(parentTx.toStringShortAsCreator());
+            exLinkDescription.setText(parentTx.toStringFullAndCreatorLang());
         }
     }
 
