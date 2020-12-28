@@ -516,17 +516,17 @@ public class ExPays {
         return toJson;
     }
 
-    public void calcPayoutsForMethodTotal() {
+    public boolean calcPayoutsForMethodTotal() {
 
         if (filteredPayoutsCount == 0)
-            return;
+            return false;
 
         // нужно подсчитать выплаты по общей сумме балансов
         int scale = asset.getScale();
-        BigDecimal totalBalances = (BigDecimal) filteredPayouts.get(filteredPayoutsCount).c;
+        BigDecimal totalBalances = filteredPayouts.get(filteredPayoutsCount).c;
         if (totalBalances.signum() == 0)
             // возможно это просто высылка писем всем - без перечислений
-            return;
+            return false;
 
         BigDecimal coefficient = payMethodValue.divide(totalBalances,
                 scale + Order.powerTen(totalBalances) + 3, RoundingMode.HALF_DOWN);
@@ -534,8 +534,10 @@ public class ExPays {
             Fun.Tuple3 item = filteredPayouts.get(index);
             BigDecimal amount = (BigDecimal) item.b;
             filteredPayouts.set(index, new Fun.Tuple3(item.a, item.b,
-                    amount.multiply(coefficient).setScale(scale)));
+                    amount.multiply(coefficient).setScale(scale, RoundingMode.DOWN)));
         }
+
+        return true;
     }
 
     public long getLongFee() {
@@ -600,9 +602,13 @@ public class ExPays {
                 totalPay = payMethodValue;
             }
 
+            // возьмем знаки (минус) для создания позиции баланса такой
+            Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
+            Long key = signs.a * assetKey;
+
             // проверим как будто всю сумму одному переводим
             int result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
-                    assetKey, asset, totalPay, recipient,
+                    key, asset, signs.b > 0 ? totalPay : totalPay, recipient,
                     backward, rNote.getFee(), null, false, actionFlags);
             if (result != Transaction.VALIDATE_OK) {
                 errorValue = "Payouts: on isValidAction";
@@ -610,7 +616,9 @@ public class ExPays {
             }
 
             if (filterTXType == PAYMENT_METHOD_TOTAL) {
-                calcPayoutsForMethodTotal();
+                if (!calcPayoutsForMethodTotal())
+                    // не удалось просчитать значения
+                    return Transaction.VALIDATE_OK;
             }
 
             ////////// TODO NEED CHECK ALL
@@ -625,7 +633,7 @@ public class ExPays {
                     BigDecimal amount = (BigDecimal) item.c;
 
                     result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
-                            assetKey, asset, amount, recipient,
+                            key, asset, signs.b > 0 ? amount : amount.negate(), recipient,
                             backward, BigDecimal.ZERO, null, false, actionFlags);
 
                     if (result != Transaction.VALIDATE_OK) {
@@ -818,7 +826,9 @@ public class ExPays {
             return;
 
         if (payMethod == PAYMENT_METHOD_TOTAL) {
-            calcPayoutsForMethodTotal();
+            if (!calcPayoutsForMethodTotal())
+                // не удалось просчитать значения
+                return;
         }
 
         height = rNote.getBlockHeight();
@@ -841,7 +851,11 @@ public class ExPays {
             return;
 
         if (payMethod == PAYMENT_METHOD_TOTAL) {
-            calcPayoutsForMethodTotal();
+            if (payMethod == PAYMENT_METHOD_TOTAL) {
+                if (!calcPayoutsForMethodTotal())
+                    // не удалось просчитать значения
+                    return;
+            }
         }
 
         height = rNote.getBlockHeight();
