@@ -86,7 +86,7 @@ function template(data) {
     if (data.template.icon.length > 0) output += '<img src="data:image/gif;base64,' + data.template.icon + '" style="width:50px;"/> ';
     output += data.template.name + '</a></h3>';
 
-    output += '<h4> [ <input id="key1" name="template" size="4" type="text" value="' + data.template.key + '" class="" style="font-size: 1em;"'
+    output += '<h4> [ <input id="key1" name="template" size="8" type="text" value="' + data.template.key + '" class="" style="font-size: 1em;"'
                    + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
     //output += data.template.Label_seqNo + ': ' +'<a href=?tx=' + data.template.seqNo + get_lang() + '><b>' + data.template.seqNo + '</b></a></h4>';
     output += '<a href=?tx=' + data.template.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.template.seqNo + '</b></a>';
