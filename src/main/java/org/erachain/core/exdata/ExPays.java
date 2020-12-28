@@ -55,6 +55,11 @@ public class ExPays {
     private static final byte PAYMENT_METHOD_COEFF = 1; // by coefficient
     private static final byte PAYMENT_METHOD_ABSOLUTE = 2; // by ABSOLUTE VALUE
 
+    private static final byte FILTER_PERSON_NONE = 0;
+    private static final byte FILTER_PERSON_ONLY = 1;
+    private static final byte FILTER_PERSON_ONLY_MAN = 2;
+    private static final byte FILTER_PERSON_ONLY_WOMAN = 3;
+
     private static final byte NOT_FILTER_PERSONS = -1; //
     private static final byte NOT_FILTER_GENDER = -2; //
 
@@ -83,7 +88,7 @@ public class ExPays {
     private Long filterTXStartSeqNo; // 44
     public Long filterTXEndSeqNo; // 52
 
-    private final Integer filterByGender; // 53 = gender or all
+    private final int filterByGender; // 53 = gender or all
     public boolean selfPay; // 54
 
     /////////////////
@@ -99,8 +104,7 @@ public class ExPays {
 
     /**
      * make FLAGS internal
-     *
-     * @param flags
+     *  @param flags
      * @param assetKey
      * @param balancePos
      * @param backward
@@ -123,7 +127,7 @@ public class ExPays {
                   Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
                   BigDecimal filterBalanceMIN, BigDecimal filterBalanceMAX,
                   int filterTXType, Long filterTXStartSeqNo, Long filterTXEndSeqNo,
-                  Integer filterByGender, boolean selfPay) {
+                  int filterByGender, boolean selfPay) {
         this.flags = flags;
 
         if (assetKey != null && assetKey != 0L && payMethodValue != null && payMethodValue.signum() != 0) {
@@ -276,7 +280,7 @@ public class ExPays {
             outStream.write(Longs.toByteArray(this.filterTXEndSeqNo));
         }
 
-        outStream.write(new byte[]{(byte) filterTXType, (byte) (int) filterByGender, (byte) (selfPay ? 1 : 0)});
+        outStream.write(new byte[]{(byte) filterTXType, (byte) filterByGender, (byte) (selfPay ? 1 : 0)});
 
         return outStream.toByteArray();
 
@@ -314,7 +318,7 @@ public class ExPays {
         int scale;
         int len;
 
-        int flags = Ints.fromByteArray(Arrays.copyOfRange(data, position, Integer.BYTES));
+        int flags = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + Integer.BYTES));
         position += Integer.BYTES;
 
         Long assetKey = null;
@@ -431,7 +435,7 @@ public class ExPays {
                                                   Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
                                                   String filterBalanceMoreThen, String filterBalanceLessThen,
                                                   int filterTXType, String filterTXStartStr, String filterTXEndStr,
-                                                  Integer filterByPerson, boolean selfPay) {
+                                                  int filterByPerson, boolean selfPay) {
 
         int steep = 0;
         BigDecimal amountMinBG;
@@ -512,6 +516,10 @@ public class ExPays {
     }
 
     public void calcPayoutsForMethodTotal() {
+
+        if (filteredPayoutsCount == 0)
+            return;
+
         // нужно подсчитать выплаты по общей сумме балансов
         int scale = asset.getScale();
         BigDecimal totalBalances = (BigDecimal) filteredPayouts.get(filteredPayoutsCount).c;
@@ -525,30 +533,34 @@ public class ExPays {
         }
     }
 
+    public long getLongFee() {
+        return 10L * filteredPayoutsCount;
+    }
+
     public int isValid(RSignNote rNote) {
 
-        if (hasAmount() && (
-                this.balancePos < 0 || this.balancePos > 5
-                        || this.amountMin == null
-                        || this.amountMax == null
-                        || this.payMethodValue == null
-        )
-        ) {
-            return Transaction.INVALID_AMOUNT;
+        if (hasAmount()) {
+            if (this.balancePos < 0 || this.balancePos > 5) {
+                errorValue = "Payouts: balancePos";
+                return Transaction.INVALID_AMOUNT;
+            } else if (this.payMethodValue == null) {
+                errorValue = "Payouts: payMethodValue == null";
+                return Transaction.INVALID_AMOUNT;
+            }
         }
 
-
-        if (hasAssetFilter() && (
-                this.filterBalancePos < 0 || this.filterBalancePos > 5
-                        || this.filterBalanceSide < 0 || this.filterBalanceSide > 3
-                        || this.filterBalanceMAX == null
-                        || this.filterBalanceMIN == null
-        )
-        ) {
-            return Transaction.INVALID_BACKWARD_ACTION;
+        if (hasAssetFilter()) {
+            if (this.filterBalancePos < 0 || this.filterBalancePos > 5) {
+                errorValue = "Payouts: filterBalancePos";
+                return Transaction.INVALID_BACKWARD_ACTION;
+            } else if (this.filterBalanceSide < 0 || this.filterBalanceSide > 3) {
+                errorValue = "Payouts: filterBalanceSide";
+                return Transaction.INVALID_BACKWARD_ACTION;
+            }
         }
 
-        if (this.filterTXType < 1 || this.filterTXType > 200) {
+        if (this.filterTXType != 0 && Transaction.isValidTransactionType(this.filterTXType)) {
+            errorValue = "Payouts: filterTXType";
             return Transaction.INVALID_TRANSACTION_TYPE;
         }
 
@@ -556,6 +568,7 @@ public class ExPays {
                 && assetKey.equals(filterAssetKey)
                 && balancePos == filterBalancePos) {
             // при откате невозможно тогда будет правильно рассчитать - так как съехала общая сумма
+            errorValue = "Payouts: assetKey == filterAssetKey && balancePos == filterBalancePos";
             return Transaction.INVALID_TRANSFER_TYPE;
         }
 
@@ -569,7 +582,7 @@ public class ExPays {
         } else if (filteredPayoutsCount > 0) {
             height = rNote.getBlockHeight();
 
-            totalFee = BigDecimal.valueOf(25L * filteredPayoutsCount * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+            totalFee = BigDecimal.valueOf(getLongFee() * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
 
             long actionFlags = 0L;
             Account recipient = new Account((byte[]) filteredPayouts.get(0).a);
@@ -586,8 +599,10 @@ public class ExPays {
             int result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
                     assetKey, asset, totalPay, recipient,
                     backward, rNote.getFee(), null, false, actionFlags);
-            if (result != Transaction.VALIDATE_OK)
+            if (result != Transaction.VALIDATE_OK) {
+                errorValue = "Payouts: on isValidAction";
                 return result;
+            }
 
             if (filterTXType == PAYMENT_METHOD_TOTAL) {
                 calcPayoutsForMethodTotal();
@@ -609,7 +624,7 @@ public class ExPays {
                             backward, BigDecimal.ZERO, null, false, actionFlags);
 
                     if (result != Transaction.VALIDATE_OK) {
-                        errorValue = amount.toPlainString() + " -> " + recipient.getAddress();
+                        errorValue = "Payouts: " + amount.toPlainString() + " -> " + recipient.getAddress();
                         return result;
                     }
 
@@ -624,7 +639,8 @@ public class ExPays {
 
         int scale = asset.getScale();
 
-        boolean onlyPerson = filterByGender != NOT_FILTER_PERSONS;
+        boolean onlyPerson = filterByGender > FILTER_PERSON_NONE;
+        int gender = filterByGender - FILTER_PERSON_ONLY_MAN;
         byte[] accountFrom = transaction.getCreator().getShortAddressBytes();
 
         DCSet dcSet = transaction.getDCSet();
@@ -682,11 +698,10 @@ public class ExPays {
 
                     person = (PersonCls) dcSet.getItemPersonMap().get(addressDuration.a);
 
-                    if (filterByGender != NOT_FILTER_GENDER) {
-                        if (person.getGender() != filterByGender) {
-                            continue;
-                        }
+                    if (person.getGender() != gender) {
+                        continue;
                     }
+
                 } else {
 
                     if (!selfPay && Arrays.equals(accountFrom, recipientShort)) {
@@ -745,7 +760,8 @@ public class ExPays {
             LOGGER.error(e.getMessage(), e);
         }
 
-        filteredPayouts.add(new Fun.Tuple3(null, null, totalBalances));
+        if (count > 0)
+            filteredPayouts.add(new Fun.Tuple3(null, null, totalBalances));
 
         return count;
 

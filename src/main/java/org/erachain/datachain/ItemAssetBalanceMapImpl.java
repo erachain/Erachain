@@ -82,14 +82,14 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         } else {
             switch (dbsUsed) {
                 case DBS_MAP_DB:
+                case DBS_ROCK_DB:
                     map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceMap) parent, databaseSet, this);
                     break;
-                case DBS_ROCK_DB:
-                    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database, this);
-                    break;
                 default: {
-                    if (BlockChain.HOLD_ROYALTY_PERIOD_DAYS > 0)
+                    if (true
+                            || BlockChain.HOLD_ROYALTY_PERIOD_DAYS > 0)
                         // тут нужна обработка по списку держателей Актива
+                        // ДЛЯ обработки множественных выплат нужна эта таблица а не в МЕМОКН - там нет нужных индексов
                         map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceMap) parent, databaseSet, this);
                     else
                         map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, this);
@@ -231,7 +231,9 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
 
-        if (Controller.getInstance().onlyProtocolIndexing)
+        if (false
+                && Controller.getInstance().onlyProtocolIndexing)
+            // для расчета Множественных выплат отключаем это
             return null;
 
         if (assetKey < 0)

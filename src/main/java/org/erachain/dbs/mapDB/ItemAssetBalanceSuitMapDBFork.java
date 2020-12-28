@@ -68,8 +68,12 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
             map = treeMap;
         }
 
-        if (BlockChain.HOLD_ROYALTY_PERIOD_DAYS > 0 || !Controller.getInstance().onlyProtocolIndexing) {
+        if (true
+                || BlockChain.HOLD_ROYALTY_PERIOD_DAYS > 0 || !Controller.getInstance().onlyProtocolIndexing) {
             // TODO сделать потом отдельную таблицу только для заданного Актива - для ускорения
+
+            // теперь с множественными выплатами эир НУЖНО!
+
             // если включены выплаты - то нужно этот индекс тоже делать - хотя можно отдельно по одному Активу только - нужному
 
             //BIND ASSET KEY

@@ -11,6 +11,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.ExPays;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAuthor;
 import org.erachain.core.exdata.exLink.ExLinkSource;
@@ -187,6 +188,10 @@ public class RSignNote extends Transaction implements Itemable {
     public ExLink getExLink() {
         // нельзя использовать внутренюю от Трнзакции - так как она начнет по другому байт-код делать и парсить
         return extendedData.getExLink();
+    }
+
+    public ExPays getExPays() {
+        return extendedData.getExPays();
     }
 
     @Override
@@ -790,6 +795,11 @@ public class RSignNote extends Transaction implements Itemable {
 
         if (getExLink() != null)
             long_fee += 100 * BlockChain.FEE_PER_BYTE;
+
+        ExPays exPays = extendedData.getExPays();
+        if (exPays != null) {
+            long_fee += exPays.getLongFee();
+        }
 
         if (extendedData.hasAuthors()) {
             long_fee += extendedData.getAuthors().length * 100 * BlockChain.FEE_PER_BYTE;

@@ -615,6 +615,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         errorValue = value;
     }
 
+    public static boolean isValidTransactionType(int type) {
+        return !viewTypeName(type).equals("unknown");
+    }
+
     public String getErrorValue() {
         return errorValue;
     }

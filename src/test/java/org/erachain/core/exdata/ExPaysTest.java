@@ -26,11 +26,11 @@ public class ExPaysTest {
     ;
     private BigDecimal filterBalanceMoreThen = BigDecimal.TEN;
 
-    private Integer filterTXType = 31;
+    private int filterTXType = 31;
     private Long filterTXStartSeqNo = 124213435L;
     private Long filterTXEndSeqNo = 3253245325L;
 
-    private final Integer filterByGender = 1; // = gender or all
+    private final int filterByGender = 1; // = gender or all
     private boolean selfPay = false;
 
     @Test
@@ -120,8 +120,8 @@ public class ExPaysTest {
         ///////////////////
         exPays = new ExPays(flags, null, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
                 null, filterBalancePos, filterBalanceSide,
-                filterBalanceMoreThen, filterBalanceLessThen,
-                null, filterTXStartSeqNo, filterTXEndSeqNo,
+                null, filterBalanceLessThen,
+                0, filterTXStartSeqNo, null,
                 filterByGender, selfPay);
         try {
             bytes = exPays.toBytes();
