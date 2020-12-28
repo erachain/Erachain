@@ -495,19 +495,9 @@ public class MultiPayOutsPanel extends IconPanel {
         gridBagConstraints.ipady = 10;
         jPanel3.add(jButtonCalcCompu, gridBagConstraints);
 
-        jButtonViewResult.setText(Lang.getInstance().translate("View Result"));
+        jButtonViewResult.setText(Lang.getInstance().translate("Preview Results"));
         gridBagConstraints.gridx = 1;
         jPanel3.add(jButtonViewResult, gridBagConstraints);
-
-        jButtonSend.setText(Lang.getInstance().translate("Make"));
-        jButtonSend.setFont(headFont);
-        jButtonSend.setToolTipText("");
-        gridBagConstraints.gridx = 2;
-        jPanel3.add(jButtonSend, gridBagConstraints);
-
-        jButtonCancel.setText(Lang.getInstance().translate("Cancel"));
-        gridBagConstraints.gridx = 3;
-        jPanel3.add(jButtonCancel, gridBagConstraints);
 
         fieldGBC.gridy = ++gridy;
         jPanelMain.add(jPanel3, fieldGBC);
