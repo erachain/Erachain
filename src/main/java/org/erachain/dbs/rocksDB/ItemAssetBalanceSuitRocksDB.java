@@ -95,8 +95,9 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
         indexes = new ArrayList<>();
 
-        if (BlockChain.HOLD_ROYALTY_PERIOD_DAYS > 0 || !Controller.getInstance().onlyProtocolIndexing) {
+        if (BlockChain.TEST_DB == 0) {
             // TODO сделать потом отдельную таблицу только для заданного Актива - для ускорения
+            // теперь при мульти выплатах - это протокольная таблица
             // если включены выплаты - то нужно этот индекс тоже делать - хотя можно отдельно по одному Активу только - нужному
             balanceKeyAssetIndex = new SimpleIndexDB<>(balanceKeyAssetIndexName,
                     (key, value) -> {

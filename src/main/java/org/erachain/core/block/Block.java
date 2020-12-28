@@ -2314,7 +2314,8 @@ public class Block implements Closeable, ExplorerJsonLine {
     private void makeHoldRoyalty(DCSet dcSet, boolean asOrphan) {
 
         // ловим блок когда можно начислять
-        if (BlockChain.HOLD_ROYALTY_PERIOD_DAYS <= 0 || heightBlock % (BlockChain.BLOCKS_PER_DAY(heightBlock) * BlockChain.HOLD_ROYALTY_PERIOD_DAYS) != 0)
+        if (BlockChain.HOLD_ROYALTY_PERIOD_DAYS <= 0
+                || heightBlock % (BlockChain.BLOCKS_PER_DAY(heightBlock) * BlockChain.HOLD_ROYALTY_PERIOD_DAYS) != 0)
             return;
 
         // если сумма малая - не начисляем

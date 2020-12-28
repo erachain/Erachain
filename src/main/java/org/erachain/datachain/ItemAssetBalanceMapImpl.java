@@ -86,8 +86,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
                     map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceMap) parent, databaseSet, this);
                     break;
                 default: {
-                    if (true
-                            || BlockChain.HOLD_ROYALTY_PERIOD_DAYS > 0)
+                    if (BlockChain.TEST_DB == 0)
                         // тут нужна обработка по списку держателей Актива
                         // ДЛЯ обработки множественных выплат нужна эта таблица а не в МЕМОКН - там нет нужных индексов
                         map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceMap) parent, databaseSet, this);
