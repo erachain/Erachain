@@ -1571,12 +1571,14 @@ public class ExData {
             Account templateOwner = template.getOwner();
 
             BigDecimal royaltyFee = getRoyaltyFeeBG();
-            templateOwner.changeBalance(dcSet, false, false, Transaction.FEE_KEY, royaltyFee, false, false, false);
-            // учтем что получили бонусы
-            templateOwner.changeCOMPUBonusBalances(dcSet, false, royaltyFee, Transaction.BALANCE_SIDE_DEBIT);
+            if (royaltyFee != null && royaltyFee.signum() != 0) {
+                templateOwner.changeBalance(dcSet, false, false, Transaction.FEE_KEY, royaltyFee, false, false, false);
+                // учтем что получили бонусы
+                templateOwner.changeCOMPUBonusBalances(dcSet, false, royaltyFee, Transaction.BALANCE_SIDE_DEBIT);
 
-            transaction.addCalculated(block, templateOwner, Transaction.FEE_KEY, royaltyFee,
-                    Lang.getInstance().translate("template royalty for %1").replace("%1", "" + templateKey));
+                transaction.addCalculated(block, templateOwner, Transaction.FEE_KEY, royaltyFee,
+                        Lang.getInstance().translate("template royalty for %1").replace("%1", "" + templateKey));
+            }
 
         }
 
@@ -1603,9 +1605,11 @@ public class ExData {
             Account templateOwner = template.getOwner();
 
             BigDecimal royaltyFee = getRoyaltyFeeBG();
-            templateOwner.changeBalance(dcSet, true, false, Transaction.FEE_KEY, royaltyFee, false, false, false);
-            // учтем что получили бонусы
-            templateOwner.changeCOMPUBonusBalances(dcSet, true, royaltyFee, Transaction.BALANCE_SIDE_DEBIT);
+            if (royaltyFee != null && royaltyFee.signum() != 0) {
+                templateOwner.changeBalance(dcSet, true, false, Transaction.FEE_KEY, royaltyFee, false, false, false);
+                // учтем что получили бонусы
+                templateOwner.changeCOMPUBonusBalances(dcSet, true, royaltyFee, Transaction.BALANCE_SIDE_DEBIT);
+            }
 
         }
     }
