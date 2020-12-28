@@ -262,7 +262,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     // 
     // TYPES *******
     // universal
-    public static final int EXTENDED = 0;
+    public static final int EXTENDED = 1;
     // genesis
     public static final int GENESIS_ISSUE_ASSET_TRANSACTION = 1;
     public static final int GENESIS_ISSUE_TEMPLATE_TRANSACTION = 2;
@@ -688,6 +688,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public static Integer[] getTransactionTypes() {
         return new Integer[]{
+                0,
                 ISSUE_ASSET_TRANSACTION,
                 ISSUE_IMPRINT_TRANSACTION,
                 ISSUE_TEMPLATE_TRANSACTION,

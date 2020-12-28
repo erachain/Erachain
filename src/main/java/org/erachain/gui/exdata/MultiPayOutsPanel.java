@@ -55,10 +55,12 @@ public class MultiPayOutsPanel extends IconPanel {
                 Lang.getInstance().translate("Total Credit")
         }));
         jComboBoxFilterSideBalance.setSelectedIndex(1);
+
         jComboBoxTXTypeFilter.setModel(new javax.swing.DefaultComboBoxModel<Integer>(Transaction.getTransactionTypes()));
+        jComboBoxTXTypeFilter.addItem(-1);
         jComboBoxTXTypeFilter.setRenderer(new RenderComboBoxActionFilter());
 
-        jComboBoxPyoutAction.setRenderer(new RenderComboBoxAssetActions());
+        jComboBoxPayoutAction.setRenderer(new RenderComboBoxAssetActions());
         jComboBoxPayoutAsset.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -90,6 +92,15 @@ public class MultiPayOutsPanel extends IconPanel {
             }
         });
 
+        jButtonViewResult.addActionListener(new ActionListener() {
+            // create Hashs
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ExPays pays = getPayouts().a;
+                //pays.process();
+            }
+        });
+
     }
 
     public void updateAction() {
@@ -101,7 +112,7 @@ public class MultiPayOutsPanel extends IconPanel {
         if (creator == null)
             return;
 
-        jComboBoxPyoutAction.setModel(new javax.swing.DefaultComboBoxModel(
+        jComboBoxPayoutAction.setModel(new javax.swing.DefaultComboBoxModel(
                 asset.viewAssetTypeActionsList(creator.equals(asset.getOwner()), false).toArray()));
 
     }
@@ -139,7 +150,7 @@ public class MultiPayOutsPanel extends IconPanel {
         jLabel13 = new javax.swing.JLabel();
         jLabelTitle = new javax.swing.JLabel();
         jComboBoxPayoutAsset = new javax.swing.JComboBox<>();
-        jComboBoxPyoutAction = new javax.swing.JComboBox<>();
+        jComboBoxPayoutAction = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
         jComboBoxFilterAsset = new javax.swing.JComboBox<>();
         jLabelBalancePosition = new javax.swing.JLabel();
@@ -170,8 +181,6 @@ public class MultiPayOutsPanel extends IconPanel {
         jPanelMain = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jButtonViewResult = new javax.swing.JButton();
-        jButtonCancel = new javax.swing.JButton();
-        jButtonSend = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jCheckBoxSelfPay = new javax.swing.JCheckBox();
         jCheckBoxPayoutsUse = new javax.swing.JCheckBox();
@@ -253,7 +262,7 @@ public class MultiPayOutsPanel extends IconPanel {
         jPanelMain.add(jLabelAction, labelGBC);
 
         fieldGBC.gridy = gridy;
-        jPanelMain.add(jComboBoxPyoutAction, fieldGBC);
+        jPanelMain.add(jComboBoxPayoutAction, fieldGBC);
 
         separateBGC.gridy = ++gridy;
         jPanelMain.add(jSeparator1, separateBGC);
@@ -516,28 +525,28 @@ public class MultiPayOutsPanel extends IconPanel {
         if (!jPanelMain.isVisible())
             return new Fun.Tuple2<>(null, null);
 
-        boolean backward = false;
+        Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> balancePosition
+                = (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>) jComboBoxPayoutAction.getSelectedItem();
+
+        Integer txTypeFilter = (Integer) jComboBoxTXTypeFilter.getSelectedItem();
 
         return ExPays.make(((AssetCls) jComboBoxPayoutAsset.getSelectedItem()).getKey(),
-                jComboBoxFilterBalancePosition.getSelectedIndex(), backward,
-                jTextFieldPaymentMin.getText(),
-                jTextFieldPaymentMax.getText(), jComboBoxMethodPaymentType.getSelectedIndex(),
-                jTextFieldAmount.getText(),
+                balancePosition.a.a, balancePosition.a.b,
+                jComboBoxMethodPaymentType.getSelectedIndex(), jTextFieldAmount.getText(), jTextFieldPaymentMin.getText(),
+                jTextFieldPaymentMax.getText(),
                 ((AssetCls) jComboBoxFilterAsset.getSelectedItem()).getKey(),
                 jComboBoxFilterSideBalance.getSelectedIndex(), jComboBoxFilterBalancePosition.getSelectedIndex(),
-                jTextFieldLQ.getText(), jTextFieldBQ.getText(),
-                (Integer) jComboBoxTXTypeFilter.getSelectedItem(),
+                jTextFieldBQ.getText(), jTextFieldLQ.getText(),
+                txTypeFilter,
                 jTextFieldDateStart.getText(), jTextFieldDateEnd.getText(),
                 jComboBoxPersonFilter.getSelectedIndex(), jCheckBoxSelfPay.isSelected());
     }
 
     private javax.swing.JButton jButtonCalcCompu;
-    private javax.swing.JButton jButtonCancel;
-    private javax.swing.JButton jButtonSend;
     private javax.swing.JButton jButtonViewResult;
     private javax.swing.JCheckBox jCheckBoxPayoutsUse;
     private javax.swing.JCheckBox jCheckBoxSelfPay;
-    private javax.swing.JComboBox<String> jComboBoxPyoutAction;
+    private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxPayoutAction;
     private javax.swing.JComboBox<ItemCls> jComboBoxPayoutAsset;
     private javax.swing.JComboBox<String> jComboBoxMethodPaymentType;
     private javax.swing.JComboBox<ItemCls> jComboBoxFilterAsset;

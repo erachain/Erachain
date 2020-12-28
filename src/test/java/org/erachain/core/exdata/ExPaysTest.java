@@ -36,9 +36,9 @@ public class ExPaysTest {
     @Test
     public void toByte() {
 
-        ExPays exPays = new ExPays(flags, assetKey, balancePos, backward, amountMin, amountMax,
-                payMethod, payMethodValue, filterAssetKey, filterBalancePos, filterBalanceSide,
-                filterBalanceLessThen, filterBalanceMoreThen,
+        ExPays exPays = new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
+                filterAssetKey, filterBalancePos, filterBalanceSide,
+                filterBalanceMoreThen, filterBalanceLessThen,
                 filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
                 filterByGender, selfPay);
         byte[] bytes = null;
@@ -56,9 +56,9 @@ public class ExPaysTest {
 
     @Test
     public void parse() {
-        ExPays exPays = new ExPays(flags, assetKey, balancePos, backward, amountMin, amountMax,
-                payMethod, payMethodValue, filterAssetKey, filterBalancePos, filterBalanceSide,
-                filterBalanceLessThen, filterBalanceMoreThen,
+        ExPays exPays = new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
+                filterAssetKey, filterBalancePos, filterBalanceSide,
+                filterBalanceMoreThen, filterBalanceLessThen,
                 filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
                 filterByGender, selfPay);
         byte[] bytes = null;
@@ -78,9 +78,9 @@ public class ExPaysTest {
         assertEquals(exPays.filterTXEndSeqNo, exPaysParsed.filterTXEndSeqNo);
 
         ///////////////////
-        exPays = new ExPays(flags, null, balancePos, backward, amountMin, amountMax,
-                payMethod, payMethodValue, filterAssetKey, filterBalancePos, filterBalanceSide,
-                filterBalanceLessThen, filterBalanceMoreThen,
+        exPays = new ExPays(flags, null, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
+                filterAssetKey, filterBalancePos, filterBalanceSide,
+                filterBalanceMoreThen, filterBalanceLessThen,
                 filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
                 filterByGender, selfPay);
         try {
@@ -98,9 +98,9 @@ public class ExPaysTest {
         assertEquals(exPays.filterTXEndSeqNo, exPaysParsed.filterTXEndSeqNo);
 
         ///////////////////
-        exPays = new ExPays(flags, null, balancePos, backward, amountMin, amountMax,
-                payMethod, payMethodValue, null, filterBalancePos, filterBalanceSide,
-                filterBalanceLessThen, filterBalanceMoreThen,
+        exPays = new ExPays(flags, null, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
+                null, filterBalancePos, filterBalanceSide,
+                filterBalanceMoreThen, filterBalanceLessThen,
                 filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
                 filterByGender, selfPay);
         try {
@@ -118,9 +118,9 @@ public class ExPaysTest {
         assertEquals(exPays.filterTXEndSeqNo, exPaysParsed.filterTXEndSeqNo);
 
         ///////////////////
-        exPays = new ExPays(flags, null, balancePos, backward, amountMin, amountMax,
-                payMethod, payMethodValue, null, filterBalancePos, filterBalanceSide,
-                filterBalanceLessThen, filterBalanceMoreThen,
+        exPays = new ExPays(flags, null, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
+                null, filterBalancePos, filterBalanceSide,
+                filterBalanceMoreThen, filterBalanceLessThen,
                 null, filterTXStartSeqNo, filterTXEndSeqNo,
                 filterByGender, selfPay);
         try {

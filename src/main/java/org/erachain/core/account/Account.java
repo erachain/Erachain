@@ -205,7 +205,7 @@ public class Account {
      * @return
      */
     public static int balancePosition(long key, BigDecimal amount, boolean isBackward, boolean isDirect) {
-        if (key == 0l || amount == null || amount.signum() == 0)
+        if (key == 0L || amount == null || amount.signum() == 0)
             return 0;
 
         int type;
@@ -229,6 +229,31 @@ public class Account {
         }
 
         return type;
+
+    }
+
+    /**
+     * Sign asset + sign amount
+     *
+     * @param action
+     * @return
+     */
+    public static Tuple2<Integer, Integer> getSignsForAction(int action) {
+
+        switch (action) {
+            case TransactionAmount.ACTION_SEND:
+            case TransactionAmount.ACTION_PLEDGE:
+                return new Tuple2(1, 1);
+            case TransactionAmount.ACTION_HOLD:
+            case TransactionAmount.ACTION_RESERCED_6:
+                return new Tuple2(1, -1);
+            case TransactionAmount.ACTION_DEBT:
+                return new Tuple2(-1, 1);
+            case TransactionAmount.ACTION_SPEND:
+                return new Tuple2(-1, -1);
+        }
+
+        return null;
 
     }
 

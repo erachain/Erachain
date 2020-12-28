@@ -39,12 +39,13 @@ import java.util.List;
 
 public class ExPays {
 
-    public static final byte BASE_LENGTH = 4 + 2;
+    public static final byte BASE_LENGTH = 4 + 3;
 
     public static final int MAX_COUNT = Integer.MAX_VALUE >> 1;
     private static final byte AMOUNT_FLAG_MASK = 64;
     private static final byte BALANCE_FLAG_MASK = 32;
-    private static final byte TXTYPE_FLAG_MASK = 16;
+    private static final byte ACTIVE_START_FLAG_MASK = 16;
+    private static final byte ACTIVE_END_FLAG_MASK = 8;
 
     private static final byte PAYMENT_METHOD_TOTAL = 1; // by TOTAL
     private static final byte PAYMENT_METHOD_COEFF = 2; // by coefficient
@@ -70,10 +71,10 @@ public class ExPays {
     private Long filterAssetKey; // 29
     private int filterBalancePos; //30
     private int filterBalanceSide; //31
-    private BigDecimal filterBalanceLessThen; // 33
-    private BigDecimal filterBalanceMoreThen; // 35
+    private BigDecimal filterBalanceMoreThen; // 33
+    private BigDecimal filterBalanceLessThen; // 34
 
-    private Integer filterTXType; // 36
+    private int filterTXType; // 36
     private Long filterTXStartSeqNo; // 44
     public Long filterTXEndSeqNo; // 52
 
@@ -91,26 +92,47 @@ public class ExPays {
     public String errorValue;
 
 
-    public ExPays(int flags, Long assetKey, int actionType, boolean backward, BigDecimal amountMin, BigDecimal amountMax,
-                  int payMethod, BigDecimal payMethodValue, Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
-                  BigDecimal filterBalanceLessThen, BigDecimal filterBalanceMoreThen,
-                  Integer filterTXType, Long filterTXStartSeqNo, Long filterTXEndSeqNo,
+    /**
+     * make FLAGS internal
+     *
+     * @param flags
+     * @param assetKey
+     * @param actionType
+     * @param backward
+     * @param payMethod
+     * @param payMethodValue
+     * @param amountMin
+     * @param amountMax
+     * @param filterAssetKey
+     * @param filterBalancePos
+     * @param filterBalanceSide
+     * @param filterBalanceMoreThen
+     * @param filterBalanceLessThen
+     * @param filterTXType
+     * @param filterTXStartSeqNo
+     * @param filterTXEndSeqNo
+     * @param filterByGender
+     * @param selfPay
+     */
+    public ExPays(int flags, Long assetKey, int actionType, boolean backward, int payMethod, BigDecimal payMethodValue, BigDecimal amountMin, BigDecimal amountMax,
+                  Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
+                  BigDecimal filterBalanceMoreThen, BigDecimal filterBalanceLessThen,
+                  int filterTXType, Long filterTXStartSeqNo, Long filterTXEndSeqNo,
                   Integer filterByGender, boolean selfPay) {
         this.flags = flags;
 
-        if (assetKey != null && assetKey != 0) {
+        if (assetKey != null && assetKey != 0L && payMethodValue != null && payMethodValue.signum() != 0) {
             this.flags |= AMOUNT_FLAG_MASK;
             this.assetKey = assetKey;
             this.actionType = actionType;
             this.backward = backward;
-            this.amountMin = amountMin;
-            this.amountMax = amountMax;
             this.payMethod = payMethod;
             this.payMethodValue = payMethodValue;
+            this.amountMin = amountMin;
+            this.amountMax = amountMax;
         }
 
-
-        if (filterAssetKey != null && filterAssetKey != 0) {
+        if (filterAssetKey != null && filterAssetKey != 0L) {
             this.flags |= BALANCE_FLAG_MASK;
             this.filterAssetKey = filterAssetKey;
             this.filterBalancePos = filterBalancePos;
@@ -119,10 +141,14 @@ public class ExPays {
             this.filterBalanceMoreThen = filterBalanceMoreThen;
         }
 
-        if (filterTXType != null && filterTXType != 0) {
-            this.flags |= TXTYPE_FLAG_MASK;
-            this.filterTXType = filterTXType;
+        this.filterTXType = filterTXType;
+
+        if (filterTXStartSeqNo != null && filterTXStartSeqNo != 0) {
+            this.flags |= ACTIVE_START_FLAG_MASK;
             this.filterTXStartSeqNo = filterTXStartSeqNo;
+        }
+        if (filterTXEndSeqNo != null && filterTXEndSeqNo != 0) {
+            this.flags |= ACTIVE_END_FLAG_MASK;
             this.filterTXEndSeqNo = filterTXEndSeqNo;
         }
 
@@ -138,8 +164,12 @@ public class ExPays {
         return (this.flags & BALANCE_FLAG_MASK) != 0;
     }
 
-    public boolean hasTXTypeFilter() {
-        return (this.flags & TXTYPE_FLAG_MASK) != 0;
+    public boolean hasTXTypeFilterActiveStart() {
+        return (this.flags & ACTIVE_START_FLAG_MASK) != 0;
+    }
+
+    public boolean hasTXTypeFilterActiveEnd() {
+        return (this.flags & ACTIVE_END_FLAG_MASK) != 0;
     }
 
     public void setDC(DCSet dcSet) {
@@ -184,20 +214,23 @@ public class ExPays {
             buff = new byte[]{(byte) filterBalancePos, (byte) filterBalanceSide};
             outStream.write(buff);
 
-            outStream.write(this.filterBalanceLessThen.scale());
-            buff = this.filterBalanceLessThen.unscaledValue().toByteArray();
-            outStream.write(buff.length);
-            outStream.write(buff);
-
             outStream.write(this.filterBalanceMoreThen.scale());
             buff = this.filterBalanceMoreThen.unscaledValue().toByteArray();
             outStream.write(buff.length);
             outStream.write(buff);
+
+            outStream.write(this.filterBalanceLessThen.scale());
+            buff = this.filterBalanceLessThen.unscaledValue().toByteArray();
+            outStream.write(buff.length);
+            outStream.write(buff);
         }
 
-        if (hasTXTypeFilter()) {
-            outStream.write(filterTXType);
+        outStream.write(filterTXType);
+
+        if (hasTXTypeFilterActiveStart()) {
             outStream.write(Longs.toByteArray(this.filterTXStartSeqNo));
+        }
+        if (hasTXTypeFilterActiveEnd()) {
             outStream.write(Longs.toByteArray(this.filterTXEndSeqNo));
         }
 
@@ -219,12 +252,15 @@ public class ExPays {
 
         if (hasAssetFilter()) {
             len += Transaction.KEY_LENGTH + 2 + 4
-                    + filterBalanceLessThen.unscaledValue().toByteArray().length
-                    + filterBalanceMoreThen.unscaledValue().toByteArray().length;
+                    + filterBalanceMoreThen.unscaledValue().toByteArray().length
+                    + filterBalanceLessThen.unscaledValue().toByteArray().length;
         }
 
-        if (hasTXTypeFilter()) {
-            len += 1 + 8 + 8;
+        if (hasTXTypeFilterActiveStart()) {
+            len += 8;
+        }
+        if (hasTXTypeFilterActiveEnd()) {
+            len += 8;
         }
 
         return len;
@@ -287,54 +323,72 @@ public class ExPays {
 
             scale = data[position++];
             len = data[position++];
-            filterBalanceLessThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
+            filterBalanceMoreThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
             position += len;
 
             scale = data[position++];
             len = data[position++];
-            filterBalanceMoreThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
+            filterBalanceLessThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
             position += len;
 
         }
 
-        Integer filterTXType = null;
+        int filterTXType = data[position++];
         Long filterTXStart = null;
         Long filterTXEnd = null;
 
-        if ((flags & TXTYPE_FLAG_MASK) != 0) {
-
-            filterTXType = (int) data[position++];
-
+        if ((flags & ACTIVE_START_FLAG_MASK) != 0) {
             filterTXStart = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));
             position += Long.BYTES;
-
+        }
+        if ((flags & ACTIVE_END_FLAG_MASK) != 0) {
             filterTXEnd = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));
             position += Long.BYTES;
-
         }
 
         int filterByPerson = data[position++];
         boolean selfPay = data[position++] > 0;
 
-        return new ExPays(flags, assetKey, balancePos, backward, amountMin, amountMax,
-                payMethod, payMethodValue, filterAssetKey, filterBalancePos, filterBalanceSide,
-                filterBalanceLessThen, filterBalanceMoreThen,
+        return new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
+                filterAssetKey, filterBalancePos, filterBalanceSide,
+                filterBalanceMoreThen, filterBalanceLessThen,
                 filterTXType, filterTXStart, filterTXEnd,
                 filterByPerson, selfPay);
     }
 
-    public static Fun.Tuple2<ExPays, String> make(Long assetKey, int balancePos, boolean backward, String amountMin, String amountMax,
-                                                  int payMethod, String payMethodValue, Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
-                                                  String filterBalanceLessThen, String filterBalanceMoreThen,
-                                                  Integer filterTXType, String filterTXStartStr, String filterTXEndStr,
+    /**
+     * @param assetKey
+     * @param balancePos
+     * @param backward
+     * @param payMethod
+     * @param payMethodValue
+     * @param amountMin
+     * @param amountMax
+     * @param filterAssetKey
+     * @param filterBalancePos
+     * @param filterBalanceSide
+     * @param filterBalanceMoreThen
+     * @param filterBalanceLessThen
+     * @param filterTXType
+     * @param filterTXStartStr      as SeqNo: 123-1
+     * @param filterTXEndStr        as SeqNo: 123-1
+     * @param filterByPerson
+     * @param selfPay
+     * @return
+     */
+    public static Fun.Tuple2<ExPays, String> make(Long assetKey, int balancePos, boolean backward,
+                                                  int payMethod, String payMethodValue, String amountMin, String amountMax,
+                                                  Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
+                                                  String filterBalanceMoreThen, String filterBalanceLessThen,
+                                                  int filterTXType, String filterTXStartStr, String filterTXEndStr,
                                                   Integer filterByPerson, boolean selfPay) {
 
         int steep = 0;
         BigDecimal amountMinBG;
         BigDecimal amountMaxBG;
         BigDecimal payMethodValueBG;
-        BigDecimal filterBalanceLessThenBG;
         BigDecimal filterBalanceMoreThenBG;
+        BigDecimal filterBalanceLessThenBG;
         Long filterTXStart;
         Long filterTXEnd;
         try {
@@ -344,13 +398,13 @@ public class ExPays {
             ++steep;
             payMethodValueBG = payMethodValue == null || payMethodValue.isEmpty() ? null : new BigDecimal(payMethodValue);
             ++steep;
-            filterBalanceLessThenBG = filterBalanceLessThen == null || filterBalanceLessThen.isEmpty() ? null : new BigDecimal(filterBalanceLessThen);
-            ++steep;
             filterBalanceMoreThenBG = filterBalanceMoreThen == null || filterBalanceMoreThen.isEmpty() ? null : new BigDecimal(filterBalanceMoreThen);
             ++steep;
-            filterTXStart = filterTXStartStr == null || filterTXStartStr.isEmpty() ? null : new Long(filterTXStartStr);
+            filterBalanceLessThenBG = filterBalanceLessThen == null || filterBalanceLessThen.isEmpty() ? null : new BigDecimal(filterBalanceLessThen);
             ++steep;
-            filterTXEnd = filterTXEndStr == null || filterTXEndStr.isEmpty() ? null : new Long(filterTXEndStr);
+            filterTXStart = filterTXStartStr == null || filterTXStartStr.isEmpty() ? null : Transaction.parseDBRef(filterTXStartStr);
+            ++steep;
+            filterTXEnd = filterTXEndStr == null || filterTXEndStr.isEmpty() ? null : Transaction.parseDBRef(filterTXEndStr);
         } catch (Exception e) {
             String error;
             switch (steep) {
@@ -364,10 +418,10 @@ public class ExPays {
                     error = "Wrong payMethodValue";
                     break;
                 case 3:
-                    error = "Wrong filterBalanceLessThen";
+                    error = "Wrong filterBalanceMoreThen";
                     break;
                 case 4:
-                    error = "Wrong filterBalanceMoreThen";
+                    error = "Wrong filterBalanceLessThen";
                     break;
                 case 5:
                     error = "Wrong filterTXStartStr";
@@ -382,9 +436,9 @@ public class ExPays {
         }
 
         int flags = 0;
-        return new Fun.Tuple2<>(new ExPays(flags, assetKey, balancePos, backward, amountMinBG, amountMaxBG,
-                payMethod, payMethodValueBG, filterAssetKey, filterBalancePos, filterBalanceSide,
-                filterBalanceLessThenBG, filterBalanceMoreThenBG,
+        return new Fun.Tuple2<>(new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValueBG, amountMinBG, amountMaxBG,
+                filterAssetKey, filterBalancePos, filterBalanceSide,
+                filterBalanceMoreThenBG, filterBalanceLessThenBG,
                 filterTXType, filterTXStart, filterTXEnd,
                 filterByPerson, selfPay), null);
 
@@ -444,9 +498,7 @@ public class ExPays {
             return Transaction.INVALID_BACKWARD_ACTION;
         }
 
-        if (hasTXTypeFilter() && (
-                this.filterTXType < 0 || this.filterTXType > 200
-        )) {
+        if (this.filterTXType < 1 || this.filterTXType > 200) {
             return Transaction.INVALID_TRANSACTION_TYPE;
         }
 
@@ -558,16 +610,16 @@ public class ExPays {
 
                 balance = Account.balanceInPositionAndSide(balancesMap.get(key), filterBalancePos, filterBalanceSide);
 
-                if (filterBalanceLessThen != null && balance.compareTo(filterBalanceLessThen) > 0
-                        || filterBalanceMoreThen != null && balance.compareTo(filterBalanceMoreThen) < 0)
+                if (filterBalanceMoreThen != null && balance.compareTo(filterBalanceMoreThen) < 0
+                        || filterBalanceLessThen != null && balance.compareTo(filterBalanceLessThen) > 0)
                     continue;
 
-                byte[] recipentShort = ItemAssetBalanceMap.getShortAccountFromKey(key);
+                byte[] recipientShort = ItemAssetBalanceMap.getShortAccountFromKey(key);
 
                 if (onlyPerson) {
                     // так как тут сортировка по убыванию значит первым встретится тот счет на котром больше всего актива
                     // - он и будет выбран куда 1 раз пошлем актив свой
-                    addressDuration = dcSet.getAddressPersonMap().getItem(recipentShort);
+                    addressDuration = dcSet.getAddressPersonMap().getItem(recipientShort);
                     if (addressDuration == null)
                         continue;
                     if (usedPersons.contains(addressDuration.a))
@@ -587,7 +639,7 @@ public class ExPays {
                     }
                 } else {
 
-                    if (!selfPay && Arrays.equals(accountFrom, recipentShort)) {
+                    if (!selfPay && Arrays.equals(accountFrom, recipientShort)) {
                         // сами себе не платим?
                         continue;
                     }
@@ -596,7 +648,7 @@ public class ExPays {
                     person = null;
                 }
 
-                Account recipient = new Account(recipentShort);
+                Account recipient = new Account(recipientShort);
 
                 // IF send from PERSON to ANONYMOUS
                 if (andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
@@ -610,7 +662,7 @@ public class ExPays {
                 // - собранные блоки учитываем? да - иначе долго будет делать поиск
                 if (filterTXStartSeqNo != null || filterTXEndSeqNo != null) {
                     // на счете должна быть активность в заданном диаппазоне для данного типа
-                    if (!txMap.isCreatorWasActive(recipentShort, assetKey, filterTXType, filterTXEndSeqNo))
+                    if (!txMap.isCreatorWasActive(recipientShort, filterTXStartSeqNo, filterTXType, filterTXEndSeqNo))
                         continue;
                 }
 
