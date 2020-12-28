@@ -970,7 +970,7 @@ button.white-bgc[disabled]:focus,
             if (data.asset.this.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.asset.this.icon + '" style="width:50px;" /> ';
             output += data.asset.this.name + '</a></h3>';
 
-            output += '<h4> [ <input id="key1" name="asset" size="4" type="text" value="' + data.asset.this.key + '" class="" style="font-size: 1em;"'
+            output += '<h4> [ <input id="key1" name="asset" size="8" type="text" value="' + data.asset.this.key + '" class="" style="font-size: 1em;"'
                            + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
 
             if (data.asset.this.hasOwnProperty('seqNo')) {

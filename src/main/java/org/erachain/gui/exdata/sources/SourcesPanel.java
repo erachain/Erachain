@@ -11,7 +11,6 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
 
 public class SourcesPanel extends JPanel {
     public final SourcesModel sourcesModel;
@@ -78,8 +77,8 @@ public class SourcesPanel extends JPanel {
         TableColumn columnNo = columnModel.getColumn(AuthorsModel.KEY_COL);
         columnNo.setMinWidth(50);
         columnNo.setMaxWidth(150);
-        columnNo.setPreferredWidth(50);
-        columnNo.setWidth(50);
+        columnNo.setPreferredWidth(100);
+        columnNo.setWidth(100);
         columnNo.sizeWidthToFit();
 
         TableColumn columnShare = columnModel.getColumn(AuthorsModel.SHARE_COL);

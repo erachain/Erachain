@@ -612,7 +612,7 @@ public class RSignNote extends Transaction implements Itemable {
         super.process(block, forDeal);
 
         parseDataFull(); // need for take HASHES from FILES
-        extendedData.process(this);
+        extendedData.process(this, block);
 
         byte[][] hashes = extendedData.getAllHashesAsBytes(true);
         if (hashes != null) {
@@ -621,6 +621,7 @@ public class RSignNote extends Transaction implements Itemable {
                 dcSet.getTransactionFinalMapSigns().put(hash, dbKey);
             }
         }
+
     }
 
     @Override
@@ -778,7 +779,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         long long_fee = super.calcBaseFee();
         if (long_fee == 0)
-            return 0L;
+            return getRoyaltyFee();
 
         byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
 
@@ -797,7 +798,12 @@ public class RSignNote extends Transaction implements Itemable {
             long_fee += extendedData.getSources().length * 100 * BlockChain.FEE_PER_BYTE;
         }
 
-        return long_fee;
+        return long_fee + getRoyaltyFee();
+    }
+
+    @Override
+    public long getRoyaltyFee() {
+        return extendedData.getRoyaltyFee();
     }
 
     public void parseDataV2WithoutFiles() {

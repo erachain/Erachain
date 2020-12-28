@@ -6,6 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
@@ -241,17 +242,29 @@ public class IssuePersonRecord extends IssueItemRecord {
         boolean isPersonAlive = person.isAlive(this.timestamp);
         if (isPersonAlive) {
             // IF PERSON is LIVE
-            if (person.getImage().length > person.getMAXimageLenght()) {
+            if (person.getImage() == null) {
+                return Transaction.INVALID_IMAGE_LENGTH_MAX;
+            }
+            int len = person.getImage().length;
+            if (len > person.getMAXimageLenght()) {
                 if (!BlockChain.CLONE_MODE && !BlockChain.TEST_MODE && height > 157640) {
                     // early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
+                    errorValue = "" + len + " > " + person.getMAXimageLenght();
                     return Transaction.INVALID_IMAGE_LENGTH_MAX;
                 }
-            } else if (person.getImage().length < person.getMINimageLenght()) {
+            } else if (len < person.getMINimageLenght()) {
                 // 2998-1 - транзакция забаненая
                 if (!BlockChain.CLONE_MODE && !BlockChain.TEST_MODE && height != 2998) {
+                    errorValue = "" + len + " < " + person.getMINimageLenght();
                     return Transaction.INVALID_IMAGE_LENGTH_MIN;
                 }
             }
+
+            if (person.getIcon() != null && person.getIcon().length > ItemCls.MAX_ICON_LENGTH) {
+                errorValue = "" + person.getIcon().length + " > " + ItemCls.MAX_ICON_LENGTH;
+                return Transaction.INVALID_ICON_LENGTH_MAX;
+            }
+
         } else {
             // person is DIE - any PHOTO
         }
