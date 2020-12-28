@@ -58,6 +58,21 @@ public class IssueImprintRecord extends IssueItemRecord {
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Imprint"; }
 
+    int minLen = 200 * 25;
+
+    @Override
+    public long calcBaseFee() {
+
+        int len = this.getDataLength(Transaction.FOR_NETWORK, true);
+
+        if (this.height > BlockChain.USE_NEW_ISSUE_FEE) {
+            if (len < minLen)
+                len = minLen;
+        }
+
+        return len * BlockChain.FEE_PER_BYTE;
+    }
+
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
         //boolean asPack = releaserReference != null;
