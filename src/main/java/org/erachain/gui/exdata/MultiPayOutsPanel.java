@@ -101,6 +101,15 @@ public class MultiPayOutsPanel extends IconPanel {
             }
         });
 
+        jButtonCalcCompu.addActionListener(new ActionListener() {
+            // create Hashs
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ExPays pays = getPayouts().a;
+                //pays.orphan()
+            }
+        });
+
     }
 
     public void updateAction() {
