@@ -256,10 +256,10 @@ public class BlockChain {
     /**
      * Новый уровень начальных номеров для всех сущностей
      */
-    public static int START_KEY_UP = MAIN_MODE ? 1650000 : DEMO_MODE ? 23000 : Integer.MAX_VALUE;
+    public static int START_KEY_UP = MAIN_MODE ? 1700000 : DEMO_MODE ? 23000 : Integer.MAX_VALUE;
     public static int START_KEY_UP_ITEMS = 1 << 20;
 
-    public static final int USE_NEW_ISSUE_FEE = MAIN_MODE ? 1650000 : 0;
+    public static final int USE_NEW_ISSUE_FEE = MAIN_MODE ? 1700000 : 0;
 
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
