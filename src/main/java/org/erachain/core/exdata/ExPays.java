@@ -523,6 +523,10 @@ public class ExPays {
         // нужно подсчитать выплаты по общей сумме балансов
         int scale = asset.getScale();
         BigDecimal totalBalances = (BigDecimal) filteredPayouts.get(filteredPayoutsCount).c;
+        if (totalBalances.signum() == 0)
+            // возможно это просто высылка писем всем - без перечислений
+            return;
+
         BigDecimal coefficient = payMethodValue.divide(totalBalances,
                 scale + Order.powerTen(totalBalances) + 3, RoundingMode.HALF_DOWN);
         for (int index = 0; index < filteredPayoutsCount; index++) {
@@ -773,24 +777,47 @@ public class ExPays {
 
     }
 
+    public void processBody(Transaction rNote, boolean asOrphan) {
+        PublicKeyAccount creator = rNote.getCreator();
+        boolean isDirect = asset.isDirectBalances();
+        long absKey = assetKey;
+        boolean incomeReverse = balancePos == TransactionAmount.ACTION_HOLD;
+
+        Account recipient;
+        for (Fun.Tuple3 item : filteredPayouts) {
+
+            recipient = (Account) item.a;
+            if (recipient == null)
+                break;
+            BigDecimal amount = (BigDecimal) item.c;
+
+            TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey, assetKey, amount, backward,
+                    isDirect, incomeReverse);
+
+        }
+
+    }
+
     public void process(Transaction rNote) {
 
         if (filteredPayouts == null) {
             filteredPayouts = new ArrayList<>();
             filteredPayoutsCount = filterPayList(rNote, false);
-            if (payMethod == PAYMENT_METHOD_TOTAL) {
-                calcPayoutsForMethodTotal();
-            }
         }
 
         if (filteredPayoutsCount == 0)
             return;
+
+        if (payMethod == PAYMENT_METHOD_TOTAL) {
+            calcPayoutsForMethodTotal();
+        }
 
         height = rNote.getBlockHeight();
         asset = dcSet.getItemAssetMap().get(assetKey);
 
         totalFee = BigDecimal.ZERO;
 
+        processBody(rNote, false);
 
     }
 
@@ -799,18 +826,21 @@ public class ExPays {
         if (filteredPayouts == null) {
             filteredPayouts = new ArrayList<>();
             filteredPayoutsCount = filterPayList(rNote, false);
-            if (payMethod == PAYMENT_METHOD_TOTAL) {
-                calcPayoutsForMethodTotal();
-            }
         }
 
         if (filteredPayoutsCount == 0)
             return;
 
+        if (payMethod == PAYMENT_METHOD_TOTAL) {
+            calcPayoutsForMethodTotal();
+        }
+
         height = rNote.getBlockHeight();
         asset = dcSet.getItemAssetMap().get(assetKey);
 
         totalFee = BigDecimal.ZERO;
+
+        processBody(rNote, true);
 
     }
 

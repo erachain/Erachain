@@ -50,9 +50,9 @@ public class ExPayoutsPanel extends IconPanel {
         }));
         jComboBoxFilterBalancePosition.setRenderer(new RenderComboBoxViewBalance());
         jComboBoxFilterSideBalance.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
-                Lang.getInstance().translate("Total Debit"),
-                Lang.getInstance().translate("Left"),
-                Lang.getInstance().translate("Total Credit")
+                Lang.getInstance().translate("Total Debit"), // Transaction.BALANCE_SIDE_DEBIT = 1
+                Lang.getInstance().translate("Left"), // BALANCE_SIDE_LEFT = 2
+                Lang.getInstance().translate("Total Credit") // BALANCE_SIDE_CREDIT = 3
         }));
         jComboBoxFilterSideBalance.setSelectedIndex(1);
 
@@ -544,7 +544,7 @@ public class ExPayoutsPanel extends IconPanel {
                 jComboBoxMethodPaymentType.getSelectedIndex(), jTextFieldAmount.getText(), jTextFieldPaymentMin.getText(),
                 jTextFieldPaymentMax.getText(),
                 ((AssetCls) jComboBoxFilterAsset.getSelectedItem()).getKey(),
-                jComboBoxFilterSideBalance.getSelectedIndex() + 1, jComboBoxFilterBalancePosition.getSelectedIndex(),
+                jComboBoxFilterBalancePosition.getSelectedIndex() + 1, jComboBoxFilterSideBalance.getSelectedIndex() + 1,
                 jTextFieldBQ.getText(), jTextFieldLQ.getText(),
                 txTypeFilter,
                 jTextFieldDateStart.getText(), jTextFieldDateEnd.getText(),

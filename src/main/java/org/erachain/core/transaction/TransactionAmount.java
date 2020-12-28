@@ -1219,9 +1219,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return VALIDATE_OK;
     }
 
-    private static void processAction(DCSet dcSet, boolean asOrphan, PublicKeyAccount creator, Account recipient,
-                                      int actionType, long absKey, long key, BigDecimal amount,
-                                      boolean backward, boolean isDirect, boolean incomeReverse) {
+    public static void processAction(DCSet dcSet, boolean asOrphan, PublicKeyAccount creator, Account recipient,
+                                     int balancePos, long absKey, long key, BigDecimal amount,
+                                     boolean backward, boolean isDirect, boolean incomeReverse) {
 
         boolean subtract = asOrphan ^ backward;
         // STANDARD ACTION PROCESS
@@ -1234,7 +1234,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // UPDATE RECIPIENT
         recipient.changeBalance(dcSet, subtract, backward, key, amount, isDirect, true, incomeReverse);
 
-        if (actionType == ACTION_DEBT) {
+        if (balancePos == ACTION_DEBT) {
             String creatorStr = creator.getAddress();
             String recipientStr = recipient.getAddress();
             Tuple3<String, Long, String> creditKey = new Tuple3<>(creatorStr, absKey, recipientStr);
