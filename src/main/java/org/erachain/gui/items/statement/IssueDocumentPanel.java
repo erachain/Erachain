@@ -73,6 +73,7 @@ public class IssueDocumentPanel extends IconPanel {
         jComboBox_Account_Work.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 exData_Panel.updateRecipients();
+                exData_Panel.multiPayOutsPanel.updateAction();
             }
         });
 

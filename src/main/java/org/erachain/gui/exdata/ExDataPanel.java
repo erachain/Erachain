@@ -329,7 +329,7 @@ public class ExDataPanel extends JPanel {
         params_Template_Model = new ParamsTemplateModel();
         jTable_Params_Message_Public = new MTable(params_Template_Model);
         docTypeAppendixPanel = new DocTypeAppendixPanel(this);
-        multiPayOutsPanel = new MultiPayOutsPanel();
+        multiPayOutsPanel = new MultiPayOutsPanel(this);
 
         params_Template_Model.addTableModelListener(new TableModelListener() {
 

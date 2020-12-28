@@ -12,6 +12,7 @@ import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -1367,48 +1368,87 @@ public abstract class AssetCls extends ItemCls {
         return viewAssetTypeAdditionAction(key, assetType, backward, actionType, isCreatorOwner);
     }
 
-    public static List<String> viewAssetTypeActionsList(long assetKey, int assetType) {
-        List<String> list = new ArrayList<>();
+    public static List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> viewAssetTypeActionsList(long assetKey,
+                                                                                                  int assetType, Boolean isCreatorOwner, boolean useAddedActions) {
+
+        List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> list = new ArrayList<>();
 
         String actionStr;
         String addActionStr;
+        Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> item;
         for (int action = TransactionAmount.ACTION_SEND; action < TransactionAmount.ACTION_PLEDGE; action++) {
 
             boolean backward = !AssetCls.isReverseSend(assetType) || action != TransactionAmount.ACTION_SEND;
 
-            actionStr = viewAssetTypeAction(assetKey, assetType, !backward, action, true);
-            if (actionStr != null && !list.contains(actionStr)) {
-                list.add(actionStr);
-                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, !backward, action, true);
-                if (addActionStr != null) {
-                    list.add(addActionStr);
+            actionStr = viewAssetTypeAction(assetKey, assetType, !backward, action,
+                    isCreatorOwner != null ? isCreatorOwner : true);
+            if (actionStr != null) {
+                item = new Fun.Tuple2<>(new Fun.Tuple2<>(action, !backward), actionStr);
+                if (!list.contains(item)) {
+                    list.add(item);
+                    if (useAddedActions) {
+                        addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, !backward, action,
+                                isCreatorOwner != null ? isCreatorOwner : true);
+                        if (addActionStr != null) {
+                            item = new Fun.Tuple2<>(new Fun.Tuple2<>(action, !backward), addActionStr);
+                            list.add(item);
+                        }
+                    }
                 }
             }
 
-            actionStr = viewAssetTypeAction(assetKey, assetType, !backward, action, false);
-            if (actionStr != null && !list.contains(actionStr)) {
-                list.add(actionStr);
-                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, !backward, action, false);
-                if (addActionStr != null) {
-                    list.add(addActionStr);
+            if (isCreatorOwner == null) {
+                actionStr = viewAssetTypeAction(assetKey, assetType, !backward, action,
+                        false);
+                if (actionStr != null) {
+                    item = new Fun.Tuple2<>(new Fun.Tuple2<>(action, !backward), actionStr);
+                    if (!list.contains(item)) {
+                        list.add(item);
+                        if (useAddedActions) {
+                            addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, !backward, action,
+                                    false);
+                            if (addActionStr != null) {
+                                item = new Fun.Tuple2<>(new Fun.Tuple2<>(action, !backward), addActionStr);
+                                list.add(item);
+                            }
+                        }
+                    }
                 }
             }
 
-            actionStr = viewAssetTypeAction(assetKey, assetType, backward, action, true);
-            if (actionStr != null && !list.contains(actionStr)) {
-                list.add(actionStr);
-                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, backward, action, true);
-                if (addActionStr != null) {
-                    list.add(addActionStr);
+            actionStr = viewAssetTypeAction(assetKey, assetType, backward, action,
+                    isCreatorOwner != null ? isCreatorOwner : true);
+            if (actionStr != null) {
+                item = new Fun.Tuple2<>(new Fun.Tuple2<>(action, backward), actionStr);
+                if (!list.contains(item)) {
+                    list.add(item);
+                    if (useAddedActions) {
+                        addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, backward, action,
+                                isCreatorOwner != null ? isCreatorOwner : true);
+                        if (addActionStr != null) {
+                            item = new Fun.Tuple2<>(new Fun.Tuple2<>(action, backward), addActionStr);
+                            list.add(item);
+                        }
+                    }
                 }
             }
 
-            actionStr = viewAssetTypeAction(assetKey, assetType, backward, action, false);
-            if (actionStr != null && !list.contains(actionStr)) {
-                list.add(actionStr);
-                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, backward, action, false);
-                if (addActionStr != null) {
-                    list.add(addActionStr);
+            if (isCreatorOwner == null) {
+                actionStr = viewAssetTypeAction(assetKey, assetType, backward, action,
+                        false);
+                if (actionStr != null) {
+                    item = new Fun.Tuple2<>(new Fun.Tuple2<>(action, backward), actionStr);
+                    if (!list.contains(item)) {
+                        list.add(item);
+                        if (useAddedActions) {
+                            addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, backward, action,
+                                    false);
+                            if (addActionStr != null) {
+                                item = new Fun.Tuple2<>(new Fun.Tuple2<>(action, backward), addActionStr);
+                                list.add(item);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1416,8 +1456,8 @@ public abstract class AssetCls extends ItemCls {
         return list;
     }
 
-    public List<String> viewAssetTypeActionsList() {
-        return viewAssetTypeActionsList(key, assetType);
+    public List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> viewAssetTypeActionsList(Boolean isCreatorOwner, boolean useAddedActions) {
+        return viewAssetTypeActionsList(key, assetType, isCreatorOwner, useAddedActions);
     }
 
     public String viewAssetTypeActionTitle(boolean backward, int actionType, boolean isCreatorOwner) {

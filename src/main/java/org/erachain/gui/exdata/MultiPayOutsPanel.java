@@ -1,6 +1,7 @@
 package org.erachain.gui.exdata;
 
 
+import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -9,6 +10,7 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.models.RenderComboBoxActionFilter;
+import org.erachain.gui.models.RenderComboBoxAssetActions;
 import org.erachain.gui.models.RenderComboBoxViewBalance;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun;
@@ -25,16 +27,19 @@ public class MultiPayOutsPanel extends IconPanel {
 
     public static String NAME = "MultiPayOutsPanel";
     public static String TITLE = "Payouts";
+
+    private ExDataPanel parent;
     public ComboBoxAssetsModel accountsModel;
     public ComboBoxAssetsModel accountsModel1;
 
-    public MultiPayOutsPanel() {
+    public MultiPayOutsPanel(ExDataPanel parent) {
         super(NAME, TITLE);
+        this.parent = parent;
         initComponents();
 
         accountsModel = new ComboBoxAssetsModel();
         accountsModel1 = new ComboBoxAssetsModel();
-        this.jComboBoxAssetToPay.setModel(accountsModel);
+        this.jComboBoxPayoutAsset.setModel(accountsModel);
         this.jComboBoxFilterAsset.setModel(accountsModel1);
         jComboBoxFilterBalancePosition.setModel(new javax.swing.DefaultComboBoxModel(new Integer[]{
                 TransactionAmount.ACTION_SEND,
@@ -53,16 +58,14 @@ public class MultiPayOutsPanel extends IconPanel {
         jComboBoxTXTypeFilter.setModel(new javax.swing.DefaultComboBoxModel<Integer>(Transaction.getTransactionTypes()));
         jComboBoxTXTypeFilter.setRenderer(new RenderComboBoxActionFilter());
 
-        jComboBoxAction.setModel(new javax.swing.DefaultComboBoxModel(
-                ((AssetCls) jComboBoxAssetToPay.getSelectedItem()).viewAssetTypeActionsList().toArray()));
-        //jComboBoxAction.setRenderer(new RenderComboBoxViewBalance());
-        jComboBoxAssetToPay.addItemListener(new ItemListener() {
+        jComboBoxPyoutAction.setRenderer(new RenderComboBoxAssetActions());
+        jComboBoxPayoutAsset.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                jComboBoxAction.setModel(new javax.swing.DefaultComboBoxModel(
-                        ((AssetCls) jComboBoxAssetToPay.getSelectedItem()).viewAssetTypeActionsList().toArray()));
+                updateAction();
             }
         });
+        updateAction();
 
         jComboBoxMethodPaymentType.addItemListener(new ItemListener() {
             @Override
@@ -86,6 +89,20 @@ public class MultiPayOutsPanel extends IconPanel {
                 jPanelMain.setVisible(jCheckBoxPayoutsUse.isSelected());
             }
         });
+
+    }
+
+    public void updateAction() {
+        AssetCls asset = (AssetCls) jComboBoxPayoutAsset.getSelectedItem();
+        if (asset == null)
+            return;
+
+        Account creator = (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem();
+        if (creator == null)
+            return;
+
+        jComboBoxPyoutAction.setModel(new javax.swing.DefaultComboBoxModel(
+                asset.viewAssetTypeActionsList(creator.equals(asset.getOwner()), false).toArray()));
 
     }
 
@@ -121,8 +138,8 @@ public class MultiPayOutsPanel extends IconPanel {
         jPanelMain = new JPanel();
         jLabel13 = new javax.swing.JLabel();
         jLabelTitle = new javax.swing.JLabel();
-        jComboBoxAssetToPay = new javax.swing.JComboBox<>();
-        jComboBoxAction = new javax.swing.JComboBox<>();
+        jComboBoxPayoutAsset = new javax.swing.JComboBox<>();
+        jComboBoxPyoutAction = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
         jComboBoxFilterAsset = new javax.swing.JComboBox<>();
         jLabelBalancePosition = new javax.swing.JLabel();
@@ -229,14 +246,14 @@ public class MultiPayOutsPanel extends IconPanel {
         jPanelMain.add(jLabelAssetToPay, labelGBC);
 
         fieldGBC.gridy = gridy;
-        jPanelMain.add(jComboBoxAssetToPay, fieldGBC);
+        jPanelMain.add(jComboBoxPayoutAsset, fieldGBC);
 
         jLabelAction.setText(Lang.getInstance().translate("Action"));
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelAction, labelGBC);
 
         fieldGBC.gridy = gridy;
-        jPanelMain.add(jComboBoxAction, fieldGBC);
+        jPanelMain.add(jComboBoxPyoutAction, fieldGBC);
 
         separateBGC.gridy = ++gridy;
         jPanelMain.add(jSeparator1, separateBGC);
@@ -511,7 +528,7 @@ public class MultiPayOutsPanel extends IconPanel {
 
         boolean backward = false;
 
-        return ExPays.make(((AssetCls) jComboBoxAssetToPay.getSelectedItem()).getKey(),
+        return ExPays.make(((AssetCls) jComboBoxPayoutAsset.getSelectedItem()).getKey(),
                 jComboBoxFilterBalancePosition.getSelectedIndex(), backward,
                 jTextFieldPaymentMin.getText(),
                 jTextFieldPaymentMax.getText(), jComboBoxMethodPaymentType.getSelectedIndex(),
@@ -530,8 +547,8 @@ public class MultiPayOutsPanel extends IconPanel {
     private javax.swing.JButton jButtonViewResult;
     private javax.swing.JCheckBox jCheckBoxPayoutsUse;
     private javax.swing.JCheckBox jCheckBoxSelfPay;
-    private javax.swing.JComboBox<String> jComboBoxAction;
-    private javax.swing.JComboBox<ItemCls> jComboBoxAssetToPay;
+    private javax.swing.JComboBox<String> jComboBoxPyoutAction;
+    private javax.swing.JComboBox<ItemCls> jComboBoxPayoutAsset;
     private javax.swing.JComboBox<String> jComboBoxMethodPaymentType;
     private javax.swing.JComboBox<ItemCls> jComboBoxFilterAsset;
     private javax.swing.JComboBox<Integer> jComboBoxTXTypeFilter;

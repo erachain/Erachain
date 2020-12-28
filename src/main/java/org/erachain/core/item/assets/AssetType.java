@@ -2,6 +2,7 @@ package org.erachain.core.item.assets;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.lang.Lang;
+import org.mapdb.Fun;
 
 import java.util.StringJoiner;
 
@@ -17,10 +18,10 @@ public class AssetType {
         this.nameFull = Lang.getInstance().translate(AssetCls.viewAssetTypeFullCls(assetType));
 
         StringJoiner joiner = new StringJoiner(", ");
-        for (String action : AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
+        for (Fun.Tuple2<?, String> action : AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
                 AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
-                assetType)) {
-            joiner.add(Lang.getInstance().translate(action));
+                assetType, null, true)) {
+            joiner.add(Lang.getInstance().translate(action.b));
         }
 
         this.description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(assetType)) + ".<br>";
