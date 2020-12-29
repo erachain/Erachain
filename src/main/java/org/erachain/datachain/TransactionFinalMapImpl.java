@@ -296,8 +296,16 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return getTransactionsByCreator(Account.makeShortBytes(address), fromID, limit, offset);
     }
 
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, boolean descending) {
+        return ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, descending);
+    }
+
     public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, boolean descending) {
         return ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, fromSeqNo, descending);
+    }
+
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, Long toSeqNo, boolean descending) {
+        return ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, fromSeqNo, toSeqNo, descending);
     }
 
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer typeTX, Boolean isCreator, Long fromID, boolean descending) {

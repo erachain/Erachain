@@ -2,6 +2,7 @@ package org.erachain.dbs.mapDB;
 
 //04/01 +- 
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.SignedBytes;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.Account;
@@ -14,6 +15,8 @@ import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
+import org.erachain.dbs.IteratorParent;
+import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
@@ -22,6 +25,7 @@ import org.mapdb.Fun;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
 
@@ -158,8 +162,15 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        Iterable keys = Fun.filter(descending ? this.creatorKey.descendingSet() : this.creatorKey, addressKey);
-        return IteratorCloseableImpl.make(keys.iterator());
+        Iterator iterator = IteratorCloseableImpl.make(
+                Fun.filter(descending ? this.creatorKey.descendingSet() : this.creatorKey, addressKey).iterator());
+
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, descending);
+        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted),
+                iterator),
+                Fun.COMPARATOR);
+
     }
 
     @Override
@@ -168,9 +179,16 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        return IteratorCloseableImpl.make(new IndexIterator((descending ? this.creatorKey.descendingSet() : this.creatorKey)
+        Iterator iterator = IteratorCloseableImpl.make(new IndexIterator((descending ? this.creatorKey.descendingSet() : this.creatorKey)
                 .subSet(Fun.t2(addressKey, fromSeqNo),
                         Fun.t2(addressKey, descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
+
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, fromSeqNo, descending);
+        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted),
+                iterator),
+                Fun.COMPARATOR);
+
     }
 
     @Override
@@ -183,9 +201,16 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
             toSeqNo = descending ? Long.MIN_VALUE : Long.MAX_VALUE;
         }
 
-        return IteratorCloseableImpl.make(new IndexIterator((descending ? this.creatorKey.descendingSet() : this.creatorKey)
+        Iterator iterator = IteratorCloseableImpl.make(new IndexIterator((descending ? this.creatorKey.descendingSet() : this.creatorKey)
                 .subSet(Fun.t2(addressKey, fromSeqNo),
                         Fun.t2(addressKey, toSeqNo)).iterator()));
+
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, fromSeqNo, toSeqNo, descending);
+        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted),
+                iterator),
+                Fun.COMPARATOR);
+
     }
 
     @Override
@@ -215,6 +240,12 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
                         type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
                         isCreator == null ? descending ? Boolean.FALSE : Boolean.TRUE : isCreator
                 ), descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
+
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByAddressAndType(addressShort, type, isCreator, descending);
+        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted),
+                iterator),
+                Fun.COMPARATOR);
 
     }
 
