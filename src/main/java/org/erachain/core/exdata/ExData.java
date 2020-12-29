@@ -257,16 +257,24 @@ public class ExData {
     }
 
     public void setDC(DCSet dcSet) {
+
+        if (this.dcSet != null && this.dcSet.equals(dcSet)) {
+            // SAME DCSet
+            return;
+        }
+
         this.dcSet = dcSet;
         if (exPays != null) {
             exPays.setDC(dcSet);
         }
+        resolveValues();
+
     }
 
     /**
      * for set up all values from JSON etc.
      */
-    public void resolveValues() {
+    private void resolveValues() {
 
         String str = "";
         Set<String> kS;

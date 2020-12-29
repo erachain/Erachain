@@ -828,7 +828,7 @@ public abstract class Transaction implements ExplorerJsonLine {
      * this.viewTime(account); }
      */
     public long getKey() {
-        return 0l;
+        return 0L;
     }
 
     public Object[][] getItemsKeys() {

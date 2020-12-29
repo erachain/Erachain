@@ -828,10 +828,12 @@ public class RSignNote extends Transaction implements Itemable {
                 Long error = null;
                 error++;
             }
-
-            extendedData.setDC(dcSet);
-            extendedData.resolveValues();
         }
+
+        // may by in new FORKED DB - try set if NEW
+        if (dcSet != null)
+            extendedData.setDC(dcSet);
+
     }
 
     public void parseDataFull() {
@@ -848,10 +850,11 @@ public class RSignNote extends Transaction implements Itemable {
                 Long error = null;
                 error++;
             }
-
-            extendedData.setDC(dcSet);
-            extendedData.resolveValues();
         }
+
+        // may by in new FORKED DB - try set if NEW
+        if (dcSet != null)
+            extendedData.setDC(dcSet);
     }
 
     public boolean isFavorite() {
