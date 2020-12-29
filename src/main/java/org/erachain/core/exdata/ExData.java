@@ -1615,7 +1615,7 @@ public class ExData {
         if (exPays != null) {
             result = exPays.isValid(rNote);
             if (result != Transaction.VALIDATE_OK)
-                errorValue = exPays.errorValue;
+                rNote.errorValue = exPays.errorValue;
             return result;
         }
 

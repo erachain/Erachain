@@ -485,6 +485,10 @@ public class OnDealClick {
                 mess = "Telegram does not exist";
                 break;
 
+            case Transaction.INVALID_TRANSACTION_TYPE:
+                mess = "Invalid transaction type";
+                break;
+
         }
         return mess;
     }

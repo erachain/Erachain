@@ -566,8 +566,8 @@ public class ExPays {
             }
         }
 
-        if (this.filterTXType != 0 && Transaction.isValidTransactionType(this.filterTXType)) {
-            errorValue = "Payouts: filterTXType";
+        if (this.filterTXType != 0 && !Transaction.isValidTransactionType(this.filterTXType)) {
+            errorValue = "Payouts: filterTXType= " + filterTXType;
             return Transaction.INVALID_TRANSACTION_TYPE;
         }
 
