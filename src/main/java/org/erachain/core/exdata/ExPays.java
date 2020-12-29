@@ -734,7 +734,7 @@ public class ExPays {
 
                 /// если задано то проверим - входит ли в в диапазон
                 // - собранные блоки учитываем? да - иначе долго будет делать поиск
-                if (filterTXStartSeqNo != null || filterTXEndSeqNo != null) {
+                if (filterTXType != 0 || filterTXStartSeqNo != null || filterTXEndSeqNo != null) {
                     // на счете должна быть активность в заданном диапазоне для данного типа
                     if (!txMap.isCreatorWasActive(recipientShort, filterTXStartSeqNo, filterTXType, filterTXEndSeqNo))
                         continue;

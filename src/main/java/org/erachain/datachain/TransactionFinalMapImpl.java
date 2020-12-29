@@ -263,7 +263,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     public List<Transaction> getTransactionsByCreator(byte[] addressShort, Long fromID, int limit, int offset) {
 
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+        if (BlockChain.TEST_DB > 0
+            // теперь при множественных выплатах это протокольный индекс
+            ///parent != null || Controller.getInstance().onlyProtocolIndexing
+        ) {
             return null;
         }
 
@@ -293,6 +296,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return getTransactionsByCreator(Account.makeShortBytes(address), fromID, limit, offset);
     }
 
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, boolean descending) {
+        return ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, fromSeqNo, descending);
+    }
+
+    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer typeTX, Boolean isCreator, Long fromID, boolean descending) {
+        return ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, typeTX, isCreator, fromID, descending);
+    }
+
     /**
      * Поиск активности данного счета по Созданным трнзакция за данный промежуток времени
      *
@@ -303,21 +314,42 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
      */
     public boolean isCreatorWasActive(byte[] addressShort, Long fromSeqNo, int typeTX, Long toSeqNo) {
         // на счете должна быть активность после fromSeqNo
-        List<Transaction> txsFind;
-        if (typeTX == 0) {
-            txsFind = getTransactionsByCreator(addressShort, fromSeqNo, 1, 0);
+        if (true) {
+            try (IteratorCloseable<Long> iterator =
+                         typeTX == 0 ? getIteratorByCreator(addressShort, fromSeqNo, false)
+                                 : getIteratorByAddressAndType(addressShort, typeTX, true, fromSeqNo, false)) {
+                if (!iterator.hasNext())
+                    return false;
+                // если полный диаппазон задан то проверим вхождение - он может быть и отрицательным
+                if (///fromSeqNo != null &&
+                        toSeqNo != null && iterator.next() > toSeqNo) {
+                    return false;
+                }
+            } catch (IOException e) {
+                return false;
+            }
+
+            return true;
+
         } else {
-            txsFind = getTransactionsByAddressAndType(addressShort, typeTX, true, fromSeqNo, 1, 0);
-        }
+            // OLD
+            List<Transaction> txsFind;
+            if (typeTX == 0) {
+                txsFind = getTransactionsByCreator(addressShort, fromSeqNo, 1, 0);
+            } else {
+                txsFind = getTransactionsByAddressAndType(addressShort, typeTX, true, fromSeqNo, 1, 0);
+            }
 
-        if (txsFind.isEmpty())
-            return false;
-        // если полный диаппазон задан то проверим вхождение - он может быть и отрицательным
-        if (fromSeqNo != null && toSeqNo != null && txsFind.get(0).getDBRef() > toSeqNo) {
-            return false;
-        }
+            if (txsFind == null || txsFind.isEmpty())
+                return false;
+            // если полный диаппазон задан то проверим вхождение - он может быть и отрицательным
+            if (///fromSeqNo != null &&
+                    toSeqNo != null && txsFind.get(0).getDBRef() > toSeqNo) {
+                return false;
+            }
 
-        return true;
+            return true;
+        }
     }
 
     @Override
