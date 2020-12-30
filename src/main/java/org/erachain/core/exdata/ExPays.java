@@ -131,7 +131,8 @@ public class ExPays {
                   int filterByGender, boolean selfPay) {
         this.flags = flags;
 
-        if (assetKey != null && assetKey != 0L && payMethodValue != null && payMethodValue.signum() != 0) {
+        if (true || // запретить без действий по активу - так как это не письма явно - письма отдельно!
+                assetKey != null && assetKey != 0L) {
             this.flags |= AMOUNT_FLAG_MASK;
             this.assetKey = assetKey;
             this.balancePos = balancePos;
@@ -151,7 +152,8 @@ public class ExPays {
             }
         }
 
-        if (filterAssetKey != null && filterAssetKey != 0L) {
+        if (true || // запретить без фильтрации по активу - так как это не письма явно - письма отдельно!
+                filterAssetKey != null && filterAssetKey != 0L) {
             this.flags |= BALANCE_FLAG_MASK;
             this.filterAssetKey = filterAssetKey;
             this.filterBalancePos = filterBalancePos;
@@ -214,9 +216,11 @@ public class ExPays {
     }
 
     public void setDC(DCSet dcSet) {
-        this.dcSet = dcSet;
-        if (hasAmount() && this.asset == null) {
-            this.asset = this.dcSet.getItemAssetMap().get(this.assetKey);
+        if (this.dcSet == null || !this.dcSet.equals(dcSet)) {
+            this.dcSet = dcSet;
+            if (hasAmount()) {
+                this.asset = this.dcSet.getItemAssetMap().get(this.assetKey);
+            }
         }
     }
 
@@ -490,6 +494,14 @@ public class ExPays {
             return new Fun.Tuple2<>(null, error);
         }
 
+        if (assetKey == null || assetKey == 0L) {
+            return new Fun.Tuple2<>(null, "Wrong assetKey (null or ZERO)");
+        } else if (filterAssetKey == null || filterAssetKey == 0L) {
+            return new Fun.Tuple2<>(null, "Wrong filterAssetKey (null or ZERO)");
+        } else if (payMethodValueBG == null || payMethodValueBG.signum() == 0) {
+            return new Fun.Tuple2<>(null, "Wrong payMethodValue (null or ZERO)");
+        }
+
         int flags = 0;
         return new Fun.Tuple2<>(new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValueBG, amountMinBG, amountMaxBG,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
@@ -547,17 +559,23 @@ public class ExPays {
     public int isValid(RSignNote rNote) {
 
         if (hasAmount()) {
-            if (this.balancePos < TransactionAmount.ACTION_SEND || this.balancePos > TransactionAmount.ACTION_SPEND) {
+            if (this.assetKey == null || this.assetKey == 0L) {
+                errorValue = "Payouts: assetKey == null or ZERO";
+                return Transaction.INVALID_ITEM_KEY;
+            } else if (this.balancePos < TransactionAmount.ACTION_SEND || this.balancePos > TransactionAmount.ACTION_SPEND) {
                 errorValue = "Payouts: balancePos";
                 return Transaction.INVALID_AMOUNT;
-            } else if (this.payMethodValue == null) {
+            } else if (this.payMethodValue == null || payMethodValue.signum() == 0) {
                 errorValue = "Payouts: payMethodValue == null";
                 return Transaction.INVALID_AMOUNT;
             }
         }
 
         if (hasAssetFilter()) {
-            if (this.filterBalancePos < TransactionAmount.ACTION_SEND || this.filterBalancePos > TransactionAmount.ACTION_SPEND) {
+            if (this.filterAssetKey == null || this.filterAssetKey == 0L) {
+                errorValue = "Payouts: filterAssetKey == null or ZERO";
+                return Transaction.INVALID_ITEM_KEY;
+            } else if (this.filterBalancePos < TransactionAmount.ACTION_SEND || this.filterBalancePos > TransactionAmount.ACTION_SPEND) {
                 errorValue = "Payouts: filterBalancePos";
                 return Transaction.INVALID_BACKWARD_ACTION;
             } else if (this.filterBalanceSide < TransactionAmount.BALANCE_SIDE_DEBIT || this.filterBalanceSide > TransactionAmount.BALANCE_SIDE_CREDIT) {
@@ -684,13 +702,14 @@ public class ExPays {
         PersonCls person;
         byte[] assetOwner = asset.getOwner().getShortAddressBytes();
 
-        try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(filterAssetKey)) {
+        boolean hasAssetFilter = hasAssetFilter();
+        try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(hasAssetFilter ? filterAssetKey : AssetCls.FEE_KEY)) {
             while (iterator.hasNext()) {
                 key = iterator.next();
 
                 balance = Account.balanceInPositionAndSide(balancesMap.get(key), filterBalancePos, filterBalanceSide);
 
-                if (filterBalanceMIN != null && balance.compareTo(filterBalanceMIN) < 0
+                if (hasAssetFilter && filterBalanceMIN != null && balance.compareTo(filterBalanceMIN) < 0
                         || filterBalanceMAX != null && balance.compareTo(filterBalanceMAX) > 0)
                     continue;
 
@@ -741,14 +760,16 @@ public class ExPays {
                 }
 
                 // IF send from PERSON to ANONYMOUS
-                if (andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
+                if (hasAssetFilter && andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
                         isPerson, assetKey, balancePos,
                         asset)) {
                     errorValue = recipient.getAddress();
                     return -Transaction.RECEIVER_NOT_PERSONALIZED;
                 }
 
-                if (payMethodValue != null && payMethod == PAYMENT_METHOD_COEFF) {
+                if (!hasAssetFilter) {
+                    payout = null;
+                } else if (payMethodValue != null && payMethod == PAYMENT_METHOD_COEFF) {
                     // нужно вычислить сразу сколько шлем
                     payout = balance.multiply(payMethodValue).setScale(scale, RoundingMode.HALF_DOWN);
                 } else if (payMethodValue != null && payMethod == PAYMENT_METHOD_ABSOLUTE) {
@@ -760,8 +781,11 @@ public class ExPays {
                 // не проверяем на 0 - так это может быть рассылка писем всем
                 filteredPayouts.add(new Fun.Tuple3(recipient, balance, payout));
 
-                // просчитаем тоже даже если ошибка
-                totalBalances = totalBalances.add(balance);
+                if (hasAssetFilter) {
+                    // просчитаем тоже даже если ошибка
+                    totalBalances = totalBalances.add(balance);
+                }
+
                 count++;
                 if (andValidate && count > MAX_COUNT) {
                     errorValue = "MAX count over: " + MAX_COUNT;
@@ -788,29 +812,32 @@ public class ExPays {
 
     public void processBody(Transaction rNote, boolean asOrphan, Block block) {
         PublicKeyAccount creator = rNote.getCreator();
-        boolean isDirect = asset.isDirectBalances();
-        long absKey = assetKey;
-        boolean incomeReverse = balancePos == TransactionAmount.ACTION_HOLD;
 
-        // возьмем знаки (минус) для создания позиции баланса такой
-        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
-        Long key = signs.a * assetKey;
+        if (hasAssetFilter()) {
+            boolean isDirect = asset.isDirectBalances();
+            long absKey = assetKey;
+            boolean incomeReverse = balancePos == TransactionAmount.ACTION_HOLD;
 
-        Account recipient;
-        for (Fun.Tuple3 item : filteredPayouts) {
+            // возьмем знаки (минус) для создания позиции баланса такой
+            Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
+            Long key = signs.a * assetKey;
 
-            recipient = (Account) item.a;
-            if (recipient == null)
-                break;
-            BigDecimal amount = (BigDecimal) item.c;
+            Account recipient;
+            for (Fun.Tuple3 item : filteredPayouts) {
 
-            TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey,
-                    key, signs.b > 0 ? amount : amount.negate(), backward,
-                    isDirect, incomeReverse);
+                recipient = (Account) item.a;
+                if (recipient == null)
+                    break;
+                BigDecimal amount = (BigDecimal) item.c;
 
-            if (!asOrphan && block != null)
-                rNote.addCalculated(block, recipient, absKey, amount, "payout");
+                TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey,
+                        key, signs.b > 0 ? amount : amount.negate(), backward,
+                        isDirect, incomeReverse);
 
+                if (!asOrphan && block != null)
+                    rNote.addCalculated(block, recipient, absKey, amount, "payout");
+
+            }
         }
 
     }

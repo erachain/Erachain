@@ -286,6 +286,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
+        if (fromSeqNo == null) {
+            fromSeqNo = descending ? Long.MAX_VALUE : Long.MIN_VALUE;
+        }
+
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.creatorKey.descendingSet() : this.creatorKey)
                 .subSet(Fun.t2(addressKey, fromSeqNo),
                         Fun.t2(addressKey, descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
@@ -296,6 +300,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, Long toSeqNo, boolean descending) {
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        if (fromSeqNo == null) {
+            fromSeqNo = descending ? Long.MAX_VALUE : Long.MIN_VALUE;
+        }
 
         if (toSeqNo == null) {
             toSeqNo = descending ? Long.MIN_VALUE : Long.MAX_VALUE;
@@ -362,6 +370,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
+        if (fromID == null) {
+            fromID = descending ? Long.MAX_VALUE : Long.MIN_VALUE;
+        }
+
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
                 Fun.t2(Fun.t3(addressKey, type, isCreator), fromID),
                 Fun.t2(Fun.t3(addressKey,
@@ -374,6 +386,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, Long toID, boolean descending) {
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        if (fromID == null) {
+            fromID = descending ? Long.MAX_VALUE : Long.MIN_VALUE;
+        }
 
         if (toID == null) {
             toID = descending ? Long.MIN_VALUE : Long.MAX_VALUE;

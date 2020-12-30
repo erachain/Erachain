@@ -110,6 +110,19 @@ public class ExPayoutsPanel extends IconPanel {
             }
         });
 
+        /*
+        jCheckBoxUseFilterAsset.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean enabled = jCheckBoxUseFilterAsset.isSelected();
+                jComboBoxFilterAsset.setEnabled(enabled);
+                jComboBoxFilterBalancePosition.setEnabled(enabled);
+                jComboBoxFilterSideBalance.setEnabled(enabled);
+                jTextFieldBQ.setEnabled(enabled);
+                jTextFieldLQ.setEnabled(enabled);
+            }
+        });
+         */
     }
 
     public void updateAction() {
@@ -157,10 +170,11 @@ public class ExPayoutsPanel extends IconPanel {
 
         jPanelMain = new JPanel();
         jLabel13 = new javax.swing.JLabel();
-        jLabelTitle = new javax.swing.JLabel();
+        jLabelActionAssetTitle = new javax.swing.JLabel();
+        jCheckBoxUseFilterAsset = new javax.swing.JCheckBox();
+        jLabelFilterAsset = new javax.swing.JLabel();
         jComboBoxPayoutAsset = new javax.swing.JComboBox<>();
         jComboBoxPayoutAction = new javax.swing.JComboBox<>();
-        jLabel5 = new javax.swing.JLabel();
         jComboBoxFilterAsset = new javax.swing.JComboBox<>();
         jLabelBalancePosition = new javax.swing.JLabel();
         jComboBoxFilterBalancePosition = new javax.swing.JComboBox<>();
@@ -254,10 +268,10 @@ public class ExPayoutsPanel extends IconPanel {
         jPanelMain.setLayout(layout);
         jPanelMain.setVisible(false);
 
-        jLabelTitle.setFont(headFont); // NOI18N
-        jLabelTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelTitle.setText(Lang.getInstance().translate("Action for Asset"));
-        jPanelMain.add(jLabelTitle, headBGC);
+        jLabelActionAssetTitle.setFont(headFont); // NOI18N
+        jLabelActionAssetTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelActionAssetTitle.setText(Lang.getInstance().translate("Action for Asset"));
+        jPanelMain.add(jLabelActionAssetTitle, headBGC);
 
         jLabelAssetToPay.setText(Lang.getInstance().translate("Asset"));
         labelGBC.gridy = ++gridy;
@@ -272,9 +286,6 @@ public class ExPayoutsPanel extends IconPanel {
 
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxPayoutAction, fieldGBC);
-
-        separateBGC.gridy = ++gridy;
-        jPanelMain.add(jSeparator1, separateBGC);
 
         ////////// PAYMENT METHOD
 
@@ -344,11 +355,12 @@ public class ExPayoutsPanel extends IconPanel {
         jPanelMain.add(jSeparator2, separateBGC);
 
         /////////////////////
-        jLabel5.setFont(headFont); // NOI18N
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setText(Lang.getInstance().translate("Filter By Asset"));
+        //jCheckBoxUseFilterAsset.setSelected(true);
+        jLabelFilterAsset.setFont(headFont); // NOI18N
+        jLabelFilterAsset.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelFilterAsset.setText(Lang.getInstance().translate("Filter By Asset"));
         headBGC.gridy = ++gridy;
-        jPanelMain.add(jLabel5, headBGC);
+        jPanelMain.add(jLabelFilterAsset, headBGC);
 
         jLabel2.setText(Lang.getInstance().translate("Asset"));
         labelGBC.gridy = ++gridy;
@@ -539,9 +551,12 @@ public class ExPayoutsPanel extends IconPanel {
 
         Integer txTypeFilter = (Integer) jComboBoxTXTypeFilter.getSelectedItem();
 
-        return ExPays.make(((AssetCls) jComboBoxPayoutAsset.getSelectedItem()).getKey(),
+        return ExPays.make(
+                ((AssetCls) jComboBoxPayoutAsset.getSelectedItem()).getKey(),
                 balancePosition.a.a, balancePosition.a.b,
-                jComboBoxMethodPaymentType.getSelectedIndex(), jTextFieldAmount.getText(), jTextFieldPaymentMin.getText(),
+                jComboBoxMethodPaymentType.getSelectedIndex(),
+                jTextFieldAmount.getText(),
+                jTextFieldPaymentMin.getText(),
                 jTextFieldPaymentMax.getText(),
                 ((AssetCls) jComboBoxFilterAsset.getSelectedItem()).getKey(),
                 jComboBoxFilterBalancePosition.getSelectedIndex() + 1, jComboBoxFilterSideBalance.getSelectedIndex() + 1,
@@ -553,6 +568,8 @@ public class ExPayoutsPanel extends IconPanel {
 
     private javax.swing.JButton jButtonCalcCompu;
     private javax.swing.JButton jButtonViewResult;
+    private javax.swing.JLabel jLabelFilterAsset;
+    private javax.swing.JCheckBox jCheckBoxUseFilterAsset;
     private javax.swing.JCheckBox jCheckBoxPayoutsUse;
     private javax.swing.JCheckBox jCheckBoxSelfPay;
     private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxPayoutAction;
@@ -570,8 +587,8 @@ public class ExPayoutsPanel extends IconPanel {
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabelMethod;
+    private javax.swing.JLabel jLabelActionAssetTitle;
     private javax.swing.JLabel jLabelAmount;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
@@ -582,7 +599,6 @@ public class ExPayoutsPanel extends IconPanel {
     private javax.swing.JLabel jLabelMethodPaymentDecscription;
     private javax.swing.JLabel jLabelPaymentMax;
     private javax.swing.JLabel jLabelPaymentMin;
-    private javax.swing.JLabel jLabelTitle;
     private javax.swing.JLabel jLabelTitlemetod;
     private javax.swing.JLabel jLabelBalancePosition;
     private javax.swing.JPanel jPanelMinMaxAmounts;

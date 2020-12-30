@@ -14,6 +14,8 @@ import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,6 +29,8 @@ public class IssueDocumentPanel extends IconPanel {
 
     public static String NAME = "IssueDocumentPanel";
     public static String TITLE = "Issue Document";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(IssueDocumentPanel.class);
 
     private IssueDocumentPanel th;
     private ExDataPanel exData_Panel;
@@ -278,6 +282,7 @@ public class IssueDocumentPanel extends IconPanel {
         try {
             messageBytes = exData_Panel.makeExData(creator, encryptCheckBox.isSelected());
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
             JOptionPane.showMessageDialog(new JFrame(), " ERROR: " + e.getMessage(),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             return;

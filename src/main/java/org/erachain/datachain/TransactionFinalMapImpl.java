@@ -333,8 +333,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         // на счете должна быть активность после fromSeqNo
         if (true) {
             try (IteratorCloseable<Long> iterator =
-                         typeTX == 0 ? getIteratorByCreator(addressShort, fromSeqNo, false)
-                                 : getIteratorByAddressAndType(addressShort, typeTX, true, fromSeqNo, false)) {
+                         typeTX == 0 ? getIteratorByCreator(addressShort, fromSeqNo, toSeqNo, false)
+                                 : getIteratorByAddressAndType(addressShort, typeTX, true, fromSeqNo, toSeqNo, false)) {
                 if (!iterator.hasNext())
                     return false;
                 // если полный диаппазон задан то проверим вхождение - он может быть и отрицательным
