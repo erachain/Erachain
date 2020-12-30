@@ -620,7 +620,7 @@ public class ExData {
 
     }
 
-    public byte[] toByte() throws Exception {
+    public byte[] toByte(int forDeal) throws Exception {
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         if (false) {
@@ -653,7 +653,7 @@ public class ExData {
         }
 
         if (exPays != null) {
-            outStream.write(exPays.toBytes());
+            outStream.write(exPays.toBytes(forDeal));
         }
 
         if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {
@@ -850,12 +850,13 @@ public class ExData {
      * @param data
      * @param onlyTitle
      * @param andFiles
+     * @param forDeal
      * @return
      * @throws Exception
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static ExData parse(
-            int version, byte[] data, boolean onlyTitle, boolean andFiles) throws Exception {
+            int version, byte[] data, boolean onlyTitle, boolean andFiles, int forDeal) throws Exception {
 
         //CHECK IF WE MATCH BLOCK LENGTH
         if (data.length < Transaction.DATA_JSON_PART_LENGTH) {
@@ -936,8 +937,8 @@ public class ExData {
 
                     if ((flags[1] & PAYS_FLAG_MASK) > 0) {
                         // ExLink READ
-                        exPays = ExPays.parse(data, position);
-                        position += exPays.length();
+                        exPays = ExPays.parse(data, position, forDeal);
+                        position += exPays.length(forDeal);
                     } else {
                         exPays = null;
                     }
@@ -1288,10 +1289,12 @@ public class ExData {
 
             secrets[recipients.length] = AEScrypto.dataEncrypt(password, privateKey, creator.getPublicKey());
 
-            return new ExData(flags, exLink, exPays, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, (byte) 0, secrets, encryptedData).toByte();
+            return new ExData(flags, exLink, exPays, title, recipientsFlags, recipients, authorsFlags, authors,
+                    sourcesFlags, sources, tags, (byte) 0, secrets, encryptedData).toByte(Transaction.FOR_NETWORK);
         }
 
-        return new ExData(flags, exLink, exPays, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, new JSONObject(out_Map), filesMap).toByte();
+        return new ExData(flags, exLink, exPays, title, recipientsFlags, recipients, authorsFlags, authors,
+                sourcesFlags, sources, tags, new JSONObject(out_Map), filesMap).toByte(Transaction.FOR_NETWORK);
 
     }
 
@@ -1324,7 +1327,7 @@ public class ExData {
         }
 
         if (exPays != null) {
-            output.put("Label_Pays", Lang.getInstance().translateFromLangObj("Payouts", langObj));
+            output.put("Label_Payouts", Lang.getInstance().translateFromLangObj("Payouts", langObj));
             output.put("exPays", exPays.makeJSONforHTML(langObj));
 
         }

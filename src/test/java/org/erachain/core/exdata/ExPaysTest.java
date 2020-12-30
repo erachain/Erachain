@@ -1,5 +1,6 @@
 package org.erachain.core.exdata;
 
+import org.erachain.core.transaction.Transaction;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -9,6 +10,8 @@ import static org.junit.Assert.assertEquals;
 public class ExPaysTest {
 
     private int flags;
+
+    int forDeal = Transaction.FOR_NETWORK;
 
     private Long assetKey = 2L;
     private int balancePos = 1;
@@ -43,10 +46,10 @@ public class ExPaysTest {
                 filterByGender, selfPay);
         byte[] bytes = null;
         try {
-            bytes = exPays.toBytes();
+            bytes = exPays.toBytes(forDeal);
         } catch (Exception e) {
         }
-        assertEquals(bytes.length, exPays.length());
+        assertEquals(bytes.length, exPays.length(forDeal));
 
     }
 
@@ -63,14 +66,14 @@ public class ExPaysTest {
                 filterByGender, selfPay);
         byte[] bytes = null;
         try {
-            bytes = exPays.toBytes();
+            bytes = exPays.toBytes(forDeal);
         } catch (Exception e) {
         }
-        assertEquals(bytes.length, exPays.length());
+        assertEquals(bytes.length, exPays.length(forDeal));
 
         ExPays exPaysParsed = null;
         try {
-            exPaysParsed = ExPays.parse(bytes, 0);
+            exPaysParsed = ExPays.parse(bytes, 0, forDeal);
         } catch (Exception e) {
             String ee = e.getMessage();
         }
@@ -84,13 +87,13 @@ public class ExPaysTest {
                 filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
                 filterByGender, selfPay);
         try {
-            bytes = exPays.toBytes();
+            bytes = exPays.toBytes(forDeal);
         } catch (Exception e) {
         }
-        assertEquals(bytes.length, exPays.length());
+        assertEquals(bytes.length, exPays.length(forDeal));
 
         try {
-            exPaysParsed = ExPays.parse(bytes, 0);
+            exPaysParsed = ExPays.parse(bytes, 0, forDeal);
         } catch (Exception e) {
             String ee = e.getMessage();
         }
@@ -104,13 +107,13 @@ public class ExPaysTest {
                 filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
                 filterByGender, selfPay);
         try {
-            bytes = exPays.toBytes();
+            bytes = exPays.toBytes(forDeal);
         } catch (Exception e) {
         }
-        assertEquals(bytes.length, exPays.length());
+        assertEquals(bytes.length, exPays.length(forDeal));
 
         try {
-            exPaysParsed = ExPays.parse(bytes, 0);
+            exPaysParsed = ExPays.parse(bytes, 0, forDeal);
         } catch (Exception e) {
             String ee = e.getMessage();
         }
@@ -124,13 +127,13 @@ public class ExPaysTest {
                 0, filterTXStartSeqNo, null,
                 filterByGender, selfPay);
         try {
-            bytes = exPays.toBytes();
+            bytes = exPays.toBytes(forDeal);
         } catch (Exception e) {
         }
-        assertEquals(bytes.length, exPays.length());
+        assertEquals(bytes.length, exPays.length(forDeal));
 
         try {
-            exPaysParsed = ExPays.parse(bytes, 0);
+            exPaysParsed = ExPays.parse(bytes, 0, forDeal);
         } catch (Exception e) {
             String ee = e.getMessage();
         }
