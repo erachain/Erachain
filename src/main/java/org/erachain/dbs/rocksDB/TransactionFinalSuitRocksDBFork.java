@@ -144,7 +144,7 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
 
         Iterator<Long> iterator = map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(), fromKey, null, descending, true);
 
-        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, descending);
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, fromSeqNo, descending);
         return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 iterator),
@@ -172,7 +172,7 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
         Iterator<Long> iterator = map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(),
                 fromKey, toKey, descending, true);
 
-        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, descending);
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, fromSeqNo, toSeqNo, descending);
         return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 iterator),
@@ -216,7 +216,7 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
         }
         Iterator<Long> iterator = map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), key, descending, true);
 
-        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, descending);
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByAddressAndType(addressShort, type, isCreator, descending);
         return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 iterator),
@@ -246,7 +246,8 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
         Iterator<Long> iterator = map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(),
                 keyFrom, keyTo, descending, true);
 
-        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, descending);
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByAddressAndType(
+                addressShort, type, isCreator, fromID, descending);
         return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 iterator),
@@ -276,7 +277,8 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
         Iterator<Long> iterator = map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(),
                 keyFrom, keyTo, descending, true);
 
-        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, descending);
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByAddressAndType(
+                addressShort, type, isCreator, fromID, toID, descending);
         return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 iterator),
