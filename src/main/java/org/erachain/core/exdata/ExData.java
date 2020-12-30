@@ -848,15 +848,15 @@ public class ExData {
      *
      * @param version
      * @param data
+     * @param forDeal
      * @param onlyTitle
      * @param andFiles
-     * @param forDeal
      * @return
      * @throws Exception
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static ExData parse(
-            int version, byte[] data, boolean onlyTitle, boolean andFiles, int forDeal) throws Exception {
+            int version, byte[] data, int forDeal, boolean onlyTitle, boolean andFiles) throws Exception {
 
         //CHECK IF WE MATCH BLOCK LENGTH
         if (data.length < Transaction.DATA_JSON_PART_LENGTH) {

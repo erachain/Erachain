@@ -450,12 +450,29 @@ public class RSignNote extends Transaction implements Itemable {
 
         if (this.data != null) {
 
-            //WRITE DATA SIZE
-            byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
-            data = Bytes.concat(data, dataSizeBytes);
+            if (forDeal == this.forDeal) {
+                //WRITE DATA SIZE
+                byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
+                data = Bytes.concat(data, dataSizeBytes);
 
-            //WRITE DATA
-            data = Bytes.concat(data, this.data);
+                //WRITE DATA
+                data = Bytes.concat(data, this.data);
+            } else {
+
+                // пересоберем байты в нужный формат forDeal
+                byte[] exData = null;
+                try {
+                    exData = extendedData.toByte(forDeal);
+                } catch (Exception e) {
+                }
+
+                //WRITE DATA SIZE
+                byte[] dataSizeBytes = Ints.toByteArray(exData.length);
+                data = Bytes.concat(data, dataSizeBytes);
+
+                //WRITE DATA
+                data = Bytes.concat(data, exData);
+            }
 
             if (typeBytes[1] < 3) {
                 //WRITE ENCRYPTED
@@ -671,7 +688,17 @@ public class RSignNote extends Transaction implements Itemable {
         int add_len = 0;
         if (this.data != null && this.data.length > 0)
             if (getVersion() > 2) {
-                add_len += DATA_SIZE_LENGTH + this.data.length;
+                if (this.forDeal == forDeal) {
+                    add_len += DATA_SIZE_LENGTH + this.data.length;
+                } else {
+                    // пересоберем байты в нужный формат forDeal
+                    byte[] exData = null;
+                    try {
+                        exData = extendedData.toByte(forDeal);
+                    } catch (Exception e) {
+                    }
+                    add_len += DATA_SIZE_LENGTH + exData.length;
+                }
             } else {
                 add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH + this.data.length;
             }
@@ -827,7 +854,7 @@ public class RSignNote extends Transaction implements Itemable {
             //Version, Title, JSON, Files
             try {
                 // здесь нельзя сохранять в parsedData
-                extendedData = ExData.parse(getVersion(), this.data, false, false, forDeal);
+                extendedData = ExData.parse(getVersion(), this.data, forDeal, false, false);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
                 Long error = null;
@@ -849,7 +876,7 @@ public class RSignNote extends Transaction implements Itemable {
 
             // version 2
             try {
-                extendedData = ExData.parse(getVersion(), this.data, false, true, forDeal);
+                extendedData = ExData.parse(getVersion(), this.data, forDeal, false, true);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
                 Long error = null;
