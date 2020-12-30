@@ -15,6 +15,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
@@ -99,7 +100,7 @@ public class ExPays {
     public List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> filteredPayouts;
     private int filteredPayoutsCount;
     private BigDecimal totalPay;
-    private long totalFee;
+    private long totalFeeBytes;
     public String errorValue;
 
 
@@ -188,7 +189,7 @@ public class ExPays {
                   BigDecimal filterBalanceMIN, BigDecimal filterBalanceMAX,
                   int filterTXType, Long filterTXStartSeqNo, Long filterTXEndSeqNo,
                   int filterByGender, boolean selfPay,
-                  int filteredPayoutsCount, BigDecimal totalPay, long totalFee) {
+                  int filteredPayoutsCount, BigDecimal totalPay, long totalFeeBytes) {
         this(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceMIN, filterBalanceMAX,
@@ -197,7 +198,7 @@ public class ExPays {
 
         this.filteredPayoutsCount = filteredPayoutsCount;
         this.totalPay = totalPay;
-        this.totalFee = totalFee;
+        this.totalFeeBytes = totalFeeBytes;
     }
 
     public List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> getFilteredPayouts(Transaction statement) {
@@ -219,7 +220,7 @@ public class ExPays {
     }
 
     public long getTotalFeeBytes() {
-        return totalFee > 0 ? totalFee : (totalFee = (hasFilterActive() ? 30L : 10L) * filteredPayoutsCount);
+        return totalFeeBytes > 0 ? totalFeeBytes : (totalFeeBytes = (hasFilterActive() ? 30L : 10L) * filteredPayoutsCount);
     }
 
     public boolean hasAmount() {
@@ -337,12 +338,15 @@ public class ExPays {
         if (forDeal == Transaction.FOR_DB_RECORD) {
             outStream.write(Ints.toByteArray(filteredPayoutsCount));
 
+            if (totalPay == null)
+                totalPay = BigDecimal.ZERO;
+
             outStream.write(this.totalPay.scale());
             buff = this.totalPay.unscaledValue().toByteArray();
             outStream.write(buff.length);
             outStream.write(buff);
 
-            outStream.write(Longs.toByteArray(this.totalFee));
+            outStream.write(Longs.toByteArray(this.totalFeeBytes));
 
         }
         outStream.write(new byte[]{(byte) filterTXType, (byte) filterByGender, (byte) (selfPay ? 1 : 0)});
@@ -609,6 +613,13 @@ public class ExPays {
             json.put("filterAsset", filterAsset.getName());
         }
 
+        if (filteredPayoutsCount > 0) {
+            json.put("Label_Counter", Lang.getInstance().translateFromLangObj("Counter", langObj));
+            json.put("Label_Total_Amount", Lang.getInstance().translateFromLangObj("Total Amount", langObj));
+            json.put("Label_Fee_Bytes_Total", Lang.getInstance().translateFromLangObj("Fee Bytes Total", langObj));
+
+        }
+
         return json;
 
     }
@@ -646,8 +657,8 @@ public class ExPays {
 
         if (filteredPayoutsCount > 0) {
             toJson.put("filteredPayoutsCount", filteredPayoutsCount);
-            toJson.put("totalFee", totalFee);
             toJson.put("totalPay", totalPay.toPlainString());
+            toJson.put("totalFeeBytes", totalFeeBytes);
         }
 
         return toJson;

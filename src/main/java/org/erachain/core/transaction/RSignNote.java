@@ -696,6 +696,7 @@ public class RSignNote extends Transaction implements Itemable {
                     try {
                         exData = extendedData.toByte(forDeal);
                     } catch (Exception e) {
+                        LOGGER.error(e.getMessage(), e);
                     }
                     add_len += DATA_SIZE_LENGTH + exData.length;
                 }

@@ -121,6 +121,20 @@ function statement(data) {
             + data.Label_Parent + ' <a href=?tx=' + data.exLink.ref + get_lang() + '><b>' + data.exLink.ref + '</b></a></h3>';
     }
 
+    if (data.hasOwnProperty('exPays')) {
+        exPays = data.exPays;
+        output += '<h3>'
+            //+ '<img src="img/parentTx.png" style="height:1.5em"> '
+            + data.Label_Payouts + '</h3>';
+
+        if (exPays.hasOwnProperty('filteredPayoutsCount')) {
+            output += exPays.Label_Counter + ': <b>' + exPays.filteredPayoutsCount + '</b><br>';
+            output += exPays.Label_Total_Amount + ': <b>' + exPays.totalPay + '</b><br>';
+            output += exPays.Label_Fee_Bytes_Total + ': <b>' + exPays.totalFeeBytes + '</b><br>';
+
+        }
+    }
+
     if (data.hasOwnProperty('title')) {
         output += '<br>' + data.Label_title + ': <b>' + escapeHtml(data.title) + '</b>';
     }
