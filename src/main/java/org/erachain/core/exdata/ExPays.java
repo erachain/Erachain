@@ -97,9 +97,9 @@ public class ExPays {
     AssetCls asset;
     AssetCls filterAsset;
     public List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> filteredPayouts;
-    public int filteredPayoutsCount;
-    public BigDecimal totalPay;
-    public long totalFee;
+    private int filteredPayoutsCount;
+    private BigDecimal totalPay;
+    private long totalFee;
     public String errorValue;
 
 
@@ -198,6 +198,28 @@ public class ExPays {
         this.filteredPayoutsCount = filteredPayoutsCount;
         this.totalPay = totalPay;
         this.totalFee = totalFee;
+    }
+
+    public List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> getFilteredPayouts(Transaction statement) {
+        if (filteredPayouts == null) {
+            filteredPayoutsCount = makeFilterPayList(statement, false);
+            if (payMethod == PAYMENT_METHOD_TOTAL) {
+                calcPayoutsForMethodTotal();
+            }
+        }
+        return filteredPayouts;
+    }
+
+    public int getFilteredPayoutsCount() {
+        return filteredPayoutsCount;
+    }
+
+    public BigDecimal getTotalPay() {
+        return totalPay;
+    }
+
+    public long getTotalFeeBytes() {
+        return totalFee > 0 ? totalFee : (totalFee = (hasFilterActive() ? 30L : 10L) * filteredPayoutsCount);
     }
 
     public boolean hasAmount() {
@@ -660,10 +682,6 @@ public class ExPays {
         return true;
     }
 
-    public long getLongFee() {
-        return totalFee > 0 ? totalFee : (totalFee = (hasFilterActive() ? 30L : 10L) * filteredPayoutsCount);
-    }
-
     public int isValid(RSignNote rNote) {
 
         if (hasAmount()) {
@@ -705,8 +723,7 @@ public class ExPays {
             return Transaction.INVALID_TRANSFER_TYPE;
         }
 
-        filteredPayouts = new ArrayList<>();
-        filteredPayoutsCount = filterPayList(rNote, true);
+        filteredPayoutsCount = makeFilterPayList(rNote, true);
 
         if (filteredPayoutsCount < 0) {
             // ERROR on make LIST
@@ -771,7 +788,9 @@ public class ExPays {
         return Transaction.VALIDATE_OK;
     }
 
-    public int filterPayList(Transaction transaction, boolean andValidate) {
+    public int makeFilterPayList(Transaction transaction, boolean andValidate) {
+
+        filteredPayouts = new ArrayList<>();
 
         int scale = asset.getScale();
 
@@ -874,22 +893,24 @@ public class ExPays {
 
                 if (!hasAssetFilter) {
                     payout = null;
-                } else if (payMethodValue != null && payMethod == PAYMENT_METHOD_COEFF) {
-                    // нужно вычислить сразу сколько шлем
-                    payout = balance.multiply(payMethodValue).setScale(scale, RoundingMode.HALF_DOWN);
-                } else if (payMethodValue != null && payMethod == PAYMENT_METHOD_ABSOLUTE) {
-                    payout = payMethodValue.setScale(scale, RoundingMode.HALF_DOWN);
                 } else {
-                    payout = null;
+                    switch (payMethod) {
+                        case PAYMENT_METHOD_COEFF:
+                            // нужно вычислить сразу сколько шлем
+                            payout = balance.multiply(payMethodValue).setScale(scale, RoundingMode.HALF_DOWN);
+                            totalBalances = totalBalances.add(payout);
+                            break;
+                        case PAYMENT_METHOD_ABSOLUTE:
+                            payout = payMethodValue.setScale(scale, RoundingMode.HALF_DOWN);
+                            break;
+                        default:
+                            payout = null;
+                            totalBalances = totalBalances.add(balance);
+                    }
                 }
 
                 // не проверяем на 0 - так это может быть рассылка писем всем
                 filteredPayouts.add(new Fun.Tuple3(recipient, balance, payout));
-
-                if (hasAssetFilter) {
-                    // просчитаем тоже даже если ошибка
-                    totalBalances = totalBalances.add(balance);
-                }
 
                 count++;
                 if (andValidate && count > MAX_COUNT) {
@@ -908,12 +929,12 @@ public class ExPays {
             LOGGER.error(e.getMessage(), e);
         }
 
-        if (filterTXType == PAYMENT_METHOD_COEFF) {
-            totalPay = totalBalances;
-        } else if (filterTXType == PAYMENT_METHOD_ABSOLUTE) {
-            totalPay = payMethodValue.multiply(new BigDecimal(filteredPayoutsCount));
-        } else {
-            totalPay = payMethodValue;
+        switch (payMethod) {
+            case PAYMENT_METHOD_ABSOLUTE:
+                totalPay = payMethodValue.multiply(new BigDecimal(count));
+                break;
+            default:
+                totalPay = totalBalances;
         }
 
         return count;
@@ -955,8 +976,7 @@ public class ExPays {
     public void process(Transaction rNote, Block block) {
 
         if (filteredPayouts == null) {
-            filteredPayouts = new ArrayList<>();
-            filteredPayoutsCount = filterPayList(rNote, false);
+            filteredPayoutsCount = makeFilterPayList(rNote, false);
         }
 
         if (filteredPayoutsCount == 0)
@@ -978,8 +998,7 @@ public class ExPays {
     public void orphan(Transaction rNote) {
 
         if (filteredPayouts == null) {
-            filteredPayouts = new ArrayList<>();
-            filteredPayoutsCount = filterPayList(rNote, false);
+            filteredPayoutsCount = makeFilterPayList(rNote, false);
         }
 
         if (filteredPayoutsCount == 0)

@@ -3,6 +3,7 @@ package org.erachain.gui.items.statement;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.ExPays;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAuthor;
 import org.erachain.core.exdata.exLink.ExLinkSource;
@@ -344,6 +345,14 @@ public class RNoteInfo extends javax.swing.JPanel {
             Transaction transaction = DCSet.getInstance().getTransactionFinalMap().get(exLink.getRef());
             resultStr += "<br>" + transaction.getTitle() + " : " + transaction.getCreator().getPersonAsString() + "</b><br>";
 
+        }
+
+        ExPays exPays = exData.getExPays();
+        exPays.getFilteredPayouts(statement);
+        if (exPays != null) {
+            resultStr += Lang.getInstance().translate("Counter") + ": <b>" + exPays.getFilteredPayoutsCount() + "</b><br>"
+                    + Lang.getInstance().translate("Payouts Total") + ": <b>" + exPays.getTotalPay().toPlainString() + "</b><br>"
+                    + Lang.getInstance().translate("FeeBytes Total") + ": <b>" + exPays.getTotalFeeBytes() + "</b><br>";
         }
 
         String title = exData.getTitle();

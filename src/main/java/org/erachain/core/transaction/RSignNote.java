@@ -830,7 +830,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         ExPays exPays = extendedData.getExPays();
         if (exPays != null) {
-            long_fee += exPays.getLongFee();
+            long_fee += exPays.getTotalFeeBytes();
         }
 
         if (extendedData.hasAuthors()) {

@@ -7,6 +7,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.*;
 import org.erachain.gui.exdata.ExDataPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -344,9 +345,11 @@ public class IssueDocumentPanel extends IconPanel {
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation transaction issue document"));
 
-        RNoteInfo ww = new RNoteInfo(issueDoc);
-        ww.jPanel2.setVisible(false);
-        confirmDialog.jScrollPane1.setViewportView(ww);
+        // for calculate ExPays
+        issueDoc.setDC(DCSet.getInstance());
+        RNoteInfo rNoteInfo = new RNoteInfo(issueDoc);
+        rNoteInfo.jPanel2.setVisible(false);
+        confirmDialog.jScrollPane1.setViewportView(rNoteInfo);
         confirmDialog.setLocationRelativeTo(th);
         confirmDialog.setVisible(true);
 
