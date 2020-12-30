@@ -352,6 +352,16 @@ public class RSignNote extends Transaction implements Itemable {
         return super.hashCode() + forDeal;
     }
 
+    @Override
+    public boolean equals(Object transaction) {
+        if (transaction instanceof RSignNote) {
+            return Arrays.equals(this.signature, ((RSignNote) transaction).signature)
+                    && forDeal == ((RSignNote) transaction).forDeal;
+        }
+        return false;
+    }
+
+
     public byte[] getData() {
         return this.data;
     }
