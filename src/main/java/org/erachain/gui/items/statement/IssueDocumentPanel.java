@@ -201,7 +201,7 @@ public class IssueDocumentPanel extends IconPanel {
 
     }// </editor-fold>
 
-    public void makeDeal(int forDeal) {
+    public void makeDeal() {
 
         // CHECK IF WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {
@@ -306,7 +306,7 @@ public class IssueDocumentPanel extends IconPanel {
         byte property1 = (byte) 0;
         byte property2 = (byte) 0;
 
-        RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2, forDeal,
+        RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2,
                 creator, feePow, key, messageBytes
         );
 
@@ -364,7 +364,7 @@ public class IssueDocumentPanel extends IconPanel {
     public void onSendClick() {
         this.jButton_Work_OK.setEnabled(false);
         this.jButton_Work_OK1.setEnabled(false);
-        makeDeal(Transaction.FOR_NETWORK);
+        makeDeal();
         this.jButton_Work_OK.setEnabled(true);
         this.jButton_Work_OK1.setEnabled(true);
     }

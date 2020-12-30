@@ -346,6 +346,12 @@ public class RSignNote extends Transaction implements Itemable {
         }
     }
 
+    @Override
+    public int hashCode() {
+        // CLEAR HASH for Transaction.FOR_DB_RECORD - если посчитали значения - запишем их в базу а не из ХЭША берем
+        return super.hashCode() + forDeal;
+    }
+
     public byte[] getData() {
         return this.data;
     }
@@ -464,6 +470,7 @@ public class RSignNote extends Transaction implements Itemable {
                 try {
                     exData = extendedData.toByte(forDeal);
                 } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
                 }
 
                 //WRITE DATA SIZE
