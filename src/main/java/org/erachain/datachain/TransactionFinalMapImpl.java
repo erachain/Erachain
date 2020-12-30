@@ -308,8 +308,17 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, fromSeqNo, toSeqNo, descending);
     }
 
+
+    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer typeTX, Boolean isCreator, boolean descending) {
+        return ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, typeTX, isCreator, descending);
+    }
+
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer typeTX, Boolean isCreator, Long fromID, boolean descending) {
         return ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, typeTX, isCreator, fromID, descending);
+    }
+
+    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer typeTX, Boolean isCreator, Long fromID, Long toID, boolean descending) {
+        return ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, typeTX, isCreator, fromID, toID, descending);
     }
 
     /**

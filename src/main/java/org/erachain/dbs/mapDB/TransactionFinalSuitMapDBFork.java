@@ -162,7 +162,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        Iterator iterator = IteratorCloseableImpl.make(
+        Iterator<Long> iterator = IteratorCloseableImpl.make(
                 Fun.filter(descending ? this.creatorKey.descendingSet() : this.creatorKey, addressKey).iterator());
 
         IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, descending);
@@ -179,7 +179,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        Iterator iterator = IteratorCloseableImpl.make(new IndexIterator((descending ? this.creatorKey.descendingSet() : this.creatorKey)
+        Iterator<Long> iterator = IteratorCloseableImpl.make(new IndexIterator((descending ? this.creatorKey.descendingSet() : this.creatorKey)
                 .subSet(Fun.t2(addressKey, fromSeqNo),
                         Fun.t2(addressKey, descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
 
@@ -201,7 +201,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
             toSeqNo = descending ? Long.MIN_VALUE : Long.MAX_VALUE;
         }
 
-        Iterator iterator = IteratorCloseableImpl.make(new IndexIterator((descending ? this.creatorKey.descendingSet() : this.creatorKey)
+        Iterator<Long> iterator = IteratorCloseableImpl.make(new IndexIterator((descending ? this.creatorKey.descendingSet() : this.creatorKey)
                 .subSet(Fun.t2(addressKey, fromSeqNo),
                         Fun.t2(addressKey, toSeqNo)).iterator()));
 
@@ -234,14 +234,15 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        return IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
+        Iterator<Long> iterator = IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
                 Fun.t2(Fun.t3(addressKey, type, isCreator), descending ? Long.MAX_VALUE : Long.MIN_VALUE),
                 Fun.t2(Fun.t3(addressKey,
                         type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
                         isCreator == null ? descending ? Boolean.FALSE : Boolean.TRUE : isCreator
                 ), descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
 
-        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByAddressAndType(addressShort, type, isCreator, descending);
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent)
+                .getIteratorByAddressAndType(addressShort, type, isCreator, descending);
         return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 iterator),
@@ -254,12 +255,20 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        return IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
+        Iterator<Long> iterator = IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
                 Fun.t2(Fun.t3(addressKey, type, isCreator), fromID),
                 Fun.t2(Fun.t3(addressKey,
                         type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
                         isCreator == null ? descending ? Boolean.FALSE : Boolean.TRUE : isCreator
                 ), descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
+
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent)
+                .getIteratorByAddressAndType(addressShort, type, isCreator, fromID, descending);
+        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted),
+                iterator),
+                Fun.COMPARATOR);
+
     }
 
     @Override
@@ -271,12 +280,20 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
             toID = descending ? Long.MIN_VALUE : Long.MAX_VALUE;
         }
 
-        return IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
+        Iterator<Long> iterator = IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
                 Fun.t2(Fun.t3(addressKey, type, isCreator), fromID),
                 Fun.t2(Fun.t3(addressKey,
                         type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
                         isCreator == null ? descending ? Boolean.FALSE : Boolean.TRUE : isCreator
                 ), toID)).iterator()));
+
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent)
+                .getIteratorByAddressAndType(addressShort, type, isCreator, fromID, toID, descending);
+        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted),
+                iterator),
+                Fun.COMPARATOR);
+
     }
 
     @Override
