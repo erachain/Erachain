@@ -207,6 +207,16 @@ public class ExPays {
         return (this.flags & BALANCE_AMOUNT_MAX_FLAG_MASK) != 0;
     }
 
+
+    /**
+     * Используется ли Итераторы дополнительные для вычисления активности? Нужно для вычисления Комиссии
+     *
+     * @return
+     */
+    public boolean hasFilterActive() {
+        return filterTXType != 0 || hasTXTypeFilterActiveStart() || hasTXTypeFilterActiveEnd();
+    }
+
     public boolean hasTXTypeFilterActiveStart() {
         return (this.flags & ACTIVE_START_FLAG_MASK) != 0;
     }
@@ -524,6 +534,33 @@ public class ExPays {
 
         JSONObject toJson = new JSONObject();
 
+        toJson.put("flags", flags);
+        toJson.put("assetKey", assetKey);
+        toJson.put("balancePos", balancePos);
+        toJson.put("backward", backward);
+        toJson.put("payMethodValue", payMethodValue.toPlainString());
+        if (payMethod != PAYMENT_METHOD_ABSOLUTE) {
+            toJson.put("amountMin", amountMin);
+            toJson.put("amountMax", amountMax);
+        }
+
+        toJson.put("filterAssetKey", filterAssetKey);
+        toJson.put("filterBalancePos", filterBalancePos);
+        toJson.put("filterBalanceSide", filterBalanceSide);
+        if (hasAssetFilterBalMIN())
+            toJson.put("filterBalanceMIN", filterBalanceMIN);
+        if (hasAssetFilterBalMAX())
+            toJson.put("filterBalanceMAX", filterBalanceMAX);
+
+        toJson.put("filterTXType", filterTXType);
+        if (hasTXTypeFilterActiveStart())
+            toJson.put("filterTXStartSeqNo", filterTXStartSeqNo);
+        if (hasTXTypeFilterActiveEnd())
+            toJson.put("filterTXEndSeqNo", filterTXEndSeqNo);
+
+        toJson.put("filterByGender", filterByGender);
+        toJson.put("selfPay", selfPay);
+
 
         return toJson;
     }
@@ -553,7 +590,7 @@ public class ExPays {
     }
 
     public long getLongFee() {
-        return 10L * filteredPayoutsCount;
+        return (hasFilterActive() ? 30L : 10L) * filteredPayoutsCount;
     }
 
     public int isValid(RSignNote rNote) {
