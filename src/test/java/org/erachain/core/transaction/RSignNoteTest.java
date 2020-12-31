@@ -112,9 +112,12 @@ public class RSignNoteTest {
 
         assertEquals(Transaction.VALIDATE_OK, rNote.isValid(Transaction.FOR_NETWORK, flags));
 
+        int lenBeforeToBytes = rNote.getDataLength(Transaction.FOR_DB_RECORD, true);
+        byte[] noteBytes = rNote.toBytes(Transaction.FOR_DB_RECORD, true);
+        assertEquals(lenBeforeToBytes, noteBytes.length);
+
         rNote.process(gb, Transaction.FOR_NETWORK);
 
-        byte[] noteBytes = rNote.toBytes(Transaction.FOR_DB_RECORD, true);
         RSignNote parsedNote = null;
         byte[] parsedBytes;
         try {

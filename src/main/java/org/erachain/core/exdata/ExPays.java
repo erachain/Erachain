@@ -274,11 +274,6 @@ public class ExPays {
         }
     }
 
-    public int getLengthDBData() {
-        return Integer.BYTES + Long.BYTES + 2
-                + (totalPay == null ? 0 : totalPay.unscaledValue().toByteArray().length);
-    }
-
     public int parseDBData(byte[] dbData, int position) {
         filteredPayoutsCount = Ints.fromByteArray(Arrays.copyOfRange(dbData, position, position + Integer.BYTES));
         position += Integer.BYTES;
@@ -299,25 +294,36 @@ public class ExPays {
 
     }
 
+    public int getLengthDBData() {
+        return Integer.BYTES + Long.BYTES
+                + (totalPay == null ? 0 : 2 + totalPay.unscaledValue().toByteArray().length);
+    }
+
     public byte[] getDBdata() {
 
-        if (totalPay == null)
-            totalPay = BigDecimal.ZERO;
+        byte[] buff;
+        byte[] dbData;
 
-        byte[] buff = this.totalPay.unscaledValue().toByteArray();
-
-        byte[] dbData = new byte[buff.length + 2 + Integer.BYTES + Long.BYTES];
+        if (totalPay == null) {
+            dbData = new byte[Integer.BYTES + Long.BYTES];
+            buff = null;
+        } else {
+            buff = this.totalPay.unscaledValue().toByteArray();
+            dbData = new byte[buff.length + 2 + Integer.BYTES + Long.BYTES];
+        }
 
         int pos = 0;
         System.arraycopy(Ints.toByteArray(filteredPayoutsCount), 0, dbData, pos, Integer.BYTES);
         pos += Integer.BYTES;
+        System.arraycopy(Longs.toByteArray(totalFeeBytes), 0, dbData, pos, Long.BYTES);
+        if (totalPay == null)
+            return dbData;
+
+        pos += Long.BYTES;
 
         dbData[pos++] = (byte) this.totalPay.scale();
         dbData[pos++] = (byte) buff.length;
         System.arraycopy(buff, 0, dbData, pos, buff.length);
-        pos += buff.length;
-
-        System.arraycopy(Longs.toByteArray(totalFeeBytes), 0, dbData, pos, Long.BYTES);
 
         return dbData;
 
