@@ -274,7 +274,55 @@ public class ExPays {
         }
     }
 
-    public byte[] toBytes(int forDeal) throws Exception {
+    public int dbDataLength() {
+        return Integer.BYTES + Long.BYTES + 2 + totalPay.unscaledValue().toByteArray().length;
+    }
+
+    public int parseDBData(byte[] dbData, int position) {
+        filteredPayoutsCount = Ints.fromByteArray(Arrays.copyOfRange(dbData, position, position + Integer.BYTES));
+        position += Integer.BYTES;
+
+        int scale = dbData[position++];
+        int len = dbData[position++];
+        if (len == 0)
+            totalPay = BigDecimal.ZERO;
+        else
+            totalPay = new BigDecimal(new BigInteger(Arrays.copyOfRange(dbData, position, position + len)), scale);
+
+        position += len;
+
+        totalFeeBytes = Longs.fromByteArray(Arrays.copyOfRange(dbData, position, position + Long.BYTES));
+        position += Long.BYTES;
+
+        return position;
+
+    }
+
+    public byte[] getDBdata() {
+
+        if (totalPay == null)
+            totalPay = BigDecimal.ZERO;
+
+        byte[] buff = this.totalPay.unscaledValue().toByteArray();
+
+        byte[] dbData = new byte[buff.length + 2 + Integer.BYTES + Long.BYTES];
+
+        int pos = 0;
+        System.arraycopy(Ints.toByteArray(filteredPayoutsCount), 0, dbData, pos, Integer.BYTES);
+        pos += Integer.BYTES;
+
+        System.arraycopy((byte) this.totalPay.scale(), 0, dbData, pos++, 1);
+        System.arraycopy((byte) buff.length, 0, dbData, pos++, 1);
+        System.arraycopy(buff, 0, dbData, pos, buff.length);
+        pos += buff.length;
+
+        System.arraycopy(Longs.toByteArray(totalFeeBytes), 0, dbData, pos, Long.BYTES);
+
+        return dbData;
+
+    }
+
+    public byte[] toBytes() throws Exception {
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
@@ -335,27 +383,13 @@ public class ExPays {
             outStream.write(Longs.toByteArray(this.filterTXEndSeqNo));
         }
 
-        if (forDeal == Transaction.FOR_DB_RECORD) {
-            outStream.write(Ints.toByteArray(filteredPayoutsCount));
-
-            if (totalPay == null)
-                totalPay = BigDecimal.ZERO;
-
-            outStream.write(this.totalPay.scale());
-            buff = this.totalPay.unscaledValue().toByteArray();
-            outStream.write(buff.length);
-            outStream.write(buff);
-
-            outStream.write(Longs.toByteArray(this.totalFeeBytes));
-
-        }
         outStream.write(new byte[]{(byte) filterTXType, (byte) filterByGender, (byte) (selfPay ? 1 : 0)});
 
         return outStream.toByteArray();
 
     }
 
-    public int length(int forDeal) {
+    public int length() {
         int len = BASE_LENGTH;
 
         if (hasAmount()) {
@@ -378,15 +412,11 @@ public class ExPays {
             len += Long.BYTES;
         }
 
-        if (forDeal == Transaction.FOR_DB_RECORD) {
-            len += Integer.BYTES + Long.BYTES + 2 + totalPay.unscaledValue().toByteArray().length;
-        }
-
         return len;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static ExPays parse(byte[] data, int position, int forDeal) throws Exception {
+    public static ExPays parse(byte[] data, int position) throws Exception {
 
         int scale;
         int len;
@@ -475,32 +505,6 @@ public class ExPays {
         int filterTXType = data[position++];
         int filterByPerson = data[position++];
         boolean selfPay = data[position++] > 0;
-
-        if (forDeal == Transaction.FOR_DB_RECORD) {
-            int filteredPayoutsCount = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + Integer.BYTES));
-            position += Integer.BYTES;
-
-            scale = data[position++];
-            len = data[position++];
-            BigDecimal totalPay;
-            if (len == 0)
-                totalPay = BigDecimal.ZERO;
-            else
-                totalPay = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
-
-            position += len;
-
-            long totalFee = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));
-            position += Long.BYTES;
-
-            return new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
-                    filterAssetKey, filterBalancePos, filterBalanceSide,
-                    filterBalanceMoreThen, filterBalanceLessThen,
-                    filterTXType, filterTXStart, filterTXEnd,
-                    filterByPerson, selfPay,
-                    filteredPayoutsCount, totalPay, totalFee);
-
-        }
 
         return new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
