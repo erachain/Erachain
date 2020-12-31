@@ -482,7 +482,12 @@ public class ExPays {
 
             scale = data[position++];
             len = data[position++];
-            BigDecimal totalPay = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
+            BigDecimal totalPay;
+            if (len == 0)
+                totalPay = BigDecimal.ZERO;
+            else
+                totalPay = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
+
             position += len;
 
             long totalFee = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));

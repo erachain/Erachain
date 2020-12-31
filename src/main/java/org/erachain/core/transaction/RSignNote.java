@@ -53,29 +53,29 @@ public class RSignNote extends Transaction implements Itemable {
     /**
      * Тут запоминаем откуда данные получили - если из базы то и парсим соответствующе
      */
-    protected int forDeal;
+    protected int dataForDB;
     protected PublicKeyAccount[] signers; // for all it need encrypt
     protected byte[][] signatures; // - multi sign
 
     ExData extendedData;
 
-    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, int forDeal, long timestamp, Long reference) {
+    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, int dataForDB, long timestamp, Long reference) {
 
         super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
 
         this.key = templateKey;
         this.data = data;
-        this.forDeal = forDeal;
+        this.dataForDB = dataForDB;
     }
 
-    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, int forDeal, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, feePow, templateKey, data, forDeal, timestamp, reference);
+    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, int dataForDB, long timestamp, Long reference, byte[] signature) {
+        this(typeBytes, creator, feePow, templateKey, data, dataForDB, timestamp, reference);
         this.signature = signature;
     }
 
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
-                     int forDeal, long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, feePow, templateKey, data, forDeal, timestamp, reference);
+                     int dataForDB, long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
+        this(typeBytes, creator, feePow, templateKey, data, dataForDB, timestamp, reference);
         this.signature = signature;
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -83,20 +83,20 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     // asPack
-    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data, int forDeal, Long reference, byte[] signature) {
-        this(typeBytes, creator, (byte) 0, templateKey, data, forDeal, 0L, reference);
+    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data, int dataForDB, Long reference, byte[] signature) {
+        this(typeBytes, creator, (byte) 0, templateKey, data, dataForDB, 0L, reference);
         this.signature = signature;
         // not need this.calcFee();
     }
 
-    public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, int forDeal, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, forDeal, timestamp, reference, signature);
+    public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, int dataForDB, long timestamp, Long reference, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, dataForDB, timestamp, reference, signature);
         // set props
         this.setTypeBytes();
     }
 
-    public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, int forDeal, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, forDeal, timestamp, reference);
+    public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, int dataForDB, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, dataForDB, timestamp, reference);
         // set props
         this.setTypeBytes();
     }
@@ -116,9 +116,9 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
-                     int forDeal, PublicKeyAccount[] signers, byte[][] signatures, long timestamp,
+                     int dataForDB, PublicKeyAccount[] signers, byte[][] signatures, long timestamp,
                      Long reference, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, feePow, templateKey, data, forDeal, timestamp, reference, signature);
+        this(typeBytes, creator, feePow, templateKey, data, dataForDB, timestamp, reference, signature);
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
@@ -129,8 +129,8 @@ public class RSignNote extends Transaction implements Itemable {
 
     // as Pack
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data,
-                     int forDeal, PublicKeyAccount[] signers, byte[][] signatures, Long reference, byte[] signature) {
-        this(typeBytes, creator, templateKey, data, forDeal, reference, signature);
+                     int dataForDB, PublicKeyAccount[] signers, byte[][] signatures, Long reference, byte[] signature) {
+        this(typeBytes, creator, templateKey, data, dataForDB, reference, signature);
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
@@ -349,14 +349,14 @@ public class RSignNote extends Transaction implements Itemable {
     @Override
     public int hashCode() {
         // CLEAR HASH for Transaction.FOR_DB_RECORD - если посчитали значения - запишем их в базу а не из ХЭША берем
-        return super.hashCode() + forDeal;
+        return super.hashCode() + dataForDB;
     }
 
     @Override
     public boolean equals(Object transaction) {
         if (transaction instanceof RSignNote) {
             return Arrays.equals(this.signature, ((RSignNote) transaction).signature)
-                    && forDeal == ((RSignNote) transaction).forDeal;
+                    && dataForDB == ((RSignNote) transaction).dataForDB;
         }
         return false;
     }
@@ -466,30 +466,23 @@ public class RSignNote extends Transaction implements Itemable {
 
         if (this.data != null) {
 
-            if (forDeal == this.forDeal) {
-                //WRITE DATA SIZE
-                byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
-                data = Bytes.concat(data, dataSizeBytes);
-
-                //WRITE DATA
-                data = Bytes.concat(data, this.data);
-            } else {
-
+            if (forDeal != this.dataForDB) {
                 // пересоберем байты в нужный формат forDeal
-                byte[] exData = null;
+
                 try {
-                    exData = extendedData.toByte(forDeal);
+                    this.data = extendedData.toByte(forDeal);
+                    this.dataForDB = forDeal;
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                 }
-
-                //WRITE DATA SIZE
-                byte[] dataSizeBytes = Ints.toByteArray(exData.length);
-                data = Bytes.concat(data, dataSizeBytes);
-
-                //WRITE DATA
-                data = Bytes.concat(data, exData);
             }
+
+            //WRITE DATA SIZE
+            byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
+            data = Bytes.concat(data, dataSizeBytes);
+
+            //WRITE DATA
+            data = Bytes.concat(data, this.data);
 
             if (typeBytes[1] < 3) {
                 //WRITE ENCRYPTED
@@ -705,18 +698,20 @@ public class RSignNote extends Transaction implements Itemable {
         int add_len = 0;
         if (this.data != null && this.data.length > 0)
             if (getVersion() > 2) {
-                if (this.forDeal == forDeal) {
-                    add_len += DATA_SIZE_LENGTH + this.data.length;
-                } else {
+                if (this.dataForDB != forDeal) {
                     // пересоберем байты в нужный формат forDeal
-                    byte[] exData = null;
                     try {
-                        exData = extendedData.toByte(forDeal);
+                        if (extendedData == null) {
+                            // with old forDeal
+                            parseDataFull();
+                        }
+                        this.data = extendedData.toByte(forDeal);
+                        this.dataForDB = forDeal;
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
                     }
-                    add_len += DATA_SIZE_LENGTH + exData.length;
                 }
+                add_len += DATA_SIZE_LENGTH + this.data.length;
             } else {
                 add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH + this.data.length;
             }
@@ -872,7 +867,7 @@ public class RSignNote extends Transaction implements Itemable {
             //Version, Title, JSON, Files
             try {
                 // здесь нельзя сохранять в parsedData
-                extendedData = ExData.parse(getVersion(), this.data, forDeal, false, false);
+                extendedData = ExData.parse(getVersion(), this.data, dataForDB, false, false);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
                 Long error = null;
@@ -894,7 +889,7 @@ public class RSignNote extends Transaction implements Itemable {
 
             // version 2
             try {
-                extendedData = ExData.parse(getVersion(), this.data, forDeal, false, true);
+                extendedData = ExData.parse(getVersion(), this.data, dataForDB, false, true);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
                 Long error = null;
@@ -920,13 +915,13 @@ public class RSignNote extends Transaction implements Itemable {
 
         byte[] exData;
         try {
-            exData = decryptedExData.c.toByte(forDeal);
+            exData = decryptedExData.c.toByte(dataForDB);
         } catch (Exception e) {
             return new Fun.Tuple3<>(decryptedExData.a, e.getMessage(), null);
         }
 
         RSignNote decryptedNote = new RSignNote(typeBytes, creator, feePow, key, exData,
-                forDeal, signers, signatures, timestamp, reference, signature,
+                dataForDB, signers, signatures, timestamp, reference, signature,
                 seqNo, fee.longValue());
         return new Fun.Tuple3<>(decryptedExData.a, decryptedExData.b, decryptedNote);
 
