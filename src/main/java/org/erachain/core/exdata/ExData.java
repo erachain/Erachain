@@ -1,5 +1,6 @@
 package org.erachain.core.exdata;
 
+import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
@@ -370,6 +371,16 @@ public class ExData {
 
     }
 
+    public byte[] makeDBData() {
+
+        byte[] dbData = new byte[0];
+        if (exPays != null) {
+            dbData = Bytes.concat(dbData, exPays.getDBdata());
+        }
+
+        return dbData;
+    }
+
     public boolean isParsedWithFiles() {
         return files != null;
     }
@@ -627,6 +638,14 @@ public class ExData {
         }
         return outStream.toByteArray();
 
+    }
+
+    public int getLengthDBData() {
+        int len = 0;
+        if (exPays != null)
+            len += exPays.getLengthDBData();
+
+        return len;
     }
 
     public byte[] toByte() throws Exception {

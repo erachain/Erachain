@@ -463,15 +463,6 @@ public class RSignNote extends Transaction implements Itemable {
             //WRITE DATA
             data = Bytes.concat(data, this.data);
 
-            if (this.dataForDB != null) {
-                //WRITE DB-DATA SIZE
-                byte[] dataDBSizeBytes = Ints.toByteArray(this.dataForDB.length);
-                data = Bytes.concat(data, dataDBSizeBytes);
-
-                //WRITE DB-DATA
-                data = Bytes.concat(data, this.dataForDB);
-            }
-
             if (typeBytes[1] < 3) {
                 //WRITE ENCRYPTED
                 data = Bytes.concat(data, new byte[]{0}); //this.encrypted);
@@ -479,10 +470,29 @@ public class RSignNote extends Transaction implements Itemable {
                 //WRITE ISTEXT
                 data = Bytes.concat(data, new byte[]{1}); //this.isText);
             }
+
+            if (forDeal == Transaction.FOR_DB_RECORD) {
+                if (this.extendedData != null) {
+                    this.dataForDB = this.extendedData.makeDBData();
+                }
+
+                if (this.dataForDB == null) {
+                    data = Bytes.concat(data, new byte[Integer.BYTES]);
+                } else {
+                    //WRITE DB-DATA SIZE
+                    byte[] dataDBSizeBytes = Ints.toByteArray(this.dataForDB.length);
+                    data = Bytes.concat(data, dataDBSizeBytes);
+
+                    //WRITE DB-DATA
+                    data = Bytes.concat(data, this.dataForDB);
+                }
+            }
+
         }
 
         return data;
     }
+
 
     // releaserReference = null - not a pack
     // releaserReference = reference for releaser account - it is as pack
@@ -572,6 +582,8 @@ public class RSignNote extends Transaction implements Itemable {
         byte[] externalData = null;
         byte[] encryptedByte = null;
         byte[] isTextByte = null;
+        byte[] dbData = null;
+
         if (typeBytes[3] < 0) {
             // IF here is DATA
 
@@ -591,9 +603,22 @@ public class RSignNote extends Transaction implements Itemable {
                 isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
                 position += IS_TEXT_LENGTH;
             }
-        }
 
-        byte[] dbData = null;
+            if (forDeal == Transaction.FOR_DB_RECORD) {
+                // ADD local DB data
+                //READ DB DATA SIZE
+                byte[] dbDataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
+                int dbDataSize = Ints.fromByteArray(dbDataSizeBytes);
+                position += DATA_SIZE_LENGTH;
+
+                if (dbDataSize > 0) {
+                    //READ DATA
+                    dbData = Arrays.copyOfRange(data, position, position + dbDataSize);
+                    position += dbDataSize;
+                }
+            }
+
+        }
 
         int signersLen = getSignersLength(typeBytes);
         PublicKeyAccount[] signers = null;
@@ -632,6 +657,41 @@ public class RSignNote extends Transaction implements Itemable {
         }
     }
 
+    @Override
+    public int getDataLength(int forDeal, boolean withSignature) {
+
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
+        int add_len = 0;
+        if (this.data != null && this.data.length > 0)
+            if (getVersion() > 2) {
+                add_len += DATA_SIZE_LENGTH + this.data.length;
+                if (forDeal == FOR_DB_RECORD) {
+                    add_len += DATA_SIZE_LENGTH + (extendedData == null ?
+                            dataForDB == null ? 0 : dataForDB.length : extendedData.getLengthDBData());
+                }
+            } else {
+                add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH + this.data.length;
+            }
+
+        if (forDeal == FOR_DB_RECORD
+                || this.key > 0 && getVersion() < 3)
+            add_len += KEY_LENGTH;
+
+        return base_len + add_len;
+    }
+
     //PROCESS/ORPHAN
 
     @Override
@@ -667,40 +727,6 @@ public class RSignNote extends Transaction implements Itemable {
 
         super.orphan(block, forDeal);
 
-    }
-
-    @Override
-    public int getDataLength(int forDeal, boolean withSignature) {
-
-        int base_len;
-        if (forDeal == FOR_MYPACK)
-            base_len = BASE_LENGTH_AS_MYPACK;
-        else if (forDeal == FOR_PACK)
-            base_len = BASE_LENGTH_AS_PACK;
-        else if (forDeal == FOR_DB_RECORD)
-            base_len = BASE_LENGTH_AS_DBRECORD;
-        else
-            base_len = BASE_LENGTH;
-
-        if (!withSignature)
-            base_len -= SIGNATURE_LENGTH;
-
-        int add_len = 0;
-        if (this.data != null && this.data.length > 0)
-            if (getVersion() > 2) {
-                if (forDeal == FOR_DB_RECORD && this.dataForDB != null) {
-                    add_len += this.dataForDB.length;
-                }
-                add_len += DATA_SIZE_LENGTH + this.data.length;
-            } else {
-                add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH + this.data.length;
-            }
-
-        if (forDeal == FOR_DB_RECORD
-                || this.key > 0 && getVersion() < 3)
-            add_len += KEY_LENGTH;
-
-        return base_len + add_len;
     }
 
     //@Override
