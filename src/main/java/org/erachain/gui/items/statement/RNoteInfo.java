@@ -348,8 +348,8 @@ public class RNoteInfo extends javax.swing.JPanel {
         }
 
         ExPays exPays = exData.getExPays();
-        exPays.getFilteredPayouts(statement);
         if (exPays != null) {
+            exPays.getFilteredPayouts(statement);
             resultStr += "<h3>" + Lang.getInstance().translate("Payouts") + "</h3>";
             resultStr += Lang.getInstance().translate("Counter") + ": <b>" + exPays.getFilteredPayoutsCount() + "</b><br>"
                     + Lang.getInstance().translate("Total Amount") + ": <b>" + exPays.getTotalPay().toPlainString() + "</b><br>"

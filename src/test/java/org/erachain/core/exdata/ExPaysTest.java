@@ -1,6 +1,5 @@
 package org.erachain.core.exdata;
 
-import org.erachain.core.transaction.Transaction;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -10,8 +9,6 @@ import static org.junit.Assert.assertEquals;
 public class ExPaysTest {
 
     private int flags;
-
-    int forDeal = Transaction.FOR_NETWORK;
 
     private Long assetKey = 2L;
     private int balancePos = 1;
@@ -48,6 +45,7 @@ public class ExPaysTest {
         try {
             bytes = exPays.toBytes();
         } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
         assertEquals(bytes.length, exPays.length());
 
@@ -68,6 +66,7 @@ public class ExPaysTest {
         try {
             bytes = exPays.toBytes();
         } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
         assertEquals(bytes.length, exPays.length());
 
@@ -75,71 +74,10 @@ public class ExPaysTest {
         try {
             exPaysParsed = ExPays.parse(bytes, 0);
         } catch (Exception e) {
-            String ee = e.getMessage();
+            System.out.println(e.getMessage());
         }
 
         assertEquals(exPays.filterTXEndSeqNo, exPaysParsed.filterTXEndSeqNo);
-
-        ///////////////////
-        exPays = new ExPays(flags, null, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
-                filterAssetKey, filterBalancePos, filterBalanceSide,
-                filterBalanceMoreThen, filterBalanceLessThen,
-                filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
-                filterByGender, selfPay);
-        try {
-            bytes = exPays.toBytes();
-        } catch (Exception e) {
-        }
-        assertEquals(bytes.length, exPays.length());
-
-        try {
-            exPaysParsed = ExPays.parse(bytes, 0);
-        } catch (Exception e) {
-            String ee = e.getMessage();
-        }
-
-        assertEquals(exPays.filterTXEndSeqNo, exPaysParsed.filterTXEndSeqNo);
-
-        ///////////////////
-        exPays = new ExPays(flags, null, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
-                null, filterBalancePos, filterBalanceSide,
-                filterBalanceMoreThen, filterBalanceLessThen,
-                filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
-                filterByGender, selfPay);
-        try {
-            bytes = exPays.toBytes();
-        } catch (Exception e) {
-        }
-        assertEquals(bytes.length, exPays.length());
-
-        try {
-            exPaysParsed = ExPays.parse(bytes, 0);
-        } catch (Exception e) {
-            String ee = e.getMessage();
-        }
-
-        assertEquals(exPays.filterTXEndSeqNo, exPaysParsed.filterTXEndSeqNo);
-
-        ///////////////////
-        exPays = new ExPays(flags, null, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
-                null, filterBalancePos, filterBalanceSide,
-                null, filterBalanceLessThen,
-                0, filterTXStartSeqNo, null,
-                filterByGender, selfPay);
-        try {
-            bytes = exPays.toBytes();
-        } catch (Exception e) {
-        }
-        assertEquals(bytes.length, exPays.length());
-
-        try {
-            exPaysParsed = ExPays.parse(bytes, 0);
-        } catch (Exception e) {
-            String ee = e.getMessage();
-        }
-
-        assertEquals(exPays.selfPay, exPaysParsed.selfPay);
-
 
     }
 
