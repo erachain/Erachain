@@ -220,7 +220,11 @@ public class ExPays {
     }
 
     public long getTotalFeeBytes() {
-        return totalFeeBytes > 0 ? totalFeeBytes : (totalFeeBytes = (hasFilterActive() ? 30L : 10L) * filteredPayoutsCount);
+        return totalFeeBytes;
+    }
+
+    public void calcTotalFeeBytes() {
+        totalFeeBytes = (hasFilterActive() ? 30L : 10L) * filteredPayoutsCount;
     }
 
     public boolean hasAmount() {
@@ -967,6 +971,8 @@ public class ExPays {
                 totalPay = totalBalances;
         }
 
+        filteredPayoutsCount = count;
+        calcTotalFeeBytes();
         return count;
 
     }
