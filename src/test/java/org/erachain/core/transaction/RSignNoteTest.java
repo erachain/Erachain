@@ -12,6 +12,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
+import org.json.simple.JSONObject;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -39,9 +40,10 @@ public class RSignNoteTest {
     AssetCls asset;
     AssetCls assetMovable;
     long key = 0;
+    JSONObject json = new JSONObject();
 
     byte version = (byte) 3;
-    byte[] flagsExData = new byte[4];
+    byte[] flagsExData = new byte[]{version, 0, 0, 0};
 
     byte[] exDataBytes;
 
@@ -57,6 +59,7 @@ public class RSignNoteTest {
         maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
         maker.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
+        json.put("MS", "Message");
     }
 
     @Test
@@ -93,7 +96,7 @@ public class RSignNoteTest {
 
         ExData exData = new ExData(flagsExData, exLink, exPays, "title", (byte) 0, null,
                 (byte) 0, null,
-                (byte) 0, null, null, (byte) 0, null, null);
+                (byte) 0, null, null, json, null);
 
         try {
             exDataBytes = exData.toByte();
@@ -104,8 +107,8 @@ public class RSignNoteTest {
 
         RSignNote rNote = new RSignNote(version, (byte) 0, (byte) 0, maker, (byte) feePow,
                 templateKey, exDataBytes, NTP.getTime(), 0L);
-        rNote.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1, true);
         rNote.sign(maker, Transaction.FOR_NETWORK);
+        rNote.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1, true);
 
         assertEquals(Transaction.VALIDATE_OK, rNote.isValid(Transaction.FOR_NETWORK, flags));
 
