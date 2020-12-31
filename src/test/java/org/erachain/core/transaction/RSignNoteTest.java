@@ -1,12 +1,16 @@
 package org.erachain.core.transaction;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.database.IDB;
+import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
 import org.junit.Test;
 
@@ -17,6 +21,14 @@ import static org.junit.Assert.assertEquals;
 public class RSignNoteTest {
 
     Controller cntrl;
+    BlockChain bchain;
+    DCSet dcSet;
+    private GenesisBlock gb;
+    int asPack = Transaction.FOR_NETWORK;
+    long FEE_KEY = AssetCls.FEE_KEY;
+    byte FEE_POWER = (byte) 1;
+    long timestamp = NTP.getTime();
+
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("tes213sdffsdft".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -33,8 +45,24 @@ public class RSignNoteTest {
 
     byte[] exDataBytes;
 
+    private void init() {
+
+        dcSet = DCSet.createEmptyHardDatabaseSet(IDB.DBS_MAP_DB);
+        cntrl = Controller.getInstance();
+        cntrl.initBlockChain(dcSet);
+        bchain = cntrl.getBlockChain();
+        gb = bchain.getGenesisBlock();
+
+        // FEE FUND
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
+        maker.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+
+    }
+
     @Test
     public void toBytes() {
+
+        init();
 
         ExLink exLink = null;
         int feePow = 0;
@@ -74,9 +102,14 @@ public class RSignNoteTest {
             exDataBytes = null;
         }
 
-        RSignNote rNote = new RSignNote(version, (byte) 0, (byte) 0, maker_1, (byte) feePow,
+        RSignNote rNote = new RSignNote(version, (byte) 0, (byte) 0, maker, (byte) feePow,
                 templateKey, exDataBytes, NTP.getTime(), 0L);
+        rNote.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1, true);
+        rNote.sign(maker, Transaction.FOR_NETWORK);
 
+        assertEquals(Transaction.VALIDATE_OK, rNote.isValid(Transaction.FOR_NETWORK, flags));
+
+        rNote.process(gb, Transaction.FOR_NETWORK);
 
         byte[] noteBytes = rNote.toBytes(Transaction.FOR_DB_RECORD, true);
         RSignNote parsedNote = null;
