@@ -52,14 +52,14 @@ public class ExPays {
     private static final byte ACTIVE_START_FLAG_MASK = 2;
     private static final byte ACTIVE_END_FLAG_MASK = 1;
 
-    private static final byte PAYMENT_METHOD_TOTAL = 0; // by TOTAL
-    private static final byte PAYMENT_METHOD_COEFF = 1; // by coefficient
-    private static final byte PAYMENT_METHOD_ABSOLUTE = 2; // by ABSOLUTE VALUE
+    public static final byte PAYMENT_METHOD_TOTAL = 0; // by TOTAL
+    public static final byte PAYMENT_METHOD_COEFF = 1; // by coefficient
+    public static final byte PAYMENT_METHOD_ABSOLUTE = 2; // by ABSOLUTE VALUE
 
-    private static final byte FILTER_PERSON_NONE = 0;
-    private static final byte FILTER_PERSON_ONLY = 1;
-    private static final byte FILTER_PERSON_ONLY_MAN = 2;
-    private static final byte FILTER_PERSON_ONLY_WOMAN = 3;
+    public static final byte FILTER_PERSON_NONE = 0;
+    public static final byte FILTER_PERSON_ONLY = 1;
+    public static final byte FILTER_PERSON_ONLY_MAN = 2;
+    public static final byte FILTER_PERSON_ONLY_WOMAN = 3;
 
     private static final byte NOT_FILTER_PERSONS = -1; //
     private static final byte NOT_FILTER_GENDER = -2; //
