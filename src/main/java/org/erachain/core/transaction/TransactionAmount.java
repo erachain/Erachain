@@ -1220,10 +1220,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     public static void processAction(DCSet dcSet, boolean asOrphan, PublicKeyAccount creator, Account recipient,
-                                     int balancePos, long absKey, long key, BigDecimal amount,
-                                     boolean backward, boolean isDirect, boolean incomeReverse) {
+                                     int balancePos, long absKey, AssetCls asset, long key, BigDecimal amount,
+                                     boolean backward, boolean incomeReverse) {
 
         boolean subtract = asOrphan ^ backward;
+        boolean isDirect = asset.isDirectBalances();
+
         // STANDARD ACTION PROCESS
         // UPDATE SENDER
         if (absKey == 666L) {
@@ -1283,6 +1285,28 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 }
             }
         }
+
+        if (balancePos == ACTION_SEND && asset.isChangeDebtBySendActions()) {
+            // если это актив который должен поменять и балансы Долговые то
+            // тут не важно какое направление и какой остаток - все одинаково - учетный же
+
+            processAction(dcSet, asOrphan, creator, recipient, ACTION_DEBT,
+                    absKey, asset, -key, amount, backward, incomeReverse);
+        } else if (balancePos == ACTION_SPEND && amount.signum() < 0 && asset.isChangeDebtBySpendActions()) {
+            // если это актив в Требованием Исполнения - то подтверждение Исполнения уменьшит и Требование Исполнения
+            // Но ПОЛУЧАТЕЛЬ - у нас создатель Актива
+
+            // смотрим какой там долг (он отрицательный)
+            BigDecimal debtBalance = creator.getBalance(dcSet, absKey, ACTION_DEBT).b;
+            // и берем наибольший из них (там оба отрицательные) - так чтобы если Требование меньше Чем  текущее Действие - чтобы в минус не ушло
+            debtBalance = debtBalance.max(amount);
+
+            if (debtBalance.signum() != 0) {
+                processAction(dcSet, !asOrphan, creator, asset.getOwner(), ACTION_DEBT,
+                        absKey, asset, key, debtBalance.negate(), backward, incomeReverse);
+            }
+        }
+
     }
 
     @Override
@@ -1302,34 +1326,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // BACKWARD - CONFISCATE
         boolean backward = isBackward();
         boolean isDirect = asset.isDirectBalances();
-        int actionType = Account.balancePosition(key, amount, backward, isDirect);
+        int balancePosition = Account.balancePosition(key, amount, backward, isDirect);
         long absKey = getAbsKey();
-        boolean incomeReverse = actionType == ACTION_HOLD;
+        boolean incomeReverse = balancePosition == ACTION_HOLD;
 
         // STANDARD ACTION PROCESS
-        processAction(dcSet, false, creator, recipient, actionType, absKey, key, amount, backward, isDirect, incomeReverse);
-
-        if (actionType == ACTION_SEND && asset.isChangeDebtBySendActions()) {
-            // если это актив который должен поменять и балансы Долговые то
-            // тут не важно какое направление и какой остаток - все одинаково - учетный же
-
-            processAction(dcSet, false, creator, recipient, ACTION_DEBT,
-                    absKey, -key, amount, backward, isDirect, incomeReverse);
-        } else if (actionType == ACTION_SPEND && amount.signum() < 0 && asset.isChangeDebtBySpendActions()) {
-            // если это актив в Требованием Исполнения - то подтверждение Исполнения уменьшит и Требование Исполнения
-            // Но ПОЛУЧАТЕЛЬ - у нас создатель Актива
-
-            // смотрим какой там долг (он отрицательный)
-            BigDecimal debtBalance = creator.getBalance(dcSet, absKey, ACTION_DEBT).b;
-            // и берем наибольший из них (там оба отрицательные) - так чтобы если Требование меньше Чем  текущее Действие - чтобы в минус не ушло
-            debtBalance = debtBalance.max(amount);
-
-            if (debtBalance.signum() != 0) {
-                processAction(dcSet, true, creator, asset.getOwner(), ACTION_DEBT,
-                        absKey, key, debtBalance.negate(), backward, isDirect, incomeReverse);
-            }
-        }
-
+        processAction(dcSet, false, creator, recipient, balancePosition, absKey, asset, key, amount, backward, incomeReverse);
 
         if (absKey == Transaction.RIGHTS_KEY && block != null) {
             block.addForgingInfoUpdate(this.recipient);
@@ -1361,30 +1363,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         boolean backward = isBackward();
         boolean isDirect = asset.isDirectBalances();
         long absKey = getAbsKey();
-        int actionType = Account.balancePosition(key, amount, backward, isDirect);
-        boolean incomeReverse = actionType == ACTION_HOLD;
+        int balancePosition = Account.balancePosition(key, amount, backward, isDirect);
+        boolean incomeReverse = balancePosition == ACTION_HOLD;
 
         // STANDARD ACTION ORPHAN
-        processAction(dcSet, true, creator, recipient, actionType, absKey, key, amount, backward, isDirect, incomeReverse);
-
-        if (actionType == ACTION_SEND && asset.isChangeDebtBySendActions()) {
-            // если это актив который должен поменять и балансы Долговые то
-
-            processAction(dcSet, true, creator, recipient, ACTION_DEBT,
-                    absKey, -key, amount, backward, isDirect, incomeReverse);
-        } else if (actionType == ACTION_SPEND && amount.signum() < 0 && asset.isChangeDebtBySpendActions()) {
-            // если это актив в Требованием Исполнения - то подтверждение Исполнения уменьшит и Требование Исполнения
-
-            // смотрим какой там долг (он отрицательный)
-            BigDecimal debtBalance = creator.getBalance(dcSet, absKey, ACTION_DEBT).b;
-            // и берем наибольший из них (там оба отрицательные) - так чтобы если Требование меньше Чем  текущее Действие - чтобы в минус не ушло
-            debtBalance = debtBalance.max(amount);
-
-            if (debtBalance.signum() != 0) {
-                processAction(dcSet, false, creator, asset.getOwner(), ACTION_DEBT,
-                        absKey, key, debtBalance.negate(), backward, isDirect, incomeReverse);
-            }
-        }
+        processAction(dcSet, true, creator, recipient, balancePosition, absKey, asset, key, amount, backward, incomeReverse);
 
         if (absKey == Transaction.RIGHTS_KEY && block != null) {
             block.addForgingInfoUpdate(this.recipient);

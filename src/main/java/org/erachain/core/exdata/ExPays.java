@@ -998,8 +998,8 @@ public class ExPays {
                 BigDecimal amount = (BigDecimal) item.c;
 
                 TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey,
-                        key, signs.b > 0 ? amount : amount.negate(), backward,
-                        isDirect, incomeReverse);
+                        asset, key, signs.b > 0 ? amount : amount.negate(), backward,
+                        incomeReverse);
 
                 if (!asOrphan && block != null)
                     rNote.addCalculated(block, recipient, absKey, amount, "payout");
