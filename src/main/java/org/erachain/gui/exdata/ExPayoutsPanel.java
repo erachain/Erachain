@@ -142,22 +142,22 @@ public class ExPayoutsPanel extends IconPanel {
     private void updateLabelsByMethod() {
         switch (jComboBoxMethodPaymentType.getSelectedIndex()) {
             case 0:
-                jLabelMethodPaymentDecscription.setText(
-                        Lang.getInstance().translate("PAY_METHOD_0"));
-                jLabelAmount.setText(Lang.getInstance().translate("Percent"));
-                jTextFieldPaymentMin.setEnabled(true);
-                jTextFieldPaymentMax.setEnabled(true);
-                return;
-            case 1:
-                jLabelMethodPaymentDecscription.setText(
-                        Lang.getInstance().translate("PAY_METHOD_1"));
+                jLabelMethodPaymentDecscription.setText("<html>" +
+                        Lang.getInstance().translate("PAY_METHOD_0_D"));
                 jLabelAmount.setText(Lang.getInstance().translate("Total"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
                 return;
+            case 1:
+                jLabelMethodPaymentDecscription.setText("<html>" +
+                        Lang.getInstance().translate("PAY_METHOD_1_D"));
+                jLabelAmount.setText(Lang.getInstance().translate("Percent"));
+                jTextFieldPaymentMin.setEnabled(true);
+                jTextFieldPaymentMax.setEnabled(true);
+                return;
             case 2:
-                jLabelMethodPaymentDecscription.setText(
-                        Lang.getInstance().translate("PAY_METHOD_2"));
+                jLabelMethodPaymentDecscription.setText("<html>" +
+                        Lang.getInstance().translate("PAY_METHOD_2_D"));
                 jLabelAmount.setText(Lang.getInstance().translate("Amount"));
                 jTextFieldPaymentMin.setEnabled(false);
                 jTextFieldPaymentMax.setEnabled(false);
@@ -299,9 +299,9 @@ public class ExPayoutsPanel extends IconPanel {
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelMethod, labelGBC);
         jComboBoxMethodPaymentType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
-                Lang.getInstance().translate("Payouts make by Total Amount and balance of recipient"),
-                Lang.getInstance().translate("Payouts make by Percentage and balance of recipient"),
-                Lang.getInstance().translate("Absolute Value"),
+                Lang.getInstance().translate("PAY_METHOD_0"),
+                Lang.getInstance().translate("PAY_METHOD_1"),
+                Lang.getInstance().translate("PAY_METHOD_2"),
         }));
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxMethodPaymentType, fieldGBC);
