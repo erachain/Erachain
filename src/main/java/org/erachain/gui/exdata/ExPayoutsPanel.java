@@ -134,8 +134,11 @@ public class ExPayoutsPanel extends IconPanel {
         if (creator == null)
             return;
 
+        int selected = jComboBoxPayoutAction.getSelectedIndex();
         jComboBoxPayoutAction.setModel(new javax.swing.DefaultComboBoxModel(
                 asset.viewAssetTypeActionsList(creator.equals(asset.getOwner()), false).toArray()));
+        if (selected >= 0)
+            jComboBoxPayoutAction.setSelectedIndex(selected);
 
     }
 
