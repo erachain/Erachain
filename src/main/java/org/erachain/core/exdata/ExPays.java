@@ -2,6 +2,8 @@ package org.erachain.core.exdata;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -559,9 +561,12 @@ public class ExPays {
         BigDecimal payMethodValueBG;
         BigDecimal filterBalanceMoreThenBG;
         BigDecimal filterBalanceLessThenBG;
-        Long filterTXStart;
-        Long filterTXEnd;
+        Long filterTXStartSeqNo;
+        Long filterTXEndSeqNo;
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:00");
+
+        Controller cntr = Controller.getInstance();
+        BlockChain chain = cntr.getBlockChain();
 
         try {
             amountMinBG = amountMin == null || amountMin.isEmpty() ? null : new BigDecimal(amountMin);
@@ -575,27 +580,35 @@ public class ExPays {
             filterBalanceLessThenBG = filterBalanceLessThen == null || filterBalanceLessThen.isEmpty() ? null : new BigDecimal(filterBalanceLessThen);
             ++steep;
             if (filterTXStartStr == null || filterTXStartStr.isEmpty()) {
-                filterTXStart = null;
+                filterTXStartSeqNo = null;
             } else {
-                try {
-                    Date parsedDate = dateFormat.parse(filterTXStartStr);
-                    Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
-                    filterTXStart = timestamp.getTime();
-                } catch (Exception e) {
-                    filterTXStart = Long.parseLong(filterTXStartStr) * 1000L;
+                filterTXStartSeqNo = Transaction.parseDBRef(filterTXStartStr);
+                if (filterTXStartSeqNo == null) {
+                    try {
+                        Date parsedDate = dateFormat.parse(filterTXStartStr);
+                        Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+                        filterTXStartSeqNo = timestamp.getTime();
+                    } catch (Exception e) {
+                        filterTXStartSeqNo = Long.parseLong(filterTXStartStr) * 1000L;
+                    }
+                    filterTXStartSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestampMS(filterTXStartSeqNo), 0);
                 }
             }
 
             ++steep;
             if (filterTXEndStr == null || filterTXEndStr.isEmpty()) {
-                filterTXEnd = null;
+                filterTXEndSeqNo = null;
             } else {
-                try {
-                    Date parsedDate = dateFormat.parse(filterTXEndStr);
-                    Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
-                    filterTXEnd = timestamp.getTime();
-                } catch (Exception e) {
-                    filterTXEnd = Long.parseLong(filterTXEndStr) * 1000L;
+                filterTXEndSeqNo = Transaction.parseDBRef(filterTXEndStr);
+                if (filterTXEndSeqNo == null) {
+                    try {
+                        Date parsedDate = dateFormat.parse(filterTXEndStr);
+                        Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+                        filterTXEndSeqNo = timestamp.getTime();
+                    } catch (Exception e) {
+                        filterTXEndSeqNo = Long.parseLong(filterTXEndStr) * 1000L;
+                    }
+                    filterTXEndSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestampMS(filterTXEndSeqNo), 0);
                 }
             }
         } catch (Exception e) {
@@ -640,7 +653,7 @@ public class ExPays {
         return new Fun.Tuple2<>(new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValueBG, amountMinBG, amountMaxBG,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceMoreThenBG, filterBalanceLessThenBG,
-                filterTXType, filterTXStart, filterTXEnd,
+                filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
                 filterByPerson, selfPay), null);
 
     }

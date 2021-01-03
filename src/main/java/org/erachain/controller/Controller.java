@@ -2139,7 +2139,7 @@ public class Controller extends Observable {
         long weight = myHWeight.b;
         Peer maxPeer = null;
 
-        long maxHeight = blockChain.getHeightOnTimestamp(NTP.getTime());
+        long maxHeight = blockChain.getHeightOnTimestampMS(NTP.getTime());
 
         try {
             for (Peer peer : network.getActivePeers(false)) {
