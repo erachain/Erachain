@@ -1,6 +1,7 @@
 package org.erachain.gui.exdata;
 
 
+import com.toedter.calendar.JDateChooser;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.item.ItemCls;
@@ -21,6 +22,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.TimeZone;
 
 
 public class ExPayoutsPanel extends IconPanel {
@@ -197,9 +199,7 @@ public class ExPayoutsPanel extends IconPanel {
         jPanelFilterBalance = new javax.swing.JPanel();
         jPanelStartEndActions = new javax.swing.JPanel();
         jLabelDataStart = new javax.swing.JLabel();
-        jTextFieldDateStart = new javax.swing.JTextField();
         jLabelDateEnd = new javax.swing.JLabel();
-        jTextFieldDateEnd = new javax.swing.JTextField();
         jLabel19 = new javax.swing.JLabel();
         jComboBoxFilterSideBalance = new javax.swing.JComboBox<>();
         jLabel20 = new javax.swing.JLabel();
@@ -227,6 +227,15 @@ public class ExPayoutsPanel extends IconPanel {
 
         Font ff = (Font) UIManager.get("Label.font");
         Font headFont = new java.awt.Font(ff.getFontName(), Font.BOLD, ff.getSize() + 1);
+
+        TimeZone tz = TimeZone.getDefault();
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        jTextFieldDateStart = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+        jTextFieldDateEnd = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+        TimeZone.setDefault(tz);
+
+        jTextFieldDateStart.setFont(UIManager.getFont("TextField.font"));
+        jTextFieldDateEnd.setFont(UIManager.getFont("TextField.font"));
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
         layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
@@ -472,6 +481,8 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelStartEndActions.add(jTextFieldDateStart, gridBagConstraints);
+        //jTextFieldDateStart.setToolTipText(Lang.getInstance().translate(
+        //        "Empty or %1 or as timestamp in seconds").replace("%1","yyyy-MM-dd hh:mm:00"));
 
         jLabelDateEnd.setText(Lang.getInstance().translate("Date end"));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -487,6 +498,8 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = fieldGBC.insets;
+        //jTextFieldDateEnd.setToolTipText(Lang.getInstance().translate(
+        //        "Empty or %1 or as timestamp in seconds").replace("%1","yyyy-MM-dd hh:mm:00"));
         jPanelStartEndActions.add(jTextFieldDateEnd, gridBagConstraints);
 
         fieldGBC.gridy = ++gridy;
@@ -554,6 +567,19 @@ public class ExPayoutsPanel extends IconPanel {
 
         Integer txTypeFilter = (Integer) jComboBoxTXTypeFilter.getSelectedItem();
 
+        String jTextFieldDateStartStr;
+        try {
+            jTextFieldDateStartStr = "" + jTextFieldDateStart.getCalendar().getTimeInMillis() * 0.001;
+        } catch (Exception ed1) {
+            jTextFieldDateStartStr = null;
+        }
+        String jTextFieldDateEndStr;
+        try {
+            jTextFieldDateEndStr = "" + jTextFieldDateEnd.getCalendar().getTimeInMillis() * 0.001;
+        } catch (Exception ed1) {
+            jTextFieldDateEndStr = null;
+        }
+
         return ExPays.make(
                 ((AssetCls) jComboBoxPayoutAsset.getSelectedItem()).getKey(),
                 balancePosition.a.a, balancePosition.a.b,
@@ -565,7 +591,7 @@ public class ExPayoutsPanel extends IconPanel {
                 jComboBoxFilterBalancePosition.getSelectedIndex() + 1, jComboBoxFilterSideBalance.getSelectedIndex() + 1,
                 jTextFieldBQ.getText(), jTextFieldLQ.getText(),
                 txTypeFilter,
-                jTextFieldDateStart.getText(), jTextFieldDateEnd.getText(),
+                jTextFieldDateStartStr, jTextFieldDateEndStr,
                 jComboBoxPersonFilter.getSelectedIndex(), jCheckBoxSelfPay.isSelected());
     }
 
@@ -616,8 +642,9 @@ public class ExPayoutsPanel extends IconPanel {
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JTextField jTextFieldAmount;
     private javax.swing.JTextField jTextFieldBQ;
-    private javax.swing.JTextField jTextFieldDateEnd;
-    private javax.swing.JTextField jTextFieldDateStart;
+    private JDateChooser jTextFieldDateStart;
+    private JDateChooser jTextFieldDateEnd;
+
     private javax.swing.JTextField jTextFieldLQ;
     private javax.swing.JTextField jTextFieldPaymentMax;
     private javax.swing.JTextField jTextFieldPaymentMin;

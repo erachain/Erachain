@@ -25,10 +25,9 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * StandardCharsets.UTF_8 JSON "TM" - template key "PR" - template params
@@ -562,6 +561,8 @@ public class ExPays {
         BigDecimal filterBalanceLessThenBG;
         Long filterTXStart;
         Long filterTXEnd;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:00");
+
         try {
             amountMinBG = amountMin == null || amountMin.isEmpty() ? null : new BigDecimal(amountMin);
             ++steep;
@@ -573,9 +574,30 @@ public class ExPays {
             ++steep;
             filterBalanceLessThenBG = filterBalanceLessThen == null || filterBalanceLessThen.isEmpty() ? null : new BigDecimal(filterBalanceLessThen);
             ++steep;
-            filterTXStart = filterTXStartStr == null || filterTXStartStr.isEmpty() ? null : Transaction.parseDBRef(filterTXStartStr);
+            if (filterTXStartStr == null || filterTXStartStr.isEmpty()) {
+                filterTXStart = null;
+            } else {
+                try {
+                    Date parsedDate = dateFormat.parse(filterTXStartStr);
+                    Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+                    filterTXStart = timestamp.getTime();
+                } catch (Exception e) {
+                    filterTXStart = Long.parseLong(filterTXStartStr) * 1000L;
+                }
+            }
+
             ++steep;
-            filterTXEnd = filterTXEndStr == null || filterTXEndStr.isEmpty() ? null : Transaction.parseDBRef(filterTXEndStr);
+            if (filterTXEndStr == null || filterTXEndStr.isEmpty()) {
+                filterTXEnd = null;
+            } else {
+                try {
+                    Date parsedDate = dateFormat.parse(filterTXEndStr);
+                    Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+                    filterTXEnd = timestamp.getTime();
+                } catch (Exception e) {
+                    filterTXEnd = Long.parseLong(filterTXEndStr) * 1000L;
+                }
+            }
         } catch (Exception e) {
             String error;
             switch (steep) {
