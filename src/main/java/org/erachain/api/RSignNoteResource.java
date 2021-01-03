@@ -2,7 +2,9 @@ package org.erachain.api;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.ExPays;
+import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.utils.APIUtils;
@@ -92,7 +94,7 @@ public class RSignNoteResource {
 
         String password = (String) jsonObject.getOrDefault("password", null);
 
-        int steep = 0;
+        int step = 0;
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
@@ -110,8 +112,6 @@ public class RSignNoteResource {
 
         boolean test = Boolean.valueOf((boolean) jsonObject.getOrDefault("test", true));
 
-        Long linkTo = (Long) jsonObject.get("linkTo");
-
         String title = (String) jsonObject.getOrDefault("title", null);
         String message = (String) jsonObject.getOrDefault("message", null);
 
@@ -126,7 +126,7 @@ public class RSignNoteResource {
             int position = Integer.valueOf(jsonObject.getOrDefault("position", 1).toString());
             boolean backward = Boolean.valueOf((boolean) jsonObject.getOrDefault("backward", false));
 
-            steep++;
+            step++;
             int payMethod = Integer.valueOf(jsonObject.getOrDefault("method", 1).toString());
             String value = (String) jsonObject.get("methodValue");
             String amountMin = (String) jsonObject.get("amountMin");
@@ -182,6 +182,14 @@ public class RSignNoteResource {
 
             JSONObject out = new JSONObject();
             JSONArray outResult = new JSONArray();
+
+            byte[] exDataResult = ExData.make(exLink, exPayoutsResult.a, creator, jTextField_Title_Message.getText(),
+                    signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
+                    (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),
+                    fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
+                    jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),
+                    hashes_Map, checkBoxMakeHashAndCheckUniqueHashes.isSelected(),
+                    files_1, checkBoxMakeHashAndCheckUniqueAttachedFiles.isSelected());
 
             if (payouts != null) {
                 out.put("_results", outResult);

@@ -1168,7 +1168,7 @@ public class ExData {
 
     public static byte[] make(ExLink exLink, ExPays exPays, PrivateKeyAccount creator, String title, boolean signCanOnlyRecipients, Account[] recipients,
                               ExLinkAuthor[] authors, ExLinkSource[] sources, String tagsStr, boolean isEncrypted,
-                              TemplateCls template, HashMap<String, String> params_Template, boolean uniqueTemplate,
+                              Long templateKey, HashMap<String, String> params_Template, boolean uniqueTemplate,
                               String message, boolean uniqueMessage,
                               HashMap<String, String> hashes_Map, boolean uniqueHashes,
                               Set<Tuple3<String, Boolean, byte[]>> files_Set, boolean uniqueFiles)
@@ -1179,8 +1179,8 @@ public class ExData {
         JSONObject hashes_JSON = new JSONObject();
 
         // add template AND params
-        if (template != null) {
-            out_Map.put("TM", template.getKey());
+        if (templateKey != null) {
+            out_Map.put("TM", templateKey);
 
             Iterator<Entry<String, String>> it_templ = params_Template.entrySet().iterator();
             while (it_templ.hasNext()) {
