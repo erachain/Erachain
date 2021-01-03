@@ -2,15 +2,13 @@ package org.erachain.api;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.ExPays;
-import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkAppendix;
-import org.erachain.core.exdata.exLink.ExLinkReply;
+import org.erachain.core.exdata.exLink.*;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
@@ -28,8 +26,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.text.SimpleDateFormat;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 @Path("r_note")
 @Produces(MediaType.APPLICATION_JSON)
@@ -101,7 +98,35 @@ public class RSignNoteResource {
         int step = 0;
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
-        String recipient = (String) jsonObject.getOrDefault("recipient", null);
+
+        step++;
+        JSONObject recipientsJson = (JSONObject) jsonObject.get("recipients");
+        boolean onlyRecipients = false;
+        Account[] recipients;
+        if (recipientsJson == null) {
+            recipients = null;
+        } else {
+            onlyRecipients = Boolean.valueOf((boolean) jsonObject.getOrDefault("onlyRecipients", false));
+            JSONArray recipientsArray = (JSONArray) jsonObject.get("list");
+            if (recipientsArray == null) {
+                JSONObject out = new JSONObject();
+                Transaction.updateMapByErrorSimple(Transaction.INVALID_RECEIVERS_LIST, out);
+                return out.toJSONString();
+            }
+
+            recipients = new Account[recipientsArray.size()];
+            for (int index = 0; index < recipientsArray.size(); index++) {
+                String recipientAddress = (String) recipientsArray.get(index);
+                //ORDINARY RECIPIENT
+                Fun.Tuple2<Account, String> result = Account.tryMakeAccount(recipientAddress);
+                if (result.a == null) {
+                    JSONObject out = new JSONObject();
+                    Transaction.updateMapByErrorSimple(Transaction.INVALID_RECEIVERS_LIST, recipientAddress, out);
+                    return out.toJSONString();
+                }
+                recipients[index] = result.a;
+            }
+        }
 
         step++;
         Long exLinkType = (Long) jsonObject.get("linkType");
@@ -110,15 +135,13 @@ public class RSignNoteResource {
             String linkToRefStr = jsonObject.get("linkTo").toString();
             if (linkToRefStr == null) {
                 JSONObject out = new JSONObject();
-                out.put("error", Transaction.INVALID_EX_LINK_REF);
-                out.put("error_message", OnDealClick.resultMess(Transaction.INVALID_EX_LINK_REF));
+                Transaction.updateMapByErrorSimple(Transaction.INVALID_EX_LINK_REF, out);
                 return out.toJSONString();
             } else {
                 Transaction parent = DCSet.getInstance().getTransactionFinalMap().getRecord(linkToRefStr);
                 if (parent == null) {
                     JSONObject out = new JSONObject();
-                    out.put("error", Transaction.INVALID_EX_LINK_REF);
-                    out.put("error_message", OnDealClick.resultMess(Transaction.INVALID_EX_LINK_REF));
+                    Transaction.updateMapByErrorSimple(Transaction.INVALID_EX_LINK_REF, out);
                     return out.toJSONString();
                 }
                 int linkType = (int) (long) exLinkType;
@@ -214,6 +237,20 @@ public class RSignNoteResource {
         Controller cntr = Controller.getInstance();
         BlockChain chain = cntr.getBlockChain();
 
+        ExLinkAuthor[] authors = null;
+        ExLinkSource[] sources = null;
+        String tags = (String) jsonObject.get("tags");
+        boolean isEncrypted = Boolean.valueOf((boolean) jsonObject.getOrDefault("encrypt", false));
+        HashMap<String, String> templateParams = null;
+        boolean templateUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("templateUnique", false));
+
+        boolean messageUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("messageUnique", false));
+
+        HashMap<String, String> hashes = new HashMap<String, String>();
+        boolean hashesUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("hashesUnique", false));
+
+        Set<Fun.Tuple3<String, Boolean, byte[]>> files = new HashSet<Fun.Tuple3<String, Boolean, byte[]>>();
+        boolean filesUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("filesUnique", false));
 
         if (!test) {
             // так как тут может очень долго работать то откроем на долго
@@ -224,13 +261,12 @@ public class RSignNoteResource {
             JSONObject out = new JSONObject();
             JSONArray outResult = new JSONArray();
 
-            byte[] exDataResult = ExData.make(linkTo, exPayoutsResult.a, creator, jTextField_Title_Message.getText(),
-                    signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
-                    templateKey, fill_Template_Panel.get_Params(),
-                    fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
-                    jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),
-                    hashes_Map, checkBoxMakeHashAndCheckUniqueHashes.isSelected(),
-                    files_1, checkBoxMakeHashAndCheckUniqueAttachedFiles.isSelected());
+            byte[] exDataResult = ExData.make(exLink, payouts, creator, title,
+                    onlyRecipients, recipients, authors, sources, tags, isEncrypted,
+                    templateKey, templateParams, templateUnique,
+                    message, messageUnique,
+                    hashes, hashesUnique,
+                    files, filesUnique;
 
             if (payouts != null) {
                 out.put("_results", outResult);

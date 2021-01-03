@@ -250,6 +250,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public static final int INVALID_EX_LINK_TYPE = 401;
     public static final int INVALID_EX_LINK_REF = 402;
+    public static final int INVALID_RECEIVERS_LIST = 403;
 
     public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 501;
     public static final int ACCOUNT_ACCSES_DENIED = 520;
