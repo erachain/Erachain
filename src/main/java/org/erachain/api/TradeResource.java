@@ -145,7 +145,7 @@ public class TradeResource {
                 wantAmount, //new BigDecimal(wantAmount), //.setScale(wantAsset.getScale()),
                 feePower.intValue());
 
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -270,7 +270,7 @@ public class TradeResource {
 
         Transaction transaction = cntr.cancelOrder2(privateKeyAccount, signature, feePower.intValue());
 
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -918,7 +918,7 @@ public class TradeResource {
                             transaction = cnt.createOrder(creator,
                                     have, want, haveAmount, wantAmount, 0);
 
-                            Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
+                            Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
                             // CLEAR for HEAP
                             transaction.resetDCSet();
 

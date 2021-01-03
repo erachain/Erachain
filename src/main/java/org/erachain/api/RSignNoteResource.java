@@ -3,9 +3,11 @@ package org.erachain.api;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.exdata.exLink.*;
+import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
@@ -25,7 +27,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Path("r_note")
@@ -39,7 +40,22 @@ public class RSignNoteResource {
     @GET
     public String help() {
         Map<String, String> help = new LinkedHashMap<String, String>();
-        help.put("POST make/{fromAddress}/{assetKey}/{forAssetKey}?position=1&amount=0&test=true&feePow=0&activeafter=[date]&activebefore=[date]&greatequal=[amount]&koeff=1&title=&onlyperson=false&selfpay=false&password=",
+        help.put("POST make"
+                        + "creator - maker account"
+                        + "assetKey - asset key for Action"
+                        + "forAssetKey"
+                        + "position=1"
+                        + "amount=0"
+                        + "test=true"
+                        + "feePow=0"
+                        + "activeafter=[date]"
+                        + "activebefore=[date]"
+                        + "greatequal=[amount]"
+                        + "koeff=1" +
+                        "title=&" +
+                        "onlyperson=false" +
+                        "&selfpay=false" +
+                        "&password=",
                 "Muli-send from Address [fromAddress] the asset [assetKey] by filter: Who has positive balance by asset [forAssetKey] where "
                         + " position - balance position for test, amount and koeff: sensed AMOUNT = amount + koeff * BALANCE, test - set false for real send or true for statistics, activeafter and activebefore - check activity for address in format: [timestamp_in_sec | YYYY-MM-DD HH:MM],"
                         + " greatequal=0 - if set balance in position must be great or equal this amount, activeTypeTX=0 - if set test activity on this type transactions,"
@@ -97,37 +113,23 @@ public class RSignNoteResource {
 
         int step = 0;
 
-        String creator = (String) jsonObject.getOrDefault("creator", null);
-
-        step++;
-        JSONObject recipientsJson = (JSONObject) jsonObject.get("recipients");
-        boolean onlyRecipients = false;
-        Account[] recipients;
-        if (recipientsJson == null) {
-            recipients = null;
-        } else {
-            onlyRecipients = Boolean.valueOf((boolean) jsonObject.getOrDefault("onlyRecipients", false));
-            JSONArray recipientsArray = (JSONArray) jsonObject.get("list");
-            if (recipientsArray == null) {
-                JSONObject out = new JSONObject();
-                Transaction.updateMapByErrorSimple(Transaction.INVALID_RECEIVERS_LIST, out);
-                return out.toJSONString();
-            }
-
-            recipients = new Account[recipientsArray.size()];
-            for (int index = 0; index < recipientsArray.size(); index++) {
-                String recipientAddress = (String) recipientsArray.get(index);
-                //ORDINARY RECIPIENT
-                Fun.Tuple2<Account, String> result = Account.tryMakeAccount(recipientAddress);
-                if (result.a == null) {
-                    JSONObject out = new JSONObject();
-                    Transaction.updateMapByErrorSimple(Transaction.INVALID_RECEIVERS_LIST, recipientAddress, out);
-                    return out.toJSONString();
-                }
-                recipients[index] = result.a;
-            }
+        /////// COMMON
+        String creatorStr = (String) jsonObject.getOrDefault("creator", null);
+        Fun.Tuple2<Account, String> resultCreator = Account.tryMakeAccount(creatorStr);
+        if (resultCreator.b != null) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
         }
 
+        String title = (String) jsonObject.get("title");
+
+        int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
+        boolean tryFree = Boolean.valueOf((boolean) jsonObject.getOrDefault("tryFree", false));
+
+        String tags = (String) jsonObject.get("tags");
+
+        boolean test = Boolean.valueOf((boolean) jsonObject.getOrDefault("test", true));
+
+        //////////// LINK TO
         step++;
         Long exLinkType = (Long) jsonObject.get("linkType");
         ExLink exLink = null;
@@ -171,16 +173,37 @@ public class RSignNoteResource {
             }
         }
 
+        /////////// RECIPIENTS
+        step++;
+        JSONObject recipientsJson = (JSONObject) jsonObject.get("recipients");
+        boolean onlyRecipients = false;
+        Account[] recipients;
+        if (recipientsJson == null) {
+            recipients = null;
+        } else {
+            onlyRecipients = Boolean.valueOf((boolean) jsonObject.getOrDefault("onlyRecipients", false));
+            JSONArray recipientsArray = (JSONArray) jsonObject.get("list");
+            if (recipientsArray == null) {
+                JSONObject out = new JSONObject();
+                Transaction.updateMapByErrorSimple(Transaction.INVALID_RECEIVERS_LIST, out);
+                return out.toJSONString();
+            }
 
-        Long templateKey = (Long) jsonObject.get("templateKey");
+            recipients = new Account[recipientsArray.size()];
+            for (int index = 0; index < recipientsArray.size(); index++) {
+                String recipientAddress = (String) recipientsArray.get(index);
+                //ORDINARY RECIPIENT
+                Fun.Tuple2<Account, String> result = Account.tryMakeAccount(recipientAddress);
+                if (result.a == null) {
+                    JSONObject out = new JSONObject();
+                    Transaction.updateMapByErrorSimple(Transaction.INVALID_RECEIVERS_LIST, recipientAddress, out);
+                    return out.toJSONString();
+                }
+                recipients[index] = result.a;
+            }
+        }
 
-        boolean test = Boolean.valueOf((boolean) jsonObject.getOrDefault("test", true));
-
-        String title = (String) jsonObject.getOrDefault("title", null);
-        String message = (String) jsonObject.getOrDefault("message", null);
-
-        int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
-
+        /////////// PAYOUTS
         JSONObject payoutsJson = (JSONObject) jsonObject.get("payouts");
         ExPays payouts;
         if (payoutsJson == null) {
@@ -190,7 +213,6 @@ public class RSignNoteResource {
             int position = Integer.valueOf(jsonObject.getOrDefault("position", 1).toString());
             boolean backward = Boolean.valueOf((boolean) jsonObject.getOrDefault("backward", false));
 
-            step++;
             int payMethod = Integer.valueOf(jsonObject.getOrDefault("method", 1).toString());
             String value = (String) jsonObject.get("methodValue");
             String amountMin = (String) jsonObject.get("amountMin");
@@ -199,13 +221,10 @@ public class RSignNoteResource {
             long filterAssetKey = Long.valueOf(jsonObject.getOrDefault("filterAssetKey", 0l).toString());
             int filterPos = Integer.valueOf(jsonObject.getOrDefault("filterBalPos", 1).toString());
             int filterSide = Integer.valueOf(jsonObject.getOrDefault("filterBalSide", 1).toString());
+
             String filterGreatEqual = (String) jsonObject.get("filterGreatEqual");
             String filterLessEqual = (String) jsonObject.get("filterLessEqual");
-
             int filterTXType = Integer.valueOf(jsonObject.getOrDefault("filterTXType", 1).toString());
-
-            int encoding = Integer.valueOf(jsonObject.getOrDefault("encoding", 0).toString());
-            boolean encrypt = Boolean.valueOf((boolean) jsonObject.getOrDefault("encrypt", false));
 
             int filterPerson = Integer.valueOf(jsonObject.getOrDefault("filterPerson", 0).toString());
             boolean selfPay = Boolean.valueOf((boolean) jsonObject.getOrDefault("selfPay", true));
@@ -228,57 +247,90 @@ public class RSignNoteResource {
         }
 
         if (!test && !BlockChain.TEST_MODE
-                && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
-        )
+                && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
             return "not LOCAL && not testnet";
+        }
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:00");
+        ExLinkAuthor[] authors = null;
+        ExLinkSource[] sources = null;
+
+        ////////// BODY THAT MAY BE ENCRYPTED
+
+        boolean isEncrypted = Boolean.valueOf((boolean) jsonObject.getOrDefault("encrypt", false));
+
+        //////// MESSAGE
+        String message = (String) jsonObject.get("message");
+        boolean messageUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("messageUnique", false));
+
+        //////// TEMPLATE
+        Long templateKey = (Long) jsonObject.get("templateKey");
+        HashMap<String, String> templateParams = null;
+        boolean templateUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("templateUnique", false));
+
+        /// HASHES
+        HashMap<String, String> hashes = new HashMap<String, String>();
+        boolean hashesUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("hashesUnique", false));
+
+        //// FILES
+        Set<Fun.Tuple3<String, Boolean, byte[]>> files = new HashSet<Fun.Tuple3<String, Boolean, byte[]>>();
+        boolean filesUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("filesUnique", false));
+
+        PrivateKeyAccount privateKeyAccount;
+        if (!test) {
+            // так как тут может очень долго работать то откроем на долго
+            APIUtils.askAPICallAllowed(password, "GET multisend\n ", request, false);
+
+        }
 
         Controller cntr = Controller.getInstance();
         BlockChain chain = cntr.getBlockChain();
 
-        ExLinkAuthor[] authors = null;
-        ExLinkSource[] sources = null;
-        String tags = (String) jsonObject.get("tags");
-        boolean isEncrypted = Boolean.valueOf((boolean) jsonObject.getOrDefault("encrypt", false));
-        HashMap<String, String> templateParams = null;
-        boolean templateUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("templateUnique", false));
-
-        boolean messageUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("messageUnique", false));
-
-        HashMap<String, String> hashes = new HashMap<String, String>();
-        boolean hashesUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("hashesUnique", false));
-
-        Set<Fun.Tuple3<String, Boolean, byte[]>> files = new HashSet<Fun.Tuple3<String, Boolean, byte[]>>();
-        boolean filesUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("filesUnique", false));
-
-        if (!test) {
-            // так как тут может очень долго работать то откроем на долго
-            APIUtils.askAPICallAllowed(password, "GET multisend\n ", request, false);
+        privateKeyAccount = cntr.getWalletPrivateKeyAccountByAddress(resultCreator.a.getAddress());
+        if (privateKeyAccount == null) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_WALLET_ADDRESS);
         }
+
         try {
 
             JSONObject out = new JSONObject();
-            JSONArray outResult = new JSONArray();
 
-            byte[] exDataResult = ExData.make(exLink, payouts, creator, title,
-                    onlyRecipients, recipients, authors, sources, tags, isEncrypted,
-                    templateKey, templateParams, templateUnique,
-                    message, messageUnique,
-                    hashes, hashesUnique,
-                    files, filesUnique;
-
-            if (payouts != null) {
-                out.put("_results", outResult);
-                out.put("count", payouts.getTotalFeeBytes());
-                out.put("totalFee", payouts.getTotalFeeBytes());
-                out.put("totalSendAmount", payouts.getTotalPay().toPlainString());
+            byte[] exDataBytes;
+            try {
+                exDataBytes = ExData.make(exLink, payouts, privateKeyAccount, title,
+                        onlyRecipients, recipients, authors, sources, tags, isEncrypted,
+                        templateKey, templateParams, templateUnique,
+                        message, messageUnique,
+                        hashes, hashesUnique,
+                        files, filesUnique);
+            } catch (Exception e) {
+                Transaction.updateMapByErrorSimple(Transaction.INVALID_DATA, e.getMessage(), out);
+                return out.toJSONString();
             }
 
-            if (test)
-                out.put("status", "TEST");
+            if (exDataBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
+                Transaction.updateMapByErrorSimple(Transaction.INVALID_DATA_LENGTH, "Message size exceeded %1 kB"
+                        .replace("%1", "" + (BlockChain.MAX_REC_DATA_BYTES >> 10)), out);
+                return out.toJSONString();
+            }
 
-            return out.toJSONString();
+            // CREATE TX MESSAGE
+            byte version = (byte) 3;
+            byte property1 = (byte) 0;
+            byte property2 = (byte) 0;
+            long key = 0L; // not need for 3 version
+
+            RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2,
+                    privateKeyAccount, feePow, key, exDataBytes);
+
+            int validate = cntr.getTransactionCreator().afterCreate(issueDoc, Transaction.FOR_NETWORK, tryFree, test);
+
+            if (validate == Transaction.VALIDATE_OK) {
+                out.put("status", "TEST");
+                return out.toJSONString();
+            } else {
+                issueDoc.updateMapByError(validate, out);
+                return out.toJSONString();
+            }
 
         } finally {
             Controller.getInstance().lockWallet();

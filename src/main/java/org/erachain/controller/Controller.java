@@ -2951,18 +2951,20 @@ public class Controller extends Observable {
     // TRANSACTIONS
 
     public void onTransactionCreate(Transaction transaction) {
-        // ADD TO UNCONFIRMED TRANSACTIONS
 
-        if (doesWalletExists() && HARD_WORK < 4) {
-            wallet.processTransaction(transaction);
-        }
-
-        // очистим мясо со скелета
+        // CLEAR ALL LOCAL DATA
         transaction = transaction.copy();
+
+        // ADD TO UNCONFIRMED TRANSACTIONS
         this.transactionsPool.offerMessage(transaction);
 
         // BROADCAST
         this.broadcastTransaction(transaction);
+
+        // ADD TO WALLET TRANSACTIONS
+        if (doesWalletExists() && HARD_WORK < 4) {
+            wallet.processTransaction(transaction);
+        }
 
     }
 

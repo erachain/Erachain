@@ -322,7 +322,7 @@ public class APIUtils {
         if (confirmed > 0) {
 
             result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK,
-                    confirmed == IssueConfirmDialog.TRY_FREE);
+                    confirmed == IssueConfirmDialog.TRY_FREE, false);
 
             if (result == Transaction.VALIDATE_OK)
                 return transaction.toJson().toJSONString();

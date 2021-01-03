@@ -223,7 +223,7 @@ public class IssueDocumentPanel extends IconPanel {
         // READ SENDER
         Account sender = (Account) this.jComboBox_Account_Work.getSelectedItem();
         int feePow = 0;
-        byte[] messageBytes;
+        byte[] exDataBytes;
         long key = 0;
         int parsing = 0;
         Integer result = 0;
@@ -281,16 +281,16 @@ public class IssueDocumentPanel extends IconPanel {
         }
 
         try {
-            messageBytes = exData_Panel.makeExData(creator, encryptCheckBox.isSelected());
+            exDataBytes = exData_Panel.makeExData(creator, encryptCheckBox.isSelected());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             JOptionPane.showMessageDialog(new JFrame(), " ERROR: " + e.getMessage(),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (messageBytes == null) {
+        if (exDataBytes == null) {
             return;
-        } else if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
+        } else if (exDataBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.getInstance().translate("Message size exceeded %1 kB")
                             .replace("%1", "" + (BlockChain.MAX_REC_DATA_BYTES >> 10)),
@@ -307,7 +307,7 @@ public class IssueDocumentPanel extends IconPanel {
         byte property2 = (byte) 0;
 
         RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2,
-                creator, feePow, key, messageBytes
+                creator, feePow, key, exDataBytes
         );
 
         // Issue_Asset_Confirm_Dialog cont = new
