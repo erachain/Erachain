@@ -55,14 +55,14 @@ public class WalletOrdersTableModel extends WalletTableModel<Order> implements O
 
             case COLUMN_HAVE:
                 AssetCls asset = DCSet.getInstance().getItemAssetMap().get(order.getHaveAssetKey());
-                return asset == null ? "[" + order.getHaveAssetKey() + "]" : asset.getShort();
+                return asset == null ? asset.toString();
 
             case COLUMN_PRICE:
                 return order.getPrice();
 
             case COLUMN_WANT:
                 asset = DCSet.getInstance().getItemAssetMap().get(order.getWantAssetKey());
-                return asset == null ? "[" + order.getWantAssetKey() + "]" : asset.getShort();
+                return asset == null ? asset.toString();
 
             case COLUMN_AMOUNT_WANT:
                 return order.getAmountWant().toPlainString();
