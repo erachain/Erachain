@@ -4,9 +4,13 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.ExPays;
-import org.erachain.core.item.templates.TemplateCls;
+import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
+import org.erachain.core.exdata.exLink.ExLinkReply;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
+import org.erachain.datachain.DCSet;
+import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
@@ -98,17 +102,54 @@ public class RSignNoteResource {
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
-        String linkToRefStr = jsonObject.get("linkTo").toString();
-        Long linkToRef;
-        if (linkToRefStr == null)
-            linkToRef = null;
-        else {
-            linkToRef = Transaction.parseDBRef(linkToRefStr);
-            if (linkToRef == null) {
-                throw ApiErrorFactory.getInstance().createError(
-                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+
+        step++;
+        Long exLinkType = (Long) jsonObject.get("linkType");
+        ExLink exLink = null;
+        if (exLinkType != null && exLinkType > ExData.LINK_SIMPLE_TYPE) {
+            String linkToRefStr = jsonObject.get("linkTo").toString();
+            if (linkToRefStr == null) {
+                JSONObject out = new JSONObject();
+                out.put("error", Transaction.INVALID_EX_LINK_REF);
+                out.put("error_message", OnDealClick.resultMess(Transaction.INVALID_EX_LINK_REF));
+                return out.toJSONString();
+            } else {
+                Transaction parent = DCSet.getInstance().getTransactionFinalMap().getRecord(linkToRefStr);
+                if (parent == null) {
+                    JSONObject out = new JSONObject();
+                    out.put("error", Transaction.INVALID_EX_LINK_REF);
+                    out.put("error_message", OnDealClick.resultMess(Transaction.INVALID_EX_LINK_REF));
+                    return out.toJSONString();
+                }
+                int linkType = (int) (long) exLinkType;
+                if (parent == null || linkType == ExData.LINK_SIMPLE_TYPE) {
+                    exLink = null;
+                } else {
+                    switch (linkType) {
+                        case ExData.LINK_APPENDIX_TYPE:
+                            exLink = new ExLinkAppendix(parent.getDBRef());
+                            break;
+                        case ExData.LINK_REPLY_COMMENT_TYPE:
+                            exLink = new ExLinkReply(parent.getDBRef());
+                            break;
+                        case ExData.LINK_COMMENT_TYPE_FOR_VIEW:
+                            APPENDIX_TYPE:
+                            exLink = new ExLinkReply(parent.getDBRef());
+                            break;
+                        default:
+                            exLink = null;
+                    }
+                }
+
+                if (exLink == null) {
+                    throw ApiErrorFactory.getInstance().createError(
+                            Transaction.INVALID_EX_LINK_REF);
+                }
             }
         }
+
+
+        Long templateKey = (Long) jsonObject.get("templateKey");
 
         boolean test = Boolean.valueOf((boolean) jsonObject.getOrDefault("test", true));
 
@@ -183,9 +224,9 @@ public class RSignNoteResource {
             JSONObject out = new JSONObject();
             JSONArray outResult = new JSONArray();
 
-            byte[] exDataResult = ExData.make(exLink, exPayoutsResult.a, creator, jTextField_Title_Message.getText(),
+            byte[] exDataResult = ExData.make(linkTo, exPayoutsResult.a, creator, jTextField_Title_Message.getText(),
                     signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
-                    (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),
+                    templateKey, fill_Template_Panel.get_Params(),
                     fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
                     jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),
                     hashes_Map, checkBoxMakeHashAndCheckUniqueHashes.isSelected(),
