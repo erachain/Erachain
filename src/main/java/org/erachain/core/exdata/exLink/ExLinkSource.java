@@ -9,8 +9,8 @@ import org.json.simple.JSONObject;
 
 public class ExLinkSource extends ExLinkMemo {
 
-    public ExLinkSource(long parentSeqNo, String memo) {
-        super(ExData.LINK_SOURCE_TYPE, parentSeqNo, memo);
+    public ExLinkSource(long parentSeqNo, int value, String memo) {
+        super(ExData.LINK_SOURCE_TYPE, parentSeqNo, value, memo);
     }
 
     public ExLinkSource(byte[] data) {

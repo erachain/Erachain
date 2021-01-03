@@ -251,8 +251,37 @@ public class RSignNoteResource {
             return "not LOCAL && not testnet";
         }
 
-        ExLinkAuthor[] authors = null;
+        ////////// AUTHORS
+        ExLinkAuthor[] authors;
+        JSONObject authorsJson = (JSONObject) jsonObject.get("authors");
+        if (authorsJson == null) {
+            authors = null;
+        } else {
+            JSONArray authorsArray = (JSONArray) authorsJson.get("list");
+            authors = new ExLinkAuthor[authorsArray.size()];
+            for (int index = 0; index < authorsArray.size(); index++) {
+                JSONObject author = (JSONObject) authorsArray.get(index);
+                authors[index] = new ExLinkAuthor((Long) author.get("ref"),
+                        (int) (long) (Long) author.get("share"),
+                        (String) author.get("memo"));
+            }
+        }
+
+        ///// SOURCES
         ExLinkSource[] sources = null;
+        JSONObject sourcesJson = (JSONObject) jsonObject.get("sources");
+        if (sourcesJson == null) {
+            sources = null;
+        } else {
+            JSONArray sourcesArray = (JSONArray) sourcesJson.get("list");
+            sources = new ExLinkSource[sourcesArray.size()];
+            for (int index = 0; index < sourcesArray.size(); index++) {
+                JSONObject source = (JSONObject) sourcesArray.get(index);
+                sources[index] = new ExLinkSource((Long) source.get("ref"),
+                        (int) (long) (Long) source.get("share"),
+                        (String) source.get("memo"));
+            }
+        }
 
         ////////// BODY THAT MAY BE ENCRYPTED
 
@@ -264,11 +293,16 @@ public class RSignNoteResource {
 
         //////// TEMPLATE
         Long templateKey = (Long) jsonObject.get("templateKey");
-        HashMap<String, String> templateParams = null;
         boolean templateUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("templateUnique", false));
+        HashMap<String, String> templateParams;
+        if (templateKey == null) {
+            templateParams = null;
+        } else {
+            templateParams = (HashMap) jsonObject.get("templateParams");
+        }
 
         /// HASHES
-        HashMap<String, String> hashes = new HashMap<String, String>();
+        HashMap<String, String> hashes = (HashMap) jsonObject.get("hashes");
         boolean hashesUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("hashesUnique", false));
 
         //// FILES
@@ -278,7 +312,7 @@ public class RSignNoteResource {
         PrivateKeyAccount privateKeyAccount;
         if (!test) {
             // так как тут может очень долго работать то откроем на долго
-            APIUtils.askAPICallAllowed(password, "GET multisend\n ", request, false);
+            APIUtils.askAPICallAllowed(password, "GET RSignNote\n ", request, false);
 
         }
 
