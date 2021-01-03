@@ -516,6 +516,12 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             return VALIDATE_OK;
         }
 
+        for (String admin : BlockChain.GENESIS_ADMINS) {
+            if (creator.equals(admin)) {
+                flags = flags | NOT_VALIDATE_FLAG_FEE;
+                break;
+            }
+        }
         int result = super.isValid(forDeal, flags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
 
         // сюда без проверки Персоны приходит
