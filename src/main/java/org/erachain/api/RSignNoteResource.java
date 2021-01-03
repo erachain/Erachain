@@ -27,6 +27,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Path("r_note")
@@ -40,27 +41,53 @@ public class RSignNoteResource {
     @GET
     public String help() {
         Map<String, String> help = new LinkedHashMap<String, String>();
-        help.put("POST make"
-                        + "creator - maker account"
-                        + "assetKey - asset key for Action"
-                        + "forAssetKey"
-                        + "position=1"
-                        + "amount=0"
-                        + "test=true"
-                        + "feePow=0"
-                        + "activeafter=[date]"
-                        + "activebefore=[date]"
-                        + "greatequal=[amount]"
-                        + "koeff=1" +
-                        "title=&" +
-                        "onlyperson=false" +
-                        "&selfpay=false" +
-                        "&password=",
-                "Muli-send from Address [fromAddress] the asset [assetKey] by filter: Who has positive balance by asset [forAssetKey] where "
-                        + " position - balance position for test, amount and koeff: sensed AMOUNT = amount + koeff * BALANCE, test - set false for real send or true for statistics, activeafter and activebefore - check activity for address in format: [timestamp_in_sec | YYYY-MM-DD HH:MM],"
-                        + " greatequal=0 - if set balance in position must be great or equal this amount, activeTypeTX=0 - if set test activity on this type transactions,"
-                        + "selfPay=true - if set pay to self address too. Default = true"
-                        + " title=, onlyperson - get only personalized addresses, password=");
+        help.put("POST make {" +
+                        "creator - maker account, " +
+                        "title, " +
+                        "feePow:0..6, " +
+                        "tryFree, " +
+                        "tags:WORDS, " +
+                        "linkType:0..4, " +
+                        "linkTo:SeqNo, " +
+                        "test:true, " +
+                        "recipients: { onlyRecipients:false, list:[Addresses] }, " +
+
+                        "payouts: { "
+                        + "assetKey:long - asset key for Action, "
+                        + "position=1 - balance position (1 - OWN, 2 - DEBT, 3 - HOLD, 4 - SPEND, 5 - PLEDGE), "
+                        + "backward:false, "
+                        + "method:0..2 - by TOTAL (0), by coefficient (1), by same Value (2), "
+                        + "methodValue:BigDecimal, "
+                        + "amountMin:BigDecimal or Null - minimum to Send, "
+                        + "amountMax:BigDecimal or Null - maximum to Send, "
+                        + "filterAssetKey:long - file by this asset balances, "
+                        + "filterBalPos:1 - check balance position (1 - OWN, 2 - DEBT, 3 - HOLD, 4 - SPEND, 5 - PLEDGE), "
+                        + "filterBalSide:1 - check balance side (0 - Debit, 1 - Left, 2 - Credit), "
+                        + "filterTXType:0, - If 0 - for all transactions, "
+                        + "filterGreatEqual:BigDecimal or Null, "
+                        + "filterLessEqual:BigDecimal or Null, "
+                        + "activeAfter=date - yyyy-MM-dd hh:mm:00 or Seq-No (3214-2) or timestamp[sec], "
+                        + "activeBefore=date - yyyy-MM-dd hh:mm:00 or Seq-No (3214-2) or timestamp[sec], "
+                        + "filterPerson:0..3 - 0 all, 1 - only for persons, 2 - only for man, 3 - only for woman, "
+                        + "selfPay:true - To pay to creator address too. Default = true, "
+                        + "}, " +
+                        "authors: { list: { ref:No, name:Name, share:Share }, " +
+                        "sources: { list: { ref:SeqNo, name:Name, share:Share }, " +
+                        "encrypt:false, " +
+                        "message:MESSAGE, " +
+                        "messageUnique:false, " +
+                        "templateKey:long, " +
+                        "templateParams: { param:Value, ..}, " +
+                        "templateUnique:false," +
+                        "hashes: { path:HASH, ..}, " +
+                        "hashesUnique:false," +
+                        "files: [ { name:Path, zip:false, data:bytes.UTF-8 }, ..]" +
+                        "filesUnique:false," +
+
+                        "ai:, ",
+                "PAYOUTS - make 'muli-send' action from creator Address the asset [assetKey] by filter, If 'test' = false it will be make real sends."
+        );
+
         //
 
         return StrJSonFine.convert(help);
@@ -222,15 +249,14 @@ public class RSignNoteResource {
             int filterPos = Integer.valueOf(jsonObject.getOrDefault("filterBalPos", 1).toString());
             int filterSide = Integer.valueOf(jsonObject.getOrDefault("filterBalSide", 1).toString());
 
+            int filterTXType = Integer.valueOf(jsonObject.getOrDefault("filterTXType", 1).toString());
             String filterGreatEqual = (String) jsonObject.get("filterGreatEqual");
             String filterLessEqual = (String) jsonObject.get("filterLessEqual");
-            int filterTXType = Integer.valueOf(jsonObject.getOrDefault("filterTXType", 1).toString());
+            String filterTXStart = (String) jsonObject.get("activeAfter");
+            String filterTXEnd = (String) jsonObject.get("activeBefore");
 
             int filterPerson = Integer.valueOf(jsonObject.getOrDefault("filterPerson", 0).toString());
             boolean selfPay = Boolean.valueOf((boolean) jsonObject.getOrDefault("selfPay", true));
-
-            String filterTXStart = (String) jsonObject.get("activeAfter");
-            String filterTXEnd = (String) jsonObject.get("activeBefore");
 
             Fun.Tuple2<ExPays, String> payoutsResult = ExPays.make(assetKey, position, backward, payMethod, value,
                     amountMin, amountMax, filterAssetKey, filterPos, filterSide,
@@ -307,6 +333,15 @@ public class RSignNoteResource {
 
         //// FILES
         Set<Fun.Tuple3<String, Boolean, byte[]>> files = new HashSet<Fun.Tuple3<String, Boolean, byte[]>>();
+        JSONArray filesArray = (JSONArray) jsonObject.get("files");
+        if (filesArray != null) {
+            for (Object fileObj : filesArray) {
+                JSONObject file = (JSONObject) fileObj;
+                files.add(new Fun.Tuple3<>((String) file.get("name"),
+                        (Boolean) file.get("zip"),
+                        file.get("data").toString().getBytes(StandardCharsets.UTF_8)));
+            }
+        }
         boolean filesUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("filesUnique", false));
 
         PrivateKeyAccount privateKeyAccount;

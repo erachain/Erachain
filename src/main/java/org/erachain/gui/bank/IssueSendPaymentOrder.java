@@ -8,7 +8,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -238,7 +238,7 @@ public class IssueSendPaymentOrder extends IconPanel {
         ExLink exLink = null;
         Long linkRef = Transaction.parseDBRef("");
         if (linkRef != null) {
-            exLink = new ExLinkSource(linkRef, null);
+            exLink = new ExLinkAppendix(linkRef);
         }
 
         // CREATE TX MESSAGE

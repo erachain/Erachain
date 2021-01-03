@@ -15,7 +15,7 @@ import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
@@ -1563,7 +1563,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                     Transaction.updateMapByErrorValue(error, "for 'linkTo'", out);
                     return out;
                 } else {
-                    linkTo = new ExLinkSource(linkToRef, null);
+                    linkTo = new ExLinkAppendix(linkToRef);
                 }
             }
         } catch (Exception e) {

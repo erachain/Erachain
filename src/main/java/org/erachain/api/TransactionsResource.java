@@ -7,7 +7,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -851,7 +851,7 @@ public class TransactionsResource {
         if (exLinkRef == null) {
             exLink = null;
         } else {
-            exLink = new ExLinkSource(exLinkRef, null);
+            exLink = new ExLinkAppendix(exLinkRef);
         }
 
         // CREATE TX MESSAGE

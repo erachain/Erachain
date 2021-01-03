@@ -7,7 +7,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.polls.PollFactory;
@@ -198,7 +198,7 @@ public class ItemPollsResource {
                     throw ApiErrorFactory.getInstance().createError(
                             Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
                 } else {
-                    linkTo = new ExLinkSource(linkToRef, null);
+                    linkTo = new ExLinkAppendix(linkToRef);
                 }
             }
 
@@ -298,7 +298,7 @@ public class ItemPollsResource {
                     throw ApiErrorFactory.getInstance().createError(
                             Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
                 } else {
-                    linkTo = new ExLinkSource(linkToRef, null);
+                    linkTo = new ExLinkAppendix(linkToRef);
                 }
             }
 
