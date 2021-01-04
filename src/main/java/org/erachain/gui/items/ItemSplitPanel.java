@@ -24,6 +24,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -194,7 +195,6 @@ public abstract class ItemSplitPanel extends SplitPanel {
         menuTable.add(vouchMenu);
 
         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
-
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -212,8 +212,15 @@ public abstract class ItemSplitPanel extends SplitPanel {
         menuTable.add(setSeeInBlockexplorer);
 
         JMenuItem byteCode = new JMenuItem(Lang.getInstance().translate("Get bytecode"));
-        vouchMenu.addActionListener(e -> {
-            Base58.encode(itemTableSelected.toBytes(true, false));
+        byteCode.addActionListener(e -> {
+            String base58str = Base58.encode(itemTableSelected.toBytes(false, false));
+            StringSelection stringSelection = new StringSelection(base58str);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", itemTableSelected.getName())
+                            + "!",
+                    Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 
         });
         menuTable.add(byteCode);
