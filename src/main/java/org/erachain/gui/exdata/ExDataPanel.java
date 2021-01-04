@@ -4,6 +4,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.ExPays;
 import org.erachain.core.exdata.exLink.*;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
@@ -16,6 +17,7 @@ import org.erachain.gui.library.*;
 import org.erachain.lang.Lang;
 import org.erachain.utils.FileHash;
 import org.erachain.utils.ZipBytes;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 
 import javax.swing.*;
@@ -86,7 +88,7 @@ public class ExDataPanel extends JPanel {
     public JCheckBox checkBoxMakeHashAndCheckUniqueHashes;
     public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
     public DocTypeAppendixPanel docTypeAppendixPanel;
-    public MultiPayOutsPanel multiPayOutsPanel;
+    public ExPayoutsPanel exPayoutsPanel;
 
 
 
@@ -327,7 +329,7 @@ public class ExDataPanel extends JPanel {
         params_Template_Model = new ParamsTemplateModel();
         jTable_Params_Message_Public = new MTable(params_Template_Model);
         docTypeAppendixPanel = new DocTypeAppendixPanel(this);
-        multiPayOutsPanel = new MultiPayOutsPanel();
+        exPayoutsPanel = new ExPayoutsPanel(this);
 
         params_Template_Model.addTableModelListener(new TableModelListener() {
 
@@ -380,7 +382,7 @@ public class ExDataPanel extends JPanel {
 
         if (BlockChain.TEST_MODE) {
             JScrollPane multiPayScrollBar = new JScrollPane();
-            multiPayScrollBar.setViewportView(multiPayOutsPanel);
+            multiPayScrollBar.setViewportView(exPayoutsPanel);
             jTabbedPane_Type.addTab(Lang.getInstance().translate("Payouts"), multiPayScrollBar);
         }
 
@@ -849,9 +851,17 @@ public class ExDataPanel extends JPanel {
                     exLink = null;
             }
         }
-        return ExData.make(exLink, creator, jTextField_Title_Message.getText(),
+
+        Fun.Tuple2<ExPays, String> exPayoutsResult = exPayoutsPanel.getPayouts();
+        if (exPayoutsResult.b != null) {
+            throw new Exception(exPayoutsResult.b);
+        }
+
+        Long templateKey = fill_Template_Panel.sel_Template == null ? null : fill_Template_Panel.sel_Template.getKey();
+
+        return ExData.make(exLink, exPayoutsResult.a, creator, jTextField_Title_Message.getText(),
                 signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
-                (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),
+                templateKey, fill_Template_Panel.get_Params(),
                 fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
                 jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),
                 hashes_Map, checkBoxMakeHashAndCheckUniqueHashes.isSelected(),

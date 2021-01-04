@@ -34,8 +34,8 @@ import java.util.HashSet;
 
 public class RHashes extends Transaction {
 
-    private static final byte TYPE_ID = (byte) HASHES_RECORD;
-    private static final String NAME_ID = "Hashes Record";
+    public static final byte TYPE_ID = (byte) HASHES_RECORD;
+    public static final String TYPE_NAME = "Hashes Record";
 
     private static final int URL_SIZE_LENGTH = 1;
     public static final int MAX_URL_LENGTH = Transaction.MAX_TITLE_BYTES_LENGTH;
@@ -53,7 +53,7 @@ public class RHashes extends Transaction {
 
     public RHashes(byte[] typeBytes, PublicKeyAccount creator, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference) {
 
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
 
         this.url = url;
         this.data = data;

@@ -17,24 +17,24 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class IssueAssetTransaction extends IssueItemRecord {
-    private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
-    private static final String NAME_ID = "Issue Asset";
+    public static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
+    public static final String TYPE_NAME = "Issue Asset";
 
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
     //private AssetCls asset;
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, linkTo, asset, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, linkTo, asset, feePow, timestamp, reference);
     }
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, asset, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, asset, feePow, timestamp, reference, signature);
     }
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow,
                                  long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, NAME_ID, creator, linkTo, asset, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, asset, feePow, timestamp, reference, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -42,7 +42,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     // as pack
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, asset, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, asset, (byte) 0, 0L, null, signature);
     }
 
     public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {

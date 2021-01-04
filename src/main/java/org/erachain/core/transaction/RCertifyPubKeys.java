@@ -33,8 +33,9 @@ import java.util.*;
 // typeBytes[2] - size of personalized accounts
 public class RCertifyPubKeys extends Transaction implements Itemable {
 
-    private static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
-    private static final String NAME_ID = "Certify Person";
+    public static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
+    public static final String TYPE_NAME = "Certify Person";
+
     private static final int USER_ADDRESS_LENGTH = Transaction.CREATOR_LENGTH;
     private static final int DATE_DAY_LENGTH = 4; // one year + 256 days max
 
@@ -53,7 +54,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
     public RCertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, byte feePow, long key,
                            List<PublicKeyAccount> certifiedPublicKeys,
                            int add_day, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, exLink, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, exLink, feePow, timestamp, reference);
 
         this.key = key;
         this.certifiedPublicKeys = certifiedPublicKeys;
@@ -515,6 +516,12 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             return VALIDATE_OK;
         }
 
+        for (String admin : BlockChain.GENESIS_ADMINS) {
+            if (creator.equals(admin)) {
+                flags = flags | NOT_VALIDATE_FLAG_FEE;
+                break;
+            }
+        }
         int result = super.isValid(forDeal, flags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
 
         // сюда без проверки Персоны приходит

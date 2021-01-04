@@ -1140,7 +1140,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                                 LOGGER.info("my BLOCK is weak ((...");
                                             }
                                         }
-
+                                    } catch (Exception e) {
+                                        LOGGER.error(e.getMessage(), e);
+                                        if (BlockChain.CHECK_BUGS > 7) {
+                                            ctrl.stopAll(106);
+                                            return;
+                                        }
                                     } catch (java.lang.OutOfMemoryError e) {
                                         LOGGER.error(e.getMessage(), e);
                                         ctrl.stopAll(105);

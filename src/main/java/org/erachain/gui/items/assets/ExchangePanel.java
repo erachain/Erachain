@@ -91,10 +91,10 @@ public class ExchangePanel extends IconPanel {
                             have.getTickerName() + "/" + want.getTickerName());
                 }
 
-                jTextField_Asset_1.setText(have.viewName());
+                jTextField_Asset_1.setText(have.toString());
                 jScrollPane_jPanel_RightPanel.setViewportView(new EchangeSellBuyPanel(have, want, action, account));
 
-                jTextField_Asset_2.setText(want.viewName());
+                jTextField_Asset_2.setText(want.toString());
                 jScrollPane_jPanel_RightPanel.setViewportView(new EchangeSellBuyPanel(have, want, action, account));
 
             }
@@ -109,7 +109,7 @@ public class ExchangePanel extends IconPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 0);
         jSelect_Trade.add(change_Button, gridBagConstraints);
 
-        jTextField_Asset_1.setText(have.viewName());
+        jTextField_Asset_1.setText(have.toString());
         jTextField_Asset_1.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -141,14 +141,14 @@ public class ExchangePanel extends IconPanel {
                                 have.getTickerName() + "/" + want.getTickerName());
                     }
 
-                    jTextField_Asset_1.setText(have.viewName());
+                    jTextField_Asset_1.setText(have.toString());
                     jScrollPane_jPanel_RightPanel
                             .setViewportView(new EchangeSellBuyPanel(have, want, action, account));
                 }
             }
         });
 
-        jTextField_Asset_2.setText(want.viewName());
+        jTextField_Asset_2.setText(want.toString());
         jTextField_Asset_2.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
@@ -181,7 +181,7 @@ public class ExchangePanel extends IconPanel {
                                 have.getTickerName() + "/" + want.getTickerName());
                     }
 
-                    jTextField_Asset_2.setText(want.viewName());
+                    jTextField_Asset_2.setText(want.toString());
                     jScrollPane_jPanel_RightPanel
                             .setViewportView(new EchangeSellBuyPanel(have, want, action, account));
 

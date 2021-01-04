@@ -552,7 +552,7 @@ public class DCSet extends DBASet implements Closeable {
          * WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
          */
 
-        if (true) {
+        if (false) {
             // USE CACHE
             if (BLOCKS_MAP != DBS_MAP_DB) {
                 // если блоки не сохраняются в общей базе данных

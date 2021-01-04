@@ -55,6 +55,7 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun;
@@ -94,7 +95,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.1.02.5";
+    public static String version = "5.2 dev";
     public static String buildTime = "2020-12-28 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -2139,7 +2140,7 @@ public class Controller extends Observable {
         long weight = myHWeight.b;
         Peer maxPeer = null;
 
-        long maxHeight = blockChain.getHeightOnTimestamp(NTP.getTime());
+        long maxHeight = blockChain.getHeightOnTimestampMS(NTP.getTime());
 
         try {
             for (Peer peer : network.getActivePeers(false)) {
@@ -2951,15 +2952,17 @@ public class Controller extends Observable {
     // TRANSACTIONS
 
     public void onTransactionCreate(Transaction transaction) {
-        // ADD TO UNCONFIRMED TRANSACTIONS
 
-        // очистим мясо со скелета
+        // CLEAR ALL LOCAL DATA
         transaction = transaction.copy();
+
+        // ADD TO UNCONFIRMED TRANSACTIONS
         this.transactionsPool.offerMessage(transaction);
 
         // BROADCAST
         this.broadcastTransaction(transaction);
 
+        // ADD TO WALLET TRANSACTIONS
         if (doesWalletExists() && HARD_WORK < 4) {
             wallet.processTransaction(transaction);
         }
@@ -3543,10 +3546,10 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction r_SignNote(byte version, byte property1, byte property2, int forDeal,
+    public Transaction r_SignNote(byte version, byte property1, byte property2,
                                   PrivateKeyAccount sender, int feePow, long key, byte[] message) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_SignNote(version, property1, property2, forDeal, sender, feePow, key,
+            return this.transactionCreator.r_SignNote(version, property1, property2, sender, feePow, key,
                     message);
         }
     }
@@ -3952,6 +3955,53 @@ public class Controller extends Observable {
             }
             if (arg.equals("-nonet")) {
                 useNet = false;
+                continue;
+            }
+
+            if (arg.startsWith("-web=") && arg.length() > 5) {
+                String value = arg.substring(5).toLowerCase();
+                if (value.equals("on")) {
+                    Settings.getInstance().updateJson("webenabled", true);
+                } else if (value.equals("off")) {
+                    Settings.getInstance().updateJson("webenabled", false);
+                }
+                continue;
+            }
+            if (arg.startsWith("-weballowed=") && arg.length() > 12) {
+                String[] array = arg.substring(12).split(",");
+                JSONArray list = new JSONArray();
+                for (String ip : array) {
+                    list.add(ip);
+                }
+                Settings.getInstance().updateJson("weballowed", list);
+                continue;
+            }
+            if (arg.startsWith("-webport=") && arg.length() > 9) {
+                Long value = new Long(arg.substring(9));
+                Settings.getInstance().updateJson("webport", value);
+                continue;
+            }
+            if (arg.startsWith("-rpc=") && arg.length() > 5) {
+                String value = arg.substring(5).toLowerCase();
+                if (value.equals("on")) {
+                    Settings.getInstance().updateJson("rpcenabled", true);
+                } else if (value.equals("off")) {
+                    Settings.getInstance().updateJson("rpcenabled", false);
+                }
+                continue;
+            }
+            if (arg.startsWith("-rpcallowed=") && arg.length() > 12) {
+                String[] array = arg.substring(12).split(",");
+                JSONArray list = new JSONArray();
+                for (String ip : array) {
+                    list.add(ip);
+                }
+                Settings.getInstance().updateJson("rpcallowed", list);
+                continue;
+            }
+            if (arg.startsWith("-rpcport=") && arg.length() > 9) {
+                Long value = new Long(arg.substring(9));
+                Settings.getInstance().updateJson("rpcport", value);
                 continue;
             }
 

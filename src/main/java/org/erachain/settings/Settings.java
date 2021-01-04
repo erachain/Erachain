@@ -29,7 +29,7 @@ import java.util.List;
 public class Settings {
 
     public static final long DEFAULT_MAINNET_STAMP = 1487844793333L; // MAIN Net
-    public static final long DEFAULT_DEMO_NET_STAMP = 1607511600000L; // DEMO Net
+    public static final long DEFAULT_DEMO_NET_STAMP = 1609491286000L; // DEMO Net
 
     public static String APP_NAME = "";
     public static String APP_FULL_NAME = "";
@@ -86,7 +86,7 @@ public class Settings {
     //GUI CONSOLE
     private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
     //WEB
-    private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
+    public static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
     private static final boolean DEFAULT_WEB_ENABLED = true;
     private static final String DEFAULT_WEB_KEYSTORE_FILE_PATH = "SSL" + File.separator +"WEBkeystore";
     private String webKeyStorePassword ="";
@@ -495,6 +495,10 @@ public class Settings {
             return new JSONArray();
         }
 
+    }
+
+    public void updateJson(String key, Object value) {
+        settingsJSON.put(key, value);
     }
 
     @SuppressWarnings("unchecked")

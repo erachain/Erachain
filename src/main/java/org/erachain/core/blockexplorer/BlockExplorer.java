@@ -937,8 +937,8 @@ public class BlockExplorer {
 
         assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
         StringJoiner joiner = new StringJoiner(", ");
-        for (String action : asset.viewAssetTypeActionsList()) {
-            joiner.add(Lang.getInstance().translateFromLangObj(action, langObj));
+        for (Tuple2<?, String> item : asset.viewAssetTypeActionsList(null, true)) {
+            joiner.add(Lang.getInstance().translateFromLangObj(item.b, langObj));
         }
         assetJSON.put("assetTypeDesc", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeDescriptionCls(asset.getAssetType()), langObj)
                 + ".\n" + Lang.getInstance().translateFromLangObj("Acceptable actions", langObj) + ":\n" + joiner.toString()

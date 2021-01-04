@@ -9,12 +9,12 @@ import org.json.simple.JSONObject;
 
 public class ExLinkAuthor extends ExLinkMemo {
 
-    public ExLinkAuthor(long parentSeqNo, String memo) {
-        super(ExData.LINK_AUTHOR_TYPE, parentSeqNo, memo);
-    }
-
     public ExLinkAuthor(byte[] data) {
         super(data);
+    }
+
+    public ExLinkAuthor(long parentSeqNo, int value, String memo) {
+        super(ExData.LINK_AUTHOR_TYPE, parentSeqNo, value, memo);
     }
 
     public ExLinkAuthor(byte[] data, int position) {

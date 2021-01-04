@@ -22,21 +22,21 @@ public class IssueImprintRecord extends IssueItemRecord {
     protected static final int BASE_LENGTH = Transaction.BASE_LENGTH - REFERENCE_LENGTH;
     protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD - REFERENCE_LENGTH;
 
-    private static final byte TYPE_ID = (byte) ISSUE_IMPRINT_TRANSACTION;
-    private static final String NAME_ID = "Issue Imprint";
+    public static final byte TYPE_ID = (byte) ISSUE_IMPRINT_TRANSACTION;
+    public static final String TYPE_NAME = "Issue Imprint";
 
 
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp) {
-        super(typeBytes, NAME_ID, creator, null, imprint, feePow, timestamp, null);
+        super(typeBytes, TYPE_NAME, creator, null, imprint, feePow, timestamp, null);
     }
 
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, ImprintCls imprint, byte feePow, long timestamp, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, imprint, feePow, timestamp, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, feePow, timestamp, null, signature);
     }
 
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, ImprintCls imprint, byte feePow,
                               long timestamp, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, NAME_ID, creator, linkTo, imprint, feePow, timestamp, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, feePow, timestamp, null, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -44,7 +44,7 @@ public class IssueImprintRecord extends IssueItemRecord {
 
     // asPack
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, ImprintCls imprint, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, imprint, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, (byte) 0, 0L, null, signature);
     }
 
     public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] signature) {

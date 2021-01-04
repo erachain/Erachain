@@ -15,7 +15,7 @@ import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
@@ -248,6 +248,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_TITLE_LENGTH = 392;
     public static final int INVALID_DATA_FORMAT = 393;
 
+    public static final int INVALID_EX_LINK_TYPE = 401;
+    public static final int INVALID_EX_LINK_REF = 402;
+    public static final int INVALID_RECEIVERS_LIST = 403;
+
     public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 501;
     public static final int ACCOUNT_ACCSES_DENIED = 520;
 
@@ -262,7 +266,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     // 
     // TYPES *******
     // universal
-    public static final int EXTENDED = 0;
+    public static final int EXTENDED = 1;
     // genesis
     public static final int GENESIS_ISSUE_ASSET_TRANSACTION = 1;
     public static final int GENESIS_ISSUE_TEMPLATE_TRANSACTION = 2;
@@ -310,6 +314,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int ARBITRARY_TRANSACTION = 12 + 130;
     public static final int MULTI_PAYMENT_TRANSACTION = 13 + 130;
     public static final int DEPLOY_AT_TRANSACTION = 14 + 130;
+
     // FEE PARAMETERS
     public static final long RIGHTS_KEY = AssetCls.ERA_KEY;
     public static final long BTC_KEY = AssetCls.ERA_KEY;
@@ -614,6 +619,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         errorValue = value;
     }
 
+    public static boolean isValidTransactionType(int type) {
+        return !viewTypeName(type).equals("unknown");
+    }
+
     public String getErrorValue() {
         return errorValue;
     }
@@ -685,6 +694,101 @@ public abstract class Transaction implements ExplorerJsonLine {
         return Byte.toUnsignedInt(this.typeBytes[0]);
     }
 
+    public static Integer[] getTransactionTypes() {
+        return new Integer[]{
+                0,
+                ISSUE_ASSET_TRANSACTION,
+                ISSUE_IMPRINT_TRANSACTION,
+                ISSUE_TEMPLATE_TRANSACTION,
+                ISSUE_PERSON_TRANSACTION,
+                ISSUE_STATUS_TRANSACTION,
+                ISSUE_UNION_TRANSACTION,
+                ISSUE_STATEMENT_TRANSACTION,
+                ISSUE_POLL_TRANSACTION,
+
+                // SEND ASSET
+                SEND_ASSET_TRANSACTION,
+
+                // OTHER
+                SIGN_NOTE_TRANSACTION,
+                CERTIFY_PUB_KEYS_TRANSACTION,
+                SET_STATUS_TO_ITEM_TRANSACTION,
+                SET_UNION_TO_ITEM_TRANSACTION,
+                SET_UNION_STATUS_TO_ITEM_TRANSACTION,
+
+                // confirm other transactions
+                VOUCH_TRANSACTION,
+
+                // HASHES
+                HASHES_RECORD,
+
+                // exchange of assets
+                CREATE_ORDER_TRANSACTION,
+                CANCEL_ORDER_TRANSACTION,
+
+                // voting
+                VOTE_ON_ITEM_POLL_TRANSACTION
+
+        };
+    }
+
+    public static String viewTypeName(int type) {
+        switch (type) {
+            case ISSUE_ASSET_TRANSACTION:
+                return IssueAssetTransaction.TYPE_NAME;
+            case ISSUE_IMPRINT_TRANSACTION:
+                return IssueImprintRecord.TYPE_NAME;
+            case ISSUE_TEMPLATE_TRANSACTION:
+                return IssueTemplateRecord.TYPE_NAME;
+            case ISSUE_PERSON_TRANSACTION:
+                return IssuePersonRecord.TYPE_NAME;
+            case ISSUE_STATUS_TRANSACTION:
+                return IssueStatusRecord.TYPE_NAME;
+            case ISSUE_UNION_TRANSACTION:
+                return IssueUnionRecord.TYPE_NAME;
+            case ISSUE_STATEMENT_TRANSACTION:
+                return IssueStatementRecord.TYPE_NAME;
+            case ISSUE_POLL_TRANSACTION:
+                return IssuePollRecord.TYPE_NAME;
+
+            // SEND ASSET
+            case SEND_ASSET_TRANSACTION:
+                return RSend.TYPE_NAME;
+
+            // OTHER
+            case SIGN_NOTE_TRANSACTION:
+                return RSignNote.TYPE_NAME;
+            case CERTIFY_PUB_KEYS_TRANSACTION:
+                return RCertifyPubKeys.TYPE_NAME;
+            case SET_STATUS_TO_ITEM_TRANSACTION:
+                return RSetStatusToItem.TYPE_NAME;
+            case SET_UNION_TO_ITEM_TRANSACTION:
+                return RSetUnionToItem.TYPE_NAME;
+            case SET_UNION_STATUS_TO_ITEM_TRANSACTION:
+                return RSetUnionStatusToItem.TYPE_NAME;
+
+            // confirm other transactions
+            case VOUCH_TRANSACTION:
+                return RVouch.TYPE_NAME;
+
+            // HASHES
+            case HASHES_RECORD:
+                return RHashes.TYPE_NAME;
+
+            // exchange of assets
+            case CREATE_ORDER_TRANSACTION:
+                return CreateOrderTransaction.TYPE_NAME;
+            case CANCEL_ORDER_TRANSACTION:
+                return CancelOrderTransaction.TYPE_NAME;
+
+            // voting
+            case VOTE_ON_ITEM_POLL_TRANSACTION:
+                return VoteOnItemPollTransaction.TYPE_NAME;
+
+        }
+        return "unknown";
+    }
+
     public int getVersion() {
         return Byte.toUnsignedInt(this.typeBytes[1]);
     }
@@ -728,7 +832,7 @@ public abstract class Transaction implements ExplorerJsonLine {
      * this.viewTime(account); }
      */
     public long getKey() {
-        return 0l;
+        return 0L;
     }
 
     public Object[][] getItemsKeys() {
@@ -1247,7 +1351,11 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public String viewCreator() {
-        return creator == null ? "GENESIS" : creator.getPersonAsString();
+        return viewAccount(creator);
+    }
+
+    public static String viewAccount(Account account) {
+        return account == null ? "GENESIS" : account.getPersonAsString();
     }
 
     public String viewRecipient() {
@@ -1264,6 +1372,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public String viewTimestamp() {
+        return viewTimestamp(timestamp);
+    }
+
+    public static String viewTimestamp(long timestamp) {
         return timestamp < 1000 ? "null" : DateTimeFormat.timestamptoString(timestamp);
     }
 
@@ -1451,7 +1563,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                     Transaction.updateMapByErrorValue(error, "for 'linkTo'", out);
                     return out;
                 } else {
-                    linkTo = new ExLinkSource(linkToRef, null);
+                    linkTo = new ExLinkAppendix(linkToRef);
                 }
             }
         } catch (Exception e) {

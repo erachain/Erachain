@@ -532,10 +532,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
 
     public String toString(DCSet db) {
         long key = this.getKey(db);
-        //String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(false);
-        return "[" + (key == 0 ? "?:" : key)
-                + "] " + this.viewName();
-        //+ (creator.length()==0?"": " (" +creator + ")");
+        return (key < getStartKey() ? "" : "[" + key + "] ") + this.viewName();
     }
 
     public String toString(DCSet db, byte[] data) {
@@ -596,10 +593,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     }
 
     public String getShort(DCSet db) {
-        long key = this.getKey(db);
-        //String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(true);
-        return (key < 1 ? "? " : key + ": ") + this.viewName().substring(0, Math.min(this.viewName().length(), 30));
-        //+ (creator.length()==0?"": " (" +creator + ")");
+        return this.viewName().substring(0, Math.min(this.viewName().length(), 30));
     }
 
     public String getShort() {

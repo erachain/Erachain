@@ -170,7 +170,7 @@ public class ItemAssetsResource {
         boolean tryFree = true;
 
         Transaction transaction = (Transaction) result;
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -213,7 +213,7 @@ public class ItemAssetsResource {
         boolean tryFree = true;
 
         Transaction transaction = cntr.issueAsset(resultRaw.a, linkTo, feePow, item);
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();

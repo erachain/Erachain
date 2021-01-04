@@ -4,8 +4,10 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.*;
 import org.erachain.gui.exdata.ExDataPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -13,6 +15,8 @@ import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,6 +30,8 @@ public class IssueDocumentPanel extends IconPanel {
 
     public static String NAME = "IssueDocumentPanel";
     public static String TITLE = "Issue Document";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(IssueDocumentPanel.class);
 
     private IssueDocumentPanel th;
     private ExDataPanel exData_Panel;
@@ -43,7 +49,7 @@ public class IssueDocumentPanel extends IconPanel {
     /**
      * Creates new form IssueDocumentPanel
      */
-    public IssueDocumentPanel() {
+    public IssueDocumentPanel(Account creator, AssetCls actionAsset) {
         super(NAME, TITLE);
         th = this;
         initComponents();
@@ -73,11 +79,22 @@ public class IssueDocumentPanel extends IconPanel {
         jComboBox_Account_Work.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 exData_Panel.updateRecipients();
+                exData_Panel.exPayoutsPanel.updateAction();
             }
         });
+        if (creator != null) {
+            jComboBox_Account_Work.setSelectedItem(creator);
+        }
+        if (actionAsset != null) {
+            exData_Panel.exPayoutsPanel.jComboBoxPayoutAsset.setSelectedItem(actionAsset);
+        }
 
         jLabel_Fee_Work.setText(Lang.getInstance().translate("Fee Power") + ":");
         this.jButton_Work_Cancel.setVisible(false);
+    }
+
+    public IssueDocumentPanel() {
+        this(null, null);
     }
 
     private void initComponents() {
@@ -184,7 +201,7 @@ public class IssueDocumentPanel extends IconPanel {
 
     }// </editor-fold>
 
-    public void makeDeal(int forDeal) {
+    public void makeDeal() {
 
         // CHECK IF WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {
@@ -206,7 +223,7 @@ public class IssueDocumentPanel extends IconPanel {
         // READ SENDER
         Account sender = (Account) this.jComboBox_Account_Work.getSelectedItem();
         int feePow = 0;
-        byte[] messageBytes;
+        byte[] exDataBytes;
         long key = 0;
         int parsing = 0;
         Integer result = 0;
@@ -264,15 +281,16 @@ public class IssueDocumentPanel extends IconPanel {
         }
 
         try {
-            messageBytes = exData_Panel.makeExData(creator, encryptCheckBox.isSelected());
+            exDataBytes = exData_Panel.makeExData(creator, encryptCheckBox.isSelected());
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
             JOptionPane.showMessageDialog(new JFrame(), " ERROR: " + e.getMessage(),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (messageBytes == null) {
+        if (exDataBytes == null) {
             return;
-        } else if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
+        } else if (exDataBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.getInstance().translate("Message size exceeded %1 kB")
                             .replace("%1", "" + (BlockChain.MAX_REC_DATA_BYTES >> 10)),
@@ -288,8 +306,8 @@ public class IssueDocumentPanel extends IconPanel {
         byte property1 = (byte) 0;
         byte property2 = (byte) 0;
 
-        RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2, forDeal,
-                creator, feePow, key, messageBytes
+        RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2,
+                creator, feePow, key, exDataBytes
         );
 
         // Issue_Asset_Confirm_Dialog cont = new
@@ -327,9 +345,11 @@ public class IssueDocumentPanel extends IconPanel {
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation transaction issue document"));
 
-        RNoteInfo ww = new RNoteInfo(issueDoc);
-        ww.jPanel2.setVisible(false);
-        confirmDialog.jScrollPane1.setViewportView(ww);
+        // for calculate ExPays
+        issueDoc.setDC(DCSet.getInstance());
+        RNoteInfo rNoteInfo = new RNoteInfo(issueDoc);
+        rNoteInfo.jPanel2.setVisible(false);
+        confirmDialog.jScrollPane1.setViewportView(rNoteInfo);
         confirmDialog.setLocationRelativeTo(th);
         confirmDialog.setVisible(true);
 
@@ -344,7 +364,7 @@ public class IssueDocumentPanel extends IconPanel {
     public void onSendClick() {
         this.jButton_Work_OK.setEnabled(false);
         this.jButton_Work_OK1.setEnabled(false);
-        makeDeal(Transaction.FOR_NETWORK);
+        makeDeal();
         this.jButton_Work_OK.setEnabled(true);
         this.jButton_Work_OK1.setEnabled(true);
     }

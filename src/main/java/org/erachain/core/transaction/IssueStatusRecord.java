@@ -15,27 +15,27 @@ import java.util.Arrays;
 
 
 public class IssueStatusRecord extends IssueItemRecord {
-    private static final byte TYPE_ID = (byte) ISSUE_STATUS_TRANSACTION;
-    private static final String NAME_ID = "Issue Status";
+    public static final byte TYPE_ID = (byte) ISSUE_STATUS_TRANSACTION;
+    public static final String TYPE_NAME = "Issue Status";
 
     public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, StatusCls status, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, linkTo, status, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, linkTo, status, feePow, timestamp, reference);
     }
 
     public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, StatusCls status, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, status, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, status, feePow, timestamp, reference, signature);
     }
 
     public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, StatusCls status, byte feePow, long timestamp,
                              Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, NAME_ID, creator, linkTo, status, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, status, feePow, timestamp, reference, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
     }
 
     public IssueStatusRecord(byte[] typeBytes, ExLink linkTo, PublicKeyAccount creator, StatusCls status, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, status, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, status, (byte) 0, 0L, null, signature);
     }
 
     public IssueStatusRecord(PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference, byte[] signature) {

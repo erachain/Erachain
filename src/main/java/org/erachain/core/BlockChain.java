@@ -256,7 +256,7 @@ public class BlockChain {
     /**
      * Новый уровень начальных номеров для всех сущностей
      */
-    public static int START_KEY_UP = MAIN_MODE ? Integer.MAX_VALUE : DEMO_MODE ? 23000 : Integer.MAX_VALUE;
+    public static int START_KEY_UP = MAIN_MODE ? 1650000 : DEMO_MODE ? 0 : Integer.MAX_VALUE;
     public static int START_KEY_UP_ITEMS = 1 << 20;
 
     public static final int USE_NEW_ISSUE_FEE = MAIN_MODE ? Integer.MAX_VALUE : 0;
@@ -1329,7 +1329,7 @@ public class BlockChain {
         return getTimestamp(height);
     }
 
-    public int getHeightOnTimestamp(long timestamp) {
+    public int getHeightOnTimestampMS(long timestamp) {
         long diff = timestamp - genesisTimestamp;
         int height = (int) (diff / (long) GENERATING_MIN_BLOCK_TIME_MS(1));
         if (height <= VERS_30SEC)

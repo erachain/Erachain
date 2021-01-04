@@ -6,7 +6,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
@@ -159,7 +159,7 @@ public class ItemPersonsResource {
         }
 
         Transaction transaction = resultGood.getA();
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -206,7 +206,7 @@ public class ItemPersonsResource {
         }
 
         Transaction transaction = transactionResult.getA();
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -246,7 +246,7 @@ public class ItemPersonsResource {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
             } else {
-                linkTo = new ExLinkSource(linkToRef, null);
+                linkTo = new ExLinkAppendix(linkToRef);
             }
         }
 
@@ -267,7 +267,7 @@ public class ItemPersonsResource {
         PrivateKeyAccount creator = APIUtils.getPrivateKeyCreator(creatorStr);
 
         Transaction transaction = cntr.r_CertifyPubKeysPerson(0, creator, linkTo, feePow, personKey, pubKey, addDays);
-        Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
+        Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
 
         // CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {

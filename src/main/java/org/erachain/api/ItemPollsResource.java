@@ -7,7 +7,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.polls.PollFactory;
@@ -198,7 +198,7 @@ public class ItemPollsResource {
                     throw ApiErrorFactory.getInstance().createError(
                             Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
                 } else {
-                    linkTo = new ExLinkSource(linkToRef, null);
+                    linkTo = new ExLinkAppendix(linkToRef);
                 }
             }
 
@@ -248,7 +248,7 @@ public class ItemPollsResource {
             IssuePollRecord issue_voiting = (IssuePollRecord) controller.issuePoll(account, linkTo, name, description, options, null, null, feePow);
 
             //VALIDATE AND PROCESS
-            int validate = controller.getTransactionCreator().afterCreate(issue_voiting, Transaction.FOR_NETWORK, false);
+            int validate = controller.getTransactionCreator().afterCreate(issue_voiting, Transaction.FOR_NETWORK, false, false);
             if (validate == Transaction.VALIDATE_OK)
                 return "ok";
         } catch (NullPointerException | ClassCastException e) {
@@ -298,7 +298,7 @@ public class ItemPollsResource {
                     throw ApiErrorFactory.getInstance().createError(
                             Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
                 } else {
-                    linkTo = new ExLinkSource(linkToRef, null);
+                    linkTo = new ExLinkAppendix(linkToRef);
                 }
             }
 
@@ -377,7 +377,7 @@ public class ItemPollsResource {
         }
 
         Transaction transaction = cntr.issuePoll(resultRaw.a, linkTo, feePow, item);
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -448,7 +448,7 @@ public class ItemPollsResource {
             //CREATE POLL
             Transaction transaction = Controller.getInstance().createItemPollVote(account, key, option, feePow);
 
-            int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
+            int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
 
             if (result == Transaction.VALIDATE_OK) {
 
@@ -507,7 +507,7 @@ public class ItemPollsResource {
 
         //CREATE POLL
         Transaction transaction = Controller.getInstance().createItemPollVote(account, pollKey, option, feePow);
-        int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
+        int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
 
         if (result == Transaction.VALIDATE_OK) {
 
