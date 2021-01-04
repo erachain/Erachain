@@ -6,14 +6,11 @@ import org.erachain.gui.items.SearchItemSplitPanel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
@@ -26,22 +23,6 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         super(new ItemAssetsTableModel(), NAME, TITLE);
 
         // MENU
-
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
-
-        setSeeInBlockexplorer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                try {
-                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
-                            + "/index/blockexplorer.html"
-                            + "?asset=" + itemTableSelected.getKey()));
-                } catch (MalformedURLException e1) {
-                    logger.error(e1.getMessage(), e1);
-                }
-            }
-        });
 
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
         sell.addActionListener(new ActionListener() {
@@ -77,12 +58,10 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             this.menuTable.addSeparator();
 
             menuTable.addSeparator();
-            menuTable.add(setSeeInBlockexplorer);
         } else {
             this.menuTable.remove(this.favoriteMenuItems);
 
             menuTable.addSeparator();
-            menuTable.add(setSeeInBlockexplorer);
         }
 
     }

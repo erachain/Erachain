@@ -507,8 +507,8 @@ public class WebTransactionsHTML {
         // TODO Auto-generated method stub
         String out = "";
         RVouch vouchRecord = (RVouch) transaction;
-        Transaction record = dcSet.getTransactionFinalMap().get(vouchRecord.getVouchHeight(),
-                vouchRecord.getVouchSeqNo());
+        Transaction record = dcSet.getTransactionFinalMap().get(vouchRecord.getRefHeight(),
+                vouchRecord.getRefSeqNo());
 		/*out += "<b>" + Lang.getInstance().translateFromLangObj("height-seqNo", langObj) + ":</b> <a href=?tx="
 				+  Base58.encode(record.getSignature()) + get_Lang(langObj) + ">" + vouchRecord.getVouchHeight() + "-"
 				+ vouchRecord.getVouchSeqNo() + "</a><br>"; */

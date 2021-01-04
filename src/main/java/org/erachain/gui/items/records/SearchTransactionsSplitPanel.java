@@ -10,7 +10,7 @@ import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.VouchLibraryPanel;
 import org.erachain.gui.models.SearchTransactionsTableModel;
-import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -123,7 +123,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                 row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 Transaction trans = transactionsTableModel.getItem(row);
                 DCSet db = DCSet.getInstance();
-                new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
+                new toSignRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
             }
         });

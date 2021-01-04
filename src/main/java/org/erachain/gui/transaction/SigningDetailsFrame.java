@@ -9,8 +9,8 @@ import org.erachain.utils.MenuPopupUtil;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class VouchingDetailsFrame extends RecDetailsFrame {
-    public VouchingDetailsFrame(RVouch vouchRecord) {
+public class SigningDetailsFrame extends RecDetailsFrame {
+    public SigningDetailsFrame(RVouch vouchRecord) {
         super(vouchRecord, true);
 
         //LABEL NAME
@@ -20,13 +20,13 @@ public class VouchingDetailsFrame extends RecDetailsFrame {
 
         //NAME
         ++detailGBC.gridy;
-        JTextField name = new JTextField(vouchRecord.getVouchHeight() + "-" + vouchRecord.getVouchSeqNo());
+        JTextField name = new JTextField(vouchRecord.getRefHeight() + "-" + vouchRecord.getRefSeqNo());
         name.setEditable(false);
         MenuPopupUtil.installContextMenu(name);
         this.add(name, detailGBC);
 
         Transaction record = DCSet.getInstance().getTransactionFinalMap().
-                get(vouchRecord.getVouchHeight(), vouchRecord.getVouchSeqNo());
+                get(vouchRecord.getRefHeight(), vouchRecord.getRefSeqNo());
 
         String message = "<div>";
         if (record == null) {

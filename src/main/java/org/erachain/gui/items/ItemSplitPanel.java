@@ -10,7 +10,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -184,11 +184,11 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         menuTable.add(favoriteMenuItems);
 
-        JMenuItem vouchMenu = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        JMenuItem vouchMenu = new JMenuItem(Lang.getInstance().translate("To sign"));
         vouchMenu.addActionListener(e -> {
             DCSet db = DCSet.getInstance();
             Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
-            new VouchRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
+            new toSignRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
 
         });
         menuTable.add(vouchMenu);
@@ -211,7 +211,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         menuTable.add(setSeeInBlockexplorer);
 
-        JMenuItem byteCode = new JMenuItem(Lang.getInstance().translate("Byte-code"));
+        JMenuItem byteCode = new JMenuItem(Lang.getInstance().translate("Get bytecode"));
         vouchMenu.addActionListener(e -> {
             Base58.encode(itemTableSelected.toBytes(true, false));
 
