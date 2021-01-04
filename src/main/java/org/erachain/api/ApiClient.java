@@ -43,6 +43,10 @@ public class ApiClient {
                             "See polls API",
                     },
                     {
+                            "GET r_note",
+                            "See notes API",
+                    },
+                    {
                             "GET statuses",
                             "See statuses API",
                     },

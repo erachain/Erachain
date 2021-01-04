@@ -55,6 +55,7 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun;
@@ -3954,6 +3955,53 @@ public class Controller extends Observable {
             }
             if (arg.equals("-nonet")) {
                 useNet = false;
+                continue;
+            }
+
+            if (arg.startsWith("-web=") && arg.length() > 5) {
+                String value = arg.substring(5).toLowerCase();
+                if (value.equals("on")) {
+                    Settings.getInstance().updateJson("webenabled", true);
+                } else if (value.equals("off")) {
+                    Settings.getInstance().updateJson("webenabled", false);
+                }
+                continue;
+            }
+            if (arg.startsWith("-weballowed=") && arg.length() > 12) {
+                String[] array = arg.substring(12).split(",");
+                JSONArray list = new JSONArray();
+                for (String ip : array) {
+                    list.add(ip);
+                }
+                Settings.getInstance().updateJson("weballowed", list);
+                continue;
+            }
+            if (arg.startsWith("-webport=") && arg.length() > 9) {
+                Long value = new Long(arg.substring(9));
+                Settings.getInstance().updateJson("webport", value);
+                continue;
+            }
+            if (arg.startsWith("-rpc=") && arg.length() > 5) {
+                String value = arg.substring(5).toLowerCase();
+                if (value.equals("on")) {
+                    Settings.getInstance().updateJson("rpcenabled", true);
+                } else if (value.equals("off")) {
+                    Settings.getInstance().updateJson("rpcenabled", false);
+                }
+                continue;
+            }
+            if (arg.startsWith("-rpcallowed=") && arg.length() > 12) {
+                String[] array = arg.substring(12).split(",");
+                JSONArray list = new JSONArray();
+                for (String ip : array) {
+                    list.add(ip);
+                }
+                Settings.getInstance().updateJson("rpcallowed", list);
+                continue;
+            }
+            if (arg.startsWith("-rpcport=") && arg.length() > 9) {
+                Long value = new Long(arg.substring(9));
+                Settings.getInstance().updateJson("rpcport", value);
                 continue;
             }
 
