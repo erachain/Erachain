@@ -2,23 +2,16 @@ package org.erachain.gui.items.persons;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
-import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
-import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
 
@@ -80,42 +73,6 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
             }
         });
         this.menuTable.add(attestPubKey_Item);
-
-        JMenuItem vouchPerson_Item = new JMenuItem(Lang.getInstance().translate("Vouch the person info"));
-        vouchPerson_Item.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                PersonCls per = (PersonCls) itemTableSelected;
-                byte[] ref = per.getReference();
-                Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
-                int blockNo = transaction.getBlockHeight();
-                int recNo = transaction.getSeqNo();
-                new VouchRecordDialog(blockNo, recNo);
-
-            }
-        });
-        this.menuTable.add(vouchPerson_Item);
-
-        menuTable.addSeparator();
-
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
-
-        setSeeInBlockexplorer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                try {
-                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
-                            + "/index/blockexplorer.html"
-                            + "?person=" + itemTableSelected.getKey()));
-                } catch (MalformedURLException e1) {
-                    logger.error(e1.getMessage(), e1);
-                }
-            }
-        });
-
-        menuTable.add(setSeeInBlockexplorer);
 
     }
 

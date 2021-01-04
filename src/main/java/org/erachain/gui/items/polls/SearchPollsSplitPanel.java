@@ -70,15 +70,6 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
         });
         menuTable.add(setSeeInBlockexplorer);
 
-        // ADD MENU ITEMS
-        JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
-        confirm_Menu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //			new UnionConfirmDialog(th, (UnionCls) itemMenu);
-            }
-        });
-        this.menuTable.add(confirm_Menu);
-
     }
 	
 	

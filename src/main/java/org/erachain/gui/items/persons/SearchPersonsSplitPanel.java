@@ -2,12 +2,9 @@ package org.erachain.gui.items.persons;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemSplitPanel;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
-import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -84,22 +81,6 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             }
         });
         this.menuTable.add(attestPubKey_Item);
-
-        JMenuItem vouchPersonItem = new JMenuItem(Lang.getInstance().translate("Vouch the person info"));
-        vouchPersonItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                PersonCls per = (PersonCls) itemTableSelected;
-                byte[] ref = per.getReference();
-                Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
-                int blockNo = transaction.getBlockHeight();
-                int recNo = transaction.getSeqNo();
-                new VouchRecordDialog(blockNo, recNo);
-
-            }
-        });
-        this.menuTable.add(vouchPersonItem);
 
         menuTable.addSeparator();
 
