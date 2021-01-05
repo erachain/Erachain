@@ -185,7 +185,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         menuTable.add(favoriteMenuItems);
 
-        JMenuItem vouchMenu = new JMenuItem(Lang.getInstance().translate("To sign"));
+        JMenuItem vouchMenu = new JMenuItem(Lang.getInstance().translate("Sign / Vouch"));
         vouchMenu.addActionListener(e -> {
             DCSet db = DCSet.getInstance();
             Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());

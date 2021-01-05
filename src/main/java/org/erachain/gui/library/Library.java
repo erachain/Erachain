@@ -527,7 +527,7 @@ public class Library {
             jsonString = ((RSend) trans).toJson().toJSONString();
             break;
 
-        case Transaction.VOUCH_TRANSACTION:
+        case Transaction.SIGN_TRANSACTION:
             jsonString = ((RVouch) trans).toJson().toJSONString();
             break;
 

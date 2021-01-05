@@ -100,7 +100,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
 
         menu.addSeparator();
 
-        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Sign / Vouch"));
 
         vouch_Item.addActionListener(e -> {
 

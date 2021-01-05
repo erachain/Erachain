@@ -151,8 +151,8 @@ public class WebTransactionsHTML {
                 output.put("body", issue_Union_HTML(transaction));
                 output.put("message", getItemDescription((Itemable) transaction));
                 break;
-            case Transaction.VOUCH_TRANSACTION:
-                output.put("body", vouch_HTML(transaction));
+            case Transaction.SIGN_TRANSACTION:
+                output.put("body", sign_HTML(transaction));
                 break;
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
                 output.put("body", certify_Pub_Key_HTML(transaction));
@@ -503,7 +503,7 @@ public class WebTransactionsHTML {
         return out;
     }
 
-    private String vouch_HTML(Transaction transaction) {
+    private String sign_HTML(Transaction transaction) {
         // TODO Auto-generated method stub
         String out = "";
         RVouch vouchRecord = (RVouch) transaction;

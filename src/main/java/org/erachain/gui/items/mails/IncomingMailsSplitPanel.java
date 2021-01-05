@@ -113,7 +113,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         });
         menu.add(Send_Mail_item_Menu);
 
-        JMenuItem signMail_item_Menu = new JMenuItem(Lang.getInstance().translate("Sign"));
+        JMenuItem signMail_item_Menu = new JMenuItem(Lang.getInstance().translate("Sign / Vouch"));
         signMail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 

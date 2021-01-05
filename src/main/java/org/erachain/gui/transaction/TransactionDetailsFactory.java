@@ -171,7 +171,7 @@ public class TransactionDetailsFactory {
 
                 return multiPaymentDetailsFrame;
 
-            case Transaction.VOUCH_TRANSACTION:
+            case Transaction.SIGN_TRANSACTION:
                 RVouch r_Vouch = (RVouch) transaction;
                 SigningDetailsFrame signingDetailsFrame = new SigningDetailsFrame(r_Vouch);
                 gridBagConstraints.gridy = signingDetailsFrame.labelGBC.gridy + 1;

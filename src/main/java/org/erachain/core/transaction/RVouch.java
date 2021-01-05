@@ -31,8 +31,8 @@ public class RVouch extends Transaction {
     protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
     protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
-    public static final byte TYPE_ID = (byte) Transaction.VOUCH_TRANSACTION;
-    public static final String TYPE_NAME = "Sign";
+    public static final byte TYPE_ID = (byte) Transaction.SIGN_TRANSACTION;
+    public static final String TYPE_NAME = "Sign / Vouch";
 
     static Logger LOGGER = LoggerFactory.getLogger(RVouch.class.getName());
     protected int refHeight;

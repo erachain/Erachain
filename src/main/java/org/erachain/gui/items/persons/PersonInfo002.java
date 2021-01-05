@@ -34,7 +34,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
     public AccountsLibraryPanel accounts_Library_Panel;
     public SignLibraryPanel voush_Library_Panel;
     public PersonOwnerPanel person_Owner_Panel;
-    public PersonSignedPanel person_Vouched_Panel;
+    public PersonSignedPanel personSignedPanel;
     /**
      * Creates new form PersonInfo002
      */
@@ -502,8 +502,8 @@ public class PersonInfo002 extends javax.swing.JPanel {
         person_Owner_Panel = new PersonOwnerPanel(person);
         jTabbedPane1.add(person_Owner_Panel);
         // vouched person
-        person_Vouched_Panel = new PersonSignedPanel(person);
-        jTabbedPane1.add(person_Vouched_Panel);
+        personSignedPanel = new PersonSignedPanel(person);
+        jTabbedPane1.add(personSignedPanel);
 
     }// </editor-fold>
 
@@ -516,7 +516,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
         accounts_Library_Panel.delay_on_close();
         voush_Library_Panel.delay_on_close();
         person_Owner_Panel.delay_on_close();
-        person_Vouched_Panel.delay_on_close();
+        personSignedPanel.delay_on_close();
 
 
     }
