@@ -237,6 +237,13 @@ public class OnDealClick {
                 mess = "Invalid data format";
                 break;
 
+            case Transaction.INVALID_EX_LINK_TYPE:
+                mess = "Invalid Link Type";
+                break;
+            case Transaction.INVALID_EX_LINK_REF:
+                mess = "Empty or invalid 'linkTo' parameter";
+                break;
+
             case Transaction.INVALID_URL_LENGTH:
                 mess = "Invalid URL length";
                 break;

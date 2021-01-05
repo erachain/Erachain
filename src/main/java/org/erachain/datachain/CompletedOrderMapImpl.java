@@ -112,8 +112,8 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
         // тут индекс не по времени а по номерам блоков как лонг
         //int heightStart = Controller.getInstance().getMyHeight();
         //int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
-        int fromBlock = startTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestamp(startTimestamp);
-        int toBlock = stopTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestamp(stopTimestamp);
+        int fromBlock = startTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestampMS(startTimestamp);
+        int toBlock = stopTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestampMS(stopTimestamp);
 
         //RETURN
         return getOrdersByHeight(have, want, fromBlock, toBlock, limit);

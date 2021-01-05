@@ -21,6 +21,12 @@ public abstract class ExLinkMemo extends ExLink {
         memoBytes = memo == null || memo.isEmpty() ? null : memo.getBytes(StandardCharsets.UTF_8);
     }
 
+    public ExLinkMemo(byte type, long parentSeqNo, int value, String memo) {
+        super(type, (byte) 0, (byte) (value >> 8), (byte) value, parentSeqNo);
+        this.memo = memo;
+        memoBytes = memo == null || memo.isEmpty() ? null : memo.getBytes(StandardCharsets.UTF_8);
+    }
+
     public ExLinkMemo(byte[] data) {
         super(data);
         int memoSize = data[BASE_LENGTH - 1];

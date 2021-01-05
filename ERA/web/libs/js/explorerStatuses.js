@@ -81,7 +81,8 @@ function status(data) {
     output += '<h4> [ <input id="key1" name="status" size="8" type="text" value="' + data.status.key + '" class="" style="font-size: 1em;"'
                    + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
     output += '<a href=?tx=' + data.status.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.status.seqNo + '</b></a>';
-    output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a></h4>';
+    output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a>';
+    output += ' ' +'<a href=../apistatus/raw/' + data.status.key + ' class="button ll-blue-bgc"><b>' + data.label_RAW + '</b></a></h4>';
 
     output += '<br><br>';
 

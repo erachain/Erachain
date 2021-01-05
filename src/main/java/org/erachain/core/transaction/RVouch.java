@@ -31,18 +31,18 @@ public class RVouch extends Transaction {
     protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
     protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
-    public static final byte TYPE_ID = (byte) Transaction.VOUCH_TRANSACTION;
-    public static final String TYPE_NAME = "Vouch";
+    public static final byte TYPE_ID = (byte) Transaction.SIGN_TRANSACTION;
+    public static final String TYPE_NAME = "Sign / Vouch";
 
     static Logger LOGGER = LoggerFactory.getLogger(RVouch.class.getName());
-    protected int vouchHeight;
-    protected int vouchSeqNo;
+    protected int refHeight;
+    protected int refSeqNo;
 
-    public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int vouchHeight, int vouchSeqNo, long timestamp, Long reference) {
+    public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int refHeight, int refSeqNo, long timestamp, Long reference) {
         super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
 
-        this.vouchHeight = vouchHeight;
-        this.vouchSeqNo = vouchSeqNo;
+        this.refHeight = refHeight;
+        this.refSeqNo = refSeqNo;
     }
 
     public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference, byte[] signature) {
@@ -83,12 +83,12 @@ public class RVouch extends Transaction {
 
     //public static String getName() { return "Send"; }
 
-    public int getVouchHeight() {
-        return this.vouchHeight;
+    public int getRefHeight() {
+        return this.refHeight;
     }
 
-    public int getVouchSeqNo() {
-        return this.vouchSeqNo;
+    public int getRefSeqNo() {
+        return this.refSeqNo;
     }
 
     @Override
@@ -200,8 +200,8 @@ public class RVouch extends Transaction {
         //GET BASE
         JSONObject transaction = this.getJsonBase();
 
-        transaction.put("vouchHeight", this.vouchHeight);
-        transaction.put("vouchSeqNo", this.vouchSeqNo);
+        transaction.put("refHeight", this.refHeight);
+        transaction.put("refSeqNo", this.refSeqNo);
 
         return transaction;
     }
@@ -212,11 +212,11 @@ public class RVouch extends Transaction {
         byte[] data = super.toBytes(forDeal, withSignature);
 
         //WRITE HEIGHT
-        byte[] heightBytes = Ints.toByteArray(this.vouchHeight);
+        byte[] heightBytes = Ints.toByteArray(this.refHeight);
         data = Bytes.concat(data, heightBytes);
 
         //SEQ HEIGHT
-        byte[] seqBytes = Ints.toByteArray(this.vouchSeqNo);
+        byte[] seqBytes = Ints.toByteArray(this.refSeqNo);
         data = Bytes.concat(data, seqBytes);
 
         return data;
@@ -253,12 +253,12 @@ public class RVouch extends Transaction {
             return VALIDATE_OK;
         }
 
-        if (this.vouchHeight < 2) {
+        if (this.refHeight < 2) {
             //CHECK HEIGHT - not 0 and NOT GENESIS
             return INVALID_BLOCK_HEIGHT;
         }
 
-        if (this.vouchSeqNo <= 0) {
+        if (this.refSeqNo <= 0) {
             //CHECK DATA SIZE
             return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
@@ -266,7 +266,7 @@ public class RVouch extends Transaction {
         int result = super.isValid(forDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
-        Transaction transaction = this.dcSet.getTransactionFinalMap().get(Transaction.makeDBRef(this.vouchHeight, this.vouchSeqNo));
+        Transaction transaction = this.dcSet.getTransactionFinalMap().get(Transaction.makeDBRef(this.refHeight, this.refSeqNo));
         if (transaction == null || transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
             if (height > BlockChain.ALL_BALANCES_OK_TO)
                 return INVALID_BLOCK_TRANS_SEQ_ERROR;
@@ -303,7 +303,7 @@ public class RVouch extends Transaction {
             return;
 
         // make key for vouching record
-        Long recordKey = Transaction.makeDBRef(this.vouchHeight, this.vouchSeqNo);
+        Long recordKey = Transaction.makeDBRef(this.refHeight, this.refSeqNo);
         // find value
         Tuple2<BigDecimal, List<Long>> value = this.dcSet.getVouchRecordMap().get(recordKey);
 
@@ -335,7 +335,7 @@ public class RVouch extends Transaction {
         super.orphan(block, forDeal);
 
         // make key for vouching record
-        Long recordKey = Transaction.makeDBRef(this.vouchHeight, this.vouchSeqNo);
+        Long recordKey = Transaction.makeDBRef(this.refHeight, this.refSeqNo);
         // find value
         Tuple2<BigDecimal, List<Long>> value = this.dcSet.getVouchRecordMap().get(recordKey);
         // update value
@@ -369,7 +369,7 @@ public class RVouch extends Transaction {
 
         // НЕЛЬЗЯ ссылаться на новую запись см. issue #1241 - иначе при откате ссылается на уже удаленную запись
         if (false) {
-            Transaction record = dcSet.getTransactionFinalMap().get(vouchHeight, vouchSeqNo);
+            Transaction record = dcSet.getTransactionFinalMap().get(refHeight, refSeqNo);
             if (record == null) {
                 ///throw new Exception(this.toString() + " - not found record: " + vouchHeight + "-" + vouchSeqNo);
             } else {

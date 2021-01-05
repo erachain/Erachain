@@ -5,7 +5,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.gui.library.MTextPane;
-import org.erachain.gui.library.VouchLibraryPanel;
+import org.erachain.gui.library.SignLibraryPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -199,7 +199,7 @@ public class InfoTemplates extends javax.swing.JPanel {
 
         // vouch panel
         Transaction trans = Transaction.findByDBRef(DCSet.getInstance(), template.getReference());
-        jTabbedPane1.add(new VouchLibraryPanel(trans));
+        jTabbedPane1.add(new SignLibraryPanel(trans));
 
     }
 

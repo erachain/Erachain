@@ -151,8 +151,8 @@ public class WebTransactionsHTML {
                 output.put("body", issue_Union_HTML(transaction));
                 output.put("message", getItemDescription((Itemable) transaction));
                 break;
-            case Transaction.VOUCH_TRANSACTION:
-                output.put("body", vouch_HTML(transaction));
+            case Transaction.SIGN_TRANSACTION:
+                output.put("body", sign_HTML(transaction));
                 break;
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
                 output.put("body", certify_Pub_Key_HTML(transaction));
@@ -503,18 +503,18 @@ public class WebTransactionsHTML {
         return out;
     }
 
-    private String vouch_HTML(Transaction transaction) {
+    private String sign_HTML(Transaction transaction) {
         // TODO Auto-generated method stub
         String out = "";
         RVouch vouchRecord = (RVouch) transaction;
-        Transaction record = dcSet.getTransactionFinalMap().get(vouchRecord.getVouchHeight(),
-                vouchRecord.getVouchSeqNo());
+        Transaction record = dcSet.getTransactionFinalMap().get(vouchRecord.getRefHeight(),
+                vouchRecord.getRefSeqNo());
 		/*out += "<b>" + Lang.getInstance().translateFromLangObj("height-seqNo", langObj) + ":</b> <a href=?tx="
 				+  Base58.encode(record.getSignature()) + get_Lang(langObj) + ">" + vouchRecord.getVouchHeight() + "-"
 				+ vouchRecord.getVouchSeqNo() + "</a><br>"; */
         //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b>";
         //  out += "<b>" + Lang.getInstance().translateFromLangObj("Vouch Record", langObj) + ":</b> ";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Vouch Record", langObj) + ": </b> <a href='?tx=" + record.viewSignature() + get_Lang() + "'> ";
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Signed Transaction", langObj) + ": </b> <a href='?tx=" + record.viewSignature() + get_Lang() + "'> ";
         out += record.getBlockHeight() + "-" + record.getSeqNo() + "</a> <br>";
         // LABEL DESCRIPTION
 

@@ -37,7 +37,19 @@ public class Start {
 
     public static void main(String args[]) throws Exception {
 
+        System.out.println("Erachain " + Controller.getBuildDateTimeString());
+        System.out.println("use option -?, -h, -help    - for see help");
+
         //SpringApplicationBuilder builder = new SpringApplicationBuilder(Start.class);
+
+        if (args.length == 1 && (args[0].equals("-?") || args[0].equals("-h") || args[0].equals("-help"))) {
+            File file = new File("z_START_EXAMPLES", "readme-commands.txt");
+            List<String> lines = Files.readLines(file, Charsets.UTF_8);
+            for (String line : lines) {
+                System.out.println(line);
+            }
+            return;
+        }
 
         //builder.headless(false).run(args);
         File file = new File("startARGS.txt");

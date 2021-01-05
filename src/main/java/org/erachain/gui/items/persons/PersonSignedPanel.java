@@ -1,11 +1,12 @@
-package org.erachain.gui.library;
+package org.erachain.gui.items.persons;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.transaction.Transaction;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.items.statement.StatementsVouchTableModel;
+import org.erachain.gui.library.MTable;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -22,21 +23,21 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class VouchLibraryPanel extends JPanel {
+public class PersonSignedPanel extends JPanel {
 
     /**
      * view VOUSH PANEL
      */
     private static final long serialVersionUID = 1L;
     protected int row;
-    StatementsVouchTableModel model;
+    PersonVouchFromTableModel model;
     private JScrollPane jScrollPane_Tab_Vouches;
     private GridBagConstraints gridBagConstraints;
 
-    public VouchLibraryPanel(Transaction transaction) {
+    public PersonSignedPanel(PersonCls person) {
 
-        this.setName(Lang.getInstance().translate("Certified"));
-        model = new StatementsVouchTableModel(transaction);
+        this.setName(Lang.getInstance().translate("Vouched for"));
+        model = new PersonVouchFromTableModel(person);
         JTable jTable_Vouches = new MTable(model);
         TableColumnModel column_mod = jTable_Vouches.getColumnModel();
         TableColumn col_data = column_mod.getColumn(StatementsVouchTableModel.COLUMN_TIMESTAMP);
@@ -45,7 +46,7 @@ public class VouchLibraryPanel extends JPanel {
         col_data.setPreferredWidth(120);// .setWidth(30);
 
 
-        TableColumn Date_Column = column_mod.getColumn(StatementsVouchTableModel.COLUMN_TIMESTAMP);
+        TableColumn Date_Column = jTable_Vouches.getColumnModel().getColumn(StatementsVouchTableModel.COLUMN_TIMESTAMP);
         //favoriteColumn.setCellRenderer(new RendererBoolean()); //personsTable.getDefaultRenderer(Boolean.class));
         int rr = (int) (getFontMetrics(UIManager.getFont("Table.font")).stringWidth("0022-22-2222"));
         Date_Column.setMinWidth(rr + 1);
@@ -98,19 +99,19 @@ public class VouchLibraryPanel extends JPanel {
 
             @Override
             public void popupMenuCanceled(PopupMenuEvent arg0) {
-                // TODO Auto-generated method stub
+// TODO Auto-generated method stub
 
             }
 
             @Override
             public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
-                // TODO Auto-generated method stub
+// TODO Auto-generated method stub
 
             }
 
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-                // TODO Auto-generated method stub
+// TODO Auto-generated method stub
                 int row1 = jTable_Vouches.getSelectedRow();
                 if (row1 < 0) return;
 
@@ -120,47 +121,42 @@ public class VouchLibraryPanel extends JPanel {
             }
         });
 
-        JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy creator name"));
-        menu_copyName.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                // StringSelection value = new
-                // StringSelection(person.getCreator().getAddress().toString());
-                //	int row = jTable_Vouches.getSelectedRow();
-                //	row = jTable_Vouches.convertRowIndexToModel(row);
+		/*
+		JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
+		menu_copyName.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				// StringSelection value = new
+				// StringSelection(person.getCreator().getAddress().toString());
+				int row = jTable_Vouches.getSelectedRow();
+				row = jTable_Vouches.convertRowIndexToModel(row);
 
 
-                @SuppressWarnings("static-access")
-                StringSelection value = new StringSelection((String) model.getValueAt(row, model.COLUMN_CREATOR_NAME));
-                clipboard.setContents(value, null);
+				@SuppressWarnings("static-access")
+				StringSelection value = new StringSelection((String) model.getValueAt(row, model.COLUMN_CREATOR_NAME));
+				clipboard.setContents(value, null);
+				
+			}
+		});
+		menu.add(menu_copyName);
+		*/
 
-            }
-        });
-        menu.add(menu_copyName);
 
-
-        JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy creator account"));
+        JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Account"));
         copy_Creator_Address.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
-
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                PublicKeyAccount public_Account = model.getCreator(row);
-                StringSelection value = new StringSelection(public_Account.getAddress());
+                StringSelection value = new StringSelection(model.getPublicKey(row).getAddress());
                 clipboard.setContents(value, null);
             }
         });
         menu.add(copy_Creator_Address);
 
-        JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy creator public key"));
+        JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
         menu_copy_Creator_PublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                // StringSelection value = new
-                // StringSelection(person.getCreator().getAddress().toString());
-
-
-                PublicKeyAccount public_Account = model.getCreator(row);
+                PublicKeyAccount public_Account = model.getPublicKey(row);
                 StringSelection value = new StringSelection(public_Account.getBase58());
                 clipboard.setContents(value, null);
             }
@@ -172,55 +168,50 @@ public class VouchLibraryPanel extends JPanel {
         menu_copy_Block_PublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                // StringSelection value = new
-                // StringSelection(person.getCreator().getAddress().toString());
-
-
-                StringSelection value = new StringSelection(model.getTransactionHeightSeqNo(row));
+                StringSelection value = new StringSelection(model.getHeightSeq(row));
                 clipboard.setContents(value, null);
             }
         });
         menu.add(menu_copy_Block_PublicKey);
 
-        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset to Creator"));
+
+        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset to Person"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                Account accountTo = (Account) model.getPublicKey(row);
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Asset to Person"), new AccountAssetSendPanel(null,
+                        null, accountTo, person, null, false));
 
-
-                Account account = (Account) model.getCreator(row);
-
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Asset to Creator"),
-                        new AccountAssetSendPanel(null,
-                                null, account, null, null, false));
-
+                ;
 
             }
         });
         menu.add(Send_Coins_item_Menu);
 
-        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail to creator"));
+        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail to Person"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                Account account = (Account) model.getPublicKey(row);
 
-
-                Account account = (Account) model.getCreator(row);
-
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"),
-                        new MailSendPanel(null, account, null));
+                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail to Person"), new MailSendPanel(null, account, null));
 
             }
         });
         menu.add(Send_Mail_item_Menu);
 
+
         ////////////////////
         TableMenuPopupUtil.installContextMenu(jTable_Vouches, menu); // SELECT
+
 
     }
 
     public void delay_on_close() {
 
-        model.deleteObservers();
+        model.removeObservers();
+
 
     }
+
 
 }

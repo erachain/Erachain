@@ -249,8 +249,8 @@ function person(data) {
                    + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
     output += '<a href=?tx=' + data.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.seqNo + '</b></a>';
     output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a>';
-    output += ' ' +'<a href=?q=@PA' + data.key + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Authorship + '</b></a></h4>';
-
+    output += ' ' +'<a href=?q=@PA' + data.key + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Authorship + '</b></a>';
+    output += ' ' +'<a href=../apiperson/raw/' + data.key + ' class="button ll-blue-bgc"><b>' + data.label_RAW + '</b></a></h4>';
     output += '<br>';
 
     output += '<h5>' + data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';

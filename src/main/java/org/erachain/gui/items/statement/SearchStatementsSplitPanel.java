@@ -7,7 +7,7 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -190,7 +190,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 if (statement == null)
                     return;
 
-                new VouchRecordDialog(statement.getBlockHeight(), statement.getSeqNo());
+                new toSignRecordDialog(statement.getBlockHeight(), statement.getSeqNo());
 
             }
         });

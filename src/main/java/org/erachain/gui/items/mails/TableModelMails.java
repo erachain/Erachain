@@ -82,7 +82,7 @@ public class TableModelMails extends WalletTableModel<Transaction> {
 
             case COLUMN_ASSET:
                 if (transaction.hasAmount())
-                    return transaction.getAsset().viewName();
+                    return transaction.getAsset().toString();
                 return "";
 
         }

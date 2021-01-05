@@ -1329,7 +1329,7 @@ public class BlockChain {
         return getTimestamp(height);
     }
 
-    public int getHeightOnTimestamp(long timestamp) {
+    public int getHeightOnTimestampMS(long timestamp) {
         long diff = timestamp - genesisTimestamp;
         int height = (int) (diff / (long) GENERATING_MIN_BLOCK_TIME_MS(1));
         if (height <= VERS_30SEC)

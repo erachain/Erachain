@@ -857,9 +857,11 @@ public class ExDataPanel extends JPanel {
             throw new Exception(exPayoutsResult.b);
         }
 
+        Long templateKey = fill_Template_Panel.sel_Template == null ? null : fill_Template_Panel.sel_Template.getKey();
+
         return ExData.make(exLink, exPayoutsResult.a, creator, jTextField_Title_Message.getText(),
                 signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
-                (TemplateCls) fill_Template_Panel.sel_Template, fill_Template_Panel.get_Params(),
+                templateKey, fill_Template_Panel.get_Params(),
                 fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
                 jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),
                 hashes_Map, checkBoxMakeHashAndCheckUniqueHashes.isSelected(),

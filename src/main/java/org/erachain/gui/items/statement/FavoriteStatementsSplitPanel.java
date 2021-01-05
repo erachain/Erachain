@@ -6,7 +6,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -100,7 +100,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
 
         menu.addSeparator();
 
-        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Sign / Vouch"));
 
         vouch_Item.addActionListener(e -> {
 
@@ -110,7 +110,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
             Transaction statement = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel
                     .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             if (statement == null) return;
-            new VouchRecordDialog(statement.getBlockHeight(), statement.getSeqNo());
+            new toSignRecordDialog(statement.getBlockHeight(), statement.getSeqNo());
         });
 
         menu.add(vouch_Item);

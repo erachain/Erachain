@@ -7,7 +7,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -117,7 +117,7 @@ public class RSendResource {
         if (exLinkRef == null) {
             exLink = null;
         } else {
-            exLink = new ExLinkSource(exLinkRef, null);
+            exLink = new ExLinkAppendix(exLinkRef);
         }
 
         boolean needAmount = false;
@@ -133,7 +133,7 @@ public class RSendResource {
             return out.toJSONString();
         }
 
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -264,7 +264,7 @@ public class RSendResource {
         if (exLinkRef == null) {
             exLink = null;
         } else {
-            exLink = new ExLinkSource(exLinkRef, null);
+            exLink = new ExLinkAppendix(exLinkRef);
         }
 
         boolean needAmount = false;
@@ -597,7 +597,7 @@ public class RSendResource {
                                 (address + counter + "TEST SEND ERA").getBytes(StandardCharsets.UTF_8), encryptMessage,
                                 new byte[]{(byte) 1}, 0);
 
-                        Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false);
+                        Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
                         // CLEAR for HEAP
                         transaction.resetDCSet();
 
@@ -760,12 +760,12 @@ public class RSendResource {
         // преобразуем в seqNo
         Long fromSeqNo = null;
         if (activeAfter != null && activeAfter > 0) {
-            fromSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestamp(activeAfter), 0);
+            fromSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestampMS(activeAfter), 0);
             //LOGGER.debug("fromSeqNo:" + Transaction.viewDBRef(fromSeqNo) + " - " + new Date(activeAfter));
         }
         Long toSeqNo = null;
         if (activeBefore != null && activeBefore > 0) {
-            toSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestamp(activeBefore), 0);
+            toSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestampMS(activeBefore), 0);
             //LOGGER.debug("toSeqNo:" + Transaction.viewDBRef(toSeqNo) + " - " + new Date(activeBefore));
         }
 
@@ -893,7 +893,7 @@ public class RSendResource {
                         if (exLinkRef == null) {
                             exLink = null;
                         } else {
-                            exLink = new ExLinkSource(exLinkRef, null);
+                            exLink = new ExLinkAppendix(exLinkRef);
                         }
 
                         Pair<Integer, Transaction> result = cntr.make_R_Send(null, accountFrom, exLink, recipientStr, feePow,
@@ -921,7 +921,7 @@ public class RSendResource {
                             WeakReference<Transaction> weakRef = new WeakReference<>(transaction);
                             int validate = cntr.getTransactionCreator().afterCreate(weakRef.get(),
                                     // если проба то не шлем в реальности
-                                    test ? Transaction.FOR_PACK : Transaction.FOR_NETWORK, false);
+                                    test ? Transaction.FOR_PACK : Transaction.FOR_NETWORK, false, false);
 
                             if (validate != Transaction.VALIDATE_OK) {
                                 resultOne.add(OnDealClick.resultMess(validate));

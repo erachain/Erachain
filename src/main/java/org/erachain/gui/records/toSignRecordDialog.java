@@ -15,8 +15,8 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.gui.transaction.SigningDetailsFrame;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
-import org.erachain.gui.transaction.VouchingDetailsFrame;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class VouchRecordDialog extends JDialog {
+public class toSignRecordDialog extends JDialog {
 
     private static final long serialVersionUID = 2717571093561259483L;
 
@@ -50,15 +50,15 @@ public class VouchRecordDialog extends JDialog {
     private javax.swing.JLabel jLabel_Name_Records;
     private javax.swing.JLabel jLabel_YourAddress;
 
-    public VouchRecordDialog(Integer block_No, Integer rec_No, Account account) {
-        vouch(block_No, rec_No, account);
+    public toSignRecordDialog(Integer block_No, Integer rec_No, Account account) {
+        toSign(block_No, rec_No, account);
     }
 
-    public VouchRecordDialog(Integer block_No, Integer rec_No) {
-        vouch(block_No, rec_No, null);
+    public toSignRecordDialog(Integer block_No, Integer rec_No) {
+        toSign(block_No, rec_No, null);
     }
 
-    private void vouch(Integer block_No, Integer rec_No, Account account) {
+    private void toSign(Integer block_No, Integer rec_No, Account account) {
         //ICON
 
         this.account = account;
@@ -77,11 +77,11 @@ public class VouchRecordDialog extends JDialog {
 
         if (block_No != null && rec_No != null) {
             jTextField_recordID.setText(block_No.toString() + "-" + rec_No.toString());
-            VouchRecordDialog.record = refreshRecordDetails(jTextField_recordID.getText());
+            toSignRecordDialog.record = refreshRecordDetails(jTextField_recordID.getText());
             jTextField_recordID.setEnabled(false);
         }
 
-        this.setTitle(Lang.getInstance().translate("Vouch Record"));
+        this.setTitle(Lang.getInstance().translate("To sign Record"));
         this.setResizable(true);
         this.setModal(true);
 
@@ -163,9 +163,9 @@ public class VouchRecordDialog extends JDialog {
 
         String Status_text = "";
         IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
-                Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+                Lang.getInstance().translate("To sign"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         //Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
-        VouchingDetailsFrame ww = new VouchingDetailsFrame((RVouch) transaction);
+        SigningDetailsFrame ww = new SigningDetailsFrame((RVouch) transaction);
 
         confirmDialog.jScrollPane1.setViewportView(ww);
         confirmDialog.setLocationRelativeTo(this);
@@ -244,12 +244,12 @@ public class VouchRecordDialog extends JDialog {
 
             @Override
             public void insertUpdate(DocumentEvent arg0) {
-                VouchRecordDialog.record = refreshRecordDetails(jTextField_recordID.getText());
+                toSignRecordDialog.record = refreshRecordDetails(jTextField_recordID.getText());
             }
 
             @Override
             public void removeUpdate(DocumentEvent arg0) {
-                VouchRecordDialog.record = refreshRecordDetails(jTextField_recordID.getText());
+                toSignRecordDialog.record = refreshRecordDetails(jTextField_recordID.getText());
             }
         });
 

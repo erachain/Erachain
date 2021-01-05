@@ -447,7 +447,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                 if (confirmDialog.isConfirm > 0) {
                     // VALIDATE AND PROCESS
                     Integer afterCreateResult = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(),
-                            Transaction.FOR_NETWORK, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
+                            Transaction.FOR_NETWORK, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, false);
                     if (afterCreateResult != Transaction.VALIDATE_OK) {
                         JOptionPane.showMessageDialog(new JFrame(),
                                 Lang.getInstance().translate(OnDealClick.resultMess(afterCreateResult)),

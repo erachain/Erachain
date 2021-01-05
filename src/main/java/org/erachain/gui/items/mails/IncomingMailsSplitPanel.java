@@ -7,7 +7,7 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -113,8 +113,8 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         });
         menu.add(Send_Mail_item_Menu);
 
-        JMenuItem vouch_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
-        vouch_Mail_item_Menu.addActionListener(new ActionListener() {
+        JMenuItem signMail_item_Menu = new JMenuItem(Lang.getInstance().translate("Sign / Vouch"));
+        signMail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
                 int row = jTableJScrollPanelLeftPanel.getSelectedRow();
@@ -122,11 +122,11 @@ public class IncomingMailsSplitPanel extends SplitPanel {
                 Transaction trans = incoming_Mails_Model.getItem(row);
                 int blockNo = trans.getBlockHeight();
                 int recNo = trans.getSeqNo();
-                new VouchRecordDialog(blockNo, recNo, ((RSend) trans).getRecipient());
+                new toSignRecordDialog(blockNo, recNo, ((RSend) trans).getRecipient());
 
             }
         });
-        menu.add(vouch_Mail_item_Menu);
+        menu.add(signMail_item_Menu);
 
         menu.addSeparator();
 

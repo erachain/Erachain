@@ -15,7 +15,7 @@ import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
@@ -248,6 +248,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_TITLE_LENGTH = 392;
     public static final int INVALID_DATA_FORMAT = 393;
 
+    public static final int INVALID_EX_LINK_TYPE = 401;
+    public static final int INVALID_EX_LINK_REF = 402;
+    public static final int INVALID_RECEIVERS_LIST = 403;
+
     public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 501;
     public static final int ACCOUNT_ACCSES_DENIED = 520;
 
@@ -292,7 +296,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int SET_UNION_TO_ITEM_TRANSACTION = 38;
     public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 39;
     // confirm other transactions
-    public static final int VOUCH_TRANSACTION = 40;
+    public static final int SIGN_TRANSACTION = 40;
     // HASHES
     public static final int HASHES_RECORD = 41;
     // exchange of assets
@@ -713,7 +717,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                 SET_UNION_STATUS_TO_ITEM_TRANSACTION,
 
                 // confirm other transactions
-                VOUCH_TRANSACTION,
+                SIGN_TRANSACTION,
 
                 // HASHES
                 HASHES_RECORD,
@@ -764,7 +768,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                 return RSetUnionStatusToItem.TYPE_NAME;
 
             // confirm other transactions
-            case VOUCH_TRANSACTION:
+            case SIGN_TRANSACTION:
                 return RVouch.TYPE_NAME;
 
             // HASHES
@@ -1559,7 +1563,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                     Transaction.updateMapByErrorValue(error, "for 'linkTo'", out);
                     return out;
                 } else {
-                    linkTo = new ExLinkSource(linkToRef, null);
+                    linkTo = new ExLinkAppendix(linkToRef);
                 }
             }
         } catch (Exception e) {
@@ -1816,6 +1820,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                 && this.hasPublicText()
                 && !BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
                 && !this.creator.isPerson(dcSet, height)) {
+            errorValue = creator.getBase58();
             return CREATOR_NOT_PERSONALIZED;
         }
 
