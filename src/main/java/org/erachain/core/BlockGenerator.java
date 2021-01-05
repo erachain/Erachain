@@ -419,10 +419,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     try {
 
-                        if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
+                        if (transaction.isValid(Transaction.FOR_NETWORK, 0L) != Transaction.VALIDATE_OK) {
                             needRemoveInvalids.add(transaction.getSignature());
                             if (BlockChain.CHECK_BUGS > 1) {
-                                LOGGER.error(" Transaction invalid: " + transaction.isValid(Transaction.FOR_NETWORK, 0l));
+                                LOGGER.error(" Transaction invalid: " + transaction.isValid(Transaction.FOR_NETWORK, 0L));
                             }
                             continue;
                         }
