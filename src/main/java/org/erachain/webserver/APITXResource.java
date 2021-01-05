@@ -47,6 +47,8 @@ public class APITXResource {
                 "GET transaction by Height and Sequence (SeqNo)");
         help.put("api/tx/signature/{height-sequence}",
                 "GET transaction Signature by Height and Sequence (SeqNo)");
+        help.put("api/tx/signs/{height-sequence}",
+                "GET Signs of transaction by Height and Sequence");
         help.put("api/tx/vouches/{height-sequence}",
                 "GET Vouches of transaction by Height and Sequence");
         help.put("api/tx/incomingfromblock/{address}/{blockStart}?type={type}",

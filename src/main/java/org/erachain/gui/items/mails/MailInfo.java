@@ -6,7 +6,7 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.gui.library.MTextPane;
-import org.erachain.gui.library.VouchLibraryPanel;
+import org.erachain.gui.library.SignLibraryPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MenuPopupUtil;
@@ -33,7 +33,7 @@ import java.nio.charset.StandardCharsets;
 public class MailInfo extends javax.swing.JPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MailInfo.class);
-    public VouchLibraryPanel voush_Library_Panel;
+    public SignLibraryPanel voush_Library_Panel;
     public JTabbedPane jTabbedPane1;
     RSend trans;
     boolean encrypted;
@@ -280,7 +280,7 @@ public class MailInfo extends javax.swing.JPanel {
 
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        voush_Library_Panel = new VouchLibraryPanel(trans);
+        voush_Library_Panel = new SignLibraryPanel(trans);
         jTabbedPane1.add(voush_Library_Panel);
         add(jTabbedPane1, gridBagConstraints);
 

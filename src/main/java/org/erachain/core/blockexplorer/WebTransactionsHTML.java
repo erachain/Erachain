@@ -514,7 +514,7 @@ public class WebTransactionsHTML {
 				+ vouchRecord.getVouchSeqNo() + "</a><br>"; */
         //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b>";
         //  out += "<b>" + Lang.getInstance().translateFromLangObj("Vouch Record", langObj) + ":</b> ";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Vouch Record", langObj) + ": </b> <a href='?tx=" + record.viewSignature() + get_Lang() + "'> ";
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Signed Transaction", langObj) + ": </b> <a href='?tx=" + record.viewSignature() + get_Lang() + "'> ";
         out += record.getBlockHeight() + "-" + record.getSeqNo() + "</a> <br>";
         // LABEL DESCRIPTION
 

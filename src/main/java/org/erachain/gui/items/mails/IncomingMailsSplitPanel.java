@@ -113,8 +113,8 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         });
         menu.add(Send_Mail_item_Menu);
 
-        JMenuItem vouch_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
-        vouch_Mail_item_Menu.addActionListener(new ActionListener() {
+        JMenuItem signMail_item_Menu = new JMenuItem(Lang.getInstance().translate("Sign"));
+        signMail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
                 int row = jTableJScrollPanelLeftPanel.getSelectedRow();
@@ -126,7 +126,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
             }
         });
-        menu.add(vouch_Mail_item_Menu);
+        menu.add(signMail_item_Menu);
 
         menu.addSeparator();
 
