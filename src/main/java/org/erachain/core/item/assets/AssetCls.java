@@ -345,8 +345,8 @@ public abstract class AssetCls extends ItemCls {
 
         JSONObject type = new JSONObject();
         type.put("id", assetType);
-        type.put("name", Lang.getInstance().translateFromLangObj(AssetCls.viewAssetTypeCls(assetType), langObj));
-        type.put("nameFull", Lang.getInstance().translateFromLangObj(AssetCls.viewAssetTypeFullCls(assetType), langObj));
+        type.put("name", Lang.getInstance().translate(AssetCls.viewAssetTypeCls(assetType), langObj));
+        type.put("nameFull", Lang.getInstance().translate(AssetCls.viewAssetTypeFullCls(assetType), langObj));
 
         List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> actions = AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
                 AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
@@ -354,19 +354,19 @@ public abstract class AssetCls extends ItemCls {
         StringJoiner joiner = new StringJoiner(", ");
         JSONArray actionsArray = new JSONArray();
         for (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> action : actions) {
-            joiner.add(Lang.getInstance().translateFromLangObj(action.b, langObj));
+            joiner.add(Lang.getInstance().translate(action.b, langObj));
             JSONObject actionJson = new JSONObject();
             actionJson.put("action", action.a.a);
             actionJson.put("backward", action.a.b);
-            actionJson.put("name", Lang.getInstance().translateFromLangObj(action.b, langObj));
+            actionJson.put("name", Lang.getInstance().translate(action.b, langObj));
             actionsArray.add(actionJson);
         }
 
-        String description = Lang.getInstance().translateFromLangObj(AssetCls.viewAssetTypeDescriptionCls(assetType), langObj) + ".<br>";
+        String description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(assetType), langObj) + ".<br>";
         if (AssetCls.isReverseSend(assetType)) {
-            description += Lang.getInstance().translateFromLangObj("Actions for OWN balance is reversed", langObj) + ".<br>";
+            description += Lang.getInstance().translate("Actions for OWN balance is reversed", langObj) + ".<br>";
         }
-        description += "<b>" + Lang.getInstance().translateFromLangObj("Acceptable actions", langObj) + ":</b><br>" + joiner.toString();
+        description += "<b>" + Lang.getInstance().translate("Acceptable actions", langObj) + ":</b><br>" + joiner.toString();
 
         type.put("description", description);
 

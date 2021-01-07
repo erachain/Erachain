@@ -122,14 +122,10 @@ public class SettingLangFrame extends JDialog {
         JSONObject inernetLangsJSON = (JSONObject) JSONValue.parse(stringFromInternet);
 
         DefaultListModel<LangFile> listModel = new DefaultListModel<LangFile>();
-        listModel.addElement(new LangFile());
         if (inernetLangsJSON != null && !inernetLangsJSON.isEmpty()) {
             for (Object internetKey : inernetLangsJSON.keySet()) {
                 JSONObject internetValue = (JSONObject) inernetLangsJSON.get(internetKey);
-                listModel.addElement(new LangFile((String) internetValue.get("_lang_name_"),
-                        (String) internetValue.get("_file_"),
-                        Long.parseLong(internetValue.get("_timestamp_of_translation_").toString())
-                ));
+                listModel.addElement(new LangFile(internetValue));
             }
         }
 
@@ -218,7 +214,7 @@ public class SettingLangFrame extends JDialog {
             }
             SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsLangJSON);
             Settings.freeInstance();
-            Lang.getInstance().loadLang();
+            Lang.getInstance().setLangForNode();
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
             JOptionPane.showMessageDialog(

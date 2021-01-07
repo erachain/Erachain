@@ -5,7 +5,6 @@ import com.google.common.io.Files;
 import org.erachain.settings.Settings;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,10 +21,12 @@ public class Lang {
     private Map<String, String> noTranslateMap;
 
     private JSONObject langObj;
+    private HashMap<String, LangFile> langList;
 
     private Lang() {
         noTranslateMap = new LinkedHashMap<String, String>();
-        loadLang();
+        getLangListAvailable();
+        setLangForNode();
     }
 
     public static Lang getInstance() {
@@ -35,11 +36,7 @@ public class Lang {
         return instance;
     }
 
-    static HashMap<String, JSONObject> langJsonObjects = new HashMap<>();
     public static JSONObject openLangFile(String filename) {
-        if (langJsonObjects.containsKey(filename)) {
-            return langJsonObjects.get(filename);
-        }
 
         JSONObject langJsonObject;
         try {
@@ -76,56 +73,7 @@ public class Lang {
             logger.error("ERROR reading language file " + filename + ".");
         }
 
-        langJsonObjects.put(filename, langJsonObject);
         return langJsonObject;
-    }
-
-    public void loadLang() {
-        logger.debug("try lang file: " + Settings.getInstance().getLangFileName());
-        langObj = openLangFile(Settings.getInstance().getLangFileName());
-        noTranslateMap = new LinkedHashMap<String, String>();
-    }
-
-    public void loadLang(String fileName) {
-        logger.debug("try lang file: " + fileName);
-        langObj = openLangFile(fileName);
-    }
-
-    public String[] translate(String[] Messages) {
-        String[] translateMessages = Messages.clone();
-        for (int i = 0; i < translateMessages.length; i++) {
-            translateMessages[i] = translate(translateMessages[i]);
-        }
-        return translateMessages;
-    }
-
-    public String translate(String message) {
-        if (message == null)
-            return "Null";
-
-        //COMMENT AFTER # FOR TRANSLATE THAT WOULD BE THE SAME TEXT IN DIFFERENT WAYS TO TRANSLATE
-        String messageWithoutComment = message.replaceFirst("(?<!\\\\)#.*$", "").trim();
-        messageWithoutComment = messageWithoutComment.replace("\\#", "#");
-
-        if (langObj == null) {
-            noTranslate(message);
-            return messageWithoutComment;
-        }
-
-        if (!langObj.containsKey(message)) {
-            noTranslate(message);
-            //IF NO SUITABLE TRANSLATION WITH THE COMMENT THEN RETURN WITHOUT COMMENT
-            if (!langObj.containsKey(messageWithoutComment)) {
-                return messageWithoutComment;
-            } else {
-                return langObj.get(messageWithoutComment).toString();
-            }
-        }
-        // if "message" = isNull  - return message
-        // if "massage" = "any string"  - return "any string"
-        String res = langObj.get(message).toString();
-        if (res.isEmpty()) return (message);
-        return res;
     }
 
     private void noTranslate(String message) {
@@ -138,63 +86,33 @@ public class Lang {
         return noTranslateMap;
     }
 
-    public List<LangFile> getLangListAvailable() {
-        List<LangFile> langList = new ArrayList<>();
+    public HashMap<String, LangFile> getLangListAvailable() {
+        if (langList != null)
+            return langList;
+
+        langList = new HashMap<>();
 
         List<String> fileList = getFileListAvailable();
 
-        //langList.add(new LangFile());
-
         for (int i = 0; i < fileList.size(); i++) {
-            if (!fileList.get(i).equals("en.json") && !fileList.get(i).equals("available.json")) {
-                try {
-                    logger.debug("try lang file: " + fileList.get(i));
-                    JSONObject langFile = openLangFile(fileList.get(i));
-                    if (langFile.isEmpty())
-                        continue;
+            try {
+                logger.debug("try lang file: " + fileList.get(i));
+                JSONObject langJson = openLangFile(fileList.get(i));
+                if (langJson.isEmpty())
+                    continue;
 
-                    String lang_name = (String) langFile.get("_lang_name_");
-                    long time_of_translation = Long.parseLong(langFile.get("_timestamp_of_translation_").toString());
-                    langList.add(new LangFile(lang_name, fileList.get(i), time_of_translation));
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
+                LangFile langFile = new LangFile(langJson);
+                langList.put(langFile.getISO(), langFile);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
             }
         }
 
         return langList;
     }
 
-
-    public List<Tuple2<String, String>> getLangListToWeb() {
-        List<Tuple2<String, String>> result = new ArrayList<>();
-        List<String> fileList = getFileListAvailable();
-        result.add(new Tuple2<>("en", new LangFile().getName()));
-        for (String fileName : fileList) {
-            if (!fileName.equals("en.json") && !fileName.equals("available.json")) {
-                try {
-                    logger.debug("try lang file: " + fileName);
-                    JSONObject langFile = openLangFile(fileName);
-                    if (langFile.isEmpty()) {
-                        continue;
-                    }
-                    result.add(new Tuple2<>(fileName.replaceAll(".json", ""),
-                            (String) langFile.get("_lang_name_")));
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        }
-        return result;
-    }
-
-    public static String getISO(JSONObject langObj) {
-        return (String) langObj.get("_lang_ISO_");
-    }
-
-
     public List<String> getFileListAvailable() {
-        List<String> lngFileList = new ArrayList<>();
+        List<String> langFileList = new ArrayList<>();
 
         File[] fileList;
         File dir = new File(Settings.getInstance().getLangDir());
@@ -205,41 +123,56 @@ public class Lang {
 
         fileList = dir.listFiles();
 
-        //lngFileList.add("en.json");
-
         for (int i = 0; i < fileList.length; i++) {
-            if (fileList[i].isFile() && fileList[i].getName().endsWith(".json")) {
-                lngFileList.add(fileList[i].getName());
+            if (fileList[i].isFile() && fileList[i].getName().endsWith(".json")
+                    && !fileList[i].getName().equals("available.json")) {
+                langFileList.add(fileList[i].getName());
             }
         }
 
-        return lngFileList;
+        return langFileList;
     }
 
-    public String translateFromLangObj(String message, JSONObject langObj1) {
+    public void setLangForNode() {
+        langObj = langList.get(Settings.getInstance().getLang()).getLangJson();
+    }
+
+    public static String translate(String message, JSONObject langObj) {
         //COMMENT AFTER # FOR TRANSLATE THAT WOULD BE THE SAME TEXT IN DIFFERENT WAYS TO TRANSLATE
         String messageWithoutComment = message.replaceFirst("(?<!\\\\)#.*$", "");
         messageWithoutComment = messageWithoutComment.replace("\\#", "#");
 
-        if (langObj1 == null) {
+        if (langObj == null) {
             //noTranslate(message);
             return messageWithoutComment;
         }
 
-        if (!langObj1.containsKey(message)) {
+        if (!langObj.containsKey(message)) {
             //	noTranslate(message);
             //IF NO SUITABLE TRANSLATION WITH THE COMMENT THEN RETURN WITHOUT COMMENT
-            if (!langObj1.containsKey(messageWithoutComment)) {
+            if (!langObj.containsKey(messageWithoutComment)) {
                 return messageWithoutComment.trim();
             } else {
-                return langObj1.get(messageWithoutComment).toString();
+                return langObj.get(messageWithoutComment).toString();
             }
         }
         // if "message" = isNull  - return message
         // if "massage" = "any string"  - return "any string"
-        String res = langObj1.get(message).toString();
+        String res = langObj.get(message).toString();
         if (res.isEmpty()) return (message);
         return res;
+    }
+
+    public String translate(String message) {
+        return translate(message, langObj);
+    }
+
+    public String[] translate(String[] Messages) {
+        String[] translateMessages = Messages.clone();
+        for (int i = 0; i < translateMessages.length; i++) {
+            translateMessages[i] = translate(translateMessages[i]);
+        }
+        return translateMessages;
     }
 
 }

@@ -25,6 +25,7 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.lang.Lang;
+import org.erachain.lang.LangFile;
 import org.erachain.settings.Settings;
 import org.erachain.utils.M_Integer;
 import org.erachain.utils.NumberAsString;
@@ -64,7 +65,6 @@ public class BlockExplorer {
     private JSONObject langObj;
     private Locale local = new Locale("ru", "RU"); // Date format
 //    private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // for
-    private String langFile;
     private DCSet dcSet;
     private LinkedHashMap output;
 
@@ -288,26 +288,25 @@ public class BlockExplorer {
 
         langObj = Lang.openLangFile(langFile);
 
-        List<Tuple2<String, String>> langs = Lang.getInstance().getLangListToWeb();
-
-        Map lang_list = new LinkedHashMap();
-        for (int i = 0; i < langs.size(); i++) {
-            Map lang_par = new LinkedHashMap();
-            lang_par.put("ISO", langs.get(i).a);
-            lang_par.put("name", langs.get(i).b);
-            lang_list.put(i, lang_par);
+        Map langList = new LinkedHashMap();
+        for (LangFile landFile : Lang.getInstance().getLangListAvailable()) {
+            Map langPars = new LinkedHashMap();
+            langPars.put("ISO", landFile.getISO());
+            langPars.put("name", landFile.getName());
+            langList.put(i, langPars);
         }
-        output.put("Lang", lang_list);
+
+        output.put("Lang", langList);
         //Основное меню. заголовки и их перевод на выбранный язык
-        output.put("id_home2", Lang.getInstance().translateFromLangObj("Blocks", langObj));
-        output.put("id_menu_top_100", Lang.getInstance().translateFromLangObj("Top 100 Richest", langObj));
-        output.put("id_menu_percons", Lang.getInstance().translateFromLangObj("Persons", langObj));
-        output.put("id_menu_pals_asset", Lang.getInstance().translateFromLangObj("Polls", langObj));
-        output.put("id_menu_assets", Lang.getInstance().translateFromLangObj("Assets", langObj));
-        output.put("id_menu_aTs", Lang.getInstance().translateFromLangObj("ATs", langObj));
-        output.put("id_menu_transactions", Lang.getInstance().translateFromLangObj("Transactions", langObj));
-        output.put("id_menu_exchange", Lang.getInstance().translateFromLangObj("Exchange", langObj));
-        output.put("id_menu_order", Lang.getInstance().translateFromLangObj("Order", langObj));
+        output.put("id_home2", Lang.getInstance().translate("Blocks", langObj));
+        output.put("id_menu_top_100", Lang.getInstance().translate("Top 100 Richest", langObj));
+        output.put("id_menu_percons", Lang.getInstance().translate("Persons", langObj));
+        output.put("id_menu_pals_asset", Lang.getInstance().translate("Polls", langObj));
+        output.put("id_menu_assets", Lang.getInstance().translate("Assets", langObj));
+        output.put("id_menu_aTs", Lang.getInstance().translate("ATs", langObj));
+        output.put("id_menu_transactions", Lang.getInstance().translate("Transactions", langObj));
+        output.put("id_menu_exchange", Lang.getInstance().translate("Exchange", langObj));
+        output.put("id_menu_order", Lang.getInstance().translate("Order", langObj));
 
         //информация о последнем блоке
         output.put("lastBlock", jsonLastBlock());
@@ -669,7 +668,7 @@ public class BlockExplorer {
         map.put("owner", item.getOwner().getAddress());
 
         if (item.getReference() != null) {
-            map.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
+            map.put("Label_seqNo", Lang.getInstance().translate("seqNo", langObj));
             long txSeqNo = dcSet.getTransactionFinalMapSigns().get(item.getReference());
             map.put("seqNo", Transaction.viewDBRef(txSeqNo));
             Transaction transaction = dcSet.getTransactionFinalMap().get(txSeqNo);
@@ -695,8 +694,8 @@ public class BlockExplorer {
         }
 
         output.put("charKey", poll.getItemTypeChar());
-        output.put("label_Actions", Lang.getInstance().translateFromLangObj("Actions", langObj));
-        output.put("label_RAW", Lang.getInstance().translateFromLangObj("Bytecode", langObj));
+        output.put("label_Actions", Lang.getInstance().translate("Actions", langObj));
+        output.put("label_RAW", Lang.getInstance().translate("Bytecode", langObj));
 
         Map output = new LinkedHashMap();
         Long assetKey;
@@ -740,17 +739,17 @@ public class BlockExplorer {
 
         output.put("poll", pollJSON);
 
-        output.put("label_table_key", Lang.getInstance().translateFromLangObj("Number", langObj));
-        output.put("label_table_option_name", Lang.getInstance().translateFromLangObj("Option", langObj));
-        output.put("label_table_person_votes", Lang.getInstance().translateFromLangObj("Personal Voters", langObj));
-        output.put("label_table_option_votes", Lang.getInstance().translateFromLangObj("Asset Votes", langObj));
-        output.put("label_Total", Lang.getInstance().translateFromLangObj("Total", langObj));
+        output.put("label_table_key", Lang.getInstance().translate("Number", langObj));
+        output.put("label_table_option_name", Lang.getInstance().translate("Option", langObj));
+        output.put("label_table_person_votes", Lang.getInstance().translate("Personal Voters", langObj));
+        output.put("label_table_option_votes", Lang.getInstance().translate("Asset Votes", langObj));
+        output.put("label_Total", Lang.getInstance().translate("Total", langObj));
 
-        output.put("label_Poll", Lang.getInstance().translateFromLangObj("Poll", langObj));
-        output.put("label_Asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
-        output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("label_Owner", Lang.getInstance().translateFromLangObj("Owner", langObj));
-        output.put("label_Description", Lang.getInstance().translateFromLangObj("Description", langObj));
+        output.put("label_Poll", Lang.getInstance().translate("Poll", langObj));
+        output.put("label_Asset", Lang.getInstance().translate("Asset", langObj));
+        output.put("label_Key", Lang.getInstance().translate("Key", langObj));
+        output.put("label_Owner", Lang.getInstance().translate("Owner", langObj));
+        output.put("label_Description", Lang.getInstance().translate("Description", langObj));
 
         return output;
 
@@ -910,8 +909,8 @@ public class BlockExplorer {
         }
 
         output.put("charKey", asset.getItemTypeChar());
-        output.put("label_Actions", Lang.getInstance().translateFromLangObj("Actions", langObj));
-        output.put("label_RAW", Lang.getInstance().translateFromLangObj("Bytecode", langObj));
+        output.put("label_Actions", Lang.getInstance().translate("Actions", langObj));
+        output.put("label_RAW", Lang.getInstance().translate("Bytecode", langObj));
 
         Map output = new LinkedHashMap();
 
@@ -924,7 +923,7 @@ public class BlockExplorer {
 
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
             /// redefine
-            assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+            assetJSON.put("description", Lang.getInstance().translate(asset.viewDescription(), langObj));
         }
 
         assetJSON.put("quantity", NumberAsString.formatAsString(asset.getQuantity()));
@@ -934,16 +933,16 @@ public class BlockExplorer {
 
         assetJSON.put("operations", orders.size() + trades.size());
 
-        assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
+        assetJSON.put("assetType", Lang.getInstance().translate(asset.viewAssetType(), langObj));
         assetJSON.put("assetTypeChar", asset.charAssetType() + asset.viewAssetTypeAbbrev());
 
-        assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
+        assetJSON.put("assetTypeFull", Lang.getInstance().translate(asset.viewAssetTypeFull(), langObj));
         StringJoiner joiner = new StringJoiner(", ");
         for (Tuple2<?, String> item : asset.viewAssetTypeActionsList(null, true)) {
-            joiner.add(Lang.getInstance().translateFromLangObj(item.b, langObj));
+            joiner.add(Lang.getInstance().translate(item.b, langObj));
         }
-        assetJSON.put("assetTypeDesc", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeDescriptionCls(asset.getAssetType()), langObj)
-                + ".\n" + Lang.getInstance().translateFromLangObj("Acceptable actions", langObj) + ":\n" + joiner.toString()
+        assetJSON.put("assetTypeDesc", Lang.getInstance().translate(asset.viewAssetTypeDescriptionCls(asset.getAssetType()), langObj)
+                + ".\n" + Lang.getInstance().translate("Acceptable actions", langObj) + ":\n" + joiner.toString()
         );
 
         output.put("this", assetJSON);
@@ -987,7 +986,7 @@ public class BlockExplorer {
             pairJSON.put("asset", pair.getKey());
             pairJSON.put("assetName", assetWant.viewName());
             if (assetWant.getKey() > 0 && assetWant.getKey() < 1000) {
-                pairJSON.put("description", Lang.getInstance().translateFromLangObj(assetWant.viewDescription(), langObj));
+                pairJSON.put("description", Lang.getInstance().translate(assetWant.viewDescription(), langObj));
             } else {
                 pairJSON.put("description", assetWant.viewDescription());
             }
@@ -1011,26 +1010,26 @@ public class BlockExplorer {
         }
 
         output.put("pairs", pairsJSON);
-        output.put("label_Asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
-        output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
-        output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_Description", Lang.getInstance().translateFromLangObj("Description", langObj));
-        output.put("label_Scale", Lang.getInstance().translateFromLangObj("Accuracy", langObj));
-        output.put("label_AssetType", Lang.getInstance().translateFromLangObj("Type # вид", langObj));
-        output.put("label_AssetType_Desc", Lang.getInstance().translateFromLangObj("Type Description", langObj));
-        output.put("label_Quantity", Lang.getInstance().translateFromLangObj("Quantity", langObj));
-        output.put("label_Released", Lang.getInstance().translateFromLangObj("Released", langObj));
-        output.put("label_Holders", Lang.getInstance().translateFromLangObj("Holders", langObj));
-        output.put("label_Available_pairs", Lang.getInstance().translateFromLangObj("Available pairs", langObj));
-        output.put("label_Pair", Lang.getInstance().translateFromLangObj("Pair", langObj));
-        output.put("label_Orders_Count", Lang.getInstance().translateFromLangObj("Orders Count", langObj));
+        output.put("label_Asset", Lang.getInstance().translate("Asset", langObj));
+        output.put("label_Key", Lang.getInstance().translate("Key", langObj));
+        output.put("Label_seqNo", Lang.getInstance().translate("seqNo", langObj));
+        output.put("label_Creator", Lang.getInstance().translate("Creator", langObj));
+        output.put("label_Description", Lang.getInstance().translate("Description", langObj));
+        output.put("label_Scale", Lang.getInstance().translate("Accuracy", langObj));
+        output.put("label_AssetType", Lang.getInstance().translate("Type # вид", langObj));
+        output.put("label_AssetType_Desc", Lang.getInstance().translate("Type Description", langObj));
+        output.put("label_Quantity", Lang.getInstance().translate("Quantity", langObj));
+        output.put("label_Released", Lang.getInstance().translate("Released", langObj));
+        output.put("label_Holders", Lang.getInstance().translate("Holders", langObj));
+        output.put("label_Available_pairs", Lang.getInstance().translate("Available pairs", langObj));
+        output.put("label_Pair", Lang.getInstance().translate("Pair", langObj));
+        output.put("label_Orders_Count", Lang.getInstance().translate("Orders Count", langObj));
         output.put("label_Open_Orders_Volume",
-                Lang.getInstance().translateFromLangObj("Open Orders Volume", langObj));
-        output.put("label_Trades_Count", Lang.getInstance().translateFromLangObj("Trades Count", langObj));
-        output.put("label_Trades_Volume", Lang.getInstance().translateFromLangObj("Trades Volume", langObj));
-        output.put("label_Total", Lang.getInstance().translateFromLangObj("Total", langObj));
-        output.put("label_View", Lang.getInstance().translateFromLangObj("View", langObj));
+                Lang.getInstance().translate("Open Orders Volume", langObj));
+        output.put("label_Trades_Count", Lang.getInstance().translate("Trades Count", langObj));
+        output.put("label_Trades_Volume", Lang.getInstance().translate("Trades Volume", langObj));
+        output.put("label_Total", Lang.getInstance().translate("Total", langObj));
+        output.put("label_View", Lang.getInstance().translate("View", langObj));
 
         return output;
     }
@@ -1101,37 +1100,36 @@ public class BlockExplorer {
         }
 
 
-
         output.put("lastTrades", tradesJSON);
 
-        output.put("label_Head", Lang.getInstance().translateFromLangObj("Exchange Order", langObj));
+        output.put("label_Head", Lang.getInstance().translate("Exchange Order", langObj));
 
-        output.put("label_Order", Lang.getInstance().translateFromLangObj("Order", langObj));
+        output.put("label_Order", Lang.getInstance().translate("Order", langObj));
 
-        output.put("label_Active", Lang.getInstance().translateFromLangObj("Active", langObj));
-        output.put("label_Completed", Lang.getInstance().translateFromLangObj("Completed", langObj));
-        output.put("label_Canceled", Lang.getInstance().translateFromLangObj("Canceled", langObj));
+        output.put("label_Active", Lang.getInstance().translate("Active", langObj));
+        output.put("label_Completed", Lang.getInstance().translate("Completed", langObj));
+        output.put("label_Canceled", Lang.getInstance().translate("Canceled", langObj));
 
-        output.put("label_Fulfilled", Lang.getInstance().translateFromLangObj("Fulfilled", langObj));
-        output.put("label_LeftHave", Lang.getInstance().translateFromLangObj("Left Have", langObj));
-        output.put("label_LeftPrice", Lang.getInstance().translateFromLangObj("Left Price", langObj));
-        output.put("label_table_LastTrades", Lang.getInstance().translateFromLangObj("Last Trades", langObj));
-        output.put("label_table_have", Lang.getInstance().translateFromLangObj("Base Asset", langObj));
-        output.put("label_table_want", Lang.getInstance().translateFromLangObj("Price Asset", langObj));
-        output.put("label_table_orders", Lang.getInstance().translateFromLangObj("Opened Orders", langObj));
-        output.put("label_table_last_price", Lang.getInstance().translateFromLangObj("Last Price", langObj));
-        output.put("label_table_volume24", Lang.getInstance().translateFromLangObj("Day Volume", langObj));
+        output.put("label_Fulfilled", Lang.getInstance().translate("Fulfilled", langObj));
+        output.put("label_LeftHave", Lang.getInstance().translate("Left Have", langObj));
+        output.put("label_LeftPrice", Lang.getInstance().translate("Left Price", langObj));
+        output.put("label_table_LastTrades", Lang.getInstance().translate("Last Trades", langObj));
+        output.put("label_table_have", Lang.getInstance().translate("Base Asset", langObj));
+        output.put("label_table_want", Lang.getInstance().translate("Price Asset", langObj));
+        output.put("label_table_orders", Lang.getInstance().translate("Opened Orders", langObj));
+        output.put("label_table_last_price", Lang.getInstance().translate("Last Price", langObj));
+        output.put("label_table_volume24", Lang.getInstance().translate("Day Volume", langObj));
 
-        output.put("label_Trade_Initiator", Lang.getInstance().translateFromLangObj("Trade Initiator", langObj));
-        output.put("label_Position_Holder", Lang.getInstance().translateFromLangObj("Position Holder", langObj));
-        output.put("label_Date", Lang.getInstance().translateFromLangObj("Date", langObj));
-        output.put("label_Pair", Lang.getInstance().translateFromLangObj("Pair", langObj));
-        output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_Amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
-        output.put("label_Volume", Lang.getInstance().translateFromLangObj("Volume", langObj));
-        output.put("label_Price", Lang.getInstance().translateFromLangObj("Price", langObj));
-        output.put("label_Reverse_Price", Lang.getInstance().translateFromLangObj("Reverse Price", langObj));
-        output.put("label_Total_Cost", Lang.getInstance().translateFromLangObj("Total Cost", langObj));
+        output.put("label_Trade_Initiator", Lang.getInstance().translate("Trade Initiator", langObj));
+        output.put("label_Position_Holder", Lang.getInstance().translate("Position Holder", langObj));
+        output.put("label_Date", Lang.getInstance().translate("Date", langObj));
+        output.put("label_Pair", Lang.getInstance().translate("Pair", langObj));
+        output.put("label_Creator", Lang.getInstance().translate("Creator", langObj));
+        output.put("label_Amount", Lang.getInstance().translate("Amount", langObj));
+        output.put("label_Volume", Lang.getInstance().translate("Volume", langObj));
+        output.put("label_Price", Lang.getInstance().translate("Price", langObj));
+        output.put("label_Reverse_Price", Lang.getInstance().translate("Reverse Price", langObj));
+        output.put("label_Total_Cost", Lang.getInstance().translate("Total Cost", langObj));
 
         return output;
     }
@@ -1382,25 +1380,25 @@ public class BlockExplorer {
         }
         output.put("trades", tradesJSON);
 
-        output.put("label_Trades", Lang.getInstance().translateFromLangObj("Trades", langObj));
-        output.put("label_Trade_Initiator", Lang.getInstance().translateFromLangObj("Trade Initiator", langObj));
-        output.put("label_Position_Holder", Lang.getInstance().translateFromLangObj("Position Holder", langObj));
-        output.put("label_Volume", Lang.getInstance().translateFromLangObj("Volume", langObj));
-        output.put("label_Price", Lang.getInstance().translateFromLangObj("Price", langObj));
-        output.put("label_Total_Cost", Lang.getInstance().translateFromLangObj("Total Cost", langObj));
-        output.put("label_Amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
-        output.put("label_Orders", Lang.getInstance().translateFromLangObj("Orders", langObj));
-        output.put("label_Sell_Orders", Lang.getInstance().translateFromLangObj("Sell Orders", langObj));
-        output.put("label_Buy_Orders", Lang.getInstance().translateFromLangObj("Buy Orders", langObj));
-        output.put("label_Total", Lang.getInstance().translateFromLangObj("Total", langObj));
-        output.put("label_Total_For_Sell", Lang.getInstance().translateFromLangObj("Total for Sell", langObj));
-        output.put("label_Total_For_Buy", Lang.getInstance().translateFromLangObj("Total for Buy", langObj));
-        output.put("label_Trade_History", Lang.getInstance().translateFromLangObj("Trade History", langObj));
-        output.put("label_Date", Lang.getInstance().translateFromLangObj("Date", langObj));
-        output.put("label_Type", Lang.getInstance().translateFromLangObj("Type", langObj));
-        output.put("label_Trade_Volume", Lang.getInstance().translateFromLangObj("Trade Volume", langObj));
-        output.put("label_Go_To", Lang.getInstance().translateFromLangObj("Go To", langObj));
-        output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("label_Trades", Lang.getInstance().translate("Trades", langObj));
+        output.put("label_Trade_Initiator", Lang.getInstance().translate("Trade Initiator", langObj));
+        output.put("label_Position_Holder", Lang.getInstance().translate("Position Holder", langObj));
+        output.put("label_Volume", Lang.getInstance().translate("Volume", langObj));
+        output.put("label_Price", Lang.getInstance().translate("Price", langObj));
+        output.put("label_Total_Cost", Lang.getInstance().translate("Total Cost", langObj));
+        output.put("label_Amount", Lang.getInstance().translate("Amount", langObj));
+        output.put("label_Orders", Lang.getInstance().translate("Orders", langObj));
+        output.put("label_Sell_Orders", Lang.getInstance().translate("Sell Orders", langObj));
+        output.put("label_Buy_Orders", Lang.getInstance().translate("Buy Orders", langObj));
+        output.put("label_Total", Lang.getInstance().translate("Total", langObj));
+        output.put("label_Total_For_Sell", Lang.getInstance().translate("Total for Sell", langObj));
+        output.put("label_Total_For_Buy", Lang.getInstance().translate("Total for Buy", langObj));
+        output.put("label_Trade_History", Lang.getInstance().translate("Trade History", langObj));
+        output.put("label_Date", Lang.getInstance().translate("Date", langObj));
+        output.put("label_Type", Lang.getInstance().translate("Type", langObj));
+        output.put("label_Trade_Volume", Lang.getInstance().translate("Trade Volume", langObj));
+        output.put("label_Go_To", Lang.getInstance().translate("Go To", langObj));
+        output.put("label_Creator", Lang.getInstance().translate("Creator", langObj));
 
         return output;
     }
@@ -1431,8 +1429,8 @@ public class BlockExplorer {
         byte[] b = person.getImage();
         String a = Base64.encodeBase64String(b);
 
-        output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("Label_name", Lang.getInstance().translateFromLangObj("Name", langObj));
+        output.put("Label_key", Lang.getInstance().translate("Key", langObj));
+        output.put("Label_name", Lang.getInstance().translate("Name", langObj));
 
         output.put("position", position);
         output.put("side", side);
@@ -1444,45 +1442,45 @@ public class BlockExplorer {
         output.put("asset_key", asset.getKey());
         output.put("asset_name", asset.viewName());
 
-        output.put("Label_asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
-        output.put("Label_person", Lang.getInstance().translateFromLangObj("Person", langObj));
+        output.put("Label_asset", Lang.getInstance().translate("Asset", langObj));
+        output.put("Label_person", Lang.getInstance().translate("Person", langObj));
 
-        output.put("Label_denied", Lang.getInstance().translateFromLangObj("DENIED", langObj));
-        output.put("Label_sum", Lang.getInstance().translateFromLangObj("SUM", langObj));
+        output.put("Label_denied", Lang.getInstance().translate("DENIED", langObj));
+        output.put("Label_sum", Lang.getInstance().translate("SUM", langObj));
 
-        output.put("Label_Positions", Lang.getInstance().translateFromLangObj("Balance Positions", langObj));
-        output.put("Label_Sides", Lang.getInstance().translateFromLangObj("Balance Sides", langObj));
+        output.put("Label_Positions", Lang.getInstance().translate("Balance Positions", langObj));
+        output.put("Label_Sides", Lang.getInstance().translate("Balance Sides", langObj));
 
-        output.put("label_Balance_1", Lang.getInstance().translateFromLangObj(Account.balancePositionName(1), langObj));
-        output.put("label_Balance_2", Lang.getInstance().translateFromLangObj(Account.balancePositionName(2), langObj));
-        output.put("label_Balance_3", Lang.getInstance().translateFromLangObj(Account.balancePositionName(3), langObj));
-        output.put("label_Balance_4", Lang.getInstance().translateFromLangObj(Account.balancePositionName(4), langObj));
-        output.put("label_Balance_5", Lang.getInstance().translateFromLangObj(Account.balancePositionName(5), langObj));
+        output.put("label_Balance_1", Lang.getInstance().translate(Account.balancePositionName(1), langObj));
+        output.put("label_Balance_2", Lang.getInstance().translate(Account.balancePositionName(2), langObj));
+        output.put("label_Balance_3", Lang.getInstance().translate(Account.balancePositionName(3), langObj));
+        output.put("label_Balance_4", Lang.getInstance().translate(Account.balancePositionName(4), langObj));
+        output.put("label_Balance_5", Lang.getInstance().translate(Account.balancePositionName(5), langObj));
 
-        output.put("label_Balance_Pos", Lang.getInstance().translateFromLangObj(Account.balancePositionName(position), langObj));
-        output.put("label_Balance_Side", Lang.getInstance().translateFromLangObj(Account.balanceSideName(side), langObj));
+        output.put("label_Balance_Pos", Lang.getInstance().translate(Account.balancePositionName(position), langObj));
+        output.put("label_Balance_Side", Lang.getInstance().translate(Account.balanceSideName(side), langObj));
 
-        output.put("Label_TotalDebit", Lang.getInstance().translateFromLangObj(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_DEBIT), langObj));
-        output.put("Label_Left", Lang.getInstance().translateFromLangObj(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_LEFT), langObj));
-        output.put("Label_TotalCredit", Lang.getInstance().translateFromLangObj(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_CREDIT), langObj));
+        output.put("Label_TotalDebit", Lang.getInstance().translate(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_DEBIT), langObj));
+        output.put("Label_Left", Lang.getInstance().translate(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_LEFT), langObj));
+        output.put("Label_TotalCredit", Lang.getInstance().translate(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_CREDIT), langObj));
 
-        output.put("Side_Help", Lang.getInstance().translateFromLangObj("Side_Help", langObj));
+        output.put("Side_Help", Lang.getInstance().translate("Side_Help", langObj));
 
         if (assetKey.equals(Transaction.FEE_KEY)) {
-            output.put("label_Balance_4", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUPositionName(4), langObj));
-            output.put("label_Balance_5", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUPositionName(5), langObj));
+            output.put("label_Balance_4", Lang.getInstance().translate(Account.balanceCOMPUPositionName(4), langObj));
+            output.put("label_Balance_5", Lang.getInstance().translate(Account.balanceCOMPUPositionName(5), langObj));
 
             if (position == TransactionAmount.ACTION_SPEND || position == TransactionAmount.ACTION_PLEDGE) {
 
-                output.put("label_Balance_Pos", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUPositionName(position), langObj));
-                output.put("label_Balance_Side", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUSideName(side), langObj));
+                output.put("label_Balance_Pos", Lang.getInstance().translate(Account.balanceCOMPUPositionName(position), langObj));
+                output.put("label_Balance_Side", Lang.getInstance().translate(Account.balanceCOMPUSideName(side), langObj));
 
-                output.put("Label_TotalDebit", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_DEBIT), langObj));
-                output.put("Label_Left", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_LEFT), langObj));
-                output.put("Label_TotalCredit", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_CREDIT), langObj));
-                output.put("Label_TotalForged", Lang.getInstance().translateFromLangObj(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_FORGED), langObj));
+                output.put("Label_TotalDebit", Lang.getInstance().translate(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_DEBIT), langObj));
+                output.put("Label_Left", Lang.getInstance().translate(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_LEFT), langObj));
+                output.put("Label_TotalCredit", Lang.getInstance().translate(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_CREDIT), langObj));
+                output.put("Label_TotalForged", Lang.getInstance().translate(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_FORGED), langObj));
 
-                output.put("Side_Help", Lang.getInstance().translateFromLangObj("Side_Help_COMPU_BONUS", langObj));
+                output.put("Side_Help", Lang.getInstance().translate("Side_Help_COMPU_BONUS", langObj));
 
                 if (side == TransactionAmount.BALANCE_SIDE_FORGED) {
                     // Это запрос на баланса Нафоржили - он в 5-й позиции на стороне 2
@@ -1526,16 +1524,16 @@ public class BlockExplorer {
         byte[] b = person.getImage();
         String a = Base64.encodeBase64String(b);
 
-        output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("Label_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("Label_result", Lang.getInstance().translateFromLangObj("Result", langObj));
-        output.put("Label_denied", Lang.getInstance().translateFromLangObj("DENIED", langObj));
-        output.put("Label_sum", Lang.getInstance().translateFromLangObj("SUM", langObj));
-        output.put("Label_from", Lang.getInstance().translateFromLangObj("From #date", langObj));
-        output.put("Label_to", Lang.getInstance().translateFromLangObj("To #date", langObj));
-        output.put("Label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("Label_key", Lang.getInstance().translate("Key", langObj));
+        output.put("Label_name", Lang.getInstance().translate("Name", langObj));
+        output.put("Label_result", Lang.getInstance().translate("Result", langObj));
+        output.put("Label_denied", Lang.getInstance().translate("DENIED", langObj));
+        output.put("Label_sum", Lang.getInstance().translate("SUM", langObj));
+        output.put("Label_from", Lang.getInstance().translate("From #date", langObj));
+        output.put("Label_to", Lang.getInstance().translate("To #date", langObj));
+        output.put("Label_creator", Lang.getInstance().translate("Creator", langObj));
 
-        output.put("Label_data", Lang.getInstance().translateFromLangObj("Data # данные", langObj));
+        output.put("Label_data", Lang.getInstance().translate("Data # данные", langObj));
 
         output.put("person_img", a);
         output.put("person_key", person.getKey());
@@ -1544,9 +1542,9 @@ public class BlockExplorer {
         output.put("status_key", status.getKey());
         output.put("status_name", status.viewName());
 
-        output.put("Label_status", Lang.getInstance().translateFromLangObj("Status", langObj));
-        output.put("Label_person", Lang.getInstance().translateFromLangObj("Person", langObj));
-        output.put("Label_transaction", Lang.getInstance().translateFromLangObj("Transaction", langObj));
+        output.put("Label_status", Lang.getInstance().translate("Status", langObj));
+        output.put("Label_person", Lang.getInstance().translate("Person", langObj));
+        output.put("Label_transaction", Lang.getInstance().translate("Transaction", langObj));
 
         //BigDecimal sum = PersonCls.getBalance(personKey, statusKey, position);
         KKPersonStatusMap map = DCSet.getInstance().getPersonStatusMap();
@@ -1588,11 +1586,11 @@ public class BlockExplorer {
 
             output.put("last", currentStatus);
 
-            output.put("Label_status_history", Lang.getInstance().translateFromLangObj("Update History", langObj));
-            output.put("Label_current_state", Lang.getInstance().translateFromLangObj("Current State", langObj));
+            output.put("Label_status_history", Lang.getInstance().translate("Update History", langObj));
+            output.put("Label_current_state", Lang.getInstance().translate("Current State", langObj));
 
         } else {
-            output.put("Label_statuses_list", Lang.getInstance().translateFromLangObj("Statuses List", langObj));
+            output.put("Label_statuses_list", Lang.getInstance().translate("Statuses List", langObj));
         }
 
         if (!status.isUnique() || history) {
@@ -1638,7 +1636,7 @@ public class BlockExplorer {
         assetJSON.put("key", asset.getKey());
         assetJSON.put("name", asset.viewName());
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
-            assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+            assetJSON.put("description", Lang.getInstance().translate(asset.viewDescription(), langObj));
         } else {
             assetJSON.put("description", asset.viewDescription());
         }
@@ -1646,8 +1644,8 @@ public class BlockExplorer {
         assetJSON.put("quantity", NumberAsString.formatAsString(asset.getQuantity()));
         assetJSON.put("released", NumberAsString.formatAsString(asset.getReleased(dcSet)));
         assetJSON.put("scale", asset.getScale());
-        assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
-        assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
+        assetJSON.put("assetType", Lang.getInstance().translate(asset.viewAssetType(), langObj));
+        assetJSON.put("assetTypeFull", Lang.getInstance().translate(asset.viewAssetTypeFull(), langObj));
         ///assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
         assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
         List<Order> orders = dcSet
@@ -1668,22 +1666,22 @@ public class BlockExplorer {
         }
 
         output.put("charKey", person.getItemTypeChar());
-        output.put("label_Actions", Lang.getInstance().translateFromLangObj("Actions", langObj));
-        output.put("label_Authorship", Lang.getInstance().translateFromLangObj("Authorship", langObj));
-        output.put("label_RAW", Lang.getInstance().translateFromLangObj("Bytecode", langObj));
+        output.put("label_Actions", Lang.getInstance().translate("Actions", langObj));
+        output.put("label_Authorship", Lang.getInstance().translate("Authorship", langObj));
+        output.put("label_RAW", Lang.getInstance().translate("Bytecode", langObj));
 
         Tuple2<Map, Transaction> itemBase = itemBase(person);
         Map output = itemBase.a;
 
-        output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("Label_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("Label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("Label_registrar", Lang.getInstance().translateFromLangObj("Registrar", langObj));
-        output.put("Label_born", Lang.getInstance().translateFromLangObj("Birthday", langObj));
-        output.put("Label_gender", Lang.getInstance().translateFromLangObj("Gender", langObj));
-        output.put("Label_total_registered", Lang.getInstance().translateFromLangObj("Registered", langObj));
-        output.put("Label_total_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
-        output.put("Label_description", Lang.getInstance().translateFromLangObj("Description", langObj));
+        output.put("Label_key", Lang.getInstance().translate("Key", langObj));
+        output.put("Label_name", Lang.getInstance().translate("Name", langObj));
+        output.put("Label_creator", Lang.getInstance().translate("Creator", langObj));
+        output.put("Label_registrar", Lang.getInstance().translate("Registrar", langObj));
+        output.put("Label_born", Lang.getInstance().translate("Birthday", langObj));
+        output.put("Label_gender", Lang.getInstance().translate("Gender", langObj));
+        output.put("Label_total_registered", Lang.getInstance().translate("Registered", langObj));
+        output.put("Label_total_certified", Lang.getInstance().translate("Certified", langObj));
+        output.put("Label_description", Lang.getInstance().translate("Description", langObj));
 
         output.put("creator", person.getOwner().getAddress());
         if (person.getOwner().getPerson() != null) {
@@ -1708,17 +1706,17 @@ public class BlockExplorer {
         output.put("birthday", person.getBirthdayStr());
         if (!person.isAlive(0L)) {
             output.put("deathday", person.getDeathdayStr());
-            output.put("Label_dead", Lang.getInstance().translateFromLangObj("Deathday", langObj));
+            output.put("Label_dead", Lang.getInstance().translate("Deathday", langObj));
 
         }
 
-        String gender = Lang.getInstance().translateFromLangObj("Man", langObj);
+        String gender = Lang.getInstance().translate("Man", langObj);
         if (person.getGender() == 0) {
-            gender = Lang.getInstance().translateFromLangObj("Man", langObj);
+            gender = Lang.getInstance().translate("Man", langObj);
         } else if (person.getGender() == 1) {
-            gender = Lang.getInstance().translateFromLangObj("Woman", langObj);
+            gender = Lang.getInstance().translate("Woman", langObj);
         } else {
-            gender = Lang.getInstance().translateFromLangObj("-", langObj);
+            gender = Lang.getInstance().translate("-", langObj);
         }
         output.put("gender", gender);
 
@@ -1730,11 +1728,11 @@ public class BlockExplorer {
         TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = dcSet.getPersonStatusMap().get(person.getKey());
         if (!statuses.isEmpty()) {
 
-            output.put("Label_statuses", Lang.getInstance().translateFromLangObj("Statuses", langObj));
-            output.put("Label_Status_table_status", Lang.getInstance().translateFromLangObj("Status", langObj));
-            output.put("Label_Status_table_period", Lang.getInstance().translateFromLangObj("Period", langObj));
-            output.put("Label_Status_table_appointing", Lang.getInstance().translateFromLangObj("Appointing", langObj));
-            output.put("Label_Status_table_seqNo", Lang.getInstance().translateFromLangObj("SeqNo", langObj));
+            output.put("Label_statuses", Lang.getInstance().translate("Statuses", langObj));
+            output.put("Label_Status_table_status", Lang.getInstance().translate("Status", langObj));
+            output.put("Label_Status_table_period", Lang.getInstance().translate("Period", langObj));
+            output.put("Label_Status_table_appointing", Lang.getInstance().translate("Appointing", langObj));
+            output.put("Label_Status_table_seqNo", Lang.getInstance().translate("SeqNo", langObj));
 
             int block;
             int seqNo;
@@ -1785,10 +1783,10 @@ public class BlockExplorer {
 
         if (!addresses.isEmpty()) {
 
-            output.put("Label_accounts", Lang.getInstance().translateFromLangObj("Accounts", langObj));
-            output.put("Label_accounts_table_address", Lang.getInstance().translateFromLangObj("Address", langObj));
-            output.put("Label_accounts_table_to_date", Lang.getInstance().translateFromLangObj("To Date", langObj));
-            output.put("Label_accounts_table_verifier", Lang.getInstance().translateFromLangObj("Account Verifier", langObj));
+            output.put("Label_accounts", Lang.getInstance().translate("Accounts", langObj));
+            output.put("Label_accounts_table_address", Lang.getInstance().translate("Address", langObj));
+            output.put("Label_accounts_table_to_date", Lang.getInstance().translate("To Date", langObj));
+            output.put("Label_accounts_table_verifier", Lang.getInstance().translate("Account Verifier", langObj));
 
             TransactionFinalMap transactionsMap = DCSet.getInstance().getTransactionFinalMap();
             BigDecimal eraBalanceA = new BigDecimal(0);
@@ -1859,10 +1857,10 @@ public class BlockExplorer {
 
         // my persons
 
-        output.put("Label_My_Persons", Lang.getInstance().translateFromLangObj("My Persons", langObj));
-        output.put("Label_accounts_table_date", Lang.getInstance().translateFromLangObj("Creation Date", langObj));
-        output.put("Label_My_Person_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("Label_My_Persons_Name", Lang.getInstance().translateFromLangObj("Name", langObj));
+        output.put("Label_My_Persons", Lang.getInstance().translate("My Persons", langObj));
+        output.put("Label_accounts_table_date", Lang.getInstance().translate("Creation Date", langObj));
+        output.put("Label_My_Person_key", Lang.getInstance().translate("Key", langObj));
+        output.put("Label_My_Persons_Name", Lang.getInstance().translate("Name", langObj));
 
         Map myPersonsJSON = new LinkedHashMap();
 
@@ -1905,14 +1903,14 @@ public class BlockExplorer {
 
         //output.put("timezone", Settings.getInstance().getTimeZone());
         //output.put("timeformat", Settings.getInstance().getTimeFormat());
-        output.put("label_hour", Lang.getInstance().translateFromLangObj("hour", langObj));
-        output.put("label_hours", Lang.getInstance().translateFromLangObj("hours", langObj));
-        output.put("label_mins", Lang.getInstance().translateFromLangObj("mins", langObj));
-        output.put("label_min", Lang.getInstance().translateFromLangObj("min", langObj));
-        output.put("label_secs", Lang.getInstance().translateFromLangObj("secs", langObj));
-        output.put("label_ago", Lang.getInstance().translateFromLangObj("ago", langObj));
+        output.put("label_hour", Lang.getInstance().translate("hour", langObj));
+        output.put("label_hours", Lang.getInstance().translate("hours", langObj));
+        output.put("label_mins", Lang.getInstance().translate("mins", langObj));
+        output.put("label_min", Lang.getInstance().translate("min", langObj));
+        output.put("label_secs", Lang.getInstance().translate("secs", langObj));
+        output.put("label_ago", Lang.getInstance().translate("ago", langObj));
         output.put("label_Last_processed_block",
-                Lang.getInstance().translateFromLangObj("Last processed block", langObj));
+                Lang.getInstance().translate("Last processed block", langObj));
 
         return output;
     }
@@ -1920,7 +1918,7 @@ public class BlockExplorer {
     public Map jsonQueryTopRichest100(int limit, long assetKey) {
 
         output.put("type", "top");
-        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type asset key", langObj));
+        output.put("search_placeholder", Lang.getInstance().translate("Type asset key", langObj));
 
         Map output = new LinkedHashMap();
         Map balances = new LinkedHashMap();
@@ -1998,13 +1996,13 @@ public class BlockExplorer {
             output.put("total", "--");// (all.add(alloreders)).toPlainString());
             output.put("released", "--");
             output.put("assetName", "--");
-            output.put("Label_Title", (Lang.getInstance().translateFromLangObj("Top %limit% %assetName% Richest", langObj)
+            output.put("Label_Title", (Lang.getInstance().translate("Top %limit% %assetName% Richest", langObj)
                     .replace("%limit%", String.valueOf(limit > 0 ? limit : ""))).replace("%assetName%", "--"));
             output.put("Label_All_non",
-                    (Lang.getInstance().translateFromLangObj("All non-empty %assetName% accounts (%count%)", langObj)
+                    (Lang.getInstance().translate("All non-empty %assetName% accounts (%count%)", langObj)
                             .replace("%assetName%", "--")).replace("%count%", String.valueOf(couter)));
             output.put("Label_All_accounts",
-                    (Lang.getInstance().translateFromLangObj("All %assetName% accounts (%count%)", langObj)
+                    (Lang.getInstance().translate("All %assetName% accounts (%count%)", langObj)
                             .replace("%assetName%", "--")).replace("%count%", String.valueOf(couter)));
         } else {
             if (asset.getQuantity() > 0) {
@@ -2014,25 +2012,25 @@ public class BlockExplorer {
             }
             output.put("released", asset.getReleased(dcSet).toPlainString());
             output.put("assetName", asset.viewName());
-            output.put("Label_Title", (Lang.getInstance().translateFromLangObj("Top %limit% %assetName% Richest", langObj)
+            output.put("Label_Title", (Lang.getInstance().translate("Top %limit% %assetName% Richest", langObj)
                     .replace("%limit%", String.valueOf(limit > 0 ? limit : ""))).replace("%assetName%", asset.viewName()));
             output.put("Label_All_non",
-                    (Lang.getInstance().translateFromLangObj("All non-empty %assetName% accounts (%count%)", langObj)
+                    (Lang.getInstance().translate("All non-empty %assetName% accounts (%count%)", langObj)
                             .replace("%assetName%", asset.viewName())).replace("%count%", String.valueOf(couter)));
             output.put("Label_All_accounts",
-                    (Lang.getInstance().translateFromLangObj("All %assetName% accounts (%count%)", langObj)
+                    (Lang.getInstance().translate("All %assetName% accounts (%count%)", langObj)
                             .replace("%assetName%", asset.viewName())).replace("%count%", String.valueOf(couter)));
         }
-        output.put("Label_Table_Account", Lang.getInstance().translateFromLangObj("Account", langObj));
-        output.put("Label_Table_Balance", Lang.getInstance().translateFromLangObj("Balance", langObj));
-        output.put("Label_Table_in_OWN", Lang.getInstance().translateFromLangObj("in OWN", langObj));
-        output.put("Label_Table_Prop", Lang.getInstance().translateFromLangObj("Prop.", langObj));
-        output.put("Label_Table_person", Lang.getInstance().translateFromLangObj("Owner", langObj));
+        output.put("Label_Table_Account", Lang.getInstance().translate("Account", langObj));
+        output.put("Label_Table_Balance", Lang.getInstance().translate("Balance", langObj));
+        output.put("Label_Table_in_OWN", Lang.getInstance().translate("in OWN", langObj));
+        output.put("Label_Table_Prop", Lang.getInstance().translate("Prop.", langObj));
+        output.put("Label_Table_person", Lang.getInstance().translate("Owner", langObj));
 
-        output.put("Label_Released", Lang.getInstance().translateFromLangObj("released", langObj));
-        output.put("Label_in_order", Lang.getInstance().translateFromLangObj("in order", langObj));
+        output.put("Label_Released", Lang.getInstance().translate("released", langObj));
+        output.put("Label_in_order", Lang.getInstance().translate("in order", langObj));
 
-        output.put("Label_Top", Lang.getInstance().translateFromLangObj("Top", langObj));
+        output.put("Label_Top", Lang.getInstance().translate("Top", langObj));
 
         output.put("allinOrders", alloreders.stripTrailingZeros().toPlainString());
         output.put("assetKey", assetKey);
@@ -2041,7 +2039,7 @@ public class BlockExplorer {
 
         output.put("top", balances);
         output.put("Label_Total_coins_in_the_system",
-                Lang.getInstance().translateFromLangObj("Total asset units in the system", langObj));
+                Lang.getInstance().translate("Total asset units in the system", langObj));
 
         return output;
     }
@@ -2123,19 +2121,19 @@ public class BlockExplorer {
         output.put("balances", balAssets);
         output.put("side", side);
 
-        output.put("Side_Help", Lang.getInstance().translateFromLangObj("Side_Help", langObj));
-        output.put("Label_TotalDebit", Lang.getInstance().translateFromLangObj("Total Debit", langObj));
-        output.put("Label_Left", Lang.getInstance().translateFromLangObj("Left # остаток", langObj));
-        output.put("Label_TotalCredit", Lang.getInstance().translateFromLangObj("Total Credit", langObj));
+        output.put("Side_Help", Lang.getInstance().translate("Side_Help", langObj));
+        output.put("Label_TotalDebit", Lang.getInstance().translate("Total Debit", langObj));
+        output.put("Label_Left", Lang.getInstance().translate("Left # остаток", langObj));
+        output.put("Label_TotalCredit", Lang.getInstance().translate("Total Credit", langObj));
 
-        output.put("label_Balance_table", Lang.getInstance().translateFromLangObj("Balance", langObj));
-        output.put("label_asset_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("label_asset_name", Lang.getInstance().translateFromLangObj("Name", langObj));
+        output.put("label_Balance_table", Lang.getInstance().translate("Balance", langObj));
+        output.put("label_asset_key", Lang.getInstance().translate("Key", langObj));
+        output.put("label_asset_name", Lang.getInstance().translate("Name", langObj));
 
-        output.put("label_Balance_1", Lang.getInstance().translateFromLangObj("OWN (1)", langObj));
-        output.put("label_Balance_2", Lang.getInstance().translateFromLangObj("DEBT (2)", langObj));
-        output.put("label_Balance_3", Lang.getInstance().translateFromLangObj("HOLD (3)", langObj));
-        output.put("label_Balance_4", Lang.getInstance().translateFromLangObj("SPEND (4)", langObj));
+        output.put("label_Balance_1", Lang.getInstance().translate("OWN (1)", langObj));
+        output.put("label_Balance_2", Lang.getInstance().translate("DEBT (2)", langObj));
+        output.put("label_Balance_3", Lang.getInstance().translate("HOLD (3)", langObj));
+        output.put("label_Balance_4", Lang.getInstance().translate("SPEND (4)", langObj));
 
         return output;
 
@@ -2535,7 +2533,7 @@ public class BlockExplorer {
     public void jsonQueryExchange(String filterStr, int start) {
 
         output.put("type", "exchange");
-        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching asset keys", langObj));
+        output.put("search_placeholder", Lang.getInstance().translate("Type searching asset keys", langObj));
 
         List<Pair<Long, Long>> list = new ArrayList<>();
         HashSet<Pair<Long, Long>> pairsSet = new HashSet<>();
@@ -2627,23 +2625,23 @@ public class BlockExplorer {
 
         output.put("lastTrades", tradesArray);
 
-        output.put("label_table_PopularPairs", Lang.getInstance().translateFromLangObj("Most Popular Pairs", langObj));
-        output.put("label_table_LastTrades", Lang.getInstance().translateFromLangObj("Last Trades", langObj));
-        output.put("label_table_have", Lang.getInstance().translateFromLangObj("Base Asset", langObj));
-        output.put("label_table_want", Lang.getInstance().translateFromLangObj("Price Asset", langObj));
-        output.put("label_table_orders", Lang.getInstance().translateFromLangObj("Opened Orders", langObj));
-        output.put("label_table_last_price", Lang.getInstance().translateFromLangObj("Last Price", langObj));
-        output.put("label_table_volume24", Lang.getInstance().translateFromLangObj("Day Volume", langObj));
+        output.put("label_table_PopularPairs", Lang.getInstance().translate("Most Popular Pairs", langObj));
+        output.put("label_table_LastTrades", Lang.getInstance().translate("Last Trades", langObj));
+        output.put("label_table_have", Lang.getInstance().translate("Base Asset", langObj));
+        output.put("label_table_want", Lang.getInstance().translate("Price Asset", langObj));
+        output.put("label_table_orders", Lang.getInstance().translate("Opened Orders", langObj));
+        output.put("label_table_last_price", Lang.getInstance().translate("Last Price", langObj));
+        output.put("label_table_volume24", Lang.getInstance().translate("Day Volume", langObj));
 
-        output.put("label_Trade_Initiator", Lang.getInstance().translateFromLangObj("Trade Initiator", langObj));
-        output.put("label_Position_Holder", Lang.getInstance().translateFromLangObj("Position Holder", langObj));
-        output.put("label_Date", Lang.getInstance().translateFromLangObj("Date", langObj));
-        output.put("label_Pair", Lang.getInstance().translateFromLangObj("Pair", langObj));
-        output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_Amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
-        output.put("label_Volume", Lang.getInstance().translateFromLangObj("Volume", langObj));
-        output.put("label_Price", Lang.getInstance().translateFromLangObj("Price", langObj));
-        output.put("label_Total_Cost", Lang.getInstance().translateFromLangObj("Total Cost", langObj));
+        output.put("label_Trade_Initiator", Lang.getInstance().translate("Trade Initiator", langObj));
+        output.put("label_Position_Holder", Lang.getInstance().translate("Position Holder", langObj));
+        output.put("label_Date", Lang.getInstance().translate("Date", langObj));
+        output.put("label_Pair", Lang.getInstance().translate("Pair", langObj));
+        output.put("label_Creator", Lang.getInstance().translate("Creator", langObj));
+        output.put("label_Amount", Lang.getInstance().translate("Amount", langObj));
+        output.put("label_Volume", Lang.getInstance().translate("Volume", langObj));
+        output.put("label_Price", Lang.getInstance().translate("Price", langObj));
+        output.put("label_Total_Cost", Lang.getInstance().translate("Total Cost", langObj));
 
 
     }
@@ -2652,7 +2650,7 @@ public class BlockExplorer {
     public void jsonQueryTransactions(String filterStr, int start, UriInfo info) {
 
         output.put("type", "transactions");
-        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or signature or BlockNo-SeqNo", langObj));
+        output.put("search_placeholder", Lang.getInstance().translate("Type searching words or signature or BlockNo-SeqNo", langObj));
 
         Object forge = info.getQueryParameters().getFirst("forge");
         boolean useForge = forge != null && (forge.toString().toLowerCase().equals("yes")
@@ -2738,7 +2736,7 @@ public class BlockExplorer {
 
         // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
         transactionsJSON(output, null, transactions, 0, pageSize,
-                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", ""));
+                Lang.getInstance().translate("Last XX transactions", langObj).replace("XX", ""));
 
         output.put("useoffset", true);
 
@@ -2747,7 +2745,7 @@ public class BlockExplorer {
     @SuppressWarnings({"serial", "static-access"})
     public void jsonQueryAddresses() {
         output.put("type", "addresses");
-        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert searching address", langObj));
+        output.put("search_placeholder", Lang.getInstance().translate("Insert searching address", langObj));
     }
 
     @SuppressWarnings({"serial", "static-access"})
@@ -2755,7 +2753,7 @@ public class BlockExplorer {
 
         output.put("type", "address");
         output.put("search", "addresses");
-        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert searching address", langObj));
+        output.put("search_placeholder", Lang.getInstance().translate("Insert searching address", langObj));
         output.put("search_message", address);
 
         Object forge = info == null ? false : info.getQueryParameters().getFirst("forge");
@@ -2801,12 +2799,12 @@ public class BlockExplorer {
 
         // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
         transactionsJSON(output, account, transactions, 0, pageSize,
-                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", ""));
+                Lang.getInstance().translate("Last XX transactions", langObj).replace("XX", ""));
 
         output.put("useoffset", true);
 
         if (person != null) {
-            output.put("label_person_name", Lang.getInstance().translateFromLangObj("Name", langObj));
+            output.put("label_person_name", Lang.getInstance().translate("Name", langObj));
             output.put("person_Img", Base64.encodeBase64String(person.b.getImage()));
             output.put("person", person.b.viewName());
             output.put("person_key", person.b.getKey());
@@ -2814,11 +2812,11 @@ public class BlockExplorer {
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balabce_LIA = account.getBalance(AssetCls.LIA_KEY);
             output.put("registered", balabce_LIA.a.b.toPlainString());
             output.put("certified", balabce_LIA.b.b.toPlainString());
-            output.put("label_registered", Lang.getInstance().translateFromLangObj("Registered", langObj));
-            output.put("label_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
+            output.put("label_registered", Lang.getInstance().translate("Registered", langObj));
+            output.put("label_certified", Lang.getInstance().translate("Certified", langObj));
         }
 
-        output.put("label_account", Lang.getInstance().translateFromLangObj("Account", langObj));
+        output.put("label_account", Lang.getInstance().translate("Account", langObj));
 
         // balance assets from
         int side = Transaction.BALANCE_SIDE_LEFT;
@@ -2961,7 +2959,7 @@ public class BlockExplorer {
         for (int column = 0; column < column_Count; column++) {
 
             output.put("Label_" + model_Peers.getColumnNameOrigin(column).replace(' ', '_'),
-                    Lang.getInstance().translateFromLangObj(model_Peers.getColumnNameOrigin(column), langObj));
+                    Lang.getInstance().translate(model_Peers.getColumnNameOrigin(column), langObj));
         }
 
         Map out_peers = new LinkedHashMap();
@@ -2986,7 +2984,7 @@ public class BlockExplorer {
 
         // calc many pages
         output.put("pages", M_Integer.roundUp((float) rowCount1 / end));
-        output.put("Label_No", Lang.getInstance().translateFromLangObj("No.", langObj));
+        output.put("Label_No", Lang.getInstance().translate("No.", langObj));
         output.put("Peers", out_peers);
         return output;
     }
@@ -3002,18 +3000,18 @@ public class BlockExplorer {
         }
 
         output.put("charKey", template.getItemTypeChar());
-        output.put("label_Actions", Lang.getInstance().translateFromLangObj("Actions", langObj));
-        output.put("label_RAW", Lang.getInstance().translateFromLangObj("Bytecode", langObj));
+        output.put("label_Actions", Lang.getInstance().translate("Actions", langObj));
+        output.put("label_RAW", Lang.getInstance().translate("Bytecode", langObj));
 
         Map output = new LinkedHashMap();
 
         Map templateJSON = itemBase(template).a;
         output.put("template", templateJSON);
 
-        output.put("label_Template", Lang.getInstance().translateFromLangObj("Template", langObj));
-        output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_Description", Lang.getInstance().translateFromLangObj("Description", langObj));
+        output.put("label_Template", Lang.getInstance().translate("Template", langObj));
+        output.put("label_Key", Lang.getInstance().translate("Key", langObj));
+        output.put("label_Creator", Lang.getInstance().translate("Creator", langObj));
+        output.put("label_Description", Lang.getInstance().translate("Description", langObj));
 
         return output;
     }
@@ -3029,8 +3027,8 @@ public class BlockExplorer {
         }
 
         output.put("charKey", status.getItemTypeChar());
-        output.put("label_Actions", Lang.getInstance().translateFromLangObj("Actions", langObj));
-        output.put("label_RAW", Lang.getInstance().translateFromLangObj("Bytecode", langObj));
+        output.put("label_Actions", Lang.getInstance().translate("Actions", langObj));
+        output.put("label_RAW", Lang.getInstance().translate("Bytecode", langObj));
 
         Map output = new LinkedHashMap();
 
@@ -3040,13 +3038,13 @@ public class BlockExplorer {
 
         output.put("status", statusJSON);
 
-        output.put("label_Status", Lang.getInstance().translateFromLangObj("Status", langObj));
-        output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_Description", Lang.getInstance().translateFromLangObj("Description", langObj));
+        output.put("label_Status", Lang.getInstance().translate("Status", langObj));
+        output.put("label_Key", Lang.getInstance().translate("Key", langObj));
+        output.put("label_Creator", Lang.getInstance().translate("Creator", langObj));
+        output.put("label_Description", Lang.getInstance().translate("Description", langObj));
 
-        output.put("label_unique_state", Lang.getInstance().translateFromLangObj("Unique State", langObj));
-        output.put("label_multi_states", Lang.getInstance().translateFromLangObj("Multi States", langObj));
+        output.put("label_unique_state", Lang.getInstance().translate("Unique State", langObj));
+        output.put("label_multi_states", Lang.getInstance().translate("Multi States", langObj));
 
         return output;
     }
@@ -3063,18 +3061,18 @@ public class BlockExplorer {
 
         HashMap output = new LinkedHashMap();
 
-        output.put("Label_type", Lang.getInstance().translateFromLangObj("Type", langObj));
-        output.put("Label_statement", Lang.getInstance().translateFromLangObj("Statement", langObj));
-        output.put("Label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("Label_date", Lang.getInstance().translateFromLangObj("Date", langObj));
-        output.put("Label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
-        output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
-        output.put("Label_fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
-        output.put("Label_size", Lang.getInstance().translateFromLangObj("Size", langObj));
-        output.put("Label_No", Lang.getInstance().translateFromLangObj("No.", langObj));
-        output.put("Label_pubKey", Lang.getInstance().translateFromLangObj("Public Key", langObj));
-        output.put("Label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
-        output.put("Label_Link", Lang.getInstance().translateFromLangObj("Link", langObj));
+        output.put("Label_type", Lang.getInstance().translate("Type", langObj));
+        output.put("Label_statement", Lang.getInstance().translate("Statement", langObj));
+        output.put("Label_creator", Lang.getInstance().translate("Creator", langObj));
+        output.put("Label_date", Lang.getInstance().translate("Date", langObj));
+        output.put("Label_block", Lang.getInstance().translate("Block", langObj));
+        output.put("Label_seqNo", Lang.getInstance().translate("seqNo", langObj));
+        output.put("Label_fee", Lang.getInstance().translate("Fee", langObj));
+        output.put("Label_size", Lang.getInstance().translate("Size", langObj));
+        output.put("Label_No", Lang.getInstance().translate("No.", langObj));
+        output.put("Label_pubKey", Lang.getInstance().translate("Public Key", langObj));
+        output.put("Label_signature", Lang.getInstance().translate("Signature", langObj));
+        output.put("Label_Link", Lang.getInstance().translate("Link", langObj));
 
         int block = rNote.getBlockHeight();
         int seqNo = rNote.getSeqNo();
@@ -3097,7 +3095,7 @@ public class BlockExplorer {
 
         output.put("type", "tx");
         output.put("search", "transactions");
-        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or signature or BlockNo-SeqNo", langObj));
+        output.put("search_placeholder", Lang.getInstance().translate("Type searching words or signature or BlockNo-SeqNo", langObj));
 
         Map output = new LinkedHashMap();
 
@@ -3123,7 +3121,7 @@ public class BlockExplorer {
             } else {
                 output.put("type", "tx");
                 output.put("body", WebTransactionsHTML.getInstance().get_HTML(transaction, langObj));
-                output.put("Label_Transaction", Lang.getInstance().translateFromLangObj("Transaction", langObj));
+                output.put("Label_Transaction", Lang.getInstance().translate("Transaction", langObj));
                 output.put("heightSeqNo", transaction.viewHeightSeq());
             }
         }
@@ -3180,7 +3178,7 @@ public class BlockExplorer {
 
         // Transactions view
         transactionsJSON(output, null, block.getTransactions(), start, pageSize,
-                Lang.getInstance().translateFromLangObj("Transactions found", langObj));
+                Lang.getInstance().translate("Transactions found", langObj));
 
         LinkedHashMap<Tuple2<Integer, Integer>, ATTransaction> atTxs = dcSet.getATTransactionMap()
                 .getATTransactions(block.getHeight());
@@ -3256,27 +3254,27 @@ public class BlockExplorer {
 
             output.put(counter + 1, transactionJSON);
         }
-        output.put("label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
-        output.put("label_Block_version", Lang.getInstance().translateFromLangObj("Block version", langObj));
-        output.put("label_Forger", Lang.getInstance().translateFromLangObj("Forger", langObj));
+        output.put("label_block", Lang.getInstance().translate("Block", langObj));
+        output.put("label_Block_version", Lang.getInstance().translate("Block version", langObj));
+        output.put("label_Forger", Lang.getInstance().translate("Forger", langObj));
         output.put("label_Transactions_count",
-                Lang.getInstance().translateFromLangObj("Transactions count", langObj));
-        output.put("label_Total_Amount", Lang.getInstance().translateFromLangObj("Total Amount", langObj));
-        output.put("label_Total_AT_Amount", Lang.getInstance().translateFromLangObj("Total AT Amount", langObj));
-        output.put("label_Total_Fee", Lang.getInstance().translateFromLangObj("Total Fee", langObj));
+                Lang.getInstance().translate("Transactions count", langObj));
+        output.put("label_Total_Amount", Lang.getInstance().translate("Total Amount", langObj));
+        output.put("label_Total_AT_Amount", Lang.getInstance().translate("Total AT Amount", langObj));
+        output.put("label_Total_Fee", Lang.getInstance().translate("Total Fee", langObj));
 
-        output.put("label_Win_Value", Lang.getInstance().translateFromLangObj("Win Value", langObj));
+        output.put("label_Win_Value", Lang.getInstance().translate("Win Value", langObj));
         output.put("label_Generating_Balance",
-                Lang.getInstance().translateFromLangObj("Generating Balance", langObj));
-        output.put("label_Target", Lang.getInstance().translateFromLangObj("Target", langObj));
+                Lang.getInstance().translate("Generating Balance", langObj));
+        output.put("label_Target", Lang.getInstance().translate("Target", langObj));
         output.put("label_Targeted_Win_Value",
-                Lang.getInstance().translateFromLangObj("Targeted Win Value", langObj));
+                Lang.getInstance().translate("Targeted Win Value", langObj));
 
-        output.put("label_Parent_block", Lang.getInstance().translateFromLangObj("Parent block", langObj));
-        output.put("label_Current_block", Lang.getInstance().translateFromLangObj("Current block", langObj));
-        output.put("label_Child_block", Lang.getInstance().translateFromLangObj("Child block", langObj));
-        output.put("label_Including", Lang.getInstance().translateFromLangObj("Including", langObj));
-        output.put("label_Signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
+        output.put("label_Parent_block", Lang.getInstance().translate("Parent block", langObj));
+        output.put("label_Current_block", Lang.getInstance().translate("Current block", langObj));
+        output.put("label_Child_block", Lang.getInstance().translate("Child block", langObj));
+        output.put("label_Including", Lang.getInstance().translate("Including", langObj));
+        output.put("label_Signature", Lang.getInstance().translate("Signature", langObj));
 
         return output;
     }
@@ -3441,7 +3439,7 @@ public class BlockExplorer {
                         }
 
                         String message = txCalculated.getMessage();
-                        String typeName = Lang.getInstance().translateFromLangObj(transaction.viewFullTypeName(), langObj);
+                        String typeName = Lang.getInstance().translate(transaction.viewFullTypeName(), langObj);
                         out.put("type", typeName);
 
                         if (typeName.equals("_protocol_")) {
@@ -3460,7 +3458,7 @@ public class BlockExplorer {
                     } else {
                         out.put("signature", Base58.encode(transaction.getSignature()));
                         out.put("timestamp", transaction.getTimestamp());
-                        String typeName = Lang.getInstance().translateFromLangObj(transaction.viewFullTypeName(), langObj);
+                        String typeName = Lang.getInstance().translate(transaction.viewFullTypeName(), langObj);
                         out.put("type", typeName);
 
                         if (transaction.getCreator() == null) {
@@ -3541,24 +3539,24 @@ public class BlockExplorer {
 
         outputTXs.put("transactions", transactionsJSON);
 
-        outputTXs.put("label_useForge", Lang.getInstance().translateFromLangObj("Forging", langObj));
+        outputTXs.put("label_useForge", Lang.getInstance().translate("Forging", langObj));
 
-        outputTXs.put("label_seqNo", Lang.getInstance().translateFromLangObj("Number", langObj));
-        outputTXs.put("label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
-        outputTXs.put("label_date", Lang.getInstance().translateFromLangObj("Date", langObj));
-        outputTXs.put("label_type_transaction", Lang.getInstance().translateFromLangObj("Type", langObj));
-        outputTXs.put("label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        outputTXs.put("label_atside", Lang.getInstance().translateFromLangObj("Side", langObj));
-        outputTXs.put("label_asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
-        outputTXs.put("label_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
+        outputTXs.put("label_seqNo", Lang.getInstance().translate("Number", langObj));
+        outputTXs.put("label_block", Lang.getInstance().translate("Block", langObj));
+        outputTXs.put("label_date", Lang.getInstance().translate("Date", langObj));
+        outputTXs.put("label_type_transaction", Lang.getInstance().translate("Type", langObj));
+        outputTXs.put("label_creator", Lang.getInstance().translate("Creator", langObj));
+        outputTXs.put("label_atside", Lang.getInstance().translate("Side", langObj));
+        outputTXs.put("label_asset", Lang.getInstance().translate("Asset", langObj));
+        outputTXs.put("label_amount", Lang.getInstance().translate("Amount", langObj));
         //outputTXs.put("label_confirmations", Lang.getInstance().translateFromLangObj("Confirmations", langObj));
-        outputTXs.put("label_recipient", Lang.getInstance().translateFromLangObj("Recipient", langObj));
-        outputTXs.put("label_size", Lang.getInstance().translateFromLangObj("Size", langObj));
-        outputTXs.put("label_seqNo", Lang.getInstance().translateFromLangObj("SeqNo", langObj));
-        outputTXs.put("label_signature", Lang.getInstance().translateFromLangObj("Signature", langObj));
-        outputTXs.put("label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
-        outputTXs.put("label_amount_key", Lang.getInstance().translateFromLangObj("Amount:Key", langObj));
-        outputTXs.put("label_fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
+        outputTXs.put("label_recipient", Lang.getInstance().translate("Recipient", langObj));
+        outputTXs.put("label_size", Lang.getInstance().translate("Size", langObj));
+        outputTXs.put("label_seqNo", Lang.getInstance().translate("SeqNo", langObj));
+        outputTXs.put("label_signature", Lang.getInstance().translate("Signature", langObj));
+        outputTXs.put("label_title", Lang.getInstance().translate("Title", langObj));
+        outputTXs.put("label_amount_key", Lang.getInstance().translate("Amount:Key", langObj));
+        outputTXs.put("label_fee", Lang.getInstance().translate("Fee", langObj));
         outputTXs.put("label_transactions_table", title);
 
         output.put("Transactions", outputTXs);

@@ -339,7 +339,7 @@ public class WebResource {
 
         if (lang != null) {
 
-            logger.info("try lang file: " + lang + ".json for " + request.getRemoteUser() + " " + request.getRequestURL());
+            //logger.info("try lang file: " + lang + ".json for " + request.getRemoteUser() + " " + request.getRequestURL());
             langObj = Lang.openLangFile(lang + ".json");
 
      /*   // translate select
@@ -350,7 +350,7 @@ public class WebResource {
       */        // translate links
             Elements el = doc.getElementsByAttributeValueContaining("translate", "true");//.select("translate");
             for (Element e : el) {
-                e.text(Lang.getInstance().translateFromLangObj(e.text(), langObj));
+                e.text(Lang.getInstance().translate(e.text(), langObj));
             }
         }
 
@@ -418,7 +418,7 @@ public class WebResource {
 
             Elements el = doc.select("translate");
             for (Element e : el) {
-                e.text(Lang.getInstance().translateFromLangObj(e.text(), langObj));
+                e.text(Lang.getInstance().translate(e.text(), langObj));
             }
         }
 

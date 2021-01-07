@@ -493,7 +493,7 @@ public class SettingsFrame extends JDialog {
             MainFrame.getInstance().jMenu_Files.webServerItem.setVisible(Settings.getInstance().isWebEnabled());
             MainFrame.getInstance().jMenu_Files.blockExplorerItem.setVisible(Settings.getInstance().isWebEnabled());
         }
-        Lang.getInstance().loadLang();
+        Lang.getInstance().setLangForNode();
 
 
         if (changeDataDir || changeWallet) {

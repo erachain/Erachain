@@ -149,7 +149,7 @@ public class ExLink {
     public JSONObject makeJSONforHTML(boolean hasRecipients, JSONObject langObj) {
         JSONObject json = new JSONObject();
         json.put("type", type);
-        json.put("typeName", Lang.getInstance().translateFromLangObj(viewTypeName(type, hasRecipients), langObj));
+        json.put("typeName", Lang.getInstance().translate(viewTypeName(type, hasRecipients), langObj));
         json.put("flags", flags);
         json.put("value1", value1);
         json.put("value2", value2);

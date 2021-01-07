@@ -1341,30 +1341,30 @@ public class ExData {
                                 int blockNo, int seqNo, JSONObject langObj) {
 
         if (title != null && !title.isEmpty()) {
-            output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
+            output.put("Label_title", Lang.getInstance().translate("Title", langObj));
             output.put("title", title);
         }
 
         if (exLink != null) {
-            output.put("Label_LinkType", Lang.getInstance().translateFromLangObj("Link Type", langObj));
-            output.put("exLink_Name", Lang.getInstance().translateFromLangObj(exLink.viewTypeName(hasRecipients()), langObj));
+            output.put("Label_LinkType", Lang.getInstance().translate("Link Type", langObj));
+            output.put("exLink_Name", Lang.getInstance().translate(exLink.viewTypeName(hasRecipients()), langObj));
             output.put("exLink", exLink.makeJSONforHTML(hasRecipients(), langObj));
-            output.put("Label_Parent", Lang.getInstance().translateFromLangObj("for # для", langObj));
+            output.put("Label_Parent", Lang.getInstance().translate("for # для", langObj));
 
         }
 
         if (exPays != null) {
-            output.put("Label_Payouts", Lang.getInstance().translateFromLangObj("Payouts", langObj));
+            output.put("Label_Payouts", Lang.getInstance().translate("Payouts", langObj));
             output.put("exPays", exPays.makeJSONforHTML(langObj));
 
         }
 
         if (isCanSignOnlyRecipients()) {
-            output.put("Label_CanSignOnlyRecipients", Lang.getInstance().translateFromLangObj("To sign can only Recipients", langObj));
+            output.put("Label_CanSignOnlyRecipients", Lang.getInstance().translate("To sign can only Recipients", langObj));
         }
 
         if (recipients != null && recipients.length > 0) {
-            output.put("Label_recipients", Lang.getInstance().translateFromLangObj("Recipients", langObj));
+            output.put("Label_recipients", Lang.getInstance().translate("Recipients", langObj));
             List<List<String>> recipientsOut = new ArrayList<>();
             for (Account recipient : recipients) {
                 recipientsOut.add(Arrays.asList(recipient.getAddress(), recipient.getPersonAsString()));
@@ -1373,7 +1373,7 @@ public class ExData {
         }
 
         if (authors != null && authors.length > 0) {
-            output.put("Label_Authors", Lang.getInstance().translateFromLangObj("Authors", langObj));
+            output.put("Label_Authors", Lang.getInstance().translate("Authors", langObj));
             JSONArray authorsOut = new JSONArray();
             for (ExLinkAuthor author : authors) {
                 authorsOut.add(author.makeJSONforHTML(langObj));
@@ -1382,7 +1382,7 @@ public class ExData {
         }
 
         if (sources != null && sources.length > 0) {
-            output.put("Label_Sources", Lang.getInstance().translateFromLangObj("Sources", langObj));
+            output.put("Label_Sources", Lang.getInstance().translate("Sources", langObj));
             JSONArray sourcesOut = new JSONArray();
             for (ExLinkSource source : sources) {
                 sourcesOut.add(source.makeJSONforHTML(langObj));
@@ -1391,20 +1391,20 @@ public class ExData {
         }
 
         if (tags != null && tags.length > 0) {
-            output.put("Label_Tags", Lang.getInstance().translateFromLangObj("Tags", langObj));
+            output.put("Label_Tags", Lang.getInstance().translate("Tags", langObj));
             output.put("tags", new String(tags, StandardCharsets.UTF_8));
         }
 
         if (isEncrypted()) {
-            output.put("encrypted", Lang.getInstance().translateFromLangObj("Encrypted", langObj));
+            output.put("encrypted", Lang.getInstance().translate("Encrypted", langObj));
             return;
 
         } else {
 
-            output.put("Label_template_hash", Lang.getInstance().translateFromLangObj("Template hash", langObj));
-            output.put("Label_mess_hash", Lang.getInstance().translateFromLangObj("Text hash", langObj));
-            output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
-            output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
+            output.put("Label_template_hash", Lang.getInstance().translate("Template hash", langObj));
+            output.put("Label_mess_hash", Lang.getInstance().translate("Text hash", langObj));
+            output.put("Label_hashes", Lang.getInstance().translate("Hashes", langObj));
+            output.put("Label_files", Lang.getInstance().translate("Files", langObj));
 
         }
 
@@ -1478,7 +1478,7 @@ public class ExData {
                     }
                     filesStr += " - <a href ='../apidocuments/getFile?download=true&block="
                             + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'><b>"
-                            + Lang.getInstance().translateFromLangObj("Download", langObj) + "</b></a><br>";
+                            + Lang.getInstance().translate("Download", langObj) + "</b></a><br>";
 
                     filesCount++;
 
