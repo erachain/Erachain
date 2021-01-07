@@ -1904,7 +1904,7 @@ public class DCSet extends DBASet implements Closeable {
     }
     
     public String toString() {
-        return (this.isFork()? "forked " : "")  + super.toString();
+        return (this.isFork() ? "forked in " + makedIn : "") + super.toString();
     }
 
 }

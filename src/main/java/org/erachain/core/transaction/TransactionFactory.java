@@ -87,7 +87,7 @@ public class TransactionFactory {
                 return JsonTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
                 */
 
-            case Transaction.VOUCH_TRANSACTION:
+            case Transaction.SIGN_TRANSACTION:
 
                 //PARSE CERTIFY PERSON TRANSACTION
                 return RVouch.Parse(data, forDeal);

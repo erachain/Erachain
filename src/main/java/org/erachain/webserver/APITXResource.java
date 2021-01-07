@@ -47,6 +47,8 @@ public class APITXResource {
                 "GET transaction by Height and Sequence (SeqNo)");
         help.put("api/tx/signature/{height-sequence}",
                 "GET transaction Signature by Height and Sequence (SeqNo)");
+        help.put("api/tx/signs/{height-sequence}",
+                "GET Signs of transaction by Height and Sequence");
         help.put("api/tx/vouches/{height-sequence}",
                 "GET Vouches of transaction by Height and Sequence");
         help.put("api/tx/incomingfromblock/{address}/{blockStart}?type={type}",
@@ -196,6 +198,36 @@ public class APITXResource {
                     .entity(out.toJSONString())
                     .build();
         }
+    }
+
+    @GET
+    @Path("signs/{number}")
+    public Response getSigns(@PathParam("number") String numberStr) {
+
+        Map out = new LinkedHashMap();
+        int step = 1;
+
+        Long dbRef = Transaction.parseDBRef(numberStr);
+        if (dbRef == null) {
+            out.put("error", step);
+            out.put("message", "height-sequence error, use integer-integer value");
+        } else {
+            Fun.Tuple2<BigDecimal, List<Long>> signsItem = DCSet.getInstance().getVouchRecordMap().get(dbRef);
+            JSONArray values = new JSONArray();
+            if (signsItem != null) {
+                out.put("sum", signsItem.a.toPlainString());
+                for (Long dbRefSignatory : signsItem.b) {
+                    values.add(Transaction.viewDBRef(dbRefSignatory));
+                }
+                out.put("signs", values);
+            }
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toString())
+                .build();
     }
 
     @GET

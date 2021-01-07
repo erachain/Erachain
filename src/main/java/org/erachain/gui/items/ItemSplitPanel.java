@@ -1,15 +1,20 @@
 package org.erachain.gui.items;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
+import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +24,10 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 //import java.util.TimerTask;
@@ -173,9 +181,49 @@ public abstract class ItemSplitPanel extends SplitPanel {
                 }
             }
 
-        });
+         });
 
         menuTable.add(favoriteMenuItems);
+
+        JMenuItem vouchMenu = new JMenuItem(Lang.getInstance().translate("Sign / Vouch"));
+        vouchMenu.addActionListener(e -> {
+            DCSet db = DCSet.getInstance();
+            Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
+            new toSignRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
+
+        });
+        menuTable.add(vouchMenu);
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
+                            + "?" + itemTableSelected.getItemTypeName() + "=" + itemTableSelected.getKey()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+
+        menuTable.add(setSeeInBlockexplorer);
+
+        JMenuItem byteCode = new JMenuItem(Lang.getInstance().translate("Get bytecode"));
+        byteCode.addActionListener(e -> {
+            String base58str = Base58.encode(itemTableSelected.toBytes(false, false));
+            StringSelection stringSelection = new StringSelection(base58str);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.getInstance().translate("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", itemTableSelected.getName())
+                            + "!",
+                    Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuTable.add(byteCode);
 
         TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menuTable);
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);

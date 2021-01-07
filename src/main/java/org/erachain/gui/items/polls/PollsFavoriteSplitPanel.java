@@ -3,20 +3,14 @@ package org.erachain.gui.items.polls;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.polls.PollCls;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
-import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
-import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 public class PollsFavoriteSplitPanel extends ItemSplitPanel {
 
@@ -49,34 +43,6 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel {
             }
         });
         this.menuTable.add(setStatus_Menu);
-
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
-
-        setSeeInBlockexplorer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                try {
-                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
-                            + "/index/blockexplorer.html"
-                            + "?poll=" + itemTableSelected.getKey()));
-                } catch (MalformedURLException e1) {
-                    logger.error(e1.getMessage(), e1);
-                }
-            }
-        });
-
-        menuTable.add(setSeeInBlockexplorer);
-        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
-        vouch_menu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                DCSet db = DCSet.getInstance();
-                Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
-                new VouchRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
-
-            }
-        });
-        menuTable.add(vouch_menu);
 
     }
 

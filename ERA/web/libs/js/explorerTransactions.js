@@ -35,8 +35,8 @@ function tx(data) {
     if (data.body.hasOwnProperty('foot')) {
         output += fformat(data.body.foot) + '<br>';
     }
-    if (data.body.hasOwnProperty('vouches')) {
-        output += data.body.vouches + '<br>';
+    if (data.body.hasOwnProperty('signs')) {
+        output += data.body.signs + '<br>';
     }
     if (data.body.hasOwnProperty('links')) {
         output += data.body.links + '<br>';

@@ -8,9 +8,9 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.ASMakeHashMenuItem;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.VouchLibraryPanel;
+import org.erachain.gui.library.SignLibraryPanel;
 import org.erachain.gui.models.SearchTransactionsTableModel;
-import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -39,7 +39,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
     public static String TITLE = "Search Transactions";
 
     public JPanel info_Panel;
-    public VouchLibraryPanel voush_Library_Panel;
+    public SignLibraryPanel voush_Library_Panel;
     SearchTransactionsTableModel transactionsTableModel;
     JScrollPane jScrollPane4;
     private JTextField searchString;
@@ -115,7 +115,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         // MENU
         JPopupMenu mainMenu = new JPopupMenu();
 
-        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Sign / Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -123,7 +123,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                 row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 Transaction trans = transactionsTableModel.getItem(row);
                 DCSet db = DCSet.getInstance();
-                new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
+                new toSignRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
             }
         });
@@ -287,7 +287,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
                     gridBagConstraints.weightx = 1.0;
                     gridBagConstraints.weighty = 1.0;
-                    voush_Library_Panel = new VouchLibraryPanel(transaction);
+                    voush_Library_Panel = new SignLibraryPanel(transaction);
                     info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
                 }

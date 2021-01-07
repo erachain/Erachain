@@ -141,10 +141,10 @@ public class TestRecVouch {
             assertEquals(vouchRecord.getCreator().getAddress(), parsedR_Vouch.getCreator().getAddress());
 
             //CHECK HEIGHT
-            assertEquals(vouchRecord.getVouchHeight(), parsedR_Vouch.getVouchHeight());
+            assertEquals(vouchRecord.getRefHeight(), parsedR_Vouch.getRefHeight());
 
             //CHECK SEQno
-            assertEquals(vouchRecord.getVouchSeqNo(), parsedR_Vouch.getVouchSeqNo());
+            assertEquals(vouchRecord.getRefSeqNo(), parsedR_Vouch.getRefSeqNo());
 
             //CHECK FEE
             assertEquals(vouchRecord.getFee(), parsedR_Vouch.getFee());

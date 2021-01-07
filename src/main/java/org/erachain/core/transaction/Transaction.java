@@ -296,7 +296,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int SET_UNION_TO_ITEM_TRANSACTION = 38;
     public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 39;
     // confirm other transactions
-    public static final int VOUCH_TRANSACTION = 40;
+    public static final int SIGN_TRANSACTION = 40;
     // HASHES
     public static final int HASHES_RECORD = 41;
     // exchange of assets
@@ -717,7 +717,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                 SET_UNION_STATUS_TO_ITEM_TRANSACTION,
 
                 // confirm other transactions
-                VOUCH_TRANSACTION,
+                SIGN_TRANSACTION,
 
                 // HASHES
                 HASHES_RECORD,
@@ -768,7 +768,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                 return RSetUnionStatusToItem.TYPE_NAME;
 
             // confirm other transactions
-            case VOUCH_TRANSACTION:
+            case SIGN_TRANSACTION:
                 return RVouch.TYPE_NAME;
 
             // HASHES
@@ -1820,6 +1820,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                 && this.hasPublicText()
                 && !BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
                 && !this.creator.isPerson(dcSet, height)) {
+            errorValue = creator.getBase58();
             return CREATOR_NOT_PERSONALIZED;
         }
 

@@ -58,7 +58,7 @@ public class RNoteInfo extends javax.swing.JPanel {
     RSignNote statementEncrypted;
     Transaction transaction;
     private MAttachedFilesPanel file_Panel;
-    private VouchLibraryPanel voush_Library_Panel;
+    private SignLibraryPanel voush_Library_Panel;
     private javax.swing.JLabel jLabel_Title;
     private javax.swing.JPanel jPanel1;
     private MSplitPane jSplitPane1;
@@ -243,7 +243,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 11, 11, 11);
-        voush_Library_Panel = new VouchLibraryPanel(transaction);
+        voush_Library_Panel = new SignLibraryPanel(transaction);
         jPanel2.add(voush_Library_Panel, gridBagConstraints);
         //
 
