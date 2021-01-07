@@ -11,6 +11,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
+import org.erachain.lang.LangFile;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -339,56 +340,6 @@ public abstract class AssetCls extends ItemCls {
         Arrays.sort(array);
 
         return array;
-    }
-
-    public static JSONObject AssetTypeJson(int assetType, JSONObject langObj) {
-
-        JSONObject type = new JSONObject();
-        type.put("id", assetType);
-        type.put("name", Lang.getInstance().translate(AssetCls.viewAssetTypeCls(assetType), langObj));
-        type.put("nameFull", Lang.getInstance().translate(AssetCls.viewAssetTypeFullCls(assetType), langObj));
-
-        List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> actions = AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
-                AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
-                assetType, null, true);
-        StringJoiner joiner = new StringJoiner(", ");
-        JSONArray actionsArray = new JSONArray();
-        for (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> action : actions) {
-            joiner.add(Lang.getInstance().translate(action.b, langObj));
-            JSONObject actionJson = new JSONObject();
-            actionJson.put("action", action.a.a);
-            actionJson.put("backward", action.a.b);
-            actionJson.put("name", Lang.getInstance().translate(action.b, langObj));
-            actionsArray.add(actionJson);
-        }
-
-        String description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(assetType), langObj) + ".<br>";
-        if (AssetCls.isReverseSend(assetType)) {
-            description += Lang.getInstance().translate("Actions for OWN balance is reversed", langObj) + ".<br>";
-        }
-        description += "<b>" + Lang.getInstance().translate("Acceptable actions", langObj) + ":</b><br>" + joiner.toString();
-
-        type.put("description", description);
-
-        return null;
-    }
-
-    public static JSONArray assetTypesJson;
-
-    public static JSONArray AssetTypesJson() {
-
-        if (assetTypesJson != null)
-            return assetTypesJson;
-
-        assetTypesJson = new JSONArray();
-        for (Fun.Tuple2<String, String> lang : Lang.getInstance().getLangListToWeb()) {
-            JSONObject langJson = new JSONObject();
-            for (int type : AssetTypes()) {
-                //langJson.put(AssetTypeJson(type, null));
-            }
-            //assetTypesJsons.put(lang.b, langJson);
-        }
-        return assetTypesJson;
     }
 
     @Override
@@ -1808,26 +1759,87 @@ public abstract class AssetCls extends ItemCls {
     }
 
     //OTHER
+    public static JSONObject AssetTypeJson(int assetType, JSONObject langObj) {
+
+        JSONObject type = new JSONObject();
+        type.put("id", assetType);
+        type.put("name", Lang.getInstance().translate(AssetCls.viewAssetTypeCls(assetType), langObj));
+        type.put("nameFull", Lang.getInstance().translate(AssetCls.viewAssetTypeFullCls(assetType), langObj));
+
+        List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> actions = AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
+                AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
+                assetType, null, true);
+        StringJoiner joiner = new StringJoiner(", ");
+        JSONArray actionsArray = new JSONArray();
+        for (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> action : actions) {
+            joiner.add(Lang.getInstance().translate(action.b, langObj));
+            JSONObject actionJson = new JSONObject();
+            actionJson.put("action", action.a.a);
+            actionJson.put("backward", action.a.b);
+            actionJson.put("name", Lang.getInstance().translate(action.b, langObj));
+            actionsArray.add(actionJson);
+        }
+
+        String description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(assetType), langObj) + ".<br>";
+        if (AssetCls.isReverseSend(assetType)) {
+            description += Lang.getInstance().translate("Actions for OWN balance is reversed", langObj) + ".<br>";
+        }
+        description += "<b>" + Lang.getInstance().translate("Acceptable actions", langObj) + ":</b><br>" + joiner.toString();
+
+        type.put("description", description);
+
+        return null;
+    }
+
+    public static JSONObject assetTypesJson;
+
+    public static JSONObject AssetTypesActionsJson() {
+
+        if (assetTypesJson != null)
+            return assetTypesJson;
+
+        assetTypesJson = new JSONObject();
+        for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
+            LangFile langFile = Lang.getInstance().getLangFile(iso);
+            JSONObject langJson = new JSONObject();
+            for (int type : AssetTypes()) {
+                langJson.put(type, AssetTypeJson(type, langFile.getLangJson()));
+            }
+            assetTypesJson.put(iso, langJson);
+        }
+        return assetTypesJson;
+    }
+
+    public static JSONObject typeJson(int type) {
+
+        String assetTypeName;
+
+        assetTypeName = viewAssetTypeCls(type);
+        if (assetTypeName == null)
+            return null;
+
+        JSONObject typeJson = new JSONObject();
+
+        typeJson.put("key", type);
+        typeJson.put("char", charAssetType(1000, type));
+        typeJson.put("abbrev", viewAssetTypeAbbrev(type));
+        typeJson.put("name", assetTypeName);
+        typeJson.put("name_full", viewAssetTypeFullCls(type));
+        typeJson.put("desc", viewAssetTypeDescriptionCls(type));
+
+        return typeJson;
+    }
 
     public static JSONArray typesJson() {
 
         JSONArray types = new JSONArray();
 
-        String assetTypeName;
         for (int i = 0; i < 256; i++) {
-            assetTypeName = viewAssetTypeCls(i);
-            if (assetTypeName == null)
+            JSONObject json = typeJson(i);
+            if (json == null)
                 continue;
 
-            JSONObject type = new JSONObject();
-            type.put("key", i);
-            type.put("char", charAssetType(1000, i));
-            type.put("abbrev", viewAssetTypeAbbrev(i));
-            type.put("name", assetTypeName);
-            type.put("name_full", viewAssetTypeFullCls(i));
-            type.put("desc", viewAssetTypeDescriptionCls(i));
-            types.add(type);
-
+            types.add(json);
         }
         return types;
     }

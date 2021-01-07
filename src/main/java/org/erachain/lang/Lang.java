@@ -36,6 +36,14 @@ public class Lang {
         return instance;
     }
 
+    public JSONObject getLangJson(String iso) {
+        return langList.get(iso).getLangJson();
+    }
+
+    public LangFile getLangFile(String iso) {
+        return langList.get(iso);
+    }
+
     public static JSONObject openLangFile(String filename) {
 
         JSONObject langJsonObject;

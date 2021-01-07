@@ -1,6 +1,5 @@
 package org.erachain.lang;
 
-import org.erachain.controller.Controller;
 import org.json.simple.JSONObject;
 
 public class LangFile {
@@ -11,16 +10,10 @@ public class LangFile {
     private long timestamp;
     private JSONObject langJson;
 
-    public LangFile() {
-        this.name = "English";
-        this.filename = "en.json";
-        this.timestamp = Controller.buildTimestamp;
-    }
-
     public LangFile(JSONObject langJson) {
         this.name = (String) langJson.get("_lang_name_");
-        this.filename = (String) langJson.get("_file_");
-        this.iso = filename.replaceAll(".json", "");
+        this.iso = (String) langJson.get("_lang_ISO_");
+        this.filename = iso + ".json";
         this.timestamp = Long.parseLong(langJson.get("_timestamp_of_translation_").toString());
         this.langJson = langJson;
     }

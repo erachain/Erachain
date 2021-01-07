@@ -262,7 +262,8 @@ public class UISettingPanel extends javax.swing.JPanel {
 
         jComboBox_Lang = new JComboBox<LangFile>();
 
-        for (LangFile langFile : Lang.getInstance().getLangListAvailable()) {
+        for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
+            LangFile langFile = Lang.getInstance().getLangFile(iso);
             jComboBox_Lang.addItem(langFile);
 
             if (langFile.getFileName().equals(Settings.getInstance().getLangFileName())) {
@@ -360,7 +361,8 @@ public class UISettingPanel extends javax.swing.JPanel {
 
                                             jComboBox_Lang.removeAllItems();
 
-                                            for (LangFile langFile : Lang.getInstance().getLangListAvailable()) {
+                                            for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
+                                                LangFile langFile = Lang.getInstance().getLangFile(iso);
                                                 jComboBox_Lang.addItem(langFile);
 
                                                 if (langFile.getFileName().equals(langFileName)) {

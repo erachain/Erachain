@@ -129,6 +129,13 @@ public class APIItemAsset {
     }
 
     @GET
+    @Path("typesActions")
+    public String getAssetTypesLang() {
+        return AssetCls.AssetTypesActionsJson().toJSONString();
+    }
+
+
+    @GET
     @Path("find/{filter_name_string}")
     public static Response find(@PathParam("filter_name_string") String filter) {
 

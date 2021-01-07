@@ -278,22 +278,22 @@ public class BlockExplorer {
         start = checkAndGetLongParam(info, start, "start");
 
         //lang
+        String langISO;
         if (!info.getQueryParameters().containsKey("lang")) {
-            langFile = LANG_DEFAULT + ".json";
+            langISO = LANG_DEFAULT;
         } else {
-            langFile = info.getQueryParameters().getFirst("lang") + ".json";
+            langISO = info.getQueryParameters().getFirst("lang");
         }
 
-        ///logger.info("try lang file: " + langFile);
-
-        langObj = Lang.openLangFile(langFile);
+        langObj = Lang.getInstance().getLangJson(langISO);
 
         Map langList = new LinkedHashMap();
-        for (LangFile landFile : Lang.getInstance().getLangListAvailable()) {
+        for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
+            LangFile langFile = Lang.getInstance().getLangFile(iso);
             Map langPars = new LinkedHashMap();
-            langPars.put("ISO", landFile.getISO());
-            langPars.put("name", landFile.getName());
-            langList.put(i, langPars);
+            langPars.put("ISO", langFile.getISO());
+            langPars.put("name", langFile.getName());
+            langList.put(langFile.getISO(), langPars);
         }
 
         output.put("Lang", langList);

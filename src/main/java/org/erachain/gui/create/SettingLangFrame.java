@@ -1,15 +1,12 @@
 package org.erachain.gui.create;
 // 30/03
 
-import com.google.common.base.Charsets;
-import org.apache.commons.io.IOUtils;
 import org.erachain.controller.Controller;
 import org.erachain.lang.Lang;
 import org.erachain.lang.LangFile;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SaveStrToFile;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +17,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,26 +102,9 @@ public class SettingLangFrame extends JDialog {
         this.add(labelSelect, labelGBC);
 
         // read internet
-        String stringFromInternet;
-        try {
-            String url = Lang.translationsUrl + "available.json";
-
-            URL u = new URL(url);
-            InputStream in = u.openStream();
-            stringFromInternet = IOUtils.toString(in, Charsets.UTF_8);
-        } catch (Exception e1) {
-            LOGGER.error(e1.getMessage(), e1);
-            stringFromInternet = "";
-        }
-
-        JSONObject inernetLangsJSON = (JSONObject) JSONValue.parse(stringFromInternet);
-
         DefaultListModel<LangFile> listModel = new DefaultListModel<LangFile>();
-        if (inernetLangsJSON != null && !inernetLangsJSON.isEmpty()) {
-            for (Object internetKey : inernetLangsJSON.keySet()) {
-                JSONObject internetValue = (JSONObject) inernetLangsJSON.get(internetKey);
-                listModel.addElement(new LangFile(internetValue));
-            }
+        for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
+            listModel.addElement(Lang.getInstance().getLangFile(iso));
         }
 
         listLang = new JList<LangFile>(listModel);
@@ -151,10 +129,7 @@ public class SettingLangFrame extends JDialog {
 
         this.add(scrollPaneLang, listLangGBC);
 
-        if (inernetLangsJSON == null || inernetLangsJSON.isEmpty()) {
-            onOKClick();
-            return;
-        }
+        onOKClick();
 
         //BUTTON OK
         nextButton = new JButton("OK");
