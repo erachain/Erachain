@@ -10,6 +10,7 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -17,9 +18,7 @@ import org.mapdb.Fun;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 
 // 1019 - Movable = true; Divisible = NO; Quantity = 1
@@ -291,6 +290,106 @@ public abstract class AssetCls extends ItemCls {
     }
 
     //GETTERS/SETTERS
+
+    public static int[] assetTypes;
+
+    public static int[] AssetTypes() {
+
+        if (assetTypes != null)
+            return assetTypes;
+
+        int[] array = new int[]{
+
+                AS_OUTSIDE_GOODS,
+                AS_OUTSIDE_IMMOVABLE,
+                AS_OUTSIDE_CURRENCY,
+                AS_OUTSIDE_SERVICE,
+                AS_OUTSIDE_BILL,
+                AS_OUTSIDE_WORK_TIME_HOURS,
+                AS_OUTSIDE_WORK_TIME_MINUTES,
+                AS_OUTSIDE_SHARE,
+
+                AS_MY_DEBT,
+
+                AS_OUTSIDE_OTHER_CLAIM,
+
+                AS_INSIDE_ASSETS,
+                AS_INSIDE_CURRENCY,
+                AS_INSIDE_UTILITY,
+                AS_INSIDE_SHARE,
+                AS_INSIDE_BONUS,
+                AS_INSIDE_ACCESS,
+                AS_INSIDE_VOTE,
+                AS_BANK_GUARANTEE,
+                AS_BANK_GUARANTEE_TOTAL,
+                AS_INDEX,
+                AS_INSIDE_OTHER_CLAIM,
+
+                AS_ACCOUNTING,
+                AS_SELF_MANAGED_ACCOUNTING,
+                AS_SELF_ACCOUNTING_LOAN,
+                AS_SELF_ACCOUNTING_MUTUAL_AID_FUND,
+                AS_SELF_ACCOUNTING_CASH_FUND
+        };
+
+        if (BlockChain.TEST_MODE) {
+            // AS_SELF_ACCOUNTING_CASH_FUND,
+        }
+
+        Arrays.sort(array);
+
+        return array;
+    }
+
+    public static JSONObject AssetTypeJson(int assetType, JSONObject langObj) {
+
+        JSONObject type = new JSONObject();
+        type.put("id", assetType);
+        type.put("name", Lang.getInstance().translateFromLangObj(AssetCls.viewAssetTypeCls(assetType), langObj));
+        type.put("nameFull", Lang.getInstance().translateFromLangObj(AssetCls.viewAssetTypeFullCls(assetType), langObj));
+
+        List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> actions = AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
+                AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
+                assetType, null, true);
+        StringJoiner joiner = new StringJoiner(", ");
+        JSONArray actionsArray = new JSONArray();
+        for (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> action : actions) {
+            joiner.add(Lang.getInstance().translateFromLangObj(action.b, langObj));
+            JSONObject actionJson = new JSONObject();
+            actionJson.put("action", action.a.a);
+            actionJson.put("backward", action.a.b);
+            actionJson.put("name", Lang.getInstance().translateFromLangObj(action.b, langObj));
+            actionsArray.add(actionJson);
+        }
+
+        String description = Lang.getInstance().translateFromLangObj(AssetCls.viewAssetTypeDescriptionCls(assetType), langObj) + ".<br>";
+        if (AssetCls.isReverseSend(assetType)) {
+            description += Lang.getInstance().translateFromLangObj("Actions for OWN balance is reversed", langObj) + ".<br>";
+        }
+        description += "<b>" + Lang.getInstance().translateFromLangObj("Acceptable actions", langObj) + ":</b><br>" + joiner.toString();
+
+        type.put("description", description);
+
+        return null;
+    }
+
+    public static JSONArray assetTypesJson;
+
+    public static JSONArray AssetTypesJson() {
+
+        if (assetTypesJson != null)
+            return assetTypesJson;
+
+        assetTypesJson = new JSONArray();
+        for (Fun.Tuple2<String, String> lang : Lang.getInstance().getLangListToWeb()) {
+            JSONObject langJson = new JSONObject();
+            for (int type : AssetTypes()) {
+                langJson.put(AssetTypeJson(type, langObj));
+            }
+            assetTypesJson.put(lang.b, langJson);
+        }
+        return assetTypesJson;
+    }
 
     @Override
     public int getItemType() {

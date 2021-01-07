@@ -11,10 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Lang {
 
@@ -37,9 +34,13 @@ public class Lang {
         return instance;
     }
 
+    static HashMap<String, JSONObject> langJsonObjects = new HashMap<>();
     public static JSONObject openLangFile(String filename) {
-        JSONObject langJsonObject;
+        if (langJsonObjects.containsKey(filename)) {
+            return langJsonObjects.get(filename);
+        }
 
+        JSONObject langJsonObject;
         try {
             File file = new File(Settings.getInstance().getLangDir(), filename);
             if (!file.isFile()) {
@@ -80,6 +81,12 @@ public class Lang {
         logger.debug("try lang file: " + Settings.getInstance().getLangFileName());
         langObj = openLangFile(Settings.getInstance().getLangFileName());
         noTranslateMap = new LinkedHashMap<String, String>();
+    }
+
+    public void loadLangs() {
+        noTranslateMap = new LinkedHashMap<String, String>();
+        for (Tuple2<String, String> langFile : getLangListToWeb()) {
+        }
     }
 
     public String[] translate(String[] Messages) {
@@ -177,6 +184,10 @@ public class Lang {
             }
         }
         return result;
+    }
+
+    public static String getISO(JSONObject langObj) {
+        return (String) langObj.get("_lang_ISO_");
     }
 
 
