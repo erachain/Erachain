@@ -384,9 +384,9 @@ public abstract class AssetCls extends ItemCls {
         for (Fun.Tuple2<String, String> lang : Lang.getInstance().getLangListToWeb()) {
             JSONObject langJson = new JSONObject();
             for (int type : AssetTypes()) {
-                langJson.put(AssetTypeJson(type, langObj));
+                //langJson.put(AssetTypeJson(type, null));
             }
-            assetTypesJson.put(lang.b, langJson);
+            //assetTypesJsons.put(lang.b, langJson);
         }
         return assetTypesJson;
     }

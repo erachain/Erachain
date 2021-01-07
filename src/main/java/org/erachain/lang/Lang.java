@@ -24,6 +24,7 @@ public class Lang {
     private JSONObject langObj;
 
     private Lang() {
+        noTranslateMap = new LinkedHashMap<String, String>();
         loadLang();
     }
 
@@ -44,23 +45,24 @@ public class Lang {
         try {
             File file = new File(Settings.getInstance().getLangDir(), filename);
             if (!file.isFile()) {
-                return (JSONObject) JSONValue.parse("");
-            }
+                langJsonObject = new JSONObject();
+            } else {
 
-            List<String> lines;
-            try {
-                lines = Files.readLines(file, Charsets.UTF_8);
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                lines = new ArrayList<String>();
-            }
+                List<String> lines;
+                try {
+                    lines = Files.readLines(file, Charsets.UTF_8);
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                    lines = new ArrayList<String>();
+                }
 
-            StringBuilder jsonString = new StringBuilder();
-            for (String line : lines) {
-                jsonString.append(line.replace("\t", ""));
-            }
+                StringBuilder jsonString = new StringBuilder();
+                for (String line : lines) {
+                    jsonString.append(line.replace("\t", ""));
+                }
 
-            langJsonObject = (JSONObject) JSONValue.parse(jsonString.toString());
+                langJsonObject = (JSONObject) JSONValue.parse(jsonString.toString());
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             langJsonObject = new JSONObject();
@@ -74,6 +76,7 @@ public class Lang {
             logger.error("ERROR reading language file " + filename + ".");
         }
 
+        langJsonObjects.put(filename, langJsonObject);
         return langJsonObject;
     }
 
@@ -83,10 +86,9 @@ public class Lang {
         noTranslateMap = new LinkedHashMap<String, String>();
     }
 
-    public void loadLangs() {
-        noTranslateMap = new LinkedHashMap<String, String>();
-        for (Tuple2<String, String> langFile : getLangListToWeb()) {
-        }
+    public void loadLang(String fileName) {
+        logger.debug("try lang file: " + fileName);
+        langObj = openLangFile(fileName);
     }
 
     public String[] translate(String[] Messages) {
@@ -137,11 +139,11 @@ public class Lang {
     }
 
     public List<LangFile> getLangListAvailable() {
-        List<LangFile> lngList = new ArrayList<>();
+        List<LangFile> langList = new ArrayList<>();
 
         List<String> fileList = getFileListAvailable();
 
-        lngList.add(new LangFile());
+        //langList.add(new LangFile());
 
         for (int i = 0; i < fileList.size(); i++) {
             if (!fileList.get(i).equals("en.json") && !fileList.get(i).equals("available.json")) {
@@ -153,14 +155,14 @@ public class Lang {
 
                     String lang_name = (String) langFile.get("_lang_name_");
                     long time_of_translation = Long.parseLong(langFile.get("_timestamp_of_translation_").toString());
-                    lngList.add(new LangFile(lang_name, fileList.get(i), time_of_translation));
+                    langList.add(new LangFile(lang_name, fileList.get(i), time_of_translation));
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
             }
         }
 
-        return lngList;
+        return langList;
     }
 
 
@@ -203,7 +205,7 @@ public class Lang {
 
         fileList = dir.listFiles();
 
-        lngFileList.add("en.json");
+        //lngFileList.add("en.json");
 
         for (int i = 0; i < fileList.length; i++) {
             if (fileList[i].isFile() && fileList[i].getName().endsWith(".json")) {
