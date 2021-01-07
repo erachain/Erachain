@@ -4,7 +4,6 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemStatusMap;
 import org.erachain.lang.Lang;
-import org.erachain.ntp.NTP;
 import org.mapdb.Fun.Tuple5;
 
 import javax.swing.*;
@@ -38,7 +37,7 @@ public class PersonInfo extends JTextPane {
         if (person == null) return "Empty Person";
 
         if (!person.isConfirmed()) {
-            message = Lang.getInstance().translate("Not confirmed");
+            message = Lang.T("Not confirmed");
         } else {
             message = "" + person.getKey();
         }
@@ -56,9 +55,9 @@ public class PersonInfo extends JTextPane {
 		// GET CERTIFIED ACCOUNTS
 		TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses= DLSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 		if ( addresses.isEmpty()){
-			message += "<p>" +  Lang.getInstance().translate("Not personalized")+ "</p";
+			message += "<p>" +  Lang.T("Not personalized")+ "</p";
 		} else {
-			message += "<h3>"+ Lang.getInstance().translate("Personalized Accounts") +"</h3>";
+			message += "<h3>"+ Lang.T("Personalized Accounts") +"</h3>";
 			// for each account seek active date
 			String active_date_str;
 			for( Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> entry : addresses.entrySet())
@@ -83,7 +82,7 @@ public class PersonInfo extends JTextPane {
         /// STATUSES
         TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = DCSet.getInstance().getPersonStatusMap().get(person.getKey());
         if (statuses.isEmpty()) {
-            message += "<div>" + Lang.getInstance().translate("Not statuses") + "</div";
+            message += "<div>" + Lang.T("Not statuses") + "</div";
         } else {
             //message += "<h3>"+ "Statuses" +"</h3>";
             String from_date_str;

@@ -14,14 +14,14 @@ public class ASMutableTreeNode extends DefaultMutableTreeNode {
 
     public ASMutableTreeNode(String o, String s, Image i) {
         super(o);
-        title = Lang.getInstance().translate(s);
+        title = Lang.T(s);
         icon = i;
 
     }
 
     public ASMutableTreeNode(String o, String s) {
         super(o);
-        title = Lang.getInstance().translate(s);
+        title = Lang.T(s);
         icon = IconPanel.getIcon(o);
 
     }

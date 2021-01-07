@@ -672,9 +672,9 @@ public class ExPays {
         }
 
         if (filteredPayoutsCount > 0) {
-            json.put("Label_Counter", Lang.getInstance().translate("Counter", langObj));
-            json.put("Label_Total_Amount", Lang.getInstance().translate("Total Amount", langObj));
-            json.put("Label_Fee_Bytes_Total", Lang.getInstance().translate("Fee Bytes Total", langObj));
+            json.put("Label_Counter", Lang.T("Counter", langObj));
+            json.put("Label_Total_Amount", Lang.T("Total Amount", langObj));
+            json.put("Label_Fee_Bytes_Total", Lang.T("Fee Bytes Total", langObj));
 
         }
 

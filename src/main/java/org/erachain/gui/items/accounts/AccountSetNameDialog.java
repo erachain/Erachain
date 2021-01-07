@@ -63,7 +63,7 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
             }
             if (!Controller.getInstance().unlockWallet(password)) {
                 //WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
                 this.jButton_OK.setEnabled(true);
@@ -175,7 +175,7 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
 
         jLabel_Title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel_Title.setText(Lang.getInstance().translate("Set name account") + ":" + account);
+        jLabel_Title.setText(Lang.T("Set name account") + ":" + account);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -185,7 +185,7 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 10);
         getContentPane().add(jLabel_Title, gridBagConstraints);
 
-        jLabel_Name.setText(Lang.getInstance().translate("Name"));
+        jLabel_Name.setText(Lang.T("Name"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -224,14 +224,14 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
         jPanel1Layout.rowHeights = new int[]{0};
         jPanel1.setLayout(jPanel1Layout);
 
-        jButton_OK.setText(Lang.getInstance().translate("Ok"));
+        jButton_OK.setText(Lang.T("Ok"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanel1.add(jButton_OK, gridBagConstraints);
 
-        jButton_Cancel.setText(Lang.getInstance().translate("Cancel"));
+        jButton_Cancel.setText(Lang.T("Cancel"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -245,7 +245,7 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
         getContentPane().add(jPanel1, gridBagConstraints);
 
-        jLabel_Description.setText(Lang.getInstance().translate("Description"));
+        jLabel_Description.setText(Lang.T("Description"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;

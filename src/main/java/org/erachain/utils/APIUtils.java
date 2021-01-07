@@ -305,8 +305,8 @@ public class APIUtils {
         if (Gui.isGuiStarted()) {
             String Status_text = "";
             IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
-                    Lang.getInstance().translate("Send Mail"), (600), (450), Status_text,
-                    Lang.getInstance().translate("Confirmation Transaction"));
+                    Lang.T("Send Mail"), (600), (450), Status_text,
+                    Lang.T("Confirmation Transaction"));
             Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
 
             // ww.jTabbedPane1.setVisible(false);
@@ -328,7 +328,7 @@ public class APIUtils {
                 return transaction.toJson().toJSONString();
             else {
 
-                // Lang.getInstance().translate(OnDealClick.resultMess(result.getB()));
+                // Lang.T(OnDealClick.resultMess(result.getB()));
                 throw ApiErrorFactory.getInstance().createError(result);
 
             }

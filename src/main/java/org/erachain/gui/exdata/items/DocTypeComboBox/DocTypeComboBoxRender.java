@@ -16,7 +16,7 @@ public class DocTypeComboBoxRender  extends DefaultListCellRenderer {
         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         String text = "";
         if (value != null) {
-            text = Lang.getInstance().translate(ExLink.viewTypeName((int) value, true));
+            text = Lang.T(ExLink.viewTypeName((int) value, true));
         }
         this.setText(text);
         return this;

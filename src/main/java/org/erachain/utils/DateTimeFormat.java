@@ -50,13 +50,13 @@ public class DateTimeFormat {
         long timeDiff = now - timestamp;
 
         if (timeDiff < 60 * 1000) {
-            return String.valueOf(timeDiff / 1000) + Lang.getInstance().translate("s");
+            return String.valueOf(timeDiff / 1000) + Lang.T("s");
         } else if (timeDiff < 60 * 60 * 1000) {
-            return String.valueOf(timeDiff / (60 * 1000)) + Lang.getInstance().translate("m") + " " + String.valueOf(timeDiff / 1000 - timeDiff / (60 * 1000) * 60) + Lang.getInstance().translate("s");
+            return String.valueOf(timeDiff / (60 * 1000)) + Lang.T("m") + " " + String.valueOf(timeDiff / 1000 - timeDiff / (60 * 1000) * 60) + Lang.T("s");
         } else if (timeDiff < 24 * 60 * 60 * 1000) {
-            return String.valueOf(timeDiff / (60 * 60 * 1000)) + Lang.getInstance().translate("h") + " " + String.valueOf(timeDiff / (60 * 1000) - timeDiff / (60 * 60 * 1000) * 60) + Lang.getInstance().translate("m");
+            return String.valueOf(timeDiff / (60 * 60 * 1000)) + Lang.T("h") + " " + String.valueOf(timeDiff / (60 * 1000) - timeDiff / (60 * 60 * 1000) * 60) + Lang.T("m");
         } else {
-            return String.valueOf(timeDiff / (24 * 60 * 60 * 1000)) + Lang.getInstance().translate("d") + " " + String.valueOf(timeDiff / (60 * 60 * 1000) - timeDiff / (24 * 60 * 60 * 1000) * 24) + Lang.getInstance().translate("h");
+            return String.valueOf(timeDiff / (24 * 60 * 60 * 1000)) + Lang.T("d") + " " + String.valueOf(timeDiff / (60 * 60 * 1000) - timeDiff / (24 * 60 * 60 * 1000) * 24) + Lang.T("h");
         }
     }
 }

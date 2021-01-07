@@ -39,7 +39,7 @@ public class DebugTabPane extends JTabbedPane {
 
         //ADD TABS
         if (Settings.getInstance().isGuiConsoleEnabled()) {
-            this.addTab(Lang.getInstance().translate("Console"), new ConsolePanel());
+            this.addTab(Lang.T("Console"), new ConsolePanel());
         }
 
         //TRANSACTIONS TABLE MODEL
@@ -76,7 +76,7 @@ public class DebugTabPane extends JTabbedPane {
         indexes.put(BlocksTableModel.COLUMN_HEIGHT, BlockMap.HEIGHT_INDEX);
 
         //ADD BLOCK TABLE
-        this.addTab(Lang.getInstance().translate("Blocks"), new JScrollPane(blocksTable));
+        this.addTab(Lang.T("Blocks"), new JScrollPane(blocksTable));
         //
         if (true || BlockChain.TEST_MODE) {
             JPanel pppp = new JPanel();

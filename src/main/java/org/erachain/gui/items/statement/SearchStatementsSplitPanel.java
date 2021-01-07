@@ -42,14 +42,14 @@ public class SearchStatementsSplitPanel extends SplitPanel {
     public SearchStatementsSplitPanel() {
         super(NAME, TITLE);
 
-        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         this.searchToolBar_LeftPanel.setVisible(true);
         this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
 
         // not show buttons
         jToolBarRightPanel.setVisible(false);
         toolBarLeftPanel.setVisible(false);
-        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key") + ":"));
+        this.toolBarLeftPanel.add(new JLabel(Lang.T("Find Key") + ":"));
         key_Item = new JTextField();
         key_Item.setToolTipText("");
         key_Item.setAlignmentX(1.0F);
@@ -129,7 +129,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
                 if (search.equals("")) {
                     search_Table_Model.clear();
-                    Label_search_Info_Panel.setText(Lang.getInstance().translate("Fill field Search"));
+                    Label_search_Info_Panel.setText(Lang.T("Fill field Search"));
                     jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
 
                     return;
@@ -138,7 +138,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 key_Item.setText("");
                 // show message
                 // jTableJScrollPanelLeftPanel.setVisible(false);//
-                Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+                Label_search_Info_Panel.setText(Lang.T("Waiting..."));
                 jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
 
                 new Thread() {
@@ -146,7 +146,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                     public void run() {
                         search_Table_Model.setFilterByName(search, null);
                         if (search_Table_Model.getRowCount() < 1) {
-                            Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Documents"));
+                            Label_search_Info_Panel.setText(Lang.T("Not Found Documents"));
                             jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                             return;
                         }
@@ -175,7 +175,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        JMenuItem vouch_Item = new JMenuItem(Lang.T("Vouch"));
 
         vouch_Item.addActionListener(new ActionListener() {
 
@@ -199,7 +199,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
         menu.addSeparator();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -284,7 +284,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
         // CHECK IF FAVORITES
         if (wallet.isDocumentFavorite(transaction)) {
-            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
 
             if (dd == 0) wallet.removeDocumentFavorite(transaction);
         } else {

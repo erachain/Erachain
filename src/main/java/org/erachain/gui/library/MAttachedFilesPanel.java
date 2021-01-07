@@ -45,7 +45,7 @@ public class MAttachedFilesPanel extends JPanel {
         JPopupMenu menu = new JPopupMenu();
         java.awt.GridBagConstraints gridBagConstraints;
 
-        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Save File"));
+        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.T("Save File"));
 
         vsend_Coins_Item.addActionListener(new ActionListener() {
 
@@ -56,7 +56,7 @@ public class MAttachedFilesPanel extends JPanel {
                 int row = table.convertRowIndexToModel(table.getSelectedRow());
                 chooser = new FileChooser();
                 String str = (String) model.getValueAt(row, 0);
-                chooser.setDialogTitle(Lang.getInstance().translate("Save File") + ": " + str);
+                chooser.setDialogTitle(Lang.T("Save File") + ": " + str);
                 //chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
                 chooser.setMultiSelectionEnabled(false);
@@ -70,7 +70,7 @@ public class MAttachedFilesPanel extends JPanel {
                     File ff = new File(pp);
                     // if file
                     if (ff.exists() && ff.isFile()) {
-                        int aaa = JOptionPane.showConfirmDialog(chooser, Lang.getInstance().translate("File") + " " + str + " " + Lang.getInstance().translate("Exists") + "! " + Lang.getInstance().translate("Overwrite") + "?", Lang.getInstance().translate("Message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                        int aaa = JOptionPane.showConfirmDialog(chooser, Lang.T("File") + " " + str + " " + Lang.T("Exists") + "! " + Lang.T("Overwrite") + "?", Lang.T("Message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
                         System.out.print("\n gggg " + aaa);
                         if (aaa != 0) {
                             return;
@@ -106,7 +106,7 @@ public class MAttachedFilesPanel extends JPanel {
         
         menu.add(vsend_Coins_Item);
         
-        JMenuItem open_Item = new JMenuItem(Lang.getInstance().translate("Open File"));
+        JMenuItem open_Item = new JMenuItem(Lang.T("Open File"));
 
         open_Item.addActionListener(new ActionListener() {
 

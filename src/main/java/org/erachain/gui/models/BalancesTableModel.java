@@ -27,7 +27,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
     private int balanceIndex;
     private long key;
     private int scale;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "OWN (1)", "DEBT (2)", "HOLD (3)", "SPEND (4)"});
+    private String[] columnNames = Lang.T(new String[]{"Account", "OWN (1)", "DEBT (2)", "HOLD (3)", "SPEND (4)"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, false};
     private List<Tuple2<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,

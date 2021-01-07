@@ -56,7 +56,7 @@ public class MTableSearchNumDialog extends javax.swing.JDialog {
         old_First_If_Txt = first_IF_Txt;
         old_Second_If_Txt = second_IF_Txt;
 
-        setTitle(Lang.getInstance().translate("Filter"));
+        setTitle(Lang.T("Filter"));
         setModal(true);
         class_1 = class1;
         String ss = "";
@@ -110,8 +110,8 @@ public class MTableSearchNumDialog extends javax.swing.JDialog {
         jComboBox_Second_IF.setSelectedIndex(ind);
         jFormattedTextField_Second_IF.setText(second_IF_Txt);
 
-        jLabel_Title.setText(Lang.getInstance().translate("Filter column") + ": " + column.getHeaderValue().toString());
-        jButton_Close.setText(Lang.getInstance().translate("Cancel"));
+        jLabel_Title.setText(Lang.T("Filter column") + ": " + column.getHeaderValue().toString());
+        jButton_Close.setText(Lang.T("Cancel"));
         jButton_Close.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -120,7 +120,7 @@ public class MTableSearchNumDialog extends javax.swing.JDialog {
             }
         });
 
-        jButton_Erase.setText(Lang.getInstance().translate("Erase"));
+        jButton_Erase.setText(Lang.T("Erase"));
         jButton_Erase.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -135,7 +135,7 @@ public class MTableSearchNumDialog extends javax.swing.JDialog {
 
             }
         });
-        jButton_OK.setText(Lang.getInstance().translate("OK"));
+        jButton_OK.setText(Lang.T("OK"));
         jButton_OK.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -231,21 +231,21 @@ public class MTableSearchNumDialog extends javax.swing.JDialog {
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
 
-        //   jComboBox_First_IF.setModel(new javax.swing.DefaultComboBoxModel<ComparisonType,String>(Lang.getInstance().translate(new String[] { "EQUAL", "BEFORE", "AFTER", "NOT_EQUAL" })));
-        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.EQUAL, Lang.getInstance().translate("EQUAL")));
-        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.AFTER, Lang.getInstance().translate("AFTER")));
-        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.BEFORE, Lang.getInstance().translate("BEFORE")));
-        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.NOT_EQUAL, Lang.getInstance().translate("NOT EQUAL")));
+        //   jComboBox_First_IF.setModel(new javax.swing.DefaultComboBoxModel<ComparisonType,String>(Lang.T(new String[] { "EQUAL", "BEFORE", "AFTER", "NOT_EQUAL" })));
+        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.EQUAL, Lang.T("EQUAL")));
+        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.AFTER, Lang.T("AFTER")));
+        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.BEFORE, Lang.T("BEFORE")));
+        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.NOT_EQUAL, Lang.T("NOT EQUAL")));
         jComboBox_First_IF.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
 
-                if (((Item) jComboBox_First_IF.getSelectedItem()).description == new Item(RowFilter.ComparisonType.AFTER, Lang.getInstance().translate("AFTER")).description) {
+                if (((Item) jComboBox_First_IF.getSelectedItem()).description == new Item(RowFilter.ComparisonType.AFTER, Lang.T("AFTER")).description) {
 
                     jComboBox_Second_IF.removeAllItems();
-                    jComboBox_Second_IF.addItem(new Item(RowFilter.ComparisonType.BEFORE, Lang.getInstance().translate("BEFORE")));
+                    jComboBox_Second_IF.addItem(new Item(RowFilter.ComparisonType.BEFORE, Lang.T("BEFORE")));
                     jComboBox_Second_IF.setSelectedItem(RowFilter.ComparisonType.BEFORE);
                     jComboBox_Second_IF.setVisible(true);
                     jFormattedTextField_Second_IF.setVisible(true);
@@ -264,7 +264,7 @@ public class MTableSearchNumDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
         getContentPane().add(jComboBox_First_IF, gridBagConstraints);
 
-        //      jComboBox_Second_IF.setModel(new javax.swing.DefaultComboBoxModel<>(Lang.getInstance().translate(new String[] { "BEFORE", "AFTER"})));
+        //      jComboBox_Second_IF.setModel(new javax.swing.DefaultComboBoxModel<>(Lang.T(new String[] { "BEFORE", "AFTER"})));
 
         jComboBox_Second_IF.addItem(new Item(RowFilter.ComparisonType.BEFORE, "BEFORE"));
         gridBagConstraints = new java.awt.GridBagConstraints();

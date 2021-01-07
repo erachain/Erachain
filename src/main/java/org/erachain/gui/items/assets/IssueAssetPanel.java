@@ -20,9 +20,9 @@ public class IssueAssetPanel extends IssueItemPanel {
     public static String NAME = "IssueAssetPanel";
     public static String TITLE = "Issue Asset";
 
-    private JLabel scaleJLabel = new JLabel(Lang.getInstance().translate("Scale") + ":");
-    private JLabel quantityJLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
-    private JLabel typeJLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
+    private JLabel scaleJLabel = new JLabel(Lang.T("Scale") + ":");
+    private JLabel quantityJLabel = new JLabel(Lang.T("Quantity") + ":");
+    private JLabel typeJLabel = new JLabel(Lang.T("Type") + ":");
 
     private JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
     private JComboBox<String> textScale = new JComboBox<>();
@@ -133,12 +133,12 @@ public class IssueAssetPanel extends IssueItemPanel {
             switch (parseStep) {
                 case 0:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Invalid Scale!"), Lang.getInstance().translate("Error"),
+                            Lang.T("Invalid Scale!"), Lang.T("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     break;
                 case 1:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"),
+                            Lang.T("Invalid quantity!"), Lang.T("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     break;
             }
@@ -164,18 +164,18 @@ public class IssueAssetPanel extends IssueItemPanel {
         AssetCls asset = (AssetCls) transaction.getItem();
 
         String text = "<HTML><body><h2>";
-        text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
-                + Lang.getInstance().translate("Issue Asset") + "</h2>"
-                + Lang.getInstance().translate("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
-                + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
-                + "[" + asset.getKey() + "]" + Lang.getInstance().translate("Name") + ":&nbsp;" + asset.viewName() + "<br>"
-                + Lang.getInstance().translate("Quantity") + ":&nbsp;" + asset.getQuantity() + "<br>"
-                + Lang.getInstance().translate("Asset Type") + ":&nbsp;"
-                + Lang.getInstance().translate(asset.viewAssetTypeFull() + "") + "<br>"
-                + Lang.getInstance().translate("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
-                + Lang.getInstance().translate("Description") + ":<br>";
+        text += Lang.T("Confirmation Transaction") + ":&nbsp;"
+                + Lang.T("Issue Asset") + "</h2>"
+                + Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
+                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
+                + "[" + asset.getKey() + "]" + Lang.T("Name") + ":&nbsp;" + asset.viewName() + "<br>"
+                + Lang.T("Quantity") + ":&nbsp;" + asset.getQuantity() + "<br>"
+                + Lang.T("Asset Type") + ":&nbsp;"
+                + Lang.T(asset.viewAssetTypeFull() + "") + "<br>"
+                + Lang.T("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
+                + Lang.T("Description") + ":<br>";
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
-            text += Library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "<br>";
+            text += Library.to_HTML(Lang.T(asset.viewDescription())) + "<br>";
         } else {
             text += Library.to_HTML(asset.viewDescription()) + "<br>";
         }

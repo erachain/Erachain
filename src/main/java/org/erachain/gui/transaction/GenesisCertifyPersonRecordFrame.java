@@ -14,7 +14,7 @@ public class GenesisCertifyPersonRecordFrame extends RecGenesis_DetailsFrame {
 
         //LABEL RECIPIENT
         ++labelGBC.gridy;
-        JLabel recipientLabel = new JLabel(Lang.getInstance().translate("Recipient") + ":");
+        JLabel recipientLabel = new JLabel(Lang.T("Recipient") + ":");
         this.add(recipientLabel, labelGBC);
 
         //RECIPIENT
@@ -26,7 +26,7 @@ public class GenesisCertifyPersonRecordFrame extends RecGenesis_DetailsFrame {
 
         //LABEL PERSON
         ++labelGBC.gridy;
-        JLabel assetLabel = new JLabel(Lang.getInstance().translate("Person") + ":");
+        JLabel assetLabel = new JLabel(Lang.T("Person") + ":");
         this.add(assetLabel, labelGBC);
 
         //PERSON

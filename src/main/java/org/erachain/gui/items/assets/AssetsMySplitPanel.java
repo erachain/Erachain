@@ -26,7 +26,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
         super(new WalletItemAssetsTableModel(), NAME, TITLE);
 
         //      add items in menu
-        JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
+        JMenuItem sell = new JMenuItem(Lang.T("To sell"));
         sell.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -37,7 +37,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             }
         });
 
-        JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
+        JMenuItem excahge = new JMenuItem(Lang.T("Exchange"));
         excahge.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -47,7 +47,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             }
         });
 
-        JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
+        JMenuItem buy = new JMenuItem(Lang.T("Buy"));
         buy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -65,7 +65,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
 
         this.menuTable.addSeparator();
 
-        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status to Asset"));
+        JMenuItem set_Status_Item = new JMenuItem(Lang.T("Set Status to Asset"));
 
         set_Status_Item.addActionListener(new ActionListener() {
             @Override
@@ -78,7 +78,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
         });
         this.menuTable.add(set_Status_Item);
 
-        JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
+        JMenuItem details = new JMenuItem(Lang.T("Details"));
         details.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -88,7 +88,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
         });
         menuTable.add(details);
 
-        JMenuItem dividend = new JMenuItem(Lang.getInstance().translate("Pay dividend"));
+        JMenuItem dividend = new JMenuItem(Lang.T("Pay dividend"));
         dividend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

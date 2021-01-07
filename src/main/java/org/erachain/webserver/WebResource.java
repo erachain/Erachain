@@ -345,12 +345,12 @@ public class WebResource {
      /*   // translate select
             Elements el = doc.getElementsByTag("option");//.select("translate");
             for (Element e : el) {
-                e.text(Lang.getInstance().translateFromLangObj(e.text(), langObj));
+                e.text(Lang.TFromLangObj(e.text(), langObj));
           }
       */        // translate links
             Elements el = doc.getElementsByAttributeValueContaining("translate", "true");//.select("translate");
             for (Element e : el) {
-                e.text(Lang.getInstance().translate(e.text(), langObj));
+                e.text(Lang.T(e.text(), langObj));
             }
         }
 
@@ -418,7 +418,7 @@ public class WebResource {
 
             Elements el = doc.select("translate");
             for (Element e : el) {
-                e.text(Lang.getInstance().translate(e.text(), langObj));
+                e.text(Lang.T(e.text(), langObj));
             }
         }
 

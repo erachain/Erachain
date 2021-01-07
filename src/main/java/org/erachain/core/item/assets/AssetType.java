@@ -14,21 +14,21 @@ public class AssetType {
 
     public AssetType(Integer assetType) {
         this.id = assetType;
-        this.name = Lang.getInstance().translate(AssetCls.viewAssetTypeCls(assetType));
-        this.nameFull = Lang.getInstance().translate(AssetCls.viewAssetTypeFullCls(assetType));
+        this.name = Lang.T(AssetCls.viewAssetTypeCls(assetType));
+        this.nameFull = Lang.T(AssetCls.viewAssetTypeFullCls(assetType));
 
         StringJoiner joiner = new StringJoiner(", ");
         for (Fun.Tuple2<?, String> action : AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
                 AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
                 assetType, null, true)) {
-            joiner.add(Lang.getInstance().translate(action.b));
+            joiner.add(Lang.T(action.b));
         }
 
-        this.description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(assetType)) + ".<br>";
+        this.description = Lang.T(AssetCls.viewAssetTypeDescriptionCls(assetType)) + ".<br>";
         if (AssetCls.isReverseSend(assetType)) {
-            description += Lang.getInstance().translate("Actions for OWN balance is reversed") + ".<br>";
+            description += Lang.T("Actions for OWN balance is reversed") + ".<br>";
         }
-        description += "<b>" + Lang.getInstance().translate("Acceptable actions") + ":</b><br>" + joiner.toString();
+        description += "<b>" + Lang.T("Acceptable actions") + ":</b><br>" + joiner.toString();
 
     }
 

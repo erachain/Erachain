@@ -1,8 +1,8 @@
 package org.erachain.gui.models;
 
 import org.erachain.lang.Lang;
-import org.json.simple.JSONObject;
 import org.erachain.utils.Pair;
+import org.json.simple.JSONObject;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public class KeyValueTableModel extends AbstractTableModel implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_VALUE = 1;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Value"});
+    private String[] columnNames = Lang.T(new String[]{"Key", "Value"});
 
     private List<Pair<String, String>> keyvaluepairs = new ArrayList<Pair<String, String>>();
 
@@ -89,7 +89,7 @@ public class KeyValueTableModel extends AbstractTableModel implements Observer {
     //CONSISTENCY CHECK
     public Pair<Boolean, String> checkUpdateable() {
         if (keyvaluepairs.isEmpty()) {
-            return new Pair<Boolean, String>(false, Lang.getInstance().translate("You need to add atleast one key/value pair to properly update the name."));
+            return new Pair<Boolean, String>(false, Lang.T("You need to add atleast one key/value pair to properly update the name."));
         }
 
         List<String> keys = new ArrayList<String>();
@@ -97,11 +97,11 @@ public class KeyValueTableModel extends AbstractTableModel implements Observer {
 
             String key = pair.getA();
             if (key == null || "".equalsIgnoreCase(key)) {
-                return new Pair<Boolean, String>(false, Lang.getInstance().translate("The entry at position %key% is missing a key!").replace("%key%", String.valueOf(keyvaluepairs.indexOf(pair))));
+                return new Pair<Boolean, String>(false, Lang.T("The entry at position %key% is missing a key!").replace("%key%", String.valueOf(keyvaluepairs.indexOf(pair))));
             }
 
             if (keys.contains(key)) {
-                return new Pair<Boolean, String>(false, Lang.getInstance().translate("There are atleast two entries with duplicate keys (Bad key: %key%)").replace("%key%", key));
+                return new Pair<Boolean, String>(false, Lang.T("There are atleast two entries with duplicate keys (Bad key: %key%)").replace("%key%", key));
             }
             keys.add(key);
         }

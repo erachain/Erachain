@@ -34,7 +34,7 @@ public class SettingsFrame extends JDialog {
     public SettingsFrame() {
 
         //CREATE FRAME
-        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Settings"));
+        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Settings"));
         setModal(true);
         setResizable(false);
         //ICON
@@ -64,7 +64,7 @@ public class SettingsFrame extends JDialog {
 
         this.add(this.settingsTabPane, gbc_tabPane);
 
-        JButton btnNewButton = new JButton(Lang.getInstance().translate("Apply"));
+        JButton btnNewButton = new JButton(Lang.T("Apply"));
         GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
         gbc_btnNewButton.fill = GridBagConstraints.NONE;
         gbc_btnNewButton.anchor = GridBagConstraints.EAST;
@@ -77,8 +77,8 @@ public class SettingsFrame extends JDialog {
             public void actionPerformed(ActionEvent e) {
 
                 int n = JOptionPane.showConfirmDialog(
-                        new JFrame(), Lang.getInstance().translate("To apply the new settings?"),
-                        Lang.getInstance().translate("Confirmation"),
+                        new JFrame(), Lang.T("To apply the new settings?"),
+                        Lang.T("Confirmation"),
                         JOptionPane.OK_CANCEL_OPTION);
                 if (n == JOptionPane.OK_OPTION) {
                     if (saveSettings()) {
@@ -97,7 +97,7 @@ public class SettingsFrame extends JDialog {
 
         this.add(btnNewButton, gbc_btnNewButton);
 
-        JButton btnCancel = new JButton(Lang.getInstance().translate("Cancel"));
+        JButton btnCancel = new JButton(Lang.T("Cancel"));
         GridBagConstraints gbc_btnCancel = new GridBagConstraints();
         gbc_btnCancel.fill = GridBagConstraints.NONE;
         gbc_btnCancel.anchor = GridBagConstraints.WEST;
@@ -120,7 +120,7 @@ public class SettingsFrame extends JDialog {
 
         this.add(btnCancel, gbc_btnCancel);
         //AS
-        JButton btnDefaultSettings = new JButton(Lang.getInstance().translate("Default Settings"));
+        JButton btnDefaultSettings = new JButton(Lang.T("Default Settings"));
         GridBagConstraints gbc_btnDefaultSettings = new GridBagConstraints();
         gbc_btnDefaultSettings.fill = GridBagConstraints.NONE;
         gbc_btnDefaultSettings.anchor = GridBagConstraints.WEST;
@@ -147,8 +147,8 @@ public class SettingsFrame extends JDialog {
                 Settings.freeInstance();
 
                 JOptionPane.showMessageDialog(
-                        new JFrame(), Lang.getInstance().translate("You need to restart the application for the changes to take effect"),
-                        Lang.getInstance().translate("Attention") + "!",
+                        new JFrame(), Lang.T("You need to restart the application for the changes to take effect"),
+                        Lang.T("Attention") + "!",
                         JOptionPane.WARNING_MESSAGE);
 
                 settingsTabPane.close();
@@ -310,8 +310,8 @@ public class SettingsFrame extends JDialog {
 
         if (!settingsTabPane.settingsBasicPanel.chckbxGuiEnabled.isSelected() && !settingsTabPane.settingsBasicPanel.chckbxRpcEnabled.isSelected()) {
             JOptionPane.showMessageDialog(
-                    new JFrame(), Lang.getInstance().translate("Both gui and rpc cannot be disabled!"),
-                    Lang.getInstance().translate("Error!"),
+                    new JFrame(), Lang.T("Both gui and rpc cannot be disabled!"),
+                    Lang.T("Error!"),
                     JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -328,8 +328,8 @@ public class SettingsFrame extends JDialog {
                 settingsTabPane.settingsAllowedPanel.rpcServiceRestart = true;
             } else {
                 JOptionPane.showMessageDialog(
-                        new JFrame(), "Rpc port " + newRpcPort + " " + Lang.getInstance().translate("already in use!"),
-                        Lang.getInstance().translate("Error!"),
+                        new JFrame(), "Rpc port " + newRpcPort + " " + Lang.T("already in use!"),
+                        Lang.T("Error!"),
                         JOptionPane.ERROR_MESSAGE);
                 return false;
             }
@@ -343,8 +343,8 @@ public class SettingsFrame extends JDialog {
                 settingsTabPane.settingsAllowedPanel.webServiceRestart = true;
             } else {
                 JOptionPane.showMessageDialog(
-                        new JFrame(), "Web port " + newWebPort + " " + Lang.getInstance().translate("already in use!"),
-                        Lang.getInstance().translate("Error!"),
+                        new JFrame(), "Web port " + newWebPort + " " + Lang.T("already in use!"),
+                        Lang.T("Error!"),
                         JOptionPane.ERROR_MESSAGE);
                 return false;
             }
@@ -498,32 +498,32 @@ public class SettingsFrame extends JDialog {
 
         if (changeDataDir || changeWallet) {
             JOptionPane.showMessageDialog(
-                    new JFrame(), Lang.getInstance().translate("You changed WalletDir or DataDir. You need to restart the wallet for the changes to take effect."),
-                    Lang.getInstance().translate("Attention!"),
+                    new JFrame(), Lang.T("You changed WalletDir or DataDir. You need to restart the wallet for the changes to take effect."),
+                    Lang.T("Attention!"),
                     JOptionPane.WARNING_MESSAGE);
         }
         if (changeKeyCaching) {
             JOptionPane.showMessageDialog(
-                    new JFrame(), Lang.getInstance().translate("You changed Generator Key Caching option. You need to restart the wallet for the changes to take effect."),
-                    Lang.getInstance().translate("Attention!"),
+                    new JFrame(), Lang.T("You changed Generator Key Caching option. You need to restart the wallet for the changes to take effect."),
+                    Lang.T("Attention!"),
                     JOptionPane.WARNING_MESSAGE);
         }
         if (limitConnections) {
             JOptionPane.showMessageDialog(
-                    new JFrame(), Lang.getInstance().translate("You changed max connections or min connections. You need to restart the wallet for the changes to take effect."),
-                    Lang.getInstance().translate("Attention!"),
+                    new JFrame(), Lang.T("You changed max connections or min connections. You need to restart the wallet for the changes to take effect."),
+                    Lang.T("Attention!"),
                     JOptionPane.WARNING_MESSAGE);
         }
         if (localPeerScanner) {
             JOptionPane.showMessageDialog(
-                    new JFrame(), Lang.getInstance().translate("You changed local peer discovery. You need to restart the wallet for the changes to take effect."),
-                    Lang.getInstance().translate("Attention!"),
+                    new JFrame(), Lang.T("You changed local peer discovery. You need to restart the wallet for the changes to take effect."),
+                    Lang.T("Attention!"),
                     JOptionPane.WARNING_MESSAGE);
         }
         if (changeLang) {
             JOptionPane.showMessageDialog(
-                    new JFrame(), Lang.getInstance().translate("You changed language. You need to restart the wallet for the changes to take effect."),
-                    Lang.getInstance().translate("Attention!"),
+                    new JFrame(), Lang.T("You changed language. You need to restart the wallet for the changes to take effect."),
+                    Lang.T("Attention!"),
                     JOptionPane.WARNING_MESSAGE);
         }
 

@@ -62,7 +62,7 @@ public class ModelAccountTransactions extends TimerTableModelCls<Transaction> im
             case COLUMN_AMOUNT:
                 return assetTransactions.get(row).getAmount().toPlainString();
             case COLUMN_TRANSACTION:
-                return Lang.getInstance().translate(assetTransactions.get(row).viewFullTypeName());
+                return Lang.T(assetTransactions.get(row).viewFullTypeName());
         }
 
         return null;

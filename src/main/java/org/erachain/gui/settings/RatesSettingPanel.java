@@ -49,7 +49,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
 
         int gridy = 0;
         jLabelTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelTitle.setText("<html><h2>" + Lang.getInstance().translate("FEE Rates for View") + "</h2><html>");
+        jLabelTitle.setText("<html><h2>" + Lang.T("FEE Rates for View") + "</h2><html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy++;
@@ -60,7 +60,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         add(jLabelTitle, gridBagConstraints);
 
         //jLabelCOMPU.setHorizontalAlignment(SwingConstants.RIGHT);
-        jLabelCOMPU.setText(Lang.getInstance().translate("Rate") + ":");
+        jLabelCOMPU.setText(Lang.T("Rate") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridwidth = 2;
@@ -70,7 +70,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         add(jLabelCOMPU, gridBagConstraints);
 
         jTextFieldRate.setText(Settings.getInstance().getCompuRate());
-        jTextFieldRate.setToolTipText(Lang.getInstance().translate("Must be numbers"));
+        jTextFieldRate.setToolTipText(Lang.T("Must be numbers"));
         jTextFieldRate.setPreferredSize(new java.awt.Dimension(100, 30));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
@@ -78,7 +78,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         add(jTextFieldRate, gridBagConstraints);
 
-        jLabelAsset.setText(Lang.getInstance().translate("Asset of Rate") + ":");
+        jLabelAsset.setText(Lang.T("Asset of Rate") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridwidth = 2;
@@ -107,7 +107,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         cbxFavoritesRate.setPreferredSize(new java.awt.Dimension(200, 30));
         add(cbxFavoritesRate, gridBagConstraints);
 
-        JLabel jExchangeTitle = new JLabel("<html><h2>" + Lang.getInstance().translate("Default Asset for Exchange Pair") + "</h2><html>");
+        JLabel jExchangeTitle = new JLabel("<html><h2>" + Lang.T("Default Asset for Exchange Pair") + "</h2><html>");
         jExchangeTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -117,7 +117,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         add(jExchangeTitle, gridBagConstraints);
 
-        jLabelDefaultAsset.setText(Lang.getInstance().translate("Asset") + ":");
+        jLabelDefaultAsset.setText(Lang.T("Asset") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridwidth = 3;

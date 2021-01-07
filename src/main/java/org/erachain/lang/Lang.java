@@ -145,7 +145,7 @@ public class Lang {
         langObj = langList.get(Settings.getInstance().getLang()).getLangJson();
     }
 
-    public static String translate(String message, JSONObject langObj) {
+    public static String T(String message, JSONObject langObj) {
         //COMMENT AFTER # FOR TRANSLATE THAT WOULD BE THE SAME TEXT IN DIFFERENT WAYS TO TRANSLATE
         String messageWithoutComment = message.replaceFirst("(?<!\\\\)#.*$", "");
         messageWithoutComment = messageWithoutComment.replace("\\#", "#");
@@ -171,14 +171,15 @@ public class Lang {
         return res;
     }
 
-    public String translate(String message) {
-        return translate(message, langObj);
+    public static String T(String message) {
+        return T(message, getInstance().langObj);
     }
 
-    public String[] translate(String[] Messages) {
+
+    public static String[] T(String[] Messages) {
         String[] translateMessages = Messages.clone();
         for (int i = 0; i < translateMessages.length; i++) {
-            translateMessages[i] = translate(translateMessages[i]);
+            translateMessages[i] = T(translateMessages[i]);
         }
         return translateMessages;
     }

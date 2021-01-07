@@ -14,7 +14,7 @@ public class ImprintFrame extends JFrame {
     private ImprintCls imprint;
 
     public ImprintFrame(ImprintCls imprint) {
-        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Check Details"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Check Details"));
 
         this.imprint = imprint;
 
@@ -36,13 +36,13 @@ public class ImprintFrame extends JFrame {
         JTabbedPane tabPane = new JTabbedPane();
 
         //DETAILS
-        tabPane.add(Lang.getInstance().translate("Details"), new ImprintDetailsPanel(this.imprint));
+        tabPane.add(Lang.T("Details"), new ImprintDetailsPanel(this.imprint));
 
         /*
         //BALANCES
         BalancesTableModel balancesTableModel = new BalancesTableModel(imprint);
         final JTable balancesTable = new JTable(balancesTableModel);
-        tabPane.add(Lang.getInstance().translate("Holders"), new JScrollPane(balancesTable));
+        tabPane.add(Lang.T("Holders"), new JScrollPane(balancesTable));
 
         //ADD TAB PANE
         this.add(tabPane);

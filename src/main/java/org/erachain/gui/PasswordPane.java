@@ -1,22 +1,15 @@
 package org.erachain.gui;
 // 30/03
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.GridLayout;
+import org.erachain.controller.Controller;
+import org.erachain.lang.Lang;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-
-import org.erachain.controller.Controller;
-import org.erachain.lang.Lang;
 
 public class PasswordPane {
     public static String showUnlockWalletDialog(Component parent) {
@@ -24,7 +17,7 @@ public class PasswordPane {
         userPanel.setLayout(new GridLayout(2, 2));
 
         //Labels for the textfield components
-        JLabel passwordLbl = new JLabel(Lang.getInstance().translate("Enter wallet password") + ":");
+        JLabel passwordLbl = new JLabel(Lang.T("Enter wallet password") + ":");
         JPasswordField passwordFld = new JPasswordField();
 
         passwordFld.addKeyListener(new KeyAdapter() {
@@ -36,14 +29,14 @@ public class PasswordPane {
 
                 if (keyCode == KeyEvent.VK_ENTER) {
                     if (e.isControlDown()) {
-                        final JButton btn = getButton(parent, Lang.getInstance().translate("Unlock"));
+                        final JButton btn = getButton(parent, Lang.T("Unlock"));
                         btn.doClick();
                     } else {
-                        final JButton btn = getButton(parent, Lang.getInstance().translate("Unlock for 2 minutes"));
+                        final JButton btn = getButton(parent, Lang.T("Unlock for 2 minutes"));
                         btn.doClick();
                     }
                 } else if (keyCode == KeyEvent.VK_ESCAPE) {
-                    final JButton btn = getButton(parent, Lang.getInstance().translate("Cancel"));
+                    final JButton btn = getButton(parent, Lang.T("Cancel"));
                     btn.doClick();
                 }
             }
@@ -53,9 +46,9 @@ public class PasswordPane {
         userPanel.add(passwordLbl);
         userPanel.add(passwordFld);
 
-        Object[] options = {Lang.getInstance().translate("Unlock"),
-                Lang.getInstance().translate("Unlock for 2 minutes"),
-                Lang.getInstance().translate("Cancel")};
+        Object[] options = {Lang.T("Unlock"),
+                Lang.T("Unlock for 2 minutes"),
+                Lang.T("Cancel")};
 
         //As the JOptionPane accepts an object as the message
         //it allows us to use any component we like - in this case
@@ -64,7 +57,7 @@ public class PasswordPane {
         int n = JOptionPane.showOptionDialog(
                 parent,
                 userPanel,
-                Lang.getInstance().translate("Unlock Wallet"),
+                Lang.T("Unlock Wallet"),
                 JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 null,
@@ -89,7 +82,7 @@ public class PasswordPane {
         } else {
             String password = PasswordPane.showUnlockWalletDialog((Component) parent);
             if (!password.equals("") && !Controller.getInstance().unlockWallet(password)) {
-                JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
             }
         }
     }

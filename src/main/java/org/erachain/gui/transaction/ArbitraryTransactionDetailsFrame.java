@@ -20,7 +20,7 @@ public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
 
         //LABEL SERVICE
         ++labelGBC.gridy;
-        JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Service ID") + ":");
+        JLabel serviceLabel = new JLabel(Lang.T("Service ID") + ":");
         this.add(serviceLabel, labelGBC);
 
         //SERVICE
@@ -32,7 +32,7 @@ public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
 
         //LABEL DATA AS BASE58
         ++labelGBC.gridy;
-        JLabel dataLabel = new JLabel(Lang.getInstance().translate("Data as Base58") + ":");
+        JLabel dataLabel = new JLabel(Lang.T("Data as Base58") + ":");
         this.add(dataLabel, labelGBC);
 
         //DATA AS BASE58
@@ -52,7 +52,7 @@ public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
 
         //LABEL DATA AS TEXT
         ++labelGBC.gridy;
-        JLabel dataTextLabel = new JLabel(Lang.getInstance().translate("Data as Text") + ":");
+        JLabel dataTextLabel = new JLabel(Lang.T("Data as Text") + ":");
         this.add(dataTextLabel, labelGBC);
 
         //DATA AS TEXT
@@ -74,7 +74,7 @@ public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
 
             //LABEL PAYMENTS
             ++labelGBC.gridy;
-            JLabel paymentsLabel = new JLabel(Lang.getInstance().translate("Payments") + ":");
+            JLabel paymentsLabel = new JLabel(Lang.T("Payments") + ":");
             this.add(paymentsLabel, labelGBC);
 
             //PAYMENTS

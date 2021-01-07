@@ -22,37 +22,37 @@ public class FileChooser extends JFileChooser {
         if (default_Wight != 0 || default_Height != 0)
             this.setPreferredSize(new Dimension(default_Wight, default_Height));
 
-        UIManager.put("FileChooser.openButtonText", Lang.getInstance().translate("Open"));
-        UIManager.put("FileChooser.cancelButtonText", Lang.getInstance().translate("Cancel"));
-        UIManager.put("FileChooser.lookInLabelText", Lang.getInstance().translate("Look in"));
-        UIManager.put("FileChooser.fileNameLabelText", Lang.getInstance().translate("File Name"));
-        UIManager.put("FileChooser.filesOfTypeLabelText", Lang.getInstance().translate("File Type"));
+        UIManager.put("FileChooser.openButtonText", Lang.T("Open"));
+        UIManager.put("FileChooser.cancelButtonText", Lang.T("Cancel"));
+        UIManager.put("FileChooser.lookInLabelText", Lang.T("Look in"));
+        UIManager.put("FileChooser.fileNameLabelText", Lang.T("File Name"));
+        UIManager.put("FileChooser.filesOfTypeLabelText", Lang.T("File Type"));
 
-        UIManager.put("FileChooser.saveButtonText", Lang.getInstance().translate("Save"));
-        UIManager.put("FileChooser.saveButtonToolTipText", Lang.getInstance().translate("Save"));
-        UIManager.put("FileChooser.openButtonText", Lang.getInstance().translate("Open"));
-        UIManager.put("FileChooser.openButtonToolTipText", Lang.getInstance().translate("Open"));
-        UIManager.put("FileChooser.cancelButtonText", Lang.getInstance().translate("Cancel"));
-        UIManager.put("FileChooser.cancelButtonToolTipText", Lang.getInstance().translate("Cancel"));
+        UIManager.put("FileChooser.saveButtonText", Lang.T("Save"));
+        UIManager.put("FileChooser.saveButtonToolTipText", Lang.T("Save"));
+        UIManager.put("FileChooser.openButtonText", Lang.T("Open"));
+        UIManager.put("FileChooser.openButtonToolTipText", Lang.T("Open"));
+        UIManager.put("FileChooser.cancelButtonText", Lang.T("Cancel"));
+        UIManager.put("FileChooser.cancelButtonToolTipText", Lang.T("Cancel"));
 
-        UIManager.put("FileChooser.lookInLabelText", Lang.getInstance().translate("Folder"));
-        UIManager.put("FileChooser.saveInLabelText", Lang.getInstance().translate("Folder"));
-        UIManager.put("FileChooser.fileNameLabelText", Lang.getInstance().translate("File Name"));
-        UIManager.put("FileChooser.folderNameLabelText", Lang.getInstance().translate("Folder Name"));
-        UIManager.put("FileChooser.filesOfTypeLabelText", Lang.getInstance().translate("File Type"));
+        UIManager.put("FileChooser.lookInLabelText", Lang.T("Folder"));
+        UIManager.put("FileChooser.saveInLabelText", Lang.T("Folder"));
+        UIManager.put("FileChooser.fileNameLabelText", Lang.T("File Name"));
+        UIManager.put("FileChooser.folderNameLabelText", Lang.T("Folder Name"));
+        UIManager.put("FileChooser.filesOfTypeLabelText", Lang.T("File Type"));
 
-        UIManager.put("FileChooser.upFolderToolTipText", Lang.getInstance().translate("UP Folder"));
-        UIManager.put("FileChooser.newFolderToolTipText", Lang.getInstance().translate("New Folder"));
-        UIManager.put("FileChooser.listViewButtonToolTipText", Lang.getInstance().translate("List View"));
-        UIManager.put("FileChooser.detailsViewButtonToolTipText", Lang.getInstance().translate("Details View"));
-        UIManager.put("FileChooser.fileNameHeaderText", Lang.getInstance().translate("Name"));
-        UIManager.put("FileChooser.fileSizeHeaderText", Lang.getInstance().translate("Size"));
-        UIManager.put("FileChooser.fileTypeHeaderText", Lang.getInstance().translate("Type"));
-        UIManager.put("FileChooser.fileDateHeaderText", Lang.getInstance().translate("File Date"));
-        UIManager.put("FileChooser.fileAttrHeaderText", Lang.getInstance().translate("File Attr"));
+        UIManager.put("FileChooser.upFolderToolTipText", Lang.T("UP Folder"));
+        UIManager.put("FileChooser.newFolderToolTipText", Lang.T("New Folder"));
+        UIManager.put("FileChooser.listViewButtonToolTipText", Lang.T("List View"));
+        UIManager.put("FileChooser.detailsViewButtonToolTipText", Lang.T("Details View"));
+        UIManager.put("FileChooser.fileNameHeaderText", Lang.T("Name"));
+        UIManager.put("FileChooser.fileSizeHeaderText", Lang.T("Size"));
+        UIManager.put("FileChooser.fileTypeHeaderText", Lang.T("Type"));
+        UIManager.put("FileChooser.fileDateHeaderText", Lang.T("File Date"));
+        UIManager.put("FileChooser.fileAttrHeaderText", Lang.T("File Attr"));
 
 
-        UIManager.put("FileChooser.detailsViewButtonAccessibleName", Lang.getInstance().translate("All Files"));
+        UIManager.put("FileChooser.detailsViewButtonAccessibleName", Lang.T("All Files"));
         this.updateUI();
 	
 		

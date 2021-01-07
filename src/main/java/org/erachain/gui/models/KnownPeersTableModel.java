@@ -33,7 +33,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
     private static final int COLUMN_ONLINE_TIME = 6;
     private static final int COLUMN_VERSION = 7;
     static Logger logger = LoggerFactory.getLogger(KnownPeersTableModel.class);
-    String[] columnNames = Lang.getInstance().translate(new String[]{"IP", "Height",
+    String[] columnNames = Lang.T(new String[]{"IP", "Height",
             "Ping mc", "Reliable", "Initiator", "Finding ago", "Online Time", "Version"});
     private List<Peer> peers;
     private List<Boolean> peersStatus = new ArrayList<Boolean>();
@@ -68,8 +68,8 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
     public void deleteAddress(int row) {
         String address = getValueAt(row, 0).toString();
         int n = JOptionPane.showConfirmDialog(
-                new JFrame(), Lang.getInstance().translate("Do you want to remove address %address%?").replace("%address%", address),
-                Lang.getInstance().translate("Confirmation"),
+                new JFrame(), Lang.T("Do you want to remove address %address%?").replace("%address%", address),
+                Lang.T("Confirmation"),
                 JOptionPane.YES_NO_OPTION);
         if (n == JOptionPane.YES_OPTION) {
             peers.remove(row);
@@ -130,9 +130,9 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
                 Tuple2<Integer, Long> res = peer.getHWeight(true);
                 if (res == null || res.a == 0) {
                     if (peer.isUsed()) {
-                        return Lang.getInstance().translate("Waiting...");
+                        return Lang.T("Waiting...");
                     }
-                    return Lang.getInstance().translate("");
+                    return Lang.T("");
                 }
                 return res.a.toString() + " " + res.b.toString() + (peer.getMute() > 0 ? " mute:" + peer.getMute() : "");
 
@@ -140,12 +140,12 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
                 if (!peer.isUsed()) {
                     int banMinutes = Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(peer);
                     if (banMinutes > 0) {
-                        return Lang.getInstance().translate("Banned") + " " + banMinutes + "m" + " (" + peer.getBanMessage() + ")";
+                        return Lang.T("Banned") + " " + banMinutes + "m" + " (" + peer.getBanMessage() + ")";
                     } else {
-                        return Lang.getInstance().translate("Broken") + (peer.getBanMessage() == null ? "" : " (" + peer.getBanMessage() + ")");
+                        return Lang.T("Broken") + (peer.getBanMessage() == null ? "" : " (" + peer.getBanMessage() + ")");
                     }
                 } else if (peer.getPing() > 1000000) {
-                    return Lang.getInstance().translate("Waiting...");
+                    return Lang.T("Waiting...");
                 } else {
                     return peer.getPing();
                 }
@@ -155,9 +155,9 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
 
             case COLUMN_INITIATOR:
                 if (peer.isWhite()) {
-                    return Lang.getInstance().translate("You");
+                    return Lang.T("You");
                 } else {
-                    return Lang.getInstance().translate("Remote");
+                    return Lang.T("Remote");
                 }
 
             case COLUMN_FINDING_AGO:

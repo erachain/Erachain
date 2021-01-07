@@ -22,7 +22,7 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
     public AssetsFavoriteSplitPanel() {
         super(new FavoriteAssetsTableModel(), NAME, TITLE);
 
-        JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
+        JMenuItem sell = new JMenuItem(Lang.T("To sell"));
 
         sell.addActionListener(e ->
                 //new ExchangeFrame((AssetCls) itemMenu, null, "To sell", "")
@@ -30,19 +30,19 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
                 MainPanel.getInstance().insertTab(
                         new ExchangePanel((AssetCls) itemTableSelected, null, "To sell", "")));
 
-        JMenuItem exchange = new JMenuItem(Lang.getInstance().translate("Exchange"));
+        JMenuItem exchange = new JMenuItem(Lang.T("Exchange"));
         exchange.addActionListener(e ->
                 MainPanel.getInstance().insertTab(
                         new ExchangePanel((AssetCls) itemTableSelected, null, "", "")));
 
-        JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
+        JMenuItem buy = new JMenuItem(Lang.T("Buy"));
         buy.addActionListener(e ->
                 //new ExchangeFrame((AssetCls) itemMenu, null, "Buy", "")
                 MainPanel.getInstance().insertTab(
                         new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", "")));
 
 
-        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status to Asset"));
+        JMenuItem set_Status_Item = new JMenuItem(Lang.T("Set Status to Asset"));
 
         set_Status_Item.addActionListener(new ActionListener() {
             @Override

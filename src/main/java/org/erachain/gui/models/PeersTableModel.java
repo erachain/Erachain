@@ -141,9 +141,9 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                 Tuple2<Integer, Long> res = peer.getHWeight(true);
                 if (res == null || res.a == 0) {
                     if (peer.isUsed()) {
-                        return Lang.getInstance().translate("Waiting...");
+                        return Lang.T("Waiting...");
                     }
-                    return Lang.getInstance().translate("");
+                    return Lang.T("");
                 }
                 long diffWeight = (res.b - cnt.blockChain.getHWeightFull(dcSet).b);
                 return "H=" + res.a.toString() + " W" + (diffWeight > 0 ? "+" + diffWeight : diffWeight) + (peer.getMute() > 0 ? " mute:" + peer.getMute() : "");
@@ -152,12 +152,12 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                 if (!peer.isUsed()) {
                     int banMinutes = cnt.getDLSet().getPeerMap().getBanMinutes(peer);
                     if (banMinutes > 0) {
-                        return Lang.getInstance().translate("Banned") + " " + banMinutes + "m" + " (" + peer.getBanMessage() + ")";
+                        return Lang.T("Banned") + " " + banMinutes + "m" + " (" + peer.getBanMessage() + ")";
                     } else {
-                        return Lang.getInstance().translate("Broken") + (peer.getBanMessage() == null ? "" : " (" + peer.getBanMessage() + ")");
+                        return Lang.T("Broken") + (peer.getBanMessage() == null ? "" : " (" + peer.getBanMessage() + ")");
                     }
                 } else if (peer.getPing() > 1000000) {
-                    return Lang.getInstance().translate("Waiting...");
+                    return Lang.T("Waiting...");
                 } else {
                     return "" + peer.getPing();
                 }
@@ -167,9 +167,9 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
 
             case COLUMN_INITIATOR:
                 if (peer.isWhite()) {
-                    return Lang.getInstance().translate("You");
+                    return Lang.T("You");
                 } else {
-                    return Lang.getInstance().translate("Remote");
+                    return Lang.T("Remote");
                 }
 
             case COLUMN_FINDING_AGO:

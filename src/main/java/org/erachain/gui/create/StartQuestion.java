@@ -3,19 +3,17 @@ package org.erachain.gui.create;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 // Questions on Start
 public class StartQuestion extends JDialog {
 
     public StartQuestion() {
-        setTitle(Lang.getInstance().translate("Start questions"));
+        setTitle(Lang.T("Start questions"));
         List<Image> icons = new ArrayList<Image>();
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));

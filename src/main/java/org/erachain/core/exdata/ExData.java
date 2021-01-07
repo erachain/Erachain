@@ -1303,9 +1303,9 @@ public class ExData {
                 }
 
                 if (publicKey == null) {
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(recipient.toString() + " : " +
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T(recipient.toString() + " : " +
                                     ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                     return null;
                 }
@@ -1341,30 +1341,30 @@ public class ExData {
                                 int blockNo, int seqNo, JSONObject langObj) {
 
         if (title != null && !title.isEmpty()) {
-            output.put("Label_title", Lang.getInstance().translate("Title", langObj));
+            output.put("Label_title", Lang.T("Title", langObj));
             output.put("title", title);
         }
 
         if (exLink != null) {
-            output.put("Label_LinkType", Lang.getInstance().translate("Link Type", langObj));
-            output.put("exLink_Name", Lang.getInstance().translate(exLink.viewTypeName(hasRecipients()), langObj));
+            output.put("Label_LinkType", Lang.T("Link Type", langObj));
+            output.put("exLink_Name", Lang.T(exLink.viewTypeName(hasRecipients()), langObj));
             output.put("exLink", exLink.makeJSONforHTML(hasRecipients(), langObj));
-            output.put("Label_Parent", Lang.getInstance().translate("for # для", langObj));
+            output.put("Label_Parent", Lang.T("for # для", langObj));
 
         }
 
         if (exPays != null) {
-            output.put("Label_Payouts", Lang.getInstance().translate("Payouts", langObj));
+            output.put("Label_Payouts", Lang.T("Payouts", langObj));
             output.put("exPays", exPays.makeJSONforHTML(langObj));
 
         }
 
         if (isCanSignOnlyRecipients()) {
-            output.put("Label_CanSignOnlyRecipients", Lang.getInstance().translate("To sign can only Recipients", langObj));
+            output.put("Label_CanSignOnlyRecipients", Lang.T("To sign can only Recipients", langObj));
         }
 
         if (recipients != null && recipients.length > 0) {
-            output.put("Label_recipients", Lang.getInstance().translate("Recipients", langObj));
+            output.put("Label_recipients", Lang.T("Recipients", langObj));
             List<List<String>> recipientsOut = new ArrayList<>();
             for (Account recipient : recipients) {
                 recipientsOut.add(Arrays.asList(recipient.getAddress(), recipient.getPersonAsString()));
@@ -1373,7 +1373,7 @@ public class ExData {
         }
 
         if (authors != null && authors.length > 0) {
-            output.put("Label_Authors", Lang.getInstance().translate("Authors", langObj));
+            output.put("Label_Authors", Lang.T("Authors", langObj));
             JSONArray authorsOut = new JSONArray();
             for (ExLinkAuthor author : authors) {
                 authorsOut.add(author.makeJSONforHTML(langObj));
@@ -1382,7 +1382,7 @@ public class ExData {
         }
 
         if (sources != null && sources.length > 0) {
-            output.put("Label_Sources", Lang.getInstance().translate("Sources", langObj));
+            output.put("Label_Sources", Lang.T("Sources", langObj));
             JSONArray sourcesOut = new JSONArray();
             for (ExLinkSource source : sources) {
                 sourcesOut.add(source.makeJSONforHTML(langObj));
@@ -1391,20 +1391,20 @@ public class ExData {
         }
 
         if (tags != null && tags.length > 0) {
-            output.put("Label_Tags", Lang.getInstance().translate("Tags", langObj));
+            output.put("Label_Tags", Lang.T("Tags", langObj));
             output.put("tags", new String(tags, StandardCharsets.UTF_8));
         }
 
         if (isEncrypted()) {
-            output.put("encrypted", Lang.getInstance().translate("Encrypted", langObj));
+            output.put("encrypted", Lang.T("Encrypted", langObj));
             return;
 
         } else {
 
-            output.put("Label_template_hash", Lang.getInstance().translate("Template hash", langObj));
-            output.put("Label_mess_hash", Lang.getInstance().translate("Text hash", langObj));
-            output.put("Label_hashes", Lang.getInstance().translate("Hashes", langObj));
-            output.put("Label_files", Lang.getInstance().translate("Files", langObj));
+            output.put("Label_template_hash", Lang.T("Template hash", langObj));
+            output.put("Label_mess_hash", Lang.T("Text hash", langObj));
+            output.put("Label_hashes", Lang.T("Hashes", langObj));
+            output.put("Label_files", Lang.T("Files", langObj));
 
         }
 
@@ -1478,7 +1478,7 @@ public class ExData {
                     }
                     filesStr += " - <a href ='../apidocuments/getFile?download=true&block="
                             + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'><b>"
-                            + Lang.getInstance().translate("Download", langObj) + "</b></a><br>";
+                            + Lang.T("Download", langObj) + "</b></a><br>";
 
                     filesCount++;
 
@@ -1682,7 +1682,7 @@ public class ExData {
                 templateOwner.changeCOMPUBonusBalances(dcSet, false, royaltyFee, Transaction.BALANCE_SIDE_DEBIT);
 
                 transaction.addCalculated(block, templateOwner, Transaction.FEE_KEY, royaltyFee,
-                        Lang.getInstance().translate("template royalty for %1").replace("%1", "" + templateKey));
+                        Lang.T("template royalty for %1").replace("%1", "" + templateKey));
             }
 
         }

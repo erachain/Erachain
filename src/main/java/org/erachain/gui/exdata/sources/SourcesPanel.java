@@ -24,7 +24,7 @@ public class SourcesPanel extends JPanel {
     public SourcesPanel() {
 
         super();
-        this.setName(Lang.getInstance().translate("Sources"));
+        this.setName(Lang.T("Sources"));
         jButtonAddSources = new JButton();
         jScrollPaneSources = new JScrollPane();
         jButtonRemoveSources = new JButton();
@@ -101,14 +101,14 @@ public class SourcesPanel extends JPanel {
         gridBagConstraints.weighty = 0.1;
         this.add(jScrollPaneSources, gridBagConstraints);
 
-        jButtonAddSources.setText(Lang.getInstance().translate("Add"));
+        jButtonAddSources.setText(Lang.T("Add"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
         this.add(jButtonAddSources, gridBagConstraints);
 
-        jButtonRemoveSources.setText(Lang.getInstance().translate("Remove"));
+        jButtonRemoveSources.setText(Lang.T("Remove"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;

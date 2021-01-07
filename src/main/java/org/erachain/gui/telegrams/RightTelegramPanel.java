@@ -205,8 +205,8 @@ public class RightTelegramPanel extends javax.swing.JPanel {
         jScrollPaneText.setViewportView(jTextPaneText);
 
 
-        JLabel jLabelTitle = new JLabel(Lang.getInstance().translate("Title")+ ":");
-        jLabelTitle.setToolTipText(Lang.getInstance().translate("Title - it is public text"));
+        JLabel jLabelTitle = new JLabel(Lang.T("Title")+ ":");
+        jLabelTitle.setToolTipText(Lang.T("Title - it is public text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(6, 10, 6, 6);
         gridBagConstraints.gridx = 0;
@@ -217,7 +217,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
         jPanelBottom.add(jLabelTitle, gridBagConstraints);
 
 
-        jTxtTitle.setToolTipText(Lang.getInstance().translate("Title - it is public text"));
+        jTxtTitle.setToolTipText(Lang.T("Title - it is public text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 0);
         gridBagConstraints.gridx = 1;
@@ -228,7 +228,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
         gridBagConstraints.gridwidth = 2;
         jPanelBottom.add(jTxtTitle, gridBagConstraints);
 
-        jScrollPaneText.setToolTipText(Lang.getInstance().translate("Message body - that may be encrypted"));
+        jScrollPaneText.setToolTipText(Lang.T("Message body - that may be encrypted"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -251,7 +251,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
 
 
         checkIsEncrypt.setSelected(true);
-        checkIsEncrypt.setText(Lang.getInstance().translate("Encrypt message"));
+        checkIsEncrypt.setText(Lang.T("Encrypt message"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -305,7 +305,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
             }
         });
 
-        JMenuItem copyText = new JMenuItem(Lang.getInstance().translate("Copy Text"));
+        JMenuItem copyText = new JMenuItem(Lang.T("Copy Text"));
         copyText.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -331,8 +331,8 @@ public class RightTelegramPanel extends javax.swing.JPanel {
                         } catch (UnsupportedEncodingException e1) {
                             message = "error UTF-8";
                             JOptionPane.showMessageDialog(new JFrame(),
-                                    Lang.getInstance().translate(message),
-                                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                                    Lang.T(message),
+                                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                         }
                     } else {
                         message = Base58.encode(dataMess);
@@ -341,22 +341,22 @@ public class RightTelegramPanel extends javax.swing.JPanel {
                 } else {
                     message = "decode error";
                     JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate(message),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                            Lang.T(message),
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                 }
 
                 StringSelection stringSelection = new StringSelection(message);
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Text has been copy to buffer") + "!",
-                        Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                        Lang.T("Text has been copy to buffer") + "!",
+                        Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 
             }
         });
         menu.add(copyText);
 
-        tryIssuePersonText = new JMenuItem(Lang.getInstance().translate("Try Issue Person"));
+        tryIssuePersonText = new JMenuItem(Lang.T("Try Issue Person"));
         tryIssuePersonText.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -384,16 +384,16 @@ public class RightTelegramPanel extends javax.swing.JPanel {
                             } catch (UnsupportedEncodingException e1) {
                                 message = "error UTF-8";
                                 JOptionPane.showMessageDialog(new JFrame(),
-                                        Lang.getInstance().translate(message),
-                                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                                        Lang.T(message),
+                                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                             }
                             try {
                                 dataMess = Base58.decode(message);
                             } catch (NumberFormatException e1) {
                                 message = "error Base58 decode";
                                 JOptionPane.showMessageDialog(new JFrame(),
-                                        Lang.getInstance().translate(message),
-                                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                                        Lang.T(message),
+                                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                                 return;
                             }
                         }
@@ -401,8 +401,8 @@ public class RightTelegramPanel extends javax.swing.JPanel {
                     } else {
                         message = "decode error";
                         JOptionPane.showMessageDialog(new JFrame(),
-                                Lang.getInstance().translate(message),
-                                Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                                Lang.T(message),
+                                Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                         return;
 
                     }
@@ -411,14 +411,14 @@ public class RightTelegramPanel extends javax.swing.JPanel {
                     issuePersonPanel.setByteCode(dataMess);
                     if (issuePersonPanel.getPerson() != null) {
                         MainPanel.getInstance().insertNewTab(
-                                Lang.getInstance().translate("Insert # Вставка") + ": " + issuePersonPanel.getPerson().getName(),
+                                Lang.T("Insert # Вставка") + ": " + issuePersonPanel.getPerson().getName(),
                                 issuePersonPanel);
                     }
 
                 } else {
                     JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate("Wrong transaction type") + ": " + transaction.viewType(),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                            Lang.T("Wrong transaction type") + ": " + transaction.viewType(),
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                 }
 
@@ -429,7 +429,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
 
         menu.addSeparator();
 
-        JMenuItem deleteTelegram = new JMenuItem(Lang.getInstance().translate("Delete Telegram"));
+        JMenuItem deleteTelegram = new JMenuItem(Lang.T("Delete Telegram"));
         deleteTelegram.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -453,7 +453,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
                 String password = PasswordPane.showUnlockWalletDialog(this);
                 if (!Controller.getInstance().unlockWallet(password)) {
                     //WRONG PASSWORD
-                    JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                     //		encrypted =!encrypted;
 

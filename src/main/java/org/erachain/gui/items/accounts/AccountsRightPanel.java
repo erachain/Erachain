@@ -193,14 +193,14 @@ public class AccountsRightPanel extends JPanel {
 
             }
         });
-        viewInfo = new JMenuItem(Lang.getInstance().translate("View Transaction"));
+        viewInfo = new JMenuItem(Lang.T("View Transaction"));
         viewInfo.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 AccountsTransactionsTableModel.Trans transaction = tableModel.getItem(th.row);
-                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction.transaction, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Lang.getInstance().translate("Transaction"));
+                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction.transaction, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Lang.T("Transaction"));
                 dd.setLocationRelativeTo(th);
                 dd.setVisible(true);
             }
@@ -208,7 +208,7 @@ public class AccountsRightPanel extends JPanel {
         });
         mainMenu.add(viewInfo);
 
-        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        JMenuItem vouch_menu = new JMenuItem(Lang.T("Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -221,7 +221,7 @@ public class AccountsRightPanel extends JPanel {
         mainMenu.add(vouch_menu);
 
         // save jsot transactions
-        JMenuItem item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
+        JMenuItem item_Save = new JMenuItem(Lang.T("Save"));
         item_Save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -237,7 +237,7 @@ public class AccountsRightPanel extends JPanel {
         mainMenu.add(item_Save);
 
         mainMenu.addSeparator();
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -314,7 +314,7 @@ public class AccountsRightPanel extends JPanel {
     private void favoriteSet(Transaction transaction) {
         // CHECK IF FAVORITES
         if (wallet.isTransactionFavorite(transaction)) {
-            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
             if (showConfirmDialog == 0) {
                 wallet.removeTransactionFavorite(transaction);
             }

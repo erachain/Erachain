@@ -15,7 +15,7 @@ public class SigningDetailsFrame extends RecDetailsFrame {
 
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Height-seq.") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Height-seq.") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME
@@ -33,7 +33,7 @@ public class SigningDetailsFrame extends RecDetailsFrame {
             message += "NULL</div>";
         } else {
             message += ", time: " + record.viewTimestamp() + "</div>";
-            message += "<div> type: <b>" + Lang.getInstance().translate(record.viewFullTypeName()) + "</b>, size: " + record.viewSize(Transaction.FOR_NETWORK)
+            message += "<div> type: <b>" + Lang.T(record.viewFullTypeName()) + "</b>, size: " + record.viewSize(Transaction.FOR_NETWORK)
                     + ", fee: " + record.viewFeeAndFiat() + "</div>";
 
             //message += "<div>REF: <font size='2'>" + record.viewReference() + "</font></div>";
@@ -48,7 +48,7 @@ public class SigningDetailsFrame extends RecDetailsFrame {
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION

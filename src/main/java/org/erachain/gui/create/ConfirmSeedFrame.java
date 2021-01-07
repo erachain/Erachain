@@ -35,7 +35,7 @@ public class ConfirmSeedFrame extends JFrame {
     private JTextField jTextFieldDataDir;
 
     public ConfirmSeedFrame(CreateWalletFrame parent) {
-        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Create Wallet"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Create Wallet"));
 
         //ICON
         List<Image> icons = new ArrayList<Image>();
@@ -74,7 +74,7 @@ public class ConfirmSeedFrame extends JFrame {
 
         //LABEL
         labelGBC.gridy = 0; //labelGBC.gridy+1;
-        JLabel label1 = new JLabel(Lang.getInstance().translate("Please confirm your wallet seed") + ":");
+        JLabel label1 = new JLabel(Lang.T("Please confirm your wallet seed") + ":");
         this.add(label1, labelGBC);
 
 
@@ -85,7 +85,7 @@ public class ConfirmSeedFrame extends JFrame {
 
         // MENU
         JPopupMenu menu = new JPopupMenu();
-        JMenuItem pasteSeed = new JMenuItem(Lang.getInstance().translate("Paste"));
+        JMenuItem pasteSeed = new JMenuItem(Lang.T("Paste"));
         pasteSeed.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -104,13 +104,13 @@ public class ConfirmSeedFrame extends JFrame {
         //LABEL
         labelGBC.gridy = labelGBC.gridy + 1;
         labelGBC.insets.top = 0;
-        JLabel label2 = new JLabel(Lang.getInstance().translate("By confirming your wallet seed we know you have saved the seed."));
+        JLabel label2 = new JLabel(Lang.T("By confirming your wallet seed we know you have saved the seed."));
         this.add(label2, labelGBC);
 
         //LABEL
         labelGBC.gridy = labelGBC.gridy + 1;
         labelGBC.insets.top = 10;
-        JLabel label3 = new JLabel(Lang.getInstance().translate("Please enter your wallet password") + ":");
+        JLabel label3 = new JLabel(Lang.T("Please enter your wallet password") + ":");
         this.add(label3, labelGBC);
 
         //ADD TEXTBOX
@@ -122,7 +122,7 @@ public class ConfirmSeedFrame extends JFrame {
         //LABEL
         labelGBC.gridy = labelGBC.gridy + 1;
         labelGBC.insets.top = 10;
-        JLabel label4 = new JLabel(Lang.getInstance().translate("Please confirm your password") + ":");
+        JLabel label4 = new JLabel(Lang.T("Please confirm your password") + ":");
         this.add(label4, labelGBC);
 
         //ADD TEXTBOX
@@ -133,7 +133,7 @@ public class ConfirmSeedFrame extends JFrame {
 
         // path label
         labelGBC.gridy = labelGBC.gridy + 1;
-        JLabel labelPath = new JLabel(Lang.getInstance().translate("Set the Wallet directory or leave it as default") + ":");
+        JLabel labelPath = new JLabel(Lang.T("Set the Wallet directory or leave it as default") + ":");
         this.add(labelPath, labelGBC);
         JPanel pan = new JPanel();
         pan.setLayout(new java.awt.GridBagLayout());
@@ -152,7 +152,7 @@ public class ConfirmSeedFrame extends JFrame {
         // this.add(jTextFieldDataDir, labelGBC);
 
         // button path  
-        JButton btnBrowseWallet = new JButton(Lang.getInstance().translate("Browse..."));
+        JButton btnBrowseWallet = new JButton(Lang.T("Browse..."));
         labelGBC.gridy = labelGBC.gridy + 1;
         btnBrowseWallet.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -162,7 +162,7 @@ public class ConfirmSeedFrame extends JFrame {
                 File ff = new File(path);
                 if (!ff.exists()) path = ".." + File.separator;
                 fileopen.setCurrentDirectory(new File(path));
-                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set wallet dir"));
+                int ret = fileopen.showDialog(null, Lang.T("Set wallet dir"));
                 if (ret == JFileChooser.APPROVE_OPTION) {
                     jTextFieldDataDir.setText(fileopen.getSelectedFile().toString());
 
@@ -178,7 +178,7 @@ public class ConfirmSeedFrame extends JFrame {
 
         //BUTTON confirm
         buttonGBC.gridy = labelGBC.gridy + 1;
-        JButton confirmButton = new JButton(Lang.getInstance().translate("Confirm"));
+        JButton confirmButton = new JButton(Lang.T("Confirm"));
         confirmButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onConfirmClick();
@@ -189,7 +189,7 @@ public class ConfirmSeedFrame extends JFrame {
 
         //BUTTON BACK
         buttonGBC.gridx = 1;
-        JButton backButton = new JButton(Lang.getInstance().translate("Back"));
+        JButton backButton = new JButton(Lang.T("Back"));
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onBackClick();
@@ -229,23 +229,23 @@ public class ConfirmSeedFrame extends JFrame {
 
         if (seed == null || !Arrays.equals(seed, confirm) || seed.length != 32) {
             //INVALID SEED
-            String message = Lang.getInstance().translate("Invalid or incorrect seed!");
-            JOptionPane.showMessageDialog(new JFrame(), message, Lang.getInstance().translate("Invalid seed"), JOptionPane.ERROR_MESSAGE);
+            String message = Lang.T("Invalid or incorrect seed!");
+            JOptionPane.showMessageDialog(new JFrame(), message, Lang.T("Invalid seed"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         String password = this.passwordTxt.getText();
         if (password.length() == 0) {
             //PASSWORD CANNOT BE EMPTY
-            String message = Lang.getInstance().translate("Password cannot be empty!");
-            JOptionPane.showMessageDialog(new JFrame(), message, Lang.getInstance().translate("Invalid password"), JOptionPane.ERROR_MESSAGE);
+            String message = Lang.T("Password cannot be empty!");
+            JOptionPane.showMessageDialog(new JFrame(), message, Lang.T("Invalid password"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         if (!password.equals(this.confirmPasswordTxt.getText())) {
             //PASSWORDS DO NOT MATCH
-            String message = Lang.getInstance().translate("Password do not match!");
-            JOptionPane.showMessageDialog(new JFrame(), message, Lang.getInstance().translate("Invalid password"), JOptionPane.ERROR_MESSAGE);
+            String message = Lang.T("Password do not match!");
+            JOptionPane.showMessageDialog(new JFrame(), message, Lang.T("Invalid password"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 

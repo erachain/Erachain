@@ -37,7 +37,7 @@ public class IssueImprintPanel extends IssueItemPanel {
 
         //LABEL NUMBER
         labelGBC.gridy = gridy;
-        JLabel numberLabel = new JLabel(Lang.getInstance().translate("Number") + " (0..9/-.):");
+        JLabel numberLabel = new JLabel(Lang.T("Number") + " (0..9/-.):");
         jPanelAdd.add(numberLabel, labelGBC);
 
         int gridwidth = fieldGBC.gridwidth;
@@ -49,7 +49,7 @@ public class IssueImprintPanel extends IssueItemPanel {
 
         //LABEL DATE
         labelGBC.gridy = gridy;
-        JLabel dateLabel = new JLabel(Lang.getInstance().translate("Date") + " (YY-MM-DD HH:MM):");
+        JLabel dateLabel = new JLabel(Lang.T("Date") + " (YY-MM-DD HH:MM):");
         jPanelAdd.add(dateLabel, labelGBC);
 
         //TXT DEBITOR
@@ -59,8 +59,8 @@ public class IssueImprintPanel extends IssueItemPanel {
 
         //LABEL DEBTOR
         labelGBC.gridy = gridy;
-        JLabel debitorLabel = new JLabel(Lang.getInstance().translate("Debtor")
-                + " (" + Lang.getInstance().translate("IBN-INN") + "):");
+        JLabel debitorLabel = new JLabel(Lang.T("Debtor")
+                + " (" + Lang.T("IBN-INN") + "):");
         jPanelAdd.add(debitorLabel, labelGBC);
 
         //TXT DEBTOR
@@ -70,8 +70,8 @@ public class IssueImprintPanel extends IssueItemPanel {
 
         //LABEL CREDITOR
         labelGBC.gridy = gridy;
-        JLabel creditorLabel = new JLabel(Lang.getInstance().translate("Creditor")
-                + " (" + Lang.getInstance().translate("IBN-INN") + "):");
+        JLabel creditorLabel = new JLabel(Lang.T("Creditor")
+                + " (" + Lang.T("IBN-INN") + "):");
         jPanelAdd.add(creditorLabel, labelGBC);
 
         //TXT CREDITOR
@@ -81,7 +81,7 @@ public class IssueImprintPanel extends IssueItemPanel {
 
         //LABEL TOTAL
         labelGBC.gridy = gridy;
-        JLabel amountLabel = new JLabel(Lang.getInstance().translate("Total") + " (123.03):");
+        JLabel amountLabel = new JLabel(Lang.T("Total") + " (123.03):");
         jPanelAdd.add(amountLabel, labelGBC);
 
         //TXT TOTAL
@@ -119,10 +119,10 @@ public class IssueImprintPanel extends IssueItemPanel {
     protected String makeTransactionView() {
 
         String text = "<HTML><body>";
-        text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;" + Lang.getInstance().translate("Issue Imprint") + "<br><br><br>";
-        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
-                + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
-        text += Lang.getInstance().translate("Hash") + ":&nbsp;" + name_total + "<br>";
+        text += Lang.T("Confirmation Transaction") + ":&nbsp;" + Lang.T("Issue Imprint") + "<br><br><br>";
+        text += Lang.T("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
+                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
+        text += Lang.T("Hash") + ":&nbsp;" + name_total + "<br>";
         text += Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
 
         return text;

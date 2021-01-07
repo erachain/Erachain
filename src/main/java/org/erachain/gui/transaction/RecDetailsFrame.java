@@ -73,19 +73,19 @@ public class RecDetailsFrame extends JPanel //JFrame
 		//LABEL TYPE
 		labelGBC.gridy = componentLevel;
 		
-		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
+		JLabel typeLabel = new JLabel(Lang.T("Type") + ":");
 		this.add(typeLabel, labelGBC);
 		
 		//TYPE
 		detailGBC.gridy = componentLevel;
-		JLabel type = new JLabel(Lang.getInstance().translate("Message Transaction"));
+		JLabel type = new JLabel(Lang.T("Message Transaction"));
 		this.add(type, detailGBC);
 		componentLevel ++;
 		*/
 
         //LABEL Height + Seq
         labelGBC.gridy = componentLevel;
-        JLabel heSeqLabel = new JLabel(Lang.getInstance().translate("Short Info") + ":");
+        JLabel heSeqLabel = new JLabel(Lang.T("Short Info") + ":");
         this.add(heSeqLabel, labelGBC);
 
         //Height + Seq
@@ -104,7 +104,7 @@ public class RecDetailsFrame extends JPanel //JFrame
             //LABEL CREATOR
             componentLevel++;
             labelGBC.gridy = componentLevel;
-            JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
+            JLabel creatorLabel = new JLabel(Lang.T("Creator") + ":");
             this.add(creatorLabel, labelGBC);
 
             //CREATOR
@@ -126,7 +126,7 @@ public class RecDetailsFrame extends JPanel //JFrame
             //LABEL CREATOR PUBLIC KEY
             componentLevel++;
             labelGBC.gridy = componentLevel;
-            JLabel creator_Pub_keyLabel = new JLabel(Lang.getInstance().translate("Creator Publick Key") + ":");
+            JLabel creator_Pub_keyLabel = new JLabel(Lang.T("Creator Publick Key") + ":");
             //	this.add(creator_Pub_keyLabel, labelGBC);
 
             //CREATOR
@@ -143,7 +143,7 @@ public class RecDetailsFrame extends JPanel //JFrame
             componentLevel++;
             //LABEL SIGNATURE
             labelGBC.gridy = componentLevel;
-            JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
+            JLabel signatureLabel = new JLabel(Lang.T("Signature") + ":");
             //			this.add(signatureLabel, labelGBC);
 
             //SIGNATURE
@@ -160,7 +160,7 @@ public class RecDetailsFrame extends JPanel //JFrame
 		//LABEL FEE POWER
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel feePowLabel = new JLabel(Lang.getInstance().translate("Size")+" & "+ Lang.getInstance().translate("Fee") + ":");
+		JLabel feePowLabel = new JLabel(Lang.T("Size")+" & "+ Lang.T("Fee") + ":");
 		this.add(feePowLabel, labelGBC);
 						
 		//FEE POWER
@@ -176,7 +176,7 @@ public class RecDetailsFrame extends JPanel //JFrame
 		//LABEL CONFIRMATIONS
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
+		JLabel confirmationsLabel = new JLabel(Lang.T("Confirmations") + ":");
 		this.add(confirmationsLabel, labelGBC);
 								
 		//CONFIRMATIONS
@@ -194,7 +194,7 @@ public class RecDetailsFrame extends JPanel //JFrame
 
         JPopupMenu shorn_Info_Meny = new JPopupMenu();
 
-        JMenuItem copy_Transaction_Sign = new JMenuItem(Lang.getInstance().translate("Copy Signature"));
+        JMenuItem copy_Transaction_Sign = new JMenuItem(Lang.T("Copy Signature"));
         copy_Transaction_Sign.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -211,7 +211,7 @@ public class RecDetailsFrame extends JPanel //JFrame
         });
         shorn_Info_Meny.add(copy_Transaction_Sign);
 
-        JMenuItem copy_Heigt_Block = new JMenuItem(Lang.getInstance().translate("Copy Block"));
+        JMenuItem copy_Heigt_Block = new JMenuItem(Lang.T("Copy Block"));
         copy_Heigt_Block.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 

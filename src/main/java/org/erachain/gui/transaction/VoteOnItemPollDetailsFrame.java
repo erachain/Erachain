@@ -18,7 +18,7 @@ public class VoteOnItemPollDetailsFrame extends RecDetailsFrame {
 
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Poll") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Poll") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME
@@ -30,7 +30,7 @@ public class VoteOnItemPollDetailsFrame extends RecDetailsFrame {
 
         //LABEL OPTION
         ++labelGBC.gridy;
-        JLabel optionLabel = new JLabel(Lang.getInstance().translate("Option") + ":");
+        JLabel optionLabel = new JLabel(Lang.T("Option") + ":");
         this.add(optionLabel, labelGBC);
 
         //OPTION

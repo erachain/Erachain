@@ -145,7 +145,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
                 case COLUMN_TYPE:
 
                     //return Lang.transactionTypes[transaction.getType()];
-                    return Lang.getInstance().translate(transaction.viewFullTypeName());
+                    return Lang.T(transaction.viewFullTypeName());
 
                 case COLUMN_AMOUNT:
 

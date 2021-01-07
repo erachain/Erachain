@@ -110,8 +110,8 @@ public class Gui extends JFrame {
 
     public void onWalletCreated() {
 
-        SysTray.getInstance().sendMessage(Lang.getInstance().translate("Wallet Initialized"),
-                Lang.getInstance().translate("Your wallet is initialized"), MessageType.INFO);
+        SysTray.getInstance().sendMessage(Lang.T("Wallet Initialized"),
+                Lang.T("Your wallet is initialized"), MessageType.INFO);
         if (Settings.getInstance().isGuiEnabled())
             mainframe = MainFrame.getInstance();
     }

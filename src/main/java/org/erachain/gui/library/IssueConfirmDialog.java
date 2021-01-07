@@ -72,9 +72,9 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jTitle_Label.setText(title_Text);
         jTextPane1.setText(text);
         if (transaction != null) {
-            String feeText = "" + Lang.getInstance().translate("Size") + ":&nbsp;"
+            String feeText = "" + Lang.T("Size") + ":&nbsp;"
                     + transaction.viewSize(Transaction.FOR_NETWORK) + " Bytes, ";
-            feeText += Lang.getInstance().translate("Fee") + ":&nbsp;<b>" + transaction.viewFeeAndFiat()
+            feeText += Lang.T("Fee") + ":&nbsp;<b>" + transaction.viewFeeAndFiat()
                     + "</b>";
             status_Text += feeText;
         }
@@ -86,7 +86,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
 
         if (!receive) {
             jButton0.setVisible(false);
-            jButton1.setText(Lang.getInstance().translate("Save"));
+            jButton1.setText(Lang.T("Save"));
         } else {
             // проверим а вообще такая транзакция может быть бесплатна?
             jButton0.setVisible(BlockChain.FREE_FEE_TO_SEQNO > 0
@@ -196,7 +196,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        jStatus_Label.setText(Lang.getInstance().translate("Status"));
+        jStatus_Label.setText(Lang.T("Status"));
         jStatus_Label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -207,7 +207,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(insest, insest, insest, insest);
         getContentPane().add(jStatus_Label, gridBagConstraints);
 
-        jButton0.setText(Lang.getInstance().translate("Try without Fee"));
+        jButton0.setText(Lang.T("Try without Fee"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -216,7 +216,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jPanel1.add(jButton0, gridBagConstraints);
 
 
-        jButton1.setText(Lang.getInstance().translate("Confirm"));
+        jButton1.setText(Lang.T("Confirm"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -224,7 +224,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
         jPanel1.add(jButton1, gridBagConstraints);
 
-        jButton2.setText(Lang.getInstance().translate("Cancel"));
+        jButton2.setText(Lang.T("Cancel"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;

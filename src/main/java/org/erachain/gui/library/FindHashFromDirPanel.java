@@ -1,27 +1,19 @@
 package org.erachain.gui.library;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
-import javax.swing.table.DefaultTableModel;
-
 import org.erachain.lang.Lang;
 import org.erachain.utils.FileHash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 
 public class FindHashFromDirPanel extends javax.swing.JPanel {
 
@@ -54,7 +46,7 @@ public class FindHashFromDirPanel extends javax.swing.JPanel {
                 FileChooser fileopen = new FileChooser();
                 fileopen.setFileSelectionMode(FileChooser.DIRECTORIES_ONLY);
                 //  fileopen.setCurrentDirectory(new File(textDataFolder.getText()));
-                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set data dir"));
+                int ret = fileopen.showDialog(null, Lang.T("Set data dir"));
                 if (ret == FileChooser.APPROVE_OPTION) {
                     jTextFieldDir.setText(fileopen.getSelectedFile().toString());
 
@@ -68,7 +60,7 @@ public class FindHashFromDirPanel extends javax.swing.JPanel {
                 dialog = new JDialog();
                 //  dialog.setModal(true);
                 dialog.setAlwaysOnTop(true);
-                dialog.add(new JLabel(Lang.getInstance().translate("Wait") + "..."));
+                dialog.add(new JLabel(Lang.T("Wait") + "..."));
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
@@ -282,7 +274,7 @@ public class FindHashFromDirPanel extends javax.swing.JPanel {
 
             if (hashes1.equals(jTextFieldHash.getText())) {
                 model.addRow(new Object[]{hashes1,
-                        Lang.getInstance().translate("from file ") + ff.getPath()});
+                        Lang.T("from file ") + ff.getPath()});
                 model.fireTableDataChanged();
             }
 

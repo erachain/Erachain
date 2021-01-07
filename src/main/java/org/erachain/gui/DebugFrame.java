@@ -17,7 +17,7 @@ public class DebugFrame extends JDialog {
 
     public DebugFrame() {
         //CREATE FRAME
-        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Debug"));
+        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Debug"));
         setModal(true);
 
         //ICON

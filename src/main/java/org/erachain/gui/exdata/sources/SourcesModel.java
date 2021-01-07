@@ -22,10 +22,10 @@ public class SourcesModel extends DefaultTableModel {
 
 
     public SourcesModel(int rows) {
-        super(new String[]{Lang.getInstance().translate("Number"),
-                        Lang.getInstance().translate("Share"),
-                        Lang.getInstance().translate("Source"),
-                        Lang.getInstance().translate("Description")
+        super(new String[]{Lang.T("Number"),
+                        Lang.T("Share"),
+                        Lang.T("Source"),
+                        Lang.T("Description")
                 },
                 rows);
         addEmpty();

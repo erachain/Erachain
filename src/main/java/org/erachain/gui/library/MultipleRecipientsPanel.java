@@ -29,14 +29,14 @@ public class MultipleRecipientsPanel extends JPanel {
     public MultipleRecipientsPanel() {
 
         super();
-        this.setName(Lang.getInstance().translate("Recipients"));
+        this.setName(Lang.T("Recipients"));
         jButtonAddRecipient = new JButton();
         jScrollPaneRecipients = new JScrollPane();
         jButtonRemoveRecipient = new JButton();
         withoutCheckBox = new JCheckBox();
-        withoutCheckBox.setText(Lang.getInstance().translate("Without Recipients"));
+        withoutCheckBox.setText(Lang.T("Without Recipients"));
         withoutCheckBox.setSelected(false);
-        signCanRecipientsCheckBox = new JCheckBox(Lang.getInstance().translate("To sign can only Recipients"));
+        signCanRecipientsCheckBox = new JCheckBox(Lang.T("To sign can only Recipients"));
         signCanRecipientsCheckBox.setSelected(true);
         signCanRecipientsCheckBox.setVisible(true);
 
@@ -108,14 +108,14 @@ public class MultipleRecipientsPanel extends JPanel {
         gridBagConstraints.weighty = 0.1;
         this.add(jScrollPaneRecipients, gridBagConstraints);
 
-        jButtonAddRecipient.setText(Lang.getInstance().translate("Add"));
+        jButtonAddRecipient.setText(Lang.T("Add"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
         this.add(jButtonAddRecipient, gridBagConstraints);
 
-        jButtonRemoveRecipient.setText(Lang.getInstance().translate("Remove"));
+        jButtonRemoveRecipient.setText(Lang.T("Remove"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -133,8 +133,8 @@ public class MultipleRecipientsPanel extends JPanel {
     class Table_Model extends DefaultTableModel {
 
         public Table_Model(int rows) {
-            super(new Object[]{Lang.getInstance().translate("Address"),
-                            Lang.getInstance().translate("Description")
+            super(new Object[]{Lang.T("Address"),
+                            Lang.T("Description")
                     },
                     rows);
             this.addEmpty();
@@ -181,10 +181,10 @@ public class MultipleRecipientsPanel extends JPanel {
 
                     Fun.Tuple2<Account, String> result = Account.tryMakeAccount(address);
                     if (result.a == null) {
-                        super.setValueAt(Lang.getInstance().translate(result.b), row, column + 1);
+                        super.setValueAt(Lang.T(result.b), row, column + 1);
                     } else {
                         super.setValueAt(
-                                Lang.getInstance().translate(Account.getDetailsForEncrypt(address, AssetCls.FEE_KEY, true, true)),
+                                Lang.T(Account.getDetailsForEncrypt(address, AssetCls.FEE_KEY, true, true)),
                                 row, column + 1);
                     }
 

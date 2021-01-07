@@ -199,7 +199,7 @@ public class AccountsPanel extends JPanel // implements ItemListener
 
     private String getTotals() {
         Fun.Tuple4<BigDecimal, BigDecimal, BigDecimal, BigDecimal> total = tableModel.getTotalBalance();
-        return Lang.getInstance().translate("Confirmed Balance") + ": "
+        return Lang.T("Confirmed Balance") + ": "
                 + total.a.toPlainString() + " / "
                 + total.b.toPlainString() + " / "
                 + total.c.toPlainString() + " / "

@@ -62,7 +62,7 @@ public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
             case COLUMN_TIMESTAMP:
                 return transaction.viewTimestamp();
             case COLUMN_TYPE:
-                return Lang.getInstance().translate(transaction.viewFullTypeName());
+                return Lang.T(transaction.viewFullTypeName());
             case COLUMN_CREATOR:
                 if (transaction.getCreator() != null) {
                     return transaction.getCreator().getPersonAsString();

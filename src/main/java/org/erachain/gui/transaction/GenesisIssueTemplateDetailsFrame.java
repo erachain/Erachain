@@ -17,7 +17,7 @@ public class GenesisIssueTemplateDetailsFrame extends RecGenesis_DetailsFrame {
 
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Name") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME
@@ -29,7 +29,7 @@ public class GenesisIssueTemplateDetailsFrame extends RecGenesis_DetailsFrame {
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION

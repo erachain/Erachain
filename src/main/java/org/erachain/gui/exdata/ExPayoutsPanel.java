@@ -52,9 +52,9 @@ public class ExPayoutsPanel extends IconPanel {
         }));
         jComboBoxFilterBalancePosition.setRenderer(new RenderComboBoxViewBalance());
         jComboBoxFilterSideBalance.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
-                Lang.getInstance().translate("Total Debit"), // Transaction.BALANCE_SIDE_DEBIT = 1
-                Lang.getInstance().translate("Left"), // BALANCE_SIDE_LEFT = 2
-                Lang.getInstance().translate("Total Credit") // BALANCE_SIDE_CREDIT = 3
+                Lang.T("Total Debit"), // Transaction.BALANCE_SIDE_DEBIT = 1
+                Lang.T("Left"), // BALANCE_SIDE_LEFT = 2
+                Lang.T("Total Credit") // BALANCE_SIDE_CREDIT = 3
         }));
         jComboBoxFilterSideBalance.setSelectedIndex(1);
 
@@ -81,10 +81,10 @@ public class ExPayoutsPanel extends IconPanel {
 
         jLabelMethodPaymentDecscription.setHorizontalAlignment(SwingConstants.LEFT);
         jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
-                Lang.getInstance().translate("All"),
-                Lang.getInstance().translate("Only for Persons"),
-                Lang.getInstance().translate("Only for Men"),
-                Lang.getInstance().translate("Only for Women")}));
+                Lang.T("All"),
+                Lang.T("Only for Persons"),
+                Lang.T("Only for Men"),
+                Lang.T("Only for Women")}));
 
         jCheckBoxPayoutsUse.setSelected(false);
         jCheckBoxPayoutsUse.addActionListener(new ActionListener() {
@@ -148,22 +148,22 @@ public class ExPayoutsPanel extends IconPanel {
         switch (jComboBoxMethodPaymentType.getSelectedIndex()) {
             case 0:
                 jLabelMethodPaymentDecscription.setText("<html>" +
-                        Lang.getInstance().translate("PAY_METHOD_0_D"));
-                jLabelAmount.setText(Lang.getInstance().translate("Total"));
+                        Lang.T("PAY_METHOD_0_D"));
+                jLabelAmount.setText(Lang.T("Total"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
                 return;
             case 1:
                 jLabelMethodPaymentDecscription.setText("<html>" +
-                        Lang.getInstance().translate("PAY_METHOD_1_D"));
-                jLabelAmount.setText(Lang.getInstance().translate("Percent"));
+                        Lang.T("PAY_METHOD_1_D"));
+                jLabelAmount.setText(Lang.T("Percent"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
                 return;
             case 2:
                 jLabelMethodPaymentDecscription.setText("<html>" +
-                        Lang.getInstance().translate("PAY_METHOD_2_D"));
-                jLabelAmount.setText(Lang.getInstance().translate("Amount"));
+                        Lang.T("PAY_METHOD_2_D"));
+                jLabelAmount.setText(Lang.T("Amount"));
                 jTextFieldPaymentMin.setEnabled(false);
                 jTextFieldPaymentMax.setEnabled(false);
                 return;
@@ -274,7 +274,7 @@ public class ExPayoutsPanel extends IconPanel {
 
         int gridy = 0;
 
-        jCheckBoxPayoutsUse.setText(Lang.getInstance().translate("Make Payouts"));
+        jCheckBoxPayoutsUse.setText(Lang.T("Make Payouts"));
         add(jCheckBoxPayoutsUse, fieldGBC);
 
         jPanelMain.setLayout(layout);
@@ -282,17 +282,17 @@ public class ExPayoutsPanel extends IconPanel {
 
         jLabelActionAssetTitle.setFont(headFont); // NOI18N
         jLabelActionAssetTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelActionAssetTitle.setText(Lang.getInstance().translate("Action for Asset"));
+        jLabelActionAssetTitle.setText(Lang.T("Action for Asset"));
         jPanelMain.add(jLabelActionAssetTitle, headBGC);
 
-        jLabelAssetToPay.setText(Lang.getInstance().translate("Asset"));
+        jLabelAssetToPay.setText(Lang.T("Asset"));
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelAssetToPay, labelGBC);
 
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxPayoutAsset, fieldGBC);
 
-        jLabelAction.setText(Lang.getInstance().translate("Action"));
+        jLabelAction.setText(Lang.T("Action"));
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelAction, labelGBC);
 
@@ -303,17 +303,17 @@ public class ExPayoutsPanel extends IconPanel {
 
         jLabelTitlemetod.setFont(headFont); // NOI18N
         jLabelTitlemetod.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelTitlemetod.setText(Lang.getInstance().translate("Method of calculation"));
+        jLabelTitlemetod.setText(Lang.T("Method of calculation"));
         headBGC.gridy = ++gridy;
         jPanelMain.add(jLabelTitlemetod, headBGC);
 
-        jLabelMethod.setText(Lang.getInstance().translate("Method"));
+        jLabelMethod.setText(Lang.T("Method"));
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelMethod, labelGBC);
         jComboBoxMethodPaymentType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
-                Lang.getInstance().translate("PAY_METHOD_0"),
-                Lang.getInstance().translate("PAY_METHOD_1"),
-                Lang.getInstance().translate("PAY_METHOD_2"),
+                Lang.T("PAY_METHOD_0"),
+                Lang.T("PAY_METHOD_1"),
+                Lang.T("PAY_METHOD_2"),
         }));
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxMethodPaymentType, fieldGBC);
@@ -331,7 +331,7 @@ public class ExPayoutsPanel extends IconPanel {
         jPanelLayout.rowHeights = new int[]{0};
         jPanelMinMaxAmounts.setLayout(jPanelLayout);
 
-        jLabelPaymentMin.setText(Lang.getInstance().translate("Minimal Volume"));
+        jLabelPaymentMin.setText(Lang.T("Minimal Volume"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = labelGBC.insets;
@@ -345,7 +345,7 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelMinMaxAmounts.add(jTextFieldPaymentMin, gridBagConstraints);
 
-        jLabelPaymentMax.setText(Lang.getInstance().translate("Maximum Volume"));
+        jLabelPaymentMax.setText(Lang.T("Maximum Volume"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
@@ -370,11 +370,11 @@ public class ExPayoutsPanel extends IconPanel {
         //jCheckBoxUseFilterAsset.setSelected(true);
         jLabelFilterAsset.setFont(headFont); // NOI18N
         jLabelFilterAsset.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelFilterAsset.setText(Lang.getInstance().translate("Filter By Asset"));
+        jLabelFilterAsset.setText(Lang.T("Filter By Asset"));
         headBGC.gridy = ++gridy;
         jPanelMain.add(jLabelFilterAsset, headBGC);
 
-        jLabel2.setText(Lang.getInstance().translate("Asset"));
+        jLabel2.setText(Lang.T("Asset"));
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel2, labelGBC);
         fieldGBC.gridy = gridy;
@@ -382,7 +382,7 @@ public class ExPayoutsPanel extends IconPanel {
 
         jPanelFilterBalance.setLayout(jPanelLayout);
 
-        jLabelBalancePosition.setText(Lang.getInstance().translate("Balance Position"));
+        jLabelBalancePosition.setText(Lang.T("Balance Position"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = labelGBC.insets;
@@ -396,7 +396,7 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelFilterBalance.add(jComboBoxFilterBalancePosition, gridBagConstraints);
 
-        jLabel19.setText(Lang.getInstance().translate("Balance Side"));
+        jLabel19.setText(Lang.T("Balance Side"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
@@ -411,13 +411,13 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelFilterBalance.add(jComboBoxFilterSideBalance, gridBagConstraints);
 
-        jLabel8.setText(Lang.getInstance().translate("More then"));
+        jLabel8.setText(Lang.T("More then"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = labelGBC.insets;
         jPanelFilterBalance.add(jLabel8, gridBagConstraints);
-        jTextFieldBQ.setToolTipText(Lang.getInstance().translate(""));
+        jTextFieldBQ.setToolTipText(Lang.T(""));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -428,14 +428,14 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelFilterBalance.add(jTextFieldBQ, gridBagConstraints);
 
-        jLabel9.setText(Lang.getInstance().translate("Less then"));
+        jLabel9.setText(Lang.T("Less then"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = labelGBC.insets;
         jPanelFilterBalance.add(jLabel9, gridBagConstraints);
-        jTextFieldLQ.setToolTipText(Lang.getInstance().translate(""));
+        jTextFieldLQ.setToolTipText(Lang.T(""));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 1;
@@ -454,11 +454,11 @@ public class ExPayoutsPanel extends IconPanel {
 
         jLabel20.setFont(headFont); // NOI18N
         jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel20.setText(Lang.getInstance().translate("Filter by Actions"));
+        jLabel20.setText(Lang.T("Filter by Actions"));
         headBGC.gridy = ++gridy;
         jPanelMain.add(jLabel20, headBGC);
 
-        jLabel3.setText(Lang.getInstance().translate("Action"));
+        jLabel3.setText(Lang.T("Action"));
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel3, labelGBC);
 
@@ -467,7 +467,7 @@ public class ExPayoutsPanel extends IconPanel {
 
         jPanelStartEndActions.setLayout(jPanelLayout);
 
-        jLabelDataStart.setText(Lang.getInstance().translate("Data start"));
+        jLabelDataStart.setText(Lang.T("Data start"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = labelGBC.insets;
@@ -481,10 +481,10 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelStartEndActions.add(jTextFieldDateStart, gridBagConstraints);
-        //jTextFieldDateStart.setToolTipText(Lang.getInstance().translate(
+        //jTextFieldDateStart.setToolTipText(Lang.T(
         //        "Empty or %1 or as timestamp in seconds").replace("%1","yyyy-MM-dd hh:mm:00"));
 
-        jLabelDateEnd.setText(Lang.getInstance().translate("Date end"));
+        jLabelDateEnd.setText(Lang.T("Date end"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
@@ -498,7 +498,7 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = fieldGBC.insets;
-        //jTextFieldDateEnd.setToolTipText(Lang.getInstance().translate(
+        //jTextFieldDateEnd.setToolTipText(Lang.T(
         //        "Empty or %1 or as timestamp in seconds").replace("%1","yyyy-MM-dd hh:mm:00"));
         jPanelStartEndActions.add(jTextFieldDateEnd, gridBagConstraints);
 
@@ -510,11 +510,11 @@ public class ExPayoutsPanel extends IconPanel {
 
         jLabel4.setFont(headFont); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText(Lang.getInstance().translate("Filter by Persons"));
+        jLabel4.setText(Lang.T("Filter by Persons"));
         headBGC.gridy = ++gridy;
         jPanelMain.add(jLabel4, headBGC);
 
-        jLabel1.setText(Lang.getInstance().translate("Filter"));
+        jLabel1.setText(Lang.T("Filter"));
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel1, labelGBC);
 
@@ -524,7 +524,7 @@ public class ExPayoutsPanel extends IconPanel {
         separateBGC.gridy = ++gridy;
         jPanelMain.add(jSeparator5, separateBGC);
 
-        jCheckBoxSelfPay.setText(Lang.getInstance().translate("Payout to Self too"));
+        jCheckBoxSelfPay.setText(Lang.T("Payout to Self too"));
         jCheckBoxSelfPay.setSelected(true);
         fieldGBC.gridy = ++gridy;
         jPanelMain.add(jCheckBoxSelfPay, fieldGBC);
@@ -533,7 +533,7 @@ public class ExPayoutsPanel extends IconPanel {
 
         jPanel3.setLayout(jPanelLayout);
 
-        jButtonCalcCompu.setText(Lang.getInstance().translate("Calculate fee"));
+        jButtonCalcCompu.setText(Lang.T("Calculate fee"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
@@ -541,7 +541,7 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.ipady = 10;
         jPanel3.add(jButtonCalcCompu, gridBagConstraints);
 
-        jButtonViewResult.setText(Lang.getInstance().translate("Preview Results"));
+        jButtonViewResult.setText(Lang.T("Preview Results"));
         gridBagConstraints.gridx = 1;
         jPanel3.add(jButtonViewResult, gridBagConstraints);
 

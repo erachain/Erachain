@@ -11,8 +11,8 @@ import java.util.List;
 public class TableModelIssueHashes extends DefaultTableModel {
 
     public TableModelIssueHashes(int rows) {
-        super(new Object[]{Lang.getInstance().translate("Hash 32 bytes"),
-                Lang.getInstance().translate("Description")}, rows);
+        super(new Object[]{Lang.T("Hash 32 bytes"),
+                Lang.T("Description")}, rows);
 
         //	this.addRow(new Object[]{"", ""});
     }

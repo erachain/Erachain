@@ -66,7 +66,7 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
 
         setLayout(new java.awt.GridBagLayout());
 
-       // jLabelStart.setText(Lang.getInstance().translate("Interval") + ":");
+       // jLabelStart.setText(Lang.T("Interval") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(6, 5, 8, 0);
         add(jLabelStart, gridBagConstraints);
@@ -80,7 +80,7 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
         gridBagConstraints.insets = new java.awt.Insets(6, 0, 8, 0);
         add(jTextFieldStart, gridBagConstraints);
 
-        jLabelEnd.setText(Lang.getInstance().translate("") + ":");
+        jLabelEnd.setText(Lang.T("") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(6, 7, 8, 0);
         add(jLabelEnd, gridBagConstraints);
@@ -97,14 +97,14 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
         add(jTextFieldEnd, gridBagConstraints);
 
         jButtonSetInterval = new javax.swing.JButton();
-        jButtonSetInterval.setText(Lang.getInstance().translate("View"));
+        jButtonSetInterval.setText(Lang.T("View"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(6, 5, 5, 0);
         add(jButtonSetInterval, gridBagConstraints);
 
        
-        jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
+        jLabelTotal.setText(Lang.T("Total") + ":" + size);
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -142,15 +142,15 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
                 && needUpdate) {
 
             needUpdate = false;
-            jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
+            jLabelTotal.setText(Lang.T("Total") + ":" + size);
 
         } else if (message.getType() == RESET_EVENT) {
             size = 0;
-            jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
+            jLabelTotal.setText(Lang.T("Total") + ":" + size);
 
         } else if (message.getType() == LIST_EVENT) {
             size = map.size();
-            jLabelTotal.setText(Lang.getInstance().translate("Total") + ":" + size);
+            jLabelTotal.setText(Lang.T("Total") + ":" + size);
 
         } else if (message.getType() == ADD_EVENT) {
             ++size;

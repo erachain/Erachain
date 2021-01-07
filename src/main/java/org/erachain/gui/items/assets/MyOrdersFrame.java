@@ -25,7 +25,7 @@ public class MyOrdersFrame extends JFrame {
 
     public MyOrdersFrame() {
 
-        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("My Orders"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("My Orders"));
 
         //ICON
         List<Image> icons = new ArrayList<Image>();
@@ -87,7 +87,7 @@ public class MyOrdersFrame extends JFrame {
 
         // MENU
         JPopupMenu ordersMenu = new JPopupMenu();
-        JMenuItem trades = new JMenuItem(Lang.getInstance().translate("Trades"));
+        JMenuItem trades = new JMenuItem(Lang.T("Trades"));
         trades.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -99,7 +99,7 @@ public class MyOrdersFrame extends JFrame {
             }
         });
         ordersMenu.add(trades);
-        JMenuItem cancel = new JMenuItem(Lang.getInstance().translate("Cancel"));
+        JMenuItem cancel = new JMenuItem(Lang.T("Cancel"));
         cancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

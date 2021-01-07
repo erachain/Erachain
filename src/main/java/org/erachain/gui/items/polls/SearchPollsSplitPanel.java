@@ -27,7 +27,7 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
         jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setMaxWidth(200);
         jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setPreferredWidth(100);
 
-        JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("To Vote"));
+        JMenuItem setVote_Menu = new JMenuItem(Lang.T("To Vote"));
         setVote_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 //			new UnionSetStatusDialog(th, (UnionCls) itemMenu);
@@ -41,7 +41,7 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
 
         menuTable.addSeparator();
 
-        JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set status"));
+        JMenuItem setStatus_Menu = new JMenuItem(Lang.T("Set status"));
         setStatus_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //			new UnionSetStatusDialog(th, (UnionCls) itemMenu);

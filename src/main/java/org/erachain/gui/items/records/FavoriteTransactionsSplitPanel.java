@@ -43,7 +43,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
         super(NAME, TITLE);
         iconName = "favorite.png";
 
-        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
 
         // not show buttons
         jToolBarRightPanel.setVisible(false);
@@ -84,7 +84,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem vouchItem = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        JMenuItem vouchItem = new JMenuItem(Lang.T("Vouch"));
 
         vouchItem.addActionListener(e -> {
 
@@ -99,7 +99,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
 
         menu.addSeparator();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -180,7 +180,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
 
         // CHECK IF FAVORITES
         if (Controller.getInstance().isTransactionFavorite(transaction)) {
-            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
 
             if (dd == 0) Controller.getInstance().removeTransactionFavorite(transaction);
         } else {

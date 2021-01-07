@@ -28,7 +28,7 @@ public class ExLinkSource extends ExLinkMemo {
     public JSONObject makeJSONforHTML(JSONObject langObj) {
         JSONObject json = super.makeJSONforHTML(langObj);
         Transaction source = Controller.getInstance().getTransaction(ref);
-        json.put("name", Lang.getInstance().translate(source.viewFullTypeName(), langObj)
+        json.put("name", Lang.T(source.viewFullTypeName(), langObj)
                 + ": " + source.getTitle() + (source.getCreator() == null ? "" : " - " + source.getCreator().getPersonAsString()));
         json.put("weight", getValue());
 

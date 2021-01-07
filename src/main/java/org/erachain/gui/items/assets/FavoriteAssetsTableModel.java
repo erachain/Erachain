@@ -49,7 +49,7 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
             case COLUMN_ADDRESS:
                 return asset.getOwner().getPersonAsString();
             case COLUMN_ASSET_TYPE:
-                return Lang.getInstance().translate(asset.viewAssetType());
+                return Lang.T(asset.viewAssetType());
             case COLUMN_AMOUNT:
                 return asset.getQuantity();
             case COLUMN_FAVORITE:

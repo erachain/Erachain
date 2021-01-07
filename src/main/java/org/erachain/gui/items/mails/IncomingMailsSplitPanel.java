@@ -41,7 +41,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
     public IncomingMailsSplitPanel() {
         super(NAME, TITLE);
-        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);
@@ -66,7 +66,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         // MENU
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem copySender = new JMenuItem(Lang.getInstance().translate("Copy Sender Account"));
+        JMenuItem copySender = new JMenuItem(Lang.T("Copy Sender Account"));
         copySender.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -81,7 +81,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         });
         menu.add(copySender);
 
-        JMenuItem copyRecipient = new JMenuItem(Lang.getInstance().translate("Copy Recipient Account"));
+        JMenuItem copyRecipient = new JMenuItem(Lang.T("Copy Recipient Account"));
         copyRecipient.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -97,7 +97,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
         menu.add(copyRecipient);
 
-        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("To Answer"));
+        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.T("To Answer"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -107,13 +107,13 @@ public class IncomingMailsSplitPanel extends SplitPanel {
                 Account account = new Account(rSend.getCreator().getAddress());
                 Account recipient = rSend.getRecipient();
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(recipient, account, null));
+                MainPanel.getInstance().insertNewTab(Lang.T("Send Mail"), new MailSendPanel(recipient, account, null));
 
             }
         });
         menu.add(Send_Mail_item_Menu);
 
-        JMenuItem signMail_item_Menu = new JMenuItem(Lang.getInstance().translate("Sign / Vouch"));
+        JMenuItem signMail_item_Menu = new JMenuItem(Lang.T("Sign / Vouch"));
         signMail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -130,7 +130,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
         menu.addSeparator();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override

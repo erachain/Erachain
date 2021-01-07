@@ -22,10 +22,10 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel {
         super(new TableModelUnionsItemsTableModel(), NAME, TITLE);
         th = this;
 
-        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        JMenuItem vouch_Item = new JMenuItem(Lang.T("Vouch"));
 
         // ADD MENU ITEMS
-        JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
+        JMenuItem confirm_Menu = new JMenuItem(Lang.T("Confirm"));
         confirm_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new UnionConfirmDialog(th, (UnionCls) itemTableSelected);
@@ -33,7 +33,7 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel {
         });
         this.menuTable.add(confirm_Menu);
 
-        JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set status"));
+        JMenuItem setStatus_Menu = new JMenuItem(Lang.T("Set status"));
         setStatus_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new UnionSetStatusDialog(th, (UnionCls) itemTableSelected);

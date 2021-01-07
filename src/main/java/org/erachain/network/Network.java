@@ -155,7 +155,7 @@ public class Network extends Observable {
             return;
         }
 
-        //logger.info(Lang.getInstance().translate("Connection successfull : ") + peer);
+        //logger.info(Lang.T("Connection successfull : ") + peer);
 
         boolean asNew = true;
         for (Peer peerKnown : this.knownPeers) {

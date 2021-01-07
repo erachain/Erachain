@@ -33,7 +33,7 @@ public class PersonOwnerPanel extends JPanel {
     @SuppressWarnings("rawtypes")
     public PersonOwnerPanel(PersonCls person) {
 
-        this.setName(Lang.getInstance().translate("Created person"));
+        this.setName(Lang.T("Created person"));
 
         person_Accounts_Model = new TableModelOwnerPersons(person.getKey());
         jTable_My_Persons = new MTable(person_Accounts_Model);
@@ -96,7 +96,7 @@ public class PersonOwnerPanel extends JPanel {
         });
 
 
-        JMenuItem copyKey = new JMenuItem(Lang.getInstance().translate("Copy Key"));
+        JMenuItem copyKey = new JMenuItem(Lang.T("Copy Key"));
         copyKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -107,7 +107,7 @@ public class PersonOwnerPanel extends JPanel {
         });
         menu.add(copyKey);
 
-        JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Name"));
+        JMenuItem menu_copyName = new JMenuItem(Lang.T("Copy Name"));
         menu_copyName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -120,20 +120,20 @@ public class PersonOwnerPanel extends JPanel {
         menu.add(menu_copyName);
 
 
-        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
+        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.T("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
+                MainPanel.getInstance().insertNewTab(Lang.T("Send asset"), new AccountAssetSendPanel(null,
                         null, null, person_Accounts_Model.getItem(row), null, false));
 
             }
         });
         menu.add(Send_Coins_item_Menu);
 
-        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.T("Send Mail"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, person_Accounts_Model.getItem(row)));
+                MainPanel.getInstance().insertNewTab(Lang.T("Send Mail"), new MailSendPanel(null, null, person_Accounts_Model.getItem(row)));
 
             }
         });

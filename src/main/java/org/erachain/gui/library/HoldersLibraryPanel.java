@@ -1,20 +1,16 @@
 package org.erachain.gui.library;
 
-import java.awt.GridBagConstraints;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
-import javax.swing.table.TableRowSorter;
-
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.models.BalancesTableModel;
 import org.erachain.gui.models.RendererBigDecimals;
 import org.erachain.lang.Lang;
+
+import javax.swing.*;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HoldersLibraryPanel extends JPanel {
 
@@ -30,19 +26,19 @@ public class HoldersLibraryPanel extends JPanel {
         
         switch (balanceIndex) {
             case 1:
-                this.setName(Lang.getInstance().translate("Owners"));
+                this.setName(Lang.T("Owners"));
                 break;
             case 2:
-                this.setName(Lang.getInstance().translate("Debtors"));
+                this.setName(Lang.T("Debtors"));
                 break;
             case 3:
-                this.setName(Lang.getInstance().translate("Holders"));
+                this.setName(Lang.T("Holders"));
                 break;
             case 4:
-                this.setName(Lang.getInstance().translate("Spenders"));
+                this.setName(Lang.T("Spenders"));
                 break;
             default:
-                this.setName(Lang.getInstance().translate("Balances"));
+                this.setName(Lang.T("Balances"));
                 break;
         }
 

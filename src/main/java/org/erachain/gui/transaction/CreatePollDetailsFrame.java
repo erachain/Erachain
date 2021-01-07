@@ -20,7 +20,7 @@ public class CreatePollDetailsFrame extends RecDetailsFrame {
 
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Name") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME
@@ -32,7 +32,7 @@ public class CreatePollDetailsFrame extends RecDetailsFrame {
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
@@ -46,7 +46,7 @@ public class CreatePollDetailsFrame extends RecDetailsFrame {
 
         //LABEL OPTIONS
         ++labelGBC.gridy;
-        JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
+        JLabel optionsLabel = new JLabel(Lang.T("Options") + ":");
         this.add(optionsLabel, labelGBC);
 
         //OPTIONS

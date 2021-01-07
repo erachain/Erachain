@@ -30,8 +30,8 @@ public class CancelOrderFrame extends JDialog {
     private JButton cancelOrderButton;
 
     public CancelOrderFrame(Order order) {
-        //super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Cancel Order"));
-        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Cancel Order"));
+        //super(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Cancel Order"));
+        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Cancel Order"));
         this.order = order;
         //	setAlwaysOnTop(true);
         setModal(true);
@@ -80,7 +80,7 @@ public class CancelOrderFrame extends JDialog {
 
         //LABEL TIMESTAMP
         labelGBC.gridy = 1;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Timestamp") + ":");
         this.add(nameLabel, labelGBC);
 
         //TXT TIMESTAMP
@@ -93,7 +93,7 @@ public class CancelOrderFrame extends JDialog {
 
         //LABEL HAVE
         labelGBC.gridy = 2;
-        JLabel haveLabel = new JLabel(Lang.getInstance().translate("Have") + ":");
+        JLabel haveLabel = new JLabel(Lang.T("Have") + ":");
         this.add(haveLabel, labelGBC);
 
         //TXT HAVE
@@ -104,7 +104,7 @@ public class CancelOrderFrame extends JDialog {
 
         //LABEL WANT
         labelGBC.gridy = 3;
-        JLabel wantLabel = new JLabel(Lang.getInstance().translate("Want") + ":");
+        JLabel wantLabel = new JLabel(Lang.T("Want") + ":");
         this.add(wantLabel, labelGBC);
 
         //TXT WANT
@@ -115,7 +115,7 @@ public class CancelOrderFrame extends JDialog {
 
         //LABEL AMOUNT
         labelGBC.gridy = 4;
-        JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
+        JLabel amountLabel = new JLabel(Lang.T("Amount") + ":");
         this.add(amountLabel, labelGBC);
 
         //TXT WANT
@@ -126,7 +126,7 @@ public class CancelOrderFrame extends JDialog {
 
         //LABEL PRICE
         labelGBC.gridy = 5;
-        JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price") + ":");
+        JLabel priceLabel = new JLabel(Lang.T("Price") + ":");
         this.add(priceLabel, labelGBC);
 
         //TXT PRICE
@@ -137,7 +137,7 @@ public class CancelOrderFrame extends JDialog {
 
         //LABEL FULFILLED
         labelGBC.gridy = 6;
-        JLabel fulfilledLabel = new JLabel(Lang.getInstance().translate("Fulfilled") + ":");
+        JLabel fulfilledLabel = new JLabel(Lang.T("Fulfilled") + ":");
         this.add(fulfilledLabel, labelGBC);
 
         //TXT FULFILLED
@@ -148,7 +148,7 @@ public class CancelOrderFrame extends JDialog {
 
         //LABEL FEE
         labelGBC.gridy = 7;
-        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        JLabel feeLabel = new JLabel(Lang.T("Fee Power") + ":");
         feeLabel.setVisible(Gui.SHOW_FEE_POWER);
         this.add(feeLabel, labelGBC);
 
@@ -161,7 +161,7 @@ public class CancelOrderFrame extends JDialog {
 
         //BUTTON CANCEL SALE
         buttonGBC.gridy = 8;
-        cancelOrderButton = new JButton(Lang.getInstance().translate("Cancel Order"));
+        cancelOrderButton = new JButton(Lang.T("Cancel Order"));
         //    cancelOrderButton.setPreferredSize(new Dimension(120, 25));
         cancelOrderButton.addActionListener(new ActionListener() {
             @Override
@@ -186,7 +186,7 @@ public class CancelOrderFrame extends JDialog {
         //CHECK IF NETWORK OK
         if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
             //NETWORK NOT OK
-            JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, Lang.T("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
             //ENABLE
             this.cancelOrderButton.setEnabled(true);
@@ -200,7 +200,7 @@ public class CancelOrderFrame extends JDialog {
             String password = PasswordPane.showUnlockWalletDialog(this);
             if (!Controller.getInstance().unlockWallet(password)) {
                 //WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
                 this.cancelOrderButton.setEnabled(true);
@@ -213,7 +213,7 @@ public class CancelOrderFrame extends JDialog {
         try {
             feePow = Integer.parseInt(txtFeePow.getText());
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, Lang.T("Invalid fee!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
             this.cancelOrderButton.setEnabled(true);
 
@@ -224,8 +224,8 @@ public class CancelOrderFrame extends JDialog {
         PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(order.getCreator().getAddress());
         if (creator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 

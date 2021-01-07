@@ -101,7 +101,7 @@ public class AssetInfo extends JTextPane {
                     + UIManager.getFont("Label.font").getFamily() + "; font-size: " + UIManager.getFont("Label.font").getSize() + "pt;'>";
 
             text += "<table><tr valign='top' align = 'left'><td>";
-            text += "<DIV  style='float:left'><b>" + Lang.getInstance().translate("Key") + ": </b>" + asset.getKey() + "</DIV>";
+            text += "<DIV  style='float:left'><b>" + Lang.T("Key") + ": </b>" + asset.getKey() + "</DIV>";
 
             // ADD IMAGE to THML
             if (cachedImage != null) {
@@ -110,20 +110,20 @@ public class AssetInfo extends JTextPane {
 
             Transaction record = Transaction.findByDBRef(DCSet.getInstance(), asset.getReference());
             if (record != null)
-                text += "<td><div  style='float:left'><div><b>" + Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq() + "</div>";
-            text += "<div><b>" + Lang.getInstance().translate("Name") + ": </b>" + asset.viewName() + "</div>";
+                text += "<td><div  style='float:left'><div><b>" + Lang.T("Block-SeqNo") + ": </b>" + record.viewHeightSeq() + "</div>";
+            text += "<div><b>" + Lang.T("Name") + ": </b>" + asset.viewName() + "</div>";
             text += "<div   style='word-wrap: break-word; '>";
 
             if (asset.getKey() > 0 && asset.getKey() < 1000) {
-                text += Library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "</div>";
+                text += Library.to_HTML(Lang.T(asset.viewDescription())) + "</div>";
             } else {
                 text += Library.to_HTML(asset.viewDescription()) + "</div>";
             }
-            text += "<div>" + Lang.getInstance().translate("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";
-            text += "<div>" + Lang.getInstance().translate("TYPE") + ": <b>" + Lang.getInstance().translate(asset.viewAssetTypeFull()) + "</b>,";
-            text += " " + Lang.getInstance().translate("accuracy") + ": <b>" + asset.getScale() + "</b>,";
-            text += " " + Lang.getInstance().translate("quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
-            text += " " + Lang.getInstance().translate("released") + ": <b>" + NumberAsString.formatAsString(asset.getReleased()) + "</b>";
+            text += "<div>" + Lang.T("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";
+            text += "<div>" + Lang.T("TYPE") + ": <b>" + Lang.T(asset.viewAssetTypeFull()) + "</b>,";
+            text += " " + Lang.T("accuracy") + ": <b>" + asset.getScale() + "</b>,";
+            text += " " + Lang.T("quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
+            text += " " + Lang.T("released") + ": <b>" + NumberAsString.formatAsString(asset.getReleased()) + "</b>";
 
             text += "</div><<BR></td></tr></table>";
             text += "<div>";

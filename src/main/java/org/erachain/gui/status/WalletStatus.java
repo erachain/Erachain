@@ -3,9 +3,9 @@ package org.erachain.gui.status;
 import org.erachain.controller.Controller;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.lang.Lang;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.utils.ObserverMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -49,10 +49,10 @@ public class WalletStatus extends JLabel implements Observer {
 
             if (status == Wallet.STATUS_UNLOCKED) {
                 this.setIcon(this.unlockedIcon);
-                this.setText(Lang.getInstance().translate("Wallet is unlocked"));
+                this.setText(Lang.T("Wallet is unlocked"));
             } else {
                 this.setIcon(this.lockedIcon);
-                this.setText(Lang.getInstance().translate("Wallet is locked"));
+                this.setText(Lang.T("Wallet is locked"));
             }
         }
     }

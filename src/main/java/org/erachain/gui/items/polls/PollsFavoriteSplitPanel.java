@@ -23,7 +23,7 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel {
         super(new FavoritePollsTableModel(), NAME, TITLE);
         iconName = "favorite.png";
 
-        JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("To Vote"));
+        JMenuItem setVote_Menu = new JMenuItem(Lang.T("To Vote"));
         setVote_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -36,7 +36,7 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel {
 
         menuTable.addSeparator();
 
-        JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set status"));
+        JMenuItem setStatus_Menu = new JMenuItem(Lang.T("Set status"));
         setStatus_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //			new UnionSetStatusDialog(th, (UnionCls) itemMenu);

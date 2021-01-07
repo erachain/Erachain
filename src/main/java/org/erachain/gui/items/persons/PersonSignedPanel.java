@@ -36,7 +36,7 @@ public class PersonSignedPanel extends JPanel {
 
     public PersonSignedPanel(PersonCls person) {
 
-        this.setName(Lang.getInstance().translate("Vouched for"));
+        this.setName(Lang.T("Vouched for"));
         model = new PersonVouchFromTableModel(person);
         JTable jTable_Vouches = new MTable(model);
         TableColumnModel column_mod = jTable_Vouches.getColumnModel();
@@ -122,7 +122,7 @@ public class PersonSignedPanel extends JPanel {
         });
 
 		/*
-		JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
+		JMenuItem menu_copyName = new JMenuItem(Lang.T("Copy Creator Name"));
 		menu_copyName.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -142,7 +142,7 @@ public class PersonSignedPanel extends JPanel {
 		*/
 
 
-        JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Account"));
+        JMenuItem copy_Creator_Address = new JMenuItem(Lang.T("Copy Account"));
         copy_Creator_Address.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -152,7 +152,7 @@ public class PersonSignedPanel extends JPanel {
         });
         menu.add(copy_Creator_Address);
 
-        JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+        JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.T("Copy Public Key"));
         menu_copy_Creator_PublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -164,7 +164,7 @@ public class PersonSignedPanel extends JPanel {
         menu.add(menu_copy_Creator_PublicKey);
 
 
-        JMenuItem menu_copy_Block_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy no. transaction"));
+        JMenuItem menu_copy_Block_PublicKey = new JMenuItem(Lang.T("Copy no. transaction"));
         menu_copy_Block_PublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -175,11 +175,11 @@ public class PersonSignedPanel extends JPanel {
         menu.add(menu_copy_Block_PublicKey);
 
 
-        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset to Person"));
+        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.T("Send Asset to Person"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account accountTo = (Account) model.getPublicKey(row);
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Asset to Person"), new AccountAssetSendPanel(null,
+                MainPanel.getInstance().insertNewTab(Lang.T("Send Asset to Person"), new AccountAssetSendPanel(null,
                         null, accountTo, person, null, false));
 
                 ;
@@ -188,12 +188,12 @@ public class PersonSignedPanel extends JPanel {
         });
         menu.add(Send_Coins_item_Menu);
 
-        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail to Person"));
+        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.T("Send Mail to Person"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account account = (Account) model.getPublicKey(row);
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail to Person"), new MailSendPanel(null, account, null));
+                MainPanel.getInstance().insertNewTab(Lang.T("Send Mail to Person"), new MailSendPanel(null, account, null));
 
             }
         });

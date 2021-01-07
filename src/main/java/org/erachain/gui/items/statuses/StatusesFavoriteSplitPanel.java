@@ -24,7 +24,7 @@ public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
         super(new FavoriteStatusesTableModel(), NAME, TITLE);
         iconName = "favorite.png";
 
-        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        JMenuItem vouch_menu = new JMenuItem(Lang.T("Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();

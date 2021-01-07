@@ -27,7 +27,7 @@ public class AboutFrame extends JDialog implements Observer {
 
     public AboutFrame() {
         //CREATE FRAME
-        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Debug"));
+        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Debug"));
         //setModalityType(DEFAULT_MODALITY_TYPE);
         setModalityType(ModalityType.MODELESS);
 
@@ -73,9 +73,9 @@ public class AboutFrame extends JDialog implements Observer {
         gbl_aboutPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         aboutPanel.setLayout(gbl_aboutPanel);
 
-        JLabel lblAuthorsLabel = new JLabel(Lang.getInstance().translate("Author") + ": "
+        JLabel lblAuthorsLabel = new JLabel(Lang.T("Author") + ": "
                 //+ "Ермолаев Дмитрий Сергеевич");
-                + Lang.getInstance().translate("ERACHAIN WORLD PTE LTD.")); //"Dmitrii Ermolaev"));
+                + Lang.T("ERACHAIN WORLD PTE LTD.")); //"Dmitrii Ermolaev"));
         lblAuthorsLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
         lblAuthorsLabel.setForeground(Color.RED);
         lblAuthorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -89,7 +89,7 @@ public class AboutFrame extends JDialog implements Observer {
 
         int gridy = 2;
         if (BlockChain.CLONE_MODE) {
-            JLabel appNameLabel = new JLabel(Lang.getInstance().translate(Settings.CLONE_OR_SIDE.toLowerCase() + "chain") + ": "
+            JLabel appNameLabel = new JLabel(Lang.T(Settings.CLONE_OR_SIDE.toLowerCase() + "chain") + ": "
                     + Controller.getInstance().APP_NAME);
             appNameLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
             appNameLabel.setForeground(Color.RED);
@@ -104,7 +104,7 @@ public class AboutFrame extends JDialog implements Observer {
         }
 
         JLabel lblversionLabel = new JLabel(
-                Lang.getInstance().translate("Version") + ": " + Controller.getVersion(true));
+                Lang.T("Version") + ": " + Controller.getVersion(true));
         lblversionLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
         lblversionLabel.setForeground(Color.RED);
         lblversionLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -117,7 +117,7 @@ public class AboutFrame extends JDialog implements Observer {
         aboutPanel.add(lblversionLabel, gbc_lbllversionLabel);
 
         JLabel label = new JLabel(
-                Controller.version + " " + Lang.getInstance().translate("build") + " "
+                Controller.version + " " + Lang.T("build") + " "
                         + Controller.buildTime);
 
         label.setHorizontalAlignment(SwingConstants.CENTER);

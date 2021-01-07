@@ -276,10 +276,10 @@ public class Library {
         UIManager.put("Panel.font", font);
 
         // text to button optionPane
-        UIManager.put("OptionPane.yesButtonText", Lang.getInstance().translate("Confirm"));
-        UIManager.put("OptionPane.noButtonText", Lang.getInstance().translate("Cancel"));
-        UIManager.put("OptionPane.cancelButtonText", Lang.getInstance().translate("Cancel"));
-        UIManager.put("OptionPane.okButtonText", Lang.getInstance().translate("OK"));
+        UIManager.put("OptionPane.yesButtonText", Lang.T("Confirm"));
+        UIManager.put("OptionPane.noButtonText", Lang.T("Cancel"));
+        UIManager.put("OptionPane.cancelButtonText", Lang.T("Cancel"));
+        UIManager.put("OptionPane.okButtonText", Lang.T("OK"));
         UIManager.put("OptionPane.titleFont", font);
 
         UIManager.put("SplitPane.oneTouchButtonSize", size_font * 2);
@@ -425,7 +425,7 @@ public class Library {
     public static void saveJSONStringToEraFile(Container parent, String JSONString){
         // String raw = Base58.encode(transaction.toBytes(false, null));
         FileChooser chooser = new FileChooser();
-        chooser.setDialogTitle(Lang.getInstance().translate("Save File"));
+        chooser.setDialogTitle(Lang.T("Save File"));
         // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
         chooser.setMultiSelectionEnabled(false);
@@ -443,9 +443,9 @@ public class Library {
             // if file
             if (ff.exists() && ff.isFile()) {
                 int aaa = JOptionPane.showConfirmDialog(chooser,
-                        Lang.getInstance().translate("File") + Lang.getInstance().translate("Exists") + "! "
-                                + Lang.getInstance().translate("Overwrite") + "?",
-                        Lang.getInstance().translate("Message"), JOptionPane.OK_CANCEL_OPTION,
+                        Lang.T("File") + Lang.T("Exists") + "! "
+                                + Lang.T("Overwrite") + "?",
+                        Lang.T("Message"), JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.INFORMATION_MESSAGE);
                 System.out.print("\n gggg " + aaa);
                 if (aaa != 0) {
@@ -594,20 +594,20 @@ public class Library {
     public static void addStandartMenuItems(JPopupMenu menu, JTextField component){
         JMenuItem item;
         item = new JMenuItem(new DefaultEditorKit.CopyAction());
-        item.setText(Lang.getInstance().translate("Copy"));
+        item.setText(Lang.T("Copy"));
         item.setEnabled(true);
  //       item.setEnabled(component.getSelectionStart() != component
  //               .getSelectionEnd());
         menu.add(item);
         item = new JMenuItem(new DefaultEditorKit.CutAction());
-        item.setText(Lang.getInstance().translate("Cut"));
+        item.setText(Lang.T("Cut"));
         item.setEnabled(true);
    //     item.setEnabled(component.isEditable()
    //             && component.getSelectionStart() != component
    //             .getSelectionEnd());
         menu.add(item);
         item = new JMenuItem(new DefaultEditorKit.PasteAction());
-        item.setText(Lang.getInstance().translate("Paste"));
+        item.setText(Lang.T("Paste"));
         item.setEnabled(component.isEditable());
         menu.add(item);
 

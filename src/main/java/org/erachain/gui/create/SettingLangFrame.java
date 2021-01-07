@@ -98,7 +98,7 @@ public class SettingLangFrame extends JDialog {
         buttonGBC.gridy = 4;
         buttonGBC.gridx = 1;
 
-        labelSelect = new JLabel(Lang.getInstance().translate("Language") + ":");
+        labelSelect = new JLabel(Lang.T("Language") + ":");
         this.add(labelSelect, labelGBC);
 
         // read internet

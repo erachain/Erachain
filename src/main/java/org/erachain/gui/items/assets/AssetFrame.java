@@ -15,7 +15,7 @@ public class AssetFrame extends JFrame {
     private AssetCls asset;
 
     public AssetFrame(AssetCls asset) {
-        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Check Details"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Check Details"));
 
         this.asset = asset;
 
@@ -37,12 +37,12 @@ public class AssetFrame extends JFrame {
         JTabbedPane tabPane = new JTabbedPane();
 
         //DETAILS
-        tabPane.add(Lang.getInstance().translate("Details"), new AssetDetailsPanel(this.asset));
+        tabPane.add(Lang.T("Details"), new AssetDetailsPanel(this.asset));
 
         //BALANCES
         BalancesTableModel balancesTableModel = new BalancesTableModel(asset, -1);
         final JTable balancesTable = new JTable(balancesTableModel);
-        tabPane.add(Lang.getInstance().translate("Holders"), new JScrollPane(balancesTable));
+        tabPane.add(Lang.T("Holders"), new JScrollPane(balancesTable));
 
         //ADD TAB PANE
         this.add(tabPane);
