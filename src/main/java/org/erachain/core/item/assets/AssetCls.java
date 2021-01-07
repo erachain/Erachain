@@ -793,7 +793,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "Outside Share";
             case AS_OUTSIDE_BILL:
-                return "Promissory Note";
+                return "Promissory Note"; // non turnover Promissory Note / non-negotiable promissory note
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of exchange";
             case AS_MY_DEBT:
@@ -860,7 +860,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "Outside Share Rights";
             case AS_OUTSIDE_BILL:
-                return "Promissory Note";
+                return "Promissory Note without turnover on me";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of Exchange";
             case AS_MY_DEBT:
@@ -993,7 +993,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "External shares which have to be transferred to an external depository. The depositary can be notified by presenting the claim and then confirm the shares transfer";
             case AS_OUTSIDE_BILL:
-                return "A digital promissory note can be called for redemption by external money. You can take it into your hands";
+                return "AS_OUTSIDE_BILL_D";
             case AS_OUTSIDE_BILL_EX:
                 return "A digital bill of exchange can be called for redemption by external money. You can take it into your hands";
             case AS_MY_DEBT:

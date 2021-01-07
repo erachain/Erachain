@@ -62,6 +62,7 @@
   "Amount:": "Amount:",
   "Amount": "Amount",
   "Anyone who has access to your seed will have access to your e-wallet.": "Anyone who can access your Seed will have access to your e-wallet.",
+  "AS_OUTSIDE_BILL_D": "Digital simple non-negotiable bill of exchange. The transfer of this bill to a new holder (excluding the transfer from the issuer of the bill) contains the clause \"without turnover on me\"",
   "AS_OUTSIDE_BILL_1": "Transfer ownership of the promissory note",
   "AS_OUTSIDE_BILL_2": "Demand for repayment of promissory notes",
   "AS_OUTSIDE_BILL_2B": "Cancel the demand for repayment of promissory notes",
