@@ -17,8 +17,8 @@ public class TradesFrame extends JDialog {
 
     public TradesFrame(Order order, boolean isSell) {
 
-        //super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Trades"));
-        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Trades"));
+        //super(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Trades"));
+        setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Trades"));
         setModal(true);
         //ICON
         List<Image> icons = new ArrayList<Image>();

@@ -75,17 +75,17 @@ public class RenderComboBoxViewBalance extends DefaultListCellRenderer {
     private String getDescriptionValue(int value) {
         switch (value) {
             case TransactionAmount.ACTION_SEND:
-                return Lang.getInstance().translate("OWN (1)");
+                return Lang.T("OWN (1)");
             case TransactionAmount.ACTION_DEBT:
-                return Lang.getInstance().translate("DEBT (2)");
+                return Lang.T("DEBT (2)");
             case TransactionAmount.ACTION_HOLD:
-                return Lang.getInstance().translate("HOLD (3)");
+                return Lang.T("HOLD (3)");
             case TransactionAmount.ACTION_REPAY_DEBT:
-                return Lang.getInstance().translate("Repay debt");
+                return Lang.T("Repay debt");
             case TransactionAmount.ACTION_SPEND:
-                return Lang.getInstance().translate("SPEND (4)");
+                return Lang.T("SPEND (4)");
             case TransactionAmount.ACTION_PLEDGE:
-                return Lang.getInstance().translate("PLEDGE (5)");
+                return Lang.T("PLEDGE (5)");
           case   TransactionAmount.ACTION_RESERCED_6:
               return "Reserved_6";
       }

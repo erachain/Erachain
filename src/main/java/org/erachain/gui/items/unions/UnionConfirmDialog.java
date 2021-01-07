@@ -56,7 +56,7 @@ public class UnionConfirmDialog extends JDialog {
 
         this.setModal(true);
         setSize(400, 300);
-        this.setTitle(Lang.getInstance().translate("Union confirm"));
+        this.setTitle(Lang.T("Union confirm"));
         this.setResizable(true);
         setPreferredSize(new Dimension(500, 600));
 //PACK
@@ -76,7 +76,7 @@ public class UnionConfirmDialog extends JDialog {
         }
 
         if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
-            pubKeyDetails.setText(Lang.getInstance().translate("Status must be OK to show public key details."));
+            pubKeyDetails.setText(Lang.T("Status must be OK to show public key details."));
             return;
         }
 
@@ -108,9 +108,9 @@ public class UnionConfirmDialog extends JDialog {
             }
         } catch (Exception e) {
             if (parse == 0) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid to Date"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid to Date"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             }
         }
 
@@ -132,8 +132,8 @@ public class UnionConfirmDialog extends JDialog {
         PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creatorAccount.getAddress());
         if (creator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -145,11 +145,11 @@ public class UnionConfirmDialog extends JDialog {
 
         //CHECK VALIDATE MESSAGE
         if (result.getB() == Transaction.VALIDATE_OK) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Union has been authenticated!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Union has been authenticated!"), Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
         } else {
 
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T(OnDealClick.resultMess(result.getB())), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
         }
 
         //ENABLE
@@ -205,7 +205,7 @@ public class UnionConfirmDialog extends JDialog {
         info.setFocusable(false);
         jLabel_UnionInfo.setViewportView(info);
         // jLabel_UnionInfo.set
-        //   jLabel_UnionInfo.setText(Lang.getInstance().translate("Public Keys of") + " " + union.viewName() +":");
+        //   jLabel_UnionInfo.setText(Lang.T("Public Keys of") + " " + union.viewName() +":");
         //     jLabel_UnionInfo.setText(new UnionInfo().Get_HTML_Union_Info_001(union) );
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -219,7 +219,7 @@ public class UnionConfirmDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 9, 0, 9);
         getContentPane().add(jLabel_UnionInfo, gridBagConstraints);
 
-        jLabel_YourAddress.setText(Lang.getInstance().translate("Your account") + ":");
+        jLabel_YourAddress.setText(Lang.T("Your account") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -241,7 +241,7 @@ public class UnionConfirmDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(21, 0, 0, 13);
         getContentPane().add(jComboBox_YourAddress, gridBagConstraints);
 
-        jLabel_Address1.setText(Lang.getInstance().translate("Account") + ":");
+        jLabel_Address1.setText(Lang.T("Account") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -270,7 +270,7 @@ public class UnionConfirmDialog extends JDialog {
             }
         });
 
-        jLabel_Adress1_Check.setText(Lang.getInstance().translate("Insert firsr Account"));
+        jLabel_Adress1_Check.setText(Lang.T("Insert firsr Account"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 6;
@@ -284,7 +284,7 @@ public class UnionConfirmDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         getContentPane().add(jTextField_Address1, gridBagConstraints);
 
-        jLabel_Address2.setText(Lang.getInstance().translate("Account") + ":");
+        jLabel_Address2.setText(Lang.T("Account") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
@@ -309,7 +309,7 @@ public class UnionConfirmDialog extends JDialog {
             }
         });
 
-        jLabel_Address2_Check.setText(Lang.getInstance().translate("insert second Addres"));
+        jLabel_Address2_Check.setText(Lang.T("insert second Addres"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 8;
@@ -324,7 +324,7 @@ public class UnionConfirmDialog extends JDialog {
         getContentPane().add(jTextField_Address2, gridBagConstraints);
 
 
-        jLabel_Address3.setText(Lang.getInstance().translate("Account") + ":");
+        jLabel_Address3.setText(Lang.T("Account") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 10;
@@ -349,7 +349,7 @@ public class UnionConfirmDialog extends JDialog {
             }
         });
 
-        jLabel_Address3_Check.setText(Lang.getInstance().translate("insert next Account"));
+        jLabel_Address3_Check.setText(Lang.T("insert next Account"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 10;
@@ -365,7 +365,7 @@ public class UnionConfirmDialog extends JDialog {
         getContentPane().add(jTextField_Address3, gridBagConstraints);
 
 
-        jLabel_ToDo.setText(Lang.getInstance().translate("To date") + ":");
+        jLabel_ToDo.setText(Lang.T("To date") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 14;
@@ -394,7 +394,7 @@ public class UnionConfirmDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         getContentPane().add(jFormattedTextField_ToDo, gridBagConstraints);
 
-        jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
+        jLabel_Fee.setText(Lang.T("Fee Power") + ":");
         jLabel_Fee.setVisible(Gui.SHOW_FEE_POWER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -420,7 +420,7 @@ public class UnionConfirmDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 48, 0);
         getContentPane().add(jFormattedTextField_Fee, gridBagConstraints);
 
-        jButton_Cansel.setText(Lang.getInstance().translate("Cancel"));
+        jButton_Cansel.setText(Lang.T("Cancel"));
         jButton_Cansel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dispose();
@@ -434,7 +434,7 @@ public class UnionConfirmDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(1, 0, 29, 0);
         getContentPane().add(jButton_Cansel, gridBagConstraints);
 
-        jButton_Confirm.setText(Lang.getInstance().translate("Confirm"));
+        jButton_Confirm.setText(Lang.T("Confirm"));
         jButton_Confirm.setToolTipText("");
         jButton_Confirm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -472,7 +472,7 @@ public class UnionConfirmDialog extends JDialog {
         //    gridBagConstraints.insets = new java.awt.Insets(12, 9, 11, 9);
         gridBagConstraints.insets = new java.awt.Insets(12, 23, 0, 9);
         getContentPane().add(jLabel_Title, gridBagConstraints);
-        jLabel_Title.setText(Lang.getInstance().translate("Information about the union"));
+        jLabel_Title.setText(Lang.T("Information about the union"));
         getContentPane().add(jLabel_Title, gridBagConstraints);
 
         pack();

@@ -41,7 +41,7 @@ public class MyOrderTab extends SplitPanel {
     @SuppressWarnings("rawtypes")
     public MyOrderTab() {
         super(NAME, TITLE);
-        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);
@@ -152,7 +152,7 @@ public class MyOrderTab extends SplitPanel {
 
         });
 
-        JMenuItem orderDetails = new JMenuItem(Lang.getInstance().translate("Details"));
+        JMenuItem orderDetails = new JMenuItem(Lang.T("Details"));
         orderDetails.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -179,7 +179,7 @@ public class MyOrderTab extends SplitPanel {
         orderMenu.add(orderDetails);
 
         // MENU on MY ORDERS
-        JMenuItem orderTrades = new JMenuItem(Lang.getInstance().translate("Trades"));
+        JMenuItem orderTrades = new JMenuItem(Lang.T("Trades"));
         orderTrades.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -191,7 +191,7 @@ public class MyOrderTab extends SplitPanel {
         });
         orderMenu.add(orderTrades);
 
-        JMenuItem cancelOrder = new JMenuItem(Lang.getInstance().translate("Cancel"));
+        JMenuItem cancelOrder = new JMenuItem(Lang.T("Cancel"));
         cancelOrder.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -202,7 +202,7 @@ public class MyOrderTab extends SplitPanel {
         });
         orderMenu.add(cancelOrder);
 
-        JMenuItem exchange = new JMenuItem(Lang.getInstance().translate("Exchange"));
+        JMenuItem exchange = new JMenuItem(Lang.T("Exchange"));
         exchange.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

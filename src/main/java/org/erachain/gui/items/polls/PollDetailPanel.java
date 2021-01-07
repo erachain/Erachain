@@ -2,17 +2,14 @@ package org.erachain.gui.items.polls;
 
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.polls.PollCls;
-import org.erachain.core.transaction.CreatePollTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
-import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.models.ItemPollOptionsTableModel;
 import org.erachain.gui.models.PollOptionsTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.BigDecimalStringComparator;
-import org.erachain.utils.DateTimeFormat;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,7 +17,6 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 @SuppressWarnings("serial")
 public class PollDetailPanel extends JPanel {
@@ -71,7 +67,7 @@ public class PollDetailPanel extends JPanel {
 
         // LABEL NAME
         labelGBC.gridy = 2;
-        JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
+        JLabel creatorLabel = new JLabel(Lang.T("Creator") + ":");
         GridBagConstraints gbc_creatorLabel = new GridBagConstraints();
         gbc_creatorLabel.insets = new Insets(0, 0, 5, 5);
         gbc_creatorLabel.gridx = 1;
@@ -141,7 +137,7 @@ public class PollDetailPanel extends JPanel {
             ImageLabel.setIcon(new ImageIcon(Im));
         }
 
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Name") + ":");
         GridBagConstraints gbc_nameLabel = new GridBagConstraints();
         gbc_nameLabel.insets = new Insets(0, 0, 5, 5);
         gbc_nameLabel.gridx = 1;
@@ -157,7 +153,7 @@ public class PollDetailPanel extends JPanel {
         gbc_name.gridy = 1;
         this.add(name, gbc_name);
 
-        JLabel dateLabel = new JLabel(Lang.getInstance().translate("Creation") + ":");
+        JLabel dateLabel = new JLabel(Lang.T("Creation") + ":");
         GridBagConstraints gbc_dateLabel = new GridBagConstraints();
         gbc_dateLabel.insets = new Insets(0, 0, 5, 5);
         gbc_dateLabel.gridx = 1;
@@ -173,7 +169,7 @@ public class PollDetailPanel extends JPanel {
         gbc_date.gridy = 2;
         this.add(date, gbc_date);
 
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         GridBagConstraints gbc_descriptionLabel = new GridBagConstraints();
         gbc_descriptionLabel.insets = new Insets(0, 0, 5, 5);
         gbc_descriptionLabel.gridx = 1;
@@ -195,7 +191,7 @@ public class PollDetailPanel extends JPanel {
         txtAreaDescription.setBorder(name.getBorder());
 
 
-        JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
+        JLabel optionsLabel = new JLabel(Lang.T("Options") + ":");
         GridBagConstraints gbc_optionsLabel = new GridBagConstraints();
         gbc_optionsLabel.insets = new Insets(0, 0, 5, 5);
         gbc_optionsLabel.gridx = 1;
@@ -206,7 +202,7 @@ public class PollDetailPanel extends JPanel {
 
         // ADD EXCHANGE BUTTON
         detailGBC.gridy = 6;
-        JButton allButton = new JButton(Lang.getInstance().translate("Vote"));
+        JButton allButton = new JButton(Lang.T("Vote"));
         allButton.setPreferredSize(new Dimension(100, 25));
         allButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

@@ -85,20 +85,20 @@ public class PersonSetStatusDialog extends JDialog {
         this.person = person;
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         initComponents();
-        this.setTitle(Lang.getInstance().translate("Set status"));
-        jLabel_Address.setText(Lang.getInstance().translate("Your account") + ":");
-        jLabel_Data_From.setText(Lang.getInstance().translate("From Date") + ":");
-        jLabel_Data_To.setText(" " + Lang.getInstance().translate("To Date") + ":");
-        jLabel_Param1.setText("%1 (" + Lang.getInstance().translate("integer") + ") :");
-        jLabel_Param2.setText("%2 (" + Lang.getInstance().translate("integer") + ") :");
-        jLabel_Addition1.setText("%3 (" + Lang.getInstance().translate("string") + "):");
-        jLabel_Addition2.setText("%4 (" + Lang.getInstance().translate("string") + "):");
-        jLabel_Parent_record.setText(Lang.getInstance().translate("Parent record") + ":");
-        jLabel_Status.setText(Lang.getInstance().translate("Status") + ":");
-        jLabel_Title.setText(Lang.getInstance().translate("Information about the person") + ":");
-        jLabel__Description.setText("%D (" + Lang.getInstance().translate("text") + ") :");
+        this.setTitle(Lang.T("Set status"));
+        jLabel_Address.setText(Lang.T("Your account") + ":");
+        jLabel_Data_From.setText(Lang.T("From Date") + ":");
+        jLabel_Data_To.setText(" " + Lang.T("To Date") + ":");
+        jLabel_Param1.setText("%1 (" + Lang.T("integer") + ") :");
+        jLabel_Param2.setText("%2 (" + Lang.T("integer") + ") :");
+        jLabel_Addition1.setText("%3 (" + Lang.T("string") + "):");
+        jLabel_Addition2.setText("%4 (" + Lang.T("string") + "):");
+        jLabel_Parent_record.setText(Lang.T("Parent record") + ":");
+        jLabel_Status.setText(Lang.T("Status") + ":");
+        jLabel_Title.setText(Lang.T("Information about the person") + ":");
+        jLabel__Description.setText("%D (" + Lang.T("text") + ") :");
 
-        jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
+        jLabel_Fee.setText(Lang.T("Fee Power") + ":");
         jLabel_Fee.setVisible(Gui.SHOW_FEE_POWER);
         jComboBox_Status.setModel(new ComboBoxStatusesModel());
         jComboBox_YourAddress.setModel(new AccountsComboBoxModel());
@@ -133,7 +133,7 @@ public class PersonSetStatusDialog extends JDialog {
 		/*
 		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
 		{
-			infoPanel.show_mess(Lang.getInstance().translate("Status must be OK to show public key details."));
+			infoPanel.show_mess(Lang.T("Status must be OK to show public key details."));
 	        jLabel_RecordInfo.setViewportView(infoPanel);
 			return null;
 		}
@@ -141,14 +141,14 @@ public class PersonSetStatusDialog extends JDialog {
 
         Transaction record = null;
         if (jParentRecTxt.getText().length() == 0) {
-            infoPanel.show_mess(Lang.getInstance().translate(""));
+            infoPanel.show_mess(Lang.T(""));
             jLabel_RecordInfo.setViewportView(infoPanel);
             return record;
         }
 
         record = DCSet.getInstance().getTransactionFinalMap().getRecord(jParentRecTxt.getText());
         if (record == null) {
-            infoPanel.show_mess(Lang.getInstance().translate("Error") + " - use 1233-321.");
+            infoPanel.show_mess(Lang.T("Error") + " - use 1233-321.");
             jLabel_RecordInfo.setViewportView(infoPanel);
             return record;
         }
@@ -228,15 +228,15 @@ public class PersonSetStatusDialog extends JDialog {
 
         } catch (Exception e) {
             if (parse == 0) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee"), Lang.getInstance().translate("Error") + e, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee"), Lang.T("Error") + e, JOptionPane.ERROR_MESSAGE);
             } else if (parse == 1) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid From Date") + e, Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid From Date") + e, Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             } else if (parse == 2) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid To Date") + e, Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid To Date") + e, Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             } else if (parse == 3) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid Value 1") + e, Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid Value 1") + e, Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             } else if (parse == 4) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid Value 2") + e, Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid Value 2") + e, Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             }
 
             //ENABLE
@@ -250,8 +250,8 @@ public class PersonSetStatusDialog extends JDialog {
         PrivateKeyAccount authenticator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator.getAddress());
         if (authenticator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -273,7 +273,7 @@ public class PersonSetStatusDialog extends JDialog {
 
         String Status_text = "";
         IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
-                Lang.getInstance().translate("Set Status"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+                Lang.T("Set Status"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.T("Confirmation Transaction"));
 
         SetStatusToItemDetailsFrame ww = new SetStatusToItemDetailsFrame((RSetStatusToItem) transaction);
         confirmDialog.jScrollPane1.setViewportView(ww);
@@ -540,7 +540,7 @@ public class PersonSetStatusDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(20, 0, 20, 17);
         getContentPane().add(jFeeTxt, gridBagConstraints);
 
-        jButton_Cansel = new MButton(Lang.getInstance().translate("Cancel"), 2);
+        jButton_Cansel = new MButton(Lang.T("Cancel"), 2);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 28;
@@ -554,7 +554,7 @@ public class PersonSetStatusDialog extends JDialog {
         });
 
 
-        jButton_SetStatus = new MButton(Lang.getInstance().translate("Set status"), 2);
+        jButton_SetStatus = new MButton(Lang.T("Set status"), 2);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 28;

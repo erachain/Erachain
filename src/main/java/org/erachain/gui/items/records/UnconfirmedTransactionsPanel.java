@@ -59,7 +59,7 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
         // this.setSize(500, 500);
         // this.setLocation(20, 20);
         // this.setMaximizable(true);
-        // this.setTitle(Lang.getInstance().translate("Accounts"));
+        // this.setTitle(Lang.T("Accounts"));
         // this.setClosable(true);
         // this.setResizable(true);
         // this.setBorder(true);
@@ -176,7 +176,7 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem item_Rebroadcast = new JMenuItem(Lang.getInstance().translate("Rebroadcast"));
+        JMenuItem item_Rebroadcast = new JMenuItem(Lang.T("Rebroadcast"));
 
         item_Rebroadcast.addActionListener(new ActionListener() {
             @Override
@@ -192,7 +192,7 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
         });
 
         menu.add(item_Rebroadcast);
-        JMenuItem item_Delete = new JMenuItem(Lang.getInstance().translate("Delete"));
+        JMenuItem item_Delete = new JMenuItem(Lang.T("Delete"));
         item_Delete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -210,7 +210,7 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
         
 
         // save jsot transactions
-        JMenuItem item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
+        JMenuItem item_Save = new JMenuItem(Lang.T("Save"));
         item_Save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -229,7 +229,7 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
 
         menu.addSeparator();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -259,7 +259,7 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
             @Override
             public void tableChanged(TableModelEvent arg0) {
                 // TODO Auto-generated method stub
-                setName(Lang.getInstance().translate("Unconfirmed Records:" + transactionsModel.getRowCount()));
+                setName(Lang.T("Unconfirmed Records:" + transactionsModel.getRowCount()));
             }
 
         });

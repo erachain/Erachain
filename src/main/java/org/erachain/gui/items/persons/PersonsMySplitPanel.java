@@ -23,7 +23,7 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
         super(new WalletItemPersonsTableModel(), NAME, TITLE);
 
         // add items in menu
-        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status to Person"));
+        JMenuItem set_Status_Item = new JMenuItem(Lang.T("Set Status to Person"));
 
         set_Status_Item.addActionListener(new ActionListener() {
             @Override
@@ -36,7 +36,7 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
         });
         this.menuTable.add(set_Status_Item);
 
-        JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Certify Public Key for Person"));
+        JMenuItem attestPubKey_Item = new JMenuItem(Lang.T("Certify Public Key for Person"));
 
         attestPubKey_Item.addActionListener(new ActionListener() {
             @Override

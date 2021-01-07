@@ -136,7 +136,7 @@ public class SysTray implements Observer {
         menu.add(walletStatus);
 
 
-        MenuItem lock = new MenuItem(Lang.getInstance().translate("Lock/Unlock Wallet"));
+        MenuItem lock = new MenuItem(Lang.T("Lock/Unlock Wallet"));
         lock.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (Controller.getInstance().isWalletUnlocked()) {
@@ -144,7 +144,7 @@ public class SysTray implements Observer {
                 } else {
                     String password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
                     if (!password.equals("") && !Controller.getInstance().unlockWallet(password)) {
-                        JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -152,7 +152,7 @@ public class SysTray implements Observer {
         menu.add(lock);
 
 
-        MenuItem settings = new MenuItem(Lang.getInstance().translate("Settings"));
+        MenuItem settings = new MenuItem(Lang.T("Settings"));
         settings.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new SettingsFrame();
@@ -161,10 +161,10 @@ public class SysTray implements Observer {
         menu.add(settings);
 
 
-        MenuItem console = new MenuItem(Lang.getInstance().translate("Console"));
+        MenuItem console = new MenuItem(Lang.T("Console"));
         console.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFrame frame = new JFrame(Lang.getInstance().translate("Console"));
+                JFrame frame = new JFrame(Lang.T("Console"));
 
                 frame.setSize(800, 600);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -176,10 +176,10 @@ public class SysTray implements Observer {
         });
         menu.add(console);
 
-        MenuItem transactions = new MenuItem(Lang.getInstance().translate("Transactions"));
+        MenuItem transactions = new MenuItem(Lang.T("Transactions"));
         transactions.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFrame frame = new JFrame(Lang.getInstance().translate("Transactions"));
+                JFrame frame = new JFrame(Lang.T("Transactions"));
 
                 frame.setSize(800, 600);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -218,11 +218,11 @@ public class SysTray implements Observer {
         });
         menu.add(transactions);
 
-        MenuItem messages = new MenuItem(Lang.getInstance().translate("Send"));
+        MenuItem messages = new MenuItem(Lang.T("Send"));
         messages.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                JFrame frame = new JFrame(Lang.getInstance().translate("Send"));
+                JFrame frame = new JFrame(Lang.T("Send"));
 
                 //    frame.setSize(800, 600);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -237,10 +237,10 @@ public class SysTray implements Observer {
         });
         menu.add(messages);
 
-        MenuItem assets = new MenuItem(Lang.getInstance().translate("Assets"));
+        MenuItem assets = new MenuItem(Lang.T("Assets"));
         assets.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFrame frame = new JFrame(Lang.getInstance().translate("Assets"));
+                JFrame frame = new JFrame(Lang.T("Assets"));
                 frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
                 frame.setSize(800, 600);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -254,10 +254,10 @@ public class SysTray implements Observer {
         });
         menu.add(assets);
 
-        MenuItem my_Accounts = new MenuItem(Lang.getInstance().translate("My Accounts"));
+        MenuItem my_Accounts = new MenuItem(Lang.T("My Accounts"));
         my_Accounts.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFrame frame = new JFrame(Lang.getInstance().translate("My Accounts"));
+                JFrame frame = new JFrame(Lang.T("My Accounts"));
 
                 frame.setSize(800, 600);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -274,7 +274,7 @@ public class SysTray implements Observer {
         menu.add(my_Accounts);
 
 
-        MenuItem exit = new MenuItem(Lang.getInstance().translate("Quit"));
+        MenuItem exit = new MenuItem(Lang.T("Quit"));
         exit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new ClosingDialog();
@@ -312,11 +312,11 @@ public class SysTray implements Observer {
                         ObserverMessage.NETWORK_STATUS, Controller.getInstance().getStatus()));
                 return;
             }
-            String networkStatus = Lang.getInstance().translate("Wallet Synchronizing");
+            String networkStatus = Lang.T("Wallet Synchronizing");
             String syncProcent = 100 * currentHeight / Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "%";
 
             String toolTipText = networkStatus + " " + syncProcent;
-            toolTipText += "\n" + Lang.getInstance().translate("Height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false, false).a;
+            toolTipText += "\n" + Lang.T("Height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false, false).a;
             setToolTipText(toolTipText);
 
         } else if (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
@@ -334,7 +334,7 @@ public class SysTray implements Observer {
             }
 
             String toolTipText = syncProcent;
-            toolTipText += "\n" + Lang.getInstance().translate("Height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(0, false, false);
+            toolTipText += "\n" + Lang.T("Height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(0, false, false);
             setToolTipText(toolTipText);
 
         } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE
@@ -354,16 +354,16 @@ public class SysTray implements Observer {
                 String toolTipText = Controller.getInstance().getApplicationName(false) + "\n";
 
                 if (Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
-                    networkStatus = Lang.getInstance().translate("No connections");
+                    networkStatus = Lang.T("No connections");
                     syncProcent = "";
                 } else if (Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING) {
-                    networkStatus = Lang.getInstance().translate("Synchronizing");
+                    networkStatus = Lang.T("Synchronizing");
                 } else if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
-                    networkStatus = Lang.getInstance().translate("OK");
+                    networkStatus = Lang.T("OK");
                     syncProcent = "";
                 }
                 toolTipText = networkStatus + " " + syncProcent;
-                toolTipText += "\n" + Lang.getInstance().translate("Height") + ": " + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
+                toolTipText += "\n" + Lang.T("Height") + ": " + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
                 setToolTipText(toolTipText);
             }
         }

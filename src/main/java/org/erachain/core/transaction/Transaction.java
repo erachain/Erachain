@@ -2348,7 +2348,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public String toStringFullAndCreatorLang() {
-        return Lang.getInstance().translate(viewFullTypeName())
+        return Lang.T(viewFullTypeName())
                 + ": " + getTitle() + (creator == null ? "" : " - " + creator.getPersonAsString());
     }
 

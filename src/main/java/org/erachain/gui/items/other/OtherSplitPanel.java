@@ -116,7 +116,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
             }
         });
 
-        connectItem = new JMenuItem(Lang.getInstance().translate("Connect"));
+        connectItem = new JMenuItem(Lang.T("Connect"));
         connectItem.addActionListener(arg0 -> {
             // чтобы развязат задержку и не тормозить GUI
             new Thread(() -> {
@@ -147,7 +147,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
 
         jPanel2.setLayout(new GridBagLayout());
 
-        jLabelPeerTitle.setText(Lang.getInstance().translate("Peers"));
+        jLabelPeerTitle.setText(Lang.T("Peers"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -180,7 +180,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
         jTableMyBlock = new MTable(myBlocksModel);
 
         JPanel jPanel7 = new JPanel(new GridBagLayout());
-        JLabel jLabelMyBlockTitle = new JLabel(Lang.getInstance().translate("My Generated Blocks"));
+        JLabel jLabelMyBlockTitle = new JLabel(Lang.T("My Generated Blocks"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
@@ -201,7 +201,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
 
         JPopupMenu menuMy = new JPopupMenu();
 
-        JMenuItem setSeeInBlockexplorerMy = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorerMy = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorerMy.addActionListener(new ActionListener() {
             @Override
@@ -241,8 +241,8 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
         JPanel jPanel8 = new JPanel(new GridBagLayout());
 
         JPanel jPanelLabelsAllBlocks = new JPanel(new BorderLayout());
-        JLabel jLabelAllBlockCaption = new JLabel(Lang.getInstance().translate("Last 100 blocks") + ". " +
-                Lang.getInstance().translate("Sum win value chain blocks:"));
+        JLabel jLabelAllBlockCaption = new JLabel(Lang.T("Last 100 blocks") + ". " +
+                Lang.T("Sum win value chain blocks:"));
         jLabelAllBlocksSum = new JLabel(String.valueOf(Controller.getInstance().getBlockChain().
                 getFullWeight(DCSet.getInstance())));
 
@@ -266,7 +266,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
 
         JPopupMenu menuAll = new JPopupMenu();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -308,7 +308,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
     }
 
     private void addMenuBan(String message, int time) {
-        JMenuItem banedTenMinItem = new JMenuItem(Lang.getInstance().translate(message));
+        JMenuItem banedTenMinItem = new JMenuItem(Lang.T(message));
         banedTenMinItem.addActionListener(arg0 -> {
             itemPeerMenu.ban(time, "banned by user");
         });

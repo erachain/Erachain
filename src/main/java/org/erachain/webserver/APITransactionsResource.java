@@ -39,7 +39,7 @@ public class APITransactionsResource {
         Map<String, String> help = new LinkedHashMap<String, String>();
 
         help.put("apirecords/get/{signature}",
-                Lang.getInstance().translate("Get Record by sigmature."));
+                Lang.T("Get Record by sigmature."));
         help.put("apirecords/getbynumber/{height-sequence}",
                 "GET Record by Height and Sequence");
         help.put("apirecords/getsignature/{height-sequence}",
@@ -47,27 +47,27 @@ public class APITransactionsResource {
         help.put("apirecords/getvouches/{height-sequence}",
                 "GET Vouches of Record by Height and Sequence");
         help.put("apirecords/incomingfromblock/{address}/{blockStart}?type={type}",
-                Lang.getInstance().translate("Get Incoming Records for Address from {blockStart}. Filter by type. Limit checked blocks = 2000 or 100 found records. If blocks not end at height - NEXT parameter was set."));
+                Lang.T("Get Incoming Records for Address from {blockStart}. Filter by type. Limit checked blocks = 2000 or 100 found records. If blocks not end at height - NEXT parameter was set."));
         help.put("apirecords/getbyaddress?address={address}&asset={asset}&recordType={recordType}&unconfirmed=true",
-                Lang.getInstance().translate("Get all Records (and Unconfirmed) for Address & Asset Key by record type. recordType is option parameter"));
+                Lang.T("Get all Records (and Unconfirmed) for Address & Asset Key by record type. recordType is option parameter"));
         help.put("apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}&unconfirmed=true",
                 "Get last Records (and Unconfirmed) from Unix Timestamp milisec(1512777600000)");
         help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",
-                Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
+                Lang.T("Get all Records for Address & Asset Key from Start to End"));
 
         help.put("apirecords/unconfirmed?address={address}&type={type}&from={from}&count={count}&descending=true",
-                Lang.getInstance().translate("Get all incoming unconfirmed transaction by address, type transaction, timestamp limited by count"));
+                Lang.T("Get all incoming unconfirmed transaction by address, type transaction, timestamp limited by count"));
 
         help.put("apirecords/unconfirmedincomes/{address}?type={type}&from={from}&count={count}&descending=true",
-                Lang.getInstance().translate("Get all unconfirmed Records for Address from Start at Count filtered by Type"));
+                Lang.T("Get all unconfirmed Records for Address from Start at Count filtered by Type"));
 
-        help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
+        help.put("apirecords/getbyblock?block={block}", Lang.T("Get all Records from Block"));
 
         help.put("apirecords/find?address={address}&creator={creator}&recipient={recipient}&from=[seqNo]&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={false}&offset={offset}&limit={limit}&unconfirmed=false&count=false",
-                Lang.getInstance().translate("Find Records. Set [seqNo] as 1234-1"));
+                Lang.T("Find Records. Set [seqNo] as 1234-1"));
 
         help.put("apirecords/search?q={query}&from=[seqNo]&useforge={false}&offset={offset}&limit={limit}&fullpage={false}",
-                Lang.getInstance().translate("Search Records by Query. Query=SeqNo|Signature|FilterWords. Result[0-1] - START & END Seq-No for use in paging (see as make it in blockexplorer. Signature as Base58. Set Set FilterWords as preffix words separated by space. Set [seqNo] as 1234-1. For use forge set &useforge=true. For fill full page - use fullpage=true"));
+                Lang.T("Search Records by Query. Query=SeqNo|Signature|FilterWords. Result[0-1] - START & END Seq-No for use in paging (see as make it in blockexplorer. Signature as Base58. Set Set FilterWords as preffix words separated by space. Set [seqNo] as 1234-1. For use forge set &useforge=true. For fill full page - use fullpage=true"));
 
         help.put("apirecords/rawTransactionsByBlock/{height}?param", "Get raw transaction(encoding Base58). By default param is 3(for network)");
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")

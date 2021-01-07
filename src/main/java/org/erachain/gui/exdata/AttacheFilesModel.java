@@ -15,8 +15,8 @@ public class AttacheFilesModel extends DefaultTableModel {
     public static final int ZIP_BYTES_COL = 5;
 
     public AttacheFilesModel() {
-        super(new Object[]{Lang.getInstance().translate("Name"), Lang.getInstance().translate("Path"), "Zip?",
-                Lang.getInstance().translate("Size/Zip size")}, 0);
+        super(new Object[]{Lang.T("Name"), Lang.T("Path"), "Zip?",
+                Lang.T("Size/Zip size")}, 0);
 
     }
 

@@ -21,7 +21,7 @@ public class PollsMySplitPanel extends ItemSplitPanel {
     public PollsMySplitPanel() {
         super(new WalletItemPollsTableModel(), NAME, TITLE);
 
-        JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("To Vote"));
+        JMenuItem setVote_Menu = new JMenuItem(Lang.T("To Vote"));
         setVote_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -34,7 +34,7 @@ public class PollsMySplitPanel extends ItemSplitPanel {
 
         menuTable.addSeparator();
 
-        JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set status"));
+        JMenuItem setStatus_Menu = new JMenuItem(Lang.T("Set status"));
         setStatus_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //			new UnionSetStatusDialog(th, (UnionCls) itemMenu);

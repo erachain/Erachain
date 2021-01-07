@@ -85,7 +85,7 @@ public class InfoTemplates extends javax.swing.JPanel {
         setLayout(layout);
         jLabel_Account_Creator = new javax.swing.JLabel();
 
-        jLabel_Account_Creator.setText(Lang.getInstance().translate("Account Creator") + ":");
+        jLabel_Account_Creator.setText(Lang.T("Account Creator") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -106,7 +106,7 @@ public class InfoTemplates extends javax.swing.JPanel {
         add(jTextField_Account_Creator, gridBagConstraints);
         jLabel_Title = new javax.swing.JLabel();
 
-        jLabel_Title.setText(Lang.getInstance().translate("Title") + ":");
+        jLabel_Title.setText(Lang.T("Title") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
@@ -127,7 +127,7 @@ public class InfoTemplates extends javax.swing.JPanel {
         add(jTextField_Title, gridBagConstraints);
         jLabel_Content = new javax.swing.JLabel();
 
-        jLabel_Content.setText(Lang.getInstance().translate("Content") + ":");
+        jLabel_Content.setText(Lang.T("Content") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
@@ -222,7 +222,7 @@ public class InfoTemplates extends javax.swing.JPanel {
                  * всплывающее if(Controller.getInstance().isItemFavorite(person)) {
                  * Search_run_menu.jButton3.setText(Lang.getInstance().
                  * translate("Remove Favorite")); } else {
-                 * Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite")
+                 * Search_run_menu.jButton3.setText(Lang.T("Add Favorite")
                  * ); } // alpha = 255; alpha_int = 5; Search_run_menu.setBackground(new
                  * Color(1,204,102,255)); Search_run_menu.setLocation(e.getXOnScreen(),
                  * e.getYOnScreen()); Search_run_menu.repaint();

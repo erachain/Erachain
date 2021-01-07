@@ -16,7 +16,7 @@ public class GenesisIssueAssetDetailsFrame extends RecGenesis_DetailsFrame {
 
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Name") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME
@@ -28,14 +28,14 @@ public class GenesisIssueAssetDetailsFrame extends RecGenesis_DetailsFrame {
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
         ++detailGBC.gridy;
         JTextArea txtAreaDescription;
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
-            txtAreaDescription = new JTextArea(Lang.getInstance().translate(asset.viewDescription()));
+            txtAreaDescription = new JTextArea(Lang.T(asset.viewDescription()));
         } else {
             txtAreaDescription = new JTextArea(asset.viewDescription());
         }
@@ -47,7 +47,7 @@ public class GenesisIssueAssetDetailsFrame extends RecGenesis_DetailsFrame {
 
         //LABEL QUANTITY
         ++labelGBC.gridy;
-        JLabel quantityLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
+        JLabel quantityLabel = new JLabel(Lang.T("Quantity") + ":");
         this.add(quantityLabel, labelGBC);
 
         //QUANTITY
@@ -59,13 +59,13 @@ public class GenesisIssueAssetDetailsFrame extends RecGenesis_DetailsFrame {
 
         //LABEL DIVISIBLE
         ++labelGBC.gridy;
-        JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Asset Type") + ":");
+        JLabel divisibleLabel = new JLabel(Lang.T("Asset Type") + ":");
         this.add(divisibleLabel, labelGBC);
 
         //DIVISIBLE
         ++detailGBC.gridy;
         //	JCheckBox divisible = new JCheckBox();
-        JTextField textType = new JTextField(Lang.getInstance().translate(asset.viewAssetTypeFull()));
+        JTextField textType = new JTextField(Lang.T(asset.viewAssetTypeFull()));
         //	= asset.viewAssetType();
         //	divisible.setSelected(asset.isDivisible()); //
         textType.setEnabled(false);

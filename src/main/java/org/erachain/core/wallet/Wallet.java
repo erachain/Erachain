@@ -509,7 +509,7 @@ public class Wallet extends Observable implements Observer {
 			this.secureDatabase.getAccountSeedMap().add(account);
 			this.database.getAccountMap().add(account, -1);
 			// set name
-			ob.put("description", Lang.getInstance().translate("Created by default Account") + " " + (nonce + 1));
+			ob.put("description", Lang.T("Created by default Account") + " " + (nonce + 1));
 			LOGGER.info("Added account #" + nonce);
 
 			this.commit();
@@ -1844,7 +1844,7 @@ public class Wallet extends Observable implements Observer {
 		if (!ff.exists())
 			pathOld = "." + File.separator;
 		fileopen.setCurrentDirectory(new File(pathOld));
-		int ret = fileopen.showDialog(null, Lang.getInstance().translate("Open Wallet Dir"));
+		int ret = fileopen.showDialog(null, Lang.T("Open Wallet Dir"));
 		if (ret != JFileChooser.APPROVE_OPTION) {
 			//is abort
 			return 3;
@@ -1868,8 +1868,8 @@ public class Wallet extends Observable implements Observer {
 			String password = PasswordPane.showUnlockWalletDialog(null);
 			if (!Controller.getInstance().unlockWallet(password)) {
 				// WRONG PASSWORD
-				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-						Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
+						Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 				return 5;
 			}
 		}

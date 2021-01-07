@@ -17,7 +17,7 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
 
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Name") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME
@@ -29,7 +29,7 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
@@ -43,7 +43,7 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
 
         //LABEL Birthday
         ++labelGBC.gridy;
-        JLabel birthdayLabel = new JLabel(Lang.getInstance().translate("Birthday") + ":");
+        JLabel birthdayLabel = new JLabel(Lang.T("Birthday") + ":");
         this.add(birthdayLabel, labelGBC);
 
         //Birthday
@@ -55,7 +55,7 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
         //LABEL Death
         if (!person.isAlive(0l)) {
             ++labelGBC.gridy;
-            JLabel deadLabel = new JLabel(Lang.getInstance().translate("Deathday") + ":");
+            JLabel deadLabel = new JLabel(Lang.T("Deathday") + ":");
             this.add(deadLabel, labelGBC);
 
             //Deathday
@@ -69,14 +69,14 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
 
         //LABEL GENDER
         ++labelGBC.gridy;
-        JLabel genderLabel = new JLabel(Lang.getInstance().translate("Gender") + ":");
+        JLabel genderLabel = new JLabel(Lang.T("Gender") + ":");
         this.add(genderLabel, labelGBC);
 
         //GENDER
         ++detailGBC.gridy;
         String txt = "";
-        if (person.getGender() == 0) txt = Lang.getInstance().translate("Male");
-        else if (person.getGender() == 1) txt = Lang.getInstance().translate("Female");
+        if (person.getGender() == 0) txt = Lang.T("Male");
+        else if (person.getGender() == 1) txt = Lang.T("Female");
         JTextField gender = new JTextField(txt);
 
         gender.setEditable(false);
@@ -84,7 +84,7 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
 
         //LABEL owner
         ++labelGBC.gridy;
-        JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
+        JLabel ownerLabel = new JLabel(Lang.T("Owner") + ":");
         this.add(ownerLabel, labelGBC);
 
         //owner
@@ -95,7 +95,7 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
 
         //LABEL owner Public key
         ++labelGBC.gridy;
-        JLabel owner_Public_keyLabel = new JLabel(Lang.getInstance().translate("Public key") + ":");
+        JLabel owner_Public_keyLabel = new JLabel(Lang.T("Public key") + ":");
         this.add(owner_Public_keyLabel, labelGBC);
 
         //owner public key

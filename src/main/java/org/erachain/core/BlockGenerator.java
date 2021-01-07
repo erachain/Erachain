@@ -1484,10 +1484,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     public enum ForgingStatus {
 
-        FORGING_DISABLED(0, Lang.getInstance().translate("Forging disabled")),
-        FORGING_ENABLED(1, Lang.getInstance().translate("Forging enabled")),
-        FORGING(2, Lang.getInstance().translate("Forging")),
-        FORGING_WAIT(3, Lang.getInstance().translate("Forging awaiting another peer sync"));
+        FORGING_DISABLED(0, Lang.T("Forging disabled")),
+        FORGING_ENABLED(1, Lang.T("Forging enabled")),
+        FORGING(2, Lang.T("Forging")),
+        FORGING_WAIT(3, Lang.T("Forging awaiting another peer sync"));
 
         private final int statusCode;
         private String name;

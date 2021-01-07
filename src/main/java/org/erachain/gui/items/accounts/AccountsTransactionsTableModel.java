@@ -98,7 +98,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
                 return itemTran.itemCls;
 
             case COLUMN_TYPE:
-                return Lang.getInstance().translate(itemTran.transaction.viewFullTypeName());
+                return Lang.T(itemTran.transaction.viewFullTypeName());
 
             case COLUMN_SENDER:
                 if (itemTran.owner != null) {

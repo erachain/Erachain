@@ -13,7 +13,7 @@ class ParamsTemplateModel extends DefaultTableModel {
     private static final long serialVersionUID = 1L;
 
     public ParamsTemplateModel() {
-        super(new Object[]{Lang.getInstance().translate("Name"), Lang.getInstance().translate("=")}, 0);
+        super(new Object[]{Lang.T("Name"), Lang.T("=")}, 0);
 
     }
 

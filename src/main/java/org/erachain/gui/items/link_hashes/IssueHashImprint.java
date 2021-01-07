@@ -66,13 +66,13 @@ public class IssueHashImprint extends javax.swing.JPanel {
         initComponents();
         this.jLabel_Title.setFont(new java.awt.Font("Tahoma", 0, 18));
         ;
-        this.jLabel_Title.setText(Lang.getInstance().translate("Write Hashs to BlockChain"));
+        this.jLabel_Title.setText(Lang.T("Write Hashs to BlockChain"));
         table_Model = new TableModelIssueHashes(0);
         this.jTable_Hash.setModel(table_Model);
-        this.jLabel_Account.setText(Lang.getInstance().translate("Account") + ":");
+        this.jLabel_Account.setText(Lang.T("Account") + ":");
         this.jComboBox_Account.setModel(new AccountsComboBoxModel());
-        String tipURL = Lang.getInstance().translate("Задайте внешнюю ссылку в виде URL. \n Причем если ссылка будет закачиваться на:\n / или = или № - то значение хеша будет добавлено к ссылке");
-        this.jLabel_URL.setText(Lang.getInstance().translate("URL") + ":");
+        String tipURL = Lang.T("Задайте внешнюю ссылку в виде URL. \n Причем если ссылка будет закачиваться на:\n / или = или № - то значение хеша будет добавлено к ссылке");
+        this.jLabel_URL.setText(Lang.T("URL") + ":");
         this.jLabel_URL.setToolTipText(tipURL);
         this.jTextField_URL.setText("");
         this.jTextField_URL.setToolTipText(tipURL);
@@ -80,8 +80,8 @@ public class IssueHashImprint extends javax.swing.JPanel {
         tip.setTipText("TIP PROBE");
 
 
-        this.jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");
-        this.jButton.setText(Lang.getInstance().translate("Write & Sign"));
+        this.jLabel_Description.setText(Lang.T("Description") + ":");
+        this.jButton.setText(Lang.T("Write & Sign"));
 
   /*   this.jButton.addActionListener(new ActionListener()
 		{
@@ -100,7 +100,7 @@ public class IssueHashImprint extends javax.swing.JPanel {
         //CHECK IF NETWORK OK
         if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
             //NETWORK NOT OK
-            JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, Lang.T("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
             //ENABLE
             this.jButton.setEnabled(true);
@@ -114,7 +114,7 @@ public class IssueHashImprint extends javax.swing.JPanel {
             String password = PasswordPane.showUnlockWalletDialog(this);
             if (!Controller.getInstance().unlockWallet(password)) {
                 //WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
                 this.jButton.setEnabled(true);
@@ -145,8 +145,8 @@ public class IssueHashImprint extends javax.swing.JPanel {
             PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
             if (creator == null) {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -155,18 +155,18 @@ public class IssueHashImprint extends javax.swing.JPanel {
 
             //CHECK VALIDATE MESSAGE
             if (result.getB() == Transaction.VALIDATE_OK) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Imprint issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Imprint issue has been sent!"), Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
                 //this.dispose();
             } else {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
-                        + "[" + result.getB() + "]!", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Unknown error")
+                        + "[" + result.getB() + "]!", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (Exception e) {
             if (parse == 0) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid quantity!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             }
         }
 
@@ -318,7 +318,7 @@ public class IssueHashImprint extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.insets = new java.awt.Insets(0, 13, 0, 0);
-        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        JLabel feeLabel = new JLabel(Lang.T("Fee Power") + ":");
         feeLabel.setVisible(Gui.SHOW_FEE_POWER);
         this.add(feeLabel, gridBagConstraints);
 

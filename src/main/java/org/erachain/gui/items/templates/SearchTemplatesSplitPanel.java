@@ -26,7 +26,7 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
 
         this.th = this;
 
-        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Sign / Vouch"));
+        JMenuItem vouch_Item = new JMenuItem(Lang.T("Sign / Vouch"));
 
         vouch_Item.addActionListener(new ActionListener() {
 

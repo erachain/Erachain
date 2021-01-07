@@ -68,17 +68,17 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         if (Controller.getInstance().doesWalletDatabaseExists())
             accountsMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
 
-        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         searthLabelSearchToolBarLeftPanel.setVisible(true);
         // this.searchTextFieldSearchToolBarLeftPanelDocument.setVisible(true);
         // this.searchToolBar_LeftPanel.setVisible(true);
         // not show buttons
         // button1ToolBarLeftPanel.setVisible(false);
         // button2ToolBarLeftPanel.setVisible(false);
-        button1ToolBarLeftPanel.setText(Lang.getInstance().translate("Load"));
-        button2ToolBarLeftPanel.setText(Lang.getInstance().translate("Save"));
+        button1ToolBarLeftPanel.setText(Lang.T("Load"));
+        button2ToolBarLeftPanel.setText(Lang.T("Save"));
         button3_ToolBar_LeftPanel = new JButton();
-        button3_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Add"));
+        button3_ToolBar_LeftPanel.setText(Lang.T("Add"));
         this.toolBarLeftPanel.add(button3_ToolBar_LeftPanel);
         jButton1_jToolBar_RightPanel.setVisible(false);
         jButton2_jToolBar_RightPanel.setVisible(false);
@@ -114,13 +114,13 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         gbc_panel.gridy = 0;
         leftPanel.add(panel, gbc_panel);
 
-        JButton btnLoadButton = new JButton(Lang.getInstance().translate("Load"));
+        JButton btnLoadButton = new JButton(Lang.T("Load"));
         panel.add(btnLoadButton);
 
-        JButton btnSaveButton = new JButton(Lang.getInstance().translate("Save"));
+        JButton btnSaveButton = new JButton(Lang.T("Save"));
         panel.add(btnSaveButton);
 
-        JButton btnAddButton = new JButton(Lang.getInstance().translate("Add"));
+        JButton btnAddButton = new JButton(Lang.T("Add"));
         panel.add(btnAddButton);
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);
@@ -192,7 +192,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
             }
         });
 
-        JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Account"));
+        JMenuItem copyAddress = new JMenuItem(Lang.T("Copy Account"));
         copyAddress.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -204,7 +204,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         });
         menu.add(copyAddress);
 
-        JMenuItem menu_copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+        JMenuItem menu_copyPublicKey = new JMenuItem(Lang.T("Copy Public Key"));
         menu_copyPublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -230,12 +230,12 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
 
         menu.addSeparator();
 
-        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
+        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.T("Send mail"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Tuple2<String, Tuple3<String, String, String>> item = accountsTableModel.getItem(row);
                 Account accountTo = FavoriteAccountsMap.detPublicKeyOrAccount(item.a, item.b);
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Send Mail"),
                         new MailSendPanel(null, accountTo, null));
             }
         });
@@ -243,12 +243,12 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
 
         menu.addSeparator();
 
-        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
+        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.T("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Tuple2<String, Tuple3<String, String, String>> item = accountsTableModel.getItem(row);
                 Account accountTo = FavoriteAccountsMap.detPublicKeyOrAccount(item.a, item.b);
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send"), new AccountAssetSendPanel(null,
+                MainPanel.getInstance().insertNewTab(Lang.T("Send"), new AccountAssetSendPanel(null,
                         null, accountTo, null, null, false));
 
             }
@@ -257,7 +257,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
 
         menu.addSeparator();
 
-        JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit name"));
+        JMenuItem setName = new JMenuItem(Lang.T("Edit name"));
         setName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Tuple2<String, Tuple3<String, String, String>> item = accountsTableModel.getItem(row);
@@ -268,7 +268,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         });
         menu.add(setName);
 
-        JMenuItem menuItemDelete = new JMenuItem(Lang.getInstance().translate("Remove Favorite"));
+        JMenuItem menuItemDelete = new JMenuItem(Lang.T("Remove Favorite"));
         menuItemDelete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (false && !Controller.getInstance().isWalletUnlocked()) {
@@ -280,8 +280,8 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
                     }
                     if (!Controller.getInstance().unlockWallet(password)) {
                         // WRONG PASSWORD
-                        JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                                Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
+                                Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                         // ENABLE
 
@@ -313,7 +313,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
                 // TODO Auto-generated method stub
                 chooser = new FileChooser();
 
-                chooser.setDialogTitle(Lang.getInstance().translate("Save File"));
+                chooser.setDialogTitle(Lang.T("Save File"));
                 // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
                 chooser.setMultiSelectionEnabled(false);
@@ -335,9 +335,9 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
                     // if file
                     if (ff.exists() && ff.isFile()) {
                         int aaa = JOptionPane.showConfirmDialog(chooser,
-                                Lang.getInstance().translate("File") + Lang.getInstance().translate("Exists") + "! "
-                                        + Lang.getInstance().translate("Overwrite") + "?",
-                                Lang.getInstance().translate("Message"), JOptionPane.OK_CANCEL_OPTION,
+                                Lang.T("File") + Lang.T("Exists") + "! "
+                                        + Lang.T("Overwrite") + "?",
+                                Lang.T("Message"), JOptionPane.OK_CANCEL_OPTION,
                                 JOptionPane.INFORMATION_MESSAGE);
                         System.out.print("\n gggg " + aaa);
                         if (aaa != 0) {
@@ -392,7 +392,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
 
                 chooser = new FileChooser();
 
-                chooser.setDialogTitle(Lang.getInstance().translate("Open File"));
+                chooser.setDialogTitle(Lang.T("Open File"));
                 // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 chooser.setDialogType(javax.swing.JFileChooser.OPEN_DIALOG);
                 chooser.setMultiSelectionEnabled(false);

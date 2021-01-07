@@ -149,7 +149,7 @@ public class ALLTelegramPanel extends IconPanel {
 
 
         jcheckIsEnscript.setSelected(true);
-        jcheckIsEnscript.setText(Lang.getInstance().translate("Encrypt message"));
+        jcheckIsEnscript.setText(Lang.T("Encrypt message"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -201,7 +201,7 @@ public class ALLTelegramPanel extends IconPanel {
             }
         });
 
-        JMenuItem deleteTelegram = new JMenuItem(Lang.getInstance().translate("Delete Telegram"));
+        JMenuItem deleteTelegram = new JMenuItem(Lang.T("Delete Telegram"));
         deleteTelegram.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 

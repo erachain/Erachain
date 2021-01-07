@@ -42,7 +42,7 @@ public class APITXResource {
         Map<String, String> help = new LinkedHashMap<String, String>();
 
         help.put("api/tx/{signature}",
-                Lang.getInstance().translate("Get transaction by signature."));
+                Lang.T("Get transaction by signature."));
         help.put("api/tx/bynumber/{height-sequence}",
                 "GET transaction by Height and Sequence (SeqNo)");
         help.put("api/tx/signature/{height-sequence}",
@@ -52,27 +52,27 @@ public class APITXResource {
         help.put("api/tx/vouches/{height-sequence}",
                 "GET Vouches of transaction by Height and Sequence");
         help.put("api/tx/incomingfromblock/{address}/{blockStart}?type={type}",
-                Lang.getInstance().translate("Get Incoming transactions for Address from {blockStart}. Filter by type. Limit checked blocks = 2000 or 100 found transactions. If blocks not end at height - NEXT parameter was set."));
+                Lang.T("Get Incoming transactions for Address from {blockStart}. Filter by type. Limit checked blocks = 2000 or 100 found transactions. If blocks not end at height - NEXT parameter was set."));
         help.put("api/tx/byaddress?address={address}&asset={asset}&txType={txType}&unconfirmed=true",
-                Lang.getInstance().translate("Get all transactions (and Unconfirmed) for Address & Asset Key by transaction type. Here txType is option parameter"));
+                Lang.T("Get all transactions (and Unconfirmed) for Address & Asset Key by transaction type. Here txType is option parameter"));
         help.put("api/tx/lastbyaddress/{address}?timestamp={Timestamp}&limit={Limit}&unconfirmed=true",
                 "Get last transactions (and Unconfirmed) from Unix Timestamp milisec(1512777600000)");
         help.put("api/tx/byaddressfrom/{address}?asset={asset}&start={start tx}&end={end tx}&type={type Transaction}&sort={des/asc}",
-                Lang.getInstance().translate("Get all transactions for Address & Asset Key from Start to End"));
+                Lang.T("Get all transactions for Address & Asset Key from Start to End"));
 
         help.put("api/tx/unconfirmed?address={address}&type={type}&from={from}&count={count}&descending=true",
-                Lang.getInstance().translate("Get all incoming unconfirmed transaction by address, type transaction, timestamp limited by count"));
+                Lang.T("Get all incoming unconfirmed transaction by address, type transaction, timestamp limited by count"));
 
         help.put("api/tx/unconfirmedincomes/{address}?type={type}&from={from}&count={count}&descending=true",
-                Lang.getInstance().translate("Get all unconfirmed transactions for Address from Start at Count filtered by Type"));
+                Lang.T("Get all unconfirmed transactions for Address from Start at Count filtered by Type"));
 
-        help.put("api/tx/byblock/{height}", Lang.getInstance().translate("Get all transactions from Block"));
+        help.put("api/tx/byblock/{height}", Lang.T("Get all transactions from Block"));
 
         help.put("api/tx/find?address={address}&creator={creator}&recipient={recipient}&from=[seqNo]&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={false}&offset={offset}&limit={limit}&unconfirmed=false&count=false",
-                Lang.getInstance().translate("Find transactions. Set [seqNo] as 1234-1"));
+                Lang.T("Find transactions. Set [seqNo] as 1234-1"));
 
         help.put("api/tx/search?q={query}&from=[seqNo]&useforge={false}&offset={offset}&limit={limit}&fullpage={false}",
-                Lang.getInstance().translate("Search transactions by Query. Query=SeqNo|Signature|FilterWords. Result[0-1] - START & END Seq-No for use in paging (see as make it in blockexplorer. Signature as Base58. Set Set FilterWords as preffix words separated by space. Set [seqNo] as 1234-1. For use forge set &useforge=true. For fill full page - use fullpage=true"));
+                Lang.T("Search transactions by Query. Query=SeqNo|Signature|FilterWords. Result[0-1] - START & END Seq-No for use in paging (see as make it in blockexplorer. Signature as Base58. Set Set FilterWords as preffix words separated by space. Set [seqNo] as 1234-1. For use forge set &useforge=true. For fill full page - use fullpage=true"));
 
         help.put("api/tx/rawbyblock/{height}?forDeal={DEAL}", "Get raw transaction(encoding Base58). forDeal = 1..5 (FOR_MYPACK, FOR_PACK, FOR_NETWORK, FOR_DB_RECORD). By default forDeal is 3(for network)");
 

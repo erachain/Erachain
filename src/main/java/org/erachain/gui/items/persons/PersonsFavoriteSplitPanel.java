@@ -24,23 +24,23 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
     public PersonsFavoriteSplitPanel() {
         super(new FavoritePersonsTableModel(), NAME, TITLE);
 
-        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
+        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.T("Send asset"));
 
         vsend_Coins_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
+                MainPanel.getInstance().insertNewTab(Lang.T("Send asset"), new AccountAssetSendPanel(null,
                         null, null, (PersonCls) itemTableSelected, null, false));
 
             }
         });
 
         // th.menuTable.add(vsend_Coins_Item);
-        JMenuItem send_Mail_Item = new JMenuItem(Lang.getInstance().translate("Send mail"));
+        JMenuItem send_Mail_Item = new JMenuItem(Lang.T("Send mail"));
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, null, (PersonCls) itemTableSelected));
+                MainPanel.getInstance().insertNewTab(Lang.T("Send Mail"), new MailSendPanel(null, null, (PersonCls) itemTableSelected));
             }
         });
 
@@ -48,7 +48,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
 //      add items in menu
 
 
-        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set status to person"));
+        JMenuItem set_Status_Item = new JMenuItem(Lang.T("Set status to person"));
 
         set_Status_Item.addActionListener(new ActionListener() {
             @Override
@@ -61,7 +61,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
         });
         this.menuTable.add(set_Status_Item);
 
-        JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Certify Public Key for Person"));
+        JMenuItem attestPubKey_Item = new JMenuItem(Lang.T("Certify Public Key for Person"));
 
         attestPubKey_Item.addActionListener(new ActionListener() {
             @Override

@@ -85,22 +85,22 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         ASMutableTreeNode root = new ASMutableTreeNode("root", "<html><span style='font-size:1.1em;'><b>"
                 + Controller.getInstance().APP_NAME, getIcon(
                 Settings.getInstance().getUserPath() + "images" + File.separator + "icons" + File.separator + "favicon.png"));
-        ASMutableTreeNode account_Node = new ASMutableTreeNode("account_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Accounts") + "</b></html>", getIcon(pathIcons + "account_Node.png"));
-        ASMutableTreeNode person_Node = new ASMutableTreeNode("person_Node", "<html><span style='font-size:1.1em;'><b> " + Lang.getInstance().translate("Persons") + "</b></html>", getIcon(pathIcons + "person_Node.png"));
-        ASMutableTreeNode document_Node = new ASMutableTreeNode("document_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Documents") + "</b></html>", getIcon(pathIcons + "document_Node.png"));
-        ASMutableTreeNode mails_Node = new ASMutableTreeNode("mails_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Mails") + "</b></html>", getIcon(pathIcons + "mails_Node.png"));
-        ASMutableTreeNode assets_Node = new ASMutableTreeNode("assets_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Assets") + "</b></html>", getIcon(pathIcons + "assets_Node.png"));
-        ASMutableTreeNode exchange_Node = new ASMutableTreeNode("exchange_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Exchange") + "</b></html>", getIcon(pathIcons + "exchange_Node.png"));
-        ASMutableTreeNode templates_Node = new ASMutableTreeNode("templates_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Templates") + "</b></html>", getIcon(pathIcons + "templates_Node.png"));
-        ASMutableTreeNode statuses_Node = new ASMutableTreeNode("statuses_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Statuses") + "</b></html>", getIcon(pathIcons + "statuses_Node.png"));
-        ASMutableTreeNode unions_Node = new ASMutableTreeNode("unions_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Unions") + "</b></html>", getIcon(pathIcons + "unions_Node.png"));
-        ASMutableTreeNode polls_Node = new ASMutableTreeNode("polls_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Polls") + "</b></html>", getIcon(pathIcons + "polls_Node.png"));
-        ASMutableTreeNode hashes_Node = new ASMutableTreeNode("hashes_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Unique Hashes") + "</b></html>", getIcon(pathIcons + "hashes_Node.png"));
-        ASMutableTreeNode linked_hashes_Node = new ASMutableTreeNode("linked_hashes_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Linked Hashes") + "</b></html>", getIcon(pathIcons + "linked_hashes_Node.png"));
-        ASMutableTreeNode records_Node = new ASMutableTreeNode("records_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Transactions") + "</b></html>", getIcon(pathIcons + "records_Node.png"));
-        ASMutableTreeNode other_Node = new ASMutableTreeNode("other_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Network DashBoard") + "</b></html>", getIcon(pathIcons + "other_Node.png"));
-        ASMutableTreeNode bank_Tree = new ASMutableTreeNode("bank_Tree", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Bank") + "</b></html>", getIcon(pathIcons + "bank_Tree.png"));
-        ASMutableTreeNode telegrams_Tree = new ASMutableTreeNode("telegrams_Tree", "<html><span style='font-size:1.1em;'><b>" + Lang.getInstance().translate("Telegrams") + "</b></html>", getIcon(pathIcons + "telegrams_Tree.png"));
+        ASMutableTreeNode account_Node = new ASMutableTreeNode("account_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Accounts") + "</b></html>", getIcon(pathIcons + "account_Node.png"));
+        ASMutableTreeNode person_Node = new ASMutableTreeNode("person_Node", "<html><span style='font-size:1.1em;'><b> " + Lang.T("Persons") + "</b></html>", getIcon(pathIcons + "person_Node.png"));
+        ASMutableTreeNode document_Node = new ASMutableTreeNode("document_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Documents") + "</b></html>", getIcon(pathIcons + "document_Node.png"));
+        ASMutableTreeNode mails_Node = new ASMutableTreeNode("mails_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Mails") + "</b></html>", getIcon(pathIcons + "mails_Node.png"));
+        ASMutableTreeNode assets_Node = new ASMutableTreeNode("assets_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Assets") + "</b></html>", getIcon(pathIcons + "assets_Node.png"));
+        ASMutableTreeNode exchange_Node = new ASMutableTreeNode("exchange_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Exchange") + "</b></html>", getIcon(pathIcons + "exchange_Node.png"));
+        ASMutableTreeNode templates_Node = new ASMutableTreeNode("templates_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Templates") + "</b></html>", getIcon(pathIcons + "templates_Node.png"));
+        ASMutableTreeNode statuses_Node = new ASMutableTreeNode("statuses_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Statuses") + "</b></html>", getIcon(pathIcons + "statuses_Node.png"));
+        ASMutableTreeNode unions_Node = new ASMutableTreeNode("unions_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Unions") + "</b></html>", getIcon(pathIcons + "unions_Node.png"));
+        ASMutableTreeNode polls_Node = new ASMutableTreeNode("polls_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Polls") + "</b></html>", getIcon(pathIcons + "polls_Node.png"));
+        ASMutableTreeNode hashes_Node = new ASMutableTreeNode("hashes_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Unique Hashes") + "</b></html>", getIcon(pathIcons + "hashes_Node.png"));
+        ASMutableTreeNode linked_hashes_Node = new ASMutableTreeNode("linked_hashes_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Linked Hashes") + "</b></html>", getIcon(pathIcons + "linked_hashes_Node.png"));
+        ASMutableTreeNode records_Node = new ASMutableTreeNode("records_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Transactions") + "</b></html>", getIcon(pathIcons + "records_Node.png"));
+        ASMutableTreeNode other_Node = new ASMutableTreeNode("other_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Network DashBoard") + "</b></html>", getIcon(pathIcons + "other_Node.png"));
+        ASMutableTreeNode bank_Tree = new ASMutableTreeNode("bank_Tree", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Bank") + "</b></html>", getIcon(pathIcons + "bank_Tree.png"));
+        ASMutableTreeNode telegrams_Tree = new ASMutableTreeNode("telegrams_Tree", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Telegrams") + "</b></html>", getIcon(pathIcons + "telegrams_Tree.png"));
 
         TreeMap<String, DefaultMutableTreeNode> nodeList = new TreeMap<String, DefaultMutableTreeNode>();
         nodeList.put("account_Node", account_Node);
@@ -153,7 +153,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         account_Node.add(new ASMutableTreeNode(FavoriteAccountsSplitPanel.NAME, FavoriteAccountsSplitPanel.TITLE));
 
         // account_Node.add(new
-        // DefaultMutableTreeNode(Lang.getInstance().translate(Search
+        // DefaultMutableTreeNode(Lang.T(Search
         // Accounts")));
         // account_Node.add(new DefaultMutableTreeNode(Issue Account"));
 
@@ -217,7 +217,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         hashes_Node.add(new ASMutableTreeNode(IssueImprintPanel.NAME, IssueImprintPanel.TITLE));
 
         linked_hashes_Node.add(new ASMutableTreeNode(IssueLinkedHashPanel.NAME, IssueLinkedHashPanel.TITLE));
-        //linked_hashes_Node.add(new ASMutableTreeNode(SearchTransactionsSplitPanel.NAME, Lang.getInstance().translate("Search Linked Hash"), SearchTransactionsSplitPanel.TITLE));
+        //linked_hashes_Node.add(new ASMutableTreeNode(SearchTransactionsSplitPanel.NAME, Lang.T("Search Linked Hash"), SearchTransactionsSplitPanel.TITLE));
 
         //telegram
         telegrams_Tree.add(new ASMutableTreeNode(TelegramSplitPanel.NAME, TelegramSplitPanel.TITLE));
@@ -260,7 +260,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         // menu
         JPopupMenu menu = new JPopupMenu("www");
 
-        JMenuItem menuExpand = new JMenuItem(Lang.getInstance().translate("Expand All"));
+        JMenuItem menuExpand = new JMenuItem(Lang.T("Expand All"));
         menuExpand.addActionListener(new ActionListener() {
 
             @Override
@@ -271,7 +271,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
             }
         });
 
-        JMenuItem menuColapse = new JMenuItem(Lang.getInstance().translate("Collapse All"));
+        JMenuItem menuColapse = new JMenuItem(Lang.T("Collapse All"));
         menuColapse.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {

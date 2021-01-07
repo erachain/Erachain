@@ -503,7 +503,7 @@ public class Controller extends Observable {
         try {
             LOGGER.info("Open " + name);
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open") + " " + name));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Open") + " " + name));
 
             //// должен быть метод
             ///// DLSet.open();
@@ -511,7 +511,7 @@ public class Controller extends Observable {
 
             LOGGER.info(name + " OK");
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("OK")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("OK")));
 
         } catch (Throwable e) {
 
@@ -553,18 +553,18 @@ public class Controller extends Observable {
 
             if (useGui && Settings.getInstance().getbacUpAskToStart()) {
                 // ask dialog
-                int n = JOptionPane.showConfirmDialog(null, Lang.getInstance().translate("BackUp Database?"),
-                        Lang.getInstance().translate("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
+                int n = JOptionPane.showConfirmDialog(null, Lang.T("BackUp Database?"),
+                        Lang.T("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
                 if (n == JOptionPane.OK_OPTION) {
                     this.setChanged();
-                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
+                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("BackUp datachain")));
                     // delete & copy files in BackUp dir
 
                     //// у объекта должен быть этот метод сохранения DLSet.createDataCheckpoint();
                 }
             } else {
                 this.setChanged();
-                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("BackUp datachain")));
                 // delete & copy files in BackUp dir
                 //// у объекта должен быть этот метод сохранения DLSet.createDataCheckpoint();
             }
@@ -580,14 +580,14 @@ public class Controller extends Observable {
 
         // CHECK NETWORK PORT AVAILABLE
         if (BlockChain.TEST_DB == 0 && !Network.isPortAvailable(BlockChain.NETWORK_PORT)) {
-            throw new Exception(Lang.getInstance().translate("Network port %port% already in use!").replace("%port%",
+            throw new Exception(Lang.T("Network port %port% already in use!").replace("%port%",
                     String.valueOf(BlockChain.NETWORK_PORT)));
         }
 
         // CHECK RPC PORT AVAILABLE
         if (Settings.getInstance().isRpcEnabled()) {
             if (!Network.isPortAvailable(Settings.getInstance().getRpcPort())) {
-                throw new Exception(Lang.getInstance().translate("Rpc port %port% already in use!").replace("%port%",
+                throw new Exception(Lang.T("Rpc port %port% already in use!").replace("%port%",
                         String.valueOf(Settings.getInstance().getRpcPort())));
             }
         }
@@ -595,7 +595,7 @@ public class Controller extends Observable {
         // CHECK WEB PORT AVAILABLE
         if (Settings.getInstance().isWebEnabled()) {
             if (!Network.isPortAvailable(Settings.getInstance().getWebPort())) {
-                LOGGER.error(Lang.getInstance().translate("Web port %port% already in use!").replace("%port%",
+                LOGGER.error(Lang.T("Web port %port% already in use!").replace("%port%",
                         String.valueOf(Settings.getInstance().getWebPort())));
             }
         }
@@ -612,11 +612,11 @@ public class Controller extends Observable {
 
         try {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open DataLocale")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Open DataLocale")));
             LOGGER.info("Try Open DataLocal");
             this.dlSet = DLSet.reCreateDB();
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataLocale OK")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("DataLocale OK")));
             LOGGER.info("DataLocale OK");
         } catch (Throwable e) {
             LOGGER.error(e.getMessage(), e);
@@ -641,7 +641,7 @@ public class Controller extends Observable {
         // OPENING DATABASES
         try {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Try Open DataChain")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Try Open DataChain")));
             LOGGER.info("Try Open DataChain");
             if (Settings.simpleTestNet) {
                 // -testnet
@@ -650,7 +650,7 @@ public class Controller extends Observable {
                 this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
             }
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataChain OK")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("DataChain OK")));
             LOGGER.info("DataChain OK");
         } catch (Throwable e) {
             // Error open DB
@@ -670,17 +670,17 @@ public class Controller extends Observable {
 
             if (Settings.getInstance().getbacUpAskToStart()) {
                 // ask dialog
-                int n = JOptionPane.showConfirmDialog(null, Lang.getInstance().translate("BackUp Database?"),
-                        Lang.getInstance().translate("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
+                int n = JOptionPane.showConfirmDialog(null, Lang.T("BackUp Database?"),
+                        Lang.T("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
                 if (n == JOptionPane.OK_OPTION) {
                     this.setChanged();
-                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
+                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("BackUp datachain")));
                     // delete & copy files in BackUp dir
                     createDataCheckpoint();
                 }
             } else {
                 this.setChanged();
-                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("BackUp datachain")));
                 // delete & copy files in BackUp dir
                 createDataCheckpoint();
             }
@@ -701,7 +701,7 @@ public class Controller extends Observable {
         }
 
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Datachain Ok")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Datachain Ok")));
         // createDataCheckpoint();
 
         // CHECK IF DB NEEDS UPDATE
@@ -746,8 +746,8 @@ public class Controller extends Observable {
         // START API SERVICE
         if (Settings.getInstance().isRpcEnabled()) {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Start API Service")));
-            LOGGER.info(Lang.getInstance().translate("Start API Service"));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Start API Service")));
+            LOGGER.info(Lang.T("Start API Service"));
             this.rpcService = new ApiService();
             this.rpcServiceRestart();
         }
@@ -755,15 +755,15 @@ public class Controller extends Observable {
         // START WEB SERVICE
         if (Settings.getInstance().isWebEnabled()) {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Start WEB Service")));
-            LOGGER.info(Lang.getInstance().translate("Start WEB Service"));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Start WEB Service")));
+            LOGGER.info(Lang.T("Start WEB Service"));
             this.webService = WebService.getInstance();
             this.webService.start();
         }
 
         // CREATE WALLET
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open Wallet")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Open Wallet")));
         this.wallet = new Wallet(this.dcSetWithObserver, this.dynamicGUI);
 
         boolean walletKeysRecovered = false;
@@ -818,17 +818,17 @@ public class Controller extends Observable {
                 this.wallet.initiateItemsFavorites();
             }
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Wallet OK")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Wallet OK")));
 
             // create telegtam
 
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open Telegram")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Open Telegram")));
             this.telegramStore = TelegramStore.getInstanse(this.dcSetWithObserver, this.dynamicGUI);
 
 
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Telegram OK")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Telegram OK")));
 
         }
 
@@ -1044,10 +1044,10 @@ public class Controller extends Observable {
             this.connectTimer.cancel();
 
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing")));
         // STOP MESSAGE PROCESSOR
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping message processor")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping message processor")));
 
         if (this.network != null) {
             LOGGER.info("Stopping message processor");
@@ -1067,7 +1067,7 @@ public class Controller extends Observable {
 
         // delete temp Dir
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Delete files from TEMP dir")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Delete files from TEMP dir")));
         LOGGER.info("Delete files from TEMP dir");
         try {
             File tempDir = new File(Settings.getInstance().getDataTempDir());
@@ -1077,31 +1077,31 @@ public class Controller extends Observable {
 
         // STOP TRANSACTIONS POOL
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping Transactions Pool")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping Transactions Pool")));
         LOGGER.info("Stopping Transactions Pool");
         this.transactionsPool.halt();
 
         // STOP WIN BLOCK SELECTOR
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping WinBlock Selector")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping WinBlock Selector")));
         LOGGER.info("Stopping WinBlock Selector");
         this.winBlockSelector.halt();
 
         // STOP BLOCK REQUESTER
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping Block Requester")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping Block Requester")));
         LOGGER.info("Stopping Block Requester");
         this.blockRequester.halt();
 
         // STOP BLOCK PROCESSOR
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping block synchronizer")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping block synchronizer")));
         LOGGER.info("Stopping block synchronizer");
         this.synchronizer.stop();
 
         // WAITING STOP MAIN PROCESS
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Waiting stopping processors")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Waiting stopping processors")));
         LOGGER.info("Waiting stopping processors");
 
         int i = 0;
@@ -1114,7 +1114,7 @@ public class Controller extends Observable {
 
         if (dcSet.isBusy())
             this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DCSet is busy...")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("DCSet is busy...")));
         LOGGER.info("DCSet is busy...");
 
         i = 0;
@@ -1128,28 +1128,28 @@ public class Controller extends Observable {
 
         // CLOSE DATABABASE
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing database")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
         LOGGER.info("Closing database");
         this.dcSet.close();
 
         if (this.wallet != null) {
             // CLOSE WALLET
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing wallet")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing wallet")));
             LOGGER.info("Closing wallet");
             this.wallet.close();
         }
 
         // CLOSE LOCAL
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing Local database")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing Local database")));
         LOGGER.info("Closing Local database");
         this.dlSet.close();
 
         if (telegramStore != null) {
             // CLOSE telegram
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing telegram")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing telegram")));
             LOGGER.info("Closing telegram");
             this.telegramStore.close();
         }
@@ -2026,7 +2026,7 @@ public class Controller extends Observable {
                             + peer.getHWeight(true);
                     LOGGER.info(info);
                     this.setChanged();
-                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate(info)));
+                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T(info)));
                     try {
                         // SYNCHRONIZE FROM PEER
                         if (!this.isOnStopping())
@@ -2403,12 +2403,12 @@ public class Controller extends Observable {
 
         if (!GraphicsEnvironment.isHeadless()
                 && (Settings.getInstance().isGuiEnabled() || Settings.getInstance().isSysTrayEnabled())) {
-            SysTray.getInstance().sendMessage(Lang.getInstance().translate("INCOMING API CALL"),
-                    Lang.getInstance().translate("An API call needs authorization!"), MessageType.WARNING);
-            Object[] options = {Lang.getInstance().translate("Yes"), Lang.getInstance().translate("No")};
+            SysTray.getInstance().sendMessage(Lang.T("INCOMING API CALL"),
+                    Lang.T("An API call needs authorization!"), MessageType.WARNING);
+            Object[] options = {Lang.T("Yes"), Lang.T("No")};
 
-            StringBuilder sb = new StringBuilder(Lang.getInstance().translate("Permission Request: "));
-            sb.append(Lang.getInstance().translate("Do you want to authorize the following API call?\n\n") + json
+            StringBuilder sb = new StringBuilder(Lang.T("Permission Request: "));
+            sb.append(Lang.T("Do you want to authorize the following API call?\n\n") + json
                     + " \n" + request.getRequestURL());
             JTextArea jta = new JTextArea(sb.toString());
             jta.setLineWrap(true);
@@ -2428,7 +2428,7 @@ public class Controller extends Observable {
             //gui = Gui.getInstance();
             gui.bringtoFront();
 
-            result = JOptionPane.showOptionDialog(gui, jsp, Lang.getInstance().translate("INCOMING API CALL"),
+            result = JOptionPane.showOptionDialog(gui, jsp, Lang.T("INCOMING API CALL"),
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
         }
 
@@ -4053,12 +4053,12 @@ public class Controller extends Observable {
 
                 //ONE MUST BE ENABLED
                 if (!Settings.getInstance().isGuiEnabled() && !Settings.getInstance().isRpcEnabled()) {
-                    throw new Exception(Lang.getInstance().translate("Both gui and rpc cannot be disabled!"));
+                    throw new Exception(Lang.T("Both gui and rpc cannot be disabled!"));
                 }
 
-                LOGGER.info(Lang.getInstance().translate("Starting %app%")
+                LOGGER.info(Lang.T("Starting %app%")
                         .replace("%app%", getApplicationName(false)));
-                LOGGER.info(getVersion(true) + Lang.getInstance().translate(" build ")
+                LOGGER.info(getVersion(true) + Lang.T(" build ")
                         + buildTime);
 
                 this.setChanged();
@@ -4111,7 +4111,7 @@ public class Controller extends Observable {
                             about_frame.setVisible(false);
                             about_frame.dispose();
                         }
-                        LOGGER.error(Lang.getInstance().translate("GUI ERROR - at Start"), e1);
+                        LOGGER.error(Lang.T("GUI ERROR - at Start"), e1);
                     }
                 }
 
@@ -4128,11 +4128,11 @@ public class Controller extends Observable {
                 if (useGui) {
                     if (Settings.getInstance().isGuiEnabled()) {
                         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, null,
-                                Lang.getInstance().translate("STARTUP ERROR") + ": "
-                                        + errorMsg, 600, 400, Lang.getInstance().translate(" "));
+                                Lang.T("STARTUP ERROR") + ": "
+                                        + errorMsg, 600, 400, Lang.T(" "));
                         dd.jButton0.setVisible(false);
                         dd.jButton1.setVisible(false);
-                        dd.jButton2.setText(Lang.getInstance().translate("Cancel"));
+                        dd.jButton2.setText(Lang.T("Cancel"));
                         dd.setLocationRelativeTo(null);
                         dd.setVisible(true);
                     }
@@ -4146,7 +4146,7 @@ public class Controller extends Observable {
                 }
 
                 if (Gui.isGuiStarted()) {
-                    JOptionPane.showMessageDialog(null, errorMsg, Lang.getInstance().translate("Startup Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, errorMsg, Lang.T("Startup Error"), JOptionPane.ERROR_MESSAGE);
 
                 }
 

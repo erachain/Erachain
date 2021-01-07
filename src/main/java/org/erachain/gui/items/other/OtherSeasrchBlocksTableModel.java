@@ -5,7 +5,6 @@ import org.erachain.core.block.Block;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
-import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +26,7 @@ public class OtherSeasrchBlocksTableModel extends AbstractTableModel {
     public static final int COLUMN_FEE = 5;
     static Logger LOGGER = LoggerFactory.getLogger(OtherSeasrchBlocksTableModel.class);
     private List<Block> blocks;
-    private String[] columnNames = Lang.getInstance()
-            .translate(new String[]{"Height", "Timestamp", "Generator", "GB pH WV dtWV", // "Generating
+    private String[] columnNames = Lang.T(new String[]{"Height", "Timestamp", "Generator", "GB pH WV dtWV", // "Generating
                     // Balance",
                     "Transactions", "Fee"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, true, false};

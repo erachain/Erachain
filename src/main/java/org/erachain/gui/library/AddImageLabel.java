@@ -61,7 +61,7 @@ public class AddImageLabel extends JPanel {
 
 
         JPopupMenu menu = new JPopupMenu();
-        JMenuItem resetMenu = new JMenuItem(Lang.getInstance().translate("Reset"));
+        JMenuItem resetMenu = new JMenuItem(Lang.T("Reset"));
         resetMenu.addActionListener(e -> reset());
         menu.add(resetMenu);
         setComponentPopupMenu(menu);
@@ -97,7 +97,7 @@ public class AddImageLabel extends JPanel {
         chooser.setMultiSelectionEnabled(false);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Image", "png", "jpg", "gif");
         chooser.setFileFilter(filter);
-        chooser.setDialogTitle(Lang.getInstance().translate("Open Image") + "...");
+        chooser.setDialogTitle(Lang.T("Open Image") + "...");
         int returnVal = chooser.showOpenDialog(getParent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = new File(chooser.getSelectedFile().getPath());

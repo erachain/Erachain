@@ -14,7 +14,7 @@ public class PaymentsTableModel extends AbstractTableModel {
     public static final int COLUMN_ASSET = 1;
     public static final int COLUMN_AMOUNT = 2;
     private static final int COLUMN_ACCOUNT = 0;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Check", "Amount"});
+    private String[] columnNames = Lang.T(new String[]{"Account", "Check", "Amount"});
     private List<Payment> payments;
 
     public PaymentsTableModel(List<Payment> payments) {

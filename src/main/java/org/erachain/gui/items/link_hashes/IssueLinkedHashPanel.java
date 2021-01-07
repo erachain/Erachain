@@ -67,7 +67,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
         jToolBarRightPanel.add(panel);
 
         JButton btnNewButton = new JButton();
-        btnNewButton.setText(Lang.getInstance().translate("Delete Hash"));
+        btnNewButton.setText(Lang.T("Delete Hash"));
         panel.add(btnNewButton);
         btnNewButton.setHorizontalAlignment(SwingConstants.LEFT);
         btnNewButton.addActionListener(new ActionListener() {
@@ -92,7 +92,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
 
         jButton3_jToolBar_RightPanel = new JButton();
         panel.add(jButton3_jToolBar_RightPanel);
-        jButton3_jToolBar_RightPanel.setText(Lang.getInstance().translate("Create Hash"));
+        jButton3_jToolBar_RightPanel.setText(Lang.T("Create Hash"));
         // jButton3_jToolBar_RightPanel.setFocusable(false);
         jButton3_jToolBar_RightPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton3_jToolBar_RightPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -107,7 +107,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
         jButton3_jToolBar_RightPanel.setFont(new Font("Tahoma", 0, 14));
 
         JButton btnNewButton_1 = new JButton();
-        btnNewButton_1.setText(Lang.getInstance().translate("Import Hashs"));
+        btnNewButton_1.setText(Lang.T("Import Hashs"));
         panel.add(btnNewButton_1);
         btnNewButton_1.setHorizontalAlignment(SwingConstants.LEFT);
         btnNewButton_1.addActionListener(new ActionListener() {
@@ -141,9 +141,9 @@ public class IssueLinkedHashPanel extends SplitPanel {
         if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
             // NETWORK NOT OK
             JOptionPane.showMessageDialog(null,
-                    Lang.getInstance().translate(
+                    Lang.T(
                             "You are unable to send a transaction while synchronizing or while having no connections!"),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
             // ENABLE
             issue_Hash_Imprint.jButton.setEnabled(true);
@@ -157,8 +157,8 @@ public class IssueLinkedHashPanel extends SplitPanel {
             String password = PasswordPane.showUnlockWalletDialog(this);
             if (!Controller.getInstance().unlockWallet(password)) {
                 // WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
+                        Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 // ENABLE
                 issue_Hash_Imprint.jButton.setEnabled(true);
@@ -188,11 +188,11 @@ public class IssueLinkedHashPanel extends SplitPanel {
 
         } catch (Exception e) {
             if (parse == 0) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee!"),
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid quantity!"),
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             }
         }
 
@@ -202,8 +202,8 @@ public class IssueLinkedHashPanel extends SplitPanel {
         PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
         if (creator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -212,13 +212,13 @@ public class IssueLinkedHashPanel extends SplitPanel {
 
         // CHECK VALIDATE MESSAGE
         if (result.getB() == Transaction.VALIDATE_OK) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Imprint issue has been sent!"),
-                    Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Imprint issue has been sent!"),
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
             // this.dispose();
         } else {
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate("Unknown error") + "[" + result.getB() + "]!",
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T("Unknown error") + "[" + result.getB() + "]!",
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
         }
 
         // ENABLE
@@ -235,7 +235,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
         // руссификация диалога выбора файла
         // new All_Options().setUpdateUI(chooser);
         FileChooser chooser = new FileChooser();
-        chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
+        chooser.setDialogTitle(Lang.T("Select File"));
 
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setMultiSelectionEnabled(true);
@@ -268,7 +268,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
                 } catch (IOException e) {
                     e.printStackTrace();
                     table_Model.addRow(
-                            new Object[]{"", Lang.getInstance().translate("error reading") + " - " + file_name});
+                            new Object[]{"", Lang.T("error reading") + " - " + file_name});
                 }
 
                 if (hashesStr.length() > 0) {
@@ -276,7 +276,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
                     for (String hashB58 : hashes) {
                         if (hashB58 != null && !hashB58.equals(new String("")))
                             table_Model.addRow(new Object[]{hashB58,
-                                    Lang.getInstance().translate("imported from") + " " + file_name});
+                                    Lang.T("imported from") + " " + file_name});
                     }
 
                 }
@@ -295,7 +295,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
                     long file_len = file.length();
                     if (file_len > Integer.MAX_VALUE) {
                         table_Model.addRow(new Object[]{"",
-                                Lang.getInstance().translate("length very long") + " - " + file_name});
+                                Lang.T("length very long") + " - " + file_name});
                         continue;
                     }
                     byte[] fileInArray = new byte[(int) file.length()];
@@ -306,7 +306,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                         table_Model.addRow(new Object[]{"",
-                                Lang.getInstance().translate("error streaming") + " - " + file_name});
+                                Lang.T("error streaming") + " - " + file_name});
                         continue;
                     }
                     try {
@@ -315,7 +315,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                         table_Model.addRow(
-                                new Object[]{"", Lang.getInstance().translate("error reading") + " - " + file_name});
+                                new Object[]{"", Lang.T("error reading") + " - " + file_name});
                         continue;
                     }
                     try {
@@ -328,7 +328,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
 
                     /// HASHING
                     String hashes = Base58.encode(Crypto.getInstance().digest(fileInArray));
-                    table_Model.addRow(new Object[]{hashes, Lang.getInstance().translate("from file ") + file_name});
+                    table_Model.addRow(new Object[]{hashes, Lang.T("from file ") + file_name});
 
                 }
 

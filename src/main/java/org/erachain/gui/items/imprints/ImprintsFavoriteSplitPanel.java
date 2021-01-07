@@ -24,13 +24,13 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
         super(new FavoriteImprintsTableModel(), NAME, TITLE);
         iconName = "favorite.png";
 
-        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
+        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.T("Send asset"));
 
         vsend_Coins_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Send asset"),
                         new AccountAssetSendPanel(null,
                                 null, itemTableSelected.getOwner(), null, null, false));
 
@@ -38,11 +38,11 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
         });
 
         menuTable.add(vsend_Coins_Item);
-        JMenuItem send_Mail_Item = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+        JMenuItem send_Mail_Item = new JMenuItem(Lang.T("Send Mail"));
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, itemTableSelected.getOwner(), null));
+                MainPanel.getInstance().insertNewTab(Lang.T("Send Mail"), new MailSendPanel(null, itemTableSelected.getOwner(), null));
             }
         });
 

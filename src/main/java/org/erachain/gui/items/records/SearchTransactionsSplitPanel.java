@@ -50,8 +50,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         this.searchToolBar_LeftPanel.setVisible(true);
         jScrollPane4 = new JScrollPane();
 
-        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Height or seqNo") + ": ");
-        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Search") + ": "));
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Height or seqNo") + ": ");
+        this.toolBarLeftPanel.add(new JLabel(Lang.T("Search") + ": "));
         searchString = new JTextField();
         searchString.setToolTipText("");
 
@@ -115,7 +115,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         // MENU
         JPopupMenu mainMenu = new JPopupMenu();
 
-        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Sign / Vouch"));
+        JMenuItem vouch_menu = new JMenuItem(Lang.T("Sign / Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -131,7 +131,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         mainMenu.add(vouch_menu);
 
         // save jsot transactions
-        JMenuItem item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
+        JMenuItem item_Save = new JMenuItem(Lang.T("Save"));
         item_Save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -150,7 +150,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         mainMenu.add(item_Save);
 
         mainMenu.addSeparator();
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -269,7 +269,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                 GridBagConstraints gridBagConstraints = null;
                 if (keys != null) {
 
-                    JLabel jLabelTitlt_Table_Sign = new JLabel(Lang.getInstance().translate("Signatures") + ":");
+                    JLabel jLabelTitlt_Table_Sign = new JLabel(Lang.T("Signatures") + ":");
                     gridBagConstraints = new java.awt.GridBagConstraints();
                     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
@@ -302,7 +302,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         // CHECK IF FAVORITES
         if (Controller.getInstance().isTransactionFavorite(transaction)) {
-            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
 
             if (dd == 0) Controller.getInstance().removeTransactionFavorite(transaction);
         } else {

@@ -1,7 +1,7 @@
 package org.erachain.gui.library;
 
-import org.erachain.lang.Lang;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
@@ -20,7 +20,7 @@ public class My_Int_Long_JTextField extends JTextField {
     public My_Int_Long_JTextField() {
         super();
         th = this;
-        th.setToolTipText(Lang.getInstance().translate("Must be digital"));
+        th.setToolTipText(Lang.T("Must be digital"));
         text_Color = this.getForeground();
         MenuPopupUtil.installContextMenu(this);
         th.setForeground(Color.RED);

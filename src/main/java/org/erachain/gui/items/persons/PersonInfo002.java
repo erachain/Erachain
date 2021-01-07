@@ -126,7 +126,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
         //	 jPanelHead.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel1.setLayout(new java.awt.GridBagLayout());
         JLabel jLabel1N = new JLabel();
-        jLabel1N.setText(Lang.getInstance().translate("Name") + ":");
+        jLabel1N.setText(Lang.T("Name") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -161,7 +161,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
         jPanel1.add(jTextField1N, gridBagConstraints);
 
 
-        JLabel lbl_Block = new JLabel(Lang.getInstance().translate("Block") + ":");
+        JLabel lbl_Block = new JLabel(Lang.T("Block") + ":");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
@@ -194,7 +194,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
             });
         }
 
-        MButton btn_Block = new MButton(Lang.getInstance().translate("Deals"), 2.0);
+        MButton btn_Block = new MButton(Lang.T("Deals"), 2.0);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
@@ -254,7 +254,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
 
         add(jPanel1, gridBagConstraints);
 
-        jLabel_Name.setText(Lang.getInstance().translate("Name") + ":");
+        jLabel_Name.setText(Lang.T("Name") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -279,7 +279,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         //	add(jTextField_Name, gridBagConstraints);
 
-        jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");
+        jLabel_Description.setText(Lang.T("Description") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -295,11 +295,11 @@ public class PersonInfo002 extends javax.swing.JPanel {
         //jTextArea_Description.setLineWrap(true);
 
 
-        String descript = Lang.getInstance().translate("Gender") + ":";
+        String descript = Lang.T("Gender") + ":";
         if (person.getGender() == 0) {
-            descript = descript + Lang.getInstance().translate("Male");
+            descript = descript + Lang.T("Male");
         } else if (person.getGender() == 1) {
-            descript = descript + Lang.getInstance().translate("Female");
+            descript = descript + Lang.T("Female");
         }
         long bi = person.getBirthday();
         long de = person.getDeathday();
@@ -310,13 +310,13 @@ public class PersonInfo002 extends javax.swing.JPanel {
 
         } else {
 
-            //descript = descript+"<br>" + Lang.getInstance().translate("Birthday") + ":" + new Date(person.getBirthday()) + "";
-            descript = descript + "<br>" + Lang.getInstance().translate("Birthday") + ":" + biStr;
+            //descript = descript+"<br>" + Lang.T("Birthday") + ":" + new Date(person.getBirthday()) + "";
+            descript = descript + "<br>" + Lang.T("Birthday") + ":" + biStr;
 
         }
 
-        descript = descript + "<br>" + Lang.getInstance().translate("Coordinates of Birth") + ": " + ((Float) person.getBirthLatitude()).toString() + "," + ((Float) person.getBirthLongitude()).toString();
-        descript = descript + "<br>" + Lang.getInstance().translate("P.Height") + ": " + person.getHeight();
+        descript = descript + "<br>" + Lang.T("Coordinates of Birth") + ": " + ((Float) person.getBirthLatitude()).toString() + "," + ((Float) person.getBirthLongitude()).toString();
+        descript = descript + "<br>" + Lang.T("P.Height") + ": " + person.getHeight();
 
         descript = descript + "<br>" + Library.to_HTML(person.getDescription());
         jTextArea_Description.setText(descript);
@@ -337,7 +337,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
         int gridy = 8;
         if (human.isMustBeSigned() && owner != null && !owner.equals(publisher)) {
 
-            jLabel_Owner.setText(Lang.getInstance().translate("Data creator") + ":");
+            jLabel_Owner.setText(Lang.T("Data creator") + ":");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy++;
@@ -367,7 +367,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
             gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
 
 
-            jLabel_Owner_Sign.setText(Lang.getInstance().translate("Owner Sign") + ":");
+            jLabel_Owner_Sign.setText(Lang.T("Owner Sign") + ":");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy++;
@@ -387,11 +387,11 @@ public class PersonInfo002 extends javax.swing.JPanel {
             gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
 
             jTextField_Owner_Sign.setText(human.isSignatureValid(DCSet.getInstance()) ? Base58.encode(human.getOwnerSignature())
-                    : Lang.getInstance().translate("Wrong signaryte for data owner"));
+                    : Lang.T("Wrong signaryte for data owner"));
             //	jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
         }
 
-        jLabel_Creator.setText(Lang.getInstance().translate("Registrar") + ":");
+        jLabel_Creator.setText(Lang.T("Registrar") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy++;
@@ -543,11 +543,11 @@ public class PersonInfo002 extends javax.swing.JPanel {
 //выводим меню всплывающее
 				if(Controller.getInstance().isItemFavorite(person))
 				{
-					Search_run_menu.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
+					Search_run_menu.jButton3.setText(Lang.T("Remove Favorite"));
 				}
 				else
 				{
-					Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
+					Search_run_menu.jButton3.setText(Lang.T("Add Favorite"));
 				}
 	//			alpha = 255;
 				alpha_int = 5;

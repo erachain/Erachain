@@ -75,7 +75,7 @@ public class RenderComboBoxAssetActions extends DefaultListCellRenderer {
     }
 
     private String getDescriptionValue(Fun.Tuple2<?, String> value) {
-        return Lang.getInstance().translate(value.b);
+        return Lang.T(value.b);
     }
 
     private Border getNoFocusBorder() {

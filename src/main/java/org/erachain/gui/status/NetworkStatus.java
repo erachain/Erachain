@@ -37,20 +37,20 @@ public class NetworkStatus extends JLabel implements Observer {
            ToolTipManager.sharedInstance().setDismissDelay((int) TimeUnit.SECONDS.toMillis(5));
         this.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent mEvt) {
-                String mess = Lang.getInstance().translate("Network Port") + ": " + BlockChain.NETWORK_PORT
-                        + ", " + Lang.getInstance().translate("target")
+                String mess = Lang.T("Network Port") + ": " + BlockChain.NETWORK_PORT
+                        + ", " + Lang.T("target")
                         + ": " + Controller.getInstance().getBlockChain().getTarget(DCSet.getInstance()) + ", ";
 
                 try {
                     if (Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
-                        mess += Lang.getInstance().translate("Block height") + ": " + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
+                        mess += Lang.T("Block height") + ": " + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
                     } else if (Controller.getInstance().getWalletSyncHeight() > 0) {
-                        mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false, false);
+                        mess += Lang.T("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false, false);
                     } else {
                         Tuple3<Integer, Long, Peer> mm = Controller.getInstance().getMaxPeerHWeight(0, false, false);
                         Integer mmm = 0;
                         if (mm!=null)mmm = mm.a;
-                        mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + mmm;
+                        mess += Lang.T("Block height") + ": " + currentHeight + "/" + mmm;
                     }
                     setToolTipText(mess);
                 } catch (Exception e) {
@@ -84,7 +84,7 @@ public class NetworkStatus extends JLabel implements Observer {
         int height = heightW.a;
 
         if (Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING && height > 0) {
-            this.setText(Lang.getInstance().translate("Synchronizing") + " " + 100 * currentHeight / height + "%");
+            this.setText(Lang.T("Synchronizing") + " " + 100 * currentHeight / height + "%");
         }
 
     }
@@ -104,7 +104,7 @@ public class NetworkStatus extends JLabel implements Observer {
             }
 
             this.setIcon(walletSynchronizingIcon);
-            this.setText(Lang.getInstance().translate("Wallet Synchronizing") + " " + 100 * currentHeight / height + "%");
+            this.setText(Lang.T("Wallet Synchronizing") + " " + 100 * currentHeight / height + "%");
 
         } else if (type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
             viewProgress();
@@ -114,16 +114,16 @@ public class NetworkStatus extends JLabel implements Observer {
 
             if (status == Controller.STATUS_NO_CONNECTIONS) {
                 this.setIcon(noConnectionsIcon);
-                this.setText(Lang.getInstance().translate("No connections"));
+                this.setText(Lang.T("No connections"));
             }
             if (status == Controller.STATUS_SYNCHRONIZING) {
                 this.setIcon(synchronizingIcon);
-                //this.setText(Lang.getInstance().translate("Synchronizing"));
+                //this.setText(Lang.T("Synchronizing"));
                 viewProgress();
             }
             if (status == Controller.STATUS_OK) {
                 this.setIcon(okeIcon);
-                this.setText(Lang.getInstance().translate("OK"));
+                this.setText(Lang.T("OK"));
             }
         }
     }

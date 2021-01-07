@@ -175,9 +175,9 @@ public abstract class ItemSplitPanel extends SplitPanel {
                 favoriteMenuItems.setVisible(true);
                 // CHECK IF FAVORITES
                 if (Controller.getInstance().isItemFavorite(itemTableSelected)) {
-                    favoriteMenuItems.setText(Lang.getInstance().translate("Remove Favorite"));
+                    favoriteMenuItems.setText(Lang.T("Remove Favorite"));
                 } else {
-                    favoriteMenuItems.setText(Lang.getInstance().translate("Add Favorite"));
+                    favoriteMenuItems.setText(Lang.T("Add Favorite"));
                 }
             }
 
@@ -185,7 +185,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         menuTable.add(favoriteMenuItems);
 
-        JMenuItem vouchMenu = new JMenuItem(Lang.getInstance().translate("Sign / Vouch"));
+        JMenuItem vouchMenu = new JMenuItem(Lang.T("Sign / Vouch"));
         vouchMenu.addActionListener(e -> {
             DCSet db = DCSet.getInstance();
             Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
@@ -194,7 +194,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
         });
         menuTable.add(vouchMenu);
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -211,16 +211,16 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         menuTable.add(setSeeInBlockexplorer);
 
-        JMenuItem byteCode = new JMenuItem(Lang.getInstance().translate("Get bytecode"));
+        JMenuItem byteCode = new JMenuItem(Lang.T("Get bytecode"));
         byteCode.addActionListener(e -> {
             String base58str = Base58.encode(itemTableSelected.toBytes(false, false));
             StringSelection stringSelection = new StringSelection(base58str);
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate("Bytecode of the '%1' has been copy to buffer")
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
                             .replace("%1", itemTableSelected.getName())
                             + "!",
-                    Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 
         });
         menuTable.add(byteCode);
@@ -238,7 +238,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
     private void favoriteSet(ItemCls itemCls) {
         // CHECK IF FAVORITES
         if (Controller.getInstance().isItemFavorite(itemCls)) {
-            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
             if (showConfirmDialog == 0) {
                 Controller.getInstance().removeItemFavorite(itemCls);
             }

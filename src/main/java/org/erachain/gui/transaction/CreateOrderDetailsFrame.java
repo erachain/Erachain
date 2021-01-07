@@ -16,7 +16,7 @@ public class CreateOrderDetailsFrame extends RecDetailsFrame {
 
         //LABEL HAVE
         ++labelGBC.gridy;
-        JLabel haveLabel = new JLabel(Lang.getInstance().translate("Have") + ":");
+        JLabel haveLabel = new JLabel(Lang.T("Have") + ":");
         this.add(haveLabel, labelGBC);
 
         //HAVE
@@ -31,7 +31,7 @@ public class CreateOrderDetailsFrame extends RecDetailsFrame {
 
         //LABEL WANT
         ++labelGBC.gridy;
-        JLabel wantLabel = new JLabel(Lang.getInstance().translate("Want") + ":");
+        JLabel wantLabel = new JLabel(Lang.T("Want") + ":");
         this.add(wantLabel, labelGBC);
 
         //HAVE
@@ -45,7 +45,7 @@ public class CreateOrderDetailsFrame extends RecDetailsFrame {
 
         //LABEL PRICE
         ++labelGBC.gridy;
-        JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price") + ":");
+        JLabel priceLabel = new JLabel(Lang.T("Price") + ":");
         this.add(priceLabel, labelGBC);
 
         //PRICE

@@ -56,7 +56,7 @@ public class AssetDetailsPanel extends JPanel {
 
         //LABEL KEY
         labelGBC.gridy = ++gridy;
-        JLabel keyLabel = new JLabel(Lang.getInstance().translate("Key") + ":");
+        JLabel keyLabel = new JLabel(Lang.T("Key") + ":");
         this.add(keyLabel, labelGBC);
 
         //KEY
@@ -67,7 +67,7 @@ public class AssetDetailsPanel extends JPanel {
 
         //LABEL SEQ-NO
         labelGBC.gridy = ++gridy;
-        this.add(new JLabel(Lang.getInstance().translate("Block-SeqNo") + ":"), labelGBC);
+        this.add(new JLabel(Lang.T("Block-SeqNo") + ":"), labelGBC);
 
         // SEQ-NO
         Transaction record = Transaction.findByDBRef(DCSet.getInstance(), asset.getReference());
@@ -78,7 +78,7 @@ public class AssetDetailsPanel extends JPanel {
 
         //LABEL NAME
         labelGBC.gridy = ++gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Name") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME
@@ -89,14 +89,14 @@ public class AssetDetailsPanel extends JPanel {
 
         //LABEL DESCRIPTION
         labelGBC.gridy = ++gridy;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
         detailGBC.gridy = gridy;
         JTextArea txtAreaDescription;
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
-            txtAreaDescription = new JTextArea(Lang.getInstance().translate(asset.viewDescription()));
+            txtAreaDescription = new JTextArea(Lang.T(asset.viewDescription()));
         } else {
             txtAreaDescription = new JTextArea(asset.viewDescription());
         }
@@ -107,7 +107,7 @@ public class AssetDetailsPanel extends JPanel {
 
         //LABEL OWNER
         labelGBC.gridy = ++gridy;
-        JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
+        JLabel ownerLabel = new JLabel(Lang.T("Owner") + ":");
         this.add(ownerLabel, labelGBC);
 
         //OWNER
@@ -128,7 +128,7 @@ public class AssetDetailsPanel extends JPanel {
         if (false) {
             //LABEL DIVISIBLE
             labelGBC.gridy = ++gridy;
-            this.add(new JLabel(Lang.getInstance().translate("Movable") + ":"), labelGBC);
+            this.add(new JLabel(Lang.T("Movable") + ":"), labelGBC);
     
             //DIVISIBLE
             detailGBC.gridy = gridy;
@@ -141,7 +141,7 @@ public class AssetDetailsPanel extends JPanel {
 
         //LABEL QUANTITY
         labelGBC.gridy = ++gridy;
-        JLabel quantityLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
+        JLabel quantityLabel = new JLabel(Lang.T("Quantity") + ":");
         this.add(quantityLabel, labelGBC);
 
         //QUANTITY
@@ -152,7 +152,7 @@ public class AssetDetailsPanel extends JPanel {
 
         //LABEL RELEASED
         labelGBC.gridy = ++gridy;
-        this.add(new JLabel(Lang.getInstance().translate("Released") + ":"), labelGBC);
+        this.add(new JLabel(Lang.T("Released") + ":"), labelGBC);
         //RELEASED
         detailGBC.gridy = gridy;
         JTextField txtReleased = new JTextField(NumberAsString.formatAsString(asset.getReleased()));
@@ -161,12 +161,12 @@ public class AssetDetailsPanel extends JPanel {
 
         //LABEL TYPE
         labelGBC.gridy = ++gridy;
-        JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
+        JLabel divisibleLabel = new JLabel(Lang.T("Type") + ":");
         this.add(divisibleLabel, labelGBC);
 
         //TYPE
         detailGBC.gridy = gridy;
-        JTextField textType = new JTextField(Lang.getInstance().translate(asset.viewAssetTypeFull()));
+        JTextField textType = new JTextField(Lang.T(asset.viewAssetTypeFull()));
 
         //	textType.setSelected(asset.isDivisible()); // SELECT - OPION = asset.getAssetType();
         //	asset.viewAssetType()
@@ -180,7 +180,7 @@ public class AssetDetailsPanel extends JPanel {
             //ADD ERM PAIR BUTTON
             labelGBC.gridy++;
             labelGBC.gridwidth = 2;
-            JButton openPairButton = new JButton(Lang.getInstance().translate("Open pair"));
+            JButton openPairButton = new JButton(Lang.T("Open pair"));
             openPairButton.setPreferredSize(new Dimension(200, 25));
             openPairButton.addActionListener(new ActionListener() {
                 @Override
@@ -200,9 +200,9 @@ public class AssetDetailsPanel extends JPanel {
 
             //CHECK IF FAVORITES
             if (Controller.getInstance().isItemFavorite(asset)) {
-                this.favoritesButton.setText(Lang.getInstance().translate("Remove Favorite"));
+                this.favoritesButton.setText(Lang.T("Remove Favorite"));
             } else {
-                this.favoritesButton.setText(Lang.getInstance().translate("Add Favorite"));
+                this.favoritesButton.setText(Lang.T("Add Favorite"));
             }
 
             this.favoritesButton.setPreferredSize(new Dimension(200, 25));
@@ -226,7 +226,7 @@ public class AssetDetailsPanel extends JPanel {
         AssetCls assetSell = Settings.getInstance().getDefaultPairAsset();
         ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");
         panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
-        MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Exchange") + ":" + asset.getKey(),
+        MainPanel.getInstance().insertNewTab(Lang.T("Exchange") + ":" + asset.getKey(),
                 panel);
 
     }
@@ -234,10 +234,10 @@ public class AssetDetailsPanel extends JPanel {
     public void onFavoriteClick() {
         //CHECK IF FAVORITES
         if (Controller.getInstance().isItemFavorite(asset)) {
-            this.favoritesButton.setText(Lang.getInstance().translate("Add Favorite"));
+            this.favoritesButton.setText(Lang.T("Add Favorite"));
             Controller.getInstance().removeItemFavorite(this.asset);
         } else {
-            this.favoritesButton.setText(Lang.getInstance().translate("Remove Favorite"));
+            this.favoritesButton.setText(Lang.T("Remove Favorite"));
             Controller.getInstance().addItemFavorite(this.asset);
         }
 

@@ -24,7 +24,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
         // MENU
 
-        JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
+        JMenuItem sell = new JMenuItem(Lang.T("To sell"));
         sell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //new ExchangeFrame((AssetCls) th.itemMenu, null, "To sell", "");
@@ -33,7 +33,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             }
         });
 
-        JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
+        JMenuItem excahge = new JMenuItem(Lang.T("Exchange"));
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "", ""));
@@ -41,7 +41,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             }
         });
 
-        JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
+        JMenuItem buy = new JMenuItem(Lang.T("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", ""));

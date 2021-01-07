@@ -77,12 +77,12 @@ public class RenderComboBoxActionFilter extends DefaultListCellRenderer {
 
     private String getDescriptionValue(int value) {
         if (value == 0) {
-            return Lang.getInstance().translate("All");
+            return Lang.T("All");
         }
 
         String typeName = Transaction.viewTypeName(value);
         return "[" + value + "] " + (Settings.DEFAULT_LANGUAGE.equals(Settings.getInstance().getLang()) ?
-                typeName : Lang.getInstance().translate(typeName) + " (" + typeName + ")");
+                typeName : Lang.T(typeName) + " (" + typeName + ")");
     }
 
     private Border getNoFocusBorder() {

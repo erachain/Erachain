@@ -165,7 +165,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
 
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
-            this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
+            this.jTextArea_Account_Description.setText(Lang.T(asset.viewDescription()));
         } else {
             this.jTextArea_Account_Description.setText(asset.viewDescription());
         }
@@ -238,16 +238,16 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             }
         });
 
-        this.jLabelTXTitle.setText(Lang.getInstance().translate("Title") + ":");
-        this.jLabel_Mess.setText(Lang.getInstance().translate("Message") + ":");
-        this.jCheckBox_Encrypt.setText(Lang.getInstance().translate("Encrypt message"));
+        this.jLabelTXTitle.setText(Lang.T("Title") + ":");
+        this.jLabel_Mess.setText(Lang.T("Message") + ":");
+        this.jCheckBox_Encrypt.setText(Lang.T("Encrypt message"));
         this.jCheckBox_Encrypt.setSelected(true);
-        this.jCheckBox_isText.setText(Lang.getInstance().translate("As Text"));
+        this.jCheckBox_isText.setText(Lang.T("As Text"));
         this.jCheckBox_isText.setSelected(true);
-        this.jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
-        this.jLabel_Amount.setText(Lang.getInstance().translate("Amount") + ":");
+        this.jLabel_Asset.setText(Lang.T("Asset") + ":");
+        this.jLabel_Amount.setText(Lang.T("Amount") + ":");
 
-        this.jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
+        this.jLabel_Fee.setText(Lang.T("Fee Power") + ":");
         jLabel_Fee.setVisible(Gui.SHOW_FEE_POWER);
 
         // CONTEXT MENU
@@ -300,28 +300,28 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         if (asset.viewAssetTypeAction(backward, balancePosition, senderIsOwner) == null) {
             // Это возможно если был выбран актив уже внутри формы, а у него тип для которого текущего действия нету
             jButton_ok.setEnabled(false);
-            jButton_ok.setText(Lang.getInstance().translate("Wrong Action"));
+            jButton_ok.setText(Lang.T("Wrong Action"));
             return;
         }
 
-        String title = Lang.getInstance().translate(asset.viewAssetTypeActionTitle(backward, balancePosition, senderIsOwner));
+        String title = Lang.T(asset.viewAssetTypeActionTitle(backward, balancePosition, senderIsOwner));
         String addAssetType = asset.viewAssetTypeAdditionAction(backward, balancePosition, senderIsOwner);
         if (addAssetType == null) {
             jLabel_Title.setText(title + " - " + asset.viewName());
         } else {
             jLabel_Title.setText(title + " - " + asset.viewName()
-                    + " (" + Lang.getInstance().translate(addAssetType) + ")");
+                    + " (" + Lang.T(addAssetType) + ")");
         }
 
         setName(title + " ]" + asset.getKey() + " ]");
 
-        jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition, senderIsOwner)));
+        jButton_ok.setText(Lang.T(asset.viewAssetTypeActionOK(backward, balancePosition, senderIsOwner)));
 
-        this.jLabelCreator.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, balancePosition, senderIsOwner)) + ":");
+        this.jLabelCreator.setText(Lang.T(asset.viewAssetTypeCreator(backward, balancePosition, senderIsOwner)) + ":");
 
-        this.jLabelRecipient.setText(Lang.getInstance().translate(
+        this.jLabelRecipient.setText(Lang.T(
                 asset.viewAssetTypeTarget(backward, balancePosition, recipientIsOwner) + " " + "Account") + ":");
-        this.jLabelRecipientDetail.setText(Lang.getInstance().translate("Account Details") + ":");
+        this.jLabelRecipientDetail.setText(Lang.T("Account Details") + ":");
 
         // set scale
         int scale = asset.getScale();
@@ -330,18 +330,18 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             jScrollPane2.setViewportView(new AssetInfo(asset, false));
         }
 
-        this.jLabel_AssetType.setText(Lang.getInstance().translate(asset.viewAssetType()));
+        this.jLabel_AssetType.setText(Lang.T(asset.viewAssetType()));
 
         /////////// RECIPIENT DETAILS
         if (recipient != null) {
-            String details = Lang.getInstance().translate(
+            String details = Lang.T(
                     Account.getDetailsForEncrypt(recipient.getAddress(), 0,
                             this.jCheckBox_Encrypt.isSelected(), false));
 
             Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                     balance = recipient.getBalance(asset.getKey());
             if (balance != null) {
-                details += (details.isEmpty() ? "" : "<br>") + Lang.getInstance().translate("Balances") + ": "
+                details += (details.isEmpty() ? "" : "<br>") + Lang.T("Balances") + ": "
                         + (balancePosition == TransactionAmount.ACTION_SEND ? ("<b>" + balance.a.b.toPlainString() + "</b>") : balance.a.b.toPlainString())
                         + " / " + (balancePosition == TransactionAmount.ACTION_DEBT ? ("<b>" + balance.b.b.toPlainString() + "</b>") : balance.b.b.toPlainString())
                         + " / " + (balancePosition == TransactionAmount.ACTION_HOLD ? ("<b>" + balance.c.b.toPlainString() + "</b>") : balance.c.b.toPlainString())
@@ -359,7 +359,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             return;
         }
 
-        String details = Lang.getInstance().translate("Balances") + ": ";
+        String details = Lang.T("Balances") + ": ";
 
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                 balance = creator.getBalance(asset.getKey());
@@ -389,7 +389,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         Fun.Tuple2<Account, String> resultMake = Account.tryMakeAccount(recipientAddress.getSelectedAddress());
         if (resultMake.b != null) {
             recipient = null;
-            this.jlabel_RecipientDetail.setText(Lang.getInstance().translate(resultMake.b));
+            this.jlabel_RecipientDetail.setText(Lang.T(resultMake.b));
             checkReadyToOK();
             return;
         }
@@ -415,7 +415,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             }
             if (!Controller.getInstance().unlockWallet(password)) {
                 //WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
                 this.jButton_ok.setEnabled(true);
@@ -454,12 +454,12 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             switch (parsing) {
                 case 1:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid amount!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
 
                 case 2:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
             }
             //ENABLE
@@ -468,7 +468,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         }
 
         if (amount.equals(new BigDecimal("0.0"))) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Amount must be greater 0.0"), Lang.getInstance().translate("Error") + ":  " + Lang.getInstance().translate("Invalid amount!"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Amount must be greater 0.0"), Lang.T("Error") + ":  " + Lang.T("Invalid amount!"), JOptionPane.ERROR_MESSAGE);
 
             //ENABLE
             this.jButton_ok.setEnabled(true);
@@ -490,7 +490,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                     try {
                         messageBytes = Base58.decode(message);
                     } catch (Exception e) {
-                        JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(new JFrame(), Lang.T("Message format is not base58 or hex!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                         //ENABLE
                         this.jButton_ok.setEnabled(true);
@@ -515,7 +515,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         if (messageBytes != null) {
             if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded!") + " <= MAX", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Message size exceeded!") + " <= MAX", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
                 this.jButton_ok.setEnabled(true);
@@ -536,9 +536,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                 }
 
                 if (publicKey == null) {
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T(
                             ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                     //ENABLE
                     this.jButton_ok.setEnabled(true);
@@ -554,7 +554,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             txTitle = "";
         if (txTitle.getBytes(StandardCharsets.UTF_8).length > 256) {
 
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Title size exceeded!") + " <= 256", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Title size exceeded!") + " <= 256", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return false;
 
         }
@@ -567,7 +567,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         String refStr = exLinkText.getText();
         Transaction parentTx = Controller.getInstance().getTransaction(refStr);
         if (parentTx == null) {
-            exLinkDescription.setText(Lang.getInstance().translate("Not Found") + "!");
+            exLinkDescription.setText(Lang.T("Not Found") + "!");
         } else {
             exLinkDescription.setText(parentTx.toStringFullAndCreatorLang());
         }
@@ -595,10 +595,10 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         String Status_text = "";
         IssueConfirmDialog confirmDialog = new IssueConfirmDialog(null, true, transaction,
-                Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, balancePosition,
+                Lang.T(asset.viewAssetTypeActionOK(backward, balancePosition,
                         creator != null && creator.equals(asset.getOwner()))),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
-                Lang.getInstance().translate("Confirmation Transaction"), !noReceive);
+                Lang.T("Confirmation Transaction"), !noReceive);
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
 
         confirmDialog.jScrollPane1.setViewportView(ww);
@@ -618,9 +618,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     private void initComponents(String message) {
 
-        jLabelRecipientDetail = new javax.swing.JLabel(Lang.getInstance().translate("Recipient Details") + ":");
-        jLabelCreator = new javax.swing.JLabel(Lang.getInstance().translate("Sender") + ":");
-        jLabelRecipient = new javax.swing.JLabel(Lang.getInstance().translate("Recipient") + ":");
+        jLabelRecipientDetail = new javax.swing.JLabel(Lang.T("Recipient Details") + ":");
+        jLabelCreator = new javax.swing.JLabel(Lang.T("Sender") + ":");
+        jLabelRecipient = new javax.swing.JLabel(Lang.T("Recipient") + ":");
         jComboBoxCreator = new javax.swing.JComboBox<>();
         jLabelTXTitle = new javax.swing.JLabel();
         jlabel_RecipientDetail = new javax.swing.JLabel();
@@ -644,9 +644,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea_Account_Description = new javax.swing.JTextArea();
 
-        exLinkTextLabel = new JLabel(Lang.getInstance().translate("Append to") + ":");
+        exLinkTextLabel = new JLabel(Lang.T("Append to") + ":");
         exLinkText = new JTextField();
-        exLinkDescriptionLabel = new JLabel(Lang.getInstance().translate("Parent") + ":");
+        exLinkDescriptionLabel = new JLabel(Lang.T("Parent") + ":");
         exLinkDescription = new JTextField();
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
@@ -772,7 +772,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         gridBagConstraints.insets = fieldGBC.insets;
         add(exLinkText, gridBagConstraints);
 
-        exLinkDescriptionLabel.setText(Lang.getInstance().translate("Parent") + ":");
+        exLinkDescriptionLabel.setText(Lang.T("Parent") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = fieldGBC.gridx + 1;
         gridBagConstraints.gridy = gridy;

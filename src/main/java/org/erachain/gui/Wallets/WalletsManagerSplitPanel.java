@@ -31,10 +31,10 @@ public class WalletsManagerSplitPanel extends SplitPanel {
         this.toolBarLeftPanel.setVisible(true);
         this.button1ToolBarLeftPanel.setVisible(true);
         this.button1ToolBarLeftPanel.setBorder(new LineBorder(Color.BLACK));
-        this.button1ToolBarLeftPanel.setText(Lang.getInstance().translate("Add wallet"));
+        this.button1ToolBarLeftPanel.setText(Lang.T("Add wallet"));
         this.button2ToolBarLeftPanel.setVisible(false);
 
-        this.setName(Lang.getInstance().translate("Wallets Manager"));
+        this.setName(Lang.T("Wallets Manager"));
         this.jToolBarRightPanel.setVisible(false);
 
         button1ToolBarLeftPanel.addActionListener(new ActionListener() {
@@ -45,7 +45,7 @@ public class WalletsManagerSplitPanel extends SplitPanel {
                 FileChooser chooser = new FileChooser();
                 chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 chooser.setMultiSelectionEnabled(false);
-                chooser.setDialogTitle(Lang.getInstance().translate("Open Wallet") + "...");
+                chooser.setDialogTitle(Lang.T("Open Wallet") + "...");
                 int returnVal = chooser.showOpenDialog(getParent());
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
 

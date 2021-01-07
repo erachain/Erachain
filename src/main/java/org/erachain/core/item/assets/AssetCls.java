@@ -10,6 +10,8 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
+import org.erachain.lang.Lang;
+import org.erachain.lang.LangFile;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -17,9 +19,7 @@ import org.mapdb.Fun;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 
 // 1019 - Movable = true; Divisible = NO; Quantity = 1
@@ -291,6 +291,56 @@ public abstract class AssetCls extends ItemCls {
     }
 
     //GETTERS/SETTERS
+
+    public static int[] assetTypes;
+
+    public static int[] AssetTypes() {
+
+        if (assetTypes != null)
+            return assetTypes;
+
+        int[] array = new int[]{
+
+                AS_OUTSIDE_GOODS,
+                AS_OUTSIDE_IMMOVABLE,
+                AS_OUTSIDE_CURRENCY,
+                AS_OUTSIDE_SERVICE,
+                AS_OUTSIDE_BILL,
+                AS_OUTSIDE_WORK_TIME_HOURS,
+                AS_OUTSIDE_WORK_TIME_MINUTES,
+                AS_OUTSIDE_SHARE,
+
+                AS_MY_DEBT,
+
+                AS_OUTSIDE_OTHER_CLAIM,
+
+                AS_INSIDE_ASSETS,
+                AS_INSIDE_CURRENCY,
+                AS_INSIDE_UTILITY,
+                AS_INSIDE_SHARE,
+                AS_INSIDE_BONUS,
+                AS_INSIDE_ACCESS,
+                AS_INSIDE_VOTE,
+                AS_BANK_GUARANTEE,
+                AS_BANK_GUARANTEE_TOTAL,
+                AS_INDEX,
+                AS_INSIDE_OTHER_CLAIM,
+
+                AS_ACCOUNTING,
+                AS_SELF_MANAGED_ACCOUNTING,
+                AS_SELF_ACCOUNTING_LOAN,
+                AS_SELF_ACCOUNTING_MUTUAL_AID_FUND,
+                AS_SELF_ACCOUNTING_CASH_FUND
+        };
+
+        if (BlockChain.TEST_MODE) {
+            // AS_SELF_ACCOUNTING_CASH_FUND,
+        }
+
+        Arrays.sort(array);
+
+        return array;
+    }
 
     @Override
     public int getItemType() {
@@ -793,7 +843,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "Outside Share";
             case AS_OUTSIDE_BILL:
-                return "Promissory Note";
+                return "Promissory Note"; // non turnover Promissory Note / non-negotiable promissory note
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of exchange";
             case AS_MY_DEBT:
@@ -860,7 +910,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "Outside Share Rights";
             case AS_OUTSIDE_BILL:
-                return "Promissory Note";
+                return "Promissory Note without turnover on me";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of Exchange";
             case AS_MY_DEBT:
@@ -993,7 +1043,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "External shares which have to be transferred to an external depository. The depositary can be notified by presenting the claim and then confirm the shares transfer";
             case AS_OUTSIDE_BILL:
-                return "A digital promissory note can be called for redemption by external money. You can take it into your hands";
+                return "AS_OUTSIDE_BILL_D";
             case AS_OUTSIDE_BILL_EX:
                 return "A digital bill of exchange can be called for redemption by external money. You can take it into your hands";
             case AS_MY_DEBT:
@@ -1709,26 +1759,87 @@ public abstract class AssetCls extends ItemCls {
     }
 
     //OTHER
+    public static JSONObject AssetTypeJson(int assetType, JSONObject langObj) {
+
+        JSONObject type = new JSONObject();
+        type.put("id", assetType);
+        type.put("name", Lang.T(AssetCls.viewAssetTypeCls(assetType), langObj));
+        type.put("nameFull", Lang.T(AssetCls.viewAssetTypeFullCls(assetType), langObj));
+
+        List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> actions = AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
+                AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
+                assetType, null, true);
+        StringJoiner joiner = new StringJoiner(", ");
+        JSONArray actionsArray = new JSONArray();
+        for (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> action : actions) {
+            joiner.add(Lang.T(action.b, langObj));
+            JSONObject actionJson = new JSONObject();
+            actionJson.put("action", action.a.a);
+            actionJson.put("backward", action.a.b);
+            actionJson.put("name", Lang.T(action.b, langObj));
+            actionsArray.add(actionJson);
+        }
+
+        String description = Lang.T(AssetCls.viewAssetTypeDescriptionCls(assetType), langObj) + ".<br>";
+        if (AssetCls.isReverseSend(assetType)) {
+            description += Lang.T("Actions for OWN balance is reversed", langObj) + ".<br>";
+        }
+        description += "<b>" + Lang.T("Acceptable actions", langObj) + ":</b><br>" + joiner.toString();
+
+        type.put("description", description);
+
+        return null;
+    }
+
+    public static JSONObject assetTypesJson;
+
+    public static JSONObject AssetTypesActionsJson() {
+
+        if (assetTypesJson != null)
+            return assetTypesJson;
+
+        assetTypesJson = new JSONObject();
+        for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
+            LangFile langFile = Lang.getInstance().getLangFile(iso);
+            JSONObject langJson = new JSONObject();
+            for (int type : AssetTypes()) {
+                langJson.put(type, AssetTypeJson(type, langFile.getLangJson()));
+            }
+            assetTypesJson.put(iso, langJson);
+        }
+        return assetTypesJson;
+    }
+
+    public static JSONObject typeJson(int type) {
+
+        String assetTypeName;
+
+        assetTypeName = viewAssetTypeCls(type);
+        if (assetTypeName == null)
+            return null;
+
+        JSONObject typeJson = new JSONObject();
+
+        typeJson.put("key", type);
+        typeJson.put("char", charAssetType(1000, type));
+        typeJson.put("abbrev", viewAssetTypeAbbrev(type));
+        typeJson.put("name", assetTypeName);
+        typeJson.put("name_full", viewAssetTypeFullCls(type));
+        typeJson.put("desc", viewAssetTypeDescriptionCls(type));
+
+        return typeJson;
+    }
 
     public static JSONArray typesJson() {
 
         JSONArray types = new JSONArray();
 
-        String assetTypeName;
         for (int i = 0; i < 256; i++) {
-            assetTypeName = viewAssetTypeCls(i);
-            if (assetTypeName == null)
+            JSONObject json = typeJson(i);
+            if (json == null)
                 continue;
 
-            JSONObject type = new JSONObject();
-            type.put("key", i);
-            type.put("char", charAssetType(1000, i));
-            type.put("abbrev", viewAssetTypeAbbrev(i));
-            type.put("name", assetTypeName);
-            type.put("name_full", viewAssetTypeFullCls(i));
-            type.put("desc", viewAssetTypeDescriptionCls(i));
-            types.add(type);
-
+            types.add(json);
         }
         return types;
     }

@@ -100,7 +100,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
         //MENU
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem seeDetails = new JMenuItem(Lang.getInstance().translate("See Details"));
+        JMenuItem seeDetails = new JMenuItem(Lang.T("See Details"));
         seeDetails.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JMenuItem menuItem = (JMenuItem) e.getSource();
@@ -112,7 +112,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                 row = invokerAsJComponent.convertRowIndexToModel(row);
 
                 IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, messageBufs.get(row).tx,
-                        (int) (parent.getWidth() / 1.2), (int) (parent.getHeight() / 1.2), Lang.getInstance().translate("Transaction"));
+                        (int) (parent.getWidth() / 1.2), (int) (parent.getHeight() / 1.2), Lang.T("Transaction"));
                 dd.setLocationRelativeTo(parent);
                 dd.setVisible(true);
 
@@ -120,7 +120,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
         });
         menu.add(seeDetails);
 
-        JMenuItem copyMessage = new JMenuItem(Lang.getInstance().translate("Copy Message"));
+        JMenuItem copyMessage = new JMenuItem(Lang.T("Copy Message"));
         copyMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JMenuItem menuItem = (JMenuItem) e.getSource();
@@ -138,7 +138,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
         });
         menu.add(copyMessage);
 
-        JMenuItem copyAllMessages = new JMenuItem(Lang.getInstance().translate("Copy All Messages"));
+        JMenuItem copyAllMessages = new JMenuItem(Lang.T("Copy All Messages"));
         copyAllMessages.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String strvalue = "";
@@ -155,7 +155,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
         });
         menu.add(copyAllMessages);
 
-        JMenuItem copySender = new JMenuItem(Lang.getInstance().translate("Copy Sender Account"));
+        JMenuItem copySender = new JMenuItem(Lang.T("Copy Sender Account"));
         copySender.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JMenuItem menuItem = (JMenuItem) e.getSource();
@@ -173,7 +173,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
         });
         menu.add(copySender);
 
-        JMenuItem copyRecipient = new JMenuItem(Lang.getInstance().translate("Copy Recipient Account"));
+        JMenuItem copyRecipient = new JMenuItem(Lang.T("Copy Recipient Account"));
         copyRecipient.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JMenuItem menuItem = (JMenuItem) e.getSource();
@@ -192,7 +192,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
 
         menu.add(copyRecipient);
 
-        menuDecrypt = new JMenuItem(Lang.getInstance().translate("Decrypt"));
+        menuDecrypt = new JMenuItem(Lang.T("Decrypt"));
         menuDecrypt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JMenuItem menuItem = (JMenuItem) e.getSource();
@@ -242,9 +242,9 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                         menuDecrypt.setVisible(true);
                     }
                     if (messageBufs.get(row).getOpend()) {
-                        menuDecrypt.setText(Lang.getInstance().translate("Hide decrypted"));
+                        menuDecrypt.setText(Lang.T("Hide decrypted"));
                     } else {
-                        menuDecrypt.setText(Lang.getInstance().translate("Decrypt"));
+                        menuDecrypt.setText(Lang.T("Decrypt"));
                     }
                 }
             }
@@ -399,7 +399,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
             CryptoOpenBox(i, 2);
         }
 
-        menuDecrypt.setText(Lang.getInstance().translate("Decrypt"));
+        menuDecrypt.setText(Lang.T("Decrypt"));
         this.repaint();
     }
 
@@ -430,7 +430,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                     }
                     if (!Controller.getInstance().unlockWallet(password)) {
                         //WRONG PASSWORD
-                        JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                         return;
                     }
@@ -440,19 +440,19 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                         messageBufs.get(row).recipient, messageBufs.get(row).rawMessage);
 
                 if (decryptedData == null) {
-                    messageBufs.get(row).setDecryptedMessage(Lang.getInstance().translate("Decrypt Error!"));
+                    messageBufs.get(row).setDecryptedMessage(Lang.T("Decrypt Error!"));
                 } else {
                     messageBufs.get(row).setDecryptedMessage((messageBufs.get(row).isText()) ? new String(decryptedData, StandardCharsets.UTF_8) :
                             Base58.encode(decryptedData)); //Converter.toHex(decryptedData));
                     messageBufs.get(row).setOpend(true);
-                    menuDecrypt.setText(Lang.getInstance().translate("Hide decrypted"));
+                    menuDecrypt.setText(Lang.T("Hide decrypted"));
                 }
 
             } else {
                 if (toOpen != 1) {
                     messageBufs.get(row).setDecryptedMessage("");
                     messageBufs.get(row).setOpend(false);
-                    menuDecrypt.setText(Lang.getInstance().translate("Decrypt"));
+                    menuDecrypt.setText(Lang.T("Decrypt"));
                 }
             }
 
@@ -728,8 +728,8 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                 }
 
                 String actionName = tx.viewFullTypeName();
-                amountStr = "<b><font size='3'>" + Lang.getInstance().translate(actionName) + " "
-                        //+ Lang.getInstance().translate("Amount") + ": "
+                amountStr = "<b><font size='3'>" + Lang.T(actionName) + " "
+                        //+ Lang.T("Amount") + ": "
                         + NumberAsString.formatAsString(this.amount) + "</font> "
                         // TODO ошибка открытия
                         + (cachedImage == null ? "" : "<img src='" + img_Local_URL + "'>")
@@ -743,9 +743,9 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                     + " width='" + (width / 2 - 1) + "'>"
                     + "<font size='2.5'" // color='" + colorTextHeader
                     + ">"
-                    + imginout + " " + Lang.getInstance().translate(sidePreff) + ": " + sideAccount.viewPerson()
-                    //+ imginout + " " + Lang.getInstance().translate("From") + ": " + sender.viewPerson()
-                    //+ "<br>" + Lang.getInstance().translate("To") + ": " + recipient.viewPerson()
+                    + imginout + " " + Lang.T(sidePreff) + ": " + sideAccount.viewPerson()
+                    //+ imginout + " " + Lang.T("From") + ": " + sender.viewPerson()
+                    //+ "<br>" + Lang.T("To") + ": " + recipient.viewPerson()
                     + "</font><br>"
                     + "<font size=1.5em color='" + colorTextHeader + "'><b>" + title
                     + "</b></font></td>"
@@ -754,7 +754,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                     + "<font size='2.5'" // color='" + colorTextHeader
                     + ">" + strconfirmations + " . "
                     + DateTimeFormat.timestamptoString(this.timestamp)
-                    + " " + Lang.getInstance().translate("Fee") + ": "
+                    + " " + Lang.T("Fee") + ": "
                     + NumberAsString.formatAsString(fee)
                     + "<br></font>"
                     + amountStr
@@ -784,12 +784,12 @@ public class MailsHTMLTableModel extends JTable implements Observer {
 
             if (this.encrypted) {
                 if (this.opened) {
-                    imgLock = Lang.getInstance().translate("Decrypted");
+                    imgLock = Lang.T("Decrypted");
                 } else {
-                    imgLock = Lang.getInstance().translate("Encrypted");
+                    imgLock = Lang.T("Encrypted");
                 }
             } else {
-                imgLock = Lang.getInstance().translate("Unencrypted");
+                imgLock = Lang.T("Unencrypted");
             }
 
             int confirmations = this.getConfirmations();
@@ -804,27 +804,27 @@ public class MailsHTMLTableModel extends JTable implements Observer {
 
             String send_type;
             if (this.getAssetKey() < 0 && amo_sign > 0) {
-                send_type = Lang.getInstance().translate("debt");
+                send_type = Lang.T("debt");
             } else if (this.getAssetKey() > 0 && amo_sign < 0) {
-                send_type = Lang.getInstance().translate("hold");
+                send_type = Lang.T("hold");
             } else if (this.getAssetKey() < 0 && amo_sign < 0) {
-                send_type = Lang.getInstance().translate("spend");
+                send_type = Lang.T("spend");
             } else {
-                send_type = Lang.getInstance().translate("pay");
+                send_type = Lang.T("pay");
             }
 
             String strAsset = Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort();
 
-            return Lang.getInstance().translate("Date") + ": " + DateTimeFormat.timestamptoString(this.timestamp) + "\n"
+            return Lang.T("Date") + ": " + DateTimeFormat.timestamptoString(this.timestamp) + "\n"
                     + send_type + "\n"
-                    + Lang.getInstance().translate("Sender") + ": " + this.sender + "\n"
-                    + Lang.getInstance().translate("Recipient") + ": " + this.recipient + "\n"
-                    + Lang.getInstance().translate("Amount") + ": " + NumberAsString.formatAsString(this.amount) + " " + strAsset + " . " + Lang.getInstance().translate("Fee") + ": " + NumberAsString.formatAsString(this.fee) + "\n"
-                    + Lang.getInstance().translate("Type") + ": " + imginout + ". " + imgLock + "\n"
-                    + Lang.getInstance().translate("Confirmations") + ": " + strConfirmations + "\n"
-                    + Lang.getInstance().translate("[MESSAGE START]\n")
+                    + Lang.T("Sender") + ": " + this.sender + "\n"
+                    + Lang.T("Recipient") + ": " + this.recipient + "\n"
+                    + Lang.T("Amount") + ": " + NumberAsString.formatAsString(this.amount) + " " + strAsset + " . " + Lang.T("Fee") + ": " + NumberAsString.formatAsString(this.fee) + "\n"
+                    + Lang.T("Type") + ": " + imginout + ". " + imgLock + "\n"
+                    + Lang.T("Confirmations") + ": " + strConfirmations + "\n"
+                    + Lang.T("[MESSAGE START]\n")
                     + getDecrMessage() + "\n"
-                    + Lang.getInstance().translate("[MESSAGE END]\n");
+                    + Lang.T("[MESSAGE END]\n");
         }
     }
 

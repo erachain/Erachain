@@ -22,24 +22,24 @@ public class ResultDialog {
 
         //CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {
-            String message = Lang.getInstance().translate("Transaction \"%1\" has been sent").replace("%1",
-                    Lang.getInstance().translate(transaction.viewFullTypeName())) + "!";
+            String message = Lang.T("Transaction \"%1\" has been sent").replace("%1",
+                    Lang.T(transaction.viewFullTypeName())) + "!";
             JOptionPane.showMessageDialog(new JFrame(), message,
-                    Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
             return true;
         } else if (BlockChain.MAIN_MODE && result == Transaction.NOT_ENOUGH_FEE
                 // и биржа включена
                 && Settings.EXCHANGE_IN_OUT) {
 
-            Object[] options = {Lang.getInstance().translate("Add funds to Your account"),
-                    Lang.getInstance().translate("Cancel")};
+            Object[] options = {Lang.T("Add funds to Your account"),
+                    Lang.T("Cancel")};
 
-            JLabel mess = new JLabel(Lang.getInstance().translate("ENOUGH_COMPU_AND_BUY"));
+            JLabel mess = new JLabel(Lang.T("ENOUGH_COMPU_AND_BUY"));
 
             int n = JOptionPane.showOptionDialog(
                     parent,
                     mess,
-                    Lang.getInstance().translate(OnDealClick.resultMess(result)),
+                    Lang.T(OnDealClick.resultMess(result)),
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.WARNING_MESSAGE,
                     null,
@@ -50,15 +50,15 @@ public class ResultDialog {
             if (n == JOptionPane.YES_OPTION) {
                 AssetCls feeAsset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
                 BigDecimal amountBuy = transaction.getFee();
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Deposit") + " COMPU", new DepositExchange(feeAsset, transaction.getCreator(),
+                MainPanel.getInstance().insertNewTab(Lang.T("Deposit") + " COMPU", new DepositExchange(feeAsset, transaction.getCreator(),
                         amountBuy, feeAsset));
             }
 
         } else {
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(result))
+                    Lang.T(OnDealClick.resultMess(result))
                             + (transaction.errorValue == null ? "" : ": " + transaction.errorValue),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
         }
         return false;
 

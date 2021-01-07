@@ -41,7 +41,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
     public OutcomingMailsSplitPanel() {
         super(NAME, TITLE);
 
-        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);
@@ -82,7 +82,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         //MENU
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem copySender = new JMenuItem(Lang.getInstance().translate("Copy Sender Account"));
+        JMenuItem copySender = new JMenuItem(Lang.T("Copy Sender Account"));
         copySender.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -96,7 +96,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         });
         menu.add(copySender);
 
-        JMenuItem copyRecipient = new JMenuItem(Lang.getInstance().translate("Copy Recipient Account"));
+        JMenuItem copyRecipient = new JMenuItem(Lang.T("Copy Recipient Account"));
         copyRecipient.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -113,7 +113,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 
         menu.addSeparator();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override

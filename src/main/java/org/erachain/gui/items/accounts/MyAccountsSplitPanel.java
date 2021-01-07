@@ -28,7 +28,7 @@ public class MyAccountsSplitPanel extends SplitPanel {
         this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
         this.toolBarLeftPanel.setVisible(false);
-        this.setName(Lang.getInstance().translate("My Accounts"));
+        this.setName(Lang.T("My Accounts"));
         this.jToolBarRightPanel.setVisible(false);
 
         GridBagConstraints PanelGBC = new GridBagConstraints();

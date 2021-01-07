@@ -15,8 +15,8 @@ public class GUIUtils {
             String password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
             if (!Controller.getInstance().unlockWallet(password)) {
                 // WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
+                        Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
                 // ENABLE
                 if (button != null) {
                     button.setEnabled(true);

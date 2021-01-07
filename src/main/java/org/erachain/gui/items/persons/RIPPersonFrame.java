@@ -33,7 +33,7 @@ public class RIPPersonFrame extends JInternalFrame {
     private JComboBox<Account> accountLBox;
 
     public RIPPersonFrame(JFrame parent) {
-        super(Lang.getInstance().translate("R.I.P Person"));
+        super(Lang.T("R.I.P Person"));
 
 
         final JTextField personKeyTxt = new JTextField();
@@ -67,7 +67,7 @@ public class RIPPersonFrame extends JInternalFrame {
 
         //LABEL FROM
         ++label.gridy;
-        this.add(new JLabel(Lang.getInstance().translate("Account") + ":"), label);
+        this.add(new JLabel(Lang.T("Account") + ":"), label);
 
         //COMBOBOX FROM
         ++input.gridy;
@@ -75,7 +75,7 @@ public class RIPPersonFrame extends JInternalFrame {
         this.add(this.accountLBox, input);
 
         ++label.gridy;
-        this.add(new JLabel(Lang.getInstance().translate("Person Key") + ":"), label);
+        this.add(new JLabel(Lang.T("Person Key") + ":"), label);
 
         ++input.gridy;
         this.add(personKeyTxt, input);
@@ -101,7 +101,7 @@ public class RIPPersonFrame extends JInternalFrame {
         ++input.gridy;
         ++label.gridy;
         JPanel htmlPanel = new JPanel();
-        htmlPanel.setBorder(BorderFactory.createTitledBorder(Lang.getInstance().translate("Details")));
+        htmlPanel.setBorder(BorderFactory.createTitledBorder(Lang.T("Details")));
 
         String text = "";
         //font = new Font(null, Font.PLAIN, 10);
@@ -125,7 +125,7 @@ public class RIPPersonFrame extends JInternalFrame {
         this.add(htmlPanel, input); // BorderLayout.SOUTH);
 
         ++label.gridy;
-        this.add(new JLabel(Lang.getInstance().translate("Date ('.'=today)") + ":"), label);
+        this.add(new JLabel(Lang.T("Date ('.'=today)") + ":"), label);
 
         input.gridy = label.gridy;
         input.gridx = 1;
@@ -135,7 +135,7 @@ public class RIPPersonFrame extends JInternalFrame {
 
         // FEE POWER
         ++label.gridy;
-        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        JLabel feeLabel = new JLabel(Lang.T("Fee Power") + ":");
         feeLabel.setVisible(Gui.SHOW_FEE_POWER);
         this.add(feeLabel, label);
 
@@ -149,7 +149,7 @@ public class RIPPersonFrame extends JInternalFrame {
         input.gridx = 1;
         input.gridwidth = 2;
         input.gridheight = 1;
-        JButton Button_Cancel = new JButton(Lang.getInstance().translate("Cancel"));
+        JButton Button_Cancel = new JButton(Lang.T("Cancel"));
         Button_Cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // программа обработки при нажатии cancel
@@ -160,7 +160,7 @@ public class RIPPersonFrame extends JInternalFrame {
         input.gridx = 4;
         input.gridwidth = 2;
         input.gridheight = 1;
-        JButton Button_Confirm = new JButton(Lang.getInstance().translate("Confirm"));
+        JButton Button_Confirm = new JButton(Lang.T("Confirm"));
         this.add(Button_Confirm, input);
         Button_Confirm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -171,7 +171,7 @@ public class RIPPersonFrame extends JInternalFrame {
         //SHOW FRAME
         this.pack();
         this.setMaximizable(true);
-        //this.setTitle(Lang.getInstance().translate("Persons"));
+        //this.setTitle(Lang.T("Persons"));
         //setPreferredSize(new Dimension(500, 600));
         this.setSize(new Dimension(500, 300));
         this.setClosable(true);
@@ -196,7 +196,7 @@ public class RIPPersonFrame extends JInternalFrame {
         long personKey = Long.parseLong(pubKeyTxt.getText());
 
         if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
-            pubKeyDetails.setText(Lang.getInstance().translate("Status must be OK to show public key details."));
+            pubKeyDetails.setText(Lang.T("Status must be OK to show public key details."));
             return null;
         }
 
@@ -224,7 +224,7 @@ public class RIPPersonFrame extends JInternalFrame {
 				else {
 					long current_time = NTP.getTime();
 					int daysLeft = (int)((aliveStatus.a - current_time) / 86400000l);
-					personDetails += "<br>" + Lang.getInstance().translate("Died %days% days ago").replace("%days%", ""+daysLeft);
+					personDetails += "<br>" + Lang.T("Died %days% days ago").replace("%days%", ""+daysLeft);
 				}
 			} else {
 				// IF PERSON ALIVE
@@ -233,8 +233,8 @@ public class RIPPersonFrame extends JInternalFrame {
 				else {
 					long current_time = NTP.getTime();
 					int daysLeft = (int)((aliveStatus.a - current_time) / 86400000l);
-					if (daysLeft < 0 ) personDetails += "<br>" + Lang.getInstance().translate("Person died %days% ago days ago").replace("%days%", ""+daysLeft);
-					else personDetails += "<br>" + Lang.getInstance().translate("Person is still alive %days%").replace("%days%", ""+daysLeft);
+					if (daysLeft < 0 ) personDetails += "<br>" + Lang.T("Person died %days% ago days ago").replace("%days%", ""+daysLeft);
+					else personDetails += "<br>" + Lang.T("Person is still alive %days%").replace("%days%", ""+daysLeft);
 				}
 			}
 			*/
@@ -265,13 +265,13 @@ public class RIPPersonFrame extends JInternalFrame {
 
         } catch (Exception e) {
             if (parse == 0) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             }
         }
 
         Pair<Integer, Long> endDateRes = ItemCls.resolveDateFromStr(toDateStr, NTP.getTime());
         if (endDateRes.getA() == -1) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid Date value"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid Date value"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             Button_Confirm.setEnabled(true);
             return;
         } else
@@ -281,8 +281,8 @@ public class RIPPersonFrame extends JInternalFrame {
         PrivateKeyAccount authenticator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator.getAddress());
         if (creator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -304,11 +304,11 @@ public class RIPPersonFrame extends JInternalFrame {
 				);
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person listed as dead"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.T("Person listed as dead"), Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
 		} else {
 		
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.T(OnDealClick.resultMess(result.getB())), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 		*/
 

@@ -137,10 +137,10 @@ public class WebService {
             try {
                 Fun.Tuple3<KeyStore, Certificate, String> result = SslUtils.getWebKeyStore(Settings.getInstance().getWebKeyStorePath(), Settings.getInstance().getWebKeyStorePassword(), Settings.getInstance().getWebStoreSourcePassword());
                 if (result.a == null) {
-                    LOGGER.error(Lang.getInstance().translate("WEB SSL not started: ") + ": " + result.c);
+                    LOGGER.error(Lang.T("WEB SSL not started: ") + ": " + result.c);
                     certificateSslIsOk = false;
                 } else {
-                    LOGGER.info(Lang.getInstance().translate("Start SSL is OK"));
+                    LOGGER.info(Lang.T("Start SSL is OK"));
                     LOGGER.info("SSL public key: " + result.b.getPublicKey().toString());
                 }
             } catch (FileNotFoundException e1) {

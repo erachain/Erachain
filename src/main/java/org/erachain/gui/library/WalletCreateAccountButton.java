@@ -21,7 +21,7 @@ public class WalletCreateAccountButton extends JButton implements Observer {
 
     public WalletCreateAccountButton(MTable table) {
 
-        super(Lang.getInstance().translate("New account"));
+        super(Lang.T("New account"));
         th = this;
 
 
@@ -43,7 +43,7 @@ public class WalletCreateAccountButton extends JButton implements Observer {
                     String password = PasswordPane.showUnlockWalletDialog(th);
                     if (!Controller.getInstance().unlockWallet(password)) {
                         //WRONG PASSWORD
-                        JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                 }
@@ -92,7 +92,7 @@ public class WalletCreateAccountButton extends JButton implements Observer {
 
             if (status == Controller.STATUS_SYNCHRONIZING) {
 
-                //this.setText(Lang.getInstance().translate("Synchronizing"));
+                //this.setText(Lang.T("Synchronizing"));
                 th.setEnabled(false);
             } else {
                 th.setEnabled(true);

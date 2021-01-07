@@ -37,11 +37,11 @@ public class IssueTemplatePanel extends IssueItemPanel {
     protected String makeTransactionView() {
 
         String text = "<HTML><body>";
-        text += Lang.getInstance().translate("Confirmation transaction issue template") + "<br><br><br>";
-        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
-                + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
-        text += Lang.getInstance().translate("Title") + ":&nbsp;" + transaction.getItem().viewName() + "<br>";
-        text += Lang.getInstance().translate("Description") + ":<br>"
+        text += Lang.T("Confirmation transaction issue template") + "<br><br><br>";
+        text += Lang.T("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
+                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
+        text += Lang.T("Title") + ":&nbsp;" + transaction.getItem().viewName() + "<br>";
+        text += Lang.T("Description") + ":<br>"
                 + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
 
         return text;

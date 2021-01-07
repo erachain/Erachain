@@ -44,7 +44,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
 
     public FavoriteStatementsSplitPanel() {
         super(NAME, TITLE);
-        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
 
         // not show buttons
         jToolBarRightPanel.setVisible(false);
@@ -86,7 +86,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         JPopupMenu menu = new JPopupMenu();
 
         // favorite menu
-        JMenuItem favoriteMenuItems = new JMenuItem(Lang.getInstance().translate("Remove Favorite"));
+        JMenuItem favoriteMenuItems = new JMenuItem(Lang.T("Remove Favorite"));
         favoriteMenuItems.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Transaction statement = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel
@@ -100,7 +100,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
 
         menu.addSeparator();
 
-        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Sign / Vouch"));
+        JMenuItem vouch_Item = new JMenuItem(Lang.T("Sign / Vouch"));
 
         vouch_Item.addActionListener(e -> {
 
@@ -117,7 +117,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
 
         menu.addSeparator();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -244,7 +244,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
     private void favoriteSet(Transaction transaction) {
         // CHECK IF FAVORITES
         if (favotitesTable.wallet.isDocumentFavorite(transaction)) {
-            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
             if (showConfirmDialog == 0) {
                 favotitesTable.wallet.removeDocumentFavorite(transaction);
             }

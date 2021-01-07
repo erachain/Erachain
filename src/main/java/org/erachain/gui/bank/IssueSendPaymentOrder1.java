@@ -1,7 +1,6 @@
 package org.erachain.gui.bank;
 
 import org.erachain.core.account.Account;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.library.*;
 import org.erachain.gui.models.AccountsComboBoxModel;
@@ -60,26 +59,26 @@ class IssueSendPaymentOrder1 extends JPanel {
         MenuPopupUtil.installContextMenu(this.jComboBox_ACCOUNT_ERA_Of_Bank);
         MenuPopupUtil.installContextMenu(this.jTextArea_Description);
         // labels
-        this.jButton_Cancel.setText(Lang.getInstance().translate("Clear all"));
-        this.jButton_OK.setText(Lang.getInstance().translate("Send"));
-        this.jCheckBox_Encrypted.setText(Lang.getInstance().translate("Encrypt"));
-        this.jLabel_4_Data.setText(Lang.getInstance().translate("INN"));
-        this.jLabel_ACCOUNT_ERA_Of_Bank.setText(Lang.getInstance().translate("To: (Account ERA)"));
-        this.jLabel_Account.setText(Lang.getInstance().translate("Select account"));
-        this.jLabel_Ammount.setText(Lang.getInstance().translate("Amount"));
-        this.jLabel_BIK.setText(Lang.getInstance().translate("BIK"));
-        this.jLabel_Date.setText(Lang.getInstance().translate("Date"));
-        this.jLabel_Description.setText(Lang.getInstance().translate("Purpose payment"));
-        this.jLabel_Number.setText(Lang.getInstance().translate("Order number"));
-        this.jLabel_Payment_info.setText(Lang.getInstance().translate("Payment details"));
-        this.jLabel_Reciever.setText(Lang.getInstance().translate("Recipient"));
-        this.jLabel_Reciever_BIK.setText(Lang.getInstance().translate("BIK"));
+        this.jButton_Cancel.setText(Lang.T("Clear all"));
+        this.jButton_OK.setText(Lang.T("Send"));
+        this.jCheckBox_Encrypted.setText(Lang.T("Encrypt"));
+        this.jLabel_4_Data.setText(Lang.T("INN"));
+        this.jLabel_ACCOUNT_ERA_Of_Bank.setText(Lang.T("To: (Account ERA)"));
+        this.jLabel_Account.setText(Lang.T("Select account"));
+        this.jLabel_Ammount.setText(Lang.T("Amount"));
+        this.jLabel_BIK.setText(Lang.T("BIK"));
+        this.jLabel_Date.setText(Lang.T("Date"));
+        this.jLabel_Description.setText(Lang.T("Purpose payment"));
+        this.jLabel_Number.setText(Lang.T("Order number"));
+        this.jLabel_Payment_info.setText(Lang.T("Payment details"));
+        this.jLabel_Reciever.setText(Lang.T("Recipient"));
+        this.jLabel_Reciever_BIK.setText(Lang.T("BIK"));
 
-        this.jLabel_Reciever_INN.setText(Lang.getInstance().translate("INN"));
-        this.jLabel_Recivier_in_Bank1.setText(Lang.getInstance().translate("Account"));
-        this.jLabel_Sender.setText(Lang.getInstance().translate("Sender"));
-        this.jLabel_Title.setText(Lang.getInstance().translate("Send payment order"));
-        this.jLabel_in_Bank.setText(Lang.getInstance().translate("Account"));
+        this.jLabel_Reciever_INN.setText(Lang.T("INN"));
+        this.jLabel_Recivier_in_Bank1.setText(Lang.T("Account"));
+        this.jLabel_Sender.setText(Lang.T("Sender"));
+        this.jLabel_Title.setText(Lang.T("Send payment order"));
+        this.jLabel_in_Bank.setText(Lang.T("Account"));
     }
 
     /**

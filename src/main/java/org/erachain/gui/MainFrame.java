@@ -108,13 +108,13 @@ public class MainFrame extends JFrame implements Observer {
         // getContentPane().add(jPanelCopyButton, gridBagConstraints);
         // this.add(new StatusPanel(), BorderLayout.SOUTH);
 
-        jMenu_Files.setText(Lang.getInstance().translate("File"));
+        jMenu_Files.setText(Lang.T("File"));
         jMenuBar1.add(jMenu_Files);
 
-        jMenu2.setText(Lang.getInstance().translate("Deals"));
+        jMenu2.setText(Lang.T("Deals"));
         jMenuBar1.add(jMenu2);
 
-        jMenuExchange.setText(Lang.getInstance().translate("Exchange"));
+        jMenuExchange.setText(Lang.T("Exchange"));
         jMenuBar1.add(jMenuExchange);
 
 
@@ -139,7 +139,7 @@ public class MainFrame extends JFrame implements Observer {
                 // TODO Auto-generated method stub
                 // read settings
                 // You can still stop closing if you want to
-                int res = JOptionPane.showConfirmDialog(instance, Lang.getInstance().translate("Are you sure you want to close?"), Lang.getInstance().translate("Close?"), JOptionPane.YES_NO_OPTION);
+                int res = JOptionPane.showConfirmDialog(instance, Lang.T("Are you sure you want to close?"), Lang.T("Close?"), JOptionPane.YES_NO_OPTION);
                 if (res != 0) return;
                 closeFrame();
                 dispose();
