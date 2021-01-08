@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 
 public class AssetVenture extends AssetCls {
 
+    protected static final int SCALE_LENGTH = 1;
     protected static final int QUANTITY_LENGTH = 8;
 
     private static final int TYPE_ID = VENTURE;
@@ -28,10 +30,15 @@ public class AssetVenture extends AssetCls {
      * If < 0 - all but not owner may sold it on exchange for owner - as Auction
      */
     protected long quantity;
+    /**
+     * +8 ... -23 = 32 диапазон. положительные - округляют целые числа
+     */
+    protected int scale;
 
     public AssetVenture(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
-        super(typeBytes, owner, name, icon, image, description, asset_type, scale);
+        super(typeBytes, owner, name, icon, image, description, asset_type);
         this.quantity = quantity;
+        this.scale = (byte) scale;
     }
 
     public AssetVenture(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
@@ -44,6 +51,61 @@ public class AssetVenture extends AssetCls {
     }
 
     //GETTERS/SETTERS
+    @Override
+    public String getItemSubType() {
+        return "venture";
+    }
+
+    /**
+     * 0 - unlimited for owner.
+     * If < 0 - all but not owner may sold it on exchange for owner - as Auction.
+     */
+    public long getQuantity() {
+        return this.quantity;
+    }
+
+    public int getScale() {
+        // TODO убрать это если будет новая цепочка с регулируемой точностью
+        if (BlockChain.MAIN_MODE && this.key > 0 && this.key < 5 ||
+                this.key > 1000 &&
+                        this.key < BlockChain.AMOUNT_SCALE_FROM
+        ) {
+            //return this.assetType == 1? BlockChain.AMOUNT_DEDAULT_SCALE : 0;
+            // IN ANY CASE
+            return BlockChain.AMOUNT_DEDAULT_SCALE;
+        }
+
+        return this.scale;
+    }
+
+    @Override
+    public BigDecimal getReleased(DCSet dcSet) {
+        if (quantity > 0) {
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                    bals = this.getOwner().getBalance(this.getKey(dcSet));
+            return new BigDecimal(quantity).subtract(bals.a.b).stripTrailingZeros();
+        } else {
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> bals = this.getOwner().getBalance(this.getKey(dcSet));
+            return bals.a.b.negate().stripTrailingZeros();
+        }
+    }
+
+    @Override
+    public BigDecimal getReleased() {
+        return getReleased(DCSet.getInstance());
+    }
+
+    /**
+     * Без ограничений - только если это счетная единица или сам владелец без ограничений
+     *
+     * @param address
+     * @param notAccounting
+     * @return
+     */
+    @Override
+    public boolean isUnlimited(Account address, boolean notAccounting) {
+        return !notAccounting && isAccounting() || getQuantity() == 0L && owner.equals(address);
+    }
 
     //PARSE
     // includeReference - TRUE only for store in local DB
@@ -149,36 +211,6 @@ public class AssetVenture extends AssetCls {
     }
 
     @Override
-    public String getItemSubType() {
-        return "venture";
-    }
-
-    /**
-     * 0 - unlimited for owner.
-     * If < 0 - all but not owner may sold it on exchange for owner - as Auction.
-     */
-    @Override
-    public long getQuantity() {
-        return this.quantity;
-    }
-
-    @Override
-    public BigDecimal getReleased(DCSet dcSet) {
-        if (quantity > 0) {
-            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
-                    bals = this.getOwner().getBalance(this.getKey(dcSet));
-            return new BigDecimal(quantity).subtract(bals.a.b).stripTrailingZeros();
-        } else {
-            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> bals = this.getOwner().getBalance(this.getKey(dcSet));
-            return bals.a.b.negate().stripTrailingZeros();
-        }
-    }
-
-    public BigDecimal getReleased() {
-        return getReleased(DCSet.getInstance());
-    }
-
-    @Override
     public byte[] toBytes(boolean includeReference, boolean onlyBody) {
         byte[] data = super.toBytes(includeReference, onlyBody);
 
@@ -205,7 +237,7 @@ public class AssetVenture extends AssetCls {
     @Override
     public int getDataLength(boolean includeReference) {
         return super.getDataLength(includeReference)
-                + SCALE_LENGTH + ASSET_TYPE_LENGTH + QUANTITY_LENGTH;
+                + SCALE_LENGTH + QUANTITY_LENGTH;
     }
 
     //OTHER
@@ -216,10 +248,18 @@ public class AssetVenture extends AssetCls {
         JSONObject assetJSON = super.toJson();
 
         // ADD DATA
+        assetJSON.put("scale", this.getScale());
         assetJSON.put("quantity", this.getQuantity());
-        assetJSON.put("released", this.getReleased());
 
         return assetJSON;
+    }
+
+    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+        JSONObject json = super.jsonForExplorerPage(langObj);
+        json.put("quantity", quantity);
+        json.put("scale", scale);
+
+        return json;
     }
 
 }

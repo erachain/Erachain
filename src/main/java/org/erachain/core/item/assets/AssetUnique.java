@@ -6,9 +6,9 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.datachain.DCSet;
-import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
@@ -21,16 +21,38 @@ public class AssetUnique extends AssetCls {
 
     private static final int TYPE_ID = UNIQUE;
 
-    public AssetUnique(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale) {
-        super(typeBytes, owner, name, icon, image, description, asset_type, scale);
+    public AssetUnique(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type) {
+        super(typeBytes, owner, name, icon, image, description, asset_type);
     }
 
-    public AssetUnique(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale) {
-        this(new byte[]{(byte) TYPE_ID, (byte) props}, owner, name, icon, image, description, asset_type, scale);
+    public AssetUnique(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type) {
+        this(new byte[]{(byte) TYPE_ID, (byte) props}, owner, name, icon, image, description, asset_type);
     }
 
-    public AssetUnique(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale) {
-        this(new byte[]{(byte) TYPE_ID, (byte) 0}, owner, name, icon, image, description, asset_type, scale);
+    public AssetUnique(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type) {
+        this(new byte[]{(byte) TYPE_ID, (byte) 0}, owner, name, icon, image, description, asset_type);
+    }
+
+    //GETTERS/SETTERS
+    @Override
+    public String getItemSubType() {
+        return "unique";
+    }
+
+    @Override
+    public BigDecimal getReleased(DCSet dcSet) {
+        Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> bals = this.getOwner().getBalance(this.getKey(dcSet));
+        return BigDecimal.ONE.subtract(bals.a.b).stripTrailingZeros();
+    }
+
+    @Override
+    public BigDecimal getReleased() {
+        return getReleased(DCSet.getInstance());
+    }
+
+    @Override
+    public boolean isUnlimited(Account address, boolean notAccounting) {
+        return false;
     }
 
     //PARSE
@@ -54,7 +76,7 @@ public class AssetUnique extends AssetCls {
         position++;
 
         if (nameLength < 1 || nameLength > MAX_NAME_LENGTH) {
-            throw new Exception("Invalid name length");
+            throw new Exception("Invalid name length: " + nameLength);
         }
 
         byte[] nameBytes = Arrays.copyOfRange(data, position, position + nameLength);
@@ -67,7 +89,7 @@ public class AssetUnique extends AssetCls {
         position += ICON_SIZE_LENGTH;
 
         if (iconLength < 0 || iconLength > MAX_ICON_LENGTH) {
-            throw new Exception("Invalid icon length");
+            throw new Exception("Invalid icon length" + name + ": " + iconLength);
         }
 
         byte[] icon = Arrays.copyOfRange(data, position, position + iconLength);
@@ -79,8 +101,9 @@ public class AssetUnique extends AssetCls {
         position += IMAGE_SIZE_LENGTH;
 
         if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
-            throw new Exception("Invalid image length");
+            throw new Exception("Invalid image length" + name + ": " + imageLength);
         }
+
 
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
@@ -91,7 +114,7 @@ public class AssetUnique extends AssetCls {
         position += DESCRIPTION_SIZE_LENGTH;
 
         if (descriptionLength > BlockChain.MAX_REC_DATA_BYTES) {
-            throw new Exception("Invalid description length");
+            throw new Exception("Invalid description length" + name + ": " + descriptionLength);
         }
 
         byte[] descriptionBytes = Arrays.copyOfRange(data, position, position + descriptionLength);
@@ -111,18 +134,14 @@ public class AssetUnique extends AssetCls {
             position += DBREF_LENGTH;
         }
 
-        //READ SCALE
-        byte[] scaleBytes = Arrays.copyOfRange(data, position, position + SCALE_LENGTH);
-        byte scale = scaleBytes[0];
-        position += SCALE_LENGTH;
-
         //READ ASSET TYPE
         byte[] assetTypeBytes = Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH);
+        //boolean divisible = divisibleBytes[0] == 1;
         position += ASSET_TYPE_LENGTH;
 
 
         //RETURN
-        AssetUnique unique = new AssetUnique(typeBytes, owner, name, icon, image, description, assetTypeBytes[0], scale);
+        AssetUnique unique = new AssetUnique(typeBytes, owner, name, icon, image, description, assetTypeBytes[0]);
         if (includeReference) {
             unique.setReference(reference, dbRef);
         }
@@ -130,35 +149,10 @@ public class AssetUnique extends AssetCls {
         return unique;
     }
 
-    //GETTERS/SETTERS
-    @Override
-    public String getItemSubType() {
-        return "unique";
-    }
-
-    @Override
-    public long getQuantity() {
-        return 1L;
-    }
-
-    @Override
-    public BigDecimal getReleased(DCSet dcSet) {
-        Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> bals = this.getOwner().getBalance(this.getKey(dcSet));
-        return BigDecimal.ONE.subtract(bals.a.b).stripTrailingZeros();
-    }
-
-    public BigDecimal getReleased() {
-        return getReleased(DCSet.getInstance());
-    }
-
-    //OTHER
     @Override
     public byte[] toBytes(boolean includeReference, boolean forOwnerSign) {
 
         byte[] data = super.toBytes(includeReference, forOwnerSign);
-
-        //WRITE SCALE
-        data = Bytes.concat(data, new byte[]{(byte) this.getScale()});
 
         //WRITE ASSET TYPE
         data = Bytes.concat(data, new byte[]{(byte) this.getAssetType()});
@@ -166,25 +160,6 @@ public class AssetUnique extends AssetCls {
         return data;
     }
 
-    @Override
-    public int getDataLength(boolean includeReference) {
-        return super.getDataLength(includeReference)
-                + SCALE_LENGTH + ASSET_TYPE_LENGTH;
-    }
-
     //OTHER
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public JSONObject toJson() {
-
-        JSONObject assetJSON = super.toJson();
-
-        // ADD DATA
-        assetJSON.put("quantity", 1);
-        assetJSON.put("released", this.getReleased());
-
-        return assetJSON;
-    }
 
 }

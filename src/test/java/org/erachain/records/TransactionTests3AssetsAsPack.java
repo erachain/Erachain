@@ -78,7 +78,7 @@ public class TransactionTests3AssetsAsPack {
         init();
 
         //CREATE ASSET
-        AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0, 8);
+        AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0);
 
         //CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, 0l);
@@ -105,7 +105,7 @@ public class TransactionTests3AssetsAsPack {
         init();
 
         //CREATE SIGNATURE
-        AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0, 8);
+        AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0);
         LOGGER.info("asset: " + asset.getTypeBytes()[0] + ", " + asset.getTypeBytes()[1]);
         boolean includeReference = false;
         byte[] raw = asset.toBytes(includeReference, false);
@@ -191,7 +191,7 @@ public class TransactionTests3AssetsAsPack {
 
         init();
 
-        AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0, 8);
+        AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0);
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, 0l);
@@ -228,7 +228,7 @@ public class TransactionTests3AssetsAsPack {
 
         init();
 
-        AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0, 8);
+        AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0);
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, 0l);
@@ -262,7 +262,7 @@ public class TransactionTests3AssetsAsPack {
 
         init();
 
-        AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0, 8);
+        AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0);
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, 0l);

@@ -190,7 +190,7 @@ public class TestRecAsset {
                 init(dbs);
 
                 //CREATE ASSET
-                AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0, 8);
+                AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0);
 
                 //CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, 0l);
@@ -220,7 +220,7 @@ public class TestRecAsset {
                 init(dbs);
 
                 //CREATE SIGNATURE
-                AssetUnique assetUni = new AssetUnique(maker, "test", icon, image, "strontje", 0, 8);
+                AssetUnique assetUni = new AssetUnique(maker, "test", icon, image, "strontje", 0);
                 LOGGER.info("asset: " + assetUni.getTypeBytes()[0] + ", " + assetUni.getTypeBytes()[1]);
                 byte[] rawUni = assetUni.toBytes(false, false);
                 assertEquals(rawUni.length, assetUni.getDataLength(false));
@@ -317,7 +317,7 @@ public class TestRecAsset {
 
                 init(dbs);
 
-                AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0, 8);
+                AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0);
 
                 //CREATE ISSUE ASSET TRANSACTION
                 IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
@@ -360,7 +360,7 @@ public class TestRecAsset {
 
                 init(dbs);
 
-                AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0, 8);
+                AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0);
 
                 //CREATE ISSUE ASSET TRANSACTION
                 IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
@@ -401,7 +401,7 @@ public class TestRecAsset {
 
                 init(dbs);
 
-                AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0, 8);
+                AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0);
 
                 //CREATE ISSUE ASSET TRANSACTION
                 IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
