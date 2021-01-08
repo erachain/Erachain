@@ -1851,18 +1851,24 @@ public abstract class AssetCls extends ItemCls {
         assetJSON.put("type_name_full", viewAssetTypeFull());
         assetJSON.put("type_desc", viewAssetTypeDescriptionCls(assetType));
 
+        assetJSON.put("scale", this.getScale());
+        assetJSON.put("quantity", this.getQuantity());
+
         return assetJSON;
     }
 
     public JSONObject jsonForExplorerPage(JSONObject langObj) {
 
-        JSONObject json = super.jsonForExplorerPage(langObj);
-        json.put("assetTypeKey", this.assetType);
-        json.put("assetTypeNameFull", viewAssetTypeFull());
-        json.put("released", getReleased());
-        json.put("orders", getOperations(DCSet.getInstance()));
+        JSONObject assetJSON = super.jsonForExplorerPage(langObj);
+        assetJSON.put("assetTypeKey", this.assetType);
+        assetJSON.put("assetTypeNameFull", viewAssetTypeFull());
+        assetJSON.put("released", getReleased());
+        assetJSON.put("orders", getOperations(DCSet.getInstance()));
 
-        return json;
+        assetJSON.put("scale", this.getScale());
+        assetJSON.put("quantity", this.getQuantity());
+
+        return assetJSON;
     }
 
     public int getDataLength(boolean includeReference) {

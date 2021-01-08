@@ -49,22 +49,11 @@ public class IssueAssetPanel extends IssueItemPanel {
         // select combobox Asset type
         assetTypeJComboBox.addActionListener(e -> {
             JComboBox source = (JComboBox) e.getSource();
-            AssetType assetType = (AssetType) source.getSelectedItem();
-
-            int fontSize = textScale.getFontMetrics(textScale.getFont()).getHeight();
-            String fontStyle = textScale.getFont().getFontName();
-            fontStyle = "<body style='font: " + (fontSize - 2) + "pt " + fontStyle + "'>";
-
-            textareasAssetTypeDescription.setText(fontStyle + assetType.getDescription());
-            textQuantity.setVisible(!AssetCls.isAccounting(assetType.getId()));
-            quantityJLabel.setVisible(!AssetCls.isAccounting(assetType.getId()));
+            refreshLabels((AssetType) source.getSelectedItem());
         });
 
         // set start text area asset type
-        int fontSize = textScale.getFontMetrics(textScale.getFont()).getHeight();
-        String fontStyle = textScale.getFont().getFontName();
-        fontStyle = "<body style='font: " + (fontSize - 2) + "pt " + fontStyle + "'>";
-        textareasAssetTypeDescription.setText(fontStyle + ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getDescription());
+        refreshLabels((AssetType) assetTypesComboBoxModel.getSelectedItem());
 
     }
 
@@ -116,6 +105,27 @@ public class IssueAssetPanel extends IssueItemPanel {
     int scale;
     long quantity;
     int assetType;
+
+    private void refreshLabels(AssetType assetType) {
+        int fontSize = textScale.getFontMetrics(textScale.getFont()).getHeight();
+        String fontStyle = textScale.getFont().getFontName();
+        fontStyle = "<body style='font: " + (fontSize - 2) + "pt " + fontStyle + "'>";
+
+        textareasAssetTypeDescription.setText(fontStyle + assetType.getDescription());
+
+        if (AssetCls.isUnique(assetType.getId())) {
+            textQuantity.setVisible(false);
+            quantityJLabel.setVisible(false);
+            textScale.setVisible(false);
+            scaleJLabel.setVisible(false);
+        } else {
+            textQuantity.setVisible(!AssetCls.isAccounting(assetType.getId()));
+            quantityJLabel.setVisible(!AssetCls.isAccounting(assetType.getId()));
+            textScale.setVisible(true);
+            scaleJLabel.setVisible(true);
+        }
+
+    }
 
     protected boolean checkValues() {
 

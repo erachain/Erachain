@@ -7,7 +7,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.datachain.DCSet;
-import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
@@ -242,25 +241,5 @@ public class AssetVenture extends AssetCls {
     }
 
     //OTHER
-    @Override
-    @SuppressWarnings("unchecked")
-    public JSONObject toJson() {
-
-        JSONObject assetJSON = super.toJson();
-
-        // ADD DATA
-        assetJSON.put("scale", this.getScale());
-        assetJSON.put("quantity", this.getQuantity());
-
-        return assetJSON;
-    }
-
-    public JSONObject jsonForExplorerPage(JSONObject langObj) {
-        JSONObject json = super.jsonForExplorerPage(langObj);
-        json.put("quantity", quantity);
-        json.put("scale", scale);
-
-        return json;
-    }
 
 }
