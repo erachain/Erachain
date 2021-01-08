@@ -843,7 +843,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "Outside Share";
             case AS_OUTSIDE_BILL:
-                return "Promissory Note"; // non turnover Promissory Note / non-negotiable promissory note
+                return "AS_OUTSIDE_BILL_N";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of exchange";
             case AS_MY_DEBT:
@@ -910,7 +910,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "Outside Share Rights";
             case AS_OUTSIDE_BILL:
-                return "Promissory Note without turnover on me";
+                return "AS_OUTSIDE_BILL_NF";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of Exchange";
             case AS_MY_DEBT:
