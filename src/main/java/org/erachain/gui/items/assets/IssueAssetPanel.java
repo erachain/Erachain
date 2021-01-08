@@ -40,6 +40,8 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         assetTypesComboBoxModel = new AssetTypesComboBoxModel();
         assetTypeJComboBox.setModel(assetTypesComboBoxModel);
+        //assetTypeJComboBox.setRenderer(new RenderComboBoxAssetActions());
+
         textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
         textScale.setSelectedIndex(8);
 
@@ -194,7 +196,7 @@ public class IssueAssetPanel extends IssueItemPanel {
                 + Lang.T("Asset Class") + ":&nbsp;"
                 + Lang.T(asset.getItemSubType() + "") + "<br>"
                 + Lang.T("Asset Type") + ":&nbsp;"
-                + asset.charAssetType() + asset.viewAssetTypeAbbrev() + ":" + Lang.T(asset.viewAssetTypeFull() + "") + "<br>"
+                + "<b>" + asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:" + Lang.T(asset.viewAssetTypeFull() + "") + "<br>"
                 + Lang.T("Quantity") + ":&nbsp;" + asset.getQuantity() + ", "
                 + Lang.T("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
                 + Lang.T("Description") + ":<br>";

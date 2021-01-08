@@ -8,7 +8,6 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.core.item.assets.AssetUnique;
-import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -175,7 +174,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
         } else {
             //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
             long maxQuantity = Long.MAX_VALUE;
-            long quantity = ((AssetVenture) asset).getQuantity();
+            long quantity = asset.getQuantity();
             //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
             if (quantity > maxQuantity || quantity < -1) {
                 return INVALID_QUANTITY;

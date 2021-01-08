@@ -122,8 +122,8 @@ public class AssetInfo extends JTextPane {
             text += "<div>" + Lang.T("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";
             text += "<div>" + Lang.T("Class") + ": <b>" + Lang.T(asset.getItemSubType()) + "</b>,";
             text += " " + Lang.T("Type") + ": <b>" +
-                    asset.charAssetType() + asset.viewAssetTypeAbbrev() + ":"
-                    + Lang.T(asset.viewAssetTypeFull()) + "</b>,";
+                    asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:"
+                    + Lang.T(asset.viewAssetTypeFull()) + ",";
             text += " " + Lang.T("Accuracy") + ": <b>" + asset.getScale() + "</b>,";
             text += " " + Lang.T("Quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
             text += " " + Lang.T("Released") + ": <b>" + NumberAsString.formatAsString(asset.getReleased()) + "</b>";
