@@ -1869,7 +1869,7 @@ public abstract class AssetCls extends ItemCls {
 
         JSONObject assetJSON = super.jsonForExplorerPage(langObj);
         assetJSON.put("assetTypeKey", this.assetType);
-        assetJSON.put("assetTypeNameFull", viewAssetTypeFull());
+        assetJSON.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
         assetJSON.put("released", getReleased());
         assetJSON.put("orders", getOperations(DCSet.getInstance()));
 

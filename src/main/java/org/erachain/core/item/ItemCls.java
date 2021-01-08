@@ -697,7 +697,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             json.put("person_key", person.b.getKey());
         }
 
-        if (icon != null)
+        if (icon != null && icon.length > 0)
             json.put("icon", Base64.encodeBase64String(getIcon()));
 
         return json;
