@@ -29,8 +29,8 @@ public class MyOrderPaymentsSplitPanel extends SplitPanel {
     public MyOrderPaymentsSplitPanel() {
         super(NAME, TITLE);
 
-        //	this.setName(Lang.getInstance().translate("My Persons"));
-        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        //	this.setName(Lang.T("My Persons"));
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);

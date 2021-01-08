@@ -120,11 +120,11 @@ public class UISettingPanel extends javax.swing.JPanel {
 
         group = new ButtonGroup();
 
-        other_Themes = new JRadioButton(Lang.getInstance().translate("Other Themes"), false);
+        other_Themes = new JRadioButton(Lang.T("Other Themes"), false);
         group.add(other_Themes);
-        system_Theme = new JRadioButton(Lang.getInstance().translate("System Theme"), true);
+        system_Theme = new JRadioButton(Lang.T("System Theme"), true);
         group.add(system_Theme);
-        metal_Theme = new JRadioButton(Lang.getInstance().translate("Metal Theme"), true);
+        metal_Theme = new JRadioButton(Lang.T("Metal Theme"), true);
         group.add(metal_Theme);
         other_Themes.isSelected();
 
@@ -191,7 +191,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         }
 
 
-        jLabel_Thems.setText(Lang.getInstance().translate("Select Theme") + ":");
+        jLabel_Thems.setText(Lang.T("Select Theme") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -216,7 +216,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         add(jComboBox_Thems, gridBagConstraints);
 
 
-        jLabel_Font.setText(Lang.getInstance().translate("Font") + ":");
+        jLabel_Font.setText(Lang.T("Font") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -251,7 +251,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new Insets(0, 7, 8, 10);
         add(size_Font, gridBagConstraints);
 
-        jLabel_Lang.setText(Lang.getInstance().translate("Interface language") + ":");
+        jLabel_Lang.setText(Lang.T("Interface language") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -262,7 +262,8 @@ public class UISettingPanel extends javax.swing.JPanel {
 
         jComboBox_Lang = new JComboBox<LangFile>();
 
-        for (LangFile langFile : Lang.getInstance().getLangListAvailable()) {
+        for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
+            LangFile langFile = Lang.getInstance().getLangFile(iso);
             jComboBox_Lang.addItem(langFile);
 
             if (langFile.getFileName().equals(Settings.getInstance().getLangFileName())) {
@@ -282,7 +283,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new Insets(0, 0, 11, 0);
         add(jComboBox_Lang, gridBagConstraints);
 
-        jButton_Download_Lang.setText(Lang.getInstance().translate("Download"));
+        jButton_Download_Lang.setText(Lang.T("Download"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 3;
@@ -360,7 +361,8 @@ public class UISettingPanel extends javax.swing.JPanel {
 
                                             jComboBox_Lang.removeAllItems();
 
-                                            for (LangFile langFile : Lang.getInstance().getLangListAvailable()) {
+                                            for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
+                                                LangFile langFile = Lang.getInstance().getLangFile(iso);
                                                 jComboBox_Lang.addItem(langFile);
 
                                                 if (langFile.getFileName().equals(langFileName)) {
@@ -376,14 +378,14 @@ public class UISettingPanel extends javax.swing.JPanel {
                             }
                             if (menu.getComponentCount() == 0) {
                                 JMenuItem item = new JMenuItem();
-                                item.setText(Lang.getInstance().translate("No new translations"));
+                                item.setText(Lang.T("No new translations"));
                                 item.setEnabled(false);
                                 menu.add(item);
                             }
 
                             menu.show(jComboBox_Lang, 0, jComboBox_Lang.getHeight());
                         } finally {
-                            jButton_Download_Lang.setText(Lang.getInstance().translate("Download"));
+                            jButton_Download_Lang.setText(Lang.T("Download"));
                         }
                     }
                 });
@@ -392,7 +394,7 @@ public class UISettingPanel extends javax.swing.JPanel {
 
         int gridy = 5;
 
-        checkMarkIncome = new JCheckBox(Lang.getInstance().translate("Mark Outcome or Income"));
+        checkMarkIncome = new JCheckBox(Lang.T("Mark Outcome or Income"));
         checkMarkIncome.setHorizontalAlignment(SwingConstants.LEFT);
         checkMarkIncome.setSelected(Settings.getInstance().markIncome());
         gridBagConstraints = new GridBagConstraints();
@@ -406,7 +408,7 @@ public class UISettingPanel extends javax.swing.JPanel {
 
         MTable<Object, Object> table = new MTable<>(null);
 
-        markColorExample = new JTextField("  " + Lang.getInstance().translate("Example ROWS Text") + "  ");
+        markColorExample = new JTextField("  " + Lang.T("Example ROWS Text") + "  ");
         markColorExample.setForeground(Settings.getInstance().markColorObj());
         markColorExample.setBackground(table.getBackground());
         markColorExample.setHorizontalAlignment(SwingConstants.CENTER);
@@ -417,7 +419,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(markColorExample, gridBagConstraints);
 
-        JButton buttonSelColor = new JButton(Lang.getInstance().translate("Select"));
+        JButton buttonSelColor = new JButton(Lang.T("Select"));
         buttonSelColor.setHorizontalAlignment(SwingConstants.CENTER);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -431,7 +433,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         });
         add(buttonSelColor, gridBagConstraints);
 
-        markColorSelectedExample = new JTextField(Lang.getInstance().translate("Example SELECTED ROWS Text"));
+        markColorSelectedExample = new JTextField(Lang.T("Example SELECTED ROWS Text"));
         markColorSelectedExample.setForeground(Settings.getInstance().markColorSelectedObj());
         markColorSelectedExample.setBackground(table.getSelectionBackground());
         markColorSelectedExample.setHorizontalAlignment(SwingConstants.LEFT);
@@ -442,7 +444,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(markColorSelectedExample, gridBagConstraints);
 
-        JButton buttonSelColorSel = new JButton(Lang.getInstance().translate("Select"));
+        JButton buttonSelColorSel = new JButton(Lang.T("Select"));
         buttonSelColorSel.setHorizontalAlignment(SwingConstants.CENTER);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 4;
@@ -457,7 +459,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         add(buttonSelColorSel, gridBagConstraints);
 
         gridy++;
-        chckbxSysTrayEvent = new JCheckBox(Lang.getInstance().translate("System Tray Events and Sounds"));
+        chckbxSysTrayEvent = new JCheckBox(Lang.T("System Tray Events and Sounds"));
         chckbxSysTrayEvent.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxSysTrayEvent.setSelected(Settings.getInstance().isSysTrayEnabled());
         gridBagConstraints = new GridBagConstraints();
@@ -467,7 +469,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(chckbxSysTrayEvent, gridBagConstraints);
 
-        jLabel_sounds.setText(Lang.getInstance().translate("Sounds") + ":");
+        jLabel_sounds.setText(Lang.T("Sounds") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++gridy;
@@ -475,7 +477,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new Insets(8, 0, 0, 0);
         add(jLabel_sounds, gridBagConstraints);
 
-        chckbxSoundReceivePayment = new JCheckBox(Lang.getInstance().translate("Receive payment"));
+        chckbxSoundReceivePayment = new JCheckBox(Lang.T("Receive payment"));
         chckbxSoundReceivePayment.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxSoundReceivePayment.setSelected(Settings.getInstance().isSoundReceivePaymentEnabled());
         gridBagConstraints = new GridBagConstraints();
@@ -485,7 +487,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(chckbxSoundReceivePayment, gridBagConstraints);
 
-        chckbxSoundReceiveMessage = new JCheckBox(Lang.getInstance().translate("Receive message"));
+        chckbxSoundReceiveMessage = new JCheckBox(Lang.T("Receive message"));
         chckbxSoundReceiveMessage.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxSoundReceiveMessage.setSelected(Settings.getInstance().isSoundReceiveMessageEnabled());
         gridBagConstraints = new GridBagConstraints();
@@ -495,7 +497,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(chckbxSoundReceiveMessage, gridBagConstraints);
 
-        chckbxSoundNewTransaction = new JCheckBox(Lang.getInstance().translate("Other transactions"));
+        chckbxSoundNewTransaction = new JCheckBox(Lang.T("Other transactions"));
         chckbxSoundNewTransaction.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxSoundNewTransaction.setSelected(Settings.getInstance().isSoundNewTransactionEnabled());
         gridBagConstraints = new GridBagConstraints();
@@ -505,7 +507,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new Insets(7, 0, 8, 10);
         add(chckbxSoundNewTransaction, gridBagConstraints);
 
-        chckbxSoundForgedBlock = new JCheckBox(Lang.getInstance().translate("Forged Block"));
+        chckbxSoundForgedBlock = new JCheckBox(Lang.T("Forged Block"));
         chckbxSoundForgedBlock.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxSoundForgedBlock.setSelected(Settings.getInstance().isSoundForgedBlockEnabled());
         gridBagConstraints = new GridBagConstraints();
@@ -516,7 +518,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         add(chckbxSoundForgedBlock, gridBagConstraints);
 
         if (false) {
-            JLabel jLabel_UI = new JLabel(Lang.getInstance().translate("UI") + ":");
+            JLabel jLabel_UI = new JLabel(Lang.T("UI") + ":");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = ++gridy;
@@ -548,7 +550,7 @@ public class UISettingPanel extends javax.swing.JPanel {
         colorChooser.removeChooserPanel(panels[1]);
         colorChooser.removeChooserPanel(panels[4]);
 
-        JDialog dialog = JColorChooser.createDialog(paramField, Lang.getInstance().translate(title),
+        JDialog dialog = JColorChooser.createDialog(paramField, Lang.T(title),
                 true, colorChooser,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {

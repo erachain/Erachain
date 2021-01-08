@@ -4,13 +4,10 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
-import org.erachain.utils.NumberAsString;
 import org.mapdb.Fun;
 
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.List;
 
 @SuppressWarnings("serial")
 public class ItemPollOptionsTableModel extends AbstractTableModel {
@@ -20,7 +17,7 @@ public class ItemPollOptionsTableModel extends AbstractTableModel {
     public static final int COLUMN_PERSONAL_PERCENTAGE = 3;
     public static final int COLUMN_VOTES = 4;
     public static final int COLUMN_PERCENTAGE = 5;
-    private String[] columnNames = Lang.getInstance().translate(
+    private String[] columnNames = Lang.T(
             new String[]{"Number", "Name", "Vote #P", "Vote % #P", "Share #Vote", "Share % #Vote"});
     private PollCls poll;
     private AssetCls asset;

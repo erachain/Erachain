@@ -15,7 +15,7 @@ public class PollOptionsTableModel extends AbstractTableModel {
     public static final int COLUMN_VOTES = 1;
     public static final int COLUMN_PERCENTAGE = 2;
     private static final int COLUMN_NAME = 0;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Name", "Votes", "% of Total"});
+    private String[] columnNames = Lang.T(new String[]{"Name", "Votes", "% of Total"});
     private Poll poll;
     private AssetCls asset;
 

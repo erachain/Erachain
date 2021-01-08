@@ -90,7 +90,8 @@ function template(data) {
                    + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
     //output += data.template.Label_seqNo + ': ' +'<a href=?tx=' + data.template.seqNo + get_lang() + '><b>' + data.template.seqNo + '</b></a></h4>';
     output += '<a href=?tx=' + data.template.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.template.seqNo + '</b></a>';
-    output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a></h4>';
+    output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a>';
+    output += ' ' +'<a href=../apitemplate/raw/' + data.template.key + ' class="button ll-blue-bgc"><b>' + data.label_RAW + '</b></a></h4>';
 
     output += '<br><br>';
 

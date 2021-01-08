@@ -29,7 +29,7 @@ public class AccountsOfDealsTableModel extends AbstractTableModel implements Obs
     public static final int COLUMN_FEE_BALANCE = 3;
     private static final int COLUMN_ADDRESS = 0;
     int deal;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Confirmed Balance", "Waiting"});
+    private String[] columnNames = Lang.T(new String[]{"Account", "Confirmed Balance", "Waiting"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, false, false, false};
     private List<PublicKeyAccount> publicKeyAccounts;
     private AssetCls asset;
@@ -133,7 +133,7 @@ public class AccountsOfDealsTableModel extends AbstractTableModel implements Obs
 
             switch (column) {
                 case COLUMN_ADDRESS:
-                    return "<HTML><b>" + Lang.getInstance().translate("Total") + ":";
+                    return "<HTML><b>" + Lang.T("Total") + ":";
                 case COLUMN_CONFIRMED_BALANCE:
 
                     return "<HTML><b>" + get_Total(deal);

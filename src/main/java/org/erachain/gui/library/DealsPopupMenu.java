@@ -41,23 +41,23 @@ public class DealsPopupMenu extends JPopupMenu {
     private JMenuItem sendMail;
 
     private Separator ownSeparator = new Separator();
-    private JLabel ownTitle = new JLabel("    " + Lang.getInstance().translate("Actions for OWN balance") + "  ");
+    private JLabel ownTitle = new JLabel("    " + Lang.T("Actions for OWN balance") + "  ");
     private JMenuItem sendAsset;
     private JMenuItem sendAssetBackward;
 
     private Separator debtSeparator = new Separator();
-    private JLabel debtTitle = new JLabel("    " + Lang.getInstance().translate("Actions for DEBT balance") + "  ");
+    private JLabel debtTitle = new JLabel("    " + Lang.T("Actions for DEBT balance") + "  ");
     private JMenuItem debtAsset;
     private JMenuItem debtAssetReturn;
     private JMenuItem debtAssetBackward;
 
     private Separator holdSeparator = new Separator();
-    private JLabel holdTitle = new JLabel("    " + Lang.getInstance().translate("Actions for HOLD balance") + "  ");
+    private JLabel holdTitle = new JLabel("    " + Lang.T("Actions for HOLD balance") + "  ");
     private JMenuItem holdAsset;
     private JMenuItem holdAssetBackward;
 
     private Separator spendSeparator = new Separator();
-    private JLabel spendTitle = new JLabel("    " + Lang.getInstance().translate("Actions for SPEND balance") + "  ");
+    private JLabel spendTitle = new JLabel("    " + Lang.T("Actions for SPEND balance") + "  ");
     private JMenuItem spendAsset;
     private JMenuItem spendAssetBackward;
 
@@ -69,10 +69,10 @@ public class DealsPopupMenu extends JPopupMenu {
         this.table = table;
         this.assetSelector = assetSelector;
 
-        sendMail = new JMenuItem(Lang.getInstance().translate("Send mail"));
+        sendMail = new JMenuItem(Lang.T("Send mail"));
         sendMail.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send mail"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Send mail"),
                         new MailSendPanel(pubKey, null, null));
             }
         });
@@ -81,7 +81,7 @@ public class DealsPopupMenu extends JPopupMenu {
         this.add(ownSeparator);
         this.add(ownTitle);
 
-        sendAsset = new JMenuItem(Lang.getInstance().translate("Send"));
+        sendAsset = new JMenuItem(Lang.T("Send"));
         sendAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // AccountAssetLendPanel
@@ -92,7 +92,7 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(sendAsset);
 
-        sendAssetBackward = new JMenuItem(Lang.getInstance().translate("Backward"));
+        sendAssetBackward = new JMenuItem(Lang.T("Backward"));
         sendAssetBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // AccountAssetLendPanel
@@ -106,7 +106,7 @@ public class DealsPopupMenu extends JPopupMenu {
         this.add(debtSeparator);
         this.add(debtTitle);
 
-        debtAsset = new JMenuItem(Lang.getInstance().translate("Lend"));
+        debtAsset = new JMenuItem(Lang.T("Lend"));
         debtAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //new AccountLendDialog(asset, pubKey);
@@ -117,7 +117,7 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(debtAsset);
 
-        debtAssetReturn = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
+        debtAssetReturn = new JMenuItem(Lang.T("Repay Debt"));
         debtAssetReturn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -128,7 +128,7 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(debtAssetReturn);
 
-        debtAssetBackward = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
+        debtAssetBackward = new JMenuItem(Lang.T("Confiscate Debt"));
         debtAssetBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -142,7 +142,7 @@ public class DealsPopupMenu extends JPopupMenu {
         this.add(holdSeparator);
         this.add(holdTitle);
 
-        holdAsset = new JMenuItem(Lang.getInstance().translate("Hold")); /// GIVE
+        holdAsset = new JMenuItem(Lang.T("Hold")); /// GIVE
         holdAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -153,7 +153,7 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(holdAsset);
 
-        holdAssetBackward = new JMenuItem(Lang.getInstance().translate("Backward Hold")); // TAKE
+        holdAssetBackward = new JMenuItem(Lang.T("Backward Hold")); // TAKE
         holdAssetBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -167,7 +167,7 @@ public class DealsPopupMenu extends JPopupMenu {
         this.add(spendSeparator);
         this.add(spendTitle);
 
-        spendAsset = new JMenuItem(Lang.getInstance().translate("Spend"));
+        spendAsset = new JMenuItem(Lang.T("Spend"));
         spendAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -178,7 +178,7 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(spendAsset);
 
-        spendAssetBackward = new JMenuItem(Lang.getInstance().translate("Backward Spend"));
+        spendAssetBackward = new JMenuItem(Lang.T("Backward Spend"));
         spendAssetBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -190,9 +190,9 @@ public class DealsPopupMenu extends JPopupMenu {
         this.add(spendAssetBackward);
 
         this.addSeparator();
-        this.add(new JLabel("    " + Lang.getInstance().translate("Account actions") + ":"));
+        this.add(new JLabel("    " + Lang.T("Account actions") + ":"));
 
-        JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Account"));
+        JMenuItem copyAddress = new JMenuItem(Lang.T("Copy Account"));
         copyAddress.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //      int row = table.getSelectedRow();
@@ -208,7 +208,7 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(copyAddress);
 
-        JMenuItem copyBalance = new JMenuItem(Lang.getInstance().translate("Copy Balance"));
+        JMenuItem copyBalance = new JMenuItem(Lang.T("Copy Balance"));
         copyBalance.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -223,7 +223,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
         this.addSeparator();
 
-        JMenuItem copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+        JMenuItem copyPublicKey = new JMenuItem(Lang.T("Copy Public Key"));
         copyPublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -233,7 +233,7 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(copyPublicKey);
 
-        JMenuItem copyBankKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key for BANK"));
+        JMenuItem copyBankKey = new JMenuItem(Lang.T("Copy Public Key for BANK"));
         copyBankKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String bankKeyAccount = "+" + Base32.encode(pubKey.getPublicKey());
@@ -244,7 +244,7 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(copyBankKey);
 
-        JMenuItem set_name = new JMenuItem(Lang.getInstance().translate("Edit name"));
+        JMenuItem set_name = new JMenuItem(Lang.T("Edit name"));
         set_name.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new AccountSetNameDialog(pubKey.getAddress());
@@ -255,7 +255,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
         this.addSeparator();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -324,7 +324,7 @@ public class DealsPopupMenu extends JPopupMenu {
         //this.spendAsset.setEnabled(true);
 
         /// MAIL
-        this.sendMail.setText(Lang.getInstance().translate("Send Mail"));
+        this.sendMail.setText(Lang.T("Send Mail"));
 
         String actionName;
 
@@ -333,7 +333,7 @@ public class DealsPopupMenu extends JPopupMenu {
         if (actionName == null) {
             this.sendAsset.setVisible(false);
         } else {
-            this.sendAsset.setText(Lang.getInstance().translate(actionName));
+            this.sendAsset.setText(Lang.T(actionName));
             this.sendAsset.setVisible(true);
         }
 
@@ -341,7 +341,7 @@ public class DealsPopupMenu extends JPopupMenu {
         if (actionName == null) {
             this.sendAssetBackward.setVisible(false);
         } else {
-            this.sendAssetBackward.setText(Lang.getInstance().translate(actionName));
+            this.sendAssetBackward.setText(Lang.T(actionName));
             this.sendAssetBackward.setVisible(true);
         }
 
@@ -350,7 +350,7 @@ public class DealsPopupMenu extends JPopupMenu {
         if (actionName == null) {
             this.debtAsset.setVisible(false);
         } else {
-            this.debtAsset.setText(Lang.getInstance().translate(actionName));
+            this.debtAsset.setText(Lang.T(actionName));
             this.debtAsset.setVisible(true);
         }
 
@@ -358,7 +358,7 @@ public class DealsPopupMenu extends JPopupMenu {
         if (actionName == null) {
             this.debtAssetReturn.setVisible(false);
         } else {
-            this.debtAssetReturn.setText(Lang.getInstance().translate(actionName));
+            this.debtAssetReturn.setText(Lang.T(actionName));
             this.debtAssetReturn.setVisible(true);
         }
 
@@ -366,7 +366,7 @@ public class DealsPopupMenu extends JPopupMenu {
         if (actionName == null) {
             this.debtAssetBackward.setVisible(false);
         } else {
-            this.debtAssetBackward.setText(Lang.getInstance().translate(actionName));
+            this.debtAssetBackward.setText(Lang.T(actionName));
             this.debtAssetBackward.setVisible(true);
         }
 
@@ -375,7 +375,7 @@ public class DealsPopupMenu extends JPopupMenu {
         if (actionName == null) {
             this.holdAsset.setVisible(false);
         } else {
-            this.holdAsset.setText(Lang.getInstance().translate(actionName));
+            this.holdAsset.setText(Lang.T(actionName));
             this.holdAsset.setVisible(true);
         }
 
@@ -383,7 +383,7 @@ public class DealsPopupMenu extends JPopupMenu {
         if (actionName == null) {
             this.holdAssetBackward.setVisible(false);
         } else {
-            this.holdAssetBackward.setText(Lang.getInstance().translate(actionName));
+            this.holdAssetBackward.setText(Lang.T(actionName));
             this.holdAssetBackward.setVisible(true);
         }
 
@@ -392,7 +392,7 @@ public class DealsPopupMenu extends JPopupMenu {
         if (actionName == null) {
             this.spendAsset.setVisible(false);
         } else {
-            this.spendAsset.setText(Lang.getInstance().translate(actionName));
+            this.spendAsset.setText(Lang.T(actionName));
             this.spendAsset.setVisible(true);
         }
 
@@ -400,7 +400,7 @@ public class DealsPopupMenu extends JPopupMenu {
         if (actionName == null) {
             this.spendAssetBackward.setVisible(false);
         } else {
-            this.spendAssetBackward.setText(Lang.getInstance().translate(actionName));
+            this.spendAssetBackward.setText(Lang.T(actionName));
             this.spendAssetBackward.setVisible(true);
         }
 

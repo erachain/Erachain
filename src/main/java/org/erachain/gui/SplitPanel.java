@@ -153,15 +153,15 @@ public class SplitPanel extends IconPanel {
 
 
         searchMyJCheckBoxLeftPanel = new JCheckBox();
-        searchMyJCheckBoxLeftPanel.setText(Lang.getInstance().translate("My") + " ");
+        searchMyJCheckBoxLeftPanel.setText(Lang.T("My") + " ");
         searchToolBar_LeftPanel.add(searchMyJCheckBoxLeftPanel);
 
         searchFavoriteJCheckBoxLeftPanel = new JCheckBox();
-        searchFavoriteJCheckBoxLeftPanel.setText(Lang.getInstance().translate("Favorite") + " ");
+        searchFavoriteJCheckBoxLeftPanel.setText(Lang.T("Favorite") + " ");
         searchToolBar_LeftPanel.add(searchFavoriteJCheckBoxLeftPanel);
 
 
-        searthLabelSearchToolBarLeftPanel.setText("    " + Lang.getInstance().translate("Search") + ":   ");
+        searthLabelSearchToolBarLeftPanel.setText("    " + Lang.T("Search") + ":   ");
         searthLabelSearchToolBarLeftPanel.setToolTipText("");
         searchToolBar_LeftPanel.add(searthLabelSearchToolBarLeftPanel);
 

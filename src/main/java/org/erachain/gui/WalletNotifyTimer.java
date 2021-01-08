@@ -89,7 +89,7 @@ public class WalletNotifyTimer<U> implements Observer {
                             if (settings.isSoundNewTransactionEnabled())
                                 sound = "send.wav";
 
-                            head = lang.translate("Payment send");
+                            head = Lang.T("Payment send");
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
                                     + rSend.getAmount().toPlainString() + " [" + rSend.getAbsKey() + "]\n "
                                     + rSend.getRecipient().getPersonAsString() + "\n"
@@ -99,7 +99,7 @@ public class WalletNotifyTimer<U> implements Observer {
                             if (settings.isSoundReceivePaymentEnabled())
                                 sound = "receivepayment.wav";
 
-                            head = lang.translate("Payment received");
+                            head = Lang.T("Payment received");
                             message = rSend.getRecipient().getPersonAsString() + " <- \n "
                                     + rSend.getAmount().toPlainString() + " [" + rSend.getAbsKey() + "]\n "
                                     + rSend.getCreator().getPersonAsString() + "\n"
@@ -111,7 +111,7 @@ public class WalletNotifyTimer<U> implements Observer {
                             if (settings.isSoundNewTransactionEnabled())
                                 sound = "send.wav";
 
-                            head = lang.translate("Mail send");
+                            head = Lang.T("Mail send");
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
                                     //+ rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
                                     + rSend.getRecipient().getPersonAsString() + "\n"
@@ -120,7 +120,7 @@ public class WalletNotifyTimer<U> implements Observer {
                             if (settings.isSoundReceiveMessageEnabled())
                                 sound = "receivemail.wav";
 
-                            head = lang.translate("Mail received");
+                            head = Lang.T("Mail received");
                             message = rSend.getRecipient().getPersonAsString() + " <- \n "
                                     //+ rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
                                     + rSend.getCreator().getPersonAsString() + "\n"
@@ -135,12 +135,12 @@ public class WalletNotifyTimer<U> implements Observer {
                         if (settings.isSoundNewTransactionEnabled())
                             sound = "outcometransaction.wav";
 
-                        head = lang.translate("Outcome transaction") + ": " + lang.translate(transaction.viewFullTypeName());
+                        head = Lang.T("Outcome transaction") + ": " + Lang.T(transaction.viewFullTypeName());
                         message = transaction.getTitle();
                     } else {
                         if (settings.isSoundNewTransactionEnabled())
                             sound = "incometransaction.wav";
-                        head = lang.translate("Income transaction") + ": " + lang.translate(transaction.viewFullTypeName());
+                        head = Lang.T("Income transaction") + ": " + Lang.T(transaction.viewFullTypeName());
                         message = transaction.getTitle();
                     }
                 }
@@ -158,8 +158,8 @@ public class WalletNotifyTimer<U> implements Observer {
                     sound = "blockforge.wav";
                 }
 
-                head = lang.translate("Forging Block %d").replace("%d", "" + blockHead.heightBlock);
-                message = lang.translate("Forging Fee") + ": " + blockHead.viewFeeAsBigDecimal();
+                head = Lang.T("Forging Block %d").replace("%d", "" + blockHead.heightBlock);
+                message = Lang.T("Forging Fee") + ": " + blockHead.viewFeeAsBigDecimal();
 
                 int diff = blockHead.heightBlock - forgingPoint.a;
                 if (diff < 300) {
@@ -172,7 +172,7 @@ public class WalletNotifyTimer<U> implements Observer {
                 Object value = ((Pair<?, ?>) event).getB();
                 if (value instanceof Order) {
                     Order order = (Order) value;
-                    head = lang.translate("Order") + " - " + lang.translate(order.state());
+                    head = Lang.T("Order") + " - " + Lang.T(order.state());
                     message = order.toString();
                     int status = order.getStatus();
                     if (status == Order.FULFILLED || status == Order.COMPLETED) {
@@ -181,12 +181,12 @@ public class WalletNotifyTimer<U> implements Observer {
                         sound = "receivemail.wav";
                     }
                 } else {
-                    head = lang.translate("EVENT");
+                    head = Lang.T("EVENT");
                     sound = "receivemail.wav";
                     message = value.toString();
                 }
             } else {
-                head = lang.translate("EVENT");
+                head = Lang.T("EVENT");
                 sound = "receivemail.wav";
                 message = event.toString();
             }

@@ -10,6 +10,8 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
+import org.erachain.lang.Lang;
+import org.erachain.lang.LangFile;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -17,15 +19,18 @@ import org.mapdb.Fun;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 
 // 1019 - Movable = true; Divisible = NO; Quantity = 1
 public abstract class AssetCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.ASSET_TYPE;
+
+    protected static final int ASSET_TYPE_LENGTH = 1;
+    //
+    protected int assetType;
+
 
     // CORE KEY
     public static final long ERA_KEY = 1L;
@@ -76,8 +81,6 @@ public abstract class AssetCls extends ItemCls {
     public static final int VENTURE = 2;
     public static final int NAME = 3;
     public static final int INITIAL_FAVORITES = 100;
-    protected static final int SCALE_LENGTH = 1;
-    protected static final int ASSET_TYPE_LENGTH = 1;
 
     ///////////////////////////////////////////////////
     /**
@@ -270,27 +273,69 @@ public abstract class AssetCls extends ItemCls {
      */
     public static final int AS_SELF_ACCOUNTING_CASH_FUND = 127;
 
-    /**
-     * +8 ... -23 = 32 диапазон. положительные - округляют целые числа
-     */
-    protected int scale;
-    //
-    protected int assetType;
-
-    protected AssetCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType, int scale) {
+    protected AssetCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType) {
         super(typeBytes, owner, name, icon, image, description);
         this.assetType = assetType;
-        this.scale = (byte) scale;
 
     }
 
-    public AssetCls(int type, byte pars, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType, int scale) {
-        this(new byte[TYPE_LENGTH], owner, name, icon, image, description, assetType, scale);
+    public AssetCls(int type, byte pars, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[TYPE_LENGTH], owner, name, icon, image, description, assetType);
         this.typeBytes[0] = (byte) type;
         this.typeBytes[1] = pars;
     }
 
     //GETTERS/SETTERS
+
+    public static int[] assetTypes;
+
+    public static int[] AssetTypes() {
+
+        if (assetTypes != null)
+            return assetTypes;
+
+        int[] array = new int[]{
+
+                AS_OUTSIDE_GOODS,
+                AS_OUTSIDE_IMMOVABLE,
+                AS_OUTSIDE_CURRENCY,
+                AS_OUTSIDE_SERVICE,
+                AS_OUTSIDE_BILL,
+                AS_OUTSIDE_WORK_TIME_HOURS,
+                AS_OUTSIDE_WORK_TIME_MINUTES,
+                AS_OUTSIDE_SHARE,
+
+                AS_MY_DEBT,
+
+                AS_OUTSIDE_OTHER_CLAIM,
+
+                AS_INSIDE_ASSETS,
+                AS_INSIDE_CURRENCY,
+                AS_INSIDE_UTILITY,
+                AS_INSIDE_SHARE,
+                AS_INSIDE_BONUS,
+                AS_INSIDE_ACCESS,
+                AS_INSIDE_VOTE,
+                AS_BANK_GUARANTEE,
+                AS_BANK_GUARANTEE_TOTAL,
+                AS_INDEX,
+                AS_INSIDE_OTHER_CLAIM,
+
+                AS_ACCOUNTING,
+                AS_SELF_MANAGED_ACCOUNTING,
+                AS_SELF_ACCOUNTING_LOAN,
+                AS_SELF_ACCOUNTING_MUTUAL_AID_FUND,
+                AS_SELF_ACCOUNTING_CASH_FUND
+        };
+
+        if (BlockChain.TEST_MODE) {
+            // AS_SELF_ACCOUNTING_CASH_FUND,
+        }
+
+        Arrays.sort(array);
+
+        return array;
+    }
 
     @Override
     public int getItemType() {
@@ -329,25 +374,10 @@ public abstract class AssetCls extends ItemCls {
         return db.getIssueAssetMap();
     }
 
-    public abstract long getQuantity();
+    //public abstract long getQuantity();
 
     public abstract BigDecimal getReleased();
     public abstract BigDecimal getReleased(DCSet dc);
-
-
-    public int getScale() {
-        // TODO убрать это если будет новая цепочка с регулируемой точностью
-        if (BlockChain.MAIN_MODE && this.key > 0 && this.key < 5 ||
-                this.key > 1000 &&
-                        this.key < BlockChain.AMOUNT_SCALE_FROM
-        ) {
-            //return this.assetType == 1? BlockChain.AMOUNT_DEDAULT_SCALE : 0;
-            // IN ANY CASE
-            return BlockChain.AMOUNT_DEDAULT_SCALE;
-        }
-
-        return this.scale;
-    }
 
     public int getAssetType() {
         return this.assetType;
@@ -571,6 +601,10 @@ public abstract class AssetCls extends ItemCls {
         return image;
     }
 
+    public abstract long getQuantity();
+
+    public abstract int getScale();
+
     @Override
     public HashMap getNovaItems() {
         return BlockChain.NOVA_ASSETS;
@@ -686,6 +720,22 @@ public abstract class AssetCls extends ItemCls {
         return isUnHoldable(key, assetType);
     }
 
+    public static boolean isUnique(int assetType) {
+        if (assetType == AS_OUTSIDE_BILL
+                || assetType == AS_OUTSIDE_BILL_EX
+                || assetType == AS_BANK_GUARANTEE
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isUnique() {
+        return isUnique(assetType);
+    }
+
+    public abstract boolean isUnlimited(Account address, boolean notAccounting);
+
     /**
      * Управлять может только сам обладатель
      *
@@ -744,17 +794,6 @@ public abstract class AssetCls extends ItemCls {
         return isReverseSend(this.assetType);
     }
 
-    /**
-     * Без ограничений - только если это счетная единица или сам владелец без огрничений
-     *
-     * @param address
-     * @param notAccounting
-     * @return
-     */
-    public boolean isUnlimited(Account address, boolean notAccounting) {
-        return !notAccounting && isAccounting() || getQuantity() == 0L && owner.equals(address);
-    }
-
     public BigDecimal defaultAmountAssetType() {
         switch (assetType) {
             case AS_BANK_GUARANTEE:
@@ -793,7 +832,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "Outside Share";
             case AS_OUTSIDE_BILL:
-                return "Promissory Note";
+                return "AS_OUTSIDE_BILL_N";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of exchange";
             case AS_MY_DEBT:
@@ -860,7 +899,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "Outside Share Rights";
             case AS_OUTSIDE_BILL:
-                return "Promissory Note";
+                return "AS_OUTSIDE_BILL_NF";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of Exchange";
             case AS_MY_DEBT:
@@ -904,6 +943,14 @@ public abstract class AssetCls extends ItemCls {
 
         }
         return null;
+    }
+
+    public static String viewAssetTypeFullClsAndChars(int assetType) {
+        return charAssetType(Long.MAX_VALUE, assetType) + viewAssetTypeAbbrev(assetType) + ":" + viewAssetTypeFullCls(assetType);
+    }
+
+    public String viewAssetTypeFullClsAndChars() {
+        return charAssetType(Long.MAX_VALUE, assetType) + viewAssetTypeAbbrev(assetType) + ":" + viewAssetTypeFullCls(assetType);
     }
 
     public static String viewAssetTypeAbbrev(int asset_type) {
@@ -993,7 +1040,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "External shares which have to be transferred to an external depository. The depositary can be notified by presenting the claim and then confirm the shares transfer";
             case AS_OUTSIDE_BILL:
-                return "A digital promissory note can be called for redemption by external money. You can take it into your hands";
+                return "AS_OUTSIDE_BILL_D";
             case AS_OUTSIDE_BILL_EX:
                 return "A digital bill of exchange can be called for redemption by external money. You can take it into your hands";
             case AS_MY_DEBT:
@@ -1709,26 +1756,87 @@ public abstract class AssetCls extends ItemCls {
     }
 
     //OTHER
+    public static JSONObject AssetTypeJson(int assetType, JSONObject langObj) {
+
+        JSONObject type = new JSONObject();
+        type.put("id", assetType);
+        type.put("name", Lang.T(AssetCls.viewAssetTypeCls(assetType), langObj));
+        type.put("nameFull", Lang.T(AssetCls.viewAssetTypeFullCls(assetType), langObj));
+
+        List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> actions = AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
+                AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
+                assetType, null, true);
+        StringJoiner joiner = new StringJoiner(", ");
+        JSONArray actionsArray = new JSONArray();
+        for (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> action : actions) {
+            joiner.add(Lang.T(action.b, langObj));
+            JSONObject actionJson = new JSONObject();
+            actionJson.put("action", action.a.a);
+            actionJson.put("backward", action.a.b);
+            actionJson.put("name", Lang.T(action.b, langObj));
+            actionsArray.add(actionJson);
+        }
+
+        String description = Lang.T(AssetCls.viewAssetTypeDescriptionCls(assetType), langObj) + ".<br>";
+        if (AssetCls.isReverseSend(assetType)) {
+            description += Lang.T("Actions for OWN balance is reversed", langObj) + ".<br>";
+        }
+        description += "<b>" + Lang.T("Acceptable actions", langObj) + ":</b><br>" + joiner.toString();
+
+        type.put("description", description);
+
+        return null;
+    }
+
+    public static JSONObject assetTypesJson;
+
+    public static JSONObject AssetTypesActionsJson() {
+
+        if (assetTypesJson != null)
+            return assetTypesJson;
+
+        assetTypesJson = new JSONObject();
+        for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
+            LangFile langFile = Lang.getInstance().getLangFile(iso);
+            JSONObject langJson = new JSONObject();
+            for (int type : AssetTypes()) {
+                langJson.put(type, AssetTypeJson(type, langFile.getLangJson()));
+            }
+            assetTypesJson.put(iso, langJson);
+        }
+        return assetTypesJson;
+    }
+
+    public static JSONObject typeJson(int type) {
+
+        String assetTypeName;
+
+        assetTypeName = viewAssetTypeCls(type);
+        if (assetTypeName == null)
+            return null;
+
+        JSONObject typeJson = new JSONObject();
+
+        typeJson.put("key", type);
+        typeJson.put("char", charAssetType(1000, type));
+        typeJson.put("abbrev", viewAssetTypeAbbrev(type));
+        typeJson.put("name", assetTypeName);
+        typeJson.put("name_full", viewAssetTypeFullCls(type));
+        typeJson.put("desc", viewAssetTypeDescriptionCls(type));
+
+        return typeJson;
+    }
 
     public static JSONArray typesJson() {
 
         JSONArray types = new JSONArray();
 
-        String assetTypeName;
         for (int i = 0; i < 256; i++) {
-            assetTypeName = viewAssetTypeCls(i);
-            if (assetTypeName == null)
+            JSONObject json = typeJson(i);
+            if (json == null)
                 continue;
 
-            JSONObject type = new JSONObject();
-            type.put("key", i);
-            type.put("char", charAssetType(1000, i));
-            type.put("abbrev", viewAssetTypeAbbrev(i));
-            type.put("name", assetTypeName);
-            type.put("name_full", viewAssetTypeFullCls(i));
-            type.put("desc", viewAssetTypeDescriptionCls(i));
-            types.add(type);
-
+            types.add(json);
         }
         return types;
     }
@@ -1740,10 +1848,10 @@ public abstract class AssetCls extends ItemCls {
         JSONObject assetJSON = super.toJson();
 
         // ADD DATA
-        assetJSON.put("scale", this.getScale());
         assetJSON.put("assetTypeKey", this.assetType);
         assetJSON.put("assetTypeName", viewAssetType());
         assetJSON.put("assetTypeDesc", viewAssetTypeDescriptionCls(assetType));
+        assetJSON.put("released", this.getReleased());
         assetJSON.put("type_key", this.assetType);
         assetJSON.put("type_char", charAssetType());
         assetJSON.put("type_abbrev", viewAssetTypeAbbrev());
@@ -1751,21 +1859,29 @@ public abstract class AssetCls extends ItemCls {
         assetJSON.put("type_name_full", viewAssetTypeFull());
         assetJSON.put("type_desc", viewAssetTypeDescriptionCls(assetType));
 
+        assetJSON.put("scale", this.getScale());
+        assetJSON.put("quantity", this.getQuantity());
+
         return assetJSON;
     }
 
     public JSONObject jsonForExplorerPage(JSONObject langObj) {
-        //DCSet dcSet = DCSet.getInstance();
 
-        JSONObject json =super.jsonForExplorerPage(langObj);
-        json.put("assetTypeKey", this.assetType);
-        json.put("assetTypeNameFull", viewAssetTypeFull());
-        json.put("quantity", getQuantity());
-        json.put("released", getReleased());
-        json.put("scale", scale);
-        json.put("orders", getOperations(DCSet.getInstance()));
+        JSONObject assetJSON = super.jsonForExplorerPage(langObj);
+        assetJSON.put("assetTypeKey", this.assetType);
+        assetJSON.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
+        assetJSON.put("released", getReleased());
+        assetJSON.put("orders", getOperations(DCSet.getInstance()));
 
-        return json;
+        assetJSON.put("scale", this.getScale());
+        assetJSON.put("quantity", this.getQuantity());
+
+        return assetJSON;
     }
+
+    public int getDataLength(boolean includeReference) {
+        return super.getDataLength(includeReference) + ASSET_TYPE_LENGTH;
+    }
+
 
 }

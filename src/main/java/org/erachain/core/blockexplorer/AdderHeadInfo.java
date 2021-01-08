@@ -39,8 +39,8 @@ public class AdderHeadInfo {
         } else if (type == PollCls.class
                 ) {
             addHeadInfoCapStatusesTemplates(output, langObj);
-            output.put("label_table_total_votes", Lang.getInstance().translateFromLangObj("Total Vote", langObj));
-            output.put("label_table_options_count", Lang.getInstance().translateFromLangObj("Options Count", langObj));
+            output.put("label_table_total_votes", Lang.T("Total Vote", langObj));
+            output.put("label_table_options_count", Lang.T("Options Count", langObj));
 
         }
 
@@ -52,26 +52,26 @@ public class AdderHeadInfo {
          * @param output словарь, в который добавляется информация
          */
     public static void addHeadInfoCapBlocks(Map output, DCSet dcSet, JSONObject langObj) {
-        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert block number or signature", langObj));
+        output.put("search_placeholder", Lang.T("Insert block number or signature", langObj));
 
         output.put("unconfirmedTxs", dcSet.getTransactionTab().size());
         output.put("totaltransactions", dcSet.getTransactionFinalMap().size());
         output.put("Label_Unconfirmed_transactions",
-                Lang.getInstance().translateFromLangObj("Unconfirmed transactions", langObj));
+                Lang.T("Unconfirmed transactions", langObj));
         output.put("Label_total_transactions",
-                Lang.getInstance().translateFromLangObj("Total Transactions", langObj));
-        output.put("Label_Height", Lang.getInstance().translateFromLangObj("Height", langObj));
-        output.put("Label_Time", Lang.getInstance().translateFromLangObj("Timestamp creation block", langObj));
-        output.put("Label_Generator", Lang.getInstance().translateFromLangObj("Creator account", langObj));
-        output.put("Label_TXs", Lang.getInstance().translateFromLangObj("TXs", langObj));
-        output.put("Label_Fee", Lang.getInstance().translateFromLangObj("Fee", langObj));
-        output.put("Label_Target", Lang.getInstance().translateFromLangObj("Target", langObj));
+                Lang.T("Total Transactions", langObj));
+        output.put("Label_Height", Lang.T("Height", langObj));
+        output.put("Label_Time", Lang.T("Timestamp creation block", langObj));
+        output.put("Label_Generator", Lang.T("Creator account", langObj));
+        output.put("Label_TXs", Lang.T("TXs", langObj));
+        output.put("Label_Fee", Lang.T("Fee", langObj));
+        output.put("Label_Target", Lang.T("Target", langObj));
         addLaterPrevious(output, langObj);
-        output.put("Label_Blocks", Lang.getInstance().translateFromLangObj("Blocks", langObj));
-        output.put("Label_Gen_balance", Lang.getInstance().translateFromLangObj("Gen.Balance", langObj));
-        output.put("Label_Delta_Height", Lang.getInstance().translateFromLangObj("Gen.Period", langObj));
-        output.put("Label_WV", Lang.getInstance().translateFromLangObj("Win", langObj));
-        output.put("Label_dtWV", Lang.getInstance().translateFromLangObj("Delta", langObj));
+        output.put("Label_Blocks", Lang.T("Blocks", langObj));
+        output.put("Label_Gen_balance", Lang.T("Gen.Balance", langObj));
+        output.put("Label_Delta_Height", Lang.T("Gen.Period", langObj));
+        output.put("Label_WV", Lang.T("Win", langObj));
+        output.put("Label_dtWV", Lang.T("Delta", langObj));
     }
 
     /**
@@ -80,17 +80,17 @@ public class AdderHeadInfo {
      * @param output словарь, в который добавляется информация
      */
     public static void addHeadInfoCapPersons(Map output, DCSet dcSet, JSONObject langObj) {
-        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or person key", langObj));
+        output.put("search_placeholder", Lang.T("Type searching words or person key", langObj));
 
         output.put("unconfirmedTxs", dcSet.getTransactionTab().size());
         output.put("Label_Unconfirmed_transactions",
-                Lang.getInstance().translateFromLangObj("Unconfirmed transactions", langObj));
-        output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("Label_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("Label_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("Label_image", Lang.getInstance().translateFromLangObj("Image", langObj));
-        output.put("Label_description", Lang.getInstance().translateFromLangObj("Description", langObj));
-        output.put("Label_Persons", Lang.getInstance().translateFromLangObj("Persons", langObj));
+                Lang.T("Unconfirmed transactions", langObj));
+        output.put("Label_key", Lang.T("Key", langObj));
+        output.put("Label_name", Lang.T("Name", langObj));
+        output.put("Label_creator", Lang.T("Creator", langObj));
+        output.put("Label_image", Lang.T("Image", langObj));
+        output.put("Label_description", Lang.T("Description", langObj));
+        output.put("Label_Persons", Lang.T("Persons", langObj));
         addLaterPrevious(output, langObj);
     }
 
@@ -100,18 +100,18 @@ public class AdderHeadInfo {
      * @param output словарь, в который добавляется информация
      */
     public static void addHeadInfoCapAssets(Map output, JSONObject langObj) {
-        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or asset key", langObj));
+        output.put("search_placeholder", Lang.T("Type searching words or asset key", langObj));
 
-        output.put("label_Title", Lang.getInstance().translateFromLangObj("Assets", langObj));
-        output.put("label_table_asset_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("label_table_asset_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("label_table_asset_owner", Lang.getInstance().translateFromLangObj("Owner", langObj));
-        output.put("label_table_asset_type", Lang.getInstance().translateFromLangObj("Type", langObj));
-        output.put("label_table_asset_description", Lang.getInstance().translateFromLangObj("Description", langObj));
-        output.put("label_table_asset_scale", Lang.getInstance().translateFromLangObj("Scale", langObj));
-        output.put("label_table_asset_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
-        output.put("label_Assets", Lang.getInstance().translateFromLangObj("Assets", langObj));
-        output.put("label_table_asset_orders", Lang.getInstance().translateFromLangObj("Orders", langObj));
+        output.put("label_Title", Lang.T("Assets", langObj));
+        output.put("label_table_asset_key", Lang.T("Key", langObj));
+        output.put("label_table_asset_name", Lang.T("Name", langObj));
+        output.put("label_table_asset_owner", Lang.T("Owner", langObj));
+        output.put("label_table_asset_type", Lang.T("Type", langObj));
+        output.put("label_table_asset_description", Lang.T("Description", langObj));
+        output.put("label_table_asset_scale", Lang.T("Scale", langObj));
+        output.put("label_table_asset_amount", Lang.T("Amount", langObj));
+        output.put("label_Assets", Lang.T("Assets", langObj));
+        output.put("label_table_asset_orders", Lang.T("Orders", langObj));
         addLaterPrevious(output, langObj);
     }
 
@@ -121,14 +121,14 @@ public class AdderHeadInfo {
      * @param output словарь, в который добавляется информация
      */
     public static void addHeadInfoCapStatusesTemplates(Map output, JSONObject langObj) {
-        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or item key", langObj));
+        output.put("search_placeholder", Lang.T("Type searching words or item key", langObj));
 
-        output.put("label_table_key", Lang.getInstance().translateFromLangObj("Key", langObj));
-        output.put("label_table_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("label_table_creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
-        output.put("label_table_description", Lang.getInstance().translateFromLangObj("Description", langObj));
-        output.put("Label_Statuses", Lang.getInstance().translateFromLangObj("Statuses", langObj));
-        output.put("Label_Templates", Lang.getInstance().translateFromLangObj("Templates", langObj));
+        output.put("label_table_key", Lang.T("Key", langObj));
+        output.put("label_table_name", Lang.T("Name", langObj));
+        output.put("label_table_creator", Lang.T("Creator", langObj));
+        output.put("label_table_description", Lang.T("Description", langObj));
+        output.put("Label_Statuses", Lang.T("Statuses", langObj));
+        output.put("Label_Templates", Lang.T("Templates", langObj));
         addLaterPrevious(output, langObj);
     }
 
@@ -138,8 +138,8 @@ public class AdderHeadInfo {
      * @param output словарь, в который добавляется информация
      */
     private static void addLaterPrevious(Map output, JSONObject langObj) {
-        output.put("Label_Later", Lang.getInstance().translateFromLangObj("Later", langObj));
-        output.put("Label_Previous", Lang.getInstance().translateFromLangObj("Previous", langObj));
+        output.put("Label_Later", Lang.T("Later", langObj));
+        output.put("Label_Previous", Lang.T("Previous", langObj));
     }
 
 

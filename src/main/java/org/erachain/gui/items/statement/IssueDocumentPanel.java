@@ -67,14 +67,14 @@ public class IssueDocumentPanel extends IconPanel {
         txtFeePow.setSelectedIndex(0);
         txtFeePow.setVisible(Gui.SHOW_FEE_POWER);
 
-        jLabel_Account_Work.setText(Lang.getInstance().translate("Select account") + ":");
-        jButton_Work_OK.setText(Lang.getInstance().translate("Sign and Send"));
+        jLabel_Account_Work.setText(Lang.T("Select account") + ":");
+        jButton_Work_OK.setText(Lang.T("Sign and Send"));
         jButton_Work_OK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onSendClick();
             }
         });
-        jButton_Work_OK1.setText(Lang.getInstance().translate("Sign and Pack"));
+        jButton_Work_OK1.setText(Lang.T("Sign and Pack"));
 
         jComboBox_Account_Work.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -89,7 +89,7 @@ public class IssueDocumentPanel extends IconPanel {
             exData_Panel.exPayoutsPanel.jComboBoxPayoutAsset.setSelectedItem(actionAsset);
         }
 
-        jLabel_Fee_Work.setText(Lang.getInstance().translate("Fee Power") + ":");
+        jLabel_Fee_Work.setText(Lang.T("Fee Power") + ":");
         this.jButton_Work_Cancel.setVisible(false);
     }
 
@@ -101,12 +101,12 @@ public class IssueDocumentPanel extends IconPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jPanel_Work = new javax.swing.JPanel();
-        jLabel_Account_Work = new javax.swing.JLabel(Lang.getInstance().translate("Account") + ": ");
+        jLabel_Account_Work = new javax.swing.JLabel(Lang.T("Account") + ": ");
         jComboBox_Account_Work = new JComboBox<Account>(new AccountsComboBoxModel());
-        encryptCheckBox = new JCheckBox(Lang.getInstance().translate("Encrypt"));
+        encryptCheckBox = new JCheckBox(Lang.T("Encrypt"));
         encryptCheckBox.setSelected(true);
 
-        jLabel_Fee_Work = new javax.swing.JLabel(Lang.getInstance().translate("FeePow") + ": ");
+        jLabel_Fee_Work = new javax.swing.JLabel(Lang.T("FeePow") + ": ");
         jLabel_Fee_Work.setVisible(Gui.SHOW_FEE_POWER);
 
         txtFeePow = new javax.swing.JComboBox();
@@ -212,8 +212,8 @@ public class IssueDocumentPanel extends IconPanel {
             }
             if (!Controller.getInstance().unlockWallet(password)) {
                 // WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
+                        Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 return;
             }
@@ -241,20 +241,20 @@ public class IssueDocumentPanel extends IconPanel {
             switch (parsing) {
                 case 1:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount!"),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid amount!"),
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
 
                 case 2:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee!"),
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
 
                 case 5:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Template not exist!"),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Template not exist!"),
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
             }
             return;
@@ -266,7 +266,7 @@ public class IssueDocumentPanel extends IconPanel {
                 Account recipient = recipients[i];
                 if (recipient == null) {
                     JOptionPane.showMessageDialog(new JFrame(), "Recipient[" + (i + 1) + "] is wrong",
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
@@ -275,8 +275,8 @@ public class IssueDocumentPanel extends IconPanel {
         PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
         if (creator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -285,16 +285,16 @@ public class IssueDocumentPanel extends IconPanel {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             JOptionPane.showMessageDialog(new JFrame(), " ERROR: " + e.getMessage(),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (exDataBytes == null) {
             return;
         } else if (exDataBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate("Message size exceeded %1 kB")
+                    Lang.T("Message size exceeded %1 kB")
                             .replace("%1", "" + (BlockChain.MAX_REC_DATA_BYTES >> 10)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
             return;
         }
@@ -313,22 +313,22 @@ public class IssueDocumentPanel extends IconPanel {
         // Issue_Asset_Confirm_Dialog cont = new
         // Issue_Asset_Confirm_Dialog(issueAssetTransaction);
         String text = "<HTML><body>";
-        text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
-                + Lang.getInstance().translate("Issue Note") + "<br><br><br>";
-        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + issueDoc.getCreator() + "<br>";
-        // text += Lang.getInstance().translate("Name") +":&nbsp;"+
+        text += Lang.T("Confirmation Transaction") + ":&nbsp;"
+                + Lang.T("Issue Note") + "<br><br><br>";
+        text += Lang.T("Creator") + ":&nbsp;" + issueDoc.getCreator() + "<br>";
+        // text += Lang.T("Name") +":&nbsp;"+
         // issueDoc.getItem().viewName() +"<br>";
-        // text += Lang.getInstance().translate("Quantity") +":&nbsp;"+
+        // text += Lang.T("Quantity") +":&nbsp;"+
         // ((AssetCls)issueAssetTransaction.getItem()).getQuantity().toString()+"<br>";
-        // text += Lang.getInstance().translate("Movable") +":&nbsp;"+
-        // Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isMovable()+"")+
+        // text += Lang.T("Movable") +":&nbsp;"+
+        // Lang.T(((AssetCls)issueAssetTransaction.getItem()).isMovable()+"")+
         // "<br>";
-        // text += Lang.getInstance().translate("Divisible") +":&nbsp;"+
-        // Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isDivisible()+"")+
+        // text += Lang.T("Divisible") +":&nbsp;"+
+        // Lang.T(((AssetCls)issueAssetTransaction.getItem()).isDivisible()+"")+
         // "<br>";
-        // text += Lang.getInstance().translate("Scale") +":&nbsp;"+
+        // text += Lang.T("Scale") +":&nbsp;"+
         // ((AssetCls)issueAssetTransaction.getItem()).getScale()+ "<br>";
-        // text += Lang.getInstance().translate("Description")+":<br>"+
+        // text += Lang.T("Description")+":<br>"+
         // Library.to_HTML(issueAssetTransaction.getItem().getDescription())+"<br>";
         String Status_text = "";
 
@@ -337,13 +337,13 @@ public class IssueDocumentPanel extends IconPanel {
         // UIManager.put("OptionPane.okButtonText", "Готово");
 
         // int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text,
-        // Lang.getInstance().translate("Issue Asset"),
+        // Lang.T("Issue Asset"),
         // JOptionPane.YES_NO_OPTION);
 
         IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, issueDoc,
                 text,
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
-                Lang.getInstance().translate("Confirmation transaction issue document"));
+                Lang.T("Confirmation transaction issue document"));
 
         // for calculate ExPays
         issueDoc.setDC(DCSet.getInstance());

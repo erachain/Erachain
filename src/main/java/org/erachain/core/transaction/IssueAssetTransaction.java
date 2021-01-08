@@ -7,6 +7,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
+import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -161,22 +162,33 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
         //CHECK QUANTITY
         AssetCls asset = (AssetCls) this.getItem();
-        //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
-        long maxQuantity = Long.MAX_VALUE;
-        long quantity = asset.getQuantity();
-        //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
-        if (quantity > maxQuantity || quantity < -1) {
-            return INVALID_QUANTITY;
-        }
 
-        if (((AssetCls) this.item).isAccounting() && quantity != 0) {
-            return INVALID_QUANTITY;
-        }
-
-        if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
-            Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
-            if (item.b < quantity) {
+        if (asset.isUnique()) {
+            if (asset instanceof AssetUnique) {
+                ;
+            } else {
+                // так как тип актива считываем в конце парсинга - по нему сразу не определить что было создано
+                // и может появиться ошибка сборки байт кода
+                return INVALID_ASSET_TYPE;
+            }
+        } else {
+            //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
+            long maxQuantity = Long.MAX_VALUE;
+            long quantity = asset.getQuantity();
+            //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
+            if (quantity > maxQuantity || quantity < -1) {
                 return INVALID_QUANTITY;
+            }
+
+            if (((AssetCls) this.item).isAccounting() && quantity != 0) {
+                return INVALID_QUANTITY;
+            }
+
+            if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
+                Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
+                if (item.b < quantity) {
+                    return INVALID_QUANTITY;
+                }
             }
         }
 

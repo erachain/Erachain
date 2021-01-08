@@ -21,7 +21,7 @@ public class OnDealClick {
         //CHECK IF NETWORK OK
         if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
             //NETWORK NOT OK
-            JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, Lang.T("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
             //ENABLE
             button.setEnabled(true);
@@ -35,7 +35,7 @@ public class OnDealClick {
             String password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
             if (!Controller.getInstance().unlockWallet(password)) {
                 //WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
                 button.setEnabled(true);
@@ -409,6 +409,10 @@ public class OnDealClick {
             case Transaction.INVALID_TIMESTAMP_END:
                 mess = "Invalid end timestamp";
                 break;
+            case Transaction.INVALID_ASSET_TYPE:
+                mess = "Invalid asset type (not unique?)";
+                break;
+
             case Transaction.INVALID_CREATOR:
                 mess = "Invalid creator";
                 break;

@@ -50,7 +50,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
 
         //this.columnNames[2] = have.getShort();
         //this.columnNames[4] = want.getShort();
-        //this.columnNames[3] = Lang.getInstance().translate("Price") + ": " + this.columnNames[4];
+        //this.columnNames[3] = Lang.T("Price") + ": " + this.columnNames[4];
 
         ///totalCalc();
 
@@ -85,7 +85,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
             case COLUMN_TIMESTAMP:
 
                 if (row == this.list.size())
-                    return "<html>" + Lang.getInstance().translate("Total") + ":</html>";
+                    return "<html>" + Lang.T("Total") + ":</html>";
 
                 return DateTimeFormat.timestamptoString(trade.getTimestamp());
 

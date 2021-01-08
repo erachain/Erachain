@@ -21,7 +21,7 @@ public class CertifyPubKeysDetailsFrame extends RecDetailsFrame {
 
         //LABEL PERSON
         ++labelGBC.gridy;
-        JLabel personLabel = new JLabel(Lang.getInstance().translate("Person") + ":");
+        JLabel personLabel = new JLabel(Lang.T("Person") + ":");
         this.add(personLabel, labelGBC);
 
         // PERSON
@@ -39,7 +39,7 @@ public class CertifyPubKeysDetailsFrame extends RecDetailsFrame {
 
         //LABEL to DAYS
         ++labelGBC.gridy;
-        JLabel amountLabel = new JLabel(Lang.getInstance().translate("End Days") + ":");
+        JLabel amountLabel = new JLabel(Lang.T("End Days") + ":");
         this.add(amountLabel, labelGBC);
 
         //ens DAYS

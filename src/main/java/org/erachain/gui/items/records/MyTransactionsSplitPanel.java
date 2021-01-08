@@ -11,7 +11,7 @@ import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.SetIntervalPanel;
-import org.erachain.gui.library.VouchLibraryPanel;
+import org.erachain.gui.library.SignLibraryPanel;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -43,7 +43,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     private static MyTransactionsSplitPanel instance;
-    public VouchLibraryPanel voush_Library_Panel;
+    public SignLibraryPanel voush_Library_Panel;
     protected Tuple2<Long, Long> selectedTransactionKey;
     protected Transaction selectedTransaction;
     private JPanel records_Info_Panel;
@@ -76,7 +76,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         // not show buttons
         jToolBarRightPanel.setVisible(true);
         // toolBarLeftPanel.setVisible(false);
-        jButton1_jToolBar_RightPanel.setText("<HTML><B> " + Lang.getInstance().translate("Record") + "</></> ");
+        jButton1_jToolBar_RightPanel.setText("<HTML><B> " + Lang.T("Record") + "</></> ");
         jButton1_jToolBar_RightPanel.setBorderPainted(true);
         jButton1_jToolBar_RightPanel.setFocusable(true);
         jButton1_jToolBar_RightPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(
@@ -130,7 +130,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         // button 1 in left tool bar
         toolBarLeftPanel.setVisible(true);
 
-        button1ToolBarLeftPanel.setText(Lang.getInstance().translate("Reset Unread"));
+        button1ToolBarLeftPanel.setText(Lang.T("Reset Unread"));
         button1ToolBarLeftPanel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -140,11 +140,11 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
 
         // button 2 in left tool bar
-        button2ToolBarLeftPanel.setText(Lang.getInstance().translate("Unread Only"));
+        button2ToolBarLeftPanel.setText(Lang.T("Unread Only"));
         button2ToolBarLeftPanel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                button2ToolBarLeftPanel.setText((Lang.getInstance().translate(button2ToolBarLeftPanel
+                button2ToolBarLeftPanel.setText((Lang.T(button2ToolBarLeftPanel
                         .isSelected() ? "See All" : "Unread Only")));
 
                 recordsModel.setOnlyUndead();
@@ -207,7 +207,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
         });
 
-        item_Rebroadcast = new JMenuItem(Lang.getInstance().translate("Rebroadcast"));
+        item_Rebroadcast = new JMenuItem(Lang.T("Rebroadcast"));
 
         item_Rebroadcast.addActionListener(new ActionListener() {
             @Override
@@ -223,7 +223,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
         menu.add(item_Rebroadcast);
 
-        item_Delete = new JMenuItem(Lang.getInstance().translate("Delete"));
+        item_Delete = new JMenuItem(Lang.T("Delete"));
         item_Delete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -240,7 +240,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
         menu.add(item_Delete);
 
-        item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
+        item_Save = new JMenuItem(Lang.T("Save"));
         item_Save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -257,7 +257,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
         menu.addSeparator();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -399,7 +399,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                 GridBagConstraints gridBagConstraints = null;
                 if (keys != null) {
 
-                    JLabel jLabelTitlt_Table_Sign = new JLabel(Lang.getInstance().translate("Signatures") + ":");
+                    JLabel jLabelTitlt_Table_Sign = new JLabel(Lang.T("Signatures") + ":");
                     gridBagConstraints = new java.awt.GridBagConstraints();
                     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
@@ -415,7 +415,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
                     gridBagConstraints.weightx = 1.0;
                     gridBagConstraints.weighty = 1.0;
-                    voush_Library_Panel = new VouchLibraryPanel(trans);
+                    voush_Library_Panel = new SignLibraryPanel(trans);
                     records_Info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
                 }
@@ -451,7 +451,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
     private void favoriteSet(Transaction transaction) {
         // CHECK IF FAVORITES
         if (wallet.isTransactionFavorite(transaction)) {
-            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
             if (showConfirmDialog == 0) {
                 wallet.removeTransactionFavorite(transaction);
             }

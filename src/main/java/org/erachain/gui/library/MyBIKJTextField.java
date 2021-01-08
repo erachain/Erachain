@@ -1,7 +1,7 @@
 package org.erachain.gui.library;
 
-import org.erachain.lang.Lang;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
@@ -22,7 +22,7 @@ public class MyBIKJTextField extends JTextField {
         th = this;
         text_Color = this.getForeground();
         th.setForeground(Color.RED);
-        th.setToolTipText(Lang.getInstance().translate("Must be 9 numbers"));
+        th.setToolTipText(Lang.T("Must be 9 numbers"));
         MenuPopupUtil.installContextMenu(this);
         addCaretListener(new CaretListener() {
 

@@ -3,6 +3,8 @@ package org.erachain.gui.items.assets;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetType;
+import org.erachain.core.item.assets.AssetUnique;
+import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.IssueItemPanel;
@@ -20,9 +22,9 @@ public class IssueAssetPanel extends IssueItemPanel {
     public static String NAME = "IssueAssetPanel";
     public static String TITLE = "Issue Asset";
 
-    private JLabel scaleJLabel = new JLabel(Lang.getInstance().translate("Scale") + ":");
-    private JLabel quantityJLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
-    private JLabel typeJLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
+    private JLabel scaleJLabel = new JLabel(Lang.T("Scale") + ":");
+    private JLabel quantityJLabel = new JLabel(Lang.T("Quantity") + ":");
+    private JLabel typeJLabel = new JLabel(Lang.T("Type") + ":");
 
     private JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
     private JComboBox<String> textScale = new JComboBox<>();
@@ -38,6 +40,8 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         assetTypesComboBoxModel = new AssetTypesComboBoxModel();
         assetTypeJComboBox.setModel(assetTypesComboBoxModel);
+        //assetTypeJComboBox.setRenderer(new RenderComboBoxAssetActions());
+
         textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
         textScale.setSelectedIndex(8);
 
@@ -49,22 +53,11 @@ public class IssueAssetPanel extends IssueItemPanel {
         // select combobox Asset type
         assetTypeJComboBox.addActionListener(e -> {
             JComboBox source = (JComboBox) e.getSource();
-            AssetType assetType = (AssetType) source.getSelectedItem();
-
-            int fontSize = textScale.getFontMetrics(textScale.getFont()).getHeight();
-            String fontStyle = textScale.getFont().getFontName();
-            fontStyle = "<body style='font: " + (fontSize - 2) + "pt " + fontStyle + "'>";
-
-            textareasAssetTypeDescription.setText(fontStyle + assetType.getDescription());
-            textQuantity.setVisible(!AssetCls.isAccounting(assetType.getId()));
-            quantityJLabel.setVisible(!AssetCls.isAccounting(assetType.getId()));
+            refreshLabels((AssetType) source.getSelectedItem());
         });
 
         // set start text area asset type
-        int fontSize = textScale.getFontMetrics(textScale.getFont()).getHeight();
-        String fontStyle = textScale.getFont().getFontName();
-        fontStyle = "<body style='font: " + (fontSize - 2) + "pt " + fontStyle + "'>";
-        textareasAssetTypeDescription.setText(fontStyle + ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getDescription());
+        refreshLabels((AssetType) assetTypesComboBoxModel.getSelectedItem());
 
     }
 
@@ -117,45 +110,76 @@ public class IssueAssetPanel extends IssueItemPanel {
     long quantity;
     int assetType;
 
+    private void refreshLabels(AssetType assetType) {
+        int fontSize = textScale.getFontMetrics(textScale.getFont()).getHeight();
+        String fontStyle = textScale.getFont().getFontName();
+        fontStyle = "<body style='font: " + (fontSize - 2) + "pt " + fontStyle + "'>";
+
+        textareasAssetTypeDescription.setText(fontStyle + assetType.getDescription());
+
+        if (AssetCls.isUnique(assetType.getId())) {
+            textQuantity.setVisible(false);
+            quantityJLabel.setVisible(false);
+            textScale.setVisible(false);
+            scaleJLabel.setVisible(false);
+        } else {
+            textQuantity.setVisible(!AssetCls.isAccounting(assetType.getId()));
+            quantityJLabel.setVisible(!AssetCls.isAccounting(assetType.getId()));
+            textScale.setVisible(true);
+            scaleJLabel.setVisible(true);
+        }
+
+    }
+
     protected boolean checkValues() {
+
+        assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
 
         int parseStep = 0;
         try {
 
-            // READ SCALE
-            scale = Byte.parseByte((String) textScale.getSelectedItem());
+            if (!AssetCls.isUnique(assetType)) {
+                // READ SCALE
+                scale = Byte.parseByte((String) textScale.getSelectedItem());
 
-            // READ QUANTITY
-            parseStep++;
-            quantity = Long.parseLong(textQuantity.getText());
+                // READ QUANTITY
+                parseStep++;
+                quantity = Long.parseLong(textQuantity.getText());
+            }
 
         } catch (Exception e) {
             switch (parseStep) {
                 case 0:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Invalid Scale!"), Lang.getInstance().translate("Error"),
+                            Lang.T("Invalid Scale!"), Lang.T("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     break;
                 case 1:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"),
+                            Lang.T("Invalid quantity!"), Lang.T("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     break;
             }
             return false;
         }
 
-        assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
-
         return true;
     }
 
     protected void makeTransaction() {
 
+        AssetCls asset;
+        if (AssetCls.isUnique(assetType)) {
+            asset = new AssetUnique(creator, textName.getText(), addLogoIconLabel.getImgBytes(),
+                    addImageLabel.getImgBytes(), textAreaDescription.getText(),
+                    assetType);
+        } else {
+            asset = new AssetVenture(creator, textName.getText(), addLogoIconLabel.getImgBytes(),
+                    addImageLabel.getImgBytes(), textAreaDescription.getText(),
+                    assetType, scale, quantity);
+        }
         transaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
-                creator, exLink, textName.getText(), textAreaDescription.getText(),
-                addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
-                scale, assetType, quantity, feePow);
+                creator, exLink, feePow, asset);
 
     }
 
@@ -163,19 +187,21 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         AssetCls asset = (AssetCls) transaction.getItem();
 
-        String text = "<HTML><body><h2>";
-        text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
-                + Lang.getInstance().translate("Issue Asset") + "</h2>"
-                + Lang.getInstance().translate("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
-                + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
-                + "[" + asset.getKey() + "]" + Lang.getInstance().translate("Name") + ":&nbsp;" + asset.viewName() + "<br>"
-                + Lang.getInstance().translate("Quantity") + ":&nbsp;" + asset.getQuantity() + "<br>"
-                + Lang.getInstance().translate("Asset Type") + ":&nbsp;"
-                + Lang.getInstance().translate(asset.viewAssetTypeFull() + "") + "<br>"
-                + Lang.getInstance().translate("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
-                + Lang.getInstance().translate("Description") + ":<br>";
+        String text = "<body><h2>";
+        text += Lang.T("Confirmation Transaction") + ":&nbsp;"
+                + Lang.T("Issue Asset") + "</h2>"
+                + Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
+                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
+                + "[" + asset.getKey() + "]" + Lang.T("Name") + ":&nbsp;" + asset.viewName() + "<br>"
+                + Lang.T("Asset Class") + ":&nbsp;"
+                + Lang.T(asset.getItemSubType() + "") + "<br>"
+                + Lang.T("Asset Type") + ":&nbsp;"
+                + "<b>" + asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:" + Lang.T(asset.viewAssetTypeFull() + "") + "<br>"
+                + Lang.T("Quantity") + ":&nbsp;" + asset.getQuantity() + ", "
+                + Lang.T("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
+                + Lang.T("Description") + ":<br>";
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
-            text += Library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "<br>";
+            text += Library.to_HTML(Lang.T(asset.viewDescription())) + "<br>";
         } else {
             text += Library.to_HTML(asset.viewDescription()) + "<br>";
         }

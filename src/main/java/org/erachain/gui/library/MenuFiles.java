@@ -2,6 +2,7 @@ package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.*;
 import org.erachain.gui.create.LicenseDataJFrame;
@@ -71,10 +72,10 @@ public class MenuFiles extends JMenu {
 
 
                 if (Controller.getInstance().isWalletUnlocked()) {
-                    lockItem.setText(Lang.getInstance().translate("Lock Wallet"));
+                    lockItem.setText(Lang.T("Lock Wallet"));
                     lockItem.setIcon(lockedIcon);
                 } else {
-                    lockItem.setText(Lang.getInstance().translate("Unlock Wallet"));
+                    lockItem.setText(Lang.T("Unlock Wallet"));
                     lockItem.setIcon(unlockedIcon);
                 }
                 //		Dimension d = fileMenu.getPreferredSize();
@@ -103,7 +104,7 @@ public class MenuFiles extends JMenu {
 
 
         lockItem = new JMenuItem("lock");
-        lockItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Lock/Unlock Wallet"));
+        lockItem.getAccessibleContext().setAccessibleDescription(Lang.T("Lock/Unlock Wallet"));
         lockItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.ALT_MASK));
 
         lockItem.addActionListener(new ActionListener() {
@@ -118,8 +119,8 @@ public class MenuFiles extends JMenu {
         addSeparator();
 
         //CONSOLE
-        JMenuItem consoleItem = new JMenuItem(Lang.getInstance().translate("Debug"));
-        consoleItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Debug information"));
+        JMenuItem consoleItem = new JMenuItem(Lang.T("Debug"));
+        consoleItem.getAccessibleContext().setAccessibleDescription(Lang.T("Debug information"));
         consoleItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.ALT_MASK));
         consoleItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -129,8 +130,8 @@ public class MenuFiles extends JMenu {
         add(consoleItem);
 
         //SETTINGS
-        JMenuItem settingsItem = new JMenuItem(Lang.getInstance().translate("Settings"));
-        settingsItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Settings of program"));
+        JMenuItem settingsItem = new JMenuItem(Lang.T("Settings"));
+        settingsItem.getAccessibleContext().setAccessibleDescription(Lang.T("Settings of program"));
         settingsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
         settingsItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -141,15 +142,15 @@ public class MenuFiles extends JMenu {
 
         // read transaction
 
-        JMenuItem readTransItem = new JMenuItem(Lang.getInstance().translate("Read Transaction"));
-        readTransItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Read Transaction"));
+        JMenuItem readTransItem = new JMenuItem(Lang.T("Read Transaction"));
+        readTransItem.getAccessibleContext().setAccessibleDescription(Lang.T("Read Transaction"));
         readTransItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
         readTransItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
 //        		String raw = Base58.encode(transaction.toBytes(false, null));
                 FileChooser chooser = new FileChooser();
-                chooser.setDialogTitle(Lang.getInstance().translate("Open File"));
+                chooser.setDialogTitle(Lang.T("Open File"));
                 //chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 chooser.setDialogType(javax.swing.JFileChooser.OPEN_DIALOG);
                 chooser.setMultiSelectionEnabled(false);
@@ -207,19 +208,19 @@ public class MenuFiles extends JMenu {
                     if (!js.containsKey("asset")) return;
                     long assetKey = ((Long) js.get("asset"));
                     if (!js.containsKey("recipient")) return;
-                    String recipient = (String) js.get("recipient");
+                    Account recipient = Account.tryMakeAccount((String) js.get("recipient")).a;
                     if (!js.containsKey("head")) return;
                     String head = (String) js.get("head");
                     if (!js.containsKey("amount")) return;
                     String amount = (String) js.get("amount");
                     Boolean backward = (Boolean) js.get("backward");
                     AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey),
-                            ct.getWalletAccountByAddress(creator), ct.getWalletAccountByAddress(recipient), null, null, backward);
-                    MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Read Transaction"),
+                            ct.getWalletAccountByAddress(creator), recipient, null, null, backward);
+                    MainPanel.getInstance().insertNewTab(Lang.T("Read Transaction"),
                             panel);
 
                     AssetCls asset = ct.getAsset(assetKey);
-                    panel.recipientAddress.setSelectedAddress(recipient);
+                    panel.recipientAddress.setSelectedAccount(recipient);
                     panel.recipientAddress.setEditable(false);
                     panel.jTextFieldTXTitle.setText(head);
                     panel.jTextFieldTXTitle.setEditable(false);
@@ -237,15 +238,15 @@ public class MenuFiles extends JMenu {
 
         // write teransaction
 
-        JMenuItem writeTransItem = new JMenuItem(Lang.getInstance().translate("Write Transaction"));
-        writeTransItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Read Transaction"));
+        JMenuItem writeTransItem = new JMenuItem(Lang.T("Write Transaction"));
+        writeTransItem.getAccessibleContext().setAccessibleDescription(Lang.T("Read Transaction"));
         writeTransItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
         writeTransItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //  new SettingsFrame();
                 // no receive
                 //AccountSendDialog dd = new AccountSendDialog(null, null, null, null, false);
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Write Transaction"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Write Transaction"),
                         new AccountAssetSendPanel(null,
                                 null, null, null, null, false));
 
@@ -255,7 +256,7 @@ public class MenuFiles extends JMenu {
         if (BlockChain.TEST_MODE) add(writeTransItem);
 
         //WEB SERVER
-        webServerItem = new JMenuItem(Lang.getInstance().translate("Decentralized Web server"));
+        webServerItem = new JMenuItem(Lang.T("Decentralized Web server"));
         webServerItem.getAccessibleContext().setAccessibleDescription("http://127.0.0.1:" + Settings.getInstance().getWebPort());
         webServerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.ALT_MASK));
         webServerItem.addActionListener(new ActionListener() {
@@ -274,7 +275,7 @@ public class MenuFiles extends JMenu {
         webServerItem.setVisible(Settings.getInstance().isWebEnabled());
 
         //WEB SERVER
-        blockExplorerItem = new JMenuItem(Lang.getInstance().translate("Built-in BlockExplorer"));
+        blockExplorerItem = new JMenuItem(Lang.T("Built-in BlockExplorer"));
         blockExplorerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.ALT_MASK));
         blockExplorerItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -297,8 +298,8 @@ public class MenuFiles extends JMenu {
         blockExplorerItem.setVisible(Settings.getInstance().isWebEnabled());
 
         //ABOUT
-        JMenuItem aboutItem = new JMenuItem(Lang.getInstance().translate("About"));
-        aboutItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
+        JMenuItem aboutItem = new JMenuItem(Lang.T("About"));
+        aboutItem.getAccessibleContext().setAccessibleDescription(Lang.T("Information about the application"));
         aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
         aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -312,8 +313,8 @@ public class MenuFiles extends JMenu {
         add(aboutItem);
 
         // ERACHAIN LICENSE
-        JMenuItem licenseItem = new JMenuItem(Lang.getInstance().translate("License"));
-        //    licenseItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
+        JMenuItem licenseItem = new JMenuItem(Lang.T("License"));
+        //    licenseItem.getAccessibleContext().setAccessibleDescription(Lang.T("Information about the application"));
         //    licenseItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
         licenseItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -324,8 +325,8 @@ public class MenuFiles extends JMenu {
 
         // CLONECHAIN LICENSE
         //ABOUT
-        JMenuItem dataLicenseItem = new JMenuItem(Lang.getInstance().translate("Data License of Clonechain"));
-        //    licenseItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
+        JMenuItem dataLicenseItem = new JMenuItem(Lang.T("Data License of Clonechain"));
+        //    licenseItem.getAccessibleContext().setAccessibleDescription(Lang.T("Information about the application"));
         //    licenseItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
         dataLicenseItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -339,9 +340,9 @@ public class MenuFiles extends JMenu {
         addSeparator();
 
         //QUIT
-        JMenuItem quitItem = new JMenuItem(Lang.getInstance().translate("Quit"));
+        JMenuItem quitItem = new JMenuItem(Lang.T("Quit"));
         quitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.ALT_MASK));
-        quitItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Quit the application"));
+        quitItem.getAccessibleContext().setAccessibleDescription(Lang.T("Quit the application"));
         quitItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 MainFrame.getInstance().closeFrame();
@@ -357,10 +358,10 @@ public class MenuFiles extends JMenu {
 			@Override
 			public void menuSelected(MenuEvent arg0) {
         		if(Controller.getInstance().isWalletUnlocked()) {
-        			lockItem.setText(Lang.getInstance().translate("Lock Wallet"));
+        			lockItem.setText(Lang.T("Lock Wallet"));
         			lockItem.setIcon(lockedIcon);
         		} else {
-        			lockItem.setText(Lang.getInstance().translate("Unlock Wallet"));
+        			lockItem.setText(Lang.T("Unlock Wallet"));
         			lockItem.setIcon(unlockedIcon);
         		}
 			}

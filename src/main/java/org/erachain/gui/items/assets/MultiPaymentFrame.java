@@ -33,7 +33,7 @@ public class MultiPaymentFrame extends JFrame {
 
     @SuppressWarnings("unchecked")
     public MultiPaymentFrame(AssetCls asset, List<Payment> payments) {
-        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Pay dividend"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Pay dividend"));
 
         this.asset = asset;
         this.payments = payments;
@@ -91,7 +91,7 @@ public class MultiPaymentFrame extends JFrame {
 
         //LABEL ACCOUNT
         labelGBC.gridy = 0;
-        JLabel accountLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
+        JLabel accountLabel = new JLabel(Lang.T("Account") + ":");
         this.add(accountLabel, labelGBC);
 
         //TXT ACCOUNT
@@ -102,7 +102,7 @@ public class MultiPaymentFrame extends JFrame {
 
         //LABEL PAYMENTS
         labelGBC.gridy = 1;
-        JLabel paymentsLabel = new JLabel(Lang.getInstance().translate("Payments") + ":");
+        JLabel paymentsLabel = new JLabel(Lang.T("Payments") + ":");
         this.add(paymentsLabel, labelGBC);
 
         //OPTIONS
@@ -117,7 +117,7 @@ public class MultiPaymentFrame extends JFrame {
 
         //LABEL FEE
         labelGBC.gridy = 2;
-        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        JLabel feeLabel = new JLabel(Lang.T("Fee Power") + ":");
         feeLabel.setVisible(Gui.SHOW_FEE_POWER);
         this.add(feeLabel, labelGBC);
 
@@ -134,7 +134,7 @@ public class MultiPaymentFrame extends JFrame {
 
         //BUTTON GENERATE
         buttonGBC.gridy = 3;
-        this.sendButton = new JButton(Lang.getInstance().translate("Send"));
+        this.sendButton = new JButton(Lang.T("Send"));
         this.sendButton.setPreferredSize(new Dimension(160, 25));
         this.sendButton.addActionListener(new ActionListener() {
             @Override
@@ -158,7 +158,7 @@ public class MultiPaymentFrame extends JFrame {
         //CHECK IF NETWORK OK
         if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
             //NETWORK NOT OK
-            JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, Lang.T("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
             //ENABLE
             this.sendButton.setEnabled(true);
@@ -172,7 +172,7 @@ public class MultiPaymentFrame extends JFrame {
             String password = PasswordPane.showUnlockWalletDialog(this);
             if (!Controller.getInstance().unlockWallet(password)) {
                 //WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
                 this.sendButton.setEnabled(true);
@@ -191,8 +191,8 @@ public class MultiPaymentFrame extends JFrame {
             PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(this.asset.getOwner().getAddress());
             if (creator == null) {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -202,37 +202,37 @@ public class MultiPaymentFrame extends JFrame {
             switch (result.getB()) {
                 case Transaction.VALIDATE_OK:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Payment has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Payment has been sent!"), Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
                     break;
 
                 case Transaction.INVALID_PAYMENTS_LENGTH:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("The amount of payments must be between (1-400)!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("The amount of payments must be between (1-400)!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
 
                 case Transaction.INVALID_ADDRESS:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid Account!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid Account!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
 
                 case Transaction.NEGATIVE_AMOUNT:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Amount must be positive!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Amount must be positive!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
 
                 case Transaction.NOT_ENOUGH_FEE:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
 
                 case Transaction.NO_BALANCE:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Not enough balance!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
 
                 default:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Unknown error!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
 
             }
@@ -242,7 +242,7 @@ public class MultiPaymentFrame extends JFrame {
 
                 case 2:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
             }
         }

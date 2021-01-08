@@ -76,7 +76,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         super(NAME, TITLE);
         th = this;
         this.person = person;
-        sendButton = new MButton(Lang.getInstance().translate("Send"), 2);
+        sendButton = new MButton(Lang.T("Send"), 2);
         y = 0;
 
         GridBagConstraints fieldGBC = new GridBagConstraints();
@@ -115,7 +115,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         labelFromGBC.weightx = 0;
         labelFromGBC.gridx = 0;
         labelFromGBC.gridy = ++y;
-        JLabel fromLabel = new JLabel(Lang.getInstance().translate("Select account") + ":");
+        JLabel fromLabel = new JLabel(Lang.T("Select account") + ":");
         this.add(fromLabel, labelFromGBC);
         // fontHeight =
         // fromLabel.getFontMetrics(fromLabel.getFont()).getHeight();
@@ -144,7 +144,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         labelToGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
         labelToGBC.weightx = 0;
         labelToGBC.gridx = 0;
-        JLabel toLabel = new JLabel(Lang.getInstance().translate("To: (address or name)"));
+        JLabel toLabel = new JLabel(Lang.T("To: (address or name)"));
         this.add(toLabel, labelToGBC);
 
         // TXT TO
@@ -166,7 +166,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         labelDetailsGBC.fill = GridBagConstraints.HORIZONTAL;
         labelDetailsGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
         labelDetailsGBC.gridx = 0;
-        JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details") + ":");
+        JLabel recDetailsLabel = new JLabel(Lang.T("Receiver details") + ":");
         this.add(recDetailsLabel, labelDetailsGBC);
 
         // RECEIVER DETAILS
@@ -189,7 +189,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         labelMessageGBC.gridx = 0;
         labelMessageGBC.gridy = ++y;
 
-        JLabel title_Label = new JLabel(Lang.getInstance().translate("Title") + ":");
+        JLabel title_Label = new JLabel(Lang.T("Title") + ":");
         this.add(title_Label, labelMessageGBC);
 
         // TXT TITLE
@@ -213,7 +213,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         labelMessageGBC.gridx = 0;
         labelMessageGBC.gridy = ++y;
 
-        messageLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
+        messageLabel = new JLabel(Lang.T("Message") + ":");
 
         // TXT MESSAGE
         // GridBagConstraints txtMessageGBC = new GridBagConstraints();
@@ -241,13 +241,13 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         this.add(messageLabel, labelMessageGBC);
 
         fieldGBC.gridy = ++y;
-        encrypted = new JCheckBox(Lang.getInstance().translate("Encrypt message"));
+        encrypted = new JCheckBox(Lang.T("Encrypt message"));
         encrypted.setSelected(true);
         this.add(encrypted, fieldGBC);
 
         // TEXT ISTEXT
         fieldGBC.gridy = ++y;
-        isText = new JCheckBox(Lang.getInstance().translate("As Text"));
+        isText = new JCheckBox(Lang.T("As Text"));
         isText.setSelected(true);
         this.add(isText, fieldGBC);
 
@@ -257,7 +257,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         exLinkText = new JTextField();
         exLinkDescription = new JTextField();
 
-        exLinkTextLabel.setText(Lang.getInstance().translate("Append to") + ":");
+        exLinkTextLabel.setText(Lang.T("Append to") + ":");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++y;
@@ -274,7 +274,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 15);
         add(exLinkText, gridBagConstraints);
 
-        exLinkDescriptionLabel.setText(Lang.getInstance().translate("Parent") + ":");
+        exLinkDescriptionLabel.setText(Lang.T("Parent") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = y;
@@ -303,7 +303,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         amountlabelGBC.gridx = 0;
         amountlabelGBC.gridy = ++y;
 
-        final JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
+        final JLabel amountLabel = new JLabel(Lang.T("Amount") + ":");
         amountLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         // this.add(amountLabel, amountlabelGBC);
 
@@ -328,7 +328,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         feelabelGBC.fill = GridBagConstraints.BOTH;
         feelabelGBC.weightx = 0;
         feelabelGBC.gridx = 2;
-        final JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        final JLabel feeLabel = new JLabel(Lang.T("Fee Power") + ":");
         feeLabel.setVisible(Gui.SHOW_FEE_POWER);
         feeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         feeLabel.setVerticalAlignment(SwingConstants.TOP);
@@ -357,7 +357,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         decryptAllGBC.gridwidth = 1;
         decryptAllGBC.gridx = 3;
         decryptAllGBC.gridy = ++y;
-        JButton decryptButton = new JButton(Lang.getInstance().translate("Decrypt All"));
+        JButton decryptButton = new JButton(Lang.T("Decrypt All"));
         // this.add(decryptButton, decryptAllGBC);
 
         // BUTTON SEND
@@ -428,7 +428,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
             @Override
             public void run() {
 
-                messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("
+                messageLabel.setText("<html>" + Lang.T("Message") + ":<br>("
                         + txtMessage.getText().length() + ")</html>");
 
             }
@@ -441,16 +441,16 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
             this.cbx_To = new JComboBox(accounts_To_Model);
             if (accounts_To_Model.getSize() != 0) {
                 this.add(this.cbx_To, txtToGBC);
-                recipientBox.setSelectedAddress(cbx_To.getSelectedItem().toString());
+                recipientBox.setSelectedAccount((Account) cbx_To.getSelectedItem());
                 Account account1 = new Account(recipientBox.getSelectedAddress());
                 txtRecDetails.setText(account1.toString());
-                toLabel.setText(Lang.getInstance().translate("Select Account To") + ": ");
+                toLabel.setText(Lang.T("Select Account To") + ": ");
                 cbx_To.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         String str = (String) cbx_To.getSelectedItem();
                         if (str != null) {
-                            recipientBox.setSelectedAddress(cbx_To.getSelectedItem().toString());
+                            recipientBox.setSelectedAccount((Account) cbx_To.getSelectedItem());
                             refreshReceiverDetails();
                         }
 
@@ -458,18 +458,14 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
                 });
             } else {
 
-                this.recipientBox.setSelectedAddress("has no Accounts");
+                this.recipientBox.setMessage("has no Accounts");
                 sendButton.setEnabled(false);
 
             }
         } else {
 
             if (accountTo != null) {
-                if (accountTo instanceof PublicKeyAccount) {
-                    recipientBox.setSelectedAddress(((PublicKeyAccount) accountTo).getBase58());
-                } else {
-                    recipientBox.setSelectedAddress(accountTo.getAddress());
-                }
+                recipientBox.setSelectedAccount(accountTo);
             }
             this.add(recipientBox, txtToGBC);
         }
@@ -477,7 +473,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         /*
          * this.pack(); this.setLocationRelativeTo(null);
          * this.setMaximizable(true);
-         * this.setTitle(Lang.getInstance().translate("Persons"));
+         * this.setTitle(Lang.T("Persons"));
          * this.setClosable(true); this.setResizable(true);
          */
 
@@ -509,7 +505,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
             return;
         }
 
-        this.txtRecDetails.setText(Lang.getInstance().translate(
+        this.txtRecDetails.setText(Lang.T(
                 Account.getDetailsForEncrypt(recipient, asset.getKey(),
                         encrypted.isSelected(), true)));
 
@@ -549,8 +545,8 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
             }
             if (!Controller.getInstance().unlockWallet(password)) {
                 // WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
+                        Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 // ENABLE
                 this.sendButton.setEnabled(true);
@@ -568,7 +564,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipientAddress);
         Account recipient = accountRes.a;
         if (recipient == null) {
-            JOptionPane.showMessageDialog(null, accountRes.b, Lang.getInstance().translate("Error"),
+            JOptionPane.showMessageDialog(null, accountRes.b, Lang.T("Error"),
                     JOptionPane.ERROR_MESSAGE);
 
             // ENABLE
@@ -592,14 +588,14 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
             switch (parsing) {
                 case 1:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount!"),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid amount!"),
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
 
                 case 2:
 
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee!"),
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
             }
             // ENABLE
@@ -624,8 +620,8 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
                         messageBytes = Base58.decode(message);
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(new JFrame(),
-                                Lang.getInstance().translate("Message format is not base58 or hex!"),
-                                Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                                Lang.T("Message format is not base58 or hex!"),
+                                Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                         // ENABLE
                         this.sendButton.setEnabled(true);
@@ -655,8 +651,8 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         if (messageBytes != null) {
             if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Message size exceeded!") + " <= MAX",
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        Lang.T("Message size exceeded!") + " <= MAX",
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                 // ENABLE
                 this.sendButton.setEnabled(true);
@@ -669,8 +665,8 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
                         .getWalletPrivateKeyAccountByAddress(sender.getAddress());
                 if (creator == null) {
                     JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                            Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -685,9 +681,9 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
                 }
                 if (publicKey == null) {
                     JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate(
+                            Lang.T(
                                     ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                     // ENABLE
                     this.sendButton.setEnabled(true);
@@ -705,8 +701,8 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         if (head.getBytes(StandardCharsets.UTF_8).length > 256) {
 
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate("Title size exceeded!") + " <= 256",
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T("Title size exceeded!") + " <= 256",
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
 
         }
@@ -714,8 +710,8 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
         if (creator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -733,8 +729,8 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
 
         String Status_text = "";
         IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
-                Lang.getInstance().translate("Send Mail"), (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2),
-                Status_text, Lang.getInstance().translate("Confirmation transaction send mail"));
+                Lang.T("Send Mail"), (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2),
+                Status_text, Lang.T("Confirmation transaction send mail"));
 
         MailInfo ww = new MailInfo((RSend) transaction);
         ww.jTabbedPane1.setVisible(false);

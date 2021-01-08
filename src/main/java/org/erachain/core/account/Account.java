@@ -319,7 +319,7 @@ public class Account {
 
         if (account.getBalanceUSE(assetKey).compareTo(BigDecimal.ZERO) == 0
                 && account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0) {
-            return Lang.getInstance().translate("Warning!") + " " + (statusBad ? "???" : "")
+            return Lang.T("Warning!") + " " + (statusBad ? "???" : "")
                     + account.toString(assetKey);
         } else {
             return (statusBad ? "???" : "") + account.toString(assetKey);

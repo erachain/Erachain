@@ -25,7 +25,7 @@ public class RCalculatedDetailsFrame extends RecDetailsFrame {
         th = this;
         //LABEL RECIPIENT
         ++labelGBC.gridy;
-        JLabel recipientLabel = new JLabel(Lang.getInstance().translate("Recipient") + ":");
+        JLabel recipientLabel = new JLabel(Lang.T("Recipient") + ":");
         this.add(recipientLabel, labelGBC);
 
         //RECIPIENT
@@ -47,7 +47,7 @@ public class RCalculatedDetailsFrame extends RecDetailsFrame {
         if (r_Calc.getMessage() != null) {
             //LABEL MESSAGE
             ++labelGBC.gridy;
-            JLabel title_Label = new JLabel(Lang.getInstance().translate("Message") + ":");
+            JLabel title_Label = new JLabel(Lang.T("Message") + ":");
             this.add(title_Label, labelGBC);
 
             // ISTEXT
@@ -61,7 +61,7 @@ public class RCalculatedDetailsFrame extends RecDetailsFrame {
 
         if (r_Calc.getAmount() != null) {
 
-            String sendType = Lang.getInstance().translate(r_Calc.viewFullTypeName());
+            String sendType = Lang.T(r_Calc.viewFullTypeName());
             //LABEL AMOUNT
             ++labelGBC.gridy;
             JLabel amountLabel = new JLabel(sendType + ":");

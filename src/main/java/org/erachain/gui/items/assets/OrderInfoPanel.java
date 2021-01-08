@@ -3,7 +3,6 @@ package org.erachain.gui.items.assets;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
-import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -33,7 +32,7 @@ public class OrderInfoPanel extends JPanel {
         labelGBC.gridx = 0;
         // LABEL HAVE
         ++labelGBC.gridy;
-        JLabel haveLabel = new JLabel(Lang.getInstance().translate("Have") + ":");
+        JLabel haveLabel = new JLabel(Lang.T("Have") + ":");
         this.add(haveLabel, labelGBC);
 
         // HAVE
@@ -46,7 +45,7 @@ public class OrderInfoPanel extends JPanel {
 
         // LABEL WANT
         ++labelGBC.gridy;
-        JLabel wantLabel = new JLabel(Lang.getInstance().translate("Want") + ":");
+        JLabel wantLabel = new JLabel(Lang.T("Want") + ":");
         this.add(wantLabel, labelGBC);
 
         // HAVE
@@ -59,7 +58,7 @@ public class OrderInfoPanel extends JPanel {
 
         // LABEL PRICE
         ++labelGBC.gridy;
-        JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price") + ":");
+        JLabel priceLabel = new JLabel(Lang.T("Price") + ":");
         this.add(priceLabel, labelGBC);
 
         // PRICE

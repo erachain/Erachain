@@ -64,9 +64,9 @@ public abstract class SearchTableModelCls<U> extends AbstractTableModel {
     }
 
     @Override
-    //     private String[] columnNames = Lang.getInstance().translate();
+    //     private String[] columnNames = Lang.T();
     public String getColumnName(int index) {
-        return Lang.getInstance().translate(columnNames[index]);
+        return Lang.T(columnNames[index]);
     }
 
     public String getColumnNameOrigin(int index) {

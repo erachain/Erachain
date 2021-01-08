@@ -20,7 +20,7 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
     public static final int COLUMN_TEMPLATE_NAME = 2;
     public static final int COLUMN_TEXT = 3;
     private static final int COLUMN_ADDRESS = 0;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Template Key", "Template Name", "Own Text"});
+    private String[] columnNames = Lang.T(new String[]{"Account", "Template Key", "Template Name", "Own Text"});
     private List<PublicKeyAccount> publicKeyAccounts;
     private TemplateCls template;
 

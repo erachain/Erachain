@@ -28,7 +28,7 @@ public class AllAssetsFrame extends JFrame {
 
     public AllAssetsFrame() {
 
-        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("All Assets"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("All Assets"));
 
         //ICON
         List<Image> icons = new ArrayList<Image>();
@@ -137,7 +137,7 @@ public class AllAssetsFrame extends JFrame {
 
         // MENU
         JPopupMenu nameSalesMenu = new JPopupMenu();
-        JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
+        JMenuItem details = new JMenuItem(Lang.T("Details"));
         details.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -168,7 +168,7 @@ public class AllAssetsFrame extends JFrame {
             }
         });
 
-        this.add(new JLabel(Lang.getInstance().translate("search") + ":"), searchLabelGBC);
+        this.add(new JLabel(Lang.T("search") + ":"), searchLabelGBC);
         this.add(txtSearch, searchGBC);
         this.add(new JScrollPane(assetsTable), tableGBC);
 

@@ -21,7 +21,7 @@ public class WalletOrphanButton extends JButton implements Observer {
 
     public WalletOrphanButton() {
 
-        super(Lang.getInstance().translate("Roll back blocks"));
+        super(Lang.T("Roll back blocks"));
         th = this;
         this.addActionListener(new ActionListener() {
 
@@ -35,8 +35,8 @@ public class WalletOrphanButton extends JButton implements Observer {
                     String password = PasswordPane.showUnlockWalletDialog(th);
                     if (!Controller.getInstance().unlockWallet(password)) {
                         // WRONG PASSWORD
-                        JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                                Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
+                                Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                 }
@@ -49,7 +49,7 @@ public class WalletOrphanButton extends JButton implements Observer {
                     @Override
                     public void run() {
 
-                        String message = Lang.getInstance().translate("Insert Quantity") + ":";
+                        String message = Lang.T("Insert Quantity") + ":";
                         String retVal = JOptionPane.showInputDialog(null, message, "10");
                         if (retVal != null) {
 

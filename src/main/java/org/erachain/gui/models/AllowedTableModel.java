@@ -2,8 +2,8 @@ package org.erachain.gui.models;
 
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -65,8 +65,8 @@ public class AllowedTableModel extends AbstractTableModel implements Observer {
     public void deleteAddress(int row) {
         String address = this.getValueAt(row, 0).toString();
         int n = JOptionPane.showConfirmDialog(
-                new JFrame(), Lang.getInstance().translate("Do you want to remove address %address%?").replace("%address%", address),
-                Lang.getInstance().translate("Confirmation"),
+                new JFrame(), Lang.T("Do you want to remove address %address%?").replace("%address%", address),
+                Lang.T("Confirmation"),
                 JOptionPane.YES_NO_OPTION);
         if (n == JOptionPane.YES_OPTION) {
             peers.remove(row);

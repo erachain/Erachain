@@ -33,7 +33,7 @@ public class BalanceFromAssets extends AbstractTableModel implements Observer {
     Object tab_Balances;
     Tuple2<Long, String> asset;
     private long key;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Asset", "key Asset", "Balance"});
+    private String[] columnNames = Lang.T(new String[]{"Account", "Asset", "key Asset", "Balance"});
     // balances;
     private List<Tuple2<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,

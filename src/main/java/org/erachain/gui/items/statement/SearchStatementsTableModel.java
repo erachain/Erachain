@@ -51,7 +51,7 @@ public class SearchStatementsTableModel extends SearchTableModelCls<Transaction>
             case COLUMN_TIMESTAMP:
                 return transaction.viewTimestamp();
             case COLUMN_TYPE:
-                return Lang.getInstance().translate(transaction.viewFullTypeName());
+                return Lang.T(transaction.viewFullTypeName());
             case COLUMN_CREATOR:
                 return transaction.getCreator().getPersonAsString();
             case COLUMN_TITLE:

@@ -1,15 +1,20 @@
 package org.erachain.gui.items;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
+import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +24,10 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 //import java.util.TimerTask;
@@ -167,15 +175,55 @@ public abstract class ItemSplitPanel extends SplitPanel {
                 favoriteMenuItems.setVisible(true);
                 // CHECK IF FAVORITES
                 if (Controller.getInstance().isItemFavorite(itemTableSelected)) {
-                    favoriteMenuItems.setText(Lang.getInstance().translate("Remove Favorite"));
+                    favoriteMenuItems.setText(Lang.T("Remove Favorite"));
                 } else {
-                    favoriteMenuItems.setText(Lang.getInstance().translate("Add Favorite"));
+                    favoriteMenuItems.setText(Lang.T("Add Favorite"));
                 }
             }
 
-        });
+         });
 
         menuTable.add(favoriteMenuItems);
+
+        JMenuItem vouchMenu = new JMenuItem(Lang.T("Sign / Vouch"));
+        vouchMenu.addActionListener(e -> {
+            DCSet db = DCSet.getInstance();
+            Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
+            new toSignRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
+
+        });
+        menuTable.add(vouchMenu);
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
+                            + "?" + itemTableSelected.getItemTypeName() + "=" + itemTableSelected.getKey()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+
+        menuTable.add(setSeeInBlockexplorer);
+
+        JMenuItem byteCode = new JMenuItem(Lang.T("Get bytecode"));
+        byteCode.addActionListener(e -> {
+            String base58str = Base58.encode(itemTableSelected.toBytes(false, false));
+            StringSelection stringSelection = new StringSelection(base58str);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", itemTableSelected.getName())
+                            + "!",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuTable.add(byteCode);
 
         TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menuTable);
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
@@ -190,7 +238,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
     private void favoriteSet(ItemCls itemCls) {
         // CHECK IF FAVORITES
         if (Controller.getInstance().isItemFavorite(itemCls)) {
-            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
             if (showConfirmDialog == 0) {
                 Controller.getInstance().removeItemFavorite(itemCls);
             }

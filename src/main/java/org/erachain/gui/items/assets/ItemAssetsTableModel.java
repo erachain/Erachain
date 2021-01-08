@@ -44,7 +44,7 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
 
             case COLUMN_ASSET_TYPE:
 
-                return Lang.getInstance().translate(asset.viewAssetType());
+                return Lang.T(asset.viewAssetType());
 
             case COLUMN_ADDRESS:
 

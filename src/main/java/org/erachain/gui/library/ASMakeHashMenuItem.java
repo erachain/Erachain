@@ -18,19 +18,19 @@ public class ASMakeHashMenuItem extends JButton {
     public ASMakeHashMenuItem(JTextField inputObject) {
         super();
         th = this;
-        //     this.set_Text_and_Size_From_UIManaget(Lang.getInstance().translate("make Hash"),1.0);
-        this.setText(Lang.getInstance().translate("Hash"));
+        //     this.set_Text_and_Size_From_UIManaget(Lang.T("make Hash"),1.0);
+        this.setText(Lang.T("Hash"));
         this.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 th.setEnabled(false);
                 String ss = inputObject.getText();
-                inputObject.setText("  " + Lang.getInstance().translate("Waiting..."));
+                inputObject.setText("  " + Lang.T("Waiting..."));
                 inputObject.setEnabled(false);
                 // read file
                 FileChooser chooser = new FileChooser();
-                chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
+                chooser.setDialogTitle(Lang.T("Select File"));
                 chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 chooser.setMultiSelectionEnabled(true);
                 chooser.setMultiSelectionEnabled(false);

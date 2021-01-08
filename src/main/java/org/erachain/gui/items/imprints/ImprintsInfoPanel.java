@@ -67,7 +67,7 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
         layout.rowHeights = new int[]{0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0};
         setLayout(layout);
 
-        key_jLabel.setText(Lang.getInstance().translate("Key") + ":");
+        key_jLabel.setText(Lang.T("Key") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -91,7 +91,7 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(6, 0, 0, 9);
         add(key_jTextField, gridBagConstraints);
 
-        Name_jLabel.setText(Lang.getInstance().translate("Name") + ":");
+        Name_jLabel.setText(Lang.T("Name") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -109,7 +109,7 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
         add(Name_jTextField, gridBagConstraints);
 
-        description_jLabel.setText(Lang.getInstance().translate("Description") + ":");
+        description_jLabel.setText(Lang.T("Description") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -132,7 +132,7 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
         add(jScrollPane1, gridBagConstraints);
 
-        owner_jLabel.setText(Lang.getInstance().translate("Owner") + ":");
+        owner_jLabel.setText(Lang.T("Owner") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -150,7 +150,7 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
         add(owner_jTextField, gridBagConstraints);
 
-        holders_jLabel.setText(Lang.getInstance().translate("Holders"));
+        holders_jLabel.setText(Lang.T("Holders"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;

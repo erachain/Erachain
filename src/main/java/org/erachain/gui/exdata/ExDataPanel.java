@@ -109,7 +109,7 @@ public class ExDataPanel extends JPanel {
                 if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED)
                     return;
                 String str = JOptionPane.showInputDialog(jTextPane_Message_Public.th,
-                        Lang.getInstance().translate("Insert") + " " + arg0.getDescription(),
+                        Lang.T("Insert") + " " + arg0.getDescription(),
                         jTextPane_Message_Public.pars.get("{{" + arg0.getDescription() + "}}"));
                 if (str == null || str.equals(""))
                     return;
@@ -125,12 +125,12 @@ public class ExDataPanel extends JPanel {
         });
         initComponents();
 
-        // jLabel_Template.setText(Lang.getInstance().translate("Select
+        // jLabel_Template.setText(Lang.T("Select
         // Template") + ":");
-        jLabel_Title_Message.setText(Lang.getInstance().translate("Title") + ":");
+        jLabel_Title_Message.setText(Lang.T("Title") + ":");
         jTextField_Title_Message.setText("");
 
-        this.jButton_Remove_Other_Hashes.setText(Lang.getInstance().translate("Delete"));
+        this.jButton_Remove_Other_Hashes.setText(Lang.T("Delete"));
         this.jButton_Remove_Other_Hashes.addActionListener(new ActionListener() {
             // delete row
             @Override
@@ -145,7 +145,7 @@ public class ExDataPanel extends JPanel {
             }
         });
 
-        this.jButton_Add_From_File_Other_Hashes.setText(Lang.getInstance().translate("Create Hash"));
+        this.jButton_Add_From_File_Other_Hashes.setText(Lang.T("Create Hash"));
         // jButton3_jToolBar_RightPanel.setFocusable(false);
         jButton_Add_From_File_Other_Hashes.addActionListener(new ActionListener() {
             // create Hashs
@@ -156,20 +156,20 @@ public class ExDataPanel extends JPanel {
             }
         });
 
-        this.jButton_Add_Other_Hashes.setText(Lang.getInstance().translate("Add"));
+        this.jButton_Add_Other_Hashes.setText(Lang.T("Add"));
         jButton_Add_Other_Hashes.addActionListener(new ActionListener() {
             // create Hashs
             @Override
             public void actionPerformed(ActionEvent e) {
-                String str = JOptionPane.showInputDialog(null, Lang.getInstance().translate("Insert Hash"),
-                        Lang.getInstance().translate("Add"), JOptionPane.INFORMATION_MESSAGE);
+                String str = JOptionPane.showInputDialog(null, Lang.T("Insert Hash"),
+                        Lang.T("Add"), JOptionPane.INFORMATION_MESSAGE);
                 if (str == null || str == "" || str.equals(""))
                     return;
                 hashes_Table_Model.addRow(new Object[]{str, "Add"});
                 hashes_Table_Model.fireTableDataChanged();
             }
         });
-        this.jButton_Input_Hashes_From_File_Other_Hashes.setText(Lang.getInstance().translate("Import Hashs"));
+        this.jButton_Input_Hashes_From_File_Other_Hashes.setText(Lang.T("Import Hashs"));
         jButton_Input_Hashes_From_File_Other_Hashes.addActionListener(new ActionListener() {
             // create Hashs
             @Override
@@ -178,7 +178,7 @@ public class ExDataPanel extends JPanel {
             }
         });
 
-        this.jButton_Add_Attached_Files.setText(Lang.getInstance().translate("Add"));
+        this.jButton_Add_Attached_Files.setText(Lang.T("Add"));
         jButton_Add_Attached_Files.addActionListener(new ActionListener() {
             // create Hashs
             @Override
@@ -187,7 +187,7 @@ public class ExDataPanel extends JPanel {
             }
         });
 
-        this.jButton_Remove_Attached_Files.setText(Lang.getInstance().translate("Delete"));
+        this.jButton_Remove_Attached_Files.setText(Lang.T("Delete"));
         this.jButton_Remove_Attached_Files.addActionListener(new ActionListener() {
             // delete row
             @Override
@@ -378,20 +378,20 @@ public class ExDataPanel extends JPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
 
-        jTabbedPane_Type.addTab(Lang.getInstance().translate("Type"), docTypeAppendixPanel);
+        jTabbedPane_Type.addTab(Lang.T("Type"), docTypeAppendixPanel);
 
         if (BlockChain.TEST_MODE) {
             JScrollPane multiPayScrollBar = new JScrollPane();
             multiPayScrollBar.setViewportView(exPayoutsPanel);
-            jTabbedPane_Type.addTab(Lang.getInstance().translate("Payouts"), multiPayScrollBar);
+            jTabbedPane_Type.addTab(Lang.T("Payouts"), multiPayScrollBar);
         }
 
-        jTabbedPane_Type.addTab(Lang.getInstance().translate("Recipients"), multipleRecipientsPanel);
-        jTabbedPane_Type.addTab(Lang.getInstance().translate(authorsPanel.getName()),authorsPanel);
-        jTabbedPane_Type.addTab(Lang.getInstance().translate(sourcesPanel.getName()),sourcesPanel);
+        jTabbedPane_Type.addTab(Lang.T("Recipients"), multipleRecipientsPanel);
+        jTabbedPane_Type.addTab(Lang.T(authorsPanel.getName()),authorsPanel);
+        jTabbedPane_Type.addTab(Lang.T(sourcesPanel.getName()),sourcesPanel);
 
         fill_Template_Panel = new MFillTemplatePanel();
-        jTabbedPane_Type.addTab(Lang.getInstance().translate("Template"), fill_Template_Panel);
+        jTabbedPane_Type.addTab(Lang.T("Template"), fill_Template_Panel);
 
         jPanel_Message.setLayout(new GridBagLayout());
 
@@ -407,7 +407,7 @@ public class ExDataPanel extends JPanel {
         gridBagConstraints.weighty = 0.1;
         jPanel_Message.add(jScrollPane_Message_TextPane, gridBagConstraints);
 
-        checkBoxMakeHashAndCheckUniqueText = new JCheckBox(Lang.getInstance().translate("Make hash and check unique"));
+        checkBoxMakeHashAndCheckUniqueText = new JCheckBox(Lang.T("Make hash and check unique"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -423,7 +423,7 @@ public class ExDataPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         // jPanel_Message.add(jCheckBox_Message_Private, gridBagConstraints);
 
-        jTabbedPane_Type.addTab(Lang.getInstance().translate("Text"), jPanel_Message);
+        jTabbedPane_Type.addTab(Lang.T("Text"), jPanel_Message);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -441,7 +441,7 @@ public class ExDataPanel extends JPanel {
         jPanel_Attached_Files.setLayout(new GridBagLayout());
 
         // Make hash and check unique
-        checkBoxMakeHashAndCheckUniqueAttachedFiles = new JCheckBox(Lang.getInstance().translate("Make hash and check unique"));
+        checkBoxMakeHashAndCheckUniqueAttachedFiles = new JCheckBox(Lang.T("Make hash and check unique"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -459,7 +459,7 @@ public class ExDataPanel extends JPanel {
         // null,
         // null,null}}, new
         // String []
-        // {Lang.getInstance().translate("Path"),
+        // {Lang.T("Path"),
         // "Data","ZIP?",
         // "Size/Zip Size",
         // "www"});
@@ -484,7 +484,7 @@ public class ExDataPanel extends JPanel {
 
         jPanel_Other_Attached_Files_Work.setLayout(new GridBagLayout());
 
-        jButton_Remove_Attached_Files.setText(Lang.getInstance().translate("Remove File"));
+        jButton_Remove_Attached_Files.setText(Lang.T("Remove File"));
         jButton_Remove_Attached_Files.setToolTipText("");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -512,7 +512,7 @@ public class ExDataPanel extends JPanel {
 
 
         // Make hash and check unique
-        checkBoxMakeHashAndCheckUniqueHashes = new JCheckBox(Lang.getInstance().translate("Check unique"));
+        checkBoxMakeHashAndCheckUniqueHashes = new JCheckBox(Lang.T("Check unique"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -568,9 +568,9 @@ public class ExDataPanel extends JPanel {
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
         jPanel_Other_Hashes.add(jButton_Remove_Other_Hashes, gridBagConstraints);
 
-        jTabbedPane_Type.addTab(Lang.getInstance().translate("Hashes"), jPanel_Other_Hashes);
+        jTabbedPane_Type.addTab(Lang.T("Hashes"), jPanel_Other_Hashes);
 
-        jTabbedPane_Type.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
+        jTabbedPane_Type.addTab(Lang.T("Attached Files"), jPanel_Attached_Files);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -651,7 +651,7 @@ public class ExDataPanel extends JPanel {
         // руссификация диалога выбора файла
         // new All_Options().setUpdateUI(chooser);
         FileChooser chooser = new FileChooser();
-        chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
+        chooser.setDialogTitle(Lang.T("Select File"));
 
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setMultiSelectionEnabled(true);
@@ -684,7 +684,7 @@ public class ExDataPanel extends JPanel {
                 } catch (IOException e) {
                     e.printStackTrace();
                     hashes_Table_Model.addRow(
-                            new Object[]{"", Lang.getInstance().translate("error reading") + " - " + file_name});
+                            new Object[]{"", Lang.T("error reading") + " - " + file_name});
                 }
 
                 if (hashesStr.length() > 0) {
@@ -692,7 +692,7 @@ public class ExDataPanel extends JPanel {
                     for (String hashB58 : hashes) {
                         if (hashB58 != null && !hashB58.equals(new String("")))
                             hashes_Table_Model.addRow(new Object[]{hashB58,
-                                    Lang.getInstance().translate("imported from") + " " + file_name});
+                                    Lang.T("imported from") + " " + file_name});
                     }
 
                 }
@@ -708,7 +708,7 @@ public class ExDataPanel extends JPanel {
                     FileHash gf = new FileHash(patch);
                     String hashes = gf.getHash();
                     hashes_Table_Model
-                            .addRow(new Object[]{hashes, Lang.getInstance().translate("from file ") + patch.getPath()});
+                            .addRow(new Object[]{hashes, Lang.T("from file ") + patch.getPath()});
                     gf = null;
                 }
 
@@ -733,7 +733,7 @@ public class ExDataPanel extends JPanel {
         // руссификация диалога выбора файла
         // new All_Options().setUpdateUI(chooser);
         FileChooser chooser = new FileChooser();
-        chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
+        chooser.setDialogTitle(Lang.T("Select File"));
 
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setMultiSelectionEnabled(true);

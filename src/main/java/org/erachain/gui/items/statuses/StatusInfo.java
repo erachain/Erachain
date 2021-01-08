@@ -23,14 +23,14 @@ public class StatusInfo extends MTextPane {
         if (status == null) return message = "Empty Status";
 
         if (!status.isConfirmed()) {
-            message = Lang.getInstance().translate("Not confirmed");
+            message = Lang.T("Not confirmed");
         } else {
             message = "" + status.getKey();
         }
 
 
         Transaction issue_record = Transaction.findByDBRef(DCSet.getInstance(), status.getReference());
-        message = "<div><b>" + Lang.getInstance().translate("Created") + ":" + "</b> : "
+        message = "<div><b>" + Lang.T("Created") + ":" + "</b> : "
                 + issue_record.viewTimestamp() + " [" + issue_record.viewHeightSeq() + "]" + "</div>";
 
 

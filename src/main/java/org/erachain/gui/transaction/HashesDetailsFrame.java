@@ -14,7 +14,7 @@ public class HashesDetailsFrame extends RecDetailsFrame {
 
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("URL") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("URL") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME
@@ -26,7 +26,7 @@ public class HashesDetailsFrame extends RecDetailsFrame {
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
@@ -47,7 +47,7 @@ public class HashesDetailsFrame extends RecDetailsFrame {
 
         //LABEL HASHES
         ++labelGBC.gridy;
-        JLabel hashesLabel = new JLabel(Lang.getInstance().translate("HASHES") + ":");
+        JLabel hashesLabel = new JLabel(Lang.T("HASHES") + ":");
         this.add(hashesLabel, labelGBC);
 
         //HASHES

@@ -29,7 +29,7 @@ public class RPCStatus extends JLabel implements Observer {
         if (type == ObserverMessage.RPC_WORK_TYPE ) {
             if (data) {
                 this.setIcon(new ImageIcon(path));
-                this.setText(Lang.getInstance().translate("RPC Start"));
+                this.setText(Lang.T("RPC Start"));
             } else{
                 this.setIcon(null);
                 this.setText("");

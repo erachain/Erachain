@@ -4,7 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.MailSendPanel;
-import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
@@ -19,11 +19,11 @@ public class MenuDeals extends JMenu {
         // DEALS
 
         // MAIL
-        JMenuItem dealsMenuMail = new JMenuItem(Lang.getInstance().translate("Send mail"));
+        JMenuItem dealsMenuMail = new JMenuItem(Lang.T("Send mail"));
         dealsMenuMail.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send mail"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Send mail"),
                         new MailSendPanel(null, null, null));
 
             }
@@ -33,12 +33,12 @@ public class MenuDeals extends JMenu {
         addSeparator();
 
         // Send
-        JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Send"));
-        dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
+        JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.T("Send"));
+        dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.T("Send Asset and Message"));
         dealsMenuSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Send"),
                         new AccountAssetSendPanel(null,
                                 null, null, null, null, false));
 
@@ -50,11 +50,11 @@ public class MenuDeals extends JMenu {
 
         // to lend
 
-        JMenuItem dealsMenuLend = new JMenuItem(Lang.getInstance().translate("Lend"));
+        JMenuItem dealsMenuLend = new JMenuItem(Lang.T("Lend"));
         dealsMenuLend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Lend"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Lend"),
                         new AccountAssetLendPanel(null, null, null, null));
 
             }
@@ -63,11 +63,11 @@ public class MenuDeals extends JMenu {
 
         // Confiscate_Debt
 
-        JMenuItem dealsMenu_Confiscate_Debt = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
+        JMenuItem dealsMenu_Confiscate_Debt = new JMenuItem(Lang.T("Confiscate Debt"));
         dealsMenu_Confiscate_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Confiscate Debt"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Confiscate Debt"),
                         new AccountAssetConfiscateDebtPanel(null, null, null, null));
 
             }
@@ -76,11 +76,11 @@ public class MenuDeals extends JMenu {
 
         // Repay_Debt
 
-        JMenuItem dealsMenu_Repay_Debt = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
+        JMenuItem dealsMenu_Repay_Debt = new JMenuItem(Lang.T("Repay Debt"));
         dealsMenu_Repay_Debt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Repay Debt"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Repay Debt"),
                         new AccountAssetRepayDebtPanel(null, null, null, null));
 
             }
@@ -91,11 +91,11 @@ public class MenuDeals extends JMenu {
 
         // Take on HOLD
 
-        JMenuItem dealsMenu_Take_On_Hold = new JMenuItem(Lang.getInstance().translate("Take on Hold"));
+        JMenuItem dealsMenu_Take_On_Hold = new JMenuItem(Lang.T("Take on Hold"));
         dealsMenu_Take_On_Hold.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Take on Hold"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Take on Hold"),
                         new AccountAssetHoldPanel(null, null, null, null, true));
             }
         });
@@ -105,11 +105,11 @@ public class MenuDeals extends JMenu {
 
         // Spend
 
-        JMenuItem dealsMenu_Spend = new JMenuItem(Lang.getInstance().translate("Spend"));
+        JMenuItem dealsMenu_Spend = new JMenuItem(Lang.T("Spend"));
         dealsMenu_Spend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Spend"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Spend"),
                         new AccountAssetSpendPanel(null,
                                 null, null, null, null, false));
 
@@ -120,24 +120,24 @@ public class MenuDeals extends JMenu {
         addSeparator();
 
         //vouch
-        JMenuItem dealsMenuVouchRecord = new JMenuItem(Lang.getInstance().translate("Vouch"));
-        dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Vouching record"));
+        JMenuItem dealsMenuVouchRecord = new JMenuItem(Lang.T("Vouch"));
+        dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.T("Vouching record"));
         dealsMenuVouchRecord.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new VouchRecordDialog(null, null);
+                new toSignRecordDialog(null, null);
             }
         });
         add(dealsMenuVouchRecord);
 
 
-        JMenuItem dealsMenu_Open_Wallet = new JMenuItem(Lang.getInstance().translate("Open Wallet"));
+        JMenuItem dealsMenu_Open_Wallet = new JMenuItem(Lang.T("Open Wallet"));
         dealsMenu_Open_Wallet.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
                 int res = Controller.getInstance().loadWalletFromDir();
                 if (res == 0) {
                     JOptionPane.showMessageDialog(
-                            new JFrame(), Lang.getInstance().translate("wallet does not exist") + "!",
+                            new JFrame(), Lang.T("wallet does not exist") + "!",
                             "Error!",
                             JOptionPane.ERROR_MESSAGE);
 
@@ -153,22 +153,22 @@ public class MenuDeals extends JMenu {
 
 		     /*   
 		        
-		        JMenuItem dealsMenuSignNote = new JMenuItem(Lang.getInstance().translate("Statement"));
-		        dealsMenuSignNote.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Statement record"));
+		        JMenuItem dealsMenuSignNote = new JMenuItem(Lang.T("Statement"));
+		        dealsMenuSignNote.getAccessibleContext().setAccessibleDescription(Lang.T("Statement record"));
 		        dealsMenuSignNote.addActionListener(new ActionListener()
 		        {
 		        	public void actionPerformed(ActionEvent e)
 		        	{
 		        		// 
-		        		//selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+		        		//selectOrAdd(new toSignRecordDialog(), MainFrame.desktopPane.getAllFrames());
 		        		selectOrAdd(new Sign_Frame(null, null), MainFrame.desktopPane.getAllFrames());
 		        	}
 		        });
 		    //    dealsMenu.add(dealsMenuSignNote);
 
 		        // Imprints menu
-		        JMenuItem imprintsMenuList = new JMenuItem(Lang.getInstance().translate("List"));
-		        imprintsMenuList.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Imprints List"));
+		        JMenuItem imprintsMenuList = new JMenuItem(Lang.T("List"));
+		        imprintsMenuList.getAccessibleContext().setAccessibleDescription(Lang.T("Imprints List"));
 		        imprintsMenuList.addActionListener(new ActionListener()
 		        {
 		        	public void actionPerformed(ActionEvent e)
@@ -181,8 +181,8 @@ public class MenuDeals extends JMenu {
 		        
 		        //// RECORDS ////
 		        // меню Persons
-		        JMenuItem recordsMenuList = new JMenuItem(Lang.getInstance().translate("List"));
-		        recordsMenuList.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Records"));
+		        JMenuItem recordsMenuList = new JMenuItem(Lang.T("List"));
+		        recordsMenuList.getAccessibleContext().setAccessibleDescription(Lang.T("All Records"));
 		        recordsMenuList.addActionListener(new ActionListener()
 		        {
 		        	public void actionPerformed(ActionEvent e)
@@ -193,8 +193,8 @@ public class MenuDeals extends JMenu {
 		        recordsMenu.add(recordsMenuList);
 		        
 		        ///// STATUSES
-		        JMenuItem allStatusesMenu = new JMenuItem(Lang.getInstance().translate("List"));
-		        allStatusesMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Statuses"));
+		        JMenuItem allStatusesMenu = new JMenuItem(Lang.T("List"));
+		        allStatusesMenu.getAccessibleContext().setAccessibleDescription(Lang.T("All Statuses"));
 		   //     allStatusesMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
 		        allStatusesMenu.addActionListener(new ActionListener()
 		        {
@@ -209,8 +209,8 @@ public class MenuDeals extends JMenu {
 		        statusesMenu.add(allStatusesMenu);  
 		 //       statusesMenu.addSeparator();
 		        
-		        JMenuItem assignStatusMenu = new JMenuItem(Lang.getInstance().translate("Assign"));
-		        assignStatusMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Assign Status"));
+		        JMenuItem assignStatusMenu = new JMenuItem(Lang.T("Assign"));
+		        assignStatusMenu.getAccessibleContext().setAccessibleDescription(Lang.T("Assign Status"));
 		   //     allStatusesMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
 		        assignStatusMenu.addActionListener(new ActionListener()
 		        {
@@ -225,15 +225,15 @@ public class MenuDeals extends JMenu {
 		    //    statusesMenu.addSeparator();
 
 		        
-		        JMenuItem issueStatusesMenu = new JMenuItem(Lang.getInstance().translate("New"));
-		        issueStatusesMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("New Status"));
+		        JMenuItem issueStatusesMenu = new JMenuItem(Lang.T("New"));
+		        issueStatusesMenu.getAccessibleContext().setAccessibleDescription(Lang.T("New Status"));
 		   //     issueStatusesMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
 		        issueStatusesMenu.addActionListener(new ActionListener()
 		        {
 		        	public void actionPerformed(ActionEvent e)
 		        	{
 		             
-		        		JInternalFrame frame = new JInternalFrame(Lang.getInstance().translate("Issue new Status"),true, true, true, true);
+		        		JInternalFrame frame = new JInternalFrame(Lang.T("Issue new Status"),true, true, true, true);
 		        		//frame.getContentPane().add(new AllStatusesPanel());
 		        		frame.getContentPane().add(new IssueStatusDialog());
 		        		frame.setName("new status");
@@ -247,8 +247,8 @@ public class MenuDeals extends JMenu {
 		   //     statusesMenu.add(issueStatusesMenu);  
 
 		        ///// UNIONS
-		        JMenuItem allUnionsMenu = new JMenuItem(Lang.getInstance().translate("All Unions"));
-		        allUnionsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Unions"));
+		        JMenuItem allUnionsMenu = new JMenuItem(Lang.T("All Unions"));
+		        allUnionsMenu.getAccessibleContext().setAccessibleDescription(Lang.T("All Unions"));
 		   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
 		        allUnionsMenu.addActionListener(new ActionListener()
 		        {
@@ -264,8 +264,8 @@ public class MenuDeals extends JMenu {
 		        unionsMenu.addSeparator();
 		        
 		        // issue Person menu
-		        JMenuItem issueUnionMenu = new JMenuItem(Lang.getInstance().translate("Establish"));
-		        issueUnionMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Establish a new Union"));
+		        JMenuItem issueUnionMenu = new JMenuItem(Lang.T("Establish"));
+		        issueUnionMenu.getAccessibleContext().setAccessibleDescription(Lang.T("Establish a new Union"));
 		   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
 		        issueUnionMenu.addActionListener(new ActionListener()
 		        {
@@ -281,8 +281,8 @@ public class MenuDeals extends JMenu {
 
 		        // ASSETS
 		        // ALL ASSETS
-		        JMenuItem allAssetsMenu = new JMenuItem(Lang.getInstance().translate("All assets"));
-		        allAssetsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All assets"));
+		        JMenuItem allAssetsMenu = new JMenuItem(Lang.T("All assets"));
+		        allAssetsMenu.getAccessibleContext().setAccessibleDescription(Lang.T("All assets"));
 		   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
 		        allAssetsMenu.addActionListener(new ActionListener()
 		        {
@@ -300,8 +300,8 @@ public class MenuDeals extends JMenu {
 		        assetsMenu.addSeparator();
 
 		        // issue asset menu
-		        JMenuItem issueAssetMenu = new JMenuItem(Lang.getInstance().translate("Issue asset"));
-		        issueAssetMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Issue asset"));
+		        JMenuItem issueAssetMenu = new JMenuItem(Lang.T("Issue asset"));
+		        issueAssetMenu.getAccessibleContext().setAccessibleDescription(Lang.T("Issue asset"));
 		        // searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
 		        issueAssetMenu.addActionListener(new ActionListener()
 		        {
@@ -318,12 +318,12 @@ public class MenuDeals extends JMenu {
 		        */
         
 /*
-        JMenuItem FindHashFromDir = new JMenuItem(Lang.getInstance().translate("Find Hash from DIR"));
-        FindHashFromDir.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Find Hash from DIR"));
+        JMenuItem FindHashFromDir = new JMenuItem(Lang.T("Find Hash from DIR"));
+        FindHashFromDir.getAccessibleContext().setAccessibleDescription(Lang.T("Find Hash from DIR"));
         FindHashFromDir.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+                //selectOrAdd(new toSignRecordDialog(), MainFrame.desktopPane.getAllFrames());
                 new FindHashFrmDirDialog();
             }
         });

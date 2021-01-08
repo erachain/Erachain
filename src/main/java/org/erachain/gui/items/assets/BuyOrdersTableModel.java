@@ -91,7 +91,7 @@ public class BuyOrdersTableModel extends TimerTableModelCls<Order> implements Ob
             case COLUMN_PRICE:
 
                 if (row == this.list.size())
-                    return "<html><b><span style='color:green'>" + Lang.getInstance().translate("Total") + "</span></b></html>";
+                    return "<html><b><span style='color:green'>" + Lang.T("Total") + "</span></b></html>";
 
                 //BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave());
                 // TODO: в новой версии нужно сделать везде +Scale = 0 - иначе несостыкоавка в процессинге ордера - там то 0

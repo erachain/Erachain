@@ -1,7 +1,7 @@
 package org.erachain.gui.library;
 
-import org.erachain.lang.Lang;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
@@ -20,7 +20,7 @@ public class MyINNJTextField extends JTextField {
     public MyINNJTextField() {
         super();
         th = this;
-        th.setToolTipText(Lang.getInstance().translate("Must be 10 or 12 numbers"));
+        th.setToolTipText(Lang.T("Must be 10 or 12 numbers"));
         text_Color = this.getForeground();
         th.setForeground(Color.RED);
         MenuPopupUtil.installContextMenu(this);

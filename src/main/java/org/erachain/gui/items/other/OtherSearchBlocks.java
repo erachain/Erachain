@@ -38,7 +38,7 @@ public class OtherSearchBlocks extends SplitPanel {
         this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
         this.searchMyJCheckBoxLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(true);
-        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Block") + " (1-20)");
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Block") + " (1-20)");
         this.searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(500, 20));
         this.button2ToolBarLeftPanel.setVisible(false);
         this.button1ToolBarLeftPanel.setVisible(false);
@@ -110,7 +110,7 @@ public class OtherSearchBlocks extends SplitPanel {
         }
 
 
-        Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+        Label_search_Info_Panel.setText(Lang.T("Waiting..."));
         jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
         new Thread() {
             @Override
@@ -118,7 +118,7 @@ public class OtherSearchBlocks extends SplitPanel {
 
                 tamleModel.searchBlock(start, end);
                 if (tamleModel.getRowCount() < 1) {
-                    Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found"));
+                    Label_search_Info_Panel.setText(Lang.T("Not Found"));
                     jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                     jScrollPaneJPanelRightPanel.setViewportView(null);
                     return;
@@ -135,7 +135,7 @@ public class OtherSearchBlocks extends SplitPanel {
         // руссификация диалога выбора файла
         // new All_Options().setUpdateUI(chooser);
         FileChooser chooser = new FileChooser();
-        chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
+        chooser.setDialogTitle(Lang.T("Select File"));
 
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setMultiSelectionEnabled(false);
@@ -156,7 +156,7 @@ public class OtherSearchBlocks extends SplitPanel {
             long file_len = file.length();
             if (file_len > Integer.MAX_VALUE) {
                 // tableModel.addRow(new Object[] { "",
-                // Lang.getInstance().translate("length very long") + " - " +
+                // Lang.T("length very long") + " - " +
                 // file_name });
                 // continue;
             }
@@ -168,7 +168,7 @@ public class OtherSearchBlocks extends SplitPanel {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
                 // tableModel.addRow(new Object[] { "",
-                // Lang.getInstance().translate("error streaming") + " - " +
+                // Lang.T("error streaming") + " - " +
                 // file_name });
                 // continue;
             }
@@ -178,7 +178,7 @@ public class OtherSearchBlocks extends SplitPanel {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
                 // tableModel.addRow(new Object[] { "",
-                // Lang.getInstance().translate("error reading") + " - " +
+                // Lang.T("error reading") + " - " +
                 // file_name });
                 // continue;
             }
@@ -193,7 +193,7 @@ public class OtherSearchBlocks extends SplitPanel {
             /// HASHING
             String hashe = Base58.encode(Crypto.getInstance().digest(fileInArray));
             // tableModel.addRow(new Object[] { hashes,
-            // Lang.getInstance().translate("from file ") + file_name });
+            // Lang.T("from file ") + file_name });
             this.searchTextFieldSearchToolBarLeftPanelDocument.setText(hashe);
             find();
 

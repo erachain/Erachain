@@ -1,10 +1,9 @@
 package org.erachain.gui.settings;
 // 16 03
 
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-
 import org.erachain.lang.Lang;
+
+import javax.swing.*;
 
 
 public class SettingsTabPane extends JTabbedPane {
@@ -27,27 +26,27 @@ public class SettingsTabPane extends JTabbedPane {
 
         settingsBasicPanel = new SettingsBasicPanel();
         JScrollPane scrollPane1 = new JScrollPane(settingsBasicPanel);
-        this.addTab(Lang.getInstance().translate("Basic"), scrollPane1);
+        this.addTab(Lang.T("Basic"), scrollPane1);
 
         settingsKnownPeersPanel = new SettingsKnownPeersPanel();
         JScrollPane scrollPane2 = new JScrollPane(settingsKnownPeersPanel);
-        this.addTab(Lang.getInstance().translate("Known Peers"), scrollPane2);
+        this.addTab(Lang.T("Known Peers"), scrollPane2);
 
         settingsAllowedPanel = new SettingsAllowedPanel();
         JScrollPane scrollPane3 = new JScrollPane(settingsAllowedPanel);
-        this.addTab(Lang.getInstance().translate("Access permission"), scrollPane3);
+        this.addTab(Lang.T("Access permission"), scrollPane3);
 
         uI_Settings_Panel = new UISettingPanel();
         JScrollPane scrollPane4 = new JScrollPane(uI_Settings_Panel);
-        this.addTab(Lang.getInstance().translate("UI Settings"), scrollPane4);
+        this.addTab(Lang.T("UI Settings"), scrollPane4);
 
         backUp_Setting_Panel = new BackUPSettingPanel();
         JScrollPane scrollPane5 = new JScrollPane(backUp_Setting_Panel);
-        this.addTab(Lang.getInstance().translate("BackUp Settings"), scrollPane5);
+        this.addTab(Lang.T("BackUp Settings"), scrollPane5);
 
         rates_Setting_Panel = new RatesSettingPanel();
         JScrollPane scrollPane6 = new JScrollPane(rates_Setting_Panel);
-        this.addTab(Lang.getInstance().translate("Exchange"), scrollPane6);
+        this.addTab(Lang.T("Exchange"), scrollPane6);
     }
 
     public void close() {

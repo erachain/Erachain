@@ -23,7 +23,7 @@ public class AuthorsPanel extends JPanel {
     public AuthorsPanel() {
 
         super();
-        this.setName(Lang.getInstance().translate("Authors"));
+        this.setName(Lang.T("Authors"));
         jButtonAddAuthor = new JButton();
         jScrollPaneAuthors = new JScrollPane();
         jButtonRemoveAuthor = new JButton();
@@ -92,14 +92,14 @@ public class AuthorsPanel extends JPanel {
         gridBagConstraints.weighty = 0.1;
         this.add(jScrollPaneAuthors, gridBagConstraints);
 
-        jButtonAddAuthor.setText(Lang.getInstance().translate("Add"));
+        jButtonAddAuthor.setText(Lang.T("Add"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
         this.add(jButtonAddAuthor, gridBagConstraints);
 
-        jButtonRemoveAuthor.setText(Lang.getInstance().translate("Remove"));
+        jButtonRemoveAuthor.setText(Lang.T("Remove"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;

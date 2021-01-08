@@ -17,7 +17,7 @@ public class GenesisTransferAssetDetailsFrame extends RecGenesis_DetailsFrame {
             isCredit = true;
             //LABEL OWNER
             ++labelGBC.gridy;
-            JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Creditor") + ":");
+            JLabel ownerLabel = new JLabel(Lang.T("Creditor") + ":");
             this.add(ownerLabel, labelGBC);
 
             //RECIPIENT
@@ -37,7 +37,7 @@ public class GenesisTransferAssetDetailsFrame extends RecGenesis_DetailsFrame {
 
         //LABEL RECIPIENT
         ++labelGBC.gridy;
-        JLabel recipientLabel = new JLabel(Lang.getInstance().translate("Recipient") + ":");
+        JLabel recipientLabel = new JLabel(Lang.T("Recipient") + ":");
         this.add(recipientLabel, labelGBC);
 
         //RECIPIENT
@@ -56,7 +56,7 @@ public class GenesisTransferAssetDetailsFrame extends RecGenesis_DetailsFrame {
 
         //LABEL ASSET
         ++labelGBC.gridy;
-        JLabel assetLabel = new JLabel(Lang.getInstance().translate("Asset") + ":");
+        JLabel assetLabel = new JLabel(Lang.T("Asset") + ":");
         this.add(assetLabel, labelGBC);
 
         //ASSET
@@ -69,7 +69,7 @@ public class GenesisTransferAssetDetailsFrame extends RecGenesis_DetailsFrame {
 
         //LABEL AMOUNT
         ++labelGBC.gridy;
-        JLabel amountLabel = new JLabel(Lang.getInstance().translate(isCredit ? "Credit" : "Amount") + ":");
+        JLabel amountLabel = new JLabel(Lang.T(isCredit ? "Credit" : "Amount") + ":");
         this.add(amountLabel, labelGBC);
 
         //AMOUNT

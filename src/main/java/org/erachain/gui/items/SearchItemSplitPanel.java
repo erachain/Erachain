@@ -20,7 +20,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
 
         super(search_Table_Model1, gui_Name, search_Label_Text);
         this.search_Table_Model = search_Table_Model1;
-        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
 
         // CHECKBOX FOR FAVORITE
         TableColumn favorite_Column = jTableJScrollPanelLeftPanel.getColumnModel()
@@ -29,7 +29,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
 
         // search Panel
         this.searchToolBar_LeftPanel.setVisible(true);
-        this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key") + ":"));
+        this.toolBarLeftPanel.add(new JLabel(Lang.T("Find Key") + ":"));
         key_Item = new MDecimalFormatedTextField();
         key_Item.setMaskType(key_Item.maskLong);
         key_Item.setToolTipText("");
@@ -48,7 +48,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 searchTextFieldSearchToolBarLeftPanelDocument.setText("");
-                Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+                Label_search_Info_Panel.setText(Lang.T("Waiting..."));
                 jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                 new Thread() {
                     @Override
@@ -59,7 +59,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
                             jTableJScrollPanelLeftPanel. getSelectionModel().addSelectionInterval(0, 0);
                             return;
                         }
-                        Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found"));
+                        Label_search_Info_Panel.setText(Lang.T("Not Found"));
                         jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                         jScrollPaneJPanelRightPanel.setViewportView(null);
                     }
@@ -80,25 +80,25 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
                 if (search.equals("")) {
                     jScrollPaneJPanelRightPanel.setViewportView(null);
                     search_Table_Model.clear();
-                    Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
+                    Label_search_Info_Panel.setText(Lang.T("Enter more  2 characters"));
                     jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                     return;
                 }
                 if (search.length() < 3) {
-                    Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
+                    Label_search_Info_Panel.setText(Lang.T("Enter more  2 characters"));
                     jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                     return;
                 }
                 key_Item.setText("");
 
-                Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+                Label_search_Info_Panel.setText(Lang.T("Waiting..."));
                 jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                 new Thread() {
                     @Override
                     public void run() {
                         search_Table_Model.findByName(search);
                         if (search_Table_Model.getRowCount() < 1) {
-                            Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found"));
+                            Label_search_Info_Panel.setText(Lang.T("Not Found"));
                             jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                             jScrollPaneJPanelRightPanel.setViewportView(null);
                             return;

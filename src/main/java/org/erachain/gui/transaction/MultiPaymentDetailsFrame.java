@@ -17,7 +17,7 @@ public class MultiPaymentDetailsFrame extends RecDetailsFrame {
 
         //LABEL PAYMENTS
         ++labelGBC.gridy;
-        JLabel paymentsLabel = new JLabel(Lang.getInstance().translate("Payments") + ":");
+        JLabel paymentsLabel = new JLabel(Lang.T("Payments") + ":");
         this.add(paymentsLabel, labelGBC);
 
         //PAYMENTS

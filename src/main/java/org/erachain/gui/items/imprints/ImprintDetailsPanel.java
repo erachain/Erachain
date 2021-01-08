@@ -1,7 +1,6 @@
 package org.erachain.gui.items.imprints;
 
 import org.erachain.core.item.imprints.ImprintCls;
-import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 
@@ -47,7 +46,7 @@ public class ImprintDetailsPanel extends JPanel {
 
         //LABEL KEY
         labelGBC.gridy = 1;
-        JLabel keyLabel = new JLabel(Lang.getInstance().translate("Key") + ":");
+        JLabel keyLabel = new JLabel(Lang.T("Key") + ":");
         this.add(keyLabel, labelGBC);
 
         //KEY
@@ -58,7 +57,7 @@ public class ImprintDetailsPanel extends JPanel {
 
         //LABEL NAME
         labelGBC.gridy = 2;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Name") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME
@@ -69,7 +68,7 @@ public class ImprintDetailsPanel extends JPanel {
 
         //LABEL DESCRIPTION
         labelGBC.gridy = 3;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
@@ -82,7 +81,7 @@ public class ImprintDetailsPanel extends JPanel {
 
         //LABEL OWNER
         labelGBC.gridy = 4;
-        JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
+        JLabel ownerLabel = new JLabel(Lang.T("Owner") + ":");
         this.add(ownerLabel, labelGBC);
 
         //OWNER
@@ -96,7 +95,7 @@ public class ImprintDetailsPanel extends JPanel {
             //ADD ERM PAIR BUTTON
             labelGBC.gridy++;
             labelGBC.gridwidth = 2;
-            JButton openPairButton = new JButton(Lang.getInstance().translate("Open pair"));
+            JButton openPairButton = new JButton(Lang.T("Open pair"));
             openPairButton.setPreferredSize(new Dimension(200, 25));
             openPairButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -118,11 +117,11 @@ public class ImprintDetailsPanel extends JPanel {
 			//CHECK IF FAVORITES
 			if(Controller.getInstance().isItemFavorite(imprint))
 			{
-				this.favoritesButton.setText(Lang.getInstance().translate("Remove Favorite"));
+				this.favoritesButton.setText(Lang.T("Remove Favorite"));
 			}
 			else
 			{
-				this.favoritesButton.setText(Lang.getInstance().translate("Add Favorite"));
+				this.favoritesButton.setText(Lang.T("Add Favorite"));
 			}
 				
 			this.favoritesButton.setPreferredSize(new Dimension(200, 25));
@@ -154,12 +153,12 @@ public class ImprintDetailsPanel extends JPanel {
 		//CHECK IF FAVORITES
 		if(Controller.getInstance().isItemFavorite(imprint))
 		{
-			this.favoritesButton.setText(Lang.getInstance().translate("Add Favorite"));
+			this.favoritesButton.setText(Lang.T("Add Favorite"));
 			Controller.getInstance().removeItemFavorite(this.imprint);
 		}
 		else
 		{
-			this.favoritesButton.setText(Lang.getInstance().translate("Remove Favorite"));
+			this.favoritesButton.setText(Lang.T("Remove Favorite"));
 			Controller.getInstance().addItemFavorite(this.imprint);
 		}
 			
