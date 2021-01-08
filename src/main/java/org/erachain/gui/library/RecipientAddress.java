@@ -47,7 +47,6 @@ public class RecipientAddress extends JComboBox {
         this.setEditable(true);
         worker = item;
 
-
         MenuPopupUtil.installContextMenu(comboTextField);
         comboTextField.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -67,14 +66,7 @@ public class RecipientAddress extends JComboBox {
             }
         });
 
-        if (account != null) {
-            if (account.isPerson()) {
-                selectedItem = account.getAddress() + " " + account.getPerson().b.getName();
-            } else {
-                selectedItem = account.getAddress();
-            }
-            comboTextField.setText(selectedItem);
-        }
+        setSelectedAccount(account);
 
     }
 
@@ -98,7 +90,8 @@ public class RecipientAddress extends JComboBox {
 
     public String getSelectedAddress() {
         String[] split = selectedItem.trim().split(" ");
-        return split[0];
+        //return split[0];
+        return selectedItem;
     }
 
     public void setSelectedAccount(Account account) {
@@ -115,7 +108,7 @@ public class RecipientAddress extends JComboBox {
 
     }
 
-    public void setText(String string) {
+    public void setMessage(String string) {
         comboTextField.setText(string);
     }
 
@@ -219,9 +212,12 @@ public class RecipientAddress extends JComboBox {
                 if (value != null) {
                     Fun.Tuple3<String, String, String> item = favoriteMap.get((String) value);
                     if (item != null) {
-                        Account acount = Account.tryMakeAccount(value.toString()).a;
-                        //Account account = Account.tryMakeAccount(item.b)
-                        this.setText(item.b + " - " + acount.getPersonAsString());
+                        Account account = Account.tryMakeAccount(value.toString()).a;
+                        if (account.isPerson()) {
+                            this.setText(item.b + " - " + account.getPersonAsString());
+                        } else {
+                            this.setText(item.b);
+                        }
                     }
                 }
                 return this;

@@ -314,7 +314,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                     + " (" + Lang.T(addAssetType) + ")");
         }
 
-        setName(title + " ]" + asset.getKey() + " ]");
+        setName(title + " [" + asset.getKey() + "]");
 
         jButton_ok.setText(Lang.T(asset.viewAssetTypeActionOK(backward, balancePosition, senderIsOwner)));
 
@@ -354,6 +354,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                         + " / " + (balancePosition == TransactionAmount.ACTION_DEBT ? ("<b>" + balance.b.b.toPlainString() + "</b>") : balance.b.b.toPlainString())
                         + " / " + (balancePosition == TransactionAmount.ACTION_HOLD ? ("<b>" + balance.c.b.toPlainString() + "</b>") : balance.c.b.toPlainString())
                         + " / " + (balancePosition == TransactionAmount.ACTION_SPEND ? ("<b>" + balance.d.b.toPlainString() + "</b>") : balance.d.b.toPlainString());
+            }
+            if (recipient.isPerson()) {
+                details += " - " + recipient.getPerson().b.getName();
             }
             this.jlabel_RecipientDetail.setText("<html>" + details);
         }

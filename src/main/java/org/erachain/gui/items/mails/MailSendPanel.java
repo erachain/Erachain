@@ -458,7 +458,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
                 });
             } else {
 
-                this.recipientBox.setText("has no Accounts");
+                this.recipientBox.setMessage("has no Accounts");
                 sendButton.setEnabled(false);
 
             }
