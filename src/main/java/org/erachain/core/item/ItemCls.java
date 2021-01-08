@@ -61,7 +61,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     protected static final int DESCRIPTION_SIZE_LENGTH = 4;
     protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
     protected static final int DBREF_LENGTH = Transaction.DBREF_LENGTH;
-    protected static final int BASE_LENGTH = TYPE_LENGTH + OWNER_LENGTH + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
+    protected static final int BASE_LENGTH = TYPE_LENGTH + OWNER_LENGTH
+            + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
 
     protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
 
