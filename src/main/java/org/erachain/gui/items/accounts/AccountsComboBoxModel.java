@@ -4,11 +4,14 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.ObserverWaiter;
-import org.mapdb.Fun.Tuple3;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun.Tuple3;
 
 import javax.swing.*;
-import java.util.*;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Stack;
+import java.util.TreeMap;
 
 @SuppressWarnings("serial")
 public class AccountsComboBoxModel extends DefaultComboBoxModel implements Observer, ObserverWaiter {
@@ -71,8 +74,8 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel implements Obser
 
     //SORTING BY BALANCE (BIGGEST BALANCE FIRST)
     private void sortAndAdd() {
-        for (String addrses_key : addresses.keySet()) {
-            this.addElement(addrses_key);
+        for (String address : addresses.keySet()) {
+            this.addElement(new Account(address));
         }
     }
 

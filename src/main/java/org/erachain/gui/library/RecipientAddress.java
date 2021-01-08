@@ -36,8 +36,9 @@ public class RecipientAddress extends JComboBox {
 
 
     public RecipientAddress(RecipientAddressInterface item, Account account) {
-        if (account != null)
-            selectedItem = account.getAddress();
+
+        // select & edit text account
+        comboTextField = (JTextField) this.getEditor().getEditorComponent();
 
         RecipientModel model = new RecipientModel();
         this.setModel(model);
@@ -46,9 +47,7 @@ public class RecipientAddress extends JComboBox {
         this.setEditable(true);
         worker = item;
 
-// select & edit text account
-        comboTextField = (JTextField) this.getEditor().getEditorComponent();
-        comboTextField.setText(selectedItem);
+
         MenuPopupUtil.installContextMenu(comboTextField);
         comboTextField.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -67,6 +66,16 @@ public class RecipientAddress extends JComboBox {
                 lifework(e);
             }
         });
+
+        if (account != null) {
+            if (account.isPerson()) {
+                selectedItem = account.getAddress() + " " + account.getPerson().b.getName();
+            } else {
+                selectedItem = account.getAddress();
+            }
+            comboTextField.setText(selectedItem);
+        }
+
     }
 
     public RecipientAddress(RecipientAddressInterface item) {
@@ -75,9 +84,11 @@ public class RecipientAddress extends JComboBox {
 
     private void lifework(DocumentEvent e) {
         selectedItem = comboTextField.getText();
+
         if (worker != null) {
             try {
-                worker.recipientAddressWorker(selectedItem);
+                String[] split = selectedItem.trim().split(" ");
+                worker.recipientAddressWorker(split[0]);
             } catch (Exception ex) {
                 // ex.printStackTrace();
             }
@@ -86,11 +97,26 @@ public class RecipientAddress extends JComboBox {
     }
 
     public String getSelectedAddress() {
-        return this.selectedItem;
+        String[] split = selectedItem.trim().split(" ");
+        return split[0];
     }
 
-    public void setSelectedAddress(String address) {
-        this.selectedItem = address;
+    public void setSelectedAccount(Account account) {
+        if (account != null) {
+            if (account.isPerson()) {
+                selectedItem = account.getAddress() + " " + account.getPerson().b.getName();
+            } else {
+                selectedItem = account.getAddress();
+            }
+        } else {
+            selectedItem = "";
+        }
+        comboTextField.setText(selectedItem);
+
+    }
+
+    public void setText(String string) {
+        comboTextField.setText(string);
     }
 
     // model class
@@ -193,7 +219,9 @@ public class RecipientAddress extends JComboBox {
                 if (value != null) {
                     Fun.Tuple3<String, String, String> item = favoriteMap.get((String) value);
                     if (item != null) {
-                        this.setText(item.b + " - " + value.toString());
+                        Account acount = Account.tryMakeAccount(value.toString()).a;
+                        //Account account = Account.tryMakeAccount(item.b)
+                        this.setText(item.b + " - " + acount.getPersonAsString());
                     }
                 }
                 return this;

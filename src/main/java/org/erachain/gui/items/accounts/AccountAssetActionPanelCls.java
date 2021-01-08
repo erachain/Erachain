@@ -270,11 +270,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         if (recipient == null) {
             jButton_ok.setEnabled(false);
         } else {
-            if (recipient instanceof PublicKeyAccount) {
-                recipientAddress.setSelectedAddress(((PublicKeyAccount) recipient).getBase58());
-            } else {
-                recipientAddress.setSelectedAddress(recipient.getAddress());
-            }
+            recipientAddress.setSelectedAccount(recipient);
             jButton_ok.setEnabled(true);
         }
 
