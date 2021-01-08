@@ -330,7 +330,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // set scale
         if (asset instanceof AssetVenture) {
-            jTextField_Amount.setScale(((AssetVenture) asset).getScale());
+            jTextField_Amount.setScale(asset.getScale());
             jTextField_Amount.setVisible(true);
             jLabel_Amount.setVisible(true);
         } else {
