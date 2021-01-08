@@ -987,7 +987,7 @@ button.white-bgc[disabled]:focus,
                 output += '</h4>';
             }
 
-            output += data.asset.label_AssetType + ': <b>(' + data.asset.this.assetTypeChar + ') ' + data.asset.this.assetTypeFull + '</b><br>';
+            output += data.asset.label_AssetType + ': <b>' + data.asset.this.assetTypeChar + '</b>: ' + data.asset.this.assetTypeFull + '<br>';
             output += data.asset.label_AssetType_Desc + ': ' + fformat(data.asset.this.assetTypeDesc) + '<br>';
 
             output += data.asset.label_Quantity + ': <b>' + addCommas(data.asset.this.quantity) + '</b>';
