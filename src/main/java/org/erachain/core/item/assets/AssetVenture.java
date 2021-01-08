@@ -52,7 +52,7 @@ public class AssetVenture extends AssetCls {
     //GETTERS/SETTERS
     @Override
     public String getItemSubType() {
-        return "venture";
+        return "common";
     }
 
     /**

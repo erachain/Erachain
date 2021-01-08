@@ -170,7 +170,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
             } else {
                 // так как тип актива считываем в конце парсинга - по нему сразу не определить что было создано
                 // и может появиться ошибка сборки байт кода
-                return INVALID_ITEM_KEY;
+                return INVALID_ASSET_TYPE;
             }
         } else {
             //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;

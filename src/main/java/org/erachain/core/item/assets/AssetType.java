@@ -15,7 +15,8 @@ public class AssetType {
     public AssetType(Integer assetType) {
         this.id = assetType;
         this.name = Lang.T(AssetCls.viewAssetTypeCls(assetType));
-        this.nameFull = Lang.T(AssetCls.viewAssetTypeFullCls(assetType));
+        this.nameFull = AssetCls.charAssetType(Long.MAX_VALUE, assetType)
+                + AssetCls.viewAssetTypeAbbrev(assetType) + ":" + Lang.T(AssetCls.viewAssetTypeFullCls(assetType));
 
         StringJoiner joiner = new StringJoiner(", ");
         for (Fun.Tuple2<?, String> action : AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(

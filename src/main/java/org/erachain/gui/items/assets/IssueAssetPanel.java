@@ -3,6 +3,8 @@ package org.erachain.gui.items.assets;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetType;
+import org.erachain.core.item.assets.AssetUnique;
+import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.IssueItemPanel;
@@ -129,15 +131,19 @@ public class IssueAssetPanel extends IssueItemPanel {
 
     protected boolean checkValues() {
 
+        assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
+
         int parseStep = 0;
         try {
 
-            // READ SCALE
-            scale = Byte.parseByte((String) textScale.getSelectedItem());
+            if (!AssetCls.isUnique(assetType)) {
+                // READ SCALE
+                scale = Byte.parseByte((String) textScale.getSelectedItem());
 
-            // READ QUANTITY
-            parseStep++;
-            quantity = Long.parseLong(textQuantity.getText());
+                // READ QUANTITY
+                parseStep++;
+                quantity = Long.parseLong(textQuantity.getText());
+            }
 
         } catch (Exception e) {
             switch (parseStep) {
@@ -155,17 +161,23 @@ public class IssueAssetPanel extends IssueItemPanel {
             return false;
         }
 
-        assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
-
         return true;
     }
 
     protected void makeTransaction() {
 
+        AssetCls asset;
+        if (AssetCls.isUnique(assetType)) {
+            asset = new AssetUnique(creator, textName.getText(), addLogoIconLabel.getImgBytes(),
+                    addImageLabel.getImgBytes(), textAreaDescription.getText(),
+                    assetType);
+        } else {
+            asset = new AssetVenture(creator, textName.getText(), addLogoIconLabel.getImgBytes(),
+                    addImageLabel.getImgBytes(), textAreaDescription.getText(),
+                    assetType, scale, quantity);
+        }
         transaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
-                creator, exLink, textName.getText(), textAreaDescription.getText(),
-                addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
-                scale, assetType, quantity, feePow);
+                creator, exLink, feePow, asset);
 
     }
 
@@ -173,15 +185,17 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         AssetCls asset = (AssetCls) transaction.getItem();
 
-        String text = "<HTML><body><h2>";
+        String text = "<body><h2>";
         text += Lang.T("Confirmation Transaction") + ":&nbsp;"
                 + Lang.T("Issue Asset") + "</h2>"
                 + Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
                 + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
                 + "[" + asset.getKey() + "]" + Lang.T("Name") + ":&nbsp;" + asset.viewName() + "<br>"
-                + Lang.T("Quantity") + ":&nbsp;" + asset.getQuantity() + "<br>"
+                + Lang.T("Asset Class") + ":&nbsp;"
+                + Lang.T(asset.getItemSubType() + "") + "<br>"
                 + Lang.T("Asset Type") + ":&nbsp;"
-                + Lang.T(asset.viewAssetTypeFull() + "") + "<br>"
+                + asset.charAssetType() + asset.viewAssetTypeAbbrev() + ":" + Lang.T(asset.viewAssetTypeFull() + "") + "<br>"
+                + Lang.T("Quantity") + ":&nbsp;" + asset.getQuantity() + ", "
                 + Lang.T("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
                 + Lang.T("Description") + ":<br>";
         if (asset.getKey() > 0 && asset.getKey() < 1000) {

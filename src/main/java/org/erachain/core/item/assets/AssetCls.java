@@ -945,6 +945,14 @@ public abstract class AssetCls extends ItemCls {
         return null;
     }
 
+    public static String viewAssetTypeFullClsAndChars(int assetType) {
+        return charAssetType(Long.MAX_VALUE, assetType) + viewAssetTypeAbbrev(assetType) + ":" + viewAssetTypeFullCls(assetType);
+    }
+
+    public String viewAssetTypeFullClsAndChars() {
+        return charAssetType(Long.MAX_VALUE, assetType) + viewAssetTypeAbbrev(assetType) + ":" + viewAssetTypeFullCls(assetType);
+    }
+
     public static String viewAssetTypeAbbrev(int asset_type) {
         switch (asset_type) {
             case AS_OUTSIDE_GOODS:
