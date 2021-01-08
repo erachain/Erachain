@@ -90,8 +90,7 @@ public class RecipientAddress extends JComboBox {
 
     public String getSelectedAddress() {
         String[] split = selectedItem.trim().split(" ");
-        //return split[0];
-        return selectedItem;
+        return split[0];
     }
 
     public void setSelectedAccount(Account account) {
