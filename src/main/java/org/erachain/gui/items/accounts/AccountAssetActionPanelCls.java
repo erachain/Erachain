@@ -12,6 +12,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
@@ -256,10 +257,14 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         //MenuPopupUtil.installContextMenu(this.jlabel_RecipientDetail);
         jTextArea_Account_Description.setWrapStyleWord(true);
         jTextArea_Account_Description.setLineWrap(true);
-        int scale = asset.getScale();
-        jTextField_Amount.setScale(scale);
-        if (showAssetForm) {
-            jScrollPane2.setViewportView(new AssetInfo(asset, false));
+
+        if (asset instanceof AssetVenture) {
+            jTextField_Amount.setScale(((AssetVenture) asset).getScale());
+            jTextField_Amount.setVisible(true);
+            jLabel_Amount.setVisible(true);
+        } else {
+            jTextField_Amount.setVisible(false);
+            jLabel_Amount.setVisible(false);
         }
 
         if (recipient == null) {
@@ -324,8 +329,15 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         this.jLabelRecipientDetail.setText(Lang.T("Account Details") + ":");
 
         // set scale
-        int scale = asset.getScale();
-        jTextField_Amount.setScale(scale);
+        if (asset instanceof AssetVenture) {
+            jTextField_Amount.setScale(((AssetVenture) asset).getScale());
+            jTextField_Amount.setVisible(true);
+            jLabel_Amount.setVisible(true);
+        } else {
+            jTextField_Amount.setVisible(false);
+            jLabel_Amount.setVisible(false);
+        }
+
         if (showAssetForm) {
             jScrollPane2.setViewportView(new AssetInfo(asset, false));
         }
@@ -444,7 +456,11 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         try {
             //READ AMOUNT
             parsing = 1;
-            amount = new BigDecimal(jTextField_Amount.getText());
+            if (asset instanceof AssetVenture) {
+                amount = new BigDecimal(jTextField_Amount.getText());
+            } else {
+                amount = BigDecimal.ONE;
+            }
 
             //READ FEE
             parsing = 2;

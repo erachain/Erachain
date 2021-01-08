@@ -601,6 +601,10 @@ public abstract class AssetCls extends ItemCls {
         return image;
     }
 
+    public abstract long getQuantity();
+
+    public abstract int getScale();
+
     @Override
     public HashMap getNovaItems() {
         return BlockChain.NOVA_ASSETS;
@@ -730,7 +734,7 @@ public abstract class AssetCls extends ItemCls {
         return isUnique(assetType);
     }
 
-    abstract boolean isUnlimited(Account address, boolean notAccounting);
+    public abstract boolean isUnlimited(Account address, boolean notAccounting);
 
     /**
      * Управлять может только сам обладатель

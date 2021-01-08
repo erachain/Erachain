@@ -40,6 +40,21 @@ public class AssetUnique extends AssetCls {
     }
 
     @Override
+    public long getQuantity() {
+        return 1L;
+    }
+
+    @Override
+    public int getScale() {
+        return 0;
+    }
+
+    @Override
+    public boolean isUnlimited(Account address, boolean notAccounting) {
+        return false;
+    }
+
+    @Override
     public BigDecimal getReleased(DCSet dcSet) {
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> bals = this.getOwner().getBalance(this.getKey(dcSet));
         return BigDecimal.ONE.subtract(bals.a.b).stripTrailingZeros();
@@ -48,11 +63,6 @@ public class AssetUnique extends AssetCls {
     @Override
     public BigDecimal getReleased() {
         return getReleased(DCSet.getInstance());
-    }
-
-    @Override
-    public boolean isUnlimited(Account address, boolean notAccounting) {
-        return false;
     }
 
     //PARSE

@@ -60,6 +60,7 @@ public class AssetVenture extends AssetCls {
      * 0 - unlimited for owner.
      * If < 0 - all but not owner may sold it on exchange for owner - as Auction.
      */
+    @Override
     public long getQuantity() {
         return this.quantity;
     }
