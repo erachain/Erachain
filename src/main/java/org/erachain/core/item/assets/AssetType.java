@@ -15,7 +15,8 @@ public class AssetType {
     public AssetType(Integer assetType) {
         this.id = assetType;
         this.name = Lang.T(AssetCls.viewAssetTypeCls(assetType));
-        this.nameFull = Lang.T(AssetCls.viewAssetTypeFullCls(assetType));
+        this.nameFull = "<b>" + AssetCls.charAssetType(Long.MAX_VALUE, assetType)
+                + AssetCls.viewAssetTypeAbbrev(assetType) + "</b>:" + Lang.T(AssetCls.viewAssetTypeFullCls(assetType));
 
         StringJoiner joiner = new StringJoiner(", ");
         for (Fun.Tuple2<?, String> action : AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
@@ -35,12 +36,12 @@ public class AssetType {
     @Override
     public String toString() {
 
-
-        return " {"
+        return "<HTML> {"
                 // + NumberAsString.formatAsString(this.getBalanceUSE(FEE_KEY))
                 + id
-                + "}" + " " + nameFull ;
+                + "}" + " " + nameFull;
     }
+
     public String getName(){
         return name;
     }

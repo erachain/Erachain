@@ -441,7 +441,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
             this.cbx_To = new JComboBox(accounts_To_Model);
             if (accounts_To_Model.getSize() != 0) {
                 this.add(this.cbx_To, txtToGBC);
-                recipientBox.setSelectedAddress(cbx_To.getSelectedItem().toString());
+                recipientBox.setSelectedAccount((Account) cbx_To.getSelectedItem());
                 Account account1 = new Account(recipientBox.getSelectedAddress());
                 txtRecDetails.setText(account1.toString());
                 toLabel.setText(Lang.T("Select Account To") + ": ");
@@ -450,7 +450,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
                     public void actionPerformed(ActionEvent e) {
                         String str = (String) cbx_To.getSelectedItem();
                         if (str != null) {
-                            recipientBox.setSelectedAddress(cbx_To.getSelectedItem().toString());
+                            recipientBox.setSelectedAccount((Account) cbx_To.getSelectedItem());
                             refreshReceiverDetails();
                         }
 
@@ -458,18 +458,14 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
                 });
             } else {
 
-                this.recipientBox.setSelectedAddress("has no Accounts");
+                this.recipientBox.setMessage("has no Accounts");
                 sendButton.setEnabled(false);
 
             }
         } else {
 
             if (accountTo != null) {
-                if (accountTo instanceof PublicKeyAccount) {
-                    recipientBox.setSelectedAddress(((PublicKeyAccount) accountTo).getBase58());
-                } else {
-                    recipientBox.setSelectedAddress(accountTo.getAddress());
-                }
+                recipientBox.setSelectedAccount(accountTo);
             }
             this.add(recipientBox, txtToGBC);
         }

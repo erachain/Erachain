@@ -409,6 +409,10 @@ public class OnDealClick {
             case Transaction.INVALID_TIMESTAMP_END:
                 mess = "Invalid end timestamp";
                 break;
+            case Transaction.INVALID_ASSET_TYPE:
+                mess = "Invalid asset type (not unique?)";
+                break;
+
             case Transaction.INVALID_CREATOR:
                 mess = "Invalid creator";
                 break;

@@ -2,6 +2,7 @@ package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.*;
 import org.erachain.gui.create.LicenseDataJFrame;
@@ -207,19 +208,19 @@ public class MenuFiles extends JMenu {
                     if (!js.containsKey("asset")) return;
                     long assetKey = ((Long) js.get("asset"));
                     if (!js.containsKey("recipient")) return;
-                    String recipient = (String) js.get("recipient");
+                    Account recipient = Account.tryMakeAccount((String) js.get("recipient")).a;
                     if (!js.containsKey("head")) return;
                     String head = (String) js.get("head");
                     if (!js.containsKey("amount")) return;
                     String amount = (String) js.get("amount");
                     Boolean backward = (Boolean) js.get("backward");
                     AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey),
-                            ct.getWalletAccountByAddress(creator), ct.getWalletAccountByAddress(recipient), null, null, backward);
+                            ct.getWalletAccountByAddress(creator), recipient, null, null, backward);
                     MainPanel.getInstance().insertNewTab(Lang.T("Read Transaction"),
                             panel);
 
                     AssetCls asset = ct.getAsset(assetKey);
-                    panel.recipientAddress.setSelectedAddress(recipient);
+                    panel.recipientAddress.setSelectedAccount(recipient);
                     panel.recipientAddress.setEditable(false);
                     panel.jTextFieldTXTitle.setText(head);
                     panel.jTextFieldTXTitle.setEditable(false);

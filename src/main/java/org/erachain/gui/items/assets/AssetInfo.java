@@ -120,10 +120,13 @@ public class AssetInfo extends JTextPane {
                 text += Library.to_HTML(asset.viewDescription()) + "</div>";
             }
             text += "<div>" + Lang.T("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";
-            text += "<div>" + Lang.T("TYPE") + ": <b>" + Lang.T(asset.viewAssetTypeFull()) + "</b>,";
-            text += " " + Lang.T("accuracy") + ": <b>" + asset.getScale() + "</b>,";
-            text += " " + Lang.T("quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
-            text += " " + Lang.T("released") + ": <b>" + NumberAsString.formatAsString(asset.getReleased()) + "</b>";
+            text += "<div>" + Lang.T("Class") + ": <b>" + Lang.T(asset.getItemSubType()) + "</b>,";
+            text += " " + Lang.T("Type") + ": <b>" +
+                    asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:"
+                    + Lang.T(asset.viewAssetTypeFull()) + ",";
+            text += " " + Lang.T("Accuracy") + ": <b>" + asset.getScale() + "</b>,";
+            text += " " + Lang.T("Quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
+            text += " " + Lang.T("Released") + ": <b>" + NumberAsString.formatAsString(asset.getReleased()) + "</b>";
 
             text += "</div><<BR></td></tr></table>";
             text += "<div>";

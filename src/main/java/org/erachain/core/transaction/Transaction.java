@@ -203,6 +203,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_TIMESTAMP_START = 215;
     public static final int INVALID_TIMESTAMP_END = 216;
 
+    public static final int INVALID_ASSET_TYPE = 222;
+
     public static final int ITEM_PERSON_IS_DEAD = 235;
     public static final int AMOUNT_LENGHT_SO_LONG = 236;
     public static final int AMOUNT_SCALE_SO_BIG = 237;
