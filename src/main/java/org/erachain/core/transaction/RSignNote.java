@@ -780,7 +780,7 @@ public class RSignNote extends Transaction implements Itemable {
                 for (byte[] hash : allHashes) {
                     if (map.contains(hash)) {
                         errorValue = Base58.encode(hash);
-                        return HASH_ALREDY_EXIST;
+                        return HASH_ALREADY_EXIST;
                     }
                 }
             }

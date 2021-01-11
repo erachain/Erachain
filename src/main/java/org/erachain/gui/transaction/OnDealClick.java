@@ -174,7 +174,7 @@ public class OnDealClick {
                 mess = "Unknown public key for encrypt";
                 break;
 
-            case Transaction.HASH_ALREDY_EXIST:
+            case Transaction.HASH_ALREADY_EXIST:
                 mess = "Hash already exist";
                 break;
             case Transaction.WRONG_SIGNER:
