@@ -1682,7 +1682,7 @@ public class ExData {
                 templateOwner.changeCOMPUBonusBalances(dcSet, false, royaltyFee, Transaction.BALANCE_SIDE_DEBIT);
 
                 transaction.addCalculated(block, templateOwner, Transaction.FEE_KEY, royaltyFee,
-                        Lang.T("template royalty for %1").replace("%1", "" + templateKey));
+                        "template royalty for %1".replace("%1", "" + templateKey));
             }
 
         }

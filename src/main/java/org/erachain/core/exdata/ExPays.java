@@ -1037,7 +1037,7 @@ public class ExPays {
                         incomeReverse);
 
                 if (!asOrphan && block != null)
-                    rNote.addCalculated(block, recipient, absKey, amount, "payout");
+                    rNote.addCalculated(block, recipient, absKey, amount, "payout by " + rNote.viewHeightSeq());
 
             }
         }
