@@ -256,10 +256,10 @@ function person(data) {
     output += '<h5>' + data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
     if ('deathday' in data) {
         output += ', &nbsp&nbsp ' + data.Label_dead + ': &nbsp&nbsp<b> ' + data.deathday + '</b>'
-    } else {
-        output += '</h5>';
     }
-    output += '<h6>' + data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b></h6>';
+    output += '</h5>';
+
+    output += '<h5>' + data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b></h5>';
 
     if (data.era_balance_a) {
         output += '<h5>ERA: &nbsp&nbsp<u>A</u>:<b>' + data.era_balance_a + '</b>&nbsp&nbsp<u>B</u>:<b>'
