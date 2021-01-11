@@ -253,39 +253,39 @@ function person(data) {
     output += ' ' +'<a href=../apiperson/raw/' + data.key + ' class="button ll-blue-bgc"><b>' + data.label_RAW + '</b></a></h4>';
     output += '<br>';
 
-    output += '<h5>' + data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
+    output += '<h4>' + data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
     if ('deathday' in data) {
         output += ', &nbsp&nbsp ' + data.Label_dead + ': &nbsp&nbsp<b> ' + data.deathday + '</b>'
     }
-    output += '</h5>';
+    output += '</h4>';
 
-    output += '<h5>' + data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b></h5>';
+    output += '<h4>' + data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b></h4>';
 
     if (data.era_balance_a) {
-        output += '<h5>ERA: &nbsp&nbsp<u>A</u>:<b>' + data.era_balance_a + '</b>&nbsp&nbsp<u>B</u>:<b>'
-            + data.era_balance_b + '</b>&nbsp&nbsp<u>C</u>:<b>' + data.era_balance_c + '</b></h5>';
+        output += '<h4>ERA: &nbsp&nbsp<u>A</u>:<b>' + data.era_balance_a + '</b>&nbsp&nbsp<u>B</u>:<b>'
+            + data.era_balance_b + '</b>&nbsp&nbsp<u>C</u>:<b>' + data.era_balance_c + '</b></h4>';
     }
     if (data.compu_balance) {
-        output += '<h5>COMPU: &nbsp&nbsp <b>' + data.compu_balance + '</b></h5>';
+        output += '<h4>COMPU: &nbsp&nbsp <b>' + data.compu_balance + '</b></h4>';
     }
 
     if (data.lia_balance_a) {
-        output += '<h5>' + data.Label_total_registered + ': <b>' + data.lia_balance_a + '</b>, ' + data.Label_total_certified + ': <b>' + data.lia_balance_b + '</b></h5>';
+        output += '<h4>' + data.Label_total_registered + ': <b>' + data.lia_balance_a + '</b>, ' + data.Label_total_certified + ': <b>' + data.lia_balance_b + '</b></h4>';
     }
 
     if (data.creator_name != "") {
-        output += data.Label_creator + ': &nbsp&nbsp<a href ="?address=' + data.creator + get_lang() + '"><b> ' + data.creator_name + '</b></a><br>';
+        output += '<h4>' + data.Label_creator + ': &nbsp&nbsp<a href ="?address=' + data.creator + get_lang() + '"><b> ' + data.creator_name + '</b></a></h4>';
     } else {
-        output += data.Label_creator + ': &nbsp&nbsp<a href ="?address=' + data.creator + get_lang() + '"><b> ' + data.creator + '</b></a><br>';
+        output += '<h4>' + data.Label_creator + ': &nbsp&nbsp<a href ="?address=' + data.creator + get_lang() + '"><b> ' + data.creator + '</b></a></h4>';
     }
 
     if (data.registrar_name != "") {
-        output += data.Label_registrar + ': &nbsp&nbsp<a href ="?address=' + data.registrar + get_lang() + '"><b> ' + data.registrar_name + '</b></a><br>';
+        output += '<h4>' + data.Label_registrar + ': &nbsp&nbsp<a href ="?address=' + data.registrar + get_lang() + '"><b> ' + data.registrar_name + '</b></a></h4>';
     } else {
-        output += data.Label_registrar + ': &nbsp&nbsp<a href ="?address=' + data.registrar + get_lang() + '"><b> ' + data.registrar + '</b></a><br>';
+        output += '<h4>' + data.Label_registrar + ': &nbsp&nbsp<a href ="?address=' + data.registrar + get_lang() + '"><b> ' + data.registrar + '</b></a></h4>';
     }
 
-    output += '<h5>' + data.Label_description + ':</h5>' + fformat(data.description) + '<br>';
+    output += '<h4>' + data.Label_description + ':</h4>' + fformat(data.description) + '<br>';
 
     output += '</td>';
     output += '</tr>';
