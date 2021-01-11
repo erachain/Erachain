@@ -175,7 +175,7 @@ public class OnDealClick {
                 break;
 
             case Transaction.HASH_ALREADY_EXIST:
-                mess = "Hash already exist";
+                mess = "HASH_ALREADY_EXIST";
                 break;
             case Transaction.WRONG_SIGNER:
                 mess = "Wrong Signer";
@@ -401,7 +401,7 @@ public class OnDealClick {
                 mess = "Duplicate key";
                 break;
             case Transaction.ITEM_DUPLICATE:
-                mess = "Invalid duplicate item";
+                mess = "ITEM_DUPLICATE";
                 break;
             case Transaction.INVALID_TIMESTAMP_START:
                 mess = "Invalid start timestamp item";
