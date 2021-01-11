@@ -609,8 +609,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJSON.put("key", this.getKey());
         itemJSON.put("name", this.name);
 
-        if (withIcon && this.getIcon() != null)
+        if (withIcon && this.getIcon() != null && this.getIcon().length > 0)
             itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+        else
+            itemJSON.put("icon", "");
 
         itemJSON.put("owner", this.owner.getAddress());
         if (showPerson) {
@@ -660,10 +662,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         JSONObject itemJSON = new JSONObject();
 
         // ADD DATA
-        if (getIcon() != null)
+        if (getIcon() != null && getIcon().length > 0)
             itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-        if (getImage() != null)
+        else
+            itemJSON.put("icon", "");
+
+        if (getImage() != null && getImage().length > 0)
             itemJSON.put("image", java.util.Base64.getEncoder().encodeToString(this.getImage()));
+        else
+            itemJSON.put("image", "");
 
         return itemJSON;
     }
