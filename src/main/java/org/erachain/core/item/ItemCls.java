@@ -3,7 +3,6 @@ package org.erachain.core.item;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.apache.commons.net.util.Base64;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -704,8 +703,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             json.put("person_key", person.b.getKey());
         }
 
-        if (icon != null && icon.length > 0)
-            json.put("icon", Base64.encodeBase64String(getIcon()));
+        if (getIcon() != null && getIcon().length > 0)
+            json.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+        else
+            json.put("icon", "");
 
         return json;
     }
