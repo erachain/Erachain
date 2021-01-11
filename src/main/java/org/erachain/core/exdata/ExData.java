@@ -559,7 +559,7 @@ public class ExData {
         return !isEncrypted() && json.containsKey("FU");
     }
 
-    static long templateRoyaltyFee = 200 * 0;
+    static long templateRoyaltyFee = 200 * 10;
 
     public long getRoyaltyFee() {
         if (templateKey > 0)
