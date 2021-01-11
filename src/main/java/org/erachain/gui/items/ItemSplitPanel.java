@@ -219,11 +219,24 @@ public abstract class ItemSplitPanel extends SplitPanel {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.T("Bytecode of the '%1' has been copy to buffer")
                             .replace("%1", itemTableSelected.getName())
-                            + "!",
+                            + ".",
                     Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 
         });
         menuTable.add(byteCode);
+
+        JMenuItem byteKey = new JMenuItem(Lang.T("Get Number"));
+        byteKey.addActionListener(e -> {
+            StringSelection stringSelection = new StringSelection("" + itemTableSelected.getKey());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Number of the '%1' has been copy to buffer")
+                            .replace("%1", itemTableSelected.getName())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuTable.add(byteKey);
 
         TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menuTable);
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
