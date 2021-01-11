@@ -89,7 +89,8 @@ public class AdderHeadInfo {
         output.put("Label_name", Lang.T("Name", langObj));
         output.put("Label_creator", Lang.T("Creator", langObj));
         output.put("Label_image", Lang.T("Image", langObj));
-        output.put("Label_description", Lang.T("Description", langObj));
+        //output.put("Label_description", Lang.T("Description", langObj));
+        output.put("Label_age", Lang.T("Age", langObj));
         output.put("Label_Persons", Lang.T("Persons", langObj));
         addLaterPrevious(output, langObj);
     }

@@ -374,7 +374,7 @@ function persons(data) {
     output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  ' +
         'class="table table-striped" style="border: 1px solid #ddd;">';
     output += '<tr><td><td><b>' + data.Label_key + ' <td><b>' +
-        data.Label_name + '<td><b>'+ data.Label_description + ' <td><b>' + data.Label_creator;
+        data.Label_name + '<td><b>'+ data.Label_age + ' <td><b>' + data.Label_creator;
     //Отображение таблицы элементов персон
     for (var i in data.pageItems) {
     //var length = Object.keys(data.pageItems).length;
@@ -383,10 +383,14 @@ function persons(data) {
 
 
         output += '<tr>';
-        output += ' <td><img src="personimage?key=' + item.key + '" width="100"/></td>';
+        output += ' <td><img src="personimage?key=' + item.key + '" width="100"/>';
         output += '<td>' + item.key + '<td><a href=?person=' +
             item.key + get_lang() + '>' + escapeHtml(item.name) + '</a>';
-        output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
+        var dateDiff = new Date(item.birthday);
+        //dateDiff = Date.now() - dateDiff;
+        //output += '<td>' + convertTimestamp(item.birthday, true) + ' - '
+        output += '<td>' + (new Date().getFullYear() - dateDiff.getFullYear());
+        //output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
         output += '<td><a href=?address=' + item.owner + get_lang() + '>';
         if (item.hasOwnProperty('person'))
             output += '[' + item.person_key + ']' + escapeHtml(item.person);

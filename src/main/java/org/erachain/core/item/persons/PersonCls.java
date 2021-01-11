@@ -204,7 +204,7 @@ public abstract class PersonCls extends ItemCls {
 
     public boolean isAlive(long onThisTime) {
 
-        if(this.deathday == Long.MIN_VALUE
+        if (this.deathday == Long.MIN_VALUE
                 || this.deathday == Long.MAX_VALUE
                 || this.deathday < this.birthday)
             return true;
@@ -445,4 +445,13 @@ public abstract class PersonCls extends ItemCls {
         return personJSON;
     }
 
+    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+        //DCSet dcSet = DCSet.getInstance();
+
+        JSONObject json = super.jsonForExplorerPage(langObj);
+        json.put("birthday", birthday);
+
+        return json;
+
+    }
 }
