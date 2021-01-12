@@ -1,6 +1,7 @@
 package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.database.wallet.WTransactionMap;
@@ -10,6 +11,7 @@ import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -181,6 +183,17 @@ public class StatementsMySplitPanel extends SplitPanel {
         // jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 
         JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append / Reply"));
+        linkMenu.addActionListener(e -> {
+            Transaction transaction = my_Statements_Model.getItem(jTableJScrollPanelLeftPanel
+                    .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow())).b;
+            MainPanel.getInstance().insertNewTab(
+                    Lang.T("For # для") + " " + transaction.viewHeightSeq(),
+                    new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, transaction.viewHeightSeq(), null));
+
+        });
+        menu.add(linkMenu);
 
         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
