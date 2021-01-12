@@ -60,6 +60,8 @@ public class DepositExchange extends IconPanel {
     private JLabel jLabel_AssetInput;
     private JLabel jLabel_Details;
     private JTextField jTextField_Details;
+    private JLabel jLabel_AreaDetails;
+    private JTextArea jTextArea_Details;
     private JLabel jTextField_Details_Check;
     private JLabel jLabel_YourAddress;
     private JTextField jTextField_Address = new JTextField();
@@ -82,6 +84,7 @@ public class DepositExchange extends IconPanel {
 
         jButton_getDetails.setEnabled(false);
         jTextField_Details.setText("");
+        jTextArea_Details.setText("");
         jTextField_Details_Check.setText(Lang.T("wait"));
 
         // http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
@@ -122,6 +125,12 @@ public class DepositExchange extends IconPanel {
                 assetOutput = "@ZEN/";
                 assetOutputName = "ZEN";
                 break;
+            case 1048583:
+                /// http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/ETH/@ETH/7KmL1nheVHYVmdaEB4rsRjiENUD3sTr7EE/1
+                urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
+                assetOutput = "@ETH/";
+                assetOutputName = "ETH";
+                break;
             default:
                 assetOutput = "@BTC/";
                 assetOutputName = "BTC";
@@ -150,6 +159,11 @@ public class DepositExchange extends IconPanel {
                 assetIncomeName = "horizens";
                 assetIncomeABBR = "ZEN";
                 break;
+            case 1048583:
+                urlPars = "ETH/" + urlPars + "/1";
+                assetIncomeName = "etheriums";
+                assetIncomeABBR = "ETH";
+                break;
             default:
                 urlPars = "BTC/" + urlPars + "/0.01";
                 assetIncomeName = "bitcoins";
@@ -158,7 +172,7 @@ public class DepositExchange extends IconPanel {
 
         urlGetDetails += urlPars;
 
-        LOGGER.info(urlGetDetails);
+        //LOGGER.info(urlGetDetails);
 
         String inputText = "";
         try {
@@ -194,14 +208,17 @@ public class DepositExchange extends IconPanel {
             inputText = "";
         }
 
+        jTextArea_Details.setText("");
+
         if (jsonObject != null && jsonObject.containsKey("addr_in")) {
-            if (BlockChain.TEST_MODE) {
+            if (false && BlockChain.TEST_MODE) {
                 jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
             if (jsonObject.containsKey("wrong")) {
-                jTextField_Details.setText(jsonObject.get("addr_in").toString());
                 jTextField_Details_Check.setText("<html><b>" + jsonObject.get("wrong") + "<b></html>");
+                jTextField_Details.setText(jsonObject.get("addr_in").toString());
+                jTextArea_Details.setText("");
 
             } else {
 
@@ -209,7 +226,7 @@ public class DepositExchange extends IconPanel {
                 String rate = jsonObject.get("rate").toString();
                 String bal = jsonObject.get("bal").toString();
 
-                LOGGER.debug(StrJSonFine.convert(jsonObject));
+                //LOGGER.debug(StrJSonFine.convert(jsonObject));
 
                 switch ((int) asset.getKey()) {
                     case 1:
@@ -222,6 +239,10 @@ public class DepositExchange extends IconPanel {
                     default:
                         help = Lang.T("Transfer <b>%1</B> to this address for deposit your account on Exchange")
                                 .replace("%1", assetIncomeName);
+                }
+
+                if (asset.getKey() == 1048583L) {
+                    jTextArea_Details.setText(jsonObject.get("addr_out_full").toString());
                 }
 
                 if (jsonObject.containsKey("may_pay")) {
@@ -296,6 +317,8 @@ public class DepositExchange extends IconPanel {
         jLabel_Details = new JLabel();
         detailsHead = new JLabel();
         jTextField_Details = new JTextField();
+        jLabel_AreaDetails = new JLabel();
+        jTextArea_Details = new JTextArea();
         jTextField_Details_Check = new JLabel();
 
 
@@ -369,7 +392,8 @@ public class DepositExchange extends IconPanel {
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel_AssetInput, labelGBC);
 
-        cbxAssetsInput = new JComboBox<AssetCls>(new FundTokensComboBoxModel(new long[]{AssetCls.BTC_KEY
+        cbxAssetsInput = new JComboBox<AssetCls>(new FundTokensComboBoxModel(new long[]{AssetCls.BTC_KEY,
+                1048583
                 // 14L // ETG
         }));
         fieldGBC.gridy = gridy;
@@ -404,11 +428,23 @@ public class DepositExchange extends IconPanel {
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel_Details, labelGBC);
 
-        titleGBC.gridy = ++gridy;
-        jPanelMain.add(jTextField_Details, titleGBC);
+        fieldGBC.gridy = gridy;
+        jPanelMain.add(jTextField_Details, fieldGBC);
         jTextField_Details.setEditable(false);
         jTextField_Details.setToolTipText("");
         jTextField_Details.setText("");
+
+        jLabel_Details.setText(Lang.T("Payment Data") + ":");
+        labelGBC.gridy = ++gridy;
+        jPanelMain.add(jLabel_Details, labelGBC);
+
+        fieldGBC.gridy = gridy;
+        jTextArea_Details.setLineWrap(true);
+        jTextArea_Details.setRows(5);
+        jPanelMain.add(jTextArea_Details, fieldGBC);
+        jTextArea_Details.setEditable(false);
+        jTextArea_Details.setToolTipText("");
+        jTextArea_Details.setText("");
 
         titleGBC.gridy = ++gridy;
         jPanelMain.add(jTextField_Details_Check, titleGBC);
@@ -496,6 +532,7 @@ public class DepositExchange extends IconPanel {
         //paneAssetInfo.setViewportView(new AssetInfo(asset, false));
 
         jTextField_Details.setText("");
+        jTextArea_Details.setText("");
         jTextField_Details_Check.setText("");
 
         switch ((int) asset.getKey()) {
@@ -518,6 +555,14 @@ public class DepositExchange extends IconPanel {
             case 1114:
                 jLabel_Details.setText(Lang.T("Address to deposit") + " ZEN" + ":");
                 refreshReceiverDetails(Lang.T("Payment details to deposit") + " ZEN",
+                        detailsHead);
+                jLabel_Asset.setText(Lang.T("What to deposit"));
+                jLabel_AssetInput.setVisible(false);
+                cbxAssetsInput.setVisible(false);
+                break;
+            case 1048583:
+                jLabel_Details.setText(Lang.T("Address to deposit") + " ETH" + ":");
+                refreshReceiverDetails(Lang.T("Payment details to deposit") + " ETH",
                         detailsHead);
                 jLabel_Asset.setText(Lang.T("What to deposit"));
                 jLabel_AssetInput.setVisible(false);
@@ -554,25 +599,28 @@ public class DepositExchange extends IconPanel {
 
             switch ((int) asset.getKey()) {
                 case 1:
-                    urlGetDetails += "ERA/"; // BTC -> eBTC
+                    urlGetDetails += "ERA/";
                     break;
                 case 12:
-                    urlGetDetails += "@BTC/"; // BTC -> eBTC
+                    urlGetDetails += "@BTC/";
                     break;
                 case 14:
-                    urlGetDetails += "@ETH/"; // BTC -> eBTC
+                    urlGetDetails += "@ETH-/";
                     break;
                 case 92:
-                    urlGetDetails += "@RUB/"; // BTC -> eUSD
+                    urlGetDetails += "@RUB/";
                     break;
                 case 95:
-                    urlGetDetails += "@USD/"; // BTC -> eUSD
+                    urlGetDetails += "@USD/";
                     break;
                 case 1114:
-                    urlGetDetails += "@ZEN/"; // ZEN -> eUSD
+                    urlGetDetails += "@ZEN/";
+                    break;
+                case 1048583:
+                    urlGetDetails += "@ETH/";
                     break;
                 default:
-                    urlGetDetails += "COMPU/"; // BTC -> COMPU
+                    urlGetDetails += "COMPU/";
             }
 
         }
