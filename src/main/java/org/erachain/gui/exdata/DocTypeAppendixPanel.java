@@ -325,7 +325,7 @@ public class DocTypeAppendixPanel extends JPanel {
     public JTextField parentReference;
     private JLabel parentDetails;
     private JLabel typeDocumentLabel;
-    private DocTypeComboBox typeDocymentCombox;
+    public DocTypeComboBox typeDocymentCombox;
 
     private JLabel tagsLabel;
     public JTextField tagsField;

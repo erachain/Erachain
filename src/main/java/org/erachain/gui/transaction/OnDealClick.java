@@ -68,7 +68,7 @@ public class OnDealClick {
                 mess = "Negative amount";
                 break;
             case Transaction.NOT_ENOUGH_FEE:
-                mess = "Not enought fee";
+                mess = "Not enough fee";
                 break;
             case Transaction.INVALID_FEE_POWER:
                 mess = "Invalid fee power";

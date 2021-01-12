@@ -49,7 +49,7 @@ public class IssueDocumentPanel extends IconPanel {
     /**
      * Creates new form IssueDocumentPanel
      */
-    public IssueDocumentPanel(Account creator, AssetCls actionAsset) {
+    public IssueDocumentPanel(Account creator, int type, String linkedTo, AssetCls actionAsset) {
         super(NAME, TITLE);
         th = this;
         initComponents();
@@ -88,9 +88,17 @@ public class IssueDocumentPanel extends IconPanel {
         if (actionAsset != null) {
             exData_Panel.exPayoutsPanel.jComboBoxPayoutAsset.setSelectedItem(actionAsset);
         }
+        if (type > 0) {
+            exData_Panel.docTypeAppendixPanel.typeDocymentCombox.setSelectedIndex(type);
+            exData_Panel.docTypeAppendixPanel.parentReference.setText(linkedTo);
+        }
 
         jLabel_Fee_Work.setText(Lang.T("Fee Power") + ":");
         this.jButton_Work_Cancel.setVisible(false);
+    }
+
+    public IssueDocumentPanel(Account creator, AssetCls actionAsset) {
+        this(creator, 0, null, actionAsset);
     }
 
     public IssueDocumentPanel() {
