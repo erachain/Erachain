@@ -10,6 +10,7 @@ import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
+import org.erachain.utils.Converter;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.URLViewer;
 import org.json.simple.JSONArray;
@@ -33,6 +34,7 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
 public class DepositExchange extends IconPanel {
@@ -62,6 +64,7 @@ public class DepositExchange extends IconPanel {
     private JTextField jTextField_Details;
     private JLabel jLabel_AreaDetails;
     private JTextArea jTextArea_Details;
+    private JLabel jLabel_DetailsCheck;
     private JLabel jTextField_Details_Check;
     private JLabel jLabel_YourAddress;
     private JTextField jTextField_Address = new JTextField();
@@ -218,7 +221,11 @@ public class DepositExchange extends IconPanel {
             if (jsonObject.containsKey("wrong")) {
                 jTextField_Details_Check.setText("<html><b>" + jsonObject.get("wrong") + "<b></html>");
                 jTextField_Details.setText(jsonObject.get("addr_in").toString());
-                jTextArea_Details.setText("");
+
+                if (jsonObject.containsKey("addr_out_full") && asset.getKey() == 1048583L) {
+                    String payMess = jsonObject.get("addr_out_full").toString();
+                    jTextArea_Details.setText("0x" + Converter.toHex(payMess.getBytes(StandardCharsets.UTF_8)));
+                }
 
             } else {
 
@@ -242,7 +249,8 @@ public class DepositExchange extends IconPanel {
                 }
 
                 if (asset.getKey() == 1048583L) {
-                    jTextArea_Details.setText(jsonObject.get("addr_out_full").toString());
+                    String payMess = jsonObject.get("addr_out_full").toString();
+                    jTextArea_Details.setText("0x" + Converter.toHex(payMess.getBytes(StandardCharsets.UTF_8)));
                 }
 
                 if (jsonObject.containsKey("may_pay")) {
@@ -319,6 +327,7 @@ public class DepositExchange extends IconPanel {
         jTextField_Details = new JTextField();
         jLabel_AreaDetails = new JLabel();
         jTextArea_Details = new JTextArea();
+        jLabel_DetailsCheck = new JLabel();
         jTextField_Details_Check = new JLabel();
 
 
@@ -424,7 +433,7 @@ public class DepositExchange extends IconPanel {
         titleGBC.gridy = ++gridy;
         jPanelMain.add(detailsHead, titleGBC);
 
-        jLabel_Details.setText(Lang.T("Address for deposit") + ":");
+        jLabel_Details.setText(Lang.T("Address") + ":");
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel_Details, labelGBC);
 
@@ -434,20 +443,23 @@ public class DepositExchange extends IconPanel {
         jTextField_Details.setToolTipText("");
         jTextField_Details.setText("");
 
-        jLabel_Details.setText(Lang.T("Payment Data") + ":");
+        jLabel_AreaDetails.setText(Lang.T("Data") + ":");
         labelGBC.gridy = ++gridy;
-        jPanelMain.add(jLabel_Details, labelGBC);
+        jPanelMain.add(jLabel_AreaDetails, labelGBC);
 
         fieldGBC.gridy = gridy;
         jTextArea_Details.setLineWrap(true);
-        jTextArea_Details.setRows(5);
+        jTextArea_Details.setRows(3);
         jPanelMain.add(jTextArea_Details, fieldGBC);
         jTextArea_Details.setEditable(false);
         jTextArea_Details.setToolTipText("");
         jTextArea_Details.setText("");
 
-        titleGBC.gridy = ++gridy;
-        jPanelMain.add(jTextField_Details_Check, titleGBC);
+        jLabel_DetailsCheck.setText(Lang.T("Status") + ":");
+        labelGBC.gridy = ++gridy;
+        jPanelMain.add(jLabel_DetailsCheck, labelGBC);
+        fieldGBC.gridy = gridy;
+        jPanelMain.add(jTextField_Details_Check, fieldGBC);
 
         //////////////////////////
         JTextPane jText_History = new JTextPane();
@@ -537,7 +549,7 @@ public class DepositExchange extends IconPanel {
 
         switch ((int) asset.getKey()) {
             case 1:
-                jLabel_Details.setText(Lang.T("Address for buy") + ":");
+                //jLabel_Details.setText(Lang.T("Address for buy") + ":");
                 refreshReceiverDetails(Lang.T("Payment details for buy") + " ERA",
                         detailsHead);
                 jLabel_Asset.setText(Lang.T("What to buy"));
@@ -545,7 +557,7 @@ public class DepositExchange extends IconPanel {
                 cbxAssetsInput.setVisible(true);
                 break;
             case 2:
-                jLabel_Details.setText(Lang.T("Address for buy") + ":");
+                //jLabel_Details.setText(Lang.T("Address for buy") + ":");
                 refreshReceiverDetails(Lang.T("Payment details for buy") + " COMPU",
                         detailsHead);
                 jLabel_Asset.setText(Lang.T("What to buy"));
@@ -553,7 +565,7 @@ public class DepositExchange extends IconPanel {
                 cbxAssetsInput.setVisible(true);
                 break;
             case 1114:
-                jLabel_Details.setText(Lang.T("Address to deposit") + " ZEN" + ":");
+                //jLabel_Details.setText(Lang.T("Address to deposit") + " ZEN" + ":");
                 refreshReceiverDetails(Lang.T("Payment details to deposit") + " ZEN",
                         detailsHead);
                 jLabel_Asset.setText(Lang.T("What to deposit"));
@@ -561,7 +573,7 @@ public class DepositExchange extends IconPanel {
                 cbxAssetsInput.setVisible(false);
                 break;
             case 1048583:
-                jLabel_Details.setText(Lang.T("Address to deposit") + " ETH" + ":");
+                //jLabel_Details.setText(Lang.T("Address to deposit") + " ETH" + ":");
                 refreshReceiverDetails(Lang.T("Payment details to deposit") + " ETH",
                         detailsHead);
                 jLabel_Asset.setText(Lang.T("What to deposit"));
@@ -569,7 +581,7 @@ public class DepositExchange extends IconPanel {
                 cbxAssetsInput.setVisible(false);
                 break;
             default:
-                jLabel_Details.setText(Lang.T("Address to deposit") + ":");
+                //jLabel_Details.setText(Lang.T("Address to deposit") + ":");
                 refreshReceiverDetails(Lang.T("Payment details to deposit") + " BTC",
                         detailsHead);
                 jLabel_Asset.setText(Lang.T("What to deposit"));
@@ -683,9 +695,9 @@ public class DepositExchange extends IconPanel {
                 if (to_pay.signum() != 0) {
                     resultText += Lang.T("Awaiting for payout")
                             + ": " + to_pay.toPlainString()
-                    + " (" + Lang.T("maybe volume is too small for payout, please send more") + ")";
+                            + " (" + Lang.T("maybe volume is too small for payout, please send more") + ")";
                 }
-                if (false && deal_acc.containsKey("message")) {
+                if (deal_acc.containsKey("message")) {
                     resultText += deal_acc.get("message");
                 }
 
