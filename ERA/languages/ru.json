@@ -1147,6 +1147,7 @@
   "Receiver details": "Сведения о получателе",
   "Recipient:": "Получатель:",
   "Recipient": "Получатель",
+  "Recipient [%1] is wrong": "Получатель [%1] ошибочный",
   "Recipient Account": "Счет Получателя",
   "Recipient Details": "Данные Получателя",
   "Recipients": "Получатели",

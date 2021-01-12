@@ -806,7 +806,7 @@ public class ExDataPanel extends JPanel {
 
     }
 
-    public byte[] makeExData(PrivateKeyAccount creator, boolean isEncrypted) throws Exception {
+    public Fun.Tuple2<byte[], String> makeExData(PrivateKeyAccount creator, boolean isEncrypted) {
 
         Account[] recipients = multipleRecipientsPanel.recipientsTableModel.getRecipients();
         boolean signCanOnlyRecipients = multipleRecipientsPanel.signCanRecipientsCheckBox.isSelected();
@@ -854,18 +854,25 @@ public class ExDataPanel extends JPanel {
 
         Fun.Tuple2<ExPays, String> exPayoutsResult = exPayoutsPanel.getPayouts();
         if (exPayoutsResult.b != null) {
-            throw new Exception(exPayoutsResult.b);
+            return new Fun.Tuple2(null, exPayoutsResult.b);
         }
 
         Long templateKey = fill_Template_Panel.sel_Template == null ? null : fill_Template_Panel.sel_Template.getKey();
 
-        return ExData.make(exLink, exPayoutsResult.a, creator, jTextField_Title_Message.getText(),
-                signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
-                templateKey, fill_Template_Panel.get_Params(),
-                fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
-                jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),
-                hashes_Map, checkBoxMakeHashAndCheckUniqueHashes.isSelected(),
-                files_1, checkBoxMakeHashAndCheckUniqueAttachedFiles.isSelected());
+        byte[] exData;
+        try {
+            exData = ExData.make(exLink, exPayoutsResult.a, creator, jTextField_Title_Message.getText(),
+                    signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
+                    templateKey, fill_Template_Panel.get_Params(),
+                    fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
+                    jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),
+                    hashes_Map, checkBoxMakeHashAndCheckUniqueHashes.isSelected(),
+                    files_1, checkBoxMakeHashAndCheckUniqueAttachedFiles.isSelected());
+        } catch (Exception e) {
+            return new Fun.Tuple2(null, e.getMessage());
+        }
+
+        return new Fun.Tuple2(exData, null);
 
     }
     // End of variables declaration

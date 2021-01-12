@@ -15,6 +15,7 @@ import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -231,49 +232,15 @@ public class IssueDocumentPanel extends IconPanel {
         // READ SENDER
         Account sender = (Account) this.jComboBox_Account_Work.getSelectedItem();
         int feePow = 0;
-        byte[] exDataBytes;
         long key = 0;
-        int parsing = 0;
-        Integer result = 0;
-        try {
-
-            // READ AMOUNT
-            parsing = 1;
-
-            // READ FEE
-            parsing = 2;
-            feePow = Integer.parseInt((String) this.txtFeePow.getSelectedItem());
-
-        } catch (Exception e) {
-            // CHECK WHERE PARSING ERROR HAPPENED
-            switch (parsing) {
-                case 1:
-
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid amount!"),
-                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-                    break;
-
-                case 2:
-
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee!"),
-                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-                    break;
-
-                case 5:
-
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Template not exist!"),
-                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-                    break;
-            }
-            return;
-        }
 
         Account[] recipients = exData_Panel.multipleRecipientsPanel.recipientsTableModel.getRecipients();
         if (recipients != null) {
             for (int i = 0; i < recipients.length; i++) {
                 Account recipient = recipients[i];
                 if (recipient == null) {
-                    JOptionPane.showMessageDialog(new JFrame(), "Recipient[" + (i + 1) + "] is wrong",
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.T("Recipient [%1] is wrong").replace("%1", "" + (i + 1)),
                             Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -288,17 +255,16 @@ public class IssueDocumentPanel extends IconPanel {
             return;
         }
 
-        try {
-            exDataBytes = exData_Panel.makeExData(creator, encryptCheckBox.isSelected());
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            JOptionPane.showMessageDialog(new JFrame(), " ERROR: " + e.getMessage(),
+        Fun.Tuple2<byte[], String> exDataResult = exData_Panel.makeExData(creator, encryptCheckBox.isSelected());
+        if (exDataResult.b != null) {
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T(exDataResult.b),
                     Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (exDataBytes == null) {
-            return;
-        } else if (exDataBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
+
+        byte[] exDataBytes = exDataResult.a;
+
+        if (exDataBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.T("Message size exceeded %1 kB")
                             .replace("%1", "" + (BlockChain.MAX_REC_DATA_BYTES >> 10)),
@@ -306,8 +272,6 @@ public class IssueDocumentPanel extends IconPanel {
 
             return;
         }
-
-        parsing = 5;
 
         // CREATE TX MESSAGE
         byte version = (byte) 3;
