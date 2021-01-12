@@ -2,6 +2,7 @@ package org.erachain.gui.exdata;
 
 
 import com.toedter.calendar.JDateChooser;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.item.ItemCls;
@@ -544,6 +545,10 @@ public class ExPayoutsPanel extends IconPanel {
         jButtonViewResult.setText(Lang.T("Preview Results"));
         gridBagConstraints.gridx = 1;
         jPanel3.add(jButtonViewResult, gridBagConstraints);
+        if (!BlockChain.TEST_MODE) {
+            jButtonCalcCompu.setVisible(false);
+            jButtonViewResult.setVisible(false);
+        }
 
         fieldGBC.gridy = ++gridy;
         jPanelMain.add(jPanel3, fieldGBC);
