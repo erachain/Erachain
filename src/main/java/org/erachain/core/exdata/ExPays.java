@@ -98,6 +98,9 @@ public class ExPays {
     private int height;
     AssetCls asset;
     AssetCls filterAsset;
+    /**
+     * recipient + balance + payout
+     */
     public List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> filteredPayouts;
     private int filteredPayoutsCount;
     private BigDecimal totalPay;
@@ -758,7 +761,7 @@ public class ExPays {
                 errorValue = "Payouts: assetKey == null or ZERO";
                 return Transaction.INVALID_ITEM_KEY;
             } else if (this.balancePos < TransactionAmount.ACTION_SEND || this.balancePos > TransactionAmount.ACTION_SPEND) {
-                errorValue = "Payouts: balancePos";
+                errorValue = "Payouts: balancePos out off range";
                 return Transaction.INVALID_AMOUNT;
             } else if (this.payMethodValue == null || payMethodValue.signum() == 0) {
                 errorValue = "Payouts: payMethodValue == null";
@@ -871,6 +874,13 @@ public class ExPays {
         ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
         TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
 
+        // определим - меняется ли позиция баланса если направление сменим
+        // это нужно чтобы отсекать смену знака у балансов для тек активов у кого меняется позиция от знака
+        int balancePosDirect = Account.balancePosition(assetKey, payMethodValue, false, asset.isSelfManaged());
+        int balancePosBackward = Account.balancePosition(assetKey, payMethodValue, true, asset.isSelfManaged());
+        boolean differentPositions = balancePosDirect != balancePosBackward;
+        int payMethodValueSign = payMethodValue.signum();
+
         byte[] key;
         BigDecimal balance;
         BigDecimal payout;
@@ -901,6 +911,10 @@ public class ExPays {
                 key = iterator.next();
 
                 balance = Account.balanceInPositionAndSide(balancesMap.get(key), filterBalancePos, filterBalanceSide);
+                if (differentPositions && payMethodValueSign != balance.signum()) {
+                    // произошла смена направления для актива у котро меняется Позиция баланса - пропускаем такое
+                    continue;
+                }
 
                 if (hasAssetFilter && filterBalanceMIN != null && balance.compareTo(filterBalanceMIN) < 0
                         || filterBalanceMAX != null && balance.compareTo(filterBalanceMAX) > 0)

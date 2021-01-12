@@ -53,7 +53,7 @@ public class ExPayoutsPanel extends IconPanel {
         jComboBoxFilterBalancePosition.setRenderer(new RenderComboBoxViewBalance());
         jComboBoxFilterSideBalance.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
                 Lang.T("Total Debit"), // Transaction.BALANCE_SIDE_DEBIT = 1
-                Lang.T("Left"), // BALANCE_SIDE_LEFT = 2
+                Lang.T("Left # Остаток"), // BALANCE_SIDE_LEFT = 2
                 Lang.T("Total Credit") // BALANCE_SIDE_CREDIT = 3
         }));
         jComboBoxFilterSideBalance.setSelectedIndex(1);
@@ -82,7 +82,7 @@ public class ExPayoutsPanel extends IconPanel {
         jLabelMethodPaymentDecscription.setHorizontalAlignment(SwingConstants.LEFT);
         jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
                 Lang.T("All"),
-                Lang.T("Only for Persons"),
+                Lang.T("Only certified addresses"),
                 Lang.T("Only for Men"),
                 Lang.T("Only for Women")}));
 
@@ -149,14 +149,14 @@ public class ExPayoutsPanel extends IconPanel {
             case 0:
                 jLabelMethodPaymentDecscription.setText("<html>" +
                         Lang.T("PAY_METHOD_0_D"));
-                jLabelAmount.setText(Lang.T("Total"));
+                jLabelAmount.setText(Lang.T("Total Amount"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
                 return;
             case 1:
                 jLabelMethodPaymentDecscription.setText("<html>" +
                         Lang.T("PAY_METHOD_1_D"));
-                jLabelAmount.setText(Lang.T("Percent"));
+                jLabelAmount.setText(Lang.T("Coefficient"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
                 return;
@@ -331,7 +331,7 @@ public class ExPayoutsPanel extends IconPanel {
         jPanelLayout.rowHeights = new int[]{0};
         jPanelMinMaxAmounts.setLayout(jPanelLayout);
 
-        jLabelPaymentMin.setText(Lang.T("Minimal Volume"));
+        jLabelPaymentMin.setText(Lang.T("Minimal Payout"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = labelGBC.insets;
@@ -345,7 +345,7 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelMinMaxAmounts.add(jTextFieldPaymentMin, gridBagConstraints);
 
-        jLabelPaymentMax.setText(Lang.T("Maximum Volume"));
+        jLabelPaymentMax.setText(Lang.T("Maximum Payout"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
@@ -370,7 +370,7 @@ public class ExPayoutsPanel extends IconPanel {
         //jCheckBoxUseFilterAsset.setSelected(true);
         jLabelFilterAsset.setFont(headFont); // NOI18N
         jLabelFilterAsset.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelFilterAsset.setText(Lang.T("Filter By Asset"));
+        jLabelFilterAsset.setText(Lang.T("Filter By Asset and Balance"));
         headBGC.gridy = ++gridy;
         jPanelMain.add(jLabelFilterAsset, headBGC);
 
@@ -411,7 +411,7 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelFilterBalance.add(jComboBoxFilterSideBalance, gridBagConstraints);
 
-        jLabel8.setText(Lang.T("More then"));
+        jLabel8.setText(Lang.T("More or Equal"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
@@ -428,7 +428,7 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelFilterBalance.add(jTextFieldBQ, gridBagConstraints);
 
-        jLabel9.setText(Lang.T("Less then"));
+        jLabel9.setText(Lang.T("Less or Equal"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 1;
@@ -454,7 +454,7 @@ public class ExPayoutsPanel extends IconPanel {
 
         jLabel20.setFont(headFont); // NOI18N
         jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel20.setText(Lang.T("Filter by Actions"));
+        jLabel20.setText(Lang.T("Filter by Actions and Period"));
         headBGC.gridy = ++gridy;
         jPanelMain.add(jLabel20, headBGC);
 

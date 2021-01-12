@@ -340,14 +340,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return amount != null && amount.signum() != 0;
     }
 
-    public static int getActionType(long assetKey, BigDecimal amount, boolean isBackward, boolean isDirect) {
-        return Account.balancePosition(assetKey, amount, isBackward, isDirect);
-    }
-
     public int getActionType() {
         if (!hasAmount())
             return 0;
-        return getActionType(this.key, this.amount, this.isBackward(), asset.isSelfManaged());
+        return Account.balancePosition(this.key, this.amount, this.isBackward(), asset.isSelfManaged());
     }
 
     // BACKWARD AMOUNT
