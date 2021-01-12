@@ -545,13 +545,11 @@ public class ExPayoutsPanel extends IconPanel {
         jButtonViewResult.setText(Lang.T("Preview Results"));
         gridBagConstraints.gridx = 1;
         jPanel3.add(jButtonViewResult, gridBagConstraints);
-        if (!BlockChain.TEST_MODE) {
-            jButtonCalcCompu.setVisible(false);
-            jButtonViewResult.setVisible(false);
-        }
 
         fieldGBC.gridy = ++gridy;
-        jPanelMain.add(jPanel3, fieldGBC);
+        if (BlockChain.TEST_MODE) {
+            jPanelMain.add(jPanel3, fieldGBC);
+        }
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 1;
