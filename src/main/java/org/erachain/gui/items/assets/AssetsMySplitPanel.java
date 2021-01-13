@@ -88,14 +88,26 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
         });
         menuTable.add(details);
 
-        JMenuItem dividend = new JMenuItem(Lang.T("Pay dividend"));
+        JMenuItem payouts = new JMenuItem(Lang.T("Make Payouts"));
+        payouts.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AssetCls asset = (AssetCls) itemTableSelected;
+                IssueDocumentPanel panel = new IssueDocumentPanel(asset.getOwner(), asset);
+                panel.selectPayouts(null, null);
+                MainPanel.getInstance().insertNewTab(Lang.T("Make Payouts"), panel);
+            }
+        });
+        menuTable.add(payouts);
+
+        JMenuItem dividend = new JMenuItem(Lang.T("Pay Dividend"));
         dividend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
-                MainPanel.getInstance().insertNewTab(Lang.T("Pay dividend"),
-                        new IssueDocumentPanel(asset.getOwner(), asset));
-
+                IssueDocumentPanel panel = new IssueDocumentPanel(asset.getOwner(), null);
+                panel.selectPayouts(null, asset);
+                MainPanel.getInstance().insertNewTab(Lang.T("Pay Dividend"), panel);
             }
         });
         menuTable.add(dividend);

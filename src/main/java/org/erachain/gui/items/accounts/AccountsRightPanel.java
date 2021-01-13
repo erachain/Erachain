@@ -1,6 +1,7 @@
 package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
@@ -8,12 +9,14 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.WalletTableRenderer;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RendererBigDecimals;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -193,7 +196,7 @@ public class AccountsRightPanel extends JPanel {
 
             }
         });
-        viewInfo = new JMenuItem(Lang.T("View Transaction"));
+        viewInfo = new JMenuItem(Lang.T("See Details"));
         viewInfo.addActionListener(new ActionListener() {
 
             @Override
@@ -217,8 +220,19 @@ public class AccountsRightPanel extends JPanel {
 
             }
         });
-
         mainMenu.add(vouch_menu);
+
+        JMenuItem issueNote = new JMenuItem(Lang.T("Append Document"));
+        issueNote.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AccountsTransactionsTableModel.Trans transaction = tableModel.getItem(th.row);
+                MainPanel.getInstance().insertNewTab(
+                        Lang.T("For # для") + " " + transaction.transaction.viewHeightSeq(),
+                        new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, transaction.transaction.viewHeightSeq(), null));
+            }
+        });
+        mainMenu.add(issueNote);
 
         // save jsot transactions
         JMenuItem item_Save = new JMenuItem(Lang.T("Save"));
@@ -230,15 +244,13 @@ public class AccountsRightPanel extends JPanel {
                 // save
                 Library.saveTransactionJSONtoFileSystem(getParent(), transaction.transaction);
             }
-
-
         });
 
         mainMenu.add(item_Save);
 
         mainMenu.addSeparator();
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -257,7 +269,6 @@ public class AccountsRightPanel extends JPanel {
 
         //   jTable1.setComponentPopupMenu(mainMenu);
         TableMenuPopupUtil.installContextMenu(jTable1, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
-
 
         // SELECT
         jTable1.addMouseListener(new MouseAdapter() {

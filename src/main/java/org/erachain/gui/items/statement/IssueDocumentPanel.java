@@ -35,7 +35,7 @@ public class IssueDocumentPanel extends IconPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(IssueDocumentPanel.class);
 
     private IssueDocumentPanel th;
-    private ExDataPanel exData_Panel;
+    public ExDataPanel exData_Panel;
     private MButton jButton_Work_Cancel;
     private MButton jButton_Work_OK;
     private MButton jButton_Work_OK1;
@@ -104,6 +104,10 @@ public class IssueDocumentPanel extends IconPanel {
 
     public IssueDocumentPanel() {
         this(null, null);
+    }
+
+    public void selectTabbedPane(int index) {
+        exData_Panel.jTabbedPane_Type.setSelectedIndex(index);
     }
 
     private void initComponents() {
@@ -339,6 +343,16 @@ public class IssueDocumentPanel extends IconPanel {
         makeDeal();
         this.jButton_Work_OK.setEnabled(true);
         this.jButton_Work_OK1.setEnabled(true);
+    }
+
+    public void selectPayouts(AssetCls actionAsset, AssetCls filterAsset) {
+        selectTabbedPane(1);
+        exData_Panel.exPayoutsPanel.jCheckBoxPayoutsUse.setSelected(true);
+        exData_Panel.exPayoutsPanel.jPanelMain.setVisible(true);
+        if (actionAsset != null)
+            exData_Panel.exPayoutsPanel.jComboBoxPayoutAsset.setSelectedItem(actionAsset);
+        if (filterAsset != null)
+            exData_Panel.exPayoutsPanel.jComboBoxFilterAsset.setSelectedItem(filterAsset);
     }
 
     public void setChecks() {

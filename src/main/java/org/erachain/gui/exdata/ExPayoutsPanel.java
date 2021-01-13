@@ -602,12 +602,12 @@ public class ExPayoutsPanel extends IconPanel {
     private javax.swing.JButton jButtonViewResult;
     private javax.swing.JLabel jLabelFilterAsset;
     private javax.swing.JCheckBox jCheckBoxUseFilterAsset;
-    private javax.swing.JCheckBox jCheckBoxPayoutsUse;
+    public javax.swing.JCheckBox jCheckBoxPayoutsUse;
     private javax.swing.JCheckBox jCheckBoxSelfPay;
     private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxPayoutAction;
     public javax.swing.JComboBox<ItemCls> jComboBoxPayoutAsset;
     private javax.swing.JComboBox<String> jComboBoxMethodPaymentType;
-    private javax.swing.JComboBox<ItemCls> jComboBoxFilterAsset;
+    public javax.swing.JComboBox<ItemCls> jComboBoxFilterAsset;
     private javax.swing.JComboBox<Integer> jComboBoxTXTypeFilter;
     private javax.swing.JComboBox<String> jComboBoxPersonFilter;
     private javax.swing.JComboBox<String> jComboBoxFilterSideBalance;
@@ -636,7 +636,7 @@ public class ExPayoutsPanel extends IconPanel {
     private javax.swing.JPanel jPanelMinMaxAmounts;
     private javax.swing.JPanel jPanelFilterBalance;
     private javax.swing.JPanel jPanelStartEndActions;
-    private javax.swing.JPanel jPanelMain;
+    public javax.swing.JPanel jPanelMain;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;

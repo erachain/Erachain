@@ -222,8 +222,6 @@ public class DealsPopupMenu extends JPopupMenu {
 
         this.add(copyBalance);
 
-        this.addSeparator();
-
         JMenuItem copyPublicKey = new JMenuItem(Lang.T("Copy Public Key"));
         copyPublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -245,17 +243,6 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(copyBankKey);
 
-        JMenuItem issueNote = new JMenuItem(Lang.T("Issue Document"));
-        issueNote.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertNewTab(Lang.T("Issue Document"),
-                        new IssueDocumentPanel(pubKey, asset));
-
-            }
-        });
-        this.add(issueNote);
-
         JMenuItem set_name = new JMenuItem(Lang.T("Edit name"));
         set_name.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -265,10 +252,7 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(set_name);
 
-        this.addSeparator();
-
         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
-
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -282,8 +266,44 @@ public class DealsPopupMenu extends JPopupMenu {
                 }
             }
         });
-
         add(setSeeInBlockexplorer);
+
+        this.addSeparator();
+        this.add(new JLabel("    " + Lang.T("Make") + ":"));
+
+        JMenuItem issueNote = new JMenuItem(Lang.T("Issue Document"));
+        issueNote.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MainPanel.getInstance().insertNewTab(Lang.T("Issue Document"),
+                        new IssueDocumentPanel(pubKey, null));
+
+            }
+        });
+        this.add(issueNote);
+
+        JMenuItem payouts = new JMenuItem(Lang.T("Make Payouts"));
+        payouts.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IssueDocumentPanel panel = new IssueDocumentPanel(pubKey, asset);
+                panel.selectPayouts(null, null);
+                MainPanel.getInstance().insertNewTab(Lang.T("Make Payouts"), panel);
+            }
+        });
+        add(payouts);
+
+        JMenuItem dividend = new JMenuItem(Lang.T("Pay Dividend"));
+        dividend.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IssueDocumentPanel panel = new IssueDocumentPanel(asset.getOwner(), null);
+                panel.selectPayouts(null, asset);
+                MainPanel.getInstance().insertNewTab(Lang.T("Pay Dividend"), panel);
+            }
+        });
+        add(dividend);
+
 
         this.addPopupMenuListener(new PopupMenuListener() {
 

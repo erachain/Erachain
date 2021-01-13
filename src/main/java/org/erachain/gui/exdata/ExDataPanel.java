@@ -1,6 +1,5 @@
 package org.erachain.gui.exdata;
 
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
@@ -78,7 +77,7 @@ public class ExDataPanel extends JPanel {
     private JScrollPane jScrollPane_Message_TextPane;
     private JScrollPane jScrollPane_Message_Public_TextPane;
     private JScrollPane jScrollPane_Params_Template_Public_TextPane;
-    private JTabbedPane jTabbedPane_Type;
+    public JTabbedPane jTabbedPane_Type;
     private JTabbedPane jTabbedPane_Other;
     private MTable jTable_Attached_Files;
     private MTable jTable_Other_Hashes;
@@ -380,15 +379,13 @@ public class ExDataPanel extends JPanel {
 
         jTabbedPane_Type.addTab(Lang.T("Type"), docTypeAppendixPanel);
 
-        if (true || BlockChain.TEST_MODE) {
-            JScrollPane multiPayScrollBar = new JScrollPane();
-            multiPayScrollBar.setViewportView(exPayoutsPanel);
-            jTabbedPane_Type.addTab(Lang.T("Payouts"), multiPayScrollBar);
-        }
+        JScrollPane multiPayScrollBar = new JScrollPane();
+        multiPayScrollBar.setViewportView(exPayoutsPanel);
+        jTabbedPane_Type.addTab(Lang.T("Payouts"), multiPayScrollBar);
 
         jTabbedPane_Type.addTab(Lang.T("Recipients"), multipleRecipientsPanel);
-        jTabbedPane_Type.addTab(Lang.T(authorsPanel.getName()),authorsPanel);
-        jTabbedPane_Type.addTab(Lang.T(sourcesPanel.getName()),sourcesPanel);
+        jTabbedPane_Type.addTab(Lang.T(authorsPanel.getName()), authorsPanel);
+        jTabbedPane_Type.addTab(Lang.T(sourcesPanel.getName()), sourcesPanel);
 
         fill_Template_Panel = new MFillTemplatePanel();
         jTabbedPane_Type.addTab(Lang.T("Template"), fill_Template_Panel);
