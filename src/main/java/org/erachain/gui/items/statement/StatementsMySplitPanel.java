@@ -184,7 +184,7 @@ public class StatementsMySplitPanel extends SplitPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem linkMenu = new JMenuItem(Lang.T("Append / Reply"));
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
         linkMenu.addActionListener(e -> {
             Transaction transaction = my_Statements_Model.getItem(jTableJScrollPanelLeftPanel
                     .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow())).b;

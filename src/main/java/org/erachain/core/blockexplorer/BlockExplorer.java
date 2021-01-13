@@ -3431,19 +3431,19 @@ public class BlockExplorer {
 
                         //out.put("reference", "--");
                         out.put("signature", transaction.viewHeightSeq());
-                        // 645124 - calced seq-No 654868
+                        // 645124 - calculated seq-No 654868
                         try {
                             out.put("timestamp", dcSet.getBlocksHeadsMap().get(transaction.getBlockHeight()).getTimestamp());
                         } catch (Exception e) {
                             out.put("timestamp", transaction.viewHeightSeq());
                         }
 
-                        String message = txCalculated.getMessage();
+                        //String message = txCalculated.getMessage();
                         String typeName = Lang.T(transaction.viewFullTypeName(), langObj);
                         out.put("type", typeName);
 
                         if (typeName.equals("_protocol_")) {
-                            out.put("title", message);
+                            //out.put("title", message);
                         }
 
                         out.put("creator", txCalculated.getRecipient().getPersonAsString());

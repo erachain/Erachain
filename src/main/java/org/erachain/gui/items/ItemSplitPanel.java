@@ -197,7 +197,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
         });
         menuTable.add(vouchMenu);
 
-        JMenuItem linkMenu = new JMenuItem(Lang.T("Append / Reply"));
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
         linkMenu.addActionListener(e -> {
             DCSet db = DCSet.getInstance();
             Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());

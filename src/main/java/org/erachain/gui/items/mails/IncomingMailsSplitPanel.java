@@ -130,7 +130,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         });
         menu.add(signMail_item_Menu);
 
-        JMenuItem linkMenu = new JMenuItem(Lang.T("Append / Reply"));
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
         linkMenu.addActionListener(e -> {
             int row = jTableJScrollPanelLeftPanel.getSelectedRow();
             row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);

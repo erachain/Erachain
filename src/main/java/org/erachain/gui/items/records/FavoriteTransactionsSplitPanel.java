@@ -100,7 +100,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
 
         menu.add(vouchItem);
 
-        JMenuItem linkMenu = new JMenuItem(Lang.T("Append / Reply"));
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
         linkMenu.addActionListener(e -> {
             int row = jTableJScrollPanelLeftPanel.getSelectedRow();
             row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);

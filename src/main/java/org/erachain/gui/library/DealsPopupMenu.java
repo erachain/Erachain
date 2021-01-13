@@ -7,6 +7,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.MailSendPanel;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.models.AccountsTableModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -243,6 +244,17 @@ public class DealsPopupMenu extends JPopupMenu {
             }
         });
         this.add(copyBankKey);
+
+        JMenuItem issueNote = new JMenuItem(Lang.T("Issue Document"));
+        issueNote.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MainPanel.getInstance().insertTab(
+                        new IssueDocumentPanel(pubKey, asset));
+
+            }
+        });
+        this.add(issueNote);
 
         JMenuItem set_name = new JMenuItem(Lang.T("Edit name"));
         set_name.addActionListener(new ActionListener() {

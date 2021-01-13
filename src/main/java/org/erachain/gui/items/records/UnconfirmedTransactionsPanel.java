@@ -230,7 +230,7 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
         });
         menu.add(item_Save);
 
-        JMenuItem linkMenu = new JMenuItem(Lang.T("Append / Reply"));
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
         linkMenu.addActionListener(e -> {
             int row = record_stpit.jTableJScrollPanelLeftPanel.getSelectedRow();
             row = record_stpit.jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);

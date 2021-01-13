@@ -152,7 +152,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         mainMenu.add(item_Save);
 
-        JMenuItem linkMenu = new JMenuItem(Lang.T("Append / Reply"));
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
         linkMenu.addActionListener(e -> {
             int row = jTableJScrollPanelLeftPanel.getSelectedRow();
             row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
