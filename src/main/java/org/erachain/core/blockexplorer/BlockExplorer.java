@@ -3485,7 +3485,7 @@ public class BlockExplorer {
                                             atSideAccount = rSend.getRecipient();
                                         }
                                         // возврат и взять на харенение обратный
-                                        outcome = outcome ^ !rSend.isBackward() ^ (rSend.getActionType() == TransactionAmount.ACTION_HOLD);
+                                        outcome = outcome ^ !rSend.isBackward() ^ (rSend.balancePosition() == TransactionAmount.ACTION_HOLD);
                                     }
                                 }
                             }

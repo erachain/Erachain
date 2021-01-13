@@ -1029,8 +1029,8 @@ public class Account {
                 if (transaction.isInvolved(this)) {
                     if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
 
-                        int actionType = ((TransactionAmount)transaction).getActionType();
-                        if (actionType == TransactionAmount.ACTION_SEND) {
+                        int balancePosition = ((TransactionAmount) transaction).balancePosition();
+                        if (balancePosition == TransactionAmount.ACTION_SEND) {
                             own = own.subtract(transaction.getAmount(this));
                         } else {
                             rent = own.subtract(transaction.getAmount(this));

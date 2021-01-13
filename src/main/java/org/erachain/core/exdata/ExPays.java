@@ -1056,6 +1056,7 @@ public class ExPays {
             Long actionPayKey = signs.a * assetKey;
             boolean isAmountNegate;
             BigDecimal actionPayAmount;
+            boolean backwardAction;
 
             Account recipient;
             for (Fun.Tuple3 item : filteredPayouts) {
@@ -1064,20 +1065,22 @@ public class ExPays {
                 if (recipient == null)
                     break;
                 actionPayAmount = (BigDecimal) item.c;
-                if (!asOrphan && block != null) {
-                    rNote.addCalculated(block, recipient, absKey, actionPayAmount,
-                            // Account.po
-                            "payout by " + rNote.viewHeightSeq());
-                }
 
                 isAmountNegate = actionPayAmount.signum() < 0;
+                backwardAction = backward ^ isAmountNegate;
+
+                if (!asOrphan && block != null) {
+                    rNote.addCalculated(block, recipient, absKey, actionPayAmount,
+                            asset.viewAssetTypeAction(backwardAction, balancePos, asset.getOwner().equals(creator)));
+                }
+
                 // сбросим направлени от фильтра
                 actionPayAmount = actionPayAmount.abs();
                 // зазадим направление от Действия нашего
                 actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
 
                 TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey,
-                        asset, actionPayKey, actionPayAmount, backward ^ isAmountNegate,
+                        asset, actionPayKey, actionPayAmount, backwardAction,
                         incomeReverse);
 
 

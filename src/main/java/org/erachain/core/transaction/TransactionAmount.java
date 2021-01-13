@@ -317,7 +317,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return 0L;
 
         // ПРОЦЕНТЫ в любом случае посчитаем - даже если халявная транзакция
-        if (hasAmount() && getActionType() == ACTION_SEND // только для передачи в собственность!
+        if (hasAmount() && balancePosition() == ACTION_SEND // только для передачи в собственность!
                 && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
                 && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)
                 && !isInvolved(asset.getOwner())) {
@@ -340,7 +340,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return amount != null && amount.signum() != 0;
     }
 
-    public int getActionType() {
+    public int balancePosition() {
         if (!hasAmount())
             return 0;
         return Account.balancePosition(this.key, this.amount, this.isBackward(), asset.isSelfManaged());
@@ -438,7 +438,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return "Mail";
 
         //return viewActionType(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
-        return asset.viewAssetTypeAction(isBackward(), getActionType(), creator == null ? false : asset.getOwner().equals(creator));
+        return asset.viewAssetTypeAction(isBackward(), balancePosition(), creator == null ? false : asset.getOwner().equals(creator));
     }
 
     // PARSE/CONVERT
@@ -492,7 +492,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             transaction.put("asset", this.getAbsKey());
             transaction.put("assetKey", this.getAbsKey());
             transaction.put("amount", this.amount.toPlainString());
-            transaction.put("actionKey", this.getActionType());
+            transaction.put("balancePos", this.balancePosition());
             transaction.put("actionName", viewActionType());
             if (this.isBackward())
                 transaction.put("backward", this.isBackward());
