@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -431,6 +432,18 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
 
     public boolean isFavorite() {
         return Controller.getInstance().isItemFavorite(this);
+    }
+
+    @Override
+    public int hashCode() {
+        return Ints.fromByteArray(reference);
+    }
+
+    @Override
+    public boolean equals(Object item) {
+        if (item instanceof ItemCls)
+            return Arrays.equals(this.reference, ((ItemCls) item).reference);
+        return false;
     }
 
     // forOwnerSign - use only DATA needed for making signature
