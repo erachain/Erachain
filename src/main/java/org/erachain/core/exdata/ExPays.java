@@ -97,6 +97,7 @@ public class ExPays {
     DCSet dcSet;
     private int height;
     AssetCls asset;
+    int payAction;
     AssetCls filterAsset;
     /**
      * recipient + balance + payout
@@ -766,6 +767,9 @@ public class ExPays {
             } else if (this.payMethodValue == null || payMethodValue.signum() == 0) {
                 errorValue = "Payouts: payMethodValue == null";
                 return Transaction.INVALID_AMOUNT;
+            } else if (payMethodValue.signum() < 0) {
+                errorValue = "Payouts: payMethodValue < 0";
+                return Transaction.INVALID_AMOUNT;
             }
         }
 
@@ -876,10 +880,23 @@ public class ExPays {
 
         // определим - меняется ли позиция баланса если направление сменим
         // это нужно чтобы отсекать смену знака у балансов для тек активов у кого меняется позиция от знака
-        int balancePosDirect = Account.balancePosition(assetKey, payMethodValue, false, asset.isSelfManaged());
-        int balancePosBackward = Account.balancePosition(assetKey, payMethodValue, true, asset.isSelfManaged());
-        boolean differentPositions = balancePosDirect != balancePosBackward;
-        int payMethodValueSign = payMethodValue.signum();
+        // настроим данные платежа по знакам Актива ИКоличества, так как величина коэффициента способа всегда положительная
+        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
+        int balancePosDirect = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), false, asset.isSelfManaged());
+        int balancePosBackward = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), true, asset.isSelfManaged());
+        int filterBySigNum;
+        if (balancePosDirect != balancePosBackward) {
+            if (balancePosDirect == TransactionAmount.ACTION_SPEND) {
+                // используем только отрицательные балансы
+                filterBySigNum = -1;
+            } else {
+                // используем только положительные балансы
+                filterBySigNum = 1;
+            }
+        } else {
+            filterBySigNum = 0;
+        }
+
 
         byte[] key;
         BigDecimal balance;
@@ -911,7 +928,7 @@ public class ExPays {
                 key = iterator.next();
 
                 balance = Account.balanceInPositionAndSide(balancesMap.get(key), filterBalancePos, filterBalanceSide);
-                if (differentPositions && payMethodValueSign != balance.signum()) {
+                if (filterBySigNum != 0 && filterBySigNum != balance.signum()) {
                     // произошла смена направления для актива у котро меняется Позиция баланса - пропускаем такое
                     continue;
                 }
@@ -1036,7 +1053,9 @@ public class ExPays {
 
             // возьмем знаки (минус) для создания позиции баланса такой
             Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
-            Long key = signs.a * assetKey;
+            Long actionPayKey = signs.a * assetKey;
+            boolean isAmountNegate;
+            BigDecimal actionPayAmount;
 
             Account recipient;
             for (Fun.Tuple3 item : filteredPayouts) {
@@ -1044,14 +1063,23 @@ public class ExPays {
                 recipient = (Account) item.a;
                 if (recipient == null)
                     break;
-                BigDecimal amount = (BigDecimal) item.c;
+                actionPayAmount = (BigDecimal) item.c;
+                if (!asOrphan && block != null) {
+                    rNote.addCalculated(block, recipient, absKey, actionPayAmount,
+                            // Account.po
+                            "payout by " + rNote.viewHeightSeq());
+                }
+
+                isAmountNegate = actionPayAmount.signum() < 0;
+                // сбросим направлени от фильтра
+                actionPayAmount = actionPayAmount.abs();
+                // зазадим направление от Действия нашего
+                actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
 
                 TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey,
-                        asset, key, signs.b > 0 ? amount : amount.negate(), backward,
+                        asset, actionPayKey, actionPayAmount, backward ^ isAmountNegate,
                         incomeReverse);
 
-                if (!asOrphan && block != null)
-                    rNote.addCalculated(block, recipient, absKey, amount, "payout by " + rNote.viewHeightSeq());
 
             }
         }
