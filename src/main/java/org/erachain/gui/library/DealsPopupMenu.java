@@ -249,7 +249,7 @@ public class DealsPopupMenu extends JPopupMenu {
         issueNote.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(
+                MainPanel.getInstance().insertNewTab(Lang.T("Issue Document"),
                         new IssueDocumentPanel(pubKey, asset));
 
             }

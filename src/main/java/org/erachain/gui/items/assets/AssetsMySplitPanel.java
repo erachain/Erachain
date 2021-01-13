@@ -93,7 +93,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
-                MainPanel.getInstance().insertTab(
+                MainPanel.getInstance().insertNewTab(Lang.T("Pay dividend"),
                         new IssueDocumentPanel(asset.getOwner(), asset));
 
             }
