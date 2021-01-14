@@ -50,6 +50,18 @@ public class Account {
     // public static String EMPTY_PUBLICK_ADDRESS = new PublicKeyAccount(new
     // byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]).getAddress();
 
+    public static final int BALANCE_POS_OWN = 1;
+    public static final int BALANCE_POS_DEBT = 2;
+    public static final int BALANCE_POS_HOLD = 3;
+    public static final int BALANCE_POS_SPEND = 4;
+    public static final int BALANCE_POS_PLEDGE = 5;
+    public static final int BALANCE_POS_6 = 6;
+
+    public static final int BALANCE_SIDE_DEBIT = 1;
+    public static final int BALANCE_SIDE_LEFT = 2;
+    public static final int BALANCE_SIDE_CREDIT = 3;
+    public static final int BALANCE_SIDE_FORGED = 4;
+
     protected String address;
     protected byte[] bytes;
     protected byte[] shortBytes;
@@ -130,15 +142,15 @@ public class Account {
 
     public static String balancePositionName(int position) {
         switch (position) {
-            case TransactionAmount.ACTION_SEND:
+            case BALANCE_POS_OWN:
                 return "I Own";
-            case TransactionAmount.ACTION_DEBT:
+            case BALANCE_POS_DEBT:
                 return "I Debt";
-            case TransactionAmount.ACTION_HOLD:
+            case BALANCE_POS_HOLD:
                 return "I Hold";
-            case TransactionAmount.ACTION_SPEND:
+            case BALANCE_POS_SPEND:
                 return "I Spend";
-            case TransactionAmount.ACTION_PLEDGE:
+            case BALANCE_POS_PLEDGE:
                 return "I Pledge";
         }
 
@@ -148,14 +160,15 @@ public class Account {
 
     public static String balanceCOMPUPositionName(int position) {
         switch (position) {
-            case TransactionAmount.ACTION_SEND:
+            case BALANCE_POS_OWN:
                 return "I Own";
-            case TransactionAmount.ACTION_DEBT:
+            case BALANCE_POS_DEBT:
+                _DEBT:
                 return "I Debt";
-            case TransactionAmount.ACTION_HOLD:
+            case BALANCE_POS_HOLD:
                 return "I Hold";
-            case TransactionAmount.ACTION_SPEND:
-            case TransactionAmount.ACTION_PLEDGE:
+            case BALANCE_POS_SPEND:
+            case BALANCE_POS_PLEDGE:
                 return "Statistics";
         }
 
@@ -165,13 +178,13 @@ public class Account {
 
     public static String balanceSideName(int side) {
         switch (side) {
-            case TransactionAmount.BALANCE_SIDE_DEBIT:
+            case BALANCE_SIDE_DEBIT:
                 return "Total Debit";
-            case TransactionAmount.BALANCE_SIDE_LEFT:
+            case BALANCE_SIDE_LEFT:
                 return "Left # остаток";
-            case TransactionAmount.BALANCE_SIDE_CREDIT:
+            case BALANCE_SIDE_CREDIT:
                 return "Total Credit";
-            case TransactionAmount.BALANCE_SIDE_FORGED:
+            case BALANCE_SIDE_FORGED:
                 return "Forged";
         }
 
@@ -181,13 +194,13 @@ public class Account {
 
     public static String balanceCOMPUSideName(int side) {
         switch (side) {
-            case TransactionAmount.BALANCE_SIDE_DEBIT:
+            case BALANCE_SIDE_DEBIT:
                 return "Bonus";
-            case TransactionAmount.BALANCE_SIDE_LEFT:
+            case BALANCE_SIDE_LEFT:
                 return "Spend # Потрачено";
-            case TransactionAmount.BALANCE_SIDE_CREDIT:
+            case BALANCE_SIDE_CREDIT:
                 return "Bonus-Spend";
-            case TransactionAmount.BALANCE_SIDE_FORGED:
+            case BALANCE_SIDE_FORGED:
                 return "Forged";
         }
 
@@ -213,18 +226,18 @@ public class Account {
         if (key > 0) {
             if (amount_sign > 0) {
                 // OWN SEND or PLEDGE
-                type = !isDirect && isBackward ? TransactionAmount.ACTION_PLEDGE : TransactionAmount.ACTION_SEND;
+                type = !isDirect && isBackward ? BALANCE_POS_PLEDGE : BALANCE_POS_OWN;
             } else {
                 // HOLD in STOCK or PLEDGE
-                type = isDirect || isBackward ? TransactionAmount.ACTION_HOLD : TransactionAmount.ACTION_RESERCED_6;
+                type = isDirect || isBackward ? BALANCE_POS_HOLD : BALANCE_POS_6;
             }
         } else {
             if (amount_sign > 0) {
                 // give CREDIT or BORROW CREDIT
-                type = TransactionAmount.ACTION_DEBT;
+                type = BALANCE_POS_DEBT;
             } else {
                 // PRODUCE or SPEND
-                type = TransactionAmount.ACTION_SPEND;
+                type = BALANCE_POS_SPEND;
             }
         }
 
@@ -241,15 +254,15 @@ public class Account {
     public static Tuple2<Integer, Integer> getSignsForBalancePos(int balancePos) {
 
         switch (balancePos) {
-            case TransactionAmount.ACTION_SEND:
-            case TransactionAmount.ACTION_PLEDGE:
+            case BALANCE_POS_OWN:
+            case BALANCE_POS_PLEDGE:
                 return new Tuple2(1, 1);
-            case TransactionAmount.ACTION_HOLD:
-            case TransactionAmount.ACTION_RESERCED_6:
+            case BALANCE_POS_HOLD:
+            case BALANCE_POS_6:
                 return new Tuple2(1, -1);
-            case TransactionAmount.ACTION_DEBT:
+            case BALANCE_POS_DEBT:
                 return new Tuple2(-1, 1);
-            case TransactionAmount.ACTION_SPEND:
+            case BALANCE_POS_SPEND:
                 return new Tuple2(-1, -1);
         }
 
@@ -558,18 +571,18 @@ public class Account {
 
     public Tuple2<BigDecimal, BigDecimal> getBalanceInPosition(DCSet dcSet, long key, int position) {
         switch (position) {
-            case TransactionAmount.ACTION_SEND:
+            case BALANCE_POS_OWN:
                 return this.getBalance(dcSet, key).a;
-            case TransactionAmount.ACTION_DEBT:
+            case BALANCE_POS_DEBT:
             case TransactionAmount.ACTION_REPAY_DEBT:
                 return this.getBalance(dcSet, key).b;
-            case TransactionAmount.ACTION_HOLD:
+            case BALANCE_POS_HOLD:
                 return this.getBalance(dcSet, key).c;
-            case TransactionAmount.ACTION_SPEND:
+            case BALANCE_POS_SPEND:
                 return this.getBalance(dcSet, key).d;
-            case TransactionAmount.ACTION_PLEDGE:
+            case BALANCE_POS_PLEDGE:
                 return this.getBalance(dcSet, key).e;
-            case TransactionAmount.ACTION_RESERCED_6:
+            case BALANCE_POS_6:
                 return new Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO);
         }
 
@@ -579,49 +592,49 @@ public class Account {
     public static BigDecimal balanceInPositionAndSide(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance,
                                                       int position, int side) {
         switch (position) {
-            case TransactionAmount.ACTION_SEND:
+            case BALANCE_POS_OWN:
                 switch (side) {
-                    case TransactionAmount.BALANCE_SIDE_CREDIT:
+                    case BALANCE_SIDE_CREDIT:
                         return balance.a.a;
-                    case TransactionAmount.BALANCE_SIDE_LEFT:
+                    case BALANCE_SIDE_LEFT:
                         return balance.a.b;
-                    case TransactionAmount.BALANCE_SIDE_DEBIT:
+                    case BALANCE_SIDE_DEBIT:
                         return balance.a.a.subtract(balance.a.b);
                 }
-            case TransactionAmount.ACTION_DEBT:
+            case BALANCE_POS_DEBT:
                 switch (side) {
-                    case TransactionAmount.BALANCE_SIDE_CREDIT:
+                    case BALANCE_SIDE_CREDIT:
                         return balance.b.a;
-                    case TransactionAmount.BALANCE_SIDE_LEFT:
+                    case BALANCE_SIDE_LEFT:
                         return balance.b.b;
-                    case TransactionAmount.BALANCE_SIDE_DEBIT:
+                    case BALANCE_SIDE_DEBIT:
                         return balance.b.a.subtract(balance.b.b);
                 }
-            case TransactionAmount.ACTION_HOLD:
+            case BALANCE_POS_HOLD:
                 switch (side) {
-                    case TransactionAmount.BALANCE_SIDE_CREDIT:
+                    case BALANCE_SIDE_CREDIT:
                         return balance.c.a;
-                    case TransactionAmount.BALANCE_SIDE_LEFT:
+                    case BALANCE_SIDE_LEFT:
                         return balance.c.b;
-                    case TransactionAmount.BALANCE_SIDE_DEBIT:
+                    case BALANCE_SIDE_DEBIT:
                         return balance.c.a.subtract(balance.c.b);
                 }
-            case TransactionAmount.ACTION_SPEND:
+            case BALANCE_POS_SPEND:
                 switch (side) {
-                    case TransactionAmount.BALANCE_SIDE_CREDIT:
+                    case BALANCE_SIDE_CREDIT:
                         return balance.d.a;
-                    case TransactionAmount.BALANCE_SIDE_LEFT:
+                    case BALANCE_SIDE_LEFT:
                         return balance.d.b;
-                    case TransactionAmount.BALANCE_SIDE_DEBIT:
+                    case BALANCE_SIDE_DEBIT:
                         return balance.d.a.subtract(balance.d.b);
                 }
-            case TransactionAmount.ACTION_PLEDGE:
+            case BALANCE_POS_PLEDGE:
                 switch (side) {
-                    case TransactionAmount.BALANCE_SIDE_CREDIT:
+                    case BALANCE_SIDE_CREDIT:
                         return balance.e.a;
-                    case TransactionAmount.BALANCE_SIDE_LEFT:
+                    case BALANCE_SIDE_LEFT:
                         return balance.e.b;
-                    case TransactionAmount.BALANCE_SIDE_DEBIT:
+                    case BALANCE_SIDE_DEBIT:
                         return balance.e.a.subtract(balance.e.b);
                 }
         }
@@ -632,15 +645,15 @@ public class Account {
     static public Tuple2<BigDecimal, BigDecimal> getBalanceInPosition(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance,
                                                                       int position) {
         switch (position) {
-            case TransactionAmount.ACTION_SEND:
+            case BALANCE_POS_OWN:
                 return balance.a;
-            case TransactionAmount.ACTION_DEBT:
+            case BALANCE_POS_DEBT:
                 return balance.b;
-            case TransactionAmount.ACTION_HOLD:
+            case BALANCE_POS_HOLD:
                 return balance.c;
-            case TransactionAmount.ACTION_SPEND:
+            case BALANCE_POS_SPEND:
                 return balance.d;
-            case TransactionAmount.ACTION_PLEDGE:
+            case BALANCE_POS_PLEDGE:
                 return balance.e;
         }
 
@@ -813,18 +826,18 @@ public class Account {
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
                 .getAssetBalanceMap().get(getShortAddressBytes(), key);
 
-        if (actionType == TransactionAmount.ACTION_SEND) {
-            if (BlockChain.ERA_COMPU_ALL_UP ) {
+        if (actionType == BALANCE_POS_OWN) {
+            if (BlockChain.ERA_COMPU_ALL_UP) {
                 return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key, this.getShortAddressBytes())));
             }
 
             return balance.a;
 
-        } else if (actionType == TransactionAmount.ACTION_DEBT)
+        } else if (actionType == BALANCE_POS_DEBT)
             return balance.b;
-        else if (actionType == TransactionAmount.ACTION_HOLD)
+        else if (actionType == BALANCE_POS_HOLD)
             return balance.c;
-        else if (actionType == TransactionAmount.ACTION_SPEND)
+        else if (actionType == BALANCE_POS_SPEND)
             return balance.d;
         else
             return balance.e;
@@ -835,7 +848,7 @@ public class Account {
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 balance = dcSet.getAssetBalanceMap().get(getShortAddressBytes(), Transaction.FEE_KEY);
 
-        if (side == Transaction.BALANCE_SIDE_DEBIT) {
+        if (side == BALANCE_SIDE_DEBIT) {
             // учтем Всего бонусы
             // это Баланс 4-й сторона 1
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -843,7 +856,7 @@ public class Account {
                     substract ? new Tuple2<BigDecimal, BigDecimal>(balance.d.a.subtract(amount), balance.d.b)
                             : new Tuple2<BigDecimal, BigDecimal>(balance.d.a.add(amount), balance.d.b),
                     balance.e);
-        } else if (side == Transaction.BALANCE_SIDE_CREDIT) {
+        } else if (side == BALANCE_SIDE_CREDIT) {
             // учтем что Всего потратили
             // это Баланс 4-й сторона 1
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -851,7 +864,7 @@ public class Account {
                     !substract ? new Tuple2<BigDecimal, BigDecimal>(balance.d.a, balance.d.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(balance.d.a, balance.d.b.add(amount)),
                     balance.e);
-        } else if (side == Transaction.BALANCE_SIDE_FORGED) {
+        } else if (side == BALANCE_SIDE_FORGED) {
             // учтем что Всего нафоржили
             // это Баланс 5-й
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -871,13 +884,13 @@ public class Account {
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 balance = dcSet.getAssetBalanceMap().get(getShortAddressBytes(), Transaction.FEE_KEY);
 
-        if (side == Transaction.BALANCE_SIDE_DEBIT) {
+        if (side == BALANCE_SIDE_DEBIT) {
             // БОНУСЫ всего полученные
             return balance.d.a;
-        } else if (side == Transaction.BALANCE_SIDE_CREDIT) {
+        } else if (side == BALANCE_SIDE_CREDIT) {
             // все потрачено на комиссии
             return balance.d.b;
-        } else if (side == Transaction.BALANCE_SIDE_FORGED) {
+        } else if (side == BALANCE_SIDE_FORGED) {
             // всего нафоржено
             return balance.e.b;
         }
@@ -894,7 +907,7 @@ public class Account {
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean subtract, boolean isBackward, long key,
                                                                     BigDecimal amount_in, boolean isDirect, boolean isNotSender, boolean notUpdateIncomed) {
 
-        int actionType = balancePosition(key, amount_in, isBackward, isDirect);
+        int balancePosition = balancePosition(key, amount_in, isBackward, isDirect);
 
         ItemAssetBalanceMap map = db.getAssetBalanceMap();
 
@@ -910,7 +923,7 @@ public class Account {
         /*
         if (false
                 && this.equals("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs") && absKey == 1 && !db.isFork()
-                && (actionType == TransactionAmount.ACTION_SEND || actionType == TransactionAmount.ACTION_DEBT)
+                && (balancePosition == BALANCE_POS_OWN || balancePosition == BALANCE_POS_DEBT)
                 && true) {
             ;
         }
@@ -921,7 +934,7 @@ public class Account {
 
         boolean updateIncomed = !notUpdateIncomed;
 
-        if (actionType == TransactionAmount.ACTION_SEND) {
+        if (balancePosition == BALANCE_POS_OWN) {
             // OWN + property
             //if (isBackward) amount = amount.negate();
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -930,7 +943,7 @@ public class Account {
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.a.a.add(amount) : balance.a.a,
                             balance.a.b.add(amount)),
                     balance.b, balance.c, balance.d, balance.e);
-        } else if (actionType == TransactionAmount.ACTION_DEBT) {
+        } else if (balancePosition == BALANCE_POS_DEBT) {
             // DEBT + CREDIT
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a,
@@ -939,7 +952,7 @@ public class Account {
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.b.a.add(amount) : balance.b.a,
                             balance.b.b.add(amount)),
                     balance.c, balance.d, balance.e);
-        } else if (actionType == TransactionAmount.ACTION_HOLD) {
+        } else if (balancePosition == BALANCE_POS_HOLD) {
             // HOLD + STOCK 🕐 🕝
 
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -949,7 +962,7 @@ public class Account {
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.c.a.add(amount) : balance.c.a,
                             balance.c.b.add(amount)),
                     balance.d, balance.e);
-        } else if (actionType == TransactionAmount.ACTION_SPEND) {
+        } else if (balancePosition == BALANCE_POS_SPEND) {
 
             Tuple2<BigDecimal, BigDecimal> ownBalance = balance.a;
 
@@ -1030,7 +1043,7 @@ public class Account {
                     if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
 
                         int balancePosition = ((TransactionAmount) transaction).balancePosition();
-                        if (balancePosition == TransactionAmount.ACTION_SEND) {
+                        if (balancePosition == BALANCE_POS_OWN) {
                             own = own.subtract(transaction.getAmount(this));
                         } else {
                             rent = own.subtract(transaction.getAmount(this));

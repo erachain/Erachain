@@ -390,7 +390,7 @@ public class BlockExplorer {
                     }
                     if (param.equals("person")) {
                         if (!assetKey) {
-                            int side = Transaction.BALANCE_SIDE_LEFT;
+                            int side = Account.BALANCE_SIDE_LEFT;
                             try {
                                 side = new Integer(info.getQueryParameters().getFirst("side"));
                             } catch (Exception e) {
@@ -1460,9 +1460,9 @@ public class BlockExplorer {
         output.put("label_Balance_Pos", Lang.T(Account.balancePositionName(position), langObj));
         output.put("label_Balance_Side", Lang.T(Account.balanceSideName(side), langObj));
 
-        output.put("Label_TotalDebit", Lang.T(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_DEBIT), langObj));
-        output.put("Label_Left", Lang.T(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_LEFT), langObj));
-        output.put("Label_TotalCredit", Lang.T(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_CREDIT), langObj));
+        output.put("Label_TotalDebit", Lang.T(Account.balanceSideName(Account.BALANCE_SIDE_DEBIT), langObj));
+        output.put("Label_Left", Lang.T(Account.balanceSideName(Account.BALANCE_SIDE_LEFT), langObj));
+        output.put("Label_TotalCredit", Lang.T(Account.balanceSideName(Account.BALANCE_SIDE_CREDIT), langObj));
 
         output.put("Side_Help", Lang.T("Side_Help", langObj));
 
@@ -1475,17 +1475,17 @@ public class BlockExplorer {
                 output.put("label_Balance_Pos", Lang.T(Account.balanceCOMPUPositionName(position), langObj));
                 output.put("label_Balance_Side", Lang.T(Account.balanceCOMPUSideName(side), langObj));
 
-                output.put("Label_TotalDebit", Lang.T(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_DEBIT), langObj));
-                output.put("Label_Left", Lang.T(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_LEFT), langObj));
-                output.put("Label_TotalCredit", Lang.T(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_CREDIT), langObj));
-                output.put("Label_TotalForged", Lang.T(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_FORGED), langObj));
+                output.put("Label_TotalDebit", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_DEBIT), langObj));
+                output.put("Label_Left", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_LEFT), langObj));
+                output.put("Label_TotalCredit", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_CREDIT), langObj));
+                output.put("Label_TotalForged", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_FORGED), langObj));
 
                 output.put("Side_Help", Lang.T("Side_Help_COMPU_BONUS", langObj));
 
-                if (side == TransactionAmount.BALANCE_SIDE_FORGED) {
+                if (side == Account.BALANCE_SIDE_FORGED) {
                     // Это запрос на баланса Нафоржили - он в 5-й позиции на стороне 2
                     position = TransactionAmount.ACTION_PLEDGE;
-                    side = TransactionAmount.BALANCE_SIDE_LEFT;
+                    side = Account.BALANCE_SIDE_LEFT;
                 }
 
             }
@@ -2101,7 +2101,7 @@ public class BlockExplorer {
                     bal.put("asset_name", asset.viewName());
 
 
-                    if (BlockChain.ERA_COMPU_ALL_UP && side == Transaction.BALANCE_SIDE_LEFT) {
+                    if (BlockChain.ERA_COMPU_ALL_UP && side == Account.BALANCE_SIDE_LEFT) {
                         bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side)
                                 .add(account.addDEVAmount(assetKey)));
                     } else {
@@ -2819,7 +2819,7 @@ public class BlockExplorer {
         output.put("label_account", Lang.T("Account", langObj));
 
         // balance assets from
-        int side = Transaction.BALANCE_SIDE_LEFT;
+        int side = Account.BALANCE_SIDE_LEFT;
         try {
             side = new Integer(info.getQueryParameters().getFirst("side"));
         } catch (Exception e) {

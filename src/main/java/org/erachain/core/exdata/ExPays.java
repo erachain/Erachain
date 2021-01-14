@@ -780,7 +780,7 @@ public class ExPays {
             } else if (this.filterBalancePos < TransactionAmount.ACTION_SEND || this.filterBalancePos > TransactionAmount.ACTION_SPEND) {
                 errorValue = "Payouts: filterBalancePos";
                 return Transaction.INVALID_BACKWARD_ACTION;
-            } else if (this.filterBalanceSide < TransactionAmount.BALANCE_SIDE_DEBIT || this.filterBalanceSide > TransactionAmount.BALANCE_SIDE_CREDIT) {
+            } else if (this.filterBalanceSide < Account.BALANCE_SIDE_DEBIT || this.filterBalanceSide > Account.BALANCE_SIDE_CREDIT) {
                 errorValue = "Payouts: filterBalanceSide";
                 return Transaction.INVALID_BACKWARD_ACTION;
             }

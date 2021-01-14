@@ -2088,7 +2088,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     forgerEarn, false, false, true);
 
             // учтем что нафоржили
-            this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, forgerEarn, Transaction.BALANCE_SIDE_FORGED);
+            this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, forgerEarn, Account.BALANCE_SIDE_FORGED);
 
             // MAKE CALCULATED TRANSACTIONS
             if (this.txCalculated != null) {
@@ -2348,12 +2348,12 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 holder.changeBalance(dcSet, asOrphan, false, BlockChain.FEE_KEY, balanceHold, false, false, false);
                 // учтем что получили бонусы
-                holder.changeCOMPUBonusBalances(dcSet, asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
+                holder.changeCOMPUBonusBalances(dcSet, asOrphan, balanceHold, Account.BALANCE_SIDE_DEBIT);
 
                 // у эмитента снимем
                 BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, !asOrphan, false, BlockChain.FEE_KEY, balanceHold,
                         false, false, false);
-                BlockChain.FEE_ASSET_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
+                BlockChain.FEE_ASSET_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Account.BALANCE_SIDE_DEBIT);
 
                 if (this.txCalculated != null) {
                     txCalculated.add(new RCalculated(holder, BlockChain.FEE_KEY, balanceHold,
