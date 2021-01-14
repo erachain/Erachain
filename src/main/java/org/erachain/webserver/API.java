@@ -152,7 +152,7 @@ public class API {
 
         help.put("GET Broadcast", "/broadcast/{raw(Base58)}?lang=en|ru - lang for localize error message");
         help.put("POST Broadcast", "/broadcast?lang=en|ru raw(Base58) - lang for localize error message");
-        help.put("POST Broadcastjson", "/broadcastjson JSON - JSOM: {raw:raw(Base58), lang:en|ru} - lang for localize error message");
+        help.put("POST Broadcastjson", "/broadcastjson JSON - JSON: {raw:raw(Base58), lang:en|ru} - lang for localize error message");
 
         help.put("POST Broadcasttelegram", "/broadcasttelegram JSON {'raw': raw(Base58)}");
         help.put("GET Broadcasttelegram", "/broadcasttelegram/{raw(Base58)}");
