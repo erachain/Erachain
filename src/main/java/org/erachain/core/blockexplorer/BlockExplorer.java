@@ -3425,11 +3425,13 @@ public class BlockExplorer {
 
                     out.put("seqNo", transaction.getSeqNo());
 
-                    out.put("title", transaction.getTitle());
                     //out.put("confirmations", transaction.getConfirmations(height));
+                    out.put("title", transaction.getTitle(langObj));
 
                     if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
+
                         RCalculated txCalculated = (RCalculated) transaction;
+
                         outcome = txCalculated.getAmount().signum() < 0;
 
                         //out.put("reference", "--");
@@ -3459,6 +3461,7 @@ public class BlockExplorer {
                         out.put("fee", "--");
 
                     } else {
+
                         out.put("signature", Base58.encode(transaction.getSignature()));
                         out.put("timestamp", transaction.getTimestamp());
                         String typeName = Lang.T(transaction.viewFullTypeName(), langObj);

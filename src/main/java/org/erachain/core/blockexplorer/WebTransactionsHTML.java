@@ -659,7 +659,7 @@ public class WebTransactionsHTML {
                 + tr.getRecipient().getAddress() + get_Lang() + "><b>" + tr.getRecipient().getPersonAsString()
                 + "</b></a><br>";
 
-        out += "<h4>" + tr.getTitle() + "</h4>";
+        out += "<h4>" + tr.getTitle(langObj) + "</h4>";
 
         if (tr.getAmount() != null) {
             out += "<br>" + Lang.T("Amount", langObj) + ": <b>"

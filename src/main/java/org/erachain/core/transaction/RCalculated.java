@@ -7,6 +7,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -103,6 +104,11 @@ public class RCalculated extends TransactionAmount {
     @Override
     public String getTitle() {
         return this.message + " (@" + Transaction.viewDBRef(reference) + ")";
+    }
+
+    @Override
+    public String getTitle(JSONObject langObj) {
+        return Lang.T(this.message, langObj) + " (@" + Transaction.viewDBRef(reference) + ")";
     }
 
     public String getMessage() {

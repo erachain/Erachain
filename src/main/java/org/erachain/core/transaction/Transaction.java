@@ -886,6 +886,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         return "";
     }
 
+    public String getTitle(JSONObject langObj) {
+        return getTitle();
+    }
+
     public ExLink getExLink() {
         return exLink;
     }
