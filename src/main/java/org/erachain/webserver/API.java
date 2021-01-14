@@ -18,6 +18,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.*;
 import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.lang.Lang;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
@@ -149,8 +150,8 @@ public class API {
         help.put("GET info by node", " GET api/info");
         help.put("GET benchmark info by node", " GET api/bench");
 
-        help.put("POST Broadcast", "/broadcast JSON {raw=raw(BASE58)}");
-        help.put("GET Broadcast", "/broadcast/{raw(BASE58)}");
+        help.put("POST Broadcast", "/broadcast?lang=en|ru JSON {raw=raw(BASE58)}");
+        help.put("GET Broadcast", "/broadcast/{raw(BASE58)}?lang=en|ru");
 
         help.put("POST Broadcasttelegram", "/broadcasttelegram JSON {'raw': raw(BASE58)}");
         help.put("GET Broadcasttelegram", "/broadcasttelegram/ {raw(BASE58)}");
@@ -710,27 +711,28 @@ public class API {
     @GET
     @Path("broadcast/{raw}")
     // http://127.0.0.1:9047/api/broadcast/DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
-    public Response broadcastRaw(@PathParam("raw") String raw) {
+    public Response broadcastRaw(@PathParam("raw") String raw, @QueryParam("lang") String lang) {
 
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastFromRaw_1(raw).toJSONString())
+                .entity(broadcastFromRaw_1(raw, lang).toJSONString())
                 .build();
     }
 
     @POST
     @Path("broadcastjson")
     public Response broadcastFromRawPost(@Context HttpServletRequest request,
-                                         MultivaluedMap<String, String> form) {
+                                         MultivaluedMap<String, String> form,
+                                         @QueryParam("lang") String lang) {
 
         String raw = form.getFirst("raw");
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastFromRaw_1(raw).toJSONString())
+                .entity(broadcastFromRaw_1(raw, lang).toJSONString())
                 .build();
 
     }
@@ -738,18 +740,19 @@ public class API {
     @POST
     @Path("broadcast")
     public Response broadcastFromRawPost(@Context HttpServletRequest request,
+                                         @QueryParam("lang") String lang,
                                          String raw) {
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastFromRaw_1(raw).toJSONString())
+                .entity(broadcastFromRaw_1(raw, lang).toJSONString())
                 .build();
 
     }
 
     // http://127.0.0.1:9047/api/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
-    public JSONObject broadcastFromRaw_1(String rawDataBase58) {
+    public JSONObject broadcastFromRaw_1(String rawDataBase58, String lang) {
         int step = 1;
         JSONObject out = new JSONObject();
         try {
@@ -764,10 +767,15 @@ public class API {
                 out.put("status", "ok");
                 return out;
             } else {
+                JSONObject langObj = null;
+                if (lang != null) {
+                    langObj = Lang.getInstance().getLangJson(lang.toLowerCase());
+                }
+
                 out.put("error", result.getB());
-                out.put("message", OnDealClick.resultMess(result.getB()));
+                out.put("message", langObj == null ? OnDealClick.resultMess(result.getB()) : Lang.T(OnDealClick.resultMess(result.getB()), langObj));
                 if (result.getA() != null && result.getA().errorValue != null) {
-                    out.put("value", result.getA().errorValue);
+                    out.put("value", langObj == null ? result.getA().errorValue : Lang.T(result.getA().errorValue, langObj));
                 }
                 return out;
             }
