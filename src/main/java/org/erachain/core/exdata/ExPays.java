@@ -897,6 +897,11 @@ public class ExPays {
             filterBySigNum = 0;
         }
 
+        boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
+        // сменим знак балансов для отрицательных
+        if (reversedBalancesInPosition) {
+            filterBySigNum *= -1;
+        }
 
         byte[] key;
         BigDecimal balance;
@@ -1049,13 +1054,14 @@ public class ExPays {
         if (hasAssetFilter()) {
             boolean isDirect = asset.isDirectBalances();
             long absKey = assetKey;
-            boolean incomeReverse = balancePos == TransactionAmount.ACTION_HOLD;
 
             // возьмем знаки (минус) для создания позиции баланса такой
             Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
             Long actionPayKey = signs.a * assetKey;
             boolean isAmountNegate;
             BigDecimal actionPayAmount;
+            boolean incomeReverse = balancePos == Account.BALANCE_POS_HOLD;
+            boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
             boolean backwardAction;
 
             Account recipient;
@@ -1067,7 +1073,7 @@ public class ExPays {
                 actionPayAmount = (BigDecimal) item.c;
 
                 isAmountNegate = actionPayAmount.signum() < 0;
-                backwardAction = backward ^ isAmountNegate;
+                backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
 
                 if (!asOrphan && block != null) {
                     rNote.addCalculated(block, recipient, absKey, actionPayAmount,

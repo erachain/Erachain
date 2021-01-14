@@ -794,6 +794,36 @@ public abstract class AssetCls extends ItemCls {
         return isReverseSend(this.assetType);
     }
 
+
+    /**
+     * в обычном сотоянии тут отрицательные балансы или нет?
+     *
+     * @param balPos
+     * @return
+     */
+    public static boolean isReverseBalancePos(int assetType, int balPos) {
+
+        switch (balPos) {
+            case Account.BALANCE_POS_OWN:
+                return assetType == AS_SELF_MANAGED_ACCOUNTING
+                        || assetType == AS_SELF_ACCOUNTING_MUTUAL_AID_FUND
+                        || assetType == AS_SELF_ACCOUNTING_CASH_FUND;
+            case Account.BALANCE_POS_SPEND:
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * в обычном сотоянии тут отрицательные балансы или нет?
+     *
+     * @param balPos
+     * @return
+     */
+    public boolean isReverseBalancePos(int balPos) {
+        return isReverseBalancePos(this.assetType, balPos);
+    }
+
     public BigDecimal defaultAmountAssetType() {
         switch (assetType) {
             case AS_BANK_GUARANTEE:
