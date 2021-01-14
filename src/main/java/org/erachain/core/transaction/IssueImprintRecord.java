@@ -172,12 +172,6 @@ public class IssueImprintRecord extends IssueItemRecord {
         }
     }
 
-    @Override
-    public boolean hasPublicText() {
-        return false;
-    }
-
-
     //PARSE CONVERT
 
     //VALIDATE

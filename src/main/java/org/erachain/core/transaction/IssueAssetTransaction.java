@@ -135,15 +135,11 @@ public class IssueAssetTransaction extends IssueItemRecord {
     @Override
     public boolean hasPublicText() {
 
-        if (BlockChain.ANONIM_SERT_USE)
-            return false;
-
         if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
             return false;
         }
 
-        String description = item.getDescription();
-        return description != null && description.length() < 100;
+        return super.hasPublicText();
 
     }
 

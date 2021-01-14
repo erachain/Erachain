@@ -136,7 +136,8 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     @Override
     public boolean hasPublicText() {
-        return true;
+        String description = item.getDescription();
+        return description != null && description.length() < 100;
     }
 
     //@Override
