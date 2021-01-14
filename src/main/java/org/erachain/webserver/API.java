@@ -150,11 +150,12 @@ public class API {
         help.put("GET info by node", " GET api/info");
         help.put("GET benchmark info by node", " GET api/bench");
 
-        help.put("POST Broadcast", "/broadcast?lang=en|ru JSON {raw=raw(BASE58)}");
-        help.put("GET Broadcast", "/broadcast/{raw(BASE58)}?lang=en|ru");
+        help.put("GET Broadcast", "/broadcast/{raw(Base58)}?lang=en|ru - lang for localize error message");
+        help.put("POST Broadcast", "/broadcast?lang=en|ru raw(Base58) - lang for localize error message");
+        help.put("POST Broadcastjson", "/broadcastjson JSON - JSOM: {raw:raw(Base58), lang:en|ru} - lang for localize error message");
 
-        help.put("POST Broadcasttelegram", "/broadcasttelegram JSON {'raw': raw(BASE58)}");
-        help.put("GET Broadcasttelegram", "/broadcasttelegram/ {raw(BASE58)}");
+        help.put("POST Broadcasttelegram", "/broadcasttelegram JSON {'raw': raw(Base58)}");
+        help.put("GET Broadcasttelegram", "/broadcasttelegram/{raw(Base58)}");
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -723,11 +724,11 @@ public class API {
 
     @POST
     @Path("broadcastjson")
-    public Response broadcastFromRawPost(@Context HttpServletRequest request,
-                                         MultivaluedMap<String, String> form,
-                                         @QueryParam("lang") String lang) {
+    public Response broadcastFromRawJsonPost(@Context HttpServletRequest request,
+                                             MultivaluedMap<String, String> form) {
 
         String raw = form.getFirst("raw");
+        String lang = form.getFirst("lang");
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
