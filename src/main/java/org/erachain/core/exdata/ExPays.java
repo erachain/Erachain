@@ -933,7 +933,7 @@ public class ExPays {
                 key = iterator.next();
 
                 balance = Account.balanceInPositionAndSide(balancesMap.get(key), filterBalancePos, filterBalanceSide);
-                if (filterBySigNum != 0 && filterBySigNum != balance.signum()) {
+                if (filterBySigNum != 0 && balance.signum() != 0 && filterBySigNum != balance.signum()) {
                     // произошла смена направления для актива у котро меняется Позиция баланса - пропускаем такое
                     continue;
                 }

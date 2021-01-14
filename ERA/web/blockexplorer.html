@@ -775,7 +775,7 @@ button.white-bgc[disabled]:focus,
             }
 
 
-            var table = '<table id=top100 BORDER=0  cellpadding=10 cellspacing=0 class="tiny table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>' + data.Label_Table_Account + '<td><b>' + data.Label_Table_person + '<td><b>' + data.Label_Table_Balance + '<td><b>' + data.Label_Table_in_OWN + '<td><b>' + data.Label_Table_Prop;
+            var table = '<table id=top100 BORDER=0  cellpadding=10 cellspacing=0 class="tiny table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>' + data.Label_Table_Account + '<td><b>' + data.Label_Table_person + '<td><b>' + data.label_Balance_1 + '<td><b>' + data.label_Balance_2 + '<td><b>' + data.label_Balance_3 + '<td><b>' + data.label_Balance_4 + '<td><b>' + data.Label_Table_Prop;
 
             for (key in data.top) {
                 var item = data.top[key];
@@ -787,9 +787,11 @@ button.white-bgc[disabled]:focus,
                 } else {
                     table += '<td>';
                 }
-                table += '<td>' + addCommas(item.balance);
-                table += '<td>' + addCommas(item.in_OWN);
-                table += '<td>' + ((item.in_OWN / data.total) * 100).toFixed(2) + "%";
+                table += '<td>' + addCommas(item.OWN);
+                table += '<td>' + addCommas(item.DEBT);
+                table += '<td>' + addCommas(item.HOLD);
+                table += '<td>' + addCommas(item.SPEND);
+                table += '<td>' + ((item.OWN / data.total) * 100).toFixed(2) + "%";
             }
             table += '</table>';
 

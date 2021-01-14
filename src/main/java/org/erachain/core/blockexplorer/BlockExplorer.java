@@ -1925,7 +1925,7 @@ public class BlockExplorer {
         BigDecimal all = BigDecimal.ZERO;
         BigDecimal alloreders = BigDecimal.ZERO;
 
-        List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
+        List<Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> top100s = new ArrayList();
 
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
         //BigDecimal total = BigDecimal.ZERO;
@@ -1941,13 +1941,12 @@ public class BlockExplorer {
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                             balance = map.get(key);
 
-                    BigDecimal balanceUSE = balance.a.b.add(balance.b.b);
-
                     // пустые не берем
-                    if (balance.a.b.signum() == 0 && balance.b.b.signum() == 0 && balance.c.b.signum() == 0)
+                    if (balance.a.b.signum() == 0 && balance.b.b.signum() == 0 && balance.c.b.signum() == 0 && balance.d.b.signum() == 0)
                         continue;
 
-                    top100s.add(Fun.t3(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)), balanceUSE, balance.a.b));
+                    top100s.add(Fun.t5(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)),
+                            balance.a.b, balance.b.b, balance.c.b, balance.d.b));
                 } catch (java.lang.ArrayIndexOutOfBoundsException e) {
                     logger.error("Wrong key raw: ");
                 }
@@ -1962,12 +1961,12 @@ public class BlockExplorer {
             alloreders = alloreders.add(order.getAmountHaveLeft());
         }
 
-        Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator_C()));
+        Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator_top100()));
 
         int couter = 0;
         AssetCls asset = Controller.getInstance().getAsset(assetKey);
 
-        for (Tuple3<String, BigDecimal, BigDecimal> top100 : top100s) {
+        for (Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal> top100 : top100s) {
 
             couter++;
 
@@ -1975,8 +1974,10 @@ public class BlockExplorer {
 
             Map balance = new LinkedHashMap();
             balance.put("address", top100.a);
-            balance.put("balance", top100.b.toPlainString());
-            balance.put("in_OWN", top100.c.toPlainString());
+            balance.put("OWN", top100.b.toPlainString());
+            balance.put("DEBT", top100.c.toPlainString());
+            balance.put("HOLD", top100.d.toPlainString());
+            balance.put("SPEND", top100.e.toPlainString());
 
             Tuple2<Integer, PersonCls> person = account.getPerson();
             if (person != null) {
@@ -2022,8 +2023,10 @@ public class BlockExplorer {
                             .replace("%assetName%", asset.viewName())).replace("%count%", String.valueOf(couter)));
         }
         output.put("Label_Table_Account", Lang.T("Account", langObj));
-        output.put("Label_Table_Balance", Lang.T("Balance", langObj));
-        output.put("Label_Table_in_OWN", Lang.T("in OWN", langObj));
+        output.put("label_Balance_1", Lang.T("OWN (1)", langObj));
+        output.put("label_Balance_2", Lang.T("DEBT (2)", langObj));
+        output.put("label_Balance_3", Lang.T("HOLD (3)", langObj));
+        output.put("label_Balance_4", Lang.T("SPEND (4)", langObj));
         output.put("Label_Table_Prop", Lang.T("Prop.", langObj));
         output.put("Label_Table_person", Lang.T("Owner", langObj));
 
@@ -3362,10 +3365,10 @@ public class BlockExplorer {
 
     }
 
-    public class BigDecimalComparator_C implements Comparator<Tuple3<String, BigDecimal, BigDecimal>> {
+    public class BigDecimalComparator_top100 implements Comparator<Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> {
 
         @Override
-        public int compare(Tuple3<String, BigDecimal, BigDecimal> a, Tuple3<String, BigDecimal, BigDecimal> b) {
+        public int compare(Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal> a, Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal> b) {
             try {
                 int result = a.c.compareTo(b.c);
                 if (result != 0)
