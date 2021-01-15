@@ -2424,7 +2424,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             //DLSet dbSet = Controller.getInstance().getDBSet();
             TransactionMap unconfirmedMap = dcSet.getTransactionTab();
             TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
-            TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
+            TransactionFinalMapSigns transFinalMapSigns = dcSet.getTransactionFinalMapSigns();
 
             long timerProcess = 0;
             long timerRefsMap_set = 0;
@@ -2487,13 +2487,13 @@ public class Block implements Closeable, ExplorerJsonLine {
                 timerStart = System.currentTimeMillis();
                 finalMap.put(key, transaction);
                 timerFinalMap_set += System.currentTimeMillis() - timerStart;
-                //logger.debug("[" + seqNo + "] try transFinalMapSinds.set" );
+                //logger.debug("[" + seqNo + "] try transFinalMapSigns.set" );
                 timerStart = System.currentTimeMillis();
-                transFinalMapSinds.put(transactionSignature, key);
+                transFinalMapSigns.put(transactionSignature, key);
                 List<byte[]> signatures = transaction.getOtherSignatures();
                 if (signatures != null) {
                     for (byte[] itemSignature : signatures) {
-                        transFinalMapSinds.put(itemSignature, key);
+                        transFinalMapSigns.put(itemSignature, key);
                     }
                 }
                 timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;

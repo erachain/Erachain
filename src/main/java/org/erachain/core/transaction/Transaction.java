@@ -370,7 +370,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected static final int DATA_NUM_FILE_LENGTH = 4;
     protected static final int SEQ_LENGTH = Integer.BYTES;
     public static final int DBREF_LENGTH = Long.BYTES;
-    public static final int DATA_SIZE_LENGTH = 4;
+    public static final int DATA_SIZE_LENGTH = Integer.BYTES;
     public static final int ENCRYPTED_LENGTH = 1;
     public static final int IS_TEXT_LENGTH = 1;
     protected static final int FEE_POWER_LENGTH = 1;
@@ -2263,6 +2263,15 @@ public abstract class Transaction implements ExplorerJsonLine {
     public Transaction copy() {
         try {
             return TransactionFactory.getInstance().parse(this.toBytes(FOR_NETWORK, true), Transaction.FOR_NETWORK);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    public Transaction copy(int forDeal) {
+        try {
+            return TransactionFactory.getInstance().parse(this.toBytes(forDeal, true), forDeal);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             return null;

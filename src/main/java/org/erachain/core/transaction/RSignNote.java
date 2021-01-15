@@ -471,13 +471,15 @@ public class RSignNote extends Transaction implements Itemable {
                 data = Bytes.concat(data, new byte[]{1}); //this.isText);
             }
 
-            if (forDeal == Transaction.FOR_DB_RECORD) {
+            if (forDeal == Transaction.FOR_DB_RECORD && typeBytes[1] > 2) {
+                // only for 3+ version
+
                 if (this.extendedData != null) {
                     this.dataForDB = this.extendedData.makeDBData();
                 }
 
-                if (this.dataForDB == null) {
-                    data = Bytes.concat(data, new byte[Integer.BYTES]);
+                if (this.dataForDB == null || this.dataForDB.length == 0) {
+                    data = Bytes.concat(data, new byte[DATA_SIZE_LENGTH]);
                 } else {
                     //WRITE DB-DATA SIZE
                     byte[] dataDBSizeBytes = Ints.toByteArray(this.dataForDB.length);
@@ -604,15 +606,16 @@ public class RSignNote extends Transaction implements Itemable {
                 position += IS_TEXT_LENGTH;
             }
 
-            if (forDeal == Transaction.FOR_DB_RECORD) {
-                // ADD local DB data
-                //READ DB DATA SIZE
+            if (forDeal == Transaction.FOR_DB_RECORD && typeBytes[1] > 2) {
+                // only for 3+ version
+                // ADD local DB-DATA
+                //READ DB-DATA SIZE
                 byte[] dbDataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
                 int dbDataSize = Ints.fromByteArray(dbDataSizeBytes);
                 position += DATA_SIZE_LENGTH;
 
                 if (dbDataSize > 0) {
-                    //READ DATA
+                    //READ DB-DATA
                     dbData = Arrays.copyOfRange(data, position, position + dbDataSize);
                     position += dbDataSize;
                 }
@@ -675,15 +678,16 @@ public class RSignNote extends Transaction implements Itemable {
 
         int add_len = 0;
         if (this.data != null && this.data.length > 0)
-            if (getVersion() > 2) {
-                add_len += DATA_SIZE_LENGTH + this.data.length;
-                if (forDeal == FOR_DB_RECORD) {
-                    add_len += DATA_SIZE_LENGTH + (extendedData == null ?
-                            dataForDB == null ? 0 : dataForDB.length : extendedData.getLengthDBData());
-                }
-            } else {
-                add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH + this.data.length;
+            add_len += DATA_SIZE_LENGTH + this.data.length;
+
+        if (getVersion() > 2) {
+            if (forDeal == FOR_DB_RECORD) {
+                add_len += DATA_SIZE_LENGTH + (extendedData == null ?
+                        dataForDB == null || dataForDB.length == 0 ? 0 : dataForDB.length : extendedData.getLengthDBData());
             }
+        } else {
+            add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH;
+        }
 
         if (forDeal == FOR_DB_RECORD
                 || this.key > 0 && getVersion() < 3)
