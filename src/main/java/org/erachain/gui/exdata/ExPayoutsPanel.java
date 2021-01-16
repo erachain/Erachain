@@ -11,7 +11,9 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.IconPanel;
+import org.erachain.gui.exdata.authors.AuthorsModel;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
+import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RenderComboBoxActionFilter;
 import org.erachain.gui.models.RenderComboBoxAssetActions;
 import org.erachain.gui.models.RenderComboBoxViewBalance;
@@ -19,6 +21,9 @@ import org.erachain.lang.Lang;
 import org.mapdb.Fun;
 
 import javax.swing.*;
+import javax.swing.plaf.BorderUIResource;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -135,10 +140,12 @@ public class ExPayoutsPanel extends IconPanel {
                 pays.calcTotalFeeBytes();
                 String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredPayoutsCount()
                         + "</b>, " + Lang.T("Additional bytes Size") + ": <b>" + pays.getTotalFeeBytes() + "</b>";
-                for (Fun.Tuple3<Account, BigDecimal, BigDecimal> item : payouts) {
-                    result += "\n" + item.a + " " + item.b.toPlainString() + " " + item.c.toPlainString();
-                }
                 jLabel_FeesResult.setText(result);
+
+                PayoutsModel model = new PayoutsModel(payouts);
+                //jTablePreviewPayouts = new MTable(model);
+                jTablePreviewPayouts.setModel(model);
+                model.fireTableDataChanged();
             }
         });
 
@@ -579,8 +586,26 @@ public class ExPayoutsPanel extends IconPanel {
         fieldGBC.gridy = ++gridy;
         jPanel3.add(jLabel_FeesResult, fieldGBC);
 
-        //fieldGBC.gridy = ++gridy;
-        //jPanel3.add(jLabel_FeesResult, fieldGBC);
+        jTablePreviewPayouts = new MTable(new AuthorsModel(0));
+
+        TableColumnModel columnModel = jTablePreviewPayouts.getColumnModel();
+        TableColumn columnNo = columnModel.getColumn(0);
+        columnNo.setMinWidth(50);
+        columnNo.setMaxWidth(150);
+        columnNo.setPreferredWidth(100);
+        columnNo.setWidth(100);
+        columnNo.sizeWidthToFit();
+
+        //headBGC.gridy = ++gridy;
+        //jPanel3.add(jTablePreviewPayouts, headBGC);
+        //jTablePreviewPayouts.setVisible(true);
+
+        JScrollPane jScrollPanePayouts = new JScrollPane();
+        jScrollPanePayouts.setViewportView(jTablePreviewPayouts);
+        jScrollPanePayouts.setBorder(new BorderUIResource.LineBorderUIResource(Color.BLACK));
+
+        fieldGBC.gridy = ++gridy;
+        jPanel3.add(jTablePreviewPayouts, fieldGBC);
 
 
         fieldGBC.gridy = ++gridy;
@@ -688,4 +713,5 @@ public class ExPayoutsPanel extends IconPanel {
     private javax.swing.JTextField jTextFieldPaymentMax;
     private javax.swing.JTextField jTextFieldPaymentMin;
 
+    private MTable jTablePreviewPayouts;
 }

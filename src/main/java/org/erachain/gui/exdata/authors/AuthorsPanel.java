@@ -61,7 +61,7 @@ public class AuthorsPanel extends JPanel {
         this.setLayout(new GridBagLayout());
 
         jScrollPaneAuthors.setOpaque(false);
-        jScrollPaneAuthors.setPreferredSize(new Dimension(0, 0));
+        //jScrollPaneAuthors.setPreferredSize(new Dimension(0, 0));
 
 
         TableColumnModel columnModel = jTableAuthors.getColumnModel();
