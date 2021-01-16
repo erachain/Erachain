@@ -67,6 +67,11 @@ public class ExPays {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExPays.class);
 
+    public static final String FILTER_PERS_ALL = "All";
+    public static final String FILTER_PERS_ONLY = "Only certified addresses";
+    public static final String FILTER_PERS_MAN = "Only for Men";
+    public static final String FILTER_PERS_WOMAN = "Only for Women";
+
     /**
      * 0 - version; 1..3 - flags;
      */
@@ -237,6 +242,20 @@ public class ExPays {
 
     public long getTotalFeeBytes() {
         return totalFeeBytes;
+    }
+
+    public String viewFilterPersMode(int mode) {
+        switch (mode) {
+            case 0:
+                return "All";
+            case 1:
+                return "Only certified addresses";
+            case 2:
+                return "Only for Men";
+            case 3:
+                return "Only for Women";
+        }
+        return "--";
     }
 
     public void calcTotalFeeBytes() {
@@ -689,10 +708,41 @@ public class ExPays {
         if (filteredPayoutsCount > 0) {
             json.put("Label_Counter", Lang.T("Counter", langObj));
             json.put("Label_Total_Amount", Lang.T("Total Amount", langObj));
-            json.put("Label_Fee_Bytes_Total", Lang.T("Fee Bytes Total", langObj));
+            json.put("Label_Additional_Fee", Lang.T("Additional Fee", langObj));
 
         }
 
+        json.put("payMethodName", Lang.T("PAY_METHOD_" + payMethod, langObj));
+        json.put("balancePosName", Lang.T(Account.balancePositionName(balancePos), langObj));
+        json.put("filterBalancePosName", Lang.T(Account.balancePositionName(filterBalancePos), langObj));
+        json.put("filterBalanceSideName", Lang.T(Account.balanceSideName(filterBalanceSide), langObj));
+        json.put("filterTXTypeName", Lang.T(Transaction.viewTypeName(filterTXType), langObj));
+        json.put("filterByGenderName", Lang.T(viewFilterPersMode(filterTXType), langObj));
+
+        json.put("Label_Action_for_Asset", Lang.T("Action for Asset", langObj));
+        json.put("Label_assetKey", Lang.T("Asset", langObj));
+        json.put("Label_balancePos", Lang.T("Balance Position", langObj));
+        json.put("Label_backward", Lang.T("Backward", langObj));
+
+        json.put("Label_payMethod", Lang.T("Method of calculation", langObj));
+        json.put("Label_payMethodValue", Lang.T("Value", langObj));
+        json.put("Label_amountMin", Lang.T("Minimal Payout", langObj));
+        json.put("Label_amountMax", Lang.T("Maximum Payout", langObj));
+
+        json.put("Label_Filter_By_Asset_and_Balance", Lang.T("Filter By Asset and Balance", langObj));
+        json.put("Label_balanceSide", Lang.T("Balance Side", langObj));
+        json.put("Label_filterBalanceMIN", Lang.T("More or Equal", langObj));
+        json.put("Label_filterBalanceMAX", Lang.T("Less or Equal", langObj));
+        json.put("Label_Filter_by_Actions_and_Period", Lang.T("Filter by Actions and Period", langObj));
+        json.put("Label_filterTXType", Lang.T("Action", langObj));
+        json.put("Label_filterTXStartSeqNo", Lang.T("Height start", langObj));
+        json.put("Label_filterTXEndSeqNo", Lang.T("Height end", langObj));
+
+        json.put("Label_Filter_by_Persons", Lang.T("Filter by Persons", langObj));
+        json.put("Label_filterByGender", Lang.T("Gender", langObj));
+        json.put("Label_selfPay", Lang.T("Payout to Self too", langObj));
+
+        json.put("Label_", Lang.T("", langObj));
         return json;
 
     }
@@ -705,6 +755,8 @@ public class ExPays {
         toJson.put("assetKey", assetKey);
         toJson.put("balancePos", balancePos);
         toJson.put("backward", backward);
+
+        toJson.put("payMethod", payMethod);
         toJson.put("payMethodValue", payMethodValue.toPlainString());
         if (payMethod != PAYMENT_METHOD_ABSOLUTE) {
             toJson.put("amountMin", amountMin);
@@ -732,6 +784,7 @@ public class ExPays {
             toJson.put("filteredPayoutsCount", filteredPayoutsCount);
             toJson.put("totalPay", totalPay.toPlainString());
             toJson.put("totalFeeBytes", totalFeeBytes);
+            toJson.put("totalFee", BlockChain.feeBG(totalFeeBytes).toPlainString());
         }
 
         return toJson;
