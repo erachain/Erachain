@@ -244,7 +244,11 @@ public class ExPays {
         return totalFeeBytes;
     }
 
-    public String viewFilterPersMode(int mode) {
+    public static String viewPayMethod(int mode) {
+        return "PAY_METHOD_" + mode;
+    }
+
+    public static String viewFilterPersMode(int mode) {
         switch (mode) {
             case 0:
                 return "All";
@@ -712,7 +716,7 @@ public class ExPays {
 
         }
 
-        json.put("payMethodName", Lang.T("PAY_METHOD_" + payMethod, langObj));
+        json.put("payMethodName", Lang.T(ExPays.viewPayMethod(payMethod), langObj));
         json.put("balancePosName", Lang.T(Account.balancePositionName(balancePos), langObj));
         json.put("filterBalancePosName", Lang.T(Account.balancePositionName(filterBalancePos), langObj));
         json.put("filterBalanceSideName", Lang.T(Account.balanceSideName(filterBalanceSide), langObj));
@@ -1042,7 +1046,7 @@ public class ExPays {
 
                     person = (PersonCls) dcSet.getItemPersonMap().get(addressDuration.a);
 
-                    if (person.getGender() != gender) {
+                    if (gender >= 0 && person.getGender() != gender) {
                         continue;
                     }
 

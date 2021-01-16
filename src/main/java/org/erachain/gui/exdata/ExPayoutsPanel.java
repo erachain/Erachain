@@ -90,10 +90,10 @@ public class ExPayoutsPanel extends IconPanel {
 
         jLabelMethodPaymentDescription.setHorizontalAlignment(SwingConstants.LEFT);
         jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
-                Lang.T("All"),
-                Lang.T("Only certified addresses"),
-                Lang.T("Only for Men"),
-                Lang.T("Only for Women")}));
+                Lang.T(ExPays.viewFilterPersMode(0)),
+                Lang.T(ExPays.viewFilterPersMode(1)),
+                Lang.T(ExPays.viewFilterPersMode(2)),
+                Lang.T(ExPays.viewFilterPersMode(3))}));
 
         jCheckBoxPayoutsUse.setSelected(false);
         jCheckBoxPayoutsUse.addActionListener(new ActionListener() {
@@ -375,9 +375,9 @@ public class ExPayoutsPanel extends IconPanel {
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelMethod, labelGBC);
         jComboBoxMethodPaymentType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
-                Lang.T("PAY_METHOD_0"),
-                Lang.T("PAY_METHOD_1"),
-                Lang.T("PAY_METHOD_2"),
+                Lang.T(ExPays.viewPayMethod(0)),
+                Lang.T(ExPays.viewPayMethod(1)),
+                Lang.T(ExPays.viewPayMethod(2)),
         }));
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxMethodPaymentType, fieldGBC);
