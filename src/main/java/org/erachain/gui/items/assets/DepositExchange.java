@@ -42,6 +42,8 @@ public class DepositExchange extends IconPanel {
     public static String NAME = "DepositExchange";
     public static String TITLE = "Deposit Exchange";
 
+    public final static long TEST_ASSET = -1; // ETH - 1048583L
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DepositExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
@@ -128,7 +130,7 @@ public class DepositExchange extends IconPanel {
                 assetOutput = "@ZEN/";
                 assetOutputName = "ZEN";
                 break;
-            case 1048583:
+            case (int) DepositExchange.TEST_ASSET:
                 /// http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/ETH/@ETH/7KmL1nheVHYVmdaEB4rsRjiENUD3sTr7EE/1
                 urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
                 assetOutput = "@ETH/";
@@ -222,7 +224,7 @@ public class DepositExchange extends IconPanel {
                 jTextField_Details_Check.setText("<html><b>" + jsonObject.get("wrong") + "<b></html>");
                 jTextField_Details.setText(jsonObject.get("addr_in").toString());
 
-                if (jsonObject.containsKey("addr_out_full") && asset.getKey() == 1048583L) {
+                if (jsonObject.containsKey("addr_out_full") && asset.getKey() == DepositExchange.TEST_ASSET) {
                     String payMess = jsonObject.get("addr_out_full").toString();
                     jTextArea_Details.setText("0x" + Converter.toHex(payMess.getBytes(StandardCharsets.UTF_8)));
                 }
@@ -248,7 +250,7 @@ public class DepositExchange extends IconPanel {
                                 .replace("%1", assetIncomeName);
                 }
 
-                if (asset.getKey() == 1048583L) {
+                if (asset.getKey() == DepositExchange.TEST_ASSET) {
                     String payMess = jsonObject.get("addr_out_full").toString();
                     jTextArea_Details.setText("0x" + Converter.toHex(payMess.getBytes(StandardCharsets.UTF_8)));
                 }
@@ -402,7 +404,7 @@ public class DepositExchange extends IconPanel {
         jPanelMain.add(jLabel_AssetInput, labelGBC);
 
         cbxAssetsInput = new JComboBox<AssetCls>(new FundTokensComboBoxModel(new long[]{AssetCls.BTC_KEY,
-                1048583
+                DepositExchange.TEST_ASSET
                 // 14L // ETG
         }));
         fieldGBC.gridy = gridy;
@@ -572,7 +574,7 @@ public class DepositExchange extends IconPanel {
                 jLabel_AssetInput.setVisible(false);
                 cbxAssetsInput.setVisible(false);
                 break;
-            case 1048583:
+            case (int) DepositExchange.TEST_ASSET:
                 //jLabel_Details.setText(Lang.T("Address to deposit") + " ETH" + ":");
                 refreshReceiverDetails(Lang.T("Payment details to deposit") + " ETH",
                         detailsHead);
@@ -628,7 +630,7 @@ public class DepositExchange extends IconPanel {
                 case 1114:
                     urlGetDetails += "@ZEN/";
                     break;
-                case 1048583:
+                case (int) DepositExchange.TEST_ASSET:
                     urlGetDetails += "@ETH/";
                     break;
                 default:
