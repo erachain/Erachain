@@ -911,7 +911,7 @@
   "Wrong filterTXEndStr": "Wrong filter TX End",
   "Wrong assetKey (null or ZERO)": "Wrong asset Key (null or ZERO)",
   "Wrong filterAssetKey (null or ZERO)": "Wrong filter Asset Key (null or ZERO)",
-  "Wrong payMethodValue (null or ZERO)": "Wrong payment method value (null or ZERO)",
+  "Wrong payMethodValue (null or ZERO)": "Wrong payment method Value (null or ZERO)",
   "WEB enabled": "WEB enabled",
   "Web port %port% already in use!": "Web port %port% is already in use!",
   "WEB port:": "WEB port",

@@ -2,13 +2,14 @@ package org.erachain.gui.exdata;
 
 
 import com.toedter.calendar.JDateChooser;
-import org.erachain.core.BlockChain;
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.models.RenderComboBoxActionFilter;
@@ -23,6 +24,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.TimeZone;
 
 
@@ -80,7 +83,7 @@ public class ExPayoutsPanel extends IconPanel {
         });
         updateLabelsByMethod();
 
-        jLabelMethodPaymentDecscription.setHorizontalAlignment(SwingConstants.LEFT);
+        jLabelMethodPaymentDescription.setHorizontalAlignment(SwingConstants.LEFT);
         jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
                 Lang.T("All"),
                 Lang.T("Only certified addresses"),
@@ -95,21 +98,47 @@ public class ExPayoutsPanel extends IconPanel {
             }
         });
 
-        jButtonViewResult.addActionListener(new ActionListener() {
-            // create Hashs
+        jButtonCalcCompu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                Fun.Tuple2<ExPays, String> exPaysRes = getPayouts();
+                if (exPaysRes.b != null) {
+                    jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
+                            Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
+                    return;
+                }
+
                 ExPays pays = getPayouts().a;
-                //pays.process();
+                pays.setDC(DCSet.getInstance());
+                List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> payouts = pays.precalcFilteredPayouts(
+                        Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
+                pays.calcTotalFeeBytes();
+                jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredPayoutsCount()
+                        + "</b>, " + Lang.T("Additional bytes Size") + ": <b>" + pays.getTotalFeeBytes());
             }
         });
 
-        jButtonCalcCompu.addActionListener(new ActionListener() {
-            // create Hashs
+        jButtonViewResult.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                Fun.Tuple2<ExPays, String> exPaysRes = getPayouts();
+                if (exPaysRes.b != null) {
+                    jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
+                            Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
+                    return;
+                }
+
                 ExPays pays = getPayouts().a;
-                //pays.orphan()
+                pays.setDC(DCSet.getInstance());
+                List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> payouts = pays.precalcFilteredPayouts(
+                        Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
+                pays.calcTotalFeeBytes();
+                String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredPayoutsCount()
+                        + "</b>, " + Lang.T("Additional bytes Size") + ": <b>" + pays.getTotalFeeBytes() + "</b>";
+                for (Fun.Tuple3<Account, BigDecimal, BigDecimal> item : payouts) {
+                    result += "\n" + item.a + " " + item.b.toPlainString() + " " + item.c.toPlainString();
+                }
+                jLabel_FeesResult.setText(result);
             }
         });
 
@@ -148,21 +177,21 @@ public class ExPayoutsPanel extends IconPanel {
     private void updateLabelsByMethod() {
         switch (jComboBoxMethodPaymentType.getSelectedIndex()) {
             case 0:
-                jLabelMethodPaymentDecscription.setText("<html>" +
+                jLabelMethodPaymentDescription.setText("<html>" +
                         Lang.T("PAY_METHOD_0_D"));
                 jLabelAmount.setText(Lang.T("Total Amount"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
                 return;
             case 1:
-                jLabelMethodPaymentDecscription.setText("<html>" +
+                jLabelMethodPaymentDescription.setText("<html>" +
                         Lang.T("PAY_METHOD_1_D"));
                 jLabelAmount.setText(Lang.T("Coefficient"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
                 return;
             case 2:
-                jLabelMethodPaymentDecscription.setText("<html>" +
+                jLabelMethodPaymentDescription.setText("<html>" +
                         Lang.T("PAY_METHOD_2_D"));
                 jLabelAmount.setText(Lang.T("Amount"));
                 jTextFieldPaymentMin.setEnabled(false);
@@ -191,10 +220,11 @@ public class ExPayoutsPanel extends IconPanel {
         jLabelAssetToPay = new javax.swing.JLabel();
         jLabelAction = new javax.swing.JLabel();
         jLabelTitlemetod = new javax.swing.JLabel();
-        jLabelMethodPaymentDecscription = new javax.swing.JLabel();
+        jLabelMethodPaymentDescription = new javax.swing.JLabel();
         jLabelPaymentMin = new javax.swing.JLabel();
         jTextFieldPaymentMin = new javax.swing.JTextField();
         jLabelPaymentMax = new javax.swing.JLabel();
+        jLabel_FeesResult = new javax.swing.JLabel();
         jTextFieldPaymentMax = new javax.swing.JTextField();
         jPanelMinMaxAmounts = new javax.swing.JPanel();
         jPanelFilterBalance = new javax.swing.JPanel();
@@ -325,7 +355,7 @@ public class ExPayoutsPanel extends IconPanel {
         jPanelMain.add(jTextFieldAmount, fieldGBC);
 
         fieldGBC.gridy = ++gridy;
-        jPanelMain.add(jLabelMethodPaymentDecscription, fieldGBC);
+        jPanelMain.add(jLabelMethodPaymentDescription, fieldGBC);
 
         java.awt.GridBagLayout jPanelLayout = new java.awt.GridBagLayout();
         jPanelLayout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0};
@@ -547,9 +577,14 @@ public class ExPayoutsPanel extends IconPanel {
         jPanel3.add(jButtonViewResult, gridBagConstraints);
 
         fieldGBC.gridy = ++gridy;
-        if (BlockChain.TEST_MODE) {
-            jPanelMain.add(jPanel3, fieldGBC);
-        }
+        jPanel3.add(jLabel_FeesResult, fieldGBC);
+
+        //fieldGBC.gridy = ++gridy;
+        //jPanel3.add(jLabel_FeesResult, fieldGBC);
+
+
+        fieldGBC.gridy = ++gridy;
+        jPanelMain.add(jPanel3, fieldGBC);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 1;
@@ -628,10 +663,11 @@ public class ExPayoutsPanel extends IconPanel {
     private javax.swing.JLabel jLabelAction;
     private javax.swing.JLabel jLabelDataStart;
     private javax.swing.JLabel jLabelDateEnd;
-    private javax.swing.JLabel jLabelMethodPaymentDecscription;
+    private javax.swing.JLabel jLabelMethodPaymentDescription;
     private javax.swing.JLabel jLabelPaymentMax;
     private javax.swing.JLabel jLabelPaymentMin;
     private javax.swing.JLabel jLabelTitlemetod;
+    private javax.swing.JLabel jLabel_FeesResult;
     private javax.swing.JLabel jLabelBalancePosition;
     private javax.swing.JPanel jPanelMinMaxAmounts;
     private javax.swing.JPanel jPanelFilterBalance;

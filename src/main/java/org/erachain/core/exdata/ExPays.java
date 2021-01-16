@@ -219,6 +219,14 @@ public class ExPays {
         return filteredPayouts;
     }
 
+    public List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> precalcFilteredPayouts(int height, Account creator) {
+        filteredPayoutsCount = makeFilterPayList(dcSet, height, asset, creator, false);
+        if (payMethod == PAYMENT_METHOD_TOTAL) {
+            calcPayoutsForMethodTotal();
+        }
+        return filteredPayouts;
+    }
+
     public int getFilteredPayoutsCount() {
         return filteredPayoutsCount;
     }
@@ -883,7 +891,7 @@ public class ExPays {
         return Transaction.VALIDATE_OK;
     }
 
-    public int makeFilterPayList(Transaction transaction, boolean andValidate) {
+    public int makeFilterPayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
 
         filteredPayouts = new ArrayList<>();
 
@@ -891,9 +899,8 @@ public class ExPays {
 
         boolean onlyPerson = filterByGender > FILTER_PERSON_NONE;
         int gender = filterByGender - FILTER_PERSON_ONLY_MAN;
-        byte[] accountFrom = transaction.getCreator().getShortAddressBytes();
+        byte[] accountFrom = creator.getShortAddressBytes();
 
-        DCSet dcSet = transaction.getDCSet();
         ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
         TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
 
@@ -940,7 +947,7 @@ public class ExPays {
             myPersonKey = null;
         }
 
-        boolean isPerson = transaction.getCreator().isPerson(dcSet, height, transaction.getCreatorPersonDuration());
+        boolean isPerson = creator.isPerson(dcSet, height);
 
         HashSet<Long> usedPersons = new HashSet<>();
         PersonCls person;
@@ -1065,6 +1072,10 @@ public class ExPays {
         calcTotalFeeBytes();
         return count;
 
+    }
+
+    public int makeFilterPayList(Transaction transaction, boolean andValidate) {
+        return makeFilterPayList(transaction.getDCSet(), height, asset, transaction.getCreator(), andValidate);
     }
 
     public void processBody(Transaction rNote, boolean asOrphan, Block block) {
