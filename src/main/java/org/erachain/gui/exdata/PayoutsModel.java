@@ -30,7 +30,14 @@ public class PayoutsModel extends DefaultTableModel {
         int count = 1;
         Vector vector = getDataVector();
         for (Fun.Tuple3<Account, BigDecimal, BigDecimal> item : payouts) {
-            vector.set(count, new Object[]{++count, item.b.toPlainString(), item.a.getPersonAsString(), item.c.toPlainString()});
+
+            Vector<Object> rowVector = new Vector<Object>(4);
+            rowVector.addElement(count);
+            rowVector.addElement(item.b.toPlainString());
+            rowVector.addElement(item.a.getPersonAsString());
+            rowVector.addElement(item.c.toPlainString());
+
+            vector.set(count++, rowVector);
         }
         fireTableDataChanged();
     }
