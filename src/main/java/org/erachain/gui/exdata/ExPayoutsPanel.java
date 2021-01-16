@@ -613,26 +613,21 @@ public class ExPayoutsPanel extends IconPanel {
         jPanel3.add(jLabel_FeesResult, headBGC);
 
         jTablePreviewPayouts = new MTable(new PayoutsModel(new ArrayList<>()));
-        //jTablePreviewPayouts = new MTable(new AuthorsModel(0));
 
         jTablePreviewPayouts.setAutoCreateRowSorter(true);
-        //jTablePreviewPayouts.setVisible(true);
-
-        headBGC.gridy = ++gridy;
-
-        jScrollPanePayouts.setVisible(false);
         jScrollPanePayouts.setViewportView(jTablePreviewPayouts);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.gridwidth = 9;
+        gridBagConstraints.gridheight = 3;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        jPanel3.add(jScrollPanePayouts, headBGC);
+        gridBagConstraints.weighty = 0.2;
 
-        //jPanel3.add(jTablePreviewPayouts, headBGC);
+        headBGC.gridy = ++gridy;
+        jPanel3.add(jScrollPanePayouts, gridBagConstraints);
 
         ///////// PANEL 3
         fieldGBC.gridy = ++gridy;
@@ -645,6 +640,7 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         fieldGBC.weightx = 0.1;
         add(jPanelMain, gridBagConstraints);
+
     }
 
     public Fun.Tuple2<ExPays, String> getPayouts() {
