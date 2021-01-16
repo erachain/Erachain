@@ -3,6 +3,7 @@ package org.erachain.gui.exdata;
 
 import com.toedter.calendar.JDateChooser;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.item.ItemCls;
@@ -105,6 +106,7 @@ public class ExPayoutsPanel extends IconPanel {
         jButtonCalcCompu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 Fun.Tuple2<ExPays, String> exPaysRes = getPayouts();
                 if (exPaysRes.b != null) {
                     jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
@@ -118,7 +120,7 @@ public class ExPayoutsPanel extends IconPanel {
                         Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
                 pays.calcTotalFeeBytes();
                 jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredPayoutsCount()
-                        + "</b>, " + Lang.T("Additional bytes Size") + ": <b>" + pays.getTotalFeeBytes()
+                        + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
                         + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay());
             }
         });
@@ -139,13 +141,14 @@ public class ExPayoutsPanel extends IconPanel {
                         Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
                 pays.calcTotalFeeBytes();
                 String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredPayoutsCount()
-                        + "</b>, " + Lang.T("Additional bytes Size") + ": <b>" + pays.getTotalFeeBytes()
+                        + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
                         + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay();
                 jLabel_FeesResult.setText(result);
 
                 PayoutsModel model = new PayoutsModel(payouts);
                 jTablePreviewPayouts.setModel(model);
                 TableColumnModel columnModel = jTablePreviewPayouts.getColumnModel();
+
                 TableColumn columnNo = columnModel.getColumn(0);
                 columnNo.setMinWidth(50);
                 columnNo.setMaxWidth(100);
@@ -167,8 +170,8 @@ public class ExPayoutsPanel extends IconPanel {
                 columnPay.setWidth(150);
                 columnPay.sizeWidthToFit();
 
-                jTablePreviewPayouts.setVisible(true);
-                model.fireTableDataChanged();
+                jScrollPanePayouts.setVisible(true);
+
             }
         });
 
@@ -594,7 +597,7 @@ public class ExPayoutsPanel extends IconPanel {
 
         jPanel3.setLayout(jPanelLayout);
 
-        jButtonCalcCompu.setText(Lang.T("Calculate fee"));
+        jButtonCalcCompu.setText(Lang.T("Preview Fee"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
@@ -610,11 +613,26 @@ public class ExPayoutsPanel extends IconPanel {
         jPanel3.add(jLabel_FeesResult, headBGC);
 
         jTablePreviewPayouts = new MTable(new PayoutsModel(new ArrayList<>()));
+        //jTablePreviewPayouts = new MTable(new AuthorsModel(0));
+
         jTablePreviewPayouts.setAutoCreateRowSorter(true);
-        jTablePreviewPayouts.setVisible(false);
+        //jTablePreviewPayouts.setVisible(true);
 
         headBGC.gridy = ++gridy;
-        jPanel3.add(jTablePreviewPayouts, headBGC);
+
+        jScrollPanePayouts.setVisible(false);
+        jScrollPanePayouts.setViewportView(jTablePreviewPayouts);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.gridwidth = 9;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        jPanel3.add(jScrollPanePayouts, headBGC);
+
+        //jPanel3.add(jTablePreviewPayouts, headBGC);
 
         ///////// PANEL 3
         fieldGBC.gridy = ++gridy;
@@ -723,4 +741,5 @@ public class ExPayoutsPanel extends IconPanel {
     private javax.swing.JTextField jTextFieldPaymentMin;
 
     private MTable jTablePreviewPayouts;
+    private JScrollPane jScrollPanePayouts = new JScrollPane();
 }

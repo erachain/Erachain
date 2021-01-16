@@ -12,12 +12,12 @@ import java.util.Vector;
 public class PayoutsModel extends DefaultTableModel {
 
     public PayoutsModel(List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> payouts) {
-        super(new String[]{Lang.T("No"),
+        super(new String[]{Lang.T("No."),
                         Lang.T("Balance"),
                         Lang.T("Account"),
                         Lang.T("Payout")
                 },
-                payouts.size() + 1);
+                payouts.size());
         setRows(payouts);
     }
 
@@ -27,12 +27,12 @@ public class PayoutsModel extends DefaultTableModel {
     }
 
     public void setRows(List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> payouts) {
-        int count = 1;
+        int count = 0;
         Vector vector = getDataVector();
         for (Fun.Tuple3<Account, BigDecimal, BigDecimal> item : payouts) {
 
             Vector<Object> rowVector = new Vector<Object>(4);
-            rowVector.addElement(count);
+            rowVector.addElement(count + 1);
             rowVector.addElement(item.b.toPlainString());
             rowVector.addElement(item.a.getPersonAsString());
             rowVector.addElement(item.c.toPlainString());
