@@ -43,6 +43,8 @@ public class ExPays {
 
     public static final byte BASE_LENGTH = 4 + 3;
 
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:00");
+
     public static final int MAX_COUNT = Integer.MAX_VALUE >> 1;
     private static final byte AMOUNT_FLAG_MASK = -128;
     private static final byte AMOUNT_MIN_FLAG_MASK = 64;
@@ -601,7 +603,6 @@ public class ExPays {
         BigDecimal filterBalanceLessThenBG;
         Long filterTXStartSeqNo;
         Long filterTXEndSeqNo;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:00");
 
         Controller cntr = Controller.getInstance();
         BlockChain chain = cntr.getBlockChain();
@@ -623,7 +624,7 @@ public class ExPays {
                 filterTXStartSeqNo = Transaction.parseDBRef(filterTXStartStr);
                 if (filterTXStartSeqNo == null) {
                     try {
-                        Date parsedDate = dateFormat.parse(filterTXStartStr);
+                        Date parsedDate = DATE_FORMAT.parse(filterTXStartStr);
                         Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
                         filterTXStartSeqNo = timestamp.getTime();
                     } catch (Exception e) {
@@ -640,13 +641,13 @@ public class ExPays {
                 filterTXEndSeqNo = Transaction.parseDBRef(filterTXEndStr);
                 if (filterTXEndSeqNo == null) {
                     try {
-                        Date parsedDate = dateFormat.parse(filterTXEndStr);
+                        Date parsedDate = DATE_FORMAT.parse(filterTXEndStr);
                         Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
                         filterTXEndSeqNo = timestamp.getTime();
                     } catch (Exception e) {
                         filterTXEndSeqNo = Long.parseLong(filterTXEndStr) * 1000L;
                     }
-                    filterTXEndSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestampMS(filterTXEndSeqNo), 0);
+                    filterTXEndSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestampMS(filterTXEndSeqNo), 99999);
                 }
             }
         } catch (Exception e) {

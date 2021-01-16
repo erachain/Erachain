@@ -114,7 +114,7 @@ public class ExPayoutsPanel extends IconPanel {
                     return;
                 }
 
-                ExPays pays = getPayouts().a;
+                ExPays pays = exPaysRes.a;
                 pays.setDC(DCSet.getInstance());
                 List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> payouts = pays.precalcFilteredPayouts(
                         Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
@@ -135,7 +135,7 @@ public class ExPayoutsPanel extends IconPanel {
                     return;
                 }
 
-                ExPays pays = getPayouts().a;
+                ExPays pays = exPaysRes.a;
                 pays.setDC(DCSet.getInstance());
                 List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> payouts = pays.precalcFilteredPayouts(
                         Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
@@ -655,13 +655,13 @@ public class ExPayoutsPanel extends IconPanel {
 
         String jTextFieldDateStartStr;
         try {
-            jTextFieldDateStartStr = "" + jTextFieldDateStart.getCalendar().getTimeInMillis() * 0.001;
+            jTextFieldDateStartStr = ExPays.DATE_FORMAT.format(jTextFieldDateStart.getCalendar().getTime());
         } catch (Exception ed1) {
             jTextFieldDateStartStr = null;
         }
         String jTextFieldDateEndStr;
         try {
-            jTextFieldDateEndStr = "" + jTextFieldDateEnd.getCalendar().getTimeInMillis() * 0.001;
+            jTextFieldDateEndStr = ExPays.DATE_FORMAT.format(jTextFieldDateEnd.getCalendar().getTime());
         } catch (Exception ed1) {
             jTextFieldDateEndStr = null;
         }
