@@ -106,6 +106,9 @@ public class ExPays {
     private int filteredPayoutsCount;
     private BigDecimal totalPay;
     private long totalFeeBytes;
+    private int maxIndex;
+    private BigDecimal maxBal;
+
     public String errorValue;
 
 
@@ -744,12 +747,28 @@ public class ExPays {
                 scale + Order.powerTen(totalBalances) + 3, RoundingMode.HALF_DOWN);
         Fun.Tuple3 item;
         BigDecimal amount;
+        maxBal = BigDecimal.ZERO;
         for (int index = 0; index < filteredPayoutsCount; index++) {
             item = filteredPayouts.get(index);
             amount = (BigDecimal) item.b;
             amount = amount.multiply(coefficient).setScale(scale, RoundingMode.DOWN);
             totalPay = totalPay.add(amount);
             filteredPayouts.set(index, new Fun.Tuple3(item.a, item.b, amount));
+
+            if (maxBal.compareTo(amount.abs()) < 0) {
+                // запомним максимальное для скидывания остатка
+                maxBal = amount.abs();
+                maxIndex = index;
+            }
+        }
+
+        BigDecimal totalDiff = payMethodValue.subtract(totalPay);
+        if (totalDiff.signum() != 0) {
+            // есть нераспределенный остаток
+            Fun.Tuple3<Account, BigDecimal, BigDecimal> maxItem = filteredPayouts.get(maxIndex);
+            filteredPayouts.set(maxIndex, new Fun.Tuple3(maxItem.a, maxItem.b, maxItem.c.add(totalDiff)));
+
+            totalPay = payMethodValue;
         }
 
         return true;
