@@ -11,7 +11,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
-import org.erachain.lang.LangFile;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -1876,7 +1875,7 @@ public abstract class AssetCls extends ItemCls {
 
         type.put("description", description);
 
-        return null;
+        return type;
     }
 
     public static JSONObject assetTypesJson;
@@ -1888,10 +1887,10 @@ public abstract class AssetCls extends ItemCls {
 
         assetTypesJson = new JSONObject();
         for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
-            LangFile langFile = Lang.getInstance().getLangFile(iso);
+            JSONObject langObj = Lang.getInstance().getLangJson(iso);
             JSONObject langJson = new JSONObject();
             for (int type : AssetTypes()) {
-                langJson.put(type, AssetTypeJson(type, langFile.getLangJson()));
+                langJson.put(type, AssetTypeJson(type, langObj));
             }
             assetTypesJson.put(iso, langJson);
         }
@@ -1908,12 +1907,14 @@ public abstract class AssetCls extends ItemCls {
 
         JSONObject typeJson = new JSONObject();
 
+        JSONObject langObj = Lang.getInstance().getLangJson("en");
+
         typeJson.put("key", type);
-        typeJson.put("char", charAssetType(1000, type));
+        typeJson.put("char", charAssetType(getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD), type));
         typeJson.put("abbrev", viewAssetTypeAbbrev(type));
-        typeJson.put("name", assetTypeName);
-        typeJson.put("name_full", viewAssetTypeFullCls(type));
-        typeJson.put("desc", viewAssetTypeDescriptionCls(type));
+        typeJson.put("name", Lang.T(assetTypeName, langObj));
+        typeJson.put("name_full", Lang.T(viewAssetTypeFullCls(type), langObj));
+        typeJson.put("desc", Lang.T(viewAssetTypeDescriptionCls(type), langObj));
 
         return typeJson;
     }
