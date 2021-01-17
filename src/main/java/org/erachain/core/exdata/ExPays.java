@@ -731,7 +731,7 @@ public class ExPays {
         json.put("filterBalancePosName", Lang.T(Account.balancePositionName(filterBalancePos), langObj));
         json.put("filterBalanceSideName", Lang.T(Account.balanceSideName(filterBalanceSide), langObj));
         json.put("filterTXTypeName", Lang.T(Transaction.viewTypeName(filterTXType), langObj));
-        json.put("filterByGenderName", Lang.T(viewFilterPersMode(filterTXType), langObj));
+        json.put("filterByGenderName", Lang.T(viewFilterPersMode(filterByGender), langObj));
 
         json.put("Label_Action_for_Asset", Lang.T("Action for Asset", langObj));
         json.put("Label_assetKey", Lang.T("Asset", langObj));

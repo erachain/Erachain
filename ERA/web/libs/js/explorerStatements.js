@@ -163,13 +163,13 @@ function statement(data) {
         if (exPays.filterTXType)
             output += exPays.Label_filterTXType + ': <b>[' + exPays.filterTXType + "]" + exPays.filterTXTypeName + '</b><br>';
         if (exPays.hasOwnProperty('filterTimeStart'))
-            output += exPays.Label_filterTimeStart + ': <b>' + exPays.filterTimeStart + '</b><br>';
+            output += exPays.Label_filterTimeStart + ': <b>' + convertTimestamp(exPays.filterTimeStart, true) + '</b><br>';
         if (exPays.hasOwnProperty('filterTimeEnd'))
-            output += exPays.Label_filterTimeEnd + ': <b>' + exPays.filterTimeEnd + '</b><br>';
+            output += exPays.Label_filterTimeEnd + ': <b>' + convertTimestamp(exPays.filterTimeEnd, true) + '</b><br>';
 
         output += '<h4>' + exPays.Label_Filter_by_Persons + '</h4>';
         if (exPays.filterByGender)
-        output += exPays.Label_filterByGender + ': <b>' + exPays.filterByGender + '</b><br>';
+        output += exPays.Label_filterByGender + ': <b>' + exPays.filterByGenderName + '</b><br>';
         output += exPays.Label_selfPay + ': <b>' + exPays.selfPay + '</b><br>';
 
     }
