@@ -86,9 +86,9 @@ public class RenderComboBoxViewBalance extends DefaultListCellRenderer {
                 return Lang.T("SPEND (4)");
             case TransactionAmount.ACTION_PLEDGE:
                 return Lang.T("PLEDGE (5)");
-          case   TransactionAmount.ACTION_RESERCED_6:
-              return "Reserved_6";
-      }
+            case TransactionAmount.ACTION_RESERVED_6:
+                return ""; // ""Reserved_6";
+        }
 
         return "";
     }
