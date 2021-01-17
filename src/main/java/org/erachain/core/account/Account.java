@@ -229,7 +229,7 @@ public class Account {
                 type = !isDirect && isBackward ? BALANCE_POS_PLEDGE : BALANCE_POS_OWN;
             } else {
                 // HOLD in STOCK or PLEDGE
-                type = isDirect || isBackward ? BALANCE_POS_HOLD : BALANCE_POS_HOLD; // BALANCE_POS_6;
+                type = isDirect || isBackward ? BALANCE_POS_HOLD : BALANCE_POS_6;
             }
         } else {
             if (amount_sign > 0) {
@@ -258,7 +258,7 @@ public class Account {
             case BALANCE_POS_PLEDGE:
                 return new Tuple2(1, 1);
             case BALANCE_POS_HOLD:
-            //case BALANCE_POS_PLEDGE:
+            case BALANCE_POS_6:
                 return new Tuple2(1, -1);
             case BALANCE_POS_DEBT:
                 return new Tuple2(-1, 1);
