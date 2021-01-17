@@ -660,6 +660,7 @@
   "PAY_METHOD_2": "Identical Value",
   "PAY_METHOD_2_D": "The <b>Identical Value</b> will be payout to all Recipients",
   "Pay dividend": "Dividend payment",
+  "Payouts: assetKey == filterAssetKey && balancePos == filterBalancePos for not ABSOLUTE method": "Prohibited combination of assets, balance sheet positions and accrual method (Asset and Position are the same, but the method is not Absolute)",
   "Payment has been sent!": "Payment has been sent!",
   "Payment Transaction": "Payment Transaction",
   "Payments": "Payments",

@@ -77,7 +77,7 @@ public class ExPaysTest {
             System.out.println(e.getMessage());
         }
 
-        assertEquals(exPays.filterTXEndSeqNo, exPaysParsed.filterTXEndSeqNo);
+        assertEquals(exPays.filterTimeEnd, exPaysParsed.filterTimeEnd);
 
     }
 

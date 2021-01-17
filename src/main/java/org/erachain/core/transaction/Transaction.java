@@ -1255,6 +1255,22 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (refStr == null)
             return null;
 
+        Long seqNo = parseDBRefSeqNo(refStr);
+        if (seqNo != null)
+            return seqNo;
+
+        try {
+            return Long.parseLong(refStr);
+        } catch (Exception e1) {
+        }
+
+        return null;
+    }
+
+    public static Long parseDBRefSeqNo(String refStr) {
+        if (refStr == null)
+            return null;
+
         try {
             String[] strA = refStr.split("\\-");
             if (strA.length > 2)
@@ -1266,10 +1282,6 @@ public abstract class Transaction implements ExplorerJsonLine {
             byte[] ref = Ints.toByteArray(height);
             return Longs.fromByteArray(Bytes.concat(ref, Ints.toByteArray(seq)));
         } catch (Exception e) {
-            try {
-                return Long.parseLong(refStr);
-            } catch (Exception e1) {
-            }
         }
         return null;
     }

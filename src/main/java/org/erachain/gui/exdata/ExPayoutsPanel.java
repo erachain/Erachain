@@ -655,13 +655,13 @@ public class ExPayoutsPanel extends IconPanel {
 
         String jTextFieldDateStartStr;
         try {
-            jTextFieldDateStartStr = ExPays.DATE_FORMAT.format(jTextFieldDateStart.getCalendar().getTime());
+            jTextFieldDateStartStr = "" + jTextFieldDateStart.getCalendar().getTimeInMillis() / 1000;
         } catch (Exception ed1) {
             jTextFieldDateStartStr = null;
         }
         String jTextFieldDateEndStr;
         try {
-            jTextFieldDateEndStr = ExPays.DATE_FORMAT.format(jTextFieldDateEnd.getCalendar().getTime());
+            jTextFieldDateEndStr = "" + jTextFieldDateEnd.getCalendar().getTimeInMillis() / 1000;
         } catch (Exception ed1) {
             jTextFieldDateEndStr = null;
         }

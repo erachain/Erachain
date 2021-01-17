@@ -94,8 +94,8 @@ public class ExPays {
     private BigDecimal filterBalanceMAX; // 34
 
     private int filterTXType; // 36
-    private Long filterTXStartSeqNo; // 44
-    public Long filterTXEndSeqNo; // 52
+    private Long filterTimeStart; // 44 - in msec
+    public Long filterTimeEnd; // 52 - in msec
 
     private final int filterByGender; // 53 = gender or all
     public boolean selfPay; // 54
@@ -136,15 +136,15 @@ public class ExPays {
      * @param filterBalanceMIN
      * @param filterBalanceMAX
      * @param filterTXType
-     * @param filterTXStartSeqNo
-     * @param filterTXEndSeqNo
+     * @param filterTimeStart
+     * @param filterTimeEnd
      * @param filterByGender
      * @param selfPay
      */
     public ExPays(int flags, Long assetKey, int balancePos, boolean backward, int payMethod, BigDecimal payMethodValue, BigDecimal amountMin, BigDecimal amountMax,
                   Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
                   BigDecimal filterBalanceMIN, BigDecimal filterBalanceMAX,
-                  int filterTXType, Long filterTXStartSeqNo, Long filterTXEndSeqNo,
+                  int filterTXType, Long filterTimeStart, Long filterTimeEnd,
                   int filterByGender, boolean selfPay) {
         this.flags = flags;
 
@@ -187,13 +187,13 @@ public class ExPays {
 
         this.filterTXType = filterTXType;
 
-        if (filterTXStartSeqNo != null) {
+        if (filterTimeStart != null) {
             this.flags |= ACTIVE_START_FLAG_MASK;
-            this.filterTXStartSeqNo = filterTXStartSeqNo;
+            this.filterTimeStart = filterTimeStart;
         }
-        if (filterTXEndSeqNo != null) {
+        if (filterTimeEnd != null) {
             this.flags |= ACTIVE_END_FLAG_MASK;
-            this.filterTXEndSeqNo = filterTXEndSeqNo;
+            this.filterTimeEnd = filterTimeEnd;
         }
 
         this.filterByGender = filterByGender;
@@ -203,13 +203,13 @@ public class ExPays {
     public ExPays(int flags, Long assetKey, int balancePos, boolean backward, int payMethod, BigDecimal payMethodValue, BigDecimal amountMin, BigDecimal amountMax,
                   Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
                   BigDecimal filterBalanceMIN, BigDecimal filterBalanceMAX,
-                  int filterTXType, Long filterTXStartSeqNo, Long filterTXEndSeqNo,
+                  int filterTXType, Long filterTimeStart, Long filterTimeEnd,
                   int filterByGender, boolean selfPay,
                   int filteredPayoutsCount, BigDecimal totalPay, long totalFeeBytes) {
         this(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceMIN, filterBalanceMAX,
-                filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
+                filterTXType, filterTimeStart, filterTimeEnd,
                 filterByGender, selfPay);
 
         this.filteredPayoutsCount = filteredPayoutsCount;
@@ -433,10 +433,10 @@ public class ExPays {
         }
 
         if (hasTXTypeFilterActiveStart()) {
-            outStream.write(Longs.toByteArray(this.filterTXStartSeqNo));
+            outStream.write(Longs.toByteArray(this.filterTimeStart));
         }
         if (hasTXTypeFilterActiveEnd()) {
-            outStream.write(Longs.toByteArray(this.filterTXEndSeqNo));
+            outStream.write(Longs.toByteArray(this.filterTimeEnd));
         }
 
         outStream.write(new byte[]{(byte) filterTXType, (byte) filterByGender, (byte) (selfPay ? 1 : 0)});
@@ -583,8 +583,8 @@ public class ExPays {
      * @param filterBalanceMoreThen
      * @param filterBalanceLessThen
      * @param filterTXType
-     * @param filterTXStartStr      as SeqNo: 123-1
-     * @param filterTXEndStr        as SeqNo: 123-1
+     * @param filterTimeStartStr      'yyyy-MM-dd hh:mm:00' or Timestamp[sec] or SeqNo: 123-1
+     * @param filterTimeXEndStr       'yyyy-MM-dd hh:mm:00' or Timestamp[sec] or SeqNo: 123-1
      * @param filterByPerson
      * @param selfPay
      * @return
@@ -593,7 +593,7 @@ public class ExPays {
                                                   int payMethod, String payMethodValue, String amountMin, String amountMax,
                                                   Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
                                                   String filterBalanceMoreThen, String filterBalanceLessThen,
-                                                  int filterTXType, String filterTXStartStr, String filterTXEndStr,
+                                                  int filterTXType, String filterTimeStartStr, String filterTimeXEndStr,
                                                   int filterByPerson, boolean selfPay) {
 
         int steep = 0;
@@ -602,8 +602,8 @@ public class ExPays {
         BigDecimal payMethodValueBG;
         BigDecimal filterBalanceMoreThenBG;
         BigDecimal filterBalanceLessThenBG;
-        Long filterTXStartSeqNo;
-        Long filterTXEndSeqNo;
+        Long filterTimeStart;
+        Long filterTimeEnd;
 
         Controller cntr = Controller.getInstance();
         BlockChain chain = cntr.getBlockChain();
@@ -619,36 +619,44 @@ public class ExPays {
             ++steep;
             filterBalanceLessThenBG = filterBalanceLessThen == null || filterBalanceLessThen.isEmpty() ? null : new BigDecimal(filterBalanceLessThen);
             ++steep;
-            if (filterTXStartStr == null || filterTXStartStr.isEmpty()) {
-                filterTXStartSeqNo = null;
+            if (filterTimeStartStr == null || filterTimeStartStr.isEmpty()) {
+                filterTimeStart = null;
             } else {
-                filterTXStartSeqNo = Transaction.parseDBRef(filterTXStartStr);
-                if (filterTXStartSeqNo == null) {
-                    try {
-                        Date parsedDate = DATE_FORMAT.parse(filterTXStartStr);
-                        Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
-                        filterTXStartSeqNo = timestamp.getTime();
-                    } catch (Exception e) {
-                        filterTXStartSeqNo = Long.parseLong(filterTXStartStr) * 1000L;
+                try {
+                    Date parsedDate = DATE_FORMAT.parse(filterTimeStartStr);
+                    Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+                    filterTimeStart = timestamp.getTime();
+                } catch (Exception e) {
+                    filterTimeStart = Transaction.parseDBRefSeqNo(filterTimeStartStr);
+                    if (filterTimeStart == null) {
+                        try {
+                            filterTimeStart = Long.parseLong(filterTimeStartStr) * 1000L;
+                        } catch (Exception e1) {
+                        }
+                    } else {
+                        filterTimeStart = Transaction.makeDBRef(chain.getHeightOnTimestampMS(filterTimeStart), 0);
                     }
-                    filterTXStartSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestampMS(filterTXStartSeqNo), 0);
                 }
             }
 
             ++steep;
-            if (filterTXEndStr == null || filterTXEndStr.isEmpty()) {
-                filterTXEndSeqNo = null;
+            if (filterTimeXEndStr == null || filterTimeXEndStr.isEmpty()) {
+                filterTimeEnd = null;
             } else {
-                filterTXEndSeqNo = Transaction.parseDBRef(filterTXEndStr);
-                if (filterTXEndSeqNo == null) {
-                    try {
-                        Date parsedDate = DATE_FORMAT.parse(filterTXEndStr);
-                        Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
-                        filterTXEndSeqNo = timestamp.getTime();
-                    } catch (Exception e) {
-                        filterTXEndSeqNo = Long.parseLong(filterTXEndStr) * 1000L;
+                try {
+                    Date parsedDate = DATE_FORMAT.parse(filterTimeXEndStr);
+                    Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+                    filterTimeEnd = timestamp.getTime();
+                } catch (Exception e) {
+                    filterTimeEnd = Transaction.parseDBRefSeqNo(filterTimeXEndStr);
+                    if (filterTimeEnd == null) {
+                        try {
+                            filterTimeEnd = Long.parseLong(filterTimeXEndStr) * 1000L;
+                        } catch (Exception e1) {
+                        }
+                    } else {
+                        filterTimeEnd = Transaction.makeDBRef(chain.getHeightOnTimestampMS(filterTimeEnd), 99999);
                     }
-                    filterTXEndSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestampMS(filterTXEndSeqNo), 99999);
                 }
             }
         } catch (Exception e) {
@@ -670,10 +678,10 @@ public class ExPays {
                     error = "Wrong filterBalanceLessThen";
                     break;
                 case 5:
-                    error = "Wrong filterTXStartStr";
+                    error = "Wrong filterTimeStartStr";
                     break;
                 case 6:
-                    error = "Wrong filterTXEndStr";
+                    error = "Wrong filterTimeXEndStr";
                     break;
                 default:
                     error = e.getMessage();
@@ -693,7 +701,7 @@ public class ExPays {
         return new Fun.Tuple2<>(new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValueBG, amountMinBG, amountMaxBG,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceMoreThenBG, filterBalanceLessThenBG,
-                filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
+                filterTXType, filterTimeStart, filterTimeEnd,
                 filterByPerson, selfPay), null);
 
     }
@@ -779,9 +787,9 @@ public class ExPays {
 
         toJson.put("filterTXType", filterTXType);
         if (hasTXTypeFilterActiveStart())
-            toJson.put("filterTXStartSeqNo", filterTXStartSeqNo);
+            toJson.put("filterTXStartSeqNo", filterTimeStart);
         if (hasTXTypeFilterActiveEnd())
-            toJson.put("filterTXEndSeqNo", filterTXEndSeqNo);
+            toJson.put("filterTXEndSeqNo", filterTimeEnd);
 
         toJson.put("filterByGender", filterByGender);
         toJson.put("selfPay", selfPay);
@@ -992,6 +1000,12 @@ public class ExPays {
             filterBySigNum *= -1;
         }
 
+
+        Long filterTimeStartSeqNo = filterTimeStart == null ? null : Transaction.makeDBRef(
+                Controller.getInstance().blockChain.getHeightOnTimestampMS(filterTimeStart), 0);
+        Long filterTimeEndSeqNo = filterTimeEnd == null ? null : Transaction.makeDBRef(
+                Controller.getInstance().blockChain.getHeightOnTimestampMS(filterTimeEnd), 0);
+
         byte[] key;
         BigDecimal balance;
         BigDecimal payout;
@@ -1071,10 +1085,10 @@ public class ExPays {
 
                 /// если задано то проверим - входит ли в в диапазон
                 // - собранные блоки учитываем? да - иначе долго будет делать поиск
-                if (filterTXType != 0 || filterTXStartSeqNo != null || filterTXEndSeqNo != null) {
+                if (filterTXType != 0 || filterTimeStartSeqNo != null || filterTimeEndSeqNo != null) {
                     iteratorUses++; // учтем для начисления комиссии за каждый созданный итератор!
                     // на счете должна быть активность в заданном диапазоне для данного типа
-                    if (!txMap.isCreatorWasActive(recipientShort, filterTXStartSeqNo, filterTXType, filterTXEndSeqNo))
+                    if (!txMap.isCreatorWasActive(recipientShort, filterTimeStartSeqNo, filterTXType, filterTimeEndSeqNo))
                         continue;
                 }
 

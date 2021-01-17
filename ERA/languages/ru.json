@@ -1115,6 +1115,7 @@
   "Payment send": "Отправлен платеж",
   "Payments": "Платежи",
   "Payouts": "Выплаты",
+  "Payouts: assetKey == filterAssetKey && balancePos == filterBalancePos for not ABSOLUTE method": "Запрещенная комбинация активов, позиций балансов и способа начисления (Актив и Позиция одинаковые, а способ не по Абсолютному значению)",
   "Payout to Self too": "Выплачивать себе так же",
   "Peers loaded from Internet : ": "Пиров загружено из Интернета : ",
   "Peers loaded from Internet with errors : ": "Пиров загружено из Интернета с ошибками : ",
