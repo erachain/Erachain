@@ -43,6 +43,8 @@ public class ExPays {
 
     public static final byte BASE_LENGTH = 4 + 3;
 
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:00");
+
     public static final int MAX_COUNT = Integer.MAX_VALUE >> 1;
     private static final byte AMOUNT_FLAG_MASK = -128;
     private static final byte AMOUNT_MIN_FLAG_MASK = 64;
@@ -66,6 +68,11 @@ public class ExPays {
     private static final byte NOT_FILTER_GENDER = -2; //
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExPays.class);
+
+    public static final String FILTER_PERS_ALL = "All";
+    public static final String FILTER_PERS_ONLY = "Only certified addresses";
+    public static final String FILTER_PERS_MAN = "Only for Men";
+    public static final String FILTER_PERS_WOMAN = "Only for Women";
 
     /**
      * 0 - version; 1..3 - flags;
@@ -219,6 +226,14 @@ public class ExPays {
         return filteredPayouts;
     }
 
+    public List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> precalcFilteredPayouts(int height, Account creator) {
+        filteredPayoutsCount = makeFilterPayList(dcSet, height, asset, creator, false);
+        if (payMethod == PAYMENT_METHOD_TOTAL) {
+            calcPayoutsForMethodTotal();
+        }
+        return filteredPayouts;
+    }
+
     public int getFilteredPayoutsCount() {
         return filteredPayoutsCount;
     }
@@ -229,6 +244,24 @@ public class ExPays {
 
     public long getTotalFeeBytes() {
         return totalFeeBytes;
+    }
+
+    public static String viewPayMethod(int mode) {
+        return "PAY_METHOD_" + mode;
+    }
+
+    public static String viewFilterPersMode(int mode) {
+        switch (mode) {
+            case 0:
+                return "All";
+            case 1:
+                return "Only certified addresses";
+            case 2:
+                return "Only for Men";
+            case 3:
+                return "Only for Women";
+        }
+        return "--";
     }
 
     public void calcTotalFeeBytes() {
@@ -570,7 +603,6 @@ public class ExPays {
         BigDecimal filterBalanceLessThenBG;
         Long filterTXStartSeqNo;
         Long filterTXEndSeqNo;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:00");
 
         Controller cntr = Controller.getInstance();
         BlockChain chain = cntr.getBlockChain();
@@ -592,7 +624,7 @@ public class ExPays {
                 filterTXStartSeqNo = Transaction.parseDBRef(filterTXStartStr);
                 if (filterTXStartSeqNo == null) {
                     try {
-                        Date parsedDate = dateFormat.parse(filterTXStartStr);
+                        Date parsedDate = DATE_FORMAT.parse(filterTXStartStr);
                         Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
                         filterTXStartSeqNo = timestamp.getTime();
                     } catch (Exception e) {
@@ -609,13 +641,13 @@ public class ExPays {
                 filterTXEndSeqNo = Transaction.parseDBRef(filterTXEndStr);
                 if (filterTXEndSeqNo == null) {
                     try {
-                        Date parsedDate = dateFormat.parse(filterTXEndStr);
+                        Date parsedDate = DATE_FORMAT.parse(filterTXEndStr);
                         Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
                         filterTXEndSeqNo = timestamp.getTime();
                     } catch (Exception e) {
                         filterTXEndSeqNo = Long.parseLong(filterTXEndStr) * 1000L;
                     }
-                    filterTXEndSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestampMS(filterTXEndSeqNo), 0);
+                    filterTXEndSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestampMS(filterTXEndSeqNo), 99999);
                 }
             }
         } catch (Exception e) {
@@ -681,10 +713,41 @@ public class ExPays {
         if (filteredPayoutsCount > 0) {
             json.put("Label_Counter", Lang.T("Counter", langObj));
             json.put("Label_Total_Amount", Lang.T("Total Amount", langObj));
-            json.put("Label_Fee_Bytes_Total", Lang.T("Fee Bytes Total", langObj));
+            json.put("Label_Additional_Fee", Lang.T("Additional Fee", langObj));
 
         }
 
+        json.put("payMethodName", Lang.T(ExPays.viewPayMethod(payMethod), langObj));
+        json.put("balancePosName", Lang.T(Account.balancePositionName(balancePos), langObj));
+        json.put("filterBalancePosName", Lang.T(Account.balancePositionName(filterBalancePos), langObj));
+        json.put("filterBalanceSideName", Lang.T(Account.balanceSideName(filterBalanceSide), langObj));
+        json.put("filterTXTypeName", Lang.T(Transaction.viewTypeName(filterTXType), langObj));
+        json.put("filterByGenderName", Lang.T(viewFilterPersMode(filterTXType), langObj));
+
+        json.put("Label_Action_for_Asset", Lang.T("Action for Asset", langObj));
+        json.put("Label_assetKey", Lang.T("Asset", langObj));
+        json.put("Label_balancePos", Lang.T("Balance Position", langObj));
+        json.put("Label_backward", Lang.T("Backward", langObj));
+
+        json.put("Label_payMethod", Lang.T("Method of calculation", langObj));
+        json.put("Label_payMethodValue", Lang.T("Value", langObj));
+        json.put("Label_amountMin", Lang.T("Minimal Payout", langObj));
+        json.put("Label_amountMax", Lang.T("Maximum Payout", langObj));
+
+        json.put("Label_Filter_By_Asset_and_Balance", Lang.T("Filter By Asset and Balance", langObj));
+        json.put("Label_balanceSide", Lang.T("Balance Side", langObj));
+        json.put("Label_filterBalanceMIN", Lang.T("More or Equal", langObj));
+        json.put("Label_filterBalanceMAX", Lang.T("Less or Equal", langObj));
+        json.put("Label_Filter_by_Actions_and_Period", Lang.T("Filter by Actions and Period", langObj));
+        json.put("Label_filterTXType", Lang.T("Action", langObj));
+        json.put("Label_filterTXStartSeqNo", Lang.T("Height start", langObj));
+        json.put("Label_filterTXEndSeqNo", Lang.T("Height end", langObj));
+
+        json.put("Label_Filter_by_Persons", Lang.T("Filter by Persons", langObj));
+        json.put("Label_filterByGender", Lang.T("Gender", langObj));
+        json.put("Label_selfPay", Lang.T("Payout to Self too", langObj));
+
+        json.put("Label_", Lang.T("", langObj));
         return json;
 
     }
@@ -697,6 +760,8 @@ public class ExPays {
         toJson.put("assetKey", assetKey);
         toJson.put("balancePos", balancePos);
         toJson.put("backward", backward);
+
+        toJson.put("payMethod", payMethod);
         toJson.put("payMethodValue", payMethodValue.toPlainString());
         if (payMethod != PAYMENT_METHOD_ABSOLUTE) {
             toJson.put("amountMin", amountMin);
@@ -724,6 +789,7 @@ public class ExPays {
             toJson.put("filteredPayoutsCount", filteredPayoutsCount);
             toJson.put("totalPay", totalPay.toPlainString());
             toJson.put("totalFeeBytes", totalFeeBytes);
+            toJson.put("totalFee", BlockChain.feeBG(totalFeeBytes).toPlainString());
         }
 
         return toJson;
@@ -883,7 +949,7 @@ public class ExPays {
         return Transaction.VALIDATE_OK;
     }
 
-    public int makeFilterPayList(Transaction transaction, boolean andValidate) {
+    public int makeFilterPayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
 
         filteredPayouts = new ArrayList<>();
 
@@ -891,9 +957,8 @@ public class ExPays {
 
         boolean onlyPerson = filterByGender > FILTER_PERSON_NONE;
         int gender = filterByGender - FILTER_PERSON_ONLY_MAN;
-        byte[] accountFrom = transaction.getCreator().getShortAddressBytes();
+        byte[] accountFrom = creator.getShortAddressBytes();
 
-        DCSet dcSet = transaction.getDCSet();
         ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
         TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
 
@@ -940,7 +1005,7 @@ public class ExPays {
             myPersonKey = null;
         }
 
-        boolean isPerson = transaction.getCreator().isPerson(dcSet, height, transaction.getCreatorPersonDuration());
+        boolean isPerson = creator.isPerson(dcSet, height);
 
         HashSet<Long> usedPersons = new HashSet<>();
         PersonCls person;
@@ -982,7 +1047,7 @@ public class ExPays {
 
                     person = (PersonCls) dcSet.getItemPersonMap().get(addressDuration.a);
 
-                    if (person.getGender() != gender) {
+                    if (gender >= 0 && person.getGender() != gender) {
                         continue;
                     }
 
@@ -1065,6 +1130,10 @@ public class ExPays {
         calcTotalFeeBytes();
         return count;
 
+    }
+
+    public int makeFilterPayList(Transaction transaction, boolean andValidate) {
+        return makeFilterPayList(transaction.getDCSet(), height, asset, transaction.getCreator(), andValidate);
     }
 
     public void processBody(Transaction rNote, boolean asOrphan, Block block) {

@@ -1254,6 +1254,10 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         try {
             String[] strA = refStr.split("\\-");
+            if (strA.length > 2)
+                // это скорее всег время типа 2020-10-11
+                return null;
+
             int height = Integer.parseInt(strA[0]);
             int seq = Integer.parseInt(strA[1]);
             byte[] ref = Ints.toByteArray(height);
