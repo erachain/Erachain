@@ -331,42 +331,22 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
      */
     public boolean isCreatorWasActive(byte[] addressShort, Long fromSeqNo, int typeTX, Long toSeqNo) {
         // на счете должна быть активность после fromSeqNo
-        if (true) {
-            try (IteratorCloseable<Long> iterator =
-                         typeTX == 0 ? getIteratorByCreator(addressShort, fromSeqNo, toSeqNo, false)
-                                 : getIteratorByAddressAndType(addressShort, typeTX, true, fromSeqNo, toSeqNo, false)) {
-                if (!iterator.hasNext())
-                    return false;
-                // если полный диаппазон задан то проверим вхождение - он может быть и отрицательным
-                if (///fromSeqNo != null &&
-                        toSeqNo != null && iterator.next() > toSeqNo) {
-                    return false;
-                }
-            } catch (IOException e) {
-                return false;
-            }
-
-            return true;
-
-        } else {
-            // OLD
-            List<Transaction> txsFind;
-            if (typeTX == 0) {
-                txsFind = getTransactionsByCreator(addressShort, fromSeqNo, 1, 0);
-            } else {
-                txsFind = getTransactionsByAddressAndType(addressShort, typeTX, true, fromSeqNo, 1, 0);
-            }
-
-            if (txsFind == null || txsFind.isEmpty())
+        try (IteratorCloseable<Long> iterator =
+                     typeTX == 0 ? getIteratorByCreator(addressShort, fromSeqNo, toSeqNo, false)
+                             : getIteratorByAddressAndType(addressShort, typeTX, true, fromSeqNo, toSeqNo, false)) {
+            if (!iterator.hasNext())
                 return false;
             // если полный диаппазон задан то проверим вхождение - он может быть и отрицательным
             if (///fromSeqNo != null &&
-                    toSeqNo != null && txsFind.get(0).getDBRef() > toSeqNo) {
+                    toSeqNo != null && iterator.next() > toSeqNo) {
                 return false;
             }
-
-            return true;
+        } catch (IOException e) {
+            return false;
         }
+
+        return true;
+
     }
 
     @Override

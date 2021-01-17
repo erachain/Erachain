@@ -113,6 +113,7 @@ public class ExPays {
     private int filteredPayoutsCount;
     private BigDecimal totalPay;
     private long totalFeeBytes;
+    private long iteratorUses;
     private int maxIndex;
     private BigDecimal maxBal;
 
@@ -265,7 +266,7 @@ public class ExPays {
     }
 
     public void calcTotalFeeBytes() {
-        totalFeeBytes = (hasFilterActive() ? 30L : 10L) * filteredPayoutsCount;
+        totalFeeBytes = 10L * filteredPayoutsCount + 5L * iteratorUses;
     }
 
     public boolean hasAmount() {
@@ -298,7 +299,7 @@ public class ExPays {
      *
      * @return
      */
-    public boolean hasFilterActive() {
+    public boolean hasFilterActives() {
         return filterTXType != 0 || hasTXTypeFilterActiveStart() || hasTXTypeFilterActiveEnd();
     }
 
@@ -848,7 +849,7 @@ public class ExPays {
                 return Transaction.INVALID_ITEM_KEY;
             } else if (this.balancePos < TransactionAmount.ACTION_SEND || this.balancePos > TransactionAmount.ACTION_SPEND) {
                 errorValue = "Payouts: balancePos out off range";
-                return Transaction.INVALID_AMOUNT;
+                return Transaction.INVALID_BALANCE_POS;
             } else if (this.payMethodValue == null || payMethodValue.signum() == 0) {
                 errorValue = "Payouts: payMethodValue == null";
                 return Transaction.INVALID_AMOUNT;
@@ -864,10 +865,10 @@ public class ExPays {
                 return Transaction.INVALID_ITEM_KEY;
             } else if (this.filterBalancePos < TransactionAmount.ACTION_SEND || this.filterBalancePos > TransactionAmount.ACTION_SPEND) {
                 errorValue = "Payouts: filterBalancePos";
-                return Transaction.INVALID_BACKWARD_ACTION;
+                return Transaction.INVALID_BALANCE_POS;
             } else if (this.filterBalanceSide < Account.BALANCE_SIDE_DEBIT || this.filterBalanceSide > Account.BALANCE_SIDE_CREDIT) {
                 errorValue = "Payouts: filterBalanceSide";
-                return Transaction.INVALID_BACKWARD_ACTION;
+                return Transaction.INVALID_BALANCE_SIDE;
             }
         }
 
@@ -878,9 +879,10 @@ public class ExPays {
 
         if (assetKey != null && filterAssetKey != null
                 && assetKey.equals(filterAssetKey)
-                && balancePos == filterBalancePos) {
+                && balancePos == filterBalancePos
+                && payMethod != PAYMENT_METHOD_ABSOLUTE) {
             // при откате невозможно тогда будет правильно рассчитать - так как съехала общая сумма
-            errorValue = "Payouts: assetKey == filterAssetKey && balancePos == filterBalancePos";
+            errorValue = "Payouts: assetKey == filterAssetKey && balancePos == filterBalancePos for not ABSOLUTE method";
             return Transaction.INVALID_TRANSFER_TYPE;
         }
 
@@ -952,6 +954,9 @@ public class ExPays {
     public int makeFilterPayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
 
         filteredPayouts = new ArrayList<>();
+
+        iteratorUses = 0L;
+        filteredPayoutsCount = 0;
 
         int scale = asset.getScale();
 
@@ -1067,6 +1072,7 @@ public class ExPays {
                 /// если задано то проверим - входит ли в в диапазон
                 // - собранные блоки учитываем? да - иначе долго будет делать поиск
                 if (filterTXType != 0 || filterTXStartSeqNo != null || filterTXEndSeqNo != null) {
+                    iteratorUses++; // учтем для начисления комиссии за каждый созданный итератор!
                     // на счете должна быть активность в заданном диапазоне для данного типа
                     if (!txMap.isCreatorWasActive(recipientShort, filterTXStartSeqNo, filterTXType, filterTXEndSeqNo))
                         continue;
@@ -1077,7 +1083,7 @@ public class ExPays {
                         isPerson, assetKey, balancePos,
                         asset)) {
                     errorValue = recipient.getAddress();
-                    return -Transaction.RECEIVER_NOT_PERSONALIZED;
+                    return (filteredPayoutsCount = -Transaction.RECEIVER_NOT_PERSONALIZED);
                 }
 
                 if (!hasAssetFilter) {
@@ -1104,7 +1110,7 @@ public class ExPays {
                 count++;
                 if (andValidate && count > MAX_COUNT) {
                     errorValue = "MAX count over: " + MAX_COUNT;
-                    return -Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR;
+                    return (filteredPayoutsCount = -Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
                 }
 
                 if (onlyPerson) {
