@@ -162,10 +162,10 @@ function statement(data) {
         output += '<h4>' + exPays.Label_Filter_by_Actions_and_Period + '</h4>';
         if (exPays.filterTXType)
             output += exPays.Label_filterTXType + ': <b>[' + exPays.filterTXType + "]" + exPays.filterTXTypeName + '</b><br>';
-        if (exPays.hasOwnProperty('filterTXStartSeqNo'))
-            output += exPays.Label_filterTXStartSeqNo + ': <b>' + exPays.filterTXStartSeqNo + '</b><br>';
-        if (exPays.hasOwnProperty('filterTXEndSeqNo'))
-            output += exPays.Label_filterTXEndSeqNo + ': <b>' + exPays.filterTXEndSeqNo + '</b><br>';
+        if (exPays.hasOwnProperty('filterTimeStart'))
+            output += exPays.Label_filterTimeStart + ': <b>' + exPays.filterTimeStart + '</b><br>';
+        if (exPays.hasOwnProperty('filterTimeEnd'))
+            output += exPays.Label_filterTimeEnd + ': <b>' + exPays.filterTimeEnd + '</b><br>';
 
         output += '<h4>' + exPays.Label_Filter_by_Persons + '</h4>';
         if (exPays.filterByGender)

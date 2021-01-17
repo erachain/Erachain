@@ -1444,6 +1444,8 @@
   "this blog is empty": "этот блог пуст",
   "This seed is the result of a Base58 encoded 256bit random key.": "Этот ключ является результатом Base58-закодированного случайного 256-битного ключа.",
   "This seed will allow you to recover your wallet if you would accidently delete the wallet file.": "Этот ключ позволит вам восстановить ваш кошелек, если вы случайно удалите файл кошелька.",
+  "Time start": "Время начала",
+  "Time end": "Время окончания",
   "Timestamp:": "Дата:",
   "Timestamp": "Дата",
   "Timestamp creation block": "Дата и время сборки блока",

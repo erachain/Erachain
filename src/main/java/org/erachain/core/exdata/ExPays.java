@@ -749,8 +749,8 @@ public class ExPays {
         json.put("Label_filterBalanceMAX", Lang.T("Less or Equal", langObj));
         json.put("Label_Filter_by_Actions_and_Period", Lang.T("Filter by Actions and Period", langObj));
         json.put("Label_filterTXType", Lang.T("Action", langObj));
-        json.put("Label_filterTXStartSeqNo", Lang.T("Height start", langObj));
-        json.put("Label_filterTXEndSeqNo", Lang.T("Height end", langObj));
+        json.put("Label_filterTimeStart", Lang.T("Time start", langObj));
+        json.put("Label_filterTimeEnd", Lang.T("Time end", langObj));
 
         json.put("Label_Filter_by_Persons", Lang.T("Filter by Persons", langObj));
         json.put("Label_filterByGender", Lang.T("Gender", langObj));
@@ -787,9 +787,9 @@ public class ExPays {
 
         toJson.put("filterTXType", filterTXType);
         if (hasTXTypeFilterActiveStart())
-            toJson.put("filterTXStartSeqNo", filterTimeStart);
+            toJson.put("filterTimeStart", filterTimeStart);
         if (hasTXTypeFilterActiveEnd())
-            toJson.put("filterTXEndSeqNo", filterTimeEnd);
+            toJson.put("filterTimeEnd", filterTimeEnd);
 
         toJson.put("filterByGender", filterByGender);
         toJson.put("selfPay", selfPay);
