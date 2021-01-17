@@ -634,7 +634,7 @@ public class ExPays {
                         } catch (Exception e1) {
                         }
                     } else {
-                        filterTimeStart = Transaction.makeDBRef(chain.getHeightOnTimestampMS(filterTimeStart), 0);
+                        filterTimeStart = Transaction.getTimestampByDBRef((filterTimeStart));
                     }
                 }
             }
@@ -655,7 +655,7 @@ public class ExPays {
                         } catch (Exception e1) {
                         }
                     } else {
-                        filterTimeEnd = Transaction.makeDBRef(chain.getHeightOnTimestampMS(filterTimeEnd), 99999);
+                        filterTimeEnd = Transaction.getTimestampByDBRef(filterTimeEnd);
                     }
                 }
             }
