@@ -124,16 +124,22 @@ public class APIItemAsset {
 
     }
 
+    static String getAssetTypesCACHE = null;
     @GET
     @Path("types")
     public String getAssetTypes() {
-        return AssetCls.typesJson().toJSONString();
+        if (getAssetTypesCACHE != null)
+            return getAssetTypesCACHE;
+        return (getAssetTypesCACHE = AssetCls.typesJson().toJSONString());
     }
 
+    static String getAssetTypesLangCACHE = null;
     @GET
     @Path("types/actions")
     public String getAssetTypesLang() {
-        return AssetCls.AssetTypesActionsJson().toJSONString();
+        if (getAssetTypesLangCACHE != null)
+            return getAssetTypesLangCACHE;
+        return (getAssetTypesLangCACHE = AssetCls.AssetTypesActionsJson().toJSONString());
     }
 
 
