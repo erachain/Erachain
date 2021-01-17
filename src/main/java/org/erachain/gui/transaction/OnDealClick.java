@@ -180,6 +180,12 @@ public class OnDealClick {
             case Transaction.WRONG_SIGNER:
                 mess = "Wrong Signer";
                 break;
+            case Transaction.INVALID_BALANCE_POS:
+                mess = "Invalid balance Position";
+                break;
+            case Transaction.INVALID_BALANCE_SIDE:
+                mess = "Invalid balance Side";
+                break;
 
             case Transaction.NAME_NOT_LOWER_CASE:
                 mess = "Name not lower case";

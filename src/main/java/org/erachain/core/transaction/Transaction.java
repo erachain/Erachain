@@ -138,6 +138,9 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public static final int WRONG_SIGNER = 55;
 
+    public static final int INVALID_BALANCE_POS = 56;
+    public static final int INVALID_BALANCE_SIDE = 57;
+
     public static final int INVALID_CLAIM_DEBT_CREATOR = 61;
 
     public static final int NOT_ENOUGH_ERA_OWN_10 = 101;
@@ -1252,17 +1255,33 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (refStr == null)
             return null;
 
+        Long seqNo = parseDBRefSeqNo(refStr);
+        if (seqNo != null)
+            return seqNo;
+
+        try {
+            return Long.parseLong(refStr);
+        } catch (Exception e1) {
+        }
+
+        return null;
+    }
+
+    public static Long parseDBRefSeqNo(String refStr) {
+        if (refStr == null)
+            return null;
+
         try {
             String[] strA = refStr.split("\\-");
+            if (strA.length > 2)
+                // это скорее всег время типа 2020-10-11
+                return null;
+
             int height = Integer.parseInt(strA[0]);
             int seq = Integer.parseInt(strA[1]);
             byte[] ref = Ints.toByteArray(height);
             return Longs.fromByteArray(Bytes.concat(ref, Ints.toByteArray(seq)));
         } catch (Exception e) {
-            try {
-                return Long.parseLong(refStr);
-            } catch (Exception e1) {
-            }
         }
         return null;
     }

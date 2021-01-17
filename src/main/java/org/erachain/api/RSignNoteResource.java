@@ -252,8 +252,8 @@ public class RSignNoteResource {
             int filterTXType = Integer.valueOf(jsonObject.getOrDefault("filterTXType", 1).toString());
             String filterGreatEqual = (String) jsonObject.get("filterGreatEqual");
             String filterLessEqual = (String) jsonObject.get("filterLessEqual");
-            String filterTXStart = (String) jsonObject.get("activeAfter");
-            String filterTXEnd = (String) jsonObject.get("activeBefore");
+            String filterTimeStart = (String) jsonObject.get("activeAfter");
+            String filterTimeEnd = (String) jsonObject.get("activeBefore");
 
             int filterPerson = Integer.valueOf(jsonObject.getOrDefault("filterPerson", 0).toString());
             boolean selfPay = Boolean.valueOf((boolean) jsonObject.getOrDefault("selfPay", true));
@@ -261,7 +261,7 @@ public class RSignNoteResource {
             Fun.Tuple2<ExPays, String> payoutsResult = ExPays.make(assetKey, position, backward, payMethod, value,
                     amountMin, amountMax, filterAssetKey, filterPos, filterSide,
                     filterGreatEqual, filterLessEqual,
-                    filterTXType, filterTXStart, filterTXEnd,
+                    filterTXType, filterTimeStart, filterTimeEnd,
                     filterPerson, selfPay);
 
             if (payoutsResult.a == null) {

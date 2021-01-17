@@ -998,12 +998,16 @@ public class BlockChain {
 
     }
 
+    public static BigDecimal feeBG(long feeLong) {
+        return BigDecimal.valueOf(feeLong * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+    }
+
     public static BigDecimal BONUS_FOR_PERSON(int height) {
 
         if (!MAIN_MODE || START_ISSUE_RIGHTS == 0 || height > START_ISSUE_RIGHTS) {
-            return BigDecimal.valueOf(5000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+            return feeBG(5000);
         } else {
-            return BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+            return feeBG(2000);
         }
     }
 
